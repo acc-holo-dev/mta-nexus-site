@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
-import type { Content } from "@nexus/domain";
+import type {
+  Content,
+  PublicationActivityEvent,
+  PublicationActivityNotificationData,
+} from "@nexus/domain";
 import { eq, inArray } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications, organizations, servers } from "../schema";
@@ -7,12 +11,27 @@ import { lockNotificationPreferencesForUsers } from "./notification-preference-l
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+const ACTIVITY_MESSAGE_EN: Record<PublicationActivityEvent, string> = {
+  created: "A publication was created in your context.",
+  edited: "The publication changed. Editorial content returned to moderation.",
+  published: "A moderator published the material.",
+  archived: "The publication was archived.",
+  restored: "The publication was restored to a draft and remains private.",
+};
+
+function withPublicationTitle(message: string, title: string) {
+  const trimmed = title.trim().slice(0, 200);
+  if (!trimmed) return message;
+  return `${message} (${trimmed})`;
+}
+
 /** Author and actual context owners receive status-only notices. At most three recipients. */
 export async function publicationNotice(
   tx: Transaction,
-  item: Pick<Content, "id" | "authorId" | "organizationId" | "serverId">,
+  item: Pick<Content, "id" | "title" | "slug" | "authorId" | "organizationId" | "serverId">,
   actorId: string | undefined,
-  event: "created" | "edited" | "published" | "archived" | "restored",
+  event: PublicationActivityEvent,
   auditId: string,
 ) {
   if (item.authorId === actorId && !item.organizationId && !item.serverId) return;
@@ -61,6 +80,14 @@ export async function publicationNotice(
     .where(inArray(notificationPreferences.userId, ids))
     .limit(3);
   const disabled = new Set(preferences.filter((row) => !row.enabled).map((row) => row.userId));
+  const data: PublicationActivityNotificationData = {
+    kind: "publication_activity",
+    event,
+    contentId: item.id,
+    contentTitle: item.title,
+    contentSlug: item.slug,
+  };
+  const message = withPublicationTitle(ACTIVITY_MESSAGE_EN[event], item.title);
   for (const recipientId of ids) {
     if (disabled.has(recipientId)) continue;
     const id = `ntf_publication_${createHash("sha256")
@@ -70,11 +97,12 @@ export async function publicationNotice(
       id,
       recipientId,
       title: "Publication activity",
-      message: `Publication ${item.id}: ${event}.`,
+      message,
       link: recipients.get(recipientId),
       type: "content",
       category: "content",
       isRead: false,
+      data,
     });
     const result = await enqueueWebPushWithRecoveryWithin(tx, id, recipientId);
     if (result.reason === "saturated" || result.reason === "error")

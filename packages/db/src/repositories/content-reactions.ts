@@ -132,6 +132,7 @@ class ContentReactionsRepository {
         .select({
           id: content.id,
           slug: content.slug,
+          title: content.title,
           status: content.status,
           type: content.type,
           authorId: content.authorId,

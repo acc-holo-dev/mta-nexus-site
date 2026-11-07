@@ -24,6 +24,49 @@ export function formatNotification(
           ? "Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены."
           : "A moderator removed your comment. Open the discussion in your workspace. Replies remain.",
     };
+  const publicationActivityMessages = (event: string): string | undefined => {
+    const messages: Record<string, string> =
+      locale === "ru"
+        ? {
+            created: "Создана публикация в вашем контексте.",
+            edited: "Публикация изменена. Статьи и новости возвращены на модерацию.",
+            published: "Модератор опубликовал материал.",
+            archived: "Публикация перенесена в архив.",
+            restored: "Публикация восстановлена в черновик и остаётся непубличной.",
+          }
+        : {
+            created: "A publication was created in your context.",
+            edited: "The publication changed. Editorial content returned to moderation.",
+            published: "A moderator published the material.",
+            archived: "The publication was archived.",
+            restored: "The publication was restored to a draft and remains private.",
+          };
+    return messages[event];
+  };
+  const withContentTitle = (message: string, title: unknown) => {
+    const trimmed = typeof title === "string" ? title.trim().slice(0, 200) : "";
+    return trimmed ? `${message} (${trimmed})` : message;
+  };
+  if (notification.data?.kind === "content_reaction") {
+    return {
+      title: locale === "ru" ? "Реакция на публикацию" : "Publication reaction",
+      message: withContentTitle(
+        locale === "ru"
+          ? "Читатель оставил реакцию на вашу публикацию."
+          : "A reader reacted to your publication.",
+        notification.data.contentTitle,
+      ),
+    };
+  }
+  if (notification.data?.kind === "publication_activity") {
+    const base = publicationActivityMessages(notification.data.event);
+    if (base) {
+      return {
+        title: locale === "ru" ? "Обновление публикации" : "Publication activity",
+        message: withContentTitle(base, notification.data.contentTitle),
+      };
+    }
+  }
   if (
     notification.title === "Publication reaction" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)
@@ -41,26 +84,13 @@ export function formatNotification(
       notification.message,
     );
   if (publication) {
-    const messages: Record<string, string> =
-      locale === "ru"
-        ? {
-            created: "Создана публикация в вашем контексте.",
-            edited: "Публикация изменена. Статьи и новости возвращены на модерацию.",
-            published: "Модератор опубликовал материал.",
-            archived: "Публикация перенесена в архив.",
-            restored: "Публикация восстановлена в черновик и остаётся непубличной.",
-          }
-        : {
-            created: "A publication was created in your context.",
-            edited: "The publication changed. Editorial content returned to moderation.",
-            published: "A moderator published the material.",
-            archived: "The publication was archived.",
-            restored: "The publication was restored to a draft and remains private.",
-          };
-    return {
-      title: locale === "ru" ? "Обновление публикации" : "Publication activity",
-      message: messages[publication[2]],
-    };
+    const message = publicationActivityMessages(publication[2]);
+    if (message) {
+      return {
+        title: locale === "ru" ? "Обновление публикации" : "Publication activity",
+        message,
+      };
+    }
   }
   const supportActivity =
     notification.title === "Support case activity" &&

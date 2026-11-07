@@ -35,8 +35,10 @@ import { db } from "../packages/db/src/client";
 import { contentReactionNotice } from "../packages/db/src/repositories/content-reaction-notice";
 import { formatNotification } from "../apps/web/src/lib/notification-copy";
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-const item = { id: "content", slug: "guide", authorId: "author" },
-  insert = () => state.queries.find((q) => q.sql.startsWith("insert"));
+const item = { id: "content", slug: "guide", title: "Guide", authorId: "author" },
+  insert = () => state.queries.find((q) => q.sql.startsWith("insert")),
+  noticeId = (params: unknown[] | undefined) =>
+    params?.find((value) => typeof value === "string" && value.startsWith("ntf_reaction_"));
 beforeEach(() => {
   vi.clearAllMocks();
   state.queries = [];
@@ -51,12 +53,19 @@ it("locks content preferences and stores a status-only notice with a safe target
     expect.arrayContaining([
       "author",
       "Publication reaction",
-      "Publication content: reaction.",
+      "A reader reacted to your publication. (Guide)",
       "/articles/guide",
+      JSON.stringify({
+        kind: "content_reaction",
+        contentId: "content",
+        contentTitle: "Guide",
+        contentSlug: "guide",
+      }),
     ]),
   );
+  expect(insert()?.params.join(" ")).not.toMatch(/Publication content:/u);
   expect(insert()?.sql).toContain("on conflict do nothing");
-  expect(state.push).toHaveBeenCalledWith(db, insert()?.params[0], "author");
+  expect(state.push).toHaveBeenCalledWith(db, noticeId(insert()?.params), "author");
 });
 it("omits self notices and respects explicitly disabled content preferences", async () => {
   await contentReactionNotice(db as unknown as Tx, item, "author");
@@ -68,12 +77,12 @@ it("omits self notices and respects explicitly disabled content preferences", as
 });
 it("uses stable actor/publication identities and skips push if already notified", async () => {
   await contentReactionNotice(db as unknown as Tx, item, "actor");
-  const id = insert()?.params[0];
+  const id = noticeId(insert()?.params);
   state.queries = [];
   state.rows = [[], []];
   state.push.mockClear();
   await contentReactionNotice(db as unknown as Tx, item, "actor");
-  expect(insert()?.params[0]).toBe(id);
+  expect(noticeId(insert()?.params)).toBe(id);
   expect(state.push).not.toHaveBeenCalled();
 });
 it("propagates inbox and intent failures while preserving inbox on optional push degradation", async () => {
@@ -85,7 +94,7 @@ it("propagates inbox and intent failures while preserving inbox on optional push
   state.rows = [[], [["notice"]]];
   state.push.mockResolvedValue({ queued: 0, reason: "error" });
   await expect(contentReactionNotice(db as unknown as Tx, item, "actor")).resolves.toBeUndefined();
-  expect(state.push).toHaveBeenCalledWith(db, insert()?.params[0], "author");
+  expect(state.push).toHaveBeenCalledWith(db, noticeId(insert()?.params), "author");
   state.rows = [[], [["notice"]]];
   state.push.mockRejectedValue(new Error("Admission intent failed"));
   await expect(contentReactionNotice(db as unknown as Tx, item, "actor")).rejects.toThrow(
@@ -95,16 +104,32 @@ it("propagates inbox and intent failures while preserving inbox on optional push
 it.each(["en", "ru"] as const)(
   "localizes the bounded persisted reaction template in %s",
   (locale) => {
-    const result = formatNotification(
+    const legacy = formatNotification(
       { title: "Publication reaction", message: "Publication content: reaction.", data: undefined },
       { approved: "", rejected: "", version: "", notes: "" },
       locale,
     );
-    expect(result.message).toBe(
+    expect(legacy.message).toBe(
       locale === "ru"
         ? "Читатель оставил реакцию на вашу публикацию."
         : "A reader reacted to your publication.",
     );
-    expect(result.message).not.toContain("content");
+    expect(legacy.message).not.toContain("content");
+    const structured = formatNotification(
+      {
+        title: "Publication reaction",
+        message: "stored",
+        data: {
+          kind: "content_reaction",
+          contentId: "content",
+          contentTitle: "Guide",
+          contentSlug: "guide",
+        },
+      },
+      { approved: "", rejected: "", version: "", notes: "" },
+      locale,
+    );
+    expect(structured.message).toContain("Guide");
+    expect(structured.message).not.toContain("content");
   },
 );

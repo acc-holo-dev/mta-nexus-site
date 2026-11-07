@@ -487,12 +487,31 @@ export interface OrganizationAccessNotificationData {
   organizationSlug: string;
 }
 
+export type PublicationActivityEvent = "created" | "edited" | "published" | "archived" | "restored";
+
+export interface PublicationActivityNotificationData {
+  kind: "publication_activity";
+  event: PublicationActivityEvent;
+  contentId: string;
+  contentTitle: string;
+  contentSlug: string;
+}
+
+export interface ContentReactionNotificationData {
+  kind: "content_reaction";
+  contentId: string;
+  contentTitle: string;
+  contentSlug: string;
+}
+
 export interface Notification {
   data?:
     | BuildReviewNotificationData
     | BuildIncidentNotificationData
     | BuildLifecycleNotificationData
     | OrganizationAccessNotificationData
+    | PublicationActivityNotificationData
+    | ContentReactionNotificationData
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData
