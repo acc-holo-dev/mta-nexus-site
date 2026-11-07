@@ -137,15 +137,31 @@ it.each(["ru", "en"] as const)(
       supportWorkspaceCopy(locale).historyExpired,
     );
     const copy = { approved: "", rejected: "", version: "", notes: "" };
-    const notice = formatNotification(
+    const legacy = formatNotification(
       { title: "Support case activity", message: `Support case ${id}: reply.`, data: undefined },
       copy,
       locale,
     );
-    expect(notice.message).not.toContain(id);
-    expect(notice.message).not.toContain("Private subject");
+    expect(legacy.message).not.toContain(id);
+    expect(legacy.message).not.toContain("Private subject");
     expect(
-      locale === "ru" ? notice.message.includes("Поддержка") : notice.message.includes("Support"),
+      locale === "ru" ? legacy.message.includes("Поддержка") : legacy.message.includes("Support"),
     ).toBe(true);
+    const structured = formatNotification(
+      {
+        title: "Support case activity",
+        message: "stored",
+        data: {
+          kind: "support_requester",
+          event: "reply",
+          caseId: id,
+          subject: "Private subject",
+        },
+      },
+      copy,
+      locale,
+    );
+    expect(structured.message).toContain("Private subject");
+    expect(structured.message).not.toContain(id);
   },
 );
