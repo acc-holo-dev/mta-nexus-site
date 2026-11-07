@@ -39,8 +39,17 @@ import { db } from "../packages/db/src/client";
 import { publicationNotice } from "../packages/db/src/repositories/publication-notice";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-const item = { id: "item", authorId: "author", organizationId: "org", serverId: undefined };
+const item = {
+  id: "item",
+  title: "Guide",
+  slug: "guide",
+  authorId: "author",
+  organizationId: "org",
+  serverId: undefined,
+};
 const inserts = () => state.queries.filter((q) => q.sql.startsWith('insert into "notifications"'));
+const noticeId = (params: unknown[]) =>
+  params.find((value) => typeof value === "string" && value.startsWith("ntf_publication_"));
 beforeEach(() => {
   vi.clearAllMocks();
   state.queries = [];
@@ -56,7 +65,19 @@ it("deduplicates original author and actual owner, excludes the actor, locks pre
   expect(state.push).toHaveBeenCalledTimes(2);
   expect(inserts()[0].params).toContain("/workspace/content/item");
   expect(inserts()[1].params).toContain("/workspace/organizations/org/content/item");
-  expect(inserts()[0].params).toContain("Publication item: edited.");
+  expect(inserts()[0].params).toContain(
+    "The publication changed. Editorial content returned to moderation. (Guide)",
+  );
+  expect(inserts()[0].params.join(" ")).not.toMatch(/Publication item:/u);
+  expect(inserts()[0].params).toContain(
+    JSON.stringify({
+      kind: "publication_activity",
+      event: "edited",
+      contentId: "item",
+      contentTitle: "Guide",
+      contentSlug: "guide",
+    }),
+  );
   expect(JSON.stringify(inserts())).not.toMatch(/body|staff|notes|ipAddress/u);
 });
 it("uses current server ownership and manager links without sending to arbitrary team members", async () => {
@@ -90,11 +111,11 @@ it("honors disabled content preferences and omits self notices", async () => {
 it("uses stable audit/recipient identities and propagates inbox failure to the authoritative transaction", async () => {
   state.rows = [[["owner"]], []];
   await publicationNotice(db as unknown as Tx, item, "owner", "published", "audit");
-  const id = inserts()[0].params[1];
+  const id = noticeId(inserts()[0].params);
   state.queries = [];
   state.rows = [[["owner"]], []];
   await publicationNotice(db as unknown as Tx, item, "owner", "published", "audit");
-  expect(inserts()[0].params[1]).toBe(id);
+  expect(noticeId(inserts()[0].params)).toBe(id);
   state.rows = [[["owner"]], []];
   state.failInbox = true;
   await expect(
@@ -109,7 +130,7 @@ it("preserves inbox on optional push errors and propagates intent failure", asyn
     publicationNotice(db as unknown as Tx, item, "owner", "archived", "audit"),
   ).resolves.toBeUndefined();
   expect(inserts()).toHaveLength(1);
-  expect(state.push).toHaveBeenCalledWith(db, inserts()[0].params[0], "author");
+  expect(state.push).toHaveBeenCalledWith(db, noticeId(inserts()[0].params), "author");
   state.rows = [[["owner"]], []];
   state.push.mockRejectedValue(new Error("Admission intent failed"));
   await expect(
@@ -136,11 +157,24 @@ it("notifies the current context owner of an author's restore using only a priva
   await publicationNotice(db as unknown as Tx, item, "author", "restored", "restore-audit");
   expect(inserts()).toHaveLength(1);
   expect(inserts()[0].params).toContain("/workspace/organizations/org/content/item");
-  expect(inserts()[0].params).toContain("Publication item: restored.");
-  const notice = { title: "Publication activity", message: "Publication item: restored." },
+  expect(inserts()[0].params).toContain(
+    "The publication was restored to a draft and remains private. (Guide)",
+  );
+  const notice = {
+      title: "Publication activity",
+      message: "The publication was restored to a draft and remains private. (Guide)",
+      data: {
+        kind: "publication_activity" as const,
+        event: "restored" as const,
+        contentId: "item",
+        contentTitle: "Guide",
+        contentSlug: "guide",
+      },
+    },
     copy = { approved: "", rejected: "", version: "", notes: "" };
   expect(formatNotification(notice, copy, "en").message).toContain("remains private");
   expect(formatNotification(notice, copy, "ru").message).toContain("остаётся непубличной");
+  expect(formatNotification(notice, copy, "en").message).toContain("Guide");
 });
 
 it("notifies the current personal server owner and never its former organization", async () => {
