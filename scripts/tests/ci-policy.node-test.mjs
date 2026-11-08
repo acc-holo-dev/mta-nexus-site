@@ -25,7 +25,7 @@ test("documentation does not trigger builds; executable docs/configuration do", 
       "AGENTS.md",
       "docs/AGENT.md",
       "planning/tasks.json",
-      "planning/tools/check_package.py",
+      "planning/milestones.json",
     ]),
     { code: false, unitOnly: false, full: false },
   );

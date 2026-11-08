@@ -34,7 +34,7 @@
 
 ## Старт для следующего агента
 
-1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Exact SHA → сначала GitHub CI для него. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
+1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Exact SHA → сначала GitHub CI для него. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started`). Markdown backlog (`docs/ROADMAP.md`, `docs/TASKS.md`, `docs/TRACEABILITY.md`) — производные представления, регенерируются из `planning/tasks.json`.
 2. Scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore`. Не вести параллельные handoff-журналы.
 3. Defaults владельца — [DECISIONS.md](DECISIONS.md). Ads/commerce/GROW пилоты не активированы. **ErrorState residual / tip-honesty micro-PRs — не приоритет**, пока владелец не вернёт эту очередь.
 4. Schema tip: **`0089_resource_qa`** (+ `0088_follow_mute_and_notify_comments`). Forward-only; не `pnpm db:generate` на живой БД. Q&A fixtures — `db:seed:historical`, не baseline seed.
