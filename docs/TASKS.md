@@ -2,6 +2,941 @@
 
 Сгенерировано из `planning/tasks.json`. Команды проверок в карточках — план проверки, а не выполненный PASS, пока `execution_state` не `done` и нет свидетельств. Читайте только выбранную задачу и её зависимости. Источники закреплены на baseline SHA. Рабочий tracker: [TRACKER.md](../planning/TRACKER.md).
 
+## OPS-09 — Подготовить private repository с реально действующей защитой main и release refs
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** github_settings.
+
+**Исходные пункты:** OPSNEW-09. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Root подтвердил public personal repository, main без protection/rulesets; тариф неизвестен. Private branch protections/rulesets доступны personal Pro, но не Free.
+
+**Результат.** После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.
+
+### Область изменений
+
+- `external: GitHub repository visibility, plan-supported branch/tag rules and required CI checks`
+
+### Приёмка
+
+- Владелец выбрал personal Pro либо иной поддерживаемый ownership/план; платная покупка/transfer не подразумевается.
+- Только после явного разрешения проверены private visibility, доступ нужных людей/ИИ и действующий main rule: PR, CI result, force/delete ограничения и явный bypass policy.
+- Release refs защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку.
+- Private environment reviewers на Pro/Team не обещаются; manual deploy остаётся отдельно.
+
+### Проверки при реализации
+
+- Read-only сверка repository visibility, effective protection/rulesets и owner-plan доступности до и после разрешённого изменения.
+- В отдельной тестовой ветке/PR проверить failed CI → merge blocked и успешный выбранный scope → корректное разрешение; не тестировать force/delete на main.
+- Сопоставить required check с существующим job name CI result в .github/workflows/ci.yml.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Требуется решение владельца о тарифе/доступах; не зависит от покупок коммерческого контура NEXUS.
+
+Release applicability: before_authorized_private_visibility_and_protection_change.
+
+### Источники
+
+- [.github/workflows/ci.yml · 619–661](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L619-L661)
+- [GitHub Docs: protected branches · 24–38](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
+- [GitHub Docs: environments · 25–44](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Permission обозначает требуемый отдельный допуск, а не выданное разрешение менять GitHub.
+- Private не делает сайт закрытым: открытая бесплатная бета сохраняется.
+- Не вводить фиктивного второго reviewer, если независимого человека нет.
+
+## OPS-11 — Принять private GHCR visibility и минимальные права доступа
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** github_settings.
+
+**Исходные пункты:** OPSNEW-11. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Нужный private package и его настройки в этой работе не инспектированы. Repo privacy и GHCR visibility независимы; новый package по умолчанию private.
+
+**Результат.** Подтвердить, что publish workflow имеет нужный доступ, а внешний consumer может только читать выбранный private package.
+
+### Область изменений
+
+- `external: GHCR package visibility, repository linkage and server read access`
+
+### Приёмка
+
+- После отдельного разрешения проверены namespace, private visibility, repository linkage/inheritance и Actions access.
+- CI использует GITHUB_TOKEN с packages:write; pull credential — classic PAT read:packages плюс read-доступ пользователя, SSO при необходимости.
+- Anonymous/unauthorized pull private image отклоняется; разрешённый reader получает approved digest и не может push/delete.
+- Срок/отзыв credential определены; токен не находится в repository/image/logs. Если package уже public, его нельзя считать закрытым после смены repo visibility.
+
+### Проверки при реализации
+
+- Read-only package settings review без вывода credentials.
+- После разрешения — scoped publish/read/negative-access probe в предназначенном для этого package; не удалять существующие release images.
+- Сверить официальный GHCR authentication/access contract; fine-grained PAT не подменяет документированный classic support.
+
+### Зависимости и условия
+
+OPS-09, OPS-10
+
+Развёртывание и хранение pull credential на production относятся к OPS-17, а не к GitHub settings task.
+
+Release applicability: before_accepting_private_registry_access_for_delivery.
+
+### Источники
+
+- [GitHub Docs: GHCR authentication · 52–88](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
+- [GitHub Docs: package visibility/access · 45–66](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
+- [GitHub Docs: public package irreversibility · 245–287](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Не включать public image для удобства pull; уже public package не переключается обратно в private.
+- Не создавать токены и не публиковать probe без отдельного внешнего разрешения.
+
+## OPS-13 — Принять эксплуатационный backup/recovery contract — F04
+
+**Фаза:** F3. **Приоритет:** P1. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** F04. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Exact-SHA CI восстановил синтетическую DB/ledger/uploads после удаления source volumes. Production schedule, off-host retention и RPO/RTO из Git не доказаны; их отсутствие не установлено.
+
+**Результат.** Подтвердить либо настроить недостающие части парного независимого резервирования и измерить реальное восстановление.
+
+### Область изменений
+
+- `docs/OPERATIONS.md`
+- `scripts/check-backup-restore.mjs`
+- `scripts/backup-restore-contract.mjs`
+
+### Приёмка
+
+- Владелец согласовал допустимую потерю данных/простой, retention, независимое расположение и доступ при потере основного хоста.
+- Сохранён согласованный recovery set DB/uploads/image/config references; проверяются свежесть и результат каждой копии.
+- На отдельно разрешённой защищённой репрезентативной копии проверены права, файлы, ledger и измеренное время/потеря данных относительно выбранных целей.
+- Evidence содержит окружение/время/результат и ответственного без данных пользователей или секретов.
+
+### Проверки при реализации
+
+- node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs — проверяют tooling, не production schedule.
+- node --test scripts/tests/production-recovery-acceptance-evidence.node-test.mjs и node scripts/check-production-recovery-acceptance-evidence.mjs — schema/template validators (#191/#267); PASS на fixture ≠ закрытие F04/OPS-13.
+- Read-only инвентаризация существующих backup jobs и последней успешной копии только после допуска к целевому окружению.
+- Отдельно разрешённый off-host restore drill; scripts/check-backup-restore.mjs не направлять на рабочие volumes, его hosted-disposable guards сохраняются.
+
+### Зависимости и условия
+
+OPS-12
+
+До хранения ценных данных/открытия трафика нужен внешний gate; конкретные RPO/RTO и storage/доступы выбирает владелец.
+
+Release applicability: before_live_acceptance.
+
+### Источники
+
+- [scripts/check-backup-restore.mjs · 350–513](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-backup-restore.mjs#L350-L513)
+- [docs/OPERATIONS.md · 989–1013](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L989-L1013)
+- [docs/OPERATIONS.md · 1017–1060](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1017-L1060)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Не заявлять заранее сроки восстановления, частоту копирования или отсутствие внешних настроек.
+- Рабочие dump/secret values не сохранять в GitHub release assets.
+
+## OPS-14 — Доказать доставку operational alerts ответственному — F03
+
+**Фаза:** F3. **Приоритет:** P1. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** F03, ARC19, ARC11. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Readiness helper подтверждает scripts/env/runbook и прямо исключает доказательство live alert routing. Health/heartbeat/progress/queue механизмы существуют; внешняя конфигурация неизвестна.
+
+**Результат.** Принять цепочку сигнал → тревога → получение ответственным → восстановление для включённых зависимостей.
+
+### Область изменений
+
+- `docs/OPERATIONS.md`
+- `scripts/observability-evidence-lib.mjs`
+- `scripts/check-web-push-worker-queue.mjs`
+- `apps/web/src/lib/observability.ts`
+
+### Приёмка
+
+- Назначены реальные owner/channel и применимые thresholds для включённых DB/scanner/workers/queue age/backup/mail и storage capacity.
+- Согласованный безопасный отказ/синтетический сигнал достигает человека с правильным объектом; recovery отражается и закрывается.
+- Различаются liveness, отсутствие progress, backlog и фактическая внешняя доставка; outbox/heartbeat не считаются получением уведомления.
+- Evidence содержит окружение, timestamps и подтверждение получения без секретов.
+
+### Проверки при реализации
+
+- node --test scripts/tests/observability-evidence-lib.node-test.mjs scripts/tests/web-push-worker-health.node-test.mjs scripts/tests/web-push-worker-queue.node-test.mjs
+- node --test scripts/tests/observability-live-drill-evidence.node-test.mjs и node scripts/check-observability-live-drill-evidence.mjs — live-drill evidence shape (#191/#262); fixture/validator PASS ≠ закрытие F03/OPS-14.
+- pnpm test:focus tests/observability.test.ts
+- pnpm observability:ready / pnpm observability:verify проверяют локальный комплект; запись readiness требует предусмотренного ACK и сама не закрывает F03.
+- Live routing/drill — только на отдельно согласованном окружении; credentials и существующие settings не читать без допуска.
+
+### Зависимости и условия
+
+OPS-04
+
+Каналы и ответственный — решение владельца; включённые optional mail/push должны совпадать с продуктовой конфигурацией, которую определяют другие треки.
+
+Release applicability: before_live_acceptance.
+
+### Источники
+
+- [scripts/observability-evidence-lib.mjs · 51–110](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/observability-evidence-lib.mjs#L51-L110)
+- [scripts/run-observability-readiness.mjs · 11–29](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/run-observability-readiness.mjs#L11-L29)
+- [apps/web/src/lib/observability.ts · 1–80](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/observability.ts#L1-L80)
+- [scripts/check-resource-release-worker-health.mjs · 7–22](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-resource-release-worker-health.mjs#L7-L22)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Не подменять live proof набором existsSync/слов в runbook.
+- Не объявлять внешнего мониторинга нет только потому, что его нет в repository.
+
+## OPS-16 — Опубликовать принятый release bundle и проверить его восстановимую доступность
+
+**Фаза:** F3. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** github_settings.
+
+**Исходные пункты:** ARC08, ARC22, OPSNEW-16. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Root подтвердил отсутствие GitHub Releases. CI image/evidence существуют, но не равны опубликованному поддерживаемому релизу.
+
+**Результат.** После явного разрешения создать private GitHub Release/tag с проверенным digest и evidence, доступными в пределах утверждённого retention.
+
+### Область изменений
+
+- `external: GitHub Release/tag/assets and retained release image/evidence bundle`
+
+### Приёмка
+
+- Release/tag указывают exact принятый SHA и полный проверенный bundle; опубликованный image имеет записанный digest/platform.
+- Full acceptance завершён для этой версии; artifacts обязательных gates не skipped/missing и проходят строгие validators.
+- Consumer с разрешённым read получает именно этот digest и bundle после удаления локального cache; предыдущий необходимый approved image сохранён.
+- Release notes описывают изменения/ограничения и migration target; статус deployed не выставлен только из-за публикации.
+
+### Проверки при реализации
+
+- Существующий CI full=true либо v*-tag policy используется только после разрешения запуска/публикации; сопоставить SHA/run attempt и все обязательные jobs.
+- Read-only сверить tag commit, Release assets/manifest и GHCR digest; pull-проверка в disposable окружении после допуска.
+- Не рассчитывать на release event, созданный GITHUB_TOKEN, как на гарантированный запуск следующего workflow; связать jobs/явный dispatch документированно при реализации.
+
+### Зависимости и условия
+
+OPS-08, OPS-10, OPS-11
+
+Кандидат должен включать принятые межтрековые изменения, которые root внесёт в release scope; эта задача не подтверждает продуктовую полноту сама.
+
+Release applicability: when_approved_release_bundle_is_published.
+
+### Источники
+
+- [.github/workflows/ci.yml · 1–21](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L1-L21)
+- [.github/workflows/ci.yml · 619–661](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L619-L661)
+- [GitHub Docs: releases · 19–39](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+- [GitHub Docs: GITHUB_TOKEN events · 33–45](https://docs.github.com/en/actions/concepts/security/github_token)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Публикация образа/tag/Release — внешняя мутация и требует отдельного допуска.
+- Source version/tag, registry digest и deployment receipt — разные идентификаторы; никакого автоматического server rollout.
+
+## OPS-17 — Выполнить отдельно одобренную установку exact digest и записать deployment receipt
+
+**Фаза:** F3. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** ARC08, ARC11, ARC12, ARC13, ARC16. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Immutable runbook уже есть; production host в аудите не инспектировался. Personal Pro не предоставляет required reviewers для private environment.
+
+**Результат.** Установить выбранный оператором готовый image на собственный сервер и подтвердить результат отдельно от CI/Release.
+
+### Область изменений
+
+- `docs/OPERATIONS.md`
+- `compose.production.yaml`
+
+### Приёмка
+
+- Оператор явно выбрал digest/manifest; Actions не имеет production deploy credential, на production нет общего self-hosted CI runner.
+- Сервер получает private image read-only pull credential; все включённые роли используют approved release без rebuild.
+- Выполнены recovery/writer/migration/readiness условия; после ingress подтверждены согласованные HTTPS smoke сценарии.
+- Записаны оператор, окружение, время, SHA, digest, schema target, предыдущая версия и исход; failed candidate не становится deployed.
+- Возврат выбран согласно schema compatibility; code rollback не объявляется DB rollback.
+
+### Проверки при реализации
+
+- Следовать существующему docs/OPERATIONS.md immutable runbook, исправленному в OPS-12, только после явного live допуска.
+- В разрешённом окружении использовать scripts/check-local-readiness.mjs и применимые worker health/queue probes; не запускать disposable CI cleanup на production.
+- HTTPS acceptance по утверждённому release scope; live credentials/пользовательские данные не выводить в evidence.
+
+### Зависимости и условия
+
+OPS-12, OPS-13, OPS-14, OPS-16, FLOW-01, FLOW-21, FLOW-22, UX-01, UX-11, UX-13, UX-15, UX-27
+
+Перед открытым пользовательским трафиком должны быть приняты cross-area gates auth/access/download/onboarding и operator-facing/legal тексты; root добавляет конкретные связи. OPS-15/OPS-18 не объявлены универсальными blockers, их роль зависит от утверждённого release scope. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно.
+
+Release applicability: when_approved_release_is_deployed_to_target_environment_after_selected_gates.
+
+### Источники
+
+- [docs/OPERATIONS.md · 1062–1086](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1062-L1086)
+- [scripts/start-production.sh · 8–16](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L8-L16)
+- [compose.production.yaml · 34–72](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L34-L72)
+- [GitHub Docs: manual workflow · 35–41](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)
+- [GitHub Docs: private reviewers · 39–54](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Workflow_dispatch — запуск обладателем write-доступа, не независимый reviewer gate.
+- Это ручное решение одного владельца/оператора, если второго человека нет.
+- Не считать review package, успешный CI или опубликованный Release разрешением выполнить эту задачу.
+
+## OPS-18 — Измерить single-instance capacity на утверждённом workload
+
+**Фаза:** F3. **Приоритет:** P2. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** ARC21. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Проект single-instance; каждый DB client pool max=10, workers имеют собственные процессы; есть process-local directory cache. CI performance regression tests содержательны, но не доказывают capacity площадки.
+
+**Результат.** Получить измеренные пределы latency/очереди/соединений/памяти/storage для выбранной конфигурации без выдуманного SLA.
+
+### Область изменений
+
+- `docs/OPERATIONS.md`
+- `docs/PROBLEMS.md`
+- `packages/db/src/client.ts`
+- `scripts/check-download-network.mjs`
+- `apps/web/src/lib/services/mta-master-directory-service.ts`
+
+### Приёмка
+
+- Владелец выбрал реалистичный workload/условия и критерии; evidence содержит actual image, inventory, объём данных и метод измерения.
+- Учтён суммарный connection budget web/workers, queue age, RSS, disk/storage read и отказ/восстановление важных зависимостей.
+- Результат показывает границу и запас либо конкретный узкий bottleneck; baseline не выдаётся за универсальную нагрузочную гарантию.
+- Если нужен рост, сформулирован отдельный follow-up с cache/rolling/migration требованиями, а не автоматически добавлен Redis.
+
+### Проверки при реализации
+
+- Существующий scripts/check-download-network.mjs и browser memory acceptance сохраняются как hosted-CI regression tests, не запускаются на production напрямую.
+- Read-only изучить реальные workload/resources только после допуска; затем отдельно согласованный нагрузочный прогон на предназначенной среде.
+- Сопоставить max=10 pool per process с числом включённых ролей; это верхняя конфигурационная оценка, не измеренные активные соединения.
+
+### Зависимости и условия
+
+OPS-04, OPS-08
+
+Workload зависит от выбранных бесплатных beta journeys; root связывает с продуктовой приёмкой. Без подтверждённой потребности multi-instance отложен.
+
+Release applicability: before_capacity_commitments_or_expanded_traffic.
+
+### Источники
+
+- [docs/ARCHITECTURE.md · 7–7](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L7-L7)
+- [packages/db/src/client.ts · 7–13](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/client.ts#L7-L13)
+- [apps/web/src/lib/services/mta-master-directory-service.ts · 395–414](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/services/mta-master-directory-service.ts#L395-L414)
+- [scripts/check-download-network.mjs · 150–200](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-download-network.mjs#L150-L200)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Не обещать число пользователей/RPS/RPO или сроки без измерения и решения.
+- Не включать horizontal scaling, cache backend или deploymentId автоматически в эту leaf-задачу.
+
+## OPS-20 — Реализовать private object-storage adapter только при выбранном триггере
+
+**Фаза:** F3. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Исходные пункты:** ARC18. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
+
+**Сейчас.** Local adapter реализован с immutable/integrity/abort checks; configured S3 fail-closed, adapter не установлен. Private object storage/signed delivery обозначены будущей целью.
+
+**Результат.** При подтверждённой необходимости добавить adapter с тем же контрактом и доказуемой миграцией объектов.
+
+### Область изменений
+
+- `packages/storage/src`
+- `packages/config/src/index.ts`
+- `tests/storage-provider.test.ts`
+- `tests/storage-atomic-upload.test.ts`
+- `tests/storage-open-file.test.ts`
+- `docs/OPERATIONS.md`
+- `docs/ARCHITECTURE.md`
+
+### Приёмка
+
+- Владелец выбрал триггер: измеренная ёмкость/доставка либо отдельный коммерческий scope; до этого local остаётся поддерживаемым путём.
+- Adapter сохраняет private access, immutable put, size/hash verification, abort и fail-closed; signed delivery не обходит текущую авторизацию/отзыв.
+- В disposable окружении пройдены contract cases и migration/restore rehearsal; ошибки не приводят к тихому fallback в local.
+- Runtime secret handling и object retention согласованы; ни платежи, ни production DRM не включены этим изменением.
+
+### Проверки при реализации
+
+- pnpm test:focus tests/storage-provider.test.ts tests/storage-atomic-upload.test.ts tests/storage-open-file.test.ts tests/storage-symlink-safety.test.ts
+- Добавить реальные adapter contract cases в существующий storage test suite; внешние bucket/credentials require отдельный допуск.
+- Миграцию рабочих объектов не выполнять до отдельной принятой репетиции и external_live задачи.
+
+### Зависимости и условия
+
+OPS-05
+
+Может быть перенесено раньше F6 при доказанной бесплатной beta capacity-потребности; решение принимает владелец. Commerce activation и его INT/security gates — другой трек. Conditional infrastructure: перенос из F6 в F3 не делает object storage обязательным для beta и не связывает его с включением коммерции.
+
+Release applicability: only_after_evidence_based_storage_trigger_and_selected_scope.
+
+### Источники
+
+- [packages/storage/src/provider-factory.ts · 7–17](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/provider-factory.ts#L7-L17)
+- [packages/storage/src/types.ts · 12–29](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/types.ts#L12-L29)
+- [packages/storage/src/local-provider.ts · 145–217](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L145-L217)
+- [docs/ARCHITECTURE.md · 44–46](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L44-L46)
+
+### Ограничения
+
+- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
+- Deferred — не beta blocker и не обещание S3 уже работает.
+- Permission local_development допускает только будущую локальную реализацию; production bucket/migration и коммерческая активация отдельно.
+
+## UX-24 — Управляемое рекламное размещение и его lifecycle
+
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Исходные пункты:** AD01, AD07. **Решения обсуждения:** NX-010, NX-011.
+
+**Сейчас.** Есть sponsored badge и fixed-price inventory target; законченный runtime placements не установлен. Конкретный lifecycle — предложение.
+
+**Результат.** Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.
+
+### Область изменений
+
+- `docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md`
+- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
+- `packages/domain/src/entities.ts`
+- `packages/db/src/schema.ts`
+- `apps/web/src/app/admin/page.tsx`
+
+### Приёмка
+
+- Slot и placement разделены; определены start/end/capacity/audience/target/moderation basis.
+- Приняты lifecycle states и допустимые переходы/причины отказа.
+- До/после срока, delisted/quarantined target не показывается; актуальная eligibility перепроверяется.
+- Concurrent booking не превышает capacity; pause имеет причину и audit.
+- Новые model/service/repository имена назначаются при принятии архитектуры, не выдаются за уже существующие.
+
+### Проверки при реализации
+
+- Review модели/переходов на fixtures до создания новой схемы.
+- После принятия: behavior checks time boundaries, concurrent capacity, pause/resume, quarantine и operator rights; новые test paths назначаются при реализации.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Concurrency/authz/audit — engineering/FLOWS; billing и commercial activation — F6.
+
+- Условно OPS-06: Если выбранная реализация добавляет или изменяет схему БД.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [packages/ui/src/platform.tsx · L80-L125](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L80-L125)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L70-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L70-L85)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
+- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L92-L102](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L92-L102)
+
+### Ограничения
+
+- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
+- Owner fixed-price direction не утверждает новые состояния/тарифы/live campaign.
+- Не включать оплату, продажу инвентаря, production campaigns или внешние trackers.
+
+## UX-25 — Рекламный слот маркирован и отделён от органики
+
+**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Исходные пункты:** AD02, AD03, AD04, AD05, AD06. **Решения обсуждения:** NX-010, NX-011.
+
+**Сейчас.** Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.
+
+**Результат.** Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.
+
+### Область изменений
+
+- `packages/ui/src/platform.tsx`
+- `apps/web/src/app/page.tsx`
+- `apps/web/src/app/market/page.tsx`
+- `apps/web/src/app/servers/page.tsx`
+- `apps/web/src/app/discover/page.tsx`
+- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
+
+### Приёмка
+
+- Реклама/Sponsored и рекламодатель понятны до клика в RU/EN; editorial/platform announcement названы иначе.
+- Paid insertion не меняет organic score/order/real metrics/trust; dedup/frequency имеют явный контракт.
+- Согласованы Home/catalog/mobile positions; не перекрыты search/navigation/primary action/download.
+- No-fill/expired/error/ineligible оставляют страницу рабочей; late load не сдвигает кнопку под пальцем.
+- Предложенный запрет ads в auth/recovery/security/report/acquisition confirmation/admin принят либо заменён явной матрицей.
+
+### Проверки при реализации
+
+- Fixture behavior check fill/no-fill/delay/error/expired/ineligible: narrow/desktop, keyboard, themes.
+- Проверка одинакового organic order до/после placement и отсутствия paid trust effects.
+
+### Зависимости и условия
+
+UX-02, UX-24
+
+Модель placement/eligibility — UX-24; внешнее включение имеет отдельный gate.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [packages/ui/src/platform.tsx · L121-L125](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L121-L125)
+- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L47-L58](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L47-L58)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L74-L81](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L74-L81)
+- [apps/web/src/app/page.tsx · L35-L75](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L35-L75)
+- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L35-L58](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L35-L58)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L93-L101](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L93-L101)
+
+### Ограничения
+
+- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
+- Позиция после первой полезной секции — proposal.
+- Sponsored не означает identity/clean build/качество; такие исходы не продаются.
+
+## UX-26 — Причины показа контроль рекламы и честные измерения
+
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Исходные пункты:** AD08, AD09. **Решения обсуждения:** NX-010, NX-011.
+
+**Сейчас.** Opt-out/explainability — принятые направления; hide/report ads и единицы рекламных измерений ещё не реализованы.
+
+**Результат.** Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.
+
+### Область изменений
+
+- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
+- `docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md`
+- `apps/web/src/app/settings/page.tsx`
+- `apps/web/src/app/admin/page.tsx`
+
+### Приёмка
+
+- Why shown объясняет допустимый тип причины без private/anti-abuse signals.
+- Opt-out даёт contextual/explicit-filter опыт без behavioral-profile ranking.
+- Hidden placement не возвращается немедленно; report привязан к placement/target без чужих данных.
+- Отдача слота, видимый показ, клик и полезное действие различены; определены period/dedup/internal traffic/unknown.
+- Ad report не меняет organic reputation и не доказывает выполнение обязательств наличием слота.
+
+### Проверки при реализации
+
+- Review privacy/event schema и единиц измерения до telemetry.
+- Local behavior check opt-out/hide/report/unknown states.
+- Controlled event fixtures: dedup/internal traffic после принятия модели.
+
+### Зависимости и условия
+
+UX-24, UX-25
+
+Privacy retention/moderation/metrics — соответствующие domain owners; коммерческие обязательства не задаёт UI.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L60-L91](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L60-L91)
+- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
+- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L93-L102](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L93-L102)
+
+### Ограничения
+
+- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
+- Не устанавливать сторонний tracking и не делать live experiment без разрешения.
+- Цены/гарантии/рост эффективности не выводятся из макета.
+
+## GROW-02 — Подготовить ограниченный пилот поддерживаемых стартовых подборок
+
+**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET02. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Частные коллекции уже существуют; редакционные проверенные наборы требуют содержания и ответственного.
+
+**Результат.** Помочь новому владельцу решить одну настоящую задачу с понятными версиями и ограничениями.
+
+### Область изменений
+
+- `docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md`
+- `planned: editorial starter collection specifications`
+
+### Приёмка
+
+- Выбраны ограниченные темы и редактор, указан источник каждого ресурса и дата проверки.
+- Порядок действий и ограничения понятны; работоспособность всей связки подтверждается отдельной проверкой.
+- Редакционный/перенесённый материал помечен, устаревание и предложенное исправление видны.
+- Проверяется решённая задача пользователя и время сопровождения, а не число созданных коллекций.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-03 — Проверить формат Lua-мастерской и очереди помощи
+
+**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET03. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Публикации и обсуждения доступны; регулярный формат и дежурная очередь ещё не запущены этим планом.
+
+**Результат.** Получать воспроизводимые решения вопросов и оставлять полезный материал следующим читателям.
+
+### Область изменений
+
+- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
+- `planned: workshop brief and outcome template`
+
+### Приёмка
+
+- Заранее определены ведущий, конечный scope, формат окружения/кода, предел часов и порядок зависших вопросов.
+- Автор вопроса может подтвердить результат; примеры не раскрывают секреты и чужие приватные файлы.
+- После пилота есть решения/памятка и фактическая нагрузка; отсутствие результата не скрыто числом комментариев.
+- Для ручного пилота не требуется строить новый forum/calendar; приглашения не отправляются без поручения.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-04 — Проверить один игровой или тестовый вечер
+
+**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET04. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Серверы и контент дают основу; полный calendar/events runtime не предполагается готовым.
+
+**Результат.** Проверить повторяемость участия до создания крупной событийной подсистемы.
+
+### Область изменений
+
+- `docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md`
+- `planned: event pilot brief`
+
+### Приёмка
+
+- У формата есть реальный host, условия участия, ограниченная цель и процедура отмены/переноса.
+- RSVP/переход отделён от подтверждения участия; источник подтверждения прозрачен.
+- Зафиксирован результат, жалобы, время host и возможность повторить цикл без постоянных личных напоминаний.
+- Автоматический календарь, push-подписки и вознаграждения не включаются незаметно в ручной пилот.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-05 — Провести ограниченный клуб тестировщиков
+
+**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET05. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Выбор сборок и обсуждения можно использовать; matchmaking и QA-service не реализуются по умолчанию.
+
+**Результат.** Автор получает воспроизводимый отчёт, тестер — обратную связь о принятии и исправлении.
+
+### Область изменений
+
+- `docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md`
+- `planned: test request and report templates`
+
+### Приёмка
+
+- Запрос содержит версию, окружение, несколько наблюдаемых сценариев, размер группы и конечный срок.
+- Отчёт отличает воспроизведено/не воспроизведено/исправлено; автор отвечает на принятый вклад.
+- Пилот имеет лимит нагрузки и право закончиться; нет обязательства бесплатной постоянной QA-поддержки.
+- Признание вклада не даёт автоматически staff/security прав и не награждает число кликов.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-06 — Проверить доску реальных потребностей без полноценной биржи
+
+**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET06. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Есть контент и обсуждения; отдельная структурированная demand board — новая возможность.
+
+**Результат.** Отличить реальную повторяющуюся проблему от голосования за абстрактную идею.
+
+### Область изменений
+
+- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
+- `planned: demand brief and resolution fields`
+
+### Приёмка
+
+- Карточка содержит задачу, существующий обходной путь и критерий результата.
+- Отклик/прототип/готовый ресурс привязан к потребности; закрытие ведёт к результату.
+- Голос означает интерес, не платёжеспособный спрос, контракт или обязанность автора.
+- Начало возможно вручную поверх контента; оплата/escrow/заказы остаются отдельным решением.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-07 — Проверить devlog и добровольный редакционный дайджест
+
+**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET07. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Публикации, follows и уведомления уже существуют; новый дайджест не должен дублировать их бесконтрольно.
+
+**Результат.** Дать конкретный повод вернуться к релизу, решению или событию с понятным следующим действием.
+
+### Область изменений
+
+- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
+- `docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md`
+- `planned: digest pilot specification`
+
+### Приёмка
+
+- Devlog связан с настоящим изменением или обратной связью; пустой bump не становится активностью.
+- Дайджест добровольный, имеет отписку и предпочтения; пустой/повторный выпуск не отправляется.
+- Security уведомления не смешаны с экспериментом; существующие category/mute настройки соблюдены.
+- Результат оценивается по полезному возврату и нагрузке/отпискам; opens/CTR — только часть воронки.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+- Условно FLOW-09: При добавлении новой доставки digest через существующие notification channels.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-08 — Описать версионированный набор ресурсов для сервера
+
+**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** 2026-11-01: local proposal draft at docs/SERVER-PACK-SPEC.md (manual snapshot shape, non-goals, sample probe). Still blocked on GROW-02 pilot selection; no runtime/schema.
+
+**Исходные пункты:** RET08. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Collection manifest содержит product IDs; точные build/version и проверка совместного запуска — отдельный контракт.
+
+**Результат.** Получить воспроизводимый snapshot набора, не переписывая уже имеющиеся коллекции и выбор версии.
+
+### Область изменений
+
+- `docs/SERVER-PACK-SPEC.md`
+- `packages/domain/src/library-collections.ts`
+- `planned: versioned server pack specification`
+
+### Приёмка
+
+- Snapshot хранит точные версии, конфигурацию/порядок, автора, дату и результаты проверки.
+- Self-declared окружение не представлено автоматическим обнаружением; pin меняется только явным действием.
+- Права на каждый файл проверяются отдельно; snapshot не передаёт право перепубликовать архивы.
+- Проверено, что небольшой ручной формат полезен, прежде чем строить install-agent или auto-update.
+
+### Проверки при реализации
+
+- Использовать фактические выводы завершённого GROW-02 как входные требования.
+- Проверить образец snapshot двух ресурсов: exact build identity, права доступа, явное обновление pin, устаревшее окружение и отсутствие файлов, на перепубликацию которых нет права.
+- Смысловая проверка спецификации; будущая установка/автообновление не выдаются за выполненный пилот.
+
+### Зависимости и условия
+
+GROW-02
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+- Условно OPS-06: Если выбранная реализация добавляет или изменяет схему БД.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
+## GROW-09 — Проверить публичные кейсы и признание полезного вклада
+
+**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** external_live.
+
+**Исходные пункты:** RET09. **Решения обсуждения:** NX-009, NX-011.
+
+**Сейчас.** Профили/публикации есть; отдельная модель подтверждённого вклада — новая продуктовая работа.
+
+**Результат.** Показать результат работы автора или помощника с проверяемым основанием и согласием на публичность.
+
+### Область изменений
+
+- `docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md`
+- `docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md`
+- `planned: portfolio case and contribution evidence templates`
+
+### Приёмка
+
+- Кейс содержит задачу, окружение, сделанное и результат; самоотчёт явно обозначен.
+- Признание ссылается на конкретного получателя пользы; self/team credit отделён, возможны исправление и обжалование.
+- Нет XP-валюты за клики/посты, покупки verification или переноса популярности в безопасность файла.
+- Измеряются повторный качественный вклад и время проверки, а не число выданных значков.
+
+### Проверки при реализации
+
+- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
+- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
+
+### Зависимости и условия
+
+GROW-01
+
+Сначала выбрать один пилот; перечисление не является командой запустить все механики.
+
+Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
+
+### Источники
+
+- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
+- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
+
+### Ограничения
+
+- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
+- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
+
 ## DOC-01 — Зафиксировать baseline решений и карту всех документов
 
 **Фаза:** F0. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
@@ -703,54 +1638,6 @@ Release applicability: before_publishing_verified_release_bundle.
 - Схема/сборщик manifest — новая работа, не уже реализованная возможность.
 - Retention длительность и место не придумывать; рабочие backups и secrets не класть в release assets.
 
-## OPS-09 — Подготовить private repository с реально действующей защитой main и release refs
-
-**Фаза:** F1. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** github_settings.
-
-**Исходные пункты:** OPSNEW-09. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Root подтвердил public personal repository, main без protection/rulesets; тариф неизвестен. Private branch protections/rulesets доступны personal Pro, но не Free.
-
-**Результат.** После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.
-
-### Область изменений
-
-- `external: GitHub repository visibility, plan-supported branch/tag rules and required CI checks`
-
-### Приёмка
-
-- Владелец выбрал personal Pro либо иной поддерживаемый ownership/план; платная покупка/transfer не подразумевается.
-- Только после явного разрешения проверены private visibility, доступ нужных людей/ИИ и действующий main rule: PR, CI result, force/delete ограничения и явный bypass policy.
-- Release refs защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку.
-- Private environment reviewers на Pro/Team не обещаются; manual deploy остаётся отдельно.
-
-### Проверки при реализации
-
-- Read-only сверка repository visibility, effective protection/rulesets и owner-plan доступности до и после разрешённого изменения.
-- В отдельной тестовой ветке/PR проверить failed CI → merge blocked и успешный выбранный scope → корректное разрешение; не тестировать force/delete на main.
-- Сопоставить required check с существующим job name CI result в .github/workflows/ci.yml.
-
-### Зависимости и условия
-
-Без обязательных task dependencies.
-
-Требуется решение владельца о тарифе/доступах; не зависит от покупок коммерческого контура NEXUS.
-
-Release applicability: before_authorized_private_visibility_and_protection_change.
-
-### Источники
-
-- [.github/workflows/ci.yml · 619–661](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L619-L661)
-- [GitHub Docs: protected branches · 24–38](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
-- [GitHub Docs: environments · 25–44](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Permission обозначает требуемый отдельный допуск, а не выданное разрешение менять GitHub.
-- Private не делает сайт закрытым: открытая бесплатная бета сохраняется.
-- Не вводить фиктивного второго reviewer, если независимого человека нет.
-
 ## OPS-10 — Подготовить trusted GHCR publish workflow без повторной сборки
 
 **Фаза:** F1. **Приоритет:** P2. **Решение:** proposal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
@@ -808,53 +1695,6 @@ Release applicability: before_enabling_trusted_ghcr_publication.
 - Не давать write/deploy token всему workflow.
 - Не считать workflow_dispatch независимым reviewer approval; publication и server deployment различны.
 
-## OPS-11 — Принять private GHCR visibility и минимальные права доступа
-
-**Фаза:** F1. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** github_settings.
-
-**Исходные пункты:** OPSNEW-11. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Нужный private package и его настройки в этой работе не инспектированы. Repo privacy и GHCR visibility независимы; новый package по умолчанию private.
-
-**Результат.** Подтвердить, что publish workflow имеет нужный доступ, а внешний consumer может только читать выбранный private package.
-
-### Область изменений
-
-- `external: GHCR package visibility, repository linkage and server read access`
-
-### Приёмка
-
-- После отдельного разрешения проверены namespace, private visibility, repository linkage/inheritance и Actions access.
-- CI использует GITHUB_TOKEN с packages:write; pull credential — classic PAT read:packages плюс read-доступ пользователя, SSO при необходимости.
-- Anonymous/unauthorized pull private image отклоняется; разрешённый reader получает approved digest и не может push/delete.
-- Срок/отзыв credential определены; токен не находится в repository/image/logs. Если package уже public, его нельзя считать закрытым после смены repo visibility.
-
-### Проверки при реализации
-
-- Read-only package settings review без вывода credentials.
-- После разрешения — scoped publish/read/negative-access probe в предназначенном для этого package; не удалять существующие release images.
-- Сверить официальный GHCR authentication/access contract; fine-grained PAT не подменяет документированный classic support.
-
-### Зависимости и условия
-
-OPS-09, OPS-10
-
-Развёртывание и хранение pull credential на production относятся к OPS-17, а не к GitHub settings task.
-
-Release applicability: before_accepting_private_registry_access_for_delivery.
-
-### Источники
-
-- [GitHub Docs: GHCR authentication · 52–88](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
-- [GitHub Docs: package visibility/access · 45–66](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
-- [GitHub Docs: public package irreversibility · 245–287](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Не включать public image для удобства pull; уже public package не переключается обратно в private.
-- Не создавать токены и не публиковать probe без отдельного внешнего разрешения.
-
 ## OPS-12 — Исправить maintenance writer inventory и порядок миграции — F05
 
 **Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
@@ -909,109 +1749,6 @@ Release applicability: before_using_maintenance_recipe.
 - Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
 - Известный F05 — не доказательство наблюдавшейся потери данных.
 - Не использовать down --volumes, prune или seed на рабочем сервере.
-
-## OPS-13 — Принять эксплуатационный backup/recovery contract — F04
-
-**Фаза:** F3. **Приоритет:** P1. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** F04. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Exact-SHA CI восстановил синтетическую DB/ledger/uploads после удаления source volumes. Production schedule, off-host retention и RPO/RTO из Git не доказаны; их отсутствие не установлено.
-
-**Результат.** Подтвердить либо настроить недостающие части парного независимого резервирования и измерить реальное восстановление.
-
-### Область изменений
-
-- `docs/OPERATIONS.md`
-- `scripts/check-backup-restore.mjs`
-- `scripts/backup-restore-contract.mjs`
-
-### Приёмка
-
-- Владелец согласовал допустимую потерю данных/простой, retention, независимое расположение и доступ при потере основного хоста.
-- Сохранён согласованный recovery set DB/uploads/image/config references; проверяются свежесть и результат каждой копии.
-- На отдельно разрешённой защищённой репрезентативной копии проверены права, файлы, ledger и измеренное время/потеря данных относительно выбранных целей.
-- Evidence содержит окружение/время/результат и ответственного без данных пользователей или секретов.
-
-### Проверки при реализации
-
-- node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs — проверяют tooling, не production schedule.
-- node --test scripts/tests/production-recovery-acceptance-evidence.node-test.mjs и node scripts/check-production-recovery-acceptance-evidence.mjs — schema/template validators (#191/#267); PASS на fixture ≠ закрытие F04/OPS-13.
-- Read-only инвентаризация существующих backup jobs и последней успешной копии только после допуска к целевому окружению.
-- Отдельно разрешённый off-host restore drill; scripts/check-backup-restore.mjs не направлять на рабочие volumes, его hosted-disposable guards сохраняются.
-
-### Зависимости и условия
-
-OPS-12
-
-До хранения ценных данных/открытия трафика нужен внешний gate; конкретные RPO/RTO и storage/доступы выбирает владелец.
-
-Release applicability: before_live_acceptance.
-
-### Источники
-
-- [scripts/check-backup-restore.mjs · 350–513](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-backup-restore.mjs#L350-L513)
-- [docs/OPERATIONS.md · 989–1013](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L989-L1013)
-- [docs/OPERATIONS.md · 1017–1060](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1017-L1060)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Не заявлять заранее сроки восстановления, частоту копирования или отсутствие внешних настроек.
-- Рабочие dump/secret values не сохранять в GitHub release assets.
-
-## OPS-14 — Доказать доставку operational alerts ответственному — F03
-
-**Фаза:** F3. **Приоритет:** P1. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** F03, ARC19, ARC11. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Readiness helper подтверждает scripts/env/runbook и прямо исключает доказательство live alert routing. Health/heartbeat/progress/queue механизмы существуют; внешняя конфигурация неизвестна.
-
-**Результат.** Принять цепочку сигнал → тревога → получение ответственным → восстановление для включённых зависимостей.
-
-### Область изменений
-
-- `docs/OPERATIONS.md`
-- `scripts/observability-evidence-lib.mjs`
-- `scripts/check-web-push-worker-queue.mjs`
-- `apps/web/src/lib/observability.ts`
-
-### Приёмка
-
-- Назначены реальные owner/channel и применимые thresholds для включённых DB/scanner/workers/queue age/backup/mail и storage capacity.
-- Согласованный безопасный отказ/синтетический сигнал достигает человека с правильным объектом; recovery отражается и закрывается.
-- Различаются liveness, отсутствие progress, backlog и фактическая внешняя доставка; outbox/heartbeat не считаются получением уведомления.
-- Evidence содержит окружение, timestamps и подтверждение получения без секретов.
-
-### Проверки при реализации
-
-- node --test scripts/tests/observability-evidence-lib.node-test.mjs scripts/tests/web-push-worker-health.node-test.mjs scripts/tests/web-push-worker-queue.node-test.mjs
-- node --test scripts/tests/observability-live-drill-evidence.node-test.mjs и node scripts/check-observability-live-drill-evidence.mjs — live-drill evidence shape (#191/#262); fixture/validator PASS ≠ закрытие F03/OPS-14.
-- pnpm test:focus tests/observability.test.ts
-- pnpm observability:ready / pnpm observability:verify проверяют локальный комплект; запись readiness требует предусмотренного ACK и сама не закрывает F03.
-- Live routing/drill — только на отдельно согласованном окружении; credentials и существующие settings не читать без допуска.
-
-### Зависимости и условия
-
-OPS-04
-
-Каналы и ответственный — решение владельца; включённые optional mail/push должны совпадать с продуктовой конфигурацией, которую определяют другие треки.
-
-Release applicability: before_live_acceptance.
-
-### Источники
-
-- [scripts/observability-evidence-lib.mjs · 51–110](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/observability-evidence-lib.mjs#L51-L110)
-- [scripts/run-observability-readiness.mjs · 11–29](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/run-observability-readiness.mjs#L11-L29)
-- [apps/web/src/lib/observability.ts · 1–80](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/observability.ts#L1-L80)
-- [scripts/check-resource-release-worker-health.mjs · 7–22](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-resource-release-worker-health.mjs#L7-L22)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Не подменять live proof набором existsSync/слов в runbook.
-- Не объявлять внешнего мониторинга нет только потому, что его нет в repository.
 
 ## OPS-15 — Выравнять ограничения worker-контейнеров без изменения доставки
 
@@ -1069,158 +1806,6 @@ Release applicability: when_accepting_selected_worker_runtime_constraints.
 - Не распространять read_only на web/DB без анализа их writable-путей.
 - Не менять auth/notification semantics и не вводить внешнюю очередь.
 
-## OPS-16 — Опубликовать принятый release bundle и проверить его восстановимую доступность
-
-**Фаза:** F3. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** github_settings.
-
-**Исходные пункты:** ARC08, ARC22, OPSNEW-16. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Root подтвердил отсутствие GitHub Releases. CI image/evidence существуют, но не равны опубликованному поддерживаемому релизу.
-
-**Результат.** После явного разрешения создать private GitHub Release/tag с проверенным digest и evidence, доступными в пределах утверждённого retention.
-
-### Область изменений
-
-- `external: GitHub Release/tag/assets and retained release image/evidence bundle`
-
-### Приёмка
-
-- Release/tag указывают exact принятый SHA и полный проверенный bundle; опубликованный image имеет записанный digest/platform.
-- Full acceptance завершён для этой версии; artifacts обязательных gates не skipped/missing и проходят строгие validators.
-- Consumer с разрешённым read получает именно этот digest и bundle после удаления локального cache; предыдущий необходимый approved image сохранён.
-- Release notes описывают изменения/ограничения и migration target; статус deployed не выставлен только из-за публикации.
-
-### Проверки при реализации
-
-- Существующий CI full=true либо v*-tag policy используется только после разрешения запуска/публикации; сопоставить SHA/run attempt и все обязательные jobs.
-- Read-only сверить tag commit, Release assets/manifest и GHCR digest; pull-проверка в disposable окружении после допуска.
-- Не рассчитывать на release event, созданный GITHUB_TOKEN, как на гарантированный запуск следующего workflow; связать jobs/явный dispatch документированно при реализации.
-
-### Зависимости и условия
-
-OPS-08, OPS-10, OPS-11
-
-Кандидат должен включать принятые межтрековые изменения, которые root внесёт в release scope; эта задача не подтверждает продуктовую полноту сама.
-
-Release applicability: when_approved_release_bundle_is_published.
-
-### Источники
-
-- [.github/workflows/ci.yml · 1–21](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L1-L21)
-- [.github/workflows/ci.yml · 619–661](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L619-L661)
-- [GitHub Docs: releases · 19–39](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
-- [GitHub Docs: GITHUB_TOKEN events · 33–45](https://docs.github.com/en/actions/concepts/security/github_token)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Публикация образа/tag/Release — внешняя мутация и требует отдельного допуска.
-- Source version/tag, registry digest и deployment receipt — разные идентификаторы; никакого автоматического server rollout.
-
-## OPS-17 — Выполнить отдельно одобренную установку exact digest и записать deployment receipt
-
-**Фаза:** F3. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** ARC08, ARC11, ARC12, ARC13, ARC16. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Immutable runbook уже есть; production host в аудите не инспектировался. Personal Pro не предоставляет required reviewers для private environment.
-
-**Результат.** Установить выбранный оператором готовый image на собственный сервер и подтвердить результат отдельно от CI/Release.
-
-### Область изменений
-
-- `docs/OPERATIONS.md`
-- `compose.production.yaml`
-
-### Приёмка
-
-- Оператор явно выбрал digest/manifest; Actions не имеет production deploy credential, на production нет общего self-hosted CI runner.
-- Сервер получает private image read-only pull credential; все включённые роли используют approved release без rebuild.
-- Выполнены recovery/writer/migration/readiness условия; после ingress подтверждены согласованные HTTPS smoke сценарии.
-- Записаны оператор, окружение, время, SHA, digest, schema target, предыдущая версия и исход; failed candidate не становится deployed.
-- Возврат выбран согласно schema compatibility; code rollback не объявляется DB rollback.
-
-### Проверки при реализации
-
-- Следовать существующему docs/OPERATIONS.md immutable runbook, исправленному в OPS-12, только после явного live допуска.
-- В разрешённом окружении использовать scripts/check-local-readiness.mjs и применимые worker health/queue probes; не запускать disposable CI cleanup на production.
-- HTTPS acceptance по утверждённому release scope; live credentials/пользовательские данные не выводить в evidence.
-
-### Зависимости и условия
-
-OPS-12, OPS-13, OPS-14, OPS-16, FLOW-01, FLOW-21, FLOW-22, UX-01, UX-11, UX-13, UX-15, UX-27
-
-Перед открытым пользовательским трафиком должны быть приняты cross-area gates auth/access/download/onboarding и operator-facing/legal тексты; root добавляет конкретные связи. OPS-15/OPS-18 не объявлены универсальными blockers, их роль зависит от утверждённого release scope. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно. Связанный core/security/browser gate включён в общий beta acceptance; принятие следующего SHA подтверждается отдельно.
-
-Release applicability: when_approved_release_is_deployed_to_target_environment_after_selected_gates.
-
-### Источники
-
-- [docs/OPERATIONS.md · 1062–1086](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1062-L1086)
-- [scripts/start-production.sh · 8–16](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L8-L16)
-- [compose.production.yaml · 34–72](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L34-L72)
-- [GitHub Docs: manual workflow · 35–41](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)
-- [GitHub Docs: private reviewers · 39–54](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Workflow_dispatch — запуск обладателем write-доступа, не независимый reviewer gate.
-- Это ручное решение одного владельца/оператора, если второго человека нет.
-- Не считать review package, успешный CI или опубликованный Release разрешением выполнить эту задачу.
-
-## OPS-18 — Измерить single-instance capacity на утверждённом workload
-
-**Фаза:** F3. **Приоритет:** P2. **Решение:** verification_required. **Очередь:** external_gate. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** ARC21. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Проект single-instance; каждый DB client pool max=10, workers имеют собственные процессы; есть process-local directory cache. CI performance regression tests содержательны, но не доказывают capacity площадки.
-
-**Результат.** Получить измеренные пределы latency/очереди/соединений/памяти/storage для выбранной конфигурации без выдуманного SLA.
-
-### Область изменений
-
-- `docs/OPERATIONS.md`
-- `docs/PROBLEMS.md`
-- `packages/db/src/client.ts`
-- `scripts/check-download-network.mjs`
-- `apps/web/src/lib/services/mta-master-directory-service.ts`
-
-### Приёмка
-
-- Владелец выбрал реалистичный workload/условия и критерии; evidence содержит actual image, inventory, объём данных и метод измерения.
-- Учтён суммарный connection budget web/workers, queue age, RSS, disk/storage read и отказ/восстановление важных зависимостей.
-- Результат показывает границу и запас либо конкретный узкий bottleneck; baseline не выдаётся за универсальную нагрузочную гарантию.
-- Если нужен рост, сформулирован отдельный follow-up с cache/rolling/migration требованиями, а не автоматически добавлен Redis.
-
-### Проверки при реализации
-
-- Существующий scripts/check-download-network.mjs и browser memory acceptance сохраняются как hosted-CI regression tests, не запускаются на production напрямую.
-- Read-only изучить реальные workload/resources только после допуска; затем отдельно согласованный нагрузочный прогон на предназначенной среде.
-- Сопоставить max=10 pool per process с числом включённых ролей; это верхняя конфигурационная оценка, не измеренные активные соединения.
-
-### Зависимости и условия
-
-OPS-04, OPS-08
-
-Workload зависит от выбранных бесплатных beta journeys; root связывает с продуктовой приёмкой. Без подтверждённой потребности multi-instance отложен.
-
-Release applicability: before_capacity_commitments_or_expanded_traffic.
-
-### Источники
-
-- [docs/ARCHITECTURE.md · 7–7](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L7-L7)
-- [packages/db/src/client.ts · 7–13](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/client.ts#L7-L13)
-- [apps/web/src/lib/services/mta-master-directory-service.ts · 395–414](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/services/mta-master-directory-service.ts#L395-L414)
-- [scripts/check-download-network.mjs · 150–200](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-download-network.mjs#L150-L200)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Не обещать число пользователей/RPS/RPO или сроки без измерения и решения.
-- Не включать horizontal scaling, cache backend или deploymentId автоматически в эту leaf-задачу.
-
 ## OPS-19 — Уточнить контракт human resource versions для сравнения обновлений
 
 **Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
@@ -1273,60 +1858,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 - Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
 - Не переименовывать задним числом опубликованные build IDs или bytes.
 - Не утверждать отсутствие любой нормализации во всех путях; задача уточняет единый контракт.
-
-## OPS-20 — Реализовать private object-storage adapter только при выбранном триггере
-
-**Фаза:** F3. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** local_development.
-
-**Исходные пункты:** ARC18. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
-
-**Сейчас.** Local adapter реализован с immutable/integrity/abort checks; configured S3 fail-closed, adapter не установлен. Private object storage/signed delivery обозначены будущей целью.
-
-**Результат.** При подтверждённой необходимости добавить adapter с тем же контрактом и доказуемой миграцией объектов.
-
-### Область изменений
-
-- `packages/storage/src`
-- `packages/config/src/index.ts`
-- `tests/storage-provider.test.ts`
-- `tests/storage-atomic-upload.test.ts`
-- `tests/storage-open-file.test.ts`
-- `docs/OPERATIONS.md`
-- `docs/ARCHITECTURE.md`
-
-### Приёмка
-
-- Владелец выбрал триггер: измеренная ёмкость/доставка либо отдельный коммерческий scope; до этого local остаётся поддерживаемым путём.
-- Adapter сохраняет private access, immutable put, size/hash verification, abort и fail-closed; signed delivery не обходит текущую авторизацию/отзыв.
-- В disposable окружении пройдены contract cases и migration/restore rehearsal; ошибки не приводят к тихому fallback в local.
-- Runtime secret handling и object retention согласованы; ни платежи, ни production DRM не включены этим изменением.
-
-### Проверки при реализации
-
-- pnpm test:focus tests/storage-provider.test.ts tests/storage-atomic-upload.test.ts tests/storage-open-file.test.ts tests/storage-symlink-safety.test.ts
-- Добавить реальные adapter contract cases в существующий storage test suite; внешние bucket/credentials require отдельный допуск.
-- Миграцию рабочих объектов не выполнять до отдельной принятой репетиции и external_live задачи.
-
-### Зависимости и условия
-
-OPS-05
-
-Может быть перенесено раньше F6 при доказанной бесплатной beta capacity-потребности; решение принимает владелец. Commerce activation и его INT/security gates — другой трек. Conditional infrastructure: перенос из F6 в F3 не делает object storage обязательным для beta и не связывает его с включением коммерции.
-
-Release applicability: only_after_evidence_based_storage_trigger_and_selected_scope.
-
-### Источники
-
-- [packages/storage/src/provider-factory.ts · 7–17](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/provider-factory.ts#L7-L17)
-- [packages/storage/src/types.ts · 12–29](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/types.ts#L12-L29)
-- [packages/storage/src/local-provider.ts · 145–217](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L145-L217)
-- [docs/ARCHITECTURE.md · 44–46](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L44-L46)
-
-### Ограничения
-
-- Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.
-- Deferred — не beta blocker и не обещание S3 уже работает.
-- Permission local_development допускает только будущую локальную реализацию; production bucket/migration и коммерческая активация отдельно.
 
 ## FLOW-01 — Безопасный возврат к исходному действию после входа
 
@@ -3368,7 +3899,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+ Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3727,167 +4258,6 @@ Release applicability: fix_confirmed_destination_before_beta; navigation_redesig
 - Принята общая capability direction, но точная guest navigation policy ещё needs_decision.
 - Needs_decision относится только к композиции guest/Workspace и capability presentation. Подтверждённый Open Library destination bug вынесен в UX-27 и исправляется независимо.
 
-## UX-24 — Управляемое рекламное размещение и его lifecycle
-
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
-
-**Исходные пункты:** AD01, AD07. **Решения обсуждения:** NX-010, NX-011.
-
-**Сейчас.** Есть sponsored badge и fixed-price inventory target; законченный runtime placements не установлен. Конкретный lifecycle — предложение.
-
-**Результат.** Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.
-
-### Область изменений
-
-- `docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md`
-- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
-- `packages/domain/src/entities.ts`
-- `packages/db/src/schema.ts`
-- `apps/web/src/app/admin/page.tsx`
-
-### Приёмка
-
-- Slot и placement разделены; определены start/end/capacity/audience/target/moderation basis.
-- Приняты lifecycle states и допустимые переходы/причины отказа.
-- До/после срока, delisted/quarantined target не показывается; актуальная eligibility перепроверяется.
-- Concurrent booking не превышает capacity; pause имеет причину и audit.
-- Новые model/service/repository имена назначаются при принятии архитектуры, не выдаются за уже существующие.
-
-### Проверки при реализации
-
-- Review модели/переходов на fixtures до создания новой схемы.
-- После принятия: behavior checks time boundaries, concurrent capacity, pause/resume, quarantine и operator rights; новые test paths назначаются при реализации.
-
-### Зависимости и условия
-
-Без обязательных task dependencies.
-
-Concurrency/authz/audit — engineering/FLOWS; billing и commercial activation — F6.
-
-- Условно OPS-06: Если выбранная реализация добавляет или изменяет схему БД.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [packages/ui/src/platform.tsx · L80-L125](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L80-L125)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L70-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L70-L85)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
-- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L92-L102](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L92-L102)
-
-### Ограничения
-
-- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
-- Owner fixed-price direction не утверждает новые состояния/тарифы/live campaign.
-- Не включать оплату, продажу инвентаря, production campaigns или внешние trackers.
-
-## UX-25 — Рекламный слот маркирован и отделён от органики
-
-**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
-
-**Исходные пункты:** AD02, AD03, AD04, AD05, AD06. **Решения обсуждения:** NX-010, NX-011.
-
-**Сейчас.** Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.
-
-**Результат.** Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.
-
-### Область изменений
-
-- `packages/ui/src/platform.tsx`
-- `apps/web/src/app/page.tsx`
-- `apps/web/src/app/market/page.tsx`
-- `apps/web/src/app/servers/page.tsx`
-- `apps/web/src/app/discover/page.tsx`
-- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
-
-### Приёмка
-
-- Реклама/Sponsored и рекламодатель понятны до клика в RU/EN; editorial/platform announcement названы иначе.
-- Paid insertion не меняет organic score/order/real metrics/trust; dedup/frequency имеют явный контракт.
-- Согласованы Home/catalog/mobile positions; не перекрыты search/navigation/primary action/download.
-- No-fill/expired/error/ineligible оставляют страницу рабочей; late load не сдвигает кнопку под пальцем.
-- Предложенный запрет ads в auth/recovery/security/report/acquisition confirmation/admin принят либо заменён явной матрицей.
-
-### Проверки при реализации
-
-- Fixture behavior check fill/no-fill/delay/error/expired/ineligible: narrow/desktop, keyboard, themes.
-- Проверка одинакового organic order до/после placement и отсутствия paid trust effects.
-
-### Зависимости и условия
-
-UX-02, UX-24
-
-Модель placement/eligibility — UX-24; внешнее включение имеет отдельный gate.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [packages/ui/src/platform.tsx · L121-L125](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L121-L125)
-- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L47-L58](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L47-L58)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L74-L81](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L74-L81)
-- [apps/web/src/app/page.tsx · L35-L75](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L35-L75)
-- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L35-L58](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L35-L58)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L93-L101](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L93-L101)
-
-### Ограничения
-
-- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
-- Позиция после первой полезной секции — proposal.
-- Sponsored не означает identity/clean build/качество; такие исходы не продаются.
-
-## UX-26 — Причины показа контроль рекламы и честные измерения
-
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
-
-**Исходные пункты:** AD08, AD09. **Решения обсуждения:** NX-010, NX-011.
-
-**Сейчас.** Opt-out/explainability — принятые направления; hide/report ads и единицы рекламных измерений ещё не реализованы.
-
-**Результат.** Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.
-
-### Область изменений
-
-- `docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md`
-- `docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md`
-- `apps/web/src/app/settings/page.tsx`
-- `apps/web/src/app/admin/page.tsx`
-
-### Приёмка
-
-- Why shown объясняет допустимый тип причины без private/anti-abuse signals.
-- Opt-out даёт contextual/explicit-filter опыт без behavioral-profile ranking.
-- Hidden placement не возвращается немедленно; report привязан к placement/target без чужих данных.
-- Отдача слота, видимый показ, клик и полезное действие различены; определены period/dedup/internal traffic/unknown.
-- Ad report не меняет organic reputation и не доказывает выполнение обязательств наличием слота.
-
-### Проверки при реализации
-
-- Review privacy/event schema и единиц измерения до telemetry.
-- Local behavior check opt-out/hide/report/unknown states.
-- Controlled event fixtures: dedup/internal traffic после принятия модели.
-
-### Зависимости и условия
-
-UX-24, UX-25
-
-Privacy retention/moderation/metrics — соответствующие domain owners; коммерческие обязательства не задаёт UI.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L60-L91](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L60-L91)
-- [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · L83-L85](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85)
-- [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · L93-L102](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L93-L102)
-
-### Ограничения
-
-- Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.
-- Не устанавливать сторонний tracking и не делать live experiment без разрешения.
-- Цены/гарантии/рост эффективности не выводятся из макета.
-
 ## UX-27 — Open Library открывает библиотеку вместо общего Workspace
 
 **Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
@@ -3970,376 +4340,6 @@ Release applicability: fix_confirmed_destination_before_beta; navigation_redesig
 ### Зависимости и условия
 
 Без обязательных task dependencies.
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-02 — Подготовить ограниченный пилот поддерживаемых стартовых подборок
-
-**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET02. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Частные коллекции уже существуют; редакционные проверенные наборы требуют содержания и ответственного.
-
-**Результат.** Помочь новому владельцу решить одну настоящую задачу с понятными версиями и ограничениями.
-
-### Область изменений
-
-- `docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md`
-- `planned: editorial starter collection specifications`
-
-### Приёмка
-
-- Выбраны ограниченные темы и редактор, указан источник каждого ресурса и дата проверки.
-- Порядок действий и ограничения понятны; работоспособность всей связки подтверждается отдельной проверкой.
-- Редакционный/перенесённый материал помечен, устаревание и предложенное исправление видны.
-- Проверяется решённая задача пользователя и время сопровождения, а не число созданных коллекций.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-03 — Проверить формат Lua-мастерской и очереди помощи
-
-**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET03. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Публикации и обсуждения доступны; регулярный формат и дежурная очередь ещё не запущены этим планом.
-
-**Результат.** Получать воспроизводимые решения вопросов и оставлять полезный материал следующим читателям.
-
-### Область изменений
-
-- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
-- `planned: workshop brief and outcome template`
-
-### Приёмка
-
-- Заранее определены ведущий, конечный scope, формат окружения/кода, предел часов и порядок зависших вопросов.
-- Автор вопроса может подтвердить результат; примеры не раскрывают секреты и чужие приватные файлы.
-- После пилота есть решения/памятка и фактическая нагрузка; отсутствие результата не скрыто числом комментариев.
-- Для ручного пилота не требуется строить новый forum/calendar; приглашения не отправляются без поручения.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-04 — Проверить один игровой или тестовый вечер
-
-**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET04. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Серверы и контент дают основу; полный calendar/events runtime не предполагается готовым.
-
-**Результат.** Проверить повторяемость участия до создания крупной событийной подсистемы.
-
-### Область изменений
-
-- `docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md`
-- `planned: event pilot brief`
-
-### Приёмка
-
-- У формата есть реальный host, условия участия, ограниченная цель и процедура отмены/переноса.
-- RSVP/переход отделён от подтверждения участия; источник подтверждения прозрачен.
-- Зафиксирован результат, жалобы, время host и возможность повторить цикл без постоянных личных напоминаний.
-- Автоматический календарь, push-подписки и вознаграждения не включаются незаметно в ручной пилот.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-05 — Провести ограниченный клуб тестировщиков
-
-**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET05. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Выбор сборок и обсуждения можно использовать; matchmaking и QA-service не реализуются по умолчанию.
-
-**Результат.** Автор получает воспроизводимый отчёт, тестер — обратную связь о принятии и исправлении.
-
-### Область изменений
-
-- `docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md`
-- `planned: test request and report templates`
-
-### Приёмка
-
-- Запрос содержит версию, окружение, несколько наблюдаемых сценариев, размер группы и конечный срок.
-- Отчёт отличает воспроизведено/не воспроизведено/исправлено; автор отвечает на принятый вклад.
-- Пилот имеет лимит нагрузки и право закончиться; нет обязательства бесплатной постоянной QA-поддержки.
-- Признание вклада не даёт автоматически staff/security прав и не награждает число кликов.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-06 — Проверить доску реальных потребностей без полноценной биржи
-
-**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET06. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Есть контент и обсуждения; отдельная структурированная demand board — новая возможность.
-
-**Результат.** Отличить реальную повторяющуюся проблему от голосования за абстрактную идею.
-
-### Область изменений
-
-- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
-- `planned: demand brief and resolution fields`
-
-### Приёмка
-
-- Карточка содержит задачу, существующий обходной путь и критерий результата.
-- Отклик/прототип/готовый ресурс привязан к потребности; закрытие ведёт к результату.
-- Голос означает интерес, не платёжеспособный спрос, контракт или обязанность автора.
-- Начало возможно вручную поверх контента; оплата/escrow/заказы остаются отдельным решением.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-07 — Проверить devlog и добровольный редакционный дайджест
-
-**Фаза:** F4. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET07. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Публикации, follows и уведомления уже существуют; новый дайджест не должен дублировать их бесконтрольно.
-
-**Результат.** Дать конкретный повод вернуться к релизу, решению или событию с понятным следующим действием.
-
-### Область изменений
-
-- `docs/handbook/19-COMMUNITY-AND-RETENTION.md`
-- `docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md`
-- `planned: digest pilot specification`
-
-### Приёмка
-
-- Devlog связан с настоящим изменением или обратной связью; пустой bump не становится активностью.
-- Дайджест добровольный, имеет отписку и предпочтения; пустой/повторный выпуск не отправляется.
-- Security уведомления не смешаны с экспериментом; существующие category/mute настройки соблюдены.
-- Результат оценивается по полезному возврату и нагрузке/отпискам; opens/CTR — только часть воронки.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-- Условно FLOW-09: При добавлении новой доставки digest через существующие notification channels.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-08 — Описать версионированный набор ресурсов для сервера
-
-**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** local_development.
-
-**Заметка исполнения.** 2026-11-01: local proposal draft at docs/SERVER-PACK-SPEC.md (manual snapshot shape, non-goals, sample probe). Still blocked on GROW-02 pilot selection; no runtime/schema.
-
-**Исходные пункты:** RET08. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Collection manifest содержит product IDs; точные build/version и проверка совместного запуска — отдельный контракт.
-
-**Результат.** Получить воспроизводимый snapshot набора, не переписывая уже имеющиеся коллекции и выбор версии.
-
-### Область изменений
-
-- `docs/SERVER-PACK-SPEC.md`
-- `packages/domain/src/library-collections.ts`
-- `planned: versioned server pack specification`
-
-### Приёмка
-
-- Snapshot хранит точные версии, конфигурацию/порядок, автора, дату и результаты проверки.
-- Self-declared окружение не представлено автоматическим обнаружением; pin меняется только явным действием.
-- Права на каждый файл проверяются отдельно; snapshot не передаёт право перепубликовать архивы.
-- Проверено, что небольшой ручной формат полезен, прежде чем строить install-agent или auto-update.
-
-### Проверки при реализации
-
-- Использовать фактические выводы завершённого GROW-02 как входные требования.
-- Проверить образец snapshot двух ресурсов: exact build identity, права доступа, явное обновление pin, устаревшее окружение и отсутствие файлов, на перепубликацию которых нет права.
-- Смысловая проверка спецификации; будущая установка/автообновление не выдаются за выполненный пилот.
-
-### Зависимости и условия
-
-GROW-02
-
-Сначала выбрать один пилот; перечисление не является командой запустить все механики.
-
-- Условно OPS-06: Если выбранная реализация добавляет или изменяет схему БД.
-
-Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
-
-### Источники
-
-- [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md · L5-L36](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md#L5-L36)
-- [docs/handbook/19-COMMUNITY-AND-RETENTION.md · L1-L35](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md#L1-L35)
-
-### Ограничения
-
-- Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
-- Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
-
-## GROW-09 — Проверить публичные кейсы и признание полезного вклада
-
-**Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** external_live.
-
-**Исходные пункты:** RET09. **Решения обсуждения:** NX-009, NX-011.
-
-**Сейчас.** Профили/публикации есть; отдельная модель подтверждённого вклада — новая продуктовая работа.
-
-**Результат.** Показать результат работы автора или помощника с проверяемым основанием и согласием на публичность.
-
-### Область изменений
-
-- `docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md`
-- `docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md`
-- `planned: portfolio case and contribution evidence templates`
-
-### Приёмка
-
-- Кейс содержит задачу, окружение, сделанное и результат; самоотчёт явно обозначен.
-- Признание ссылается на конкретного получателя пользы; self/team credit отделён, возможны исправление и обжалование.
-- Нет XP-валюты за клики/посты, покупки verification или переноса популярности в безопасность файла.
-- Измеряются повторный качественный вклад и время проверки, а не число выданных значков.
-
-### Проверки при реализации
-
-- До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.
-- После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения.
-
-### Зависимости и условия
-
-GROW-01
 
 Сначала выбрать один пилот; перечисление не является командой запустить все механики.
 
