@@ -287,7 +287,7 @@
       "execution_notes": "Subject contracts RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF/COMMERCIAL-FUTURE created; PRODUCT/ARCHITECTURE/PROJECT-MAP/indexes/FLOWS/UX/OPERATIONS cross-linked; handbook retained for DOC-04; groups/DM/events and collections≠server packs preserved; commercial goals without payment activation."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -348,7 +348,7 @@
       "execution_notes": "Architecture boundaries + cruiser exceptions documented; architecture-analysis node tests PASS."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -420,7 +420,7 @@
       "execution_notes": "Toolchain pins/node engines consistency; toolchain-pins + release-version-consistency PASS."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -496,7 +496,7 @@
       "execution_notes": "Infra pin schema + resolve-infra-image-digests; linux/amd64 digests resolved in deploy/infra-image-pins.json (productionAuthorized=false). Mutable compose tags retained for Dependabot. toolchain-pins PASS."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -570,7 +570,7 @@
       "execution_notes": "Compose overlay matrix + writer inventory documented; compose-overlay-matrix node tests PASS on host docker."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -649,7 +649,7 @@
       "execution_notes": "Runtime APP_URL vs build placeholders separated/guarded; same-digest two-origin contract tests; entrypoint 8 PASS + focused 44 PASS. Full check-production-startup.sh disposable CI remains external."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "verification_required",
       "queue_state": "specified",
@@ -719,7 +719,7 @@
       "execution_notes": "Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout. Tip journal advanced to 0089_resource_qa (90 SQL) via forward-only migrations 0088/0089; retained upgrade evidence baseline still targets 0087_server_reviews."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -783,7 +783,7 @@
       "execution_notes": "Strict evaluateReleaseUpgradeEvidence; schemaVersion=1; legacy full fixtures still PASS; 51 node tests green."
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -848,7 +848,7 @@
       "execution_notes": "Release manifest/retention contract + mismatch tests; ciArtifactDays=14; durable bundle retention still owner_decision (OPS-16). release-evidence* PASS."
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F1",
       "decision_status": "accepted_direction",
       "queue_state": "needs_decision",
@@ -908,7 +908,7 @@
       "release_conditions": ["before_authorized_private_visibility_and_protection_change"]
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -980,7 +980,7 @@
       "execution_notes": "Trusted ghcr-publish job prep: no PR packages:write; gated by NEXUS_GHCR_PUBLISH_ENABLED; restore+validate tar without rebuild. No image pushed. Needs OPS-11 enablement."
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F1",
       "decision_status": "accepted_direction",
       "queue_state": "external_gate",
@@ -1040,7 +1040,7 @@
       "release_conditions": ["before_accepting_private_registry_access_for_delivery"]
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -1110,7 +1110,7 @@
       "execution_notes": "Maintenance writer inventory aligned with production/mail/recovery overlays; production-entrypoint + backup-restore-surface + release-upgrade PASS."
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "verification_required",
       "queue_state": "external_gate",
@@ -1170,7 +1170,7 @@
       "release_conditions": ["before_live_acceptance"]
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "verification_required",
       "queue_state": "external_gate",
@@ -1238,7 +1238,7 @@
       "release_conditions": ["before_live_acceptance"]
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "proposal",
       "queue_state": "specified",
@@ -1309,7 +1309,7 @@
       "execution_notes": "license/resource-release workers aligned to push-worker read_only/tmpfs/SIGTERM profile. Structural compose+contract PASS; disposable batch/restart proof still external."
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "accepted_direction",
       "queue_state": "external_gate",
@@ -1374,7 +1374,7 @@
       "release_conditions": ["when_approved_release_bundle_is_published"]
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "accepted_direction",
       "queue_state": "external_gate",
@@ -1460,7 +1460,7 @@
       ]
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "verification_required",
       "queue_state": "external_gate",
@@ -1527,7 +1527,7 @@
       "release_conditions": ["before_capacity_commitments_or_expanded_traffic"]
     },
     {
-      "track": "operations",
+      "track": "engineering",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -1590,7 +1590,7 @@
       "execution_notes": "SemVer-like resource version helpers; strip optional v for storage/compare; fields stay separate; historical IDs not rewritten. validation + build-version-conflict + mta-version-target PASS."
     },
     {
-      "track": "operations",
+      "track": "operations_delivery",
       "phase": "F3",
       "decision_status": "existing_goal",
       "queue_state": "deferred",
@@ -1661,7 +1661,7 @@
     {
       "id": "FLOW-01",
       "title": "Безопасный возврат к исходному действию после входа",
-      "track": "flows",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -1762,7 +1762,7 @@
     {
       "id": "FLOW-02",
       "title": "Уточнить семантику Follow и сохранения по типу объекта",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -1862,7 +1862,7 @@
     {
       "id": "FLOW-03",
       "title": "Сделать release watch доступным и показывать эффективную доставку",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -1975,7 +1975,7 @@
     {
       "id": "FLOW-04",
       "title": "Объяснить discussion follow и прямые ответы без ложного mute",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2043,7 +2043,7 @@
     {
       "id": "FLOW-05",
       "title": "Спроектировать object mute и временную паузу",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2110,7 +2110,7 @@
     {
       "id": "FLOW-06",
       "title": "Спроектировать тихую закладку публикации",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2183,7 +2183,7 @@
     {
       "id": "FLOW-07",
       "title": "Согласовать saved workspace и приватные коллекции",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2263,7 +2263,7 @@
     {
       "id": "FLOW-08",
       "title": "Различить initial loading, empty и подтверждённое прочтение inbox",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2350,7 +2350,7 @@
     {
       "id": "FLOW-09",
       "title": "Разделить категории событий, inbox и Web Push браузера",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2413,7 +2413,7 @@
     {
       "id": "FLOW-10",
       "title": "Проверить повтор comment-create после потери ответа и закрепить intent protocol",
-      "track": "flows",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "verification_required",
       "queue_state": "specified",
@@ -2495,7 +2495,7 @@
     {
       "id": "FLOW-11",
       "title": "Сохранить контекст комментариев при edit/delete/search/permalink",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2588,7 +2588,7 @@
     {
       "id": "FLOW-12",
       "title": "Спроектировать Q&A ресурса и версии отдельно от рейтинговых отзывов",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2661,7 +2661,7 @@
     {
       "id": "FLOW-13",
       "title": "Сохранить честные состояния реакций и защиту от повторного notification spam",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -2727,7 +2727,7 @@
     {
       "id": "FLOW-14",
       "title": "Сохранять поисковый контекст и честные data states",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2794,7 +2794,7 @@
     {
       "id": "FLOW-15",
       "title": "Объяснить границы profile privacy и публичный просмотр",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2861,7 +2861,7 @@
     {
       "id": "FLOW-16",
       "title": "Дать честный MTA connect intent и fallback копирования адреса",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -2913,7 +2913,7 @@
     {
       "id": "FLOW-17",
       "title": "Явно показывать версию скачивания и подтверждённую передачу файла",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3001,7 +3001,7 @@
     {
       "id": "FLOW-18",
       "title": "Показывать точную eligibility отзывов без выдуманного verified-use",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3083,7 +3083,7 @@
     {
       "id": "FLOW-19",
       "title": "Добавить объектный контекст к устойчивому support flow",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -3165,7 +3165,7 @@
     {
       "id": "FLOW-20",
       "title": "Показывать author/admin lifecycle как разрешённые переходы",
-      "track": "flows",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3241,7 +3241,7 @@
     {
       "id": "FLOW-21",
       "title": "Проверять initiating session в финальных upload/download gates",
-      "track": "flows",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3318,7 +3318,7 @@
     {
       "id": "FLOW-22",
       "title": "Применить свежую аутентификацию к критичным staff-действиям",
-      "track": "flows",
+      "track": "engineering",
       "phase": "F1",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3387,7 +3387,7 @@
     {
       "id": "UX-01",
       "title": "Вкладка непрочитанных меняет реальную выдачу",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3451,7 +3451,7 @@
     {
       "id": "UX-02",
       "title": "Единое оформление действий без потери native семантики",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3535,7 +3535,7 @@
     {
       "id": "UX-03",
       "title": "Единые поля с подписями ошибками и явными состояниями",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3617,7 +3617,7 @@
     {
       "id": "UX-04",
       "title": "Сохранять редактируемую работу и честно показывать отправку",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3698,7 +3698,7 @@
     {
       "id": "UX-05",
       "title": "Проверить тему native widgets и читаемую типографику",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "verification_required",
       "queue_state": "specified",
@@ -3778,7 +3778,7 @@
     {
       "id": "UX-06",
       "title": "Один native modal pattern и понятное подтверждение действий",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -3858,7 +3858,7 @@
     {
       "id": "UX-07",
       "title": "Проверить короткий viewport для More и заголовков секций",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "verification_required",
       "queue_state": "specified",
@@ -3918,7 +3918,7 @@
     {
       "id": "UX-08",
       "title": "Таблицы сохраняют доступную прокрутку и типы колонок",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -3984,7 +3984,7 @@
     {
       "id": "UX-09",
       "title": "Публичный автор ресурса и ясные связи профиля",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4045,7 +4045,7 @@
     {
       "id": "UX-10",
       "title": "Локализовать видимые статусы и семантические метки",
-      "track": "ui_foundation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4098,7 +4098,7 @@
     {
       "id": "UX-11",
       "title": "Честная загрузка и продолжение после server review",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4158,7 +4158,7 @@
     {
       "id": "UX-12",
       "title": "Аварийный экран с безопасной ссылкой на сбой",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4212,7 +4212,7 @@
     {
       "id": "UX-13",
       "title": "Визуальная приёмка фиксирует нужное состояние страницы",
-      "track": "visual_evidence",
+      "track": "product_paths",
       "phase": "F3",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4268,7 +4268,7 @@
     {
       "id": "UX-14",
       "title": "Общая Home и personal changes summary",
-      "track": "retention_home",
+      "track": "product_paths",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4322,7 +4322,7 @@
     {
       "id": "UX-15",
       "title": "Честные данные и явные действия серверной карточки Home",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4372,7 +4372,7 @@
     {
       "id": "UX-16",
       "title": "Контекст каталога сохраняется в URL и понятных фильтрах",
-      "track": "core_ux",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4425,7 +4425,7 @@
     {
       "id": "UX-17",
       "title": "Исходники лицензия и DRM показаны как разные свойства",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4480,7 +4480,7 @@
     {
       "id": "UX-18",
       "title": "Различать отсутствие отзывов получение и установку",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4526,7 +4526,7 @@
     {
       "id": "UX-19",
       "title": "Просмотр галереи внутри страницы как расширение",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4579,7 +4579,7 @@
     {
       "id": "UX-20",
       "title": "Инструкция и помощь для конкретного ресурса и версии",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4646,7 +4646,7 @@
     {
       "id": "UX-21",
       "title": "Одиночное и пакетное получение сохраняют намерение",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -4700,7 +4700,7 @@
     {
       "id": "UX-22",
       "title": "Автор видит причины неготовности публикации",
-      "track": "creator_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -4754,7 +4754,7 @@
     {
       "id": "UX-23",
       "title": "Guest и Workspace навигация следует возможностям человека",
-      "track": "core_navigation",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -5032,7 +5032,7 @@
     {
       "id": "UX-27",
       "title": "Open Library открывает библиотеку вместо общего Workspace",
-      "track": "resource_experience",
+      "track": "product_paths",
       "phase": "F2",
       "decision_status": "existing_goal",
       "queue_state": "specified",
@@ -5086,7 +5086,7 @@
     {
       "id": "GROW-01",
       "title": "Определить полезный возврат и минимальные события измерения",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "accepted_direction",
       "queue_state": "specified",
@@ -5141,7 +5141,7 @@
     {
       "id": "GROW-02",
       "title": "Подготовить ограниченный пилот поддерживаемых стартовых подборок",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "needs_decision",
@@ -5191,7 +5191,7 @@
     {
       "id": "GROW-03",
       "title": "Проверить формат Lua-мастерской и очереди помощи",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "needs_decision",
@@ -5241,7 +5241,7 @@
     {
       "id": "GROW-04",
       "title": "Проверить один игровой или тестовый вечер",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "needs_decision",
@@ -5291,7 +5291,7 @@
     {
       "id": "GROW-05",
       "title": "Провести ограниченный клуб тестировщиков",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "needs_decision",
@@ -5341,7 +5341,7 @@
     {
       "id": "GROW-06",
       "title": "Проверить доску реальных потребностей без полноценной биржи",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "deferred",
@@ -5391,7 +5391,7 @@
     {
       "id": "GROW-07",
       "title": "Проверить devlog и добровольный редакционный дайджест",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "needs_decision",
@@ -5448,7 +5448,7 @@
     {
       "id": "GROW-08",
       "title": "Описать версионированный набор ресурсов для сервера",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "deferred",
@@ -5508,7 +5508,7 @@
     {
       "id": "GROW-09",
       "title": "Проверить публичные кейсы и признание полезного вклада",
-      "track": "retention",
+      "track": "engagement_growth",
       "phase": "F4",
       "decision_status": "proposal",
       "queue_state": "deferred",
