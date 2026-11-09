@@ -13,6 +13,6 @@ tmp
 .env.*
 **/.env
 **/.env.*
-!.env.example
+!configs/env/.env.example
 **/uploads
 **/.DS_Store

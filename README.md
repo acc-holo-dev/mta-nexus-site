@@ -15,6 +15,8 @@ docker compose -p nexus-local -f deploy/compose.yaml up --build --detach --wait 
 docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
+Копия заготовки переменных окружения для локального Compose-стека: `cp configs/env/.env.example deploy/.env` — Compose читает `deploy/.env` как project directory; без копии стек работает на безопасных dev-дефолтах из `deploy/compose.yaml`. Для host-only Next (`pnpm dev:host`) переменные задаются в корневом `.env`.
+
 При установленных Node.js 26.10.0 и pnpm 12.4.2:
 
 | Команда                            | Назначение                                            |
