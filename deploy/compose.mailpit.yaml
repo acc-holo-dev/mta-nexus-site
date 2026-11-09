@@ -2,7 +2,7 @@
 services:
   mailpit-init:
     build:
-      context: .
+      context: ..
       dockerfile: deploy/Dockerfile
       target: development
     user: "0:0"
@@ -53,7 +53,7 @@ services:
 
   mail-worker:
     build:
-      context: .
+      context: ..
       dockerfile: deploy/Dockerfile
       target: development
     init: true
@@ -76,11 +76,11 @@ services:
       ACCOUNT_MAIL_POLL_INTERVAL_MS: 1000
     volumes:
       - dev_mail:/data/dev-mail:ro
-      - ./packages/db/src:/app/packages/db/src:ro
-      - ./packages/db/scripts:/app/packages/db/scripts:ro
-      - ./packages/config/src:/app/packages/config/src:ro
-      - ./packages/domain/src:/app/packages/domain/src:ro
-      - ./packages/security/src:/app/packages/security/src:ro
+      - ../packages/db/src:/app/packages/db/src:ro
+      - ../packages/db/scripts:/app/packages/db/scripts:ro
+      - ../packages/config/src:/app/packages/config/src:ro
+      - ../packages/domain/src:/app/packages/domain/src:ro
+      - ../packages/security/src:/app/packages/security/src:ro
     depends_on:
       app:
         condition: service_healthy
