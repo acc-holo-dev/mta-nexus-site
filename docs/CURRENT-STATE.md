@@ -1,10 +1,10 @@
 # Проверенный срез проекта
 
-**Дата:** 6 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
+**Дата:** 9 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
 
 ## Текущий tip
 
-- **`origin/main` tip:** обновлять после merge текущего pack. Не объявлять verified-green без SUCCESS CI на exact SHA.
+- **`origin/main` tip:** `f907a4ea` (pushed; CI для него не подтверждён в этой сессии). Не объявлять verified-green без SUCCESS CI на exact SHA.
 - **Последний verified-green tip:** `6cefa74e` / session-binding + order/storage/plan recovery — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393).
 - Длинная серия tip-honesty / ErrorState residual PR после `6cefa74e` живёт в Git history; этот файл больше не дублирует каждый merge.
 
