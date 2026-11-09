@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 const h = vi.hoisted(() => ({

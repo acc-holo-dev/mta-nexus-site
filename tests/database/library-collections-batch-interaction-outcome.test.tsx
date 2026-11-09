@@ -86,7 +86,9 @@ it("ignores stale handlers after a confirmed batch", async () => {
 });
 
 it("lists per-item batch outcomes after a confirmed remove-many", async () => {
-  const { libraryCollectionsCopy } = await import("../../apps/web/src/lib/library-collections-i18n");
+  const { libraryCollectionsCopy } = await import(
+    "../../apps/web/src/lib/library-collections-i18n"
+  );
   check(1);
   check(2);
   harness.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>

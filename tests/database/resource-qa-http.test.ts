@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -21,7 +24,9 @@ const state = vi.hoisted(() => ({
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
+vi.mock("../../apps/web/src/lib/request-client-ip", () => ({
+  getTrustedRequestIp: () => state.ip,
+}));
 vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_generated`,
   consumeRateLimit: async (...args: unknown[]) => {

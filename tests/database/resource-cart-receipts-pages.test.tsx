@@ -16,7 +16,9 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/acquisitions/receipts",
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
@@ -33,7 +35,9 @@ vi.mock("../../apps/web/src/components/resource-download-button", () => ({
 
 import Detail from "../../apps/web/src/app/workspace/acquisitions/receipts/[id]/page";
 import DetailLoading from "../../apps/web/src/app/workspace/acquisitions/receipts/[id]/loading";
-import Page, { generateMetadata } from "../../apps/web/src/app/workspace/acquisitions/receipts/page";
+import Page, {
+  generateMetadata,
+} from "../../apps/web/src/app/workspace/acquisitions/receipts/page";
 import ListLoading from "../../apps/web/src/app/workspace/acquisitions/receipts/loading";
 import { resourceCartReceiptsCopy } from "../../apps/web/src/lib/resource-cart-receipts-i18n";
 

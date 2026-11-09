@@ -13,7 +13,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PATCH as updateServer } from "../../apps/web/src/app/api/servers/[id]/route";
 import { POST as registerServer } from "../../apps/web/src/app/api/servers/route";
 import { POST as requestVerification } from "../../apps/web/src/app/api/verification/route";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 function jsonRequest(
   url: string,

@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),

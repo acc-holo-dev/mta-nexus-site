@@ -16,7 +16,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: () => undefined, refresh: () => undefined }),
   usePathname: () => "/workspace/organizations/org/content",
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));

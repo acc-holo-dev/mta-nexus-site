@@ -2,7 +2,9 @@ import { NextRequest } from "next/server";
 import { expect, it, vi } from "vitest";
 
 vi.mock("@nexus/db", async () => {
-  const { createLicenseControlHttpDbMock } = await import("../helpers/license-control-http-harness");
+  const { createLicenseControlHttpDbMock } = await import(
+    "../helpers/license-control-http-harness"
+  );
   return createLicenseControlHttpDbMock();
 });
 vi.mock("@nexus/security", async (importOriginal) => {
@@ -18,7 +20,9 @@ vi.mock("../../apps/web/src/lib/services/auth-service", async () => {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../../apps/web/src/lib/request-client-ip", () => ({
+  getTrustedRequestIp: () => "unknown",
+}));
 
 import { GET as staffActivity } from "../../apps/web/src/app/api/admin/licenses/[id]/activity/route";
 import { GET as activity } from "../../apps/web/src/app/api/licenses/[id]/activity/route";

@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   stream: vi.fn(),
@@ -24,7 +27,10 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("../../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
 import { GET as stream } from "../../apps/web/src/app/api/discover/stream/route";
 import { GET as page } from "../../apps/web/src/app/api/admin/community/route";
-import { GET as detail, POST as command } from "../../apps/web/src/app/api/admin/community/[id]/route";
+import {
+  GET as detail,
+  POST as command,
+} from "../../apps/web/src/app/api/admin/community/[id]/route";
 const actor = { id: "actor", role: "moderator" },
   context = { params: Promise.resolve({ id: "item" }) };
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {

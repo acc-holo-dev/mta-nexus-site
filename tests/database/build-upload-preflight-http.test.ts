@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import packageFixtures from "../fixtures/build-packages.json";
 
 const preflight = vi.hoisted(() => vi.fn());

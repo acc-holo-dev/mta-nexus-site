@@ -5,7 +5,10 @@ import {
   parseDiscoverApiQuery,
   parseDiscoverQuery,
 } from "../../apps/web/src/lib/discover-query";
-import { setupDiscoverySearchBehavior, sources } from "../helpers/discovery-search-behavior-harness";
+import {
+  setupDiscoverySearchBehavior,
+  sources,
+} from "../helpers/discovery-search-behavior-harness";
 
 vi.mock("@nexus/db", async () => {
   const { sources: harnessSources } = await import("../helpers/discovery-search-behavior-harness");

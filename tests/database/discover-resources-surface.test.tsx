@@ -33,7 +33,10 @@ vi.mock("../../apps/web/src/lib/i18n-server", () => ({
 }));
 
 import DiscoverPage from "../../apps/web/src/app/discover/page";
-import { DirectoryFilters, DirectoryResults } from "../../apps/web/src/components/discovery-directory";
+import {
+  DirectoryFilters,
+  DirectoryResults,
+} from "../../apps/web/src/components/discovery-directory";
 import { LocaleProvider } from "../../apps/web/src/components/locale-context";
 import { parseDiscoverQuery } from "../../apps/web/src/lib/discover-query";
 import { discoveryCopy } from "../../apps/web/src/lib/discovery-copy";

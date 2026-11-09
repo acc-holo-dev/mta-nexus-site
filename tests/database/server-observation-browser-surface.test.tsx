@@ -24,7 +24,9 @@ vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../../apps/web/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 
 import {
   ServerObservationBrowserLoading,

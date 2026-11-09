@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -33,7 +36,14 @@ import { GET as exportGET } from "../../apps/web/src/app/api/products/[id]/copie
 import { GET as detailGET } from "../../apps/web/src/app/api/products/[id]/copies/[receiptId]/route";
 import { GET as historyGET } from "../../apps/web/src/app/api/products/[id]/copies/route";
 import { POST, GET as previewGET } from "../../apps/web/src/app/api/products/[id]/copy/route";
-import { command, metadata, preview, receipt, receiptId, sourceId } from "../helpers/resource-copy-fixtures";
+import {
+  command,
+  metadata,
+  preview,
+  receipt,
+  receiptId,
+  sourceId,
+} from "../helpers/resource-copy-fixtures";
 
 const context = { params: Promise.resolve({ id: sourceId, receiptId }) },
   base = `/api/products/${sourceId}`;

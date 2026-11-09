@@ -36,7 +36,9 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/commercial-plan-service", () => ({
   commercialPlanService: {
     catalog: state.catalog,
@@ -54,7 +56,9 @@ import Plans from "../../apps/web/src/app/admin/commerce/plans/page";
 import CatalogLoading from "../../apps/web/src/app/subscriptions/loading";
 import Catalog from "../../apps/web/src/app/subscriptions/page";
 import OperationsLoading from "../../apps/web/src/app/workspace/purchases/[id]/operations/loading";
-import Operations, { metadata } from "../../apps/web/src/app/workspace/purchases/[id]/operations/page";
+import Operations, {
+  metadata,
+} from "../../apps/web/src/app/workspace/purchases/[id]/operations/page";
 import { LocaleProvider } from "../../apps/web/src/components/locale-context";
 import { getCommercialCopy } from "../../apps/web/src/lib/commercial-i18n";
 import { getDictionary } from "../../apps/web/src/lib/i18n";

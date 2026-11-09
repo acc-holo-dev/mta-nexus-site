@@ -1,7 +1,10 @@
 import type { User } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
   claimFreeResource: vi.fn(),

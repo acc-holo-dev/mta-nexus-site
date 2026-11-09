@@ -9,7 +9,9 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.pageDiscussion },
 }));

@@ -26,14 +26,14 @@ docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check
 
 При установленных Node.js 26.11.1 и pnpm 12.4.2:
 
-| Команда                            | Назначение                                            |
-| ---------------------------------- | ----------------------------------------------------- |
-| `pnpm nexus:doctor`                | Preflight: Node/pnpm/Docker/порт/`deploy/compose.yaml`       |
-| `pnpm dev`                         | Полный Compose-стек (тот же, что выше)                |
-| `pnpm dev:docker:check`            | Readiness app + push / license / resource-release     |
-| `pnpm dev:host`                    | Только Next.js (Postgres/storage/scanner уже снаружи) |
-| `pnpm dev:mail`                    | Стек + Mailpit для локального захвата писем           |
-| `pnpm db:migrate` / `pnpm db:seed` | Миграции и демо-данные                                |
+| Команда                            | Назначение                                             |
+| ---------------------------------- | ------------------------------------------------------ |
+| `pnpm nexus:doctor`                | Preflight: Node/pnpm/Docker/порт/`deploy/compose.yaml` |
+| `pnpm dev`                         | Полный Compose-стек (тот же, что выше)                 |
+| `pnpm dev:docker:check`            | Readiness app + push / license / resource-release      |
+| `pnpm dev:host`                    | Только Next.js (Postgres/storage/scanner уже снаружи)  |
+| `pnpm dev:mail`                    | Стек + Mailpit для локального захвата писем            |
+| `pnpm db:migrate` / `pnpm db:seed` | Миграции и демо-данные                                 |
 
 ## Проверки
 

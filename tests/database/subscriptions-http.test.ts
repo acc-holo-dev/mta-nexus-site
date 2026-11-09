@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -33,7 +36,13 @@ import { GET as history } from "../../apps/web/src/app/api/subscriptions/account
 import { GET as download } from "../../apps/web/src/app/api/subscriptions/account/receipts/[id]/export/route";
 import { GET as detail } from "../../apps/web/src/app/api/subscriptions/account/receipts/[id]/route";
 import { GET as dashboard, POST } from "../../apps/web/src/app/api/subscriptions/account/route";
-import { activation, cancellation, date, receipt, subscription } from "../helpers/subscriptions-fixtures";
+import {
+  activation,
+  cancellation,
+  date,
+  receipt,
+  subscription,
+} from "../helpers/subscriptions-fixtures";
 
 const base = "/api/subscriptions/account",
   context = { params: Promise.resolve({ id: receipt.id }) };

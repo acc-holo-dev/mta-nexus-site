@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -21,7 +24,10 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 import { GET as page } from "../../apps/web/src/app/api/library/watches/route";
-import { GET as detail, POST as command } from "../../apps/web/src/app/api/library/watches/[id]/route";
+import {
+  GET as detail,
+  POST as command,
+} from "../../apps/web/src/app/api/library/watches/[id]/route";
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const request = (body: unknown, headers?: Record<string, string>) =>
   new NextRequest("https://nexus.test/api/library/watches/prd_a", {

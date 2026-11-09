@@ -240,7 +240,11 @@ test("production CI publishes only loopback ports and keeps the writer inventory
 
 test("production recovery+mail overlay adds mail-worker without dropping base writers", () => {
   const config = renderCompose(
-    ["deploy/compose.production.yaml", "deploy/compose.recovery.yaml", "deploy/compose.mail-worker.yaml"],
+    [
+      "deploy/compose.production.yaml",
+      "deploy/compose.recovery.yaml",
+      "deploy/compose.mail-worker.yaml",
+    ],
     syntheticEnv(),
     "nexus-ops-matrix-mail",
   );

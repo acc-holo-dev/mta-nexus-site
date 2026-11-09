@@ -1,6 +1,9 @@
 import { expect, it } from "vitest";
 import { validateLedgerPosting, type LedgerPosting } from "@nexus/domain";
-import { financialStatementQuery, financialReviewQuery } from "../../apps/web/src/lib/financial-query";
+import {
+  financialStatementQuery,
+  financialReviewQuery,
+} from "../../apps/web/src/lib/financial-query";
 import { formatFinancialMinor } from "../../apps/web/src/lib/financial-i18n";
 const lines: LedgerPosting[] = [
   {

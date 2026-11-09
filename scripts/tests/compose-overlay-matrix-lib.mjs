@@ -38,7 +38,11 @@ export const SUPPORTED_COMPOSE_SCENARIOS = Object.freeze([
   },
   {
     id: "production-recovery-mail",
-    files: ["deploy/compose.production.yaml", "deploy/compose.recovery.yaml", "deploy/compose.mail-worker.yaml"],
+    files: [
+      "deploy/compose.production.yaml",
+      "deploy/compose.recovery.yaml",
+      "deploy/compose.mail-worker.yaml",
+    ],
     services: [...PRODUCTION_BASE_SERVICES, "mail-worker"].sort(),
   },
   {

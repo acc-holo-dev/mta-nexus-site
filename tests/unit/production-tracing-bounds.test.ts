@@ -32,7 +32,7 @@ describe("production tracing and standalone runtime bounds", () => {
   it("keeps local storage and mail-secret file reads outside NFT project roots", () => {
     const storage = read("packages/storage/src/local-provider.ts");
     const mail = read("packages/db/src/repositories/account-mail-runtime.ts");
-    const dockerfile = read("Dockerfile");
+    const dockerfile = read("deploy/Dockerfile");
 
     expect(storage).toContain("path.resolve(/* turbopackIgnore: true */ baseDir)");
     expect(mail).toContain("/* turbopackIgnore: true */ secretPath");
@@ -46,7 +46,7 @@ describe("production tracing and standalone runtime bounds", () => {
 
   it("documents build-only placeholders and refuses baking secrets via next.config env", () => {
     const config = read("apps/web/next.config.mjs");
-    const dockerfile = read("Dockerfile");
+    const dockerfile = read("deploy/Dockerfile");
 
     expect(config).toMatch(/deliberately omit next\.config `env`|omit next\.config `env`/u);
     expect(config).not.toMatch(/^\s*env:\s*\{/mu);

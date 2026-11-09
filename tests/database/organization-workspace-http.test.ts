@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "owner", role: "user" } as Record<string, unknown> | null,
@@ -35,7 +38,10 @@ import {
   PATCH as profile,
   GET as workspace,
 } from "../../apps/web/src/app/api/workspace/organizations/[id]/route";
-import { POST as create, GET as list } from "../../apps/web/src/app/api/workspace/organizations/route";
+import {
+  POST as create,
+  GET as list,
+} from "../../apps/web/src/app/api/workspace/organizations/route";
 
 const version = "2026-10-10T12:00:00.000Z";
 const fields = { name: "Team", description: "Description", logoUrl: "", websiteUrl: "" };

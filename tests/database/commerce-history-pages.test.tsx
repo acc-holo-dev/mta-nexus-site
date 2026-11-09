@@ -47,7 +47,9 @@ vi.mock("next/link", async () => {
 import LicensesLoading from "../../apps/web/src/app/workspace/licenses/loading";
 import Licenses, { metadata as licensesMeta } from "../../apps/web/src/app/workspace/licenses/page";
 import PurchasesLoading from "../../apps/web/src/app/workspace/purchases/loading";
-import Purchases, { metadata as purchasesMeta } from "../../apps/web/src/app/workspace/purchases/page";
+import Purchases, {
+  metadata as purchasesMeta,
+} from "../../apps/web/src/app/workspace/purchases/page";
 import Sales, { metadata as salesMeta } from "../../apps/web/src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../../apps/web/src/lib/commerce-history-i18n";
 import { getDictionary } from "../../apps/web/src/lib/i18n";

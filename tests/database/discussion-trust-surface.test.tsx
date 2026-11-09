@@ -29,7 +29,9 @@ vi.mock("../../apps/web/src/lib/services/discussion-workspace-service", () => ({
 vi.mock("../../apps/web/src/lib/services/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 
 import UserTrustHistoryLoading from "../../apps/web/src/app/users/[username]/trust/history/loading";
 import HistoryPage, {

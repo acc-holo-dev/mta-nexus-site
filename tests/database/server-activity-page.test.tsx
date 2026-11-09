@@ -21,7 +21,9 @@ vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../../apps/web/src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.page },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 
 import ServerActivityPage, {
   generateMetadata,

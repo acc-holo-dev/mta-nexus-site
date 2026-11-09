@@ -11,7 +11,9 @@ vi.mock("../../apps/web/src/lib/services/commercial-plan-service", () => ({
   orderOperationsService: {},
 }));
 vi.mock("../../apps/web/src/lib/services/order-case-service", () => ({ orderCaseService: {} }));
-vi.mock("../../apps/web/src/lib/services/subscriptions-service", () => ({ subscriptionsService: {} }));
+vi.mock("../../apps/web/src/lib/services/subscriptions-service", () => ({
+  subscriptionsService: {},
+}));
 vi.mock("../../apps/web/src/lib/services/plan-reviews-service", () => ({ planReviewsService: {} }));
 vi.mock("../../apps/web/src/lib/services/resource-review-service", () => ({
   resourceReviewService: {},

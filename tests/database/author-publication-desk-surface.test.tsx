@@ -15,7 +15,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
@@ -30,7 +32,9 @@ import History, {
   generateMetadata as historyMetadata,
 } from "../../apps/web/src/app/workspace/content/[id]/history/page";
 import Loading from "../../apps/web/src/app/workspace/content/loading";
-import Desk, { generateMetadata as deskMetadata } from "../../apps/web/src/app/workspace/content/page";
+import Desk, {
+  generateMetadata as deskMetadata,
+} from "../../apps/web/src/app/workspace/content/page";
 import Following from "../../apps/web/src/app/workspace/feed/page";
 import { FollowWorkspace } from "../../apps/web/src/components/follow-workspace";
 import { PublicationFeed } from "../../apps/web/src/components/publication-feed";

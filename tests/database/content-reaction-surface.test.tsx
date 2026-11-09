@@ -29,7 +29,9 @@ vi.mock("../../apps/web/src/lib/services/content-reaction-service", () => ({
 vi.mock("../../apps/web/src/lib/services/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 
 import TrustPage, {
   generateMetadata as trustMetadata,

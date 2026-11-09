@@ -20,7 +20,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 vi.mock("@nexus/db", async () => ({
-  sessionRepository: (await import("../../packages/db/src/repositories/sessions")).sessionRepository,
+  sessionRepository: (await import("../../packages/db/src/repositories/sessions"))
+    .sessionRepository,
 }));
 
 import { authService } from "../../apps/web/src/lib/services/auth-service";

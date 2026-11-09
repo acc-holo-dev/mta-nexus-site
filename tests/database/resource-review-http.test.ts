@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -19,7 +22,9 @@ const state = vi.hoisted(() => ({
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
+vi.mock("../../apps/web/src/lib/request-client-ip", () => ({
+  getTrustedRequestIp: () => state.ip,
+}));
 vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_generated`,
   consumeRateLimit: async (...args: unknown[]) => {
@@ -44,7 +49,10 @@ import {
   POST as create,
 } from "../../apps/web/src/app/api/products/[id]/reviews/route";
 import { GET as ownPage } from "../../apps/web/src/app/api/library/reviews/route";
-import { GET as ownDetail, POST as edit } from "../../apps/web/src/app/api/library/review/[id]/route";
+import {
+  GET as ownDetail,
+  POST as edit,
+} from "../../apps/web/src/app/api/library/review/[id]/route";
 import { POST as report } from "../../apps/web/src/app/api/products/[id]/reviews/[reviewId]/report/route";
 import { GET as reportsPage } from "../../apps/web/src/app/api/review-reports/route";
 import { GET as reportDetail } from "../../apps/web/src/app/api/review-reports/[id]/route";

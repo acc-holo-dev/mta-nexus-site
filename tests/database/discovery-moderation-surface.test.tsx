@@ -35,7 +35,9 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({
   can: (actor: { role: string }) => ["moderator", "admin"].includes(actor.role),
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));

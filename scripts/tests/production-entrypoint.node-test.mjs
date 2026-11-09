@@ -108,7 +108,10 @@ test("entrypoint aligns APP_URL with NEXT_PUBLIC_APP_URL before config validatio
 test("same prebuilt image contract: runtime origin comes from env, not the entrypoint", () => {
   const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
   const dockerfile = readFileSync(new URL("../../deploy/Dockerfile", import.meta.url), "utf8");
-  const compose = readFileSync(new URL("../../deploy/compose.production.yaml", import.meta.url), "utf8");
+  const compose = readFileSync(
+    new URL("../../deploy/compose.production.yaml", import.meta.url),
+    "utf8",
+  );
   const ciOverlay = readFileSync(
     new URL("../../deploy/compose.production-ci.yaml", import.meta.url),
     "utf8",

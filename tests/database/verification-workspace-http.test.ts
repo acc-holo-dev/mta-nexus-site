@@ -33,7 +33,10 @@ import { GET as own, PATCH as update } from "../../apps/web/src/app/api/account/
 import { PATCH as decide } from "../../apps/web/src/app/api/admin/verification/[id]/route";
 import { GET as overview, POST } from "../../apps/web/src/app/api/workspace/verification/route";
 import { GET as targets } from "../../apps/web/src/app/api/workspace/verification/targets/route";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const actor = { id: "actor", role: "developer" },
   context = { params: Promise.resolve({ id: "ver_application" }) };

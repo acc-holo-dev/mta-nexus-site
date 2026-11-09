@@ -154,7 +154,6 @@ it("keeps stable notice IDs across restart so completed delivery is idempotent",
     .set({ availableAt: new Date("2099-01-01T00:00:00.000Z") })
     .where(ne(jobs.verificationRequestId, request.id));
   expect(await delivery.processNext()).toEqual({
-
     state: "idle",
     recipients: 0,
     stored: 0,

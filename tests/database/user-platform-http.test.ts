@@ -40,7 +40,10 @@ import {
 } from "../../apps/web/src/app/api/workspace/content/[id]/route";
 import { POST as create, GET as list } from "../../apps/web/src/app/api/workspace/content/route";
 import { userPlatformError } from "../../apps/web/src/lib/user-platform-copy";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const context = { params: Promise.resolve({ id: "cnt_author" }) };
 const input = {

@@ -59,6 +59,7 @@ describe("mainline repository policy", () => {
       "DECISIONS.md",
       "DOCS-MIGRATION.md",
       "FLOWS.md",
+      "GETTING-STARTED.md",
       "OPERATIONS.md",
       "PROBLEMS.md",
       "PRODUCT.md",
@@ -109,7 +110,7 @@ describe("mainline repository policy", () => {
   });
 
   it("keeps Docker DEV source mounts and polling enabled", () => {
-    const compose = read("compose.yaml");
+    const compose = read("deploy/compose.yaml");
     expect(compose).toContain('WATCHPACK_POLLING: "true"');
     expect(compose).toContain("./apps/web/src:/app/apps/web/src:ro");
     expect(compose).toContain("./packages/db/src:/app/packages/db/src:ro");

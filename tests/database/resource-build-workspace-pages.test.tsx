@@ -16,7 +16,9 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));

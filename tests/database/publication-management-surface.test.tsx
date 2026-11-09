@@ -25,7 +25,9 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/topic",
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session, getUserById: mocks.author },
 }));

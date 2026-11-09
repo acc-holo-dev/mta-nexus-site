@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 const calls = vi.hoisted(() => ({ set: vi.fn(), user: { id: "actor_b" } }));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => calls.user) },

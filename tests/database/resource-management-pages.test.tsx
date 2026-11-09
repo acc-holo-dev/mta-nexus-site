@@ -36,7 +36,9 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/product-service", () => ({
   productService: { getManagedProduct: state.product, getDependencyResolution: state.resolution },
 }));
@@ -60,7 +62,9 @@ vi.mock("../../apps/web/src/components/resource-compatibility-form", () => ({
 }));
 
 import CompatibilityPage from "../../apps/web/src/app/workspace/resources/[id]/compatibility/page";
-import VariantsPage, { metadata } from "../../apps/web/src/app/workspace/resources/[id]/variants/page";
+import VariantsPage, {
+  metadata,
+} from "../../apps/web/src/app/workspace/resources/[id]/variants/page";
 import { ResourceVariantChoices } from "../../apps/web/src/components/resource-variant-choices";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },

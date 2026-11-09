@@ -27,7 +27,10 @@ import {
   ownDiscussionCopy,
   ownDiscussionError,
 } from "../../apps/web/src/lib/discussion-workspace-copy";
-import { approvalCopy, approvalError } from "../../apps/web/src/lib/public-verification-history-copy";
+import {
+  approvalCopy,
+  approvalError,
+} from "../../apps/web/src/lib/public-verification-history-copy";
 const actor = { id: "actor", role: "user" } as User,
   time = "2026-10-11T00:00:00.123456Z";
 const row = {

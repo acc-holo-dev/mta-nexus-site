@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),

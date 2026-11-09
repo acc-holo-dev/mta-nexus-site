@@ -27,7 +27,9 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/seller-sales-service", () => ({
   sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
 }));

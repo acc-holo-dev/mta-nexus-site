@@ -8,7 +8,9 @@ import {
   type PublicationPage,
 } from "../../apps/web/src/lib/publication-feed-contract";
 const state = vi.hoisted(() => ({ locale: "en" as "ru" | "en", resolve: vi.fn(), page: vi.fn() }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
@@ -17,7 +19,9 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-import ServerUpdates, { generateMetadata } from "../../apps/web/src/app/servers/[slug]/updates/page";
+import ServerUpdates, {
+  generateMetadata,
+} from "../../apps/web/src/app/servers/[slug]/updates/page";
 import Loading from "../../apps/web/src/app/servers/[slug]/updates/loading";
 const cursor = {
   version: 1,

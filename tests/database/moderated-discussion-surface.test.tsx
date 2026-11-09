@@ -15,7 +15,9 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND_BOUNDARY");
   },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));

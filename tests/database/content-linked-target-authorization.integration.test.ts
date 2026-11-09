@@ -2,7 +2,10 @@ import { productRepository, serverRepository, sessionRepository, userRepository 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../../apps/web/src/app/api/content/route";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 function contentRequest(token: string, actorId: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/content", {

@@ -5,7 +5,9 @@ const mocks = vi.hoisted(() => ({ session: vi.fn(), locale: "en" as "ru" | "en" 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));

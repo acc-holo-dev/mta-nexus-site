@@ -33,12 +33,16 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
 
-import History, { metadata as historyMeta } from "../../apps/web/src/app/workspace/acquisitions/page";
+import History, {
+  metadata as historyMeta,
+} from "../../apps/web/src/app/workspace/acquisitions/page";
 import Activity, {
   metadata as activityMeta,
 } from "../../apps/web/src/app/workspace/resources/[id]/activity/page";

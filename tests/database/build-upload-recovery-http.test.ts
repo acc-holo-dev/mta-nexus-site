@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import { AppError, ForbiddenError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import packageFixtures from "../fixtures/build-packages.json";
 
 const mocks = vi.hoisted(() => ({

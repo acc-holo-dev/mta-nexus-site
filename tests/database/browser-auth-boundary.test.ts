@@ -20,7 +20,9 @@ const consumeRateLimit = vi.hoisted(() => vi.fn(async () => ({ success: true }))
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
 vi.mock("@nexus/db", () => ({ organizationRepository: {} }));
-vi.mock("../../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../../apps/web/src/lib/request-client-ip", () => ({
+  getTrustedRequestIp: () => "unknown",
+}));
 
 import { POST as login } from "../../apps/web/src/app/api/auth/login/route";
 import { POST as register } from "../../apps/web/src/app/api/auth/register/route";

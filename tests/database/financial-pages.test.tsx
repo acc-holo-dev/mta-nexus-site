@@ -27,7 +27,9 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("@nexus/db", () => ({
   financialStatementsRepository: { statement: state.statement, scopes: state.scopes },
   financialReviewRepository: { page: state.page, detail: state.detail },

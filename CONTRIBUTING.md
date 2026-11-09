@@ -18,12 +18,12 @@ selection and the result format, read [docs/AGENT.md](docs/AGENT.md) first, then
 
 Run these before proposing a change:
 
-| Command          | Purpose                                                    |
-| ---------------- | ---------------------------------------------------------- |
-| `pnpm check:code`| Canonical host code-health: format, lint, types, boundaries, unused, unit + tooling (no Docker) |
-| `pnpm docs:check`| Local Markdown links and heading anchors                    |
-| `pnpm test:focus path/to/file.test.ts` | Narrow targeted Vitest / `.node-test.mjs` run |
-| `pnpm test:isolated` | Full Vitest against a disposable DB (Docker stack)      |
+| Command                                | Purpose                                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `pnpm check:code`                      | Canonical host code-health: format, lint, types, boundaries, unused, unit + tooling (no Docker) |
+| `pnpm docs:check`                      | Local Markdown links and heading anchors                                                        |
+| `pnpm test:focus path/to/file.test.ts` | Narrow targeted Vitest / `.node-test.mjs` run                                                   |
+| `pnpm test:isolated`                   | Full Vitest against a disposable DB (Docker stack)                                              |
 
 `pnpm check:code` is the single local code-health gate. DB tests need `DATABASE_URL` on a
 disposable database (see [docs/OPERATIONS.md](docs/OPERATIONS.md)).

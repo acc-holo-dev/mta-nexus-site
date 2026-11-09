@@ -135,7 +135,12 @@ export async function collectDoctor(options = {}) {
     memoryGiB: Number((memoryBytes / 1024 ** 3).toFixed(1)),
   };
 
-  for (const relativePath of ["package.json", "pnpm-lock.yaml", "deploy/compose.yaml", "deploy/Dockerfile"]) {
+  for (const relativePath of [
+    "package.json",
+    "pnpm-lock.yaml",
+    "deploy/compose.yaml",
+    "deploy/Dockerfile",
+  ]) {
     const present = await pathExists(resolve(root, relativePath));
     addCheck(
       checks,

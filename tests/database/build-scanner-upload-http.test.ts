@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import packageFixtures from "../fixtures/build-packages.json";
 
 const scan = vi.hoisted(() => vi.fn());

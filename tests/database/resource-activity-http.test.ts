@@ -2,7 +2,10 @@ import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 import { resourceActivityCsv } from "../../apps/web/src/lib/resource-activity-csv";
 import {
   parseAcquisitionHistoryQuery,

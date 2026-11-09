@@ -13,7 +13,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
 }));

@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "actor", role: "user" } as { id: string; role: string } | null,
@@ -20,7 +23,9 @@ vi.mock("../../apps/web/src/lib/services/server-service", () => ({
 vi.mock("../../apps/web/src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.history },
 }));
-vi.mock("../../apps/web/src/lib/server-content-api", () => ({ serverContentRate: state.browseRate }));
+vi.mock("../../apps/web/src/lib/server-content-api", () => ({
+  serverContentRate: state.browseRate,
+}));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
 import { GET as exportPage } from "../../apps/web/src/app/api/workspace/servers/[id]/activity/export/route";

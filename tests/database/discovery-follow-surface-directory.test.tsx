@@ -45,7 +45,10 @@ vi.mock("../../apps/web/src/components/product-card", () => ({ ProductCard: () =
 vi.mock("../../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
 vi.mock("../../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
 
-import { DirectoryFilters, DirectoryResults } from "../../apps/web/src/components/discovery-directory";
+import {
+  DirectoryFilters,
+  DirectoryResults,
+} from "../../apps/web/src/components/discovery-directory";
 import { LocaleProvider } from "../../apps/web/src/components/locale-context";
 import { parseDiscoverQuery } from "../../apps/web/src/lib/discover-query";
 import { discoveryCopy } from "../../apps/web/src/lib/discovery-copy";

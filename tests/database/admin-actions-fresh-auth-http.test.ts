@@ -1,6 +1,9 @@
 import { AppError } from "@nexus/domain";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const confirmStaffActionPassword = vi.hoisted(() =>
   vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),

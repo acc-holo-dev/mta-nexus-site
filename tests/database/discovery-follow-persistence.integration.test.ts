@@ -8,7 +8,13 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { follows, notifications, organizations, servers, users } from "../../packages/db/src/schema";
+import {
+  follows,
+  notifications,
+  organizations,
+  servers,
+  users,
+} from "../../packages/db/src/schema";
 const actorIds: string[] = [],
   orgIds: string[] = [],
   serverIds: string[] = [];

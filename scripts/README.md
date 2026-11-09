@@ -11,29 +11,29 @@
 
 ## Основные entrypoint-ы и их pnpm-задачи
 
-| Скрипт                                                       | Тип        | pnpm task                                   | Назначение |
-| ------------------------------------------------------------ | ---------- | ------------------------------------------- | ---------- |
-| `scripts/check-doc-links.mjs`                                | entrypoint | `pnpm docs:check`                           | Локальные Markdown-ссылки и якоря |
-| `scripts/nexus-doctor.mjs`                                   | entrypoint | `pnpm nexus:doctor` / `dev:preflight`       | Префлайт окружения |
-| `scripts/check-legal-surfaces.mjs`                           | entrypoint | `pnpm legal:check`                          | Легальные поверхности продукта |
-| `scripts/release-evidence.mjs`                               | entrypoint | `pnpm release:verify`                       | Релизные свидетельства (не deploy) |
-| `scripts/check-observability-readiness-evidence.mjs`         | entrypoint | `pnpm observability:verify`                 | Готовность observability (evidence) |
-| `scripts/check-production-recovery-acceptance-evidence.mjs`  | entrypoint | `pnpm recovery:acceptance:verify`           | Evidence recovery acceptance |
-| `scripts/check-web-push-soak-evidence.mjs`                   | entrypoint | `pnpm push:soak:verify`                     | Evidence Web Push soak |
-| `scripts/fetch-beta-candidate-evidence.mjs`                  | entrypoint | `pnpm beta:fetch`                           | Скачать retained CI-артефакты (`gh`) |
-| `scripts/beta-candidate-evidence.mjs`                        | entrypoint | `pnpm beta:candidate`                       | Отчёт кандидата (не open beta) |
-| `scripts/ci-diagnose.mjs`                                    | entrypoint | `pnpm ci:diagnose`                          | Диагностика CI-гейтов |
-| `scripts/run-focused-tests.mjs`                              | entrypoint | `pnpm test:focus`                           | Узкий Vitest / `.node-test.mjs` прогон |
-| `scripts/run-isolated-tests.mjs`                             | entrypoint | `pnpm test:isolated`                        | Полный Vitest в одноразовой БД |
-| `scripts/run-tooling-tests.mjs`                              | entrypoint | `pnpm test:tooling`                         | Tooling-проверки (pins, infra) |
-| `scripts/run-ci-aligned-vitest.mjs`                          | entrypoint | (CI) unit-прогон, выровненный с CI         | Единый unit-гейт |
+| Скрипт                                                      | Тип        | pnpm task                             | Назначение                             |
+| ----------------------------------------------------------- | ---------- | ------------------------------------- | -------------------------------------- |
+| `scripts/check-doc-links.mjs`                               | entrypoint | `pnpm docs:check`                     | Локальные Markdown-ссылки и якоря      |
+| `scripts/nexus-doctor.mjs`                                  | entrypoint | `pnpm nexus:doctor` / `dev:preflight` | Префлайт окружения                     |
+| `scripts/check-legal-surfaces.mjs`                          | entrypoint | `pnpm legal:check`                    | Легальные поверхности продукта         |
+| `scripts/release-evidence.mjs`                              | entrypoint | `pnpm release:verify`                 | Релизные свидетельства (не deploy)     |
+| `scripts/check-observability-readiness-evidence.mjs`        | entrypoint | `pnpm observability:verify`           | Готовность observability (evidence)    |
+| `scripts/check-production-recovery-acceptance-evidence.mjs` | entrypoint | `pnpm recovery:acceptance:verify`     | Evidence recovery acceptance           |
+| `scripts/check-web-push-soak-evidence.mjs`                  | entrypoint | `pnpm push:soak:verify`               | Evidence Web Push soak                 |
+| `scripts/fetch-beta-candidate-evidence.mjs`                 | entrypoint | `pnpm beta:fetch`                     | Скачать retained CI-артефакты (`gh`)   |
+| `scripts/beta-candidate-evidence.mjs`                       | entrypoint | `pnpm beta:candidate`                 | Отчёт кандидата (не open beta)         |
+| `scripts/ci-diagnose.mjs`                                   | entrypoint | `pnpm ci:diagnose`                    | Диагностика CI-гейтов                  |
+| `scripts/run-focused-tests.mjs`                             | entrypoint | `pnpm test:focus`                     | Узкий Vitest / `.node-test.mjs` прогон |
+| `scripts/run-isolated-tests.mjs`                            | entrypoint | `pnpm test:isolated`                  | Полный Vitest в одноразовой БД         |
+| `scripts/run-tooling-tests.mjs`                             | entrypoint | `pnpm test:tooling`                   | Tooling-проверки (pins, infra)         |
+| `scripts/run-ci-aligned-vitest.mjs`                         | entrypoint | (CI) unit-прогон, выровненный с CI    | Единый unit-гейт                       |
 
 ## Библиотеки (lib)
 
-| Модуль                                          | Используется в |
-| ----------------------------------------------- | -------------- |
+| Модуль                                                                                                                                                                                        | Используется в                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | `scripts/*-lib.mjs` (например `beta-candidate-lib`, `legal-surfaces-lib`, `release-evidence-lib`, `observability-evidence-lib`, `web-push-evidence-lib`, `fetch-beta-candidate-evidence-lib`) | Соответствующие entrypoint-ы и `*.node-test.mjs` |
-| `scripts/disposable-test-database.mjs`          | DB-подготовка для `test:focus` / `test:isolated` |
+| `scripts/disposable-test-database.mjs`                                                                                                                                                        | DB-подготовка для `test:focus` / `test:isolated` |
 
 ## CI / служебные
 

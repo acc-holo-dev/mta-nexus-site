@@ -19,9 +19,7 @@
           "permission": "github_settings",
           "id": "OPS-09",
           "title": "Подготовить private repository с реально действующей защитой main и release refs",
-          "source_ids": [
-            "OPSNEW-09"
-          ],
+          "source_ids": ["OPSNEW-09"],
           "current": "Root подтвердил public personal repository, main без protection/rulesets; тариф неизвестен. Private branch protections/rulesets доступны personal Pro, но не Free.",
           "goal": "После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.",
           "scope_files": [
@@ -67,15 +65,8 @@
             "Не вводить фиктивного второго reviewer, если независимого человека нет."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_authorized_private_visibility_and_protection_change"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_authorized_private_visibility_and_protection_change"]
         },
         {
           "track": "operations_delivery",
@@ -83,17 +74,12 @@
           "decision_status": "accepted_direction",
           "queue_state": "external_gate",
           "priority": "P2",
-          "dependencies": [
-            "OPS-09",
-            "OPS-10"
-          ],
+          "dependencies": ["OPS-09", "OPS-10"],
           "dependency_notes": "Развёртывание и хранение pull credential на production относятся к OPS-17, а не к GitHub settings task.",
           "permission": "github_settings",
           "id": "OPS-11",
           "title": "Принять private GHCR visibility и минимальные права доступа",
-          "source_ids": [
-            "OPSNEW-11"
-          ],
+          "source_ids": ["OPSNEW-11"],
           "current": "Нужный private package и его настройки в этой работе не инспектированы. Repo privacy и GHCR visibility независимы; новый package по умолчанию private.",
           "goal": "Подтвердить, что publish workflow имеет нужный доступ, а внешний consumer может только читать выбранный private package.",
           "scope_files": [
@@ -139,15 +125,8 @@
             "Не создавать токены и не публиковать probe без отдельного внешнего разрешения."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_accepting_private_registry_access_for_delivery"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_accepting_private_registry_access_for_delivery"]
         },
         {
           "track": "operations_delivery",
@@ -155,16 +134,12 @@
           "decision_status": "verification_required",
           "queue_state": "external_gate",
           "priority": "P1",
-          "dependencies": [
-            "OPS-12"
-          ],
+          "dependencies": ["OPS-12"],
           "dependency_notes": "До хранения ценных данных/открытия трафика нужен внешний gate; конкретные RPO/RTO и storage/доступы выбирает владелец.",
           "permission": "external_live",
           "id": "OPS-13",
           "title": "Принять эксплуатационный backup/recovery contract — F04",
-          "source_ids": [
-            "F04"
-          ],
+          "source_ids": ["F04"],
           "current": "Exact-SHA CI восстановил синтетическую DB/ledger/uploads после удаления source volumes. Production schedule, off-host retention и RPO/RTO из Git не доказаны; их отсутствие не установлено.",
           "goal": "Подтвердить либо настроить недостающие части парного независимого резервирования и измерить реальное восстановление.",
           "scope_files": [
@@ -210,15 +185,8 @@
             "Рабочие dump/secret values не сохранять в GitHub release assets."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_live_acceptance"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_live_acceptance"]
         },
         {
           "track": "operations_delivery",
@@ -226,18 +194,12 @@
           "decision_status": "verification_required",
           "queue_state": "external_gate",
           "priority": "P1",
-          "dependencies": [
-            "OPS-04"
-          ],
+          "dependencies": ["OPS-04"],
           "dependency_notes": "Каналы и ответственный — решение владельца; включённые optional mail/push должны совпадать с продуктовой конфигурацией, которую определяют другие треки.",
           "permission": "external_live",
           "id": "OPS-14",
           "title": "Доказать доставку operational alerts ответственному — F03",
-          "source_ids": [
-            "F03",
-            "ARC19",
-            "ARC11"
-          ],
+          "source_ids": ["F03", "ARC19", "ARC11"],
           "current": "Readiness helper подтверждает scripts/env/runbook и прямо исключает доказательство live alert routing. Health/heartbeat/progress/queue механизмы существуют; внешняя конфигурация неизвестна.",
           "goal": "Принять цепочку сигнал → тревога → получение ответственным → восстановление для включённых зависимостей.",
           "scope_files": [
@@ -291,15 +253,8 @@
             "Не объявлять внешнего мониторинга нет только потому, что его нет в repository."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_live_acceptance"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_live_acceptance"]
         },
         {
           "track": "operations_delivery",
@@ -307,20 +262,12 @@
           "decision_status": "accepted_direction",
           "queue_state": "external_gate",
           "priority": "P2",
-          "dependencies": [
-            "OPS-08",
-            "OPS-10",
-            "OPS-11"
-          ],
+          "dependencies": ["OPS-08", "OPS-10", "OPS-11"],
           "dependency_notes": "Кандидат должен включать принятые межтрековые изменения, которые root внесёт в release scope; эта задача не подтверждает продуктовую полноту сама.",
           "permission": "github_settings",
           "id": "OPS-16",
           "title": "Опубликовать принятый release bundle и проверить его восстановимую доступность",
-          "source_ids": [
-            "ARC08",
-            "ARC22",
-            "OPSNEW-16"
-          ],
+          "source_ids": ["ARC08", "ARC22", "OPSNEW-16"],
           "current": "Root подтвердил отсутствие GitHub Releases. CI image/evidence существуют, но не равны опубликованному поддерживаемому релизу.",
           "goal": "После явного разрешения создать private GitHub Release/tag с проверенным digest и evidence, доступными в пределах утверждённого retention.",
           "scope_files": [
@@ -371,15 +318,8 @@
             "Source version/tag, registry digest и deployment receipt — разные идентификаторы; никакого автоматического server rollout."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "when_approved_release_bundle_is_published"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["when_approved_release_bundle_is_published"]
         },
         {
           "track": "operations_delivery",
@@ -405,19 +345,10 @@
           "permission": "external_live",
           "id": "OPS-17",
           "title": "Выполнить отдельно одобренную установку exact digest и записать deployment receipt",
-          "source_ids": [
-            "ARC08",
-            "ARC11",
-            "ARC12",
-            "ARC13",
-            "ARC16"
-          ],
+          "source_ids": ["ARC08", "ARC11", "ARC12", "ARC13", "ARC16"],
           "current": "Immutable runbook уже есть; production host в аудите не инспектировался. Personal Pro не предоставляет required reviewers для private environment.",
           "goal": "Установить выбранный оператором готовый image на собственный сервер и подтвердить результат отдельно от CI/Release.",
-          "scope_files": [
-            "docs/OPERATIONS.md",
-            "compose.production.yaml"
-          ],
+          "scope_files": ["docs/OPERATIONS.md", "compose.production.yaml"],
           "acceptance": [
             "Оператор явно выбрал digest/manifest; Actions не имеет production deploy credential, на production нет общего self-hosted CI runner.",
             "Сервер получает private image read-only pull credential; все включённые роли используют approved release без rebuild.",
@@ -471,12 +402,7 @@
             "Не считать review package, успешный CI или опубликованный Release разрешением выполнить эту задачу."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
           "release_conditions": [
             "when_approved_release_is_deployed_to_target_environment_after_selected_gates"
           ]
@@ -487,17 +413,12 @@
           "decision_status": "verification_required",
           "queue_state": "external_gate",
           "priority": "P2",
-          "dependencies": [
-            "OPS-04",
-            "OPS-08"
-          ],
+          "dependencies": ["OPS-04", "OPS-08"],
           "dependency_notes": "Workload зависит от выбранных бесплатных beta journeys; root связывает с продуктовой приёмкой. Без подтверждённой потребности multi-instance отложен.",
           "permission": "external_live",
           "id": "OPS-18",
           "title": "Измерить single-instance capacity на утверждённом workload",
-          "source_ids": [
-            "ARC21"
-          ],
+          "source_ids": ["ARC21"],
           "current": "Проект single-instance; каждый DB client pool max=10, workers имеют собственные процессы; есть process-local directory cache. CI performance regression tests содержательны, но не доказывают capacity площадки.",
           "goal": "Получить измеренные пределы latency/очереди/соединений/памяти/storage для выбранной конфигурации без выдуманного SLA.",
           "scope_files": [
@@ -550,15 +471,8 @@
             "Не включать horizontal scaling, cache backend или deploymentId автоматически в эту leaf-задачу."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_capacity_commitments_or_expanded_traffic"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_capacity_commitments_or_expanded_traffic"]
         },
         {
           "track": "operations_delivery",
@@ -566,16 +480,12 @@
           "decision_status": "existing_goal",
           "queue_state": "deferred",
           "priority": "P3",
-          "dependencies": [
-            "OPS-05"
-          ],
+          "dependencies": ["OPS-05"],
           "dependency_notes": "Может быть перенесено раньше F6 при доказанной бесплатной beta capacity-потребности; решение принимает владелец. Commerce activation и его INT/security gates — другой трек. Conditional infrastructure: перенос из F6 в F3 не делает object storage обязательным для beta и не связывает его с включением коммерции.",
           "permission": "local_development",
           "id": "OPS-20",
           "title": "Реализовать private object-storage adapter только при выбранном триггере",
-          "source_ids": [
-            "ARC18"
-          ],
+          "source_ids": ["ARC18"],
           "current": "Local adapter реализован с immutable/integrity/abort checks; configured S3 fail-closed, adapter не установлен. Private object storage/signed delivery обозначены будущей целью.",
           "goal": "При подтверждённой необходимости добавить adapter с тем же контрактом и доказуемой миграцией объектов.",
           "scope_files": [
@@ -630,15 +540,8 @@
             "Permission local_development допускает только будущую локальную реализацию; production bucket/migration и коммерческая активация отдельно."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "only_after_evidence_based_storage_trigger_and_selected_scope"
-          ]
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["only_after_evidence_based_storage_trigger_and_selected_scope"]
         },
         {
           "id": "UX-24",
@@ -648,10 +551,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P3",
-          "source_ids": [
-            "AD01",
-            "AD07"
-          ],
+          "source_ids": ["AD01", "AD07"],
           "current": "Есть sponsored badge и fixed-price inventory target; законченный runtime placements не установлен. Конкретный lifecycle — предложение.",
           "goal": "Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.",
           "scope_files": [
@@ -707,13 +607,8 @@
             "Не включать оплату, продажу инвентаря, production campaigns или внешние trackers."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-010",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-010", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "OPS-06",
@@ -729,13 +624,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "AD02",
-            "AD03",
-            "AD04",
-            "AD05",
-            "AD06"
-          ],
+          "source_ids": ["AD02", "AD03", "AD04", "AD05", "AD06"],
           "current": "Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.",
           "goal": "Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.",
           "scope_files": [
@@ -757,10 +646,7 @@
             "Fixture behavior check fill/no-fill/delay/error/expired/ineligible: narrow/desktop, keyboard, themes.",
             "Проверка одинакового organic order до/после placement и отсутствия paid trust effects."
           ],
-          "dependencies": [
-            "UX-02",
-            "UX-24"
-          ],
+          "dependencies": ["UX-02", "UX-24"],
           "dependency_notes": "Модель placement/eligibility — UX-24; внешнее включение имеет отдельный gate.",
           "permission": "local_development",
           "evidence": [
@@ -813,13 +699,8 @@
             "Sponsored не означает identity/clean build/качество; такие исходы не продаются."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-010",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-010", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "UX-26",
@@ -829,10 +710,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P3",
-          "source_ids": [
-            "AD08",
-            "AD09"
-          ],
+          "source_ids": ["AD08", "AD09"],
           "current": "Opt-out/explainability — принятые направления; hide/report ads и единицы рекламных измерений ещё не реализованы.",
           "goal": "Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.",
           "scope_files": [
@@ -853,10 +731,7 @@
             "Local behavior check opt-out/hide/report/unknown states.",
             "Controlled event fixtures: dedup/internal traffic после принятия модели."
           ],
-          "dependencies": [
-            "UX-24",
-            "UX-25"
-          ],
+          "dependencies": ["UX-24", "UX-25"],
           "dependency_notes": "Privacy retention/moderation/metrics — соответствующие domain owners; коммерческие обязательства не задаёт UI.",
           "permission": "local_development",
           "evidence": [
@@ -885,13 +760,8 @@
             "Цены/гарантии/рост эффективности не выводятся из макета."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-010",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-010", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-02",
@@ -901,9 +771,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "RET02"
-          ],
+          "source_ids": ["RET02"],
           "current": "Частные коллекции уже существуют; редакционные проверенные наборы требуют содержания и ответственного.",
           "goal": "Помочь новому владельцу решить одну настоящую задачу с понятными версиями и ограничениями.",
           "scope_files": [
@@ -920,9 +788,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -944,13 +810,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-03",
@@ -960,9 +821,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "RET03"
-          ],
+          "source_ids": ["RET03"],
           "current": "Публикации и обсуждения доступны; регулярный формат и дежурная очередь ещё не запущены этим планом.",
           "goal": "Получать воспроизводимые решения вопросов и оставлять полезный материал следующим читателям.",
           "scope_files": [
@@ -979,9 +838,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1003,13 +860,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-04",
@@ -1019,9 +871,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "RET04"
-          ],
+          "source_ids": ["RET04"],
           "current": "Серверы и контент дают основу; полный calendar/events runtime не предполагается готовым.",
           "goal": "Проверить повторяемость участия до создания крупной событийной подсистемы.",
           "scope_files": [
@@ -1038,9 +888,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1062,13 +910,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-05",
@@ -1078,9 +921,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "RET05"
-          ],
+          "source_ids": ["RET05"],
           "current": "Выбор сборок и обсуждения можно использовать; matchmaking и QA-service не реализуются по умолчанию.",
           "goal": "Автор получает воспроизводимый отчёт, тестер — обратную связь о принятии и исправлении.",
           "scope_files": [
@@ -1097,9 +938,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1121,13 +960,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-06",
@@ -1137,9 +971,7 @@
           "decision_status": "proposal",
           "queue_state": "deferred",
           "priority": "P3",
-          "source_ids": [
-            "RET06"
-          ],
+          "source_ids": ["RET06"],
           "current": "Есть контент и обсуждения; отдельная структурированная demand board — новая возможность.",
           "goal": "Отличить реальную повторяющуюся проблему от голосования за абстрактную идею.",
           "scope_files": [
@@ -1156,9 +988,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1180,13 +1010,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         },
         {
           "id": "GROW-07",
@@ -1196,9 +1021,7 @@
           "decision_status": "proposal",
           "queue_state": "needs_decision",
           "priority": "P2",
-          "source_ids": [
-            "RET07"
-          ],
+          "source_ids": ["RET07"],
           "current": "Публикации, follows и уведомления уже существуют; новый дайджест не должен дублировать их бесконтрольно.",
           "goal": "Дать конкретный повод вернуться к релизу, решению или событию с понятным следующим действием.",
           "scope_files": [
@@ -1216,9 +1039,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1240,13 +1061,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "FLOW-09",
@@ -1262,9 +1078,7 @@
           "decision_status": "proposal",
           "queue_state": "deferred",
           "priority": "P3",
-          "source_ids": [
-            "RET08"
-          ],
+          "source_ids": ["RET08"],
           "current": "Collection manifest содержит product IDs; точные build/version и проверка совместного запуска — отдельный контракт.",
           "goal": "Получить воспроизводимый snapshot набора, не переписывая уже имеющиеся коллекции и выбор версии.",
           "scope_files": [
@@ -1283,9 +1097,7 @@
             "Проверить образец snapshot двух ресурсов: exact build identity, права доступа, явное обновление pin, устаревшее окружение и отсутствие файлов, на перепубликацию которых нет права.",
             "Смысловая проверка спецификации; будущая установка/автообновление не выдаются за выполненный пилот."
           ],
-          "dependencies": [
-            "GROW-02"
-          ],
+          "dependencies": ["GROW-02"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "local_development",
           "evidence": [
@@ -1307,13 +1119,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "OPS-06",
@@ -1331,9 +1138,7 @@
           "decision_status": "proposal",
           "queue_state": "deferred",
           "priority": "P3",
-          "source_ids": [
-            "RET09"
-          ],
+          "source_ids": ["RET09"],
           "current": "Профили/публикации есть; отдельная модель подтверждённого вклада — новая продуктовая работа.",
           "goal": "Показать результат работы автора или помощника с проверяемым основанием и согласием на публичность.",
           "scope_files": [
@@ -1351,9 +1156,7 @@
             "До запуска: brief с ролью, outcome, baseline, окном, хозяином и лимитом нагрузки.",
             "После разрешённого пилота: фактические результаты, отрицательные сигналы и решение stop/change/continue; не объявлять uplift без достаточного сравнения."
           ],
-          "dependencies": [
-            "GROW-01"
-          ],
+          "dependencies": ["GROW-01"],
           "dependency_notes": "Сначала выбрать один пилот; перечисление не является командой запустить все механики.",
           "permission": "external_live",
           "evidence": [
@@ -1375,13 +1178,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "not_started",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ]
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
         }
       ]
     },
@@ -1396,9 +1194,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "DOC01"
-          ],
+          "source_ids": ["DOC01"],
           "current": "Есть 56 docs Markdown; решения и сценарии распределены по handbook, пути читаются тестами и скриптами.",
           "goal": "У каждой старой главы, стабильного decision ID и программного потребителя есть место в плане миграции.",
           "scope_files": [
@@ -1439,14 +1235,8 @@
             "Количество файлов и совпадение ID не доказывают сохранение всех смысловых требований."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-001",
-            "NX-007",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_migrating_documentation"
-          ],
+          "decision_refs": ["NX-001", "NX-007", "NX-011"],
+          "release_conditions": ["before_migrating_documentation"],
           "execution_notes": "Local inventory at 385e577e: 56 docs + README/AGENTS, 309 decision IDs, path consumers recorded in DOCS-MIGRATION.",
           "execution_updated_on": "2026-11-01"
         },
@@ -1458,9 +1248,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "DOC02"
-          ],
+          "source_ids": ["DOC02"],
           "current": "Agent contract and DOC-02 integration are on tip; handbook register remains the baseline decision index.",
           "goal": "Следующий агент начинает с одного контракта и понимает действующие решения, текущее состояние и границы задачи.",
           "scope_files": [
@@ -1487,9 +1275,7 @@
             "Релевантные operator/dev-startup suites, выбранные по rg",
             "Full acceptance согласно действующей CI-policy после интеграции"
           ],
-          "dependencies": [
-            "DOC-01"
-          ],
+          "dependencies": ["DOC-01"],
           "dependency_notes": "При отсутствии команды на реализацию пакет остаётся review draft. Эта карточка не включает GitHub push.",
           "permission": "local_development",
           "evidence": [
@@ -1516,14 +1302,8 @@
             "Нельзя просто скопировать архив поверх репозитория: draft DECISIONS и PROBLEMS требуют интеграции baseline."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-001",
-            "NX-007",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_adopting_new_agent_contract_in_repository"
-          ],
+          "decision_refs": ["NX-001", "NX-007", "NX-011"],
+          "release_conditions": ["before_adopting_new_agent_contract_in_repository"],
           "execution_notes": "Core docs integrated (AGENT/CURRENT-STATE/PRODUCT/DECISIONS/ROADMAP/TASKS/FLOWS/UX/RELEASE/RETENTION/planning); AI-007 reconciled; PROBLEMS merged; focused policy/link/operator checks passed. Full GitHub disposable acceptance not run.",
           "execution_updated_on": "2026-11-05"
         },
@@ -1535,9 +1315,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "DOC03"
-          ],
+          "source_ids": ["DOC03"],
           "current": "JSON-in-repo выбран как единственный рабочий tracker; import-baseline заморожен; GitHub Issues не созданы.",
           "goal": "Статус, исполнение и доказательство каждой задачи поддерживаются один раз.",
           "scope_files": [
@@ -1555,9 +1333,7 @@
             "Валидация уникальности ID, полноты импорта и разрешения зависимостей",
             "Сверка выборки карточек с исходной приёмкой после разрешённого импорта"
           ],
-          "dependencies": [
-            "DOC-02"
-          ],
+          "dependencies": ["DOC-02"],
           "dependency_notes": "Работа над отдельно порученными задачами может идти до выбора tracker; это не universal blocker.",
           "permission": "github_settings",
           "evidence": [
@@ -1574,18 +1350,10 @@
               "source_type": "repository"
             }
           ],
-          "limits": [
-            "Импорт задач в GitHub не выполнен этим пакетом."
-          ],
+          "limits": ["Импорт задач в GitHub не выполнен этим пакетом."],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-001",
-            "NX-007",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "when_single_working_tracker_is_selected_and_migrated"
-          ],
+          "decision_refs": ["NX-001", "NX-007", "NX-011"],
+          "release_conditions": ["when_single_working_tracker_is_selected_and_migrated"],
           "execution_notes": "Selected JSON-in-repo as the sole working tracker; froze import-baseline; Issues import deferred pending github_settings permission.",
           "execution_updated_on": "2026-11-01"
         },
@@ -1597,9 +1365,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "DOC04"
-          ],
+          "source_ids": ["DOC04"],
           "current": "Удалены 49 superseded handbook chapters после retarget consumers; сохранены 00-README, 13-DECISION-REGISTER, 15-AI-CONTEXT-INDEX; manifest planning/deletion-manifest.json; полный текст остаётся в Git history.",
           "goal": "Уменьшить дублирование без потери правил, импортов, операторских сценариев и истории миграций.",
           "scope_files": [
@@ -1619,9 +1385,7 @@
             "rg по каждому удалённому пути и названию",
             "Focused consumer checks; интеграционный gate по фактическому diff"
           ],
-          "dependencies": [
-            "DOC-05"
-          ],
+          "dependencies": ["DOC-05"],
           "dependency_notes": "Удаление завершает перенос, а не предшествует ему.",
           "permission": "local_development",
           "evidence": [
@@ -1638,18 +1402,10 @@
               "source_type": "repository"
             }
           ],
-          "limits": [
-            "Ни один файл не объявлен готовым к удалению лишь на основании этого пакета."
-          ],
+          "limits": ["Ни один файл не объявлен готовым к удалению лишь на основании этого пакета."],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-001",
-            "NX-007",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "after_semantic_migration_and_consumer_checks"
-          ],
+          "decision_refs": ["NX-001", "NX-007", "NX-011"],
+          "release_conditions": ["after_semantic_migration_and_consumer_checks"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Deleted 49 superseded handbook chapters after retargeting consumers; kept 00-README, 13-DECISION-REGISTER, 15-AI-CONTEXT-INDEX; manifest planning/deletion-manifest.json; Git history retains full text."
         },
@@ -1661,9 +1417,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "DOC05"
-          ],
+          "source_ids": ["DOC05"],
           "current": "Предметные контракты RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF/COMMERCIAL-FUTURE созданы и связаны с PRODUCT/ARCHITECTURE/PROJECT-MAP/FLOWS/UX/OPERATIONS. Groups/DM/events и collections≠server packs сохранены; commercial goals без payment activation.",
           "goal": "Сохранить уникальные owner-решения и подробные отказы/права в компактной структуре предметных контрактов.",
           "scope_files": [
@@ -1687,9 +1441,7 @@
             "node scripts/check-doc-links.mjs",
             "Policy/operator checks по затронутым путям"
           ],
-          "dependencies": [
-            "DOC-02"
-          ],
+          "dependencies": ["DOC-02"],
           "dependency_notes": "Можно переносить по одному предметному домену; не ждать окончания всех новых функций.",
           "permission": "local_development",
           "evidence": [
@@ -1710,14 +1462,8 @@
             "Пакет даёт рабочие общие контракты; полное смысловое объединение всех 52 handbook глав остаётся этой задачей."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-001",
-            "NX-007",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_retiring_old_subject_chapters"
-          ],
+          "decision_refs": ["NX-001", "NX-007", "NX-011"],
+          "release_conditions": ["before_retiring_old_subject_chapters"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Subject contracts RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF/COMMERCIAL-FUTURE created; PRODUCT/ARCHITECTURE/PROJECT-MAP/indexes/FLOWS/UX/OPERATIONS cross-linked; handbook retained for DOC-04; groups/DM/events and collections≠server packs preserved; commercial goals without payment activation."
         },
@@ -1732,10 +1478,7 @@
           "permission": "local_development",
           "id": "OPS-01",
           "title": "Закрепить границы модульного монолита и исключения HTTP → repository",
-          "source_ids": [
-            "ARC01",
-            "ARC02"
-          ],
+          "source_ids": ["ARC01", "ARC02"],
           "current": "Границы модульного монолита и HTTP→service/repository exceptions зафиксированы; dependency-cruiser и architecture-analysis проверяют контракт. Точечные допустимые repository reads остаются только по списку исключений.",
           "goal": "Описать и проверять границу составных service-команд без массового рефакторинга всех handlers.",
           "scope_files": [
@@ -1780,15 +1523,8 @@
             "Микросервисы, Redis и новая внешняя очередь не входят в задачу."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Architecture boundaries + cruiser exceptions documented; architecture-analysis node tests PASS."
         },
@@ -1803,11 +1539,7 @@
           "permission": "local_development",
           "id": "OPS-02",
           "title": "Сверять версию приложения и фактический toolchain кандидата",
-          "source_ids": [
-            "ARC03",
-            "ARC04",
-            "ARC05"
-          ],
+          "source_ids": ["ARC03", "ARC04", "ARC05"],
           "current": "Версия приложения и toolchain pins согласованы в manifests/engines/.nvmrc/packageManager; focused toolchain-pins и release-version-consistency PASS. Host/CI Node pin и Docker base сверяются отдельно от major-ok engines.",
           "goal": "Получать однозначную запись actual Node/pnpm/lockfile и проверять релизный policy без обновления зависимостей ради новизны.",
           "scope_files": [
@@ -1863,15 +1595,8 @@
             "Диапазон engines и exact release pin имеют разные функции; текущая несовместимость не заявляется."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_accepting_candidate_version_and_toolchain"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_accepting_candidate_version_and_toolchain"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Toolchain pins/node engines consistency; toolchain-pins + release-version-consistency PASS."
         },
@@ -1881,17 +1606,12 @@
           "decision_status": "proposal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-02"
-          ],
+          "dependencies": ["OPS-02"],
           "dependency_notes": "Нет обязательных межтрековых зависимостей для подготовки локального изменения.",
           "permission": "local_development",
           "id": "OPS-03",
           "title": "Закрепить образы выбранного релиза и правила их обновления",
-          "source_ids": [
-            "ARC07",
-            "ARC12"
-          ],
+          "source_ids": ["ARC07", "ARC12"],
           "current": "Infra pin schema и linux/amd64 digests зафиксированы в deploy/infra-image-pins.json (productionAuthorized=false). Mutable compose tags сохранены для Dependabot; exact production digest enablement остаётся у OPS-16/17.",
           "goal": "Сделать выбранные base/infra bytes повторно доступными по digest и сохранить проверяемый процесс обновления.",
           "scope_files": [
@@ -1951,15 +1671,8 @@
             "Не менять PostgreSQL major, storage layout или рабочие volumes в этой задаче."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_locking_selected_release_image_references"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_locking_selected_release_image_references"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Infra pin schema + resolve-infra-image-digests; linux/amd64 digests resolved in deploy/infra-image-pins.json (productionAuthorized=false). Mutable compose tags retained for Dependabot. toolchain-pins PASS."
         },
@@ -1974,9 +1687,7 @@
           "permission": "local_development",
           "id": "OPS-04",
           "title": "Описать и проверять допустимые Compose overlays и inventory ролей",
-          "source_ids": [
-            "ARC09"
-          ],
+          "source_ids": ["ARC09"],
           "current": "Dev, isolated verify, production base и CI overlay разделены; recovery/mail/file-secret overlays включаются отдельно. Порядок merge значим; CI требует Compose >=2.24.4.",
           "goal": "Для каждого поддерживаемого сочетания получать предсказуемые services, ports, volumes и secret references.",
           "scope_files": [
@@ -2034,15 +1745,8 @@
             "Task не создаёт production secrets и не запускает контейнеры на сервере."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_operating_selected_compose_overlays"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_operating_selected_compose_overlays"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Compose overlay matrix + writer inventory documented; compose-overlay-matrix node tests PASS on host docker."
         },
@@ -2052,19 +1756,12 @@
           "decision_status": "proposal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-02",
-            "OPS-04"
-          ],
+          "dependencies": ["OPS-02", "OPS-04"],
           "dependency_notes": "Нет обязательных межтрековых зависимостей для подготовки локального изменения.",
           "permission": "local_development",
           "id": "OPS-05",
           "title": "Доказать переносимость одного standalone image между runtime origins",
-          "source_ids": [
-            "ARC06",
-            "ARC10",
-            "ARC11"
-          ],
+          "source_ids": ["ARC06", "ARC10", "ARC11"],
           "current": "Runtime APP_URL отделён от build placeholders; same-digest two-origin contract покрыт focused/entrypoint tests. Full check-production-startup.sh disposable CI остаётся внешним gate.",
           "goal": "Зафиксировать build/runtime границу и проверить продвижение одного image без пересборки под каждый домен.",
           "scope_files": [
@@ -2127,15 +1824,8 @@
             "Не включать rolling/multi-instance и не требовать новой публичной version endpoint."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_using_one_image_across_runtime_origins"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_using_one_image_across_runtime_origins"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Runtime APP_URL vs build placeholders separated/guarded; same-digest two-origin contract tests; entrypoint 8 PASS + focused 44 PASS. Full check-production-startup.sh disposable CI remains external."
         },
@@ -2150,9 +1840,7 @@
           "permission": "local_development",
           "id": "OPS-06",
           "title": "Выбрать безопасный authoring path следующей forward-only миграции",
-          "source_ids": [
-            "ARC14"
-          ],
+          "source_ids": ["ARC14"],
           "current": "Journal содержит 90 SQL migrations до 0089_resource_qa, snapshots — только 0000/0001. db:generate вызывает обычный Drizzle generate. Конкретный будущий DDL не воспроизводился; текущая БД не объявлена неверной.",
           "goal": "В disposable checkout проверить риск и документировать поддерживаемый manual/custom либо generator workflow.",
           "scope_files": [
@@ -2206,15 +1894,8 @@
             "Предположение о повторном DDL не выдавать за уже полученный результат генерации."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_next_schema_change_using_authoring_path"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_next_schema_change_using_authoring_path"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout. Tip journal advanced to 0089_resource_qa (90 SQL) via forward-only migrations 0088/0089; retained upgrade evidence baseline still targets 0087_server_reviews."
         },
@@ -2229,10 +1910,7 @@
           "permission": "local_development",
           "id": "OPS-07",
           "title": "Сделать upgrade-evidence validator строгим — F02",
-          "source_ids": [
-            "ARC15",
-            "F02"
-          ],
+          "source_ids": ["ARC15", "F02"],
           "current": "evaluateReleaseUpgradeEvidence строгий: schemaVersion=1, неполный PASS отвергается; legacy full fixtures сохраняют PASS. productionAuthorized в локальных repro остаётся false — не live upgrade evidence.",
           "goal": "Не допускать technical candidate PASS без обязательных identity, target, verification и cleanup доказательств.",
           "scope_files": [
@@ -2280,15 +1958,8 @@
             "Не использовать обходы offline evidence/SHA policy; объявить их семантику явно."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_next_release_candidate"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_next_release_candidate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Strict evaluateReleaseUpgradeEvidence; schemaVersion=1; legacy full fixtures still PASS; 51 node tests green."
         },
@@ -2298,18 +1969,12 @@
           "decision_status": "proposal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-02",
-            "OPS-07"
-          ],
+          "dependencies": ["OPS-02", "OPS-07"],
           "dependency_notes": "Нет обязательных межтрековых зависимостей для подготовки локального изменения.",
           "permission": "local_development",
           "id": "OPS-08",
           "title": "Собирать release manifest и согласованный retention комплект",
-          "source_ids": [
-            "ARC22",
-            "OPSNEW-08"
-          ],
+          "source_ids": ["ARC22", "OPSNEW-08"],
           "current": "Release manifest/retention contract и mismatch tests на tip; ciArtifactDays=14. Durable bundle retention/publish остаются owner_decision (OPS-16) — не объявляется выполненным.",
           "goal": "Связать идентичность исходников, образов, схемы и приёмки в один версионированный кандидатный документ с независимым от CI cache хранением.",
           "scope_files": [
@@ -2358,15 +2023,8 @@
             "Retention длительность и место не придумывать; рабочие backups и secrets не класть в release assets."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_publishing_verified_release_bundle"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_publishing_verified_release_bundle"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Release manifest/retention contract + mismatch tests; ciArtifactDays=14; durable bundle retention still owner_decision (OPS-16). release-evidence* PASS."
         },
@@ -2376,21 +2034,12 @@
           "decision_status": "proposal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-03",
-            "OPS-05",
-            "OPS-07",
-            "OPS-08"
-          ],
+          "dependencies": ["OPS-03", "OPS-05", "OPS-07", "OPS-08"],
           "dependency_notes": "Нет обязательных межтрековых зависимостей для подготовки локального изменения.",
           "permission": "local_development",
           "id": "OPS-10",
           "title": "Подготовить trusted GHCR publish workflow без повторной сборки",
-          "source_ids": [
-            "ARC08",
-            "ARC22",
-            "OPSNEW-10"
-          ],
+          "source_ids": ["ARC08", "ARC22", "OPSNEW-10"],
           "current": "Trusted ghcr-publish job подготовлен: без packages:write на PR; gate NEXUS_GHCR_PUBLISH_ENABLED; restore+validate tar без rebuild. Образ не публиковался; enablement — OPS-11.",
           "goal": "Добавить проверяемую подготовку/publish кандидата из тех же bytes только после full_acceptance доверенного exact SHA.",
           "scope_files": [
@@ -2446,15 +2095,8 @@
             "Не считать workflow_dispatch независимым reviewer approval; publication и server deployment различны."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_enabling_trusted_ghcr_publication"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_enabling_trusted_ghcr_publication"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Trusted ghcr-publish job prep: no PR packages:write; gated by NEXUS_GHCR_PUBLISH_ENABLED; restore+validate tar without rebuild. No image pushed. Needs OPS-11 enablement."
         },
@@ -2464,18 +2106,12 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-04"
-          ],
+          "dependencies": ["OPS-04"],
           "dependency_notes": "Если задача затронет новый SQL, сначала OPS-06. Multi-instance coordination за пределами текущего single-instance release.",
           "permission": "local_development",
           "id": "OPS-12",
           "title": "Исправить maintenance writer inventory и порядок миграции — F05",
-          "source_ids": [
-            "ARC13",
-            "ARC16",
-            "F05"
-          ],
+          "source_ids": ["ARC13", "ARC16", "F05"],
           "current": "Maintenance writer inventory согласован с production/mail/recovery overlays; stop/resume включает штатные license/resource-release workers. App startup по-прежнему применяет forward-only migrations до HTTP.",
           "goal": "Сделать исполнимый runbook консистентной паузы, одной migration phase и полного resume фактически включённых ролей.",
           "scope_files": [
@@ -2529,15 +2165,8 @@
             "Не использовать down --volumes, prune или seed на рабочем сервере."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_using_maintenance_recipe"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["before_using_maintenance_recipe"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Maintenance writer inventory aligned with production/mail/recovery overlays; production-entrypoint + backup-restore-surface + release-upgrade PASS."
         },
@@ -2547,17 +2176,12 @@
           "decision_status": "proposal",
           "queue_state": "specified",
           "priority": "P2",
-          "dependencies": [
-            "OPS-04"
-          ],
+          "dependencies": ["OPS-04"],
           "dependency_notes": "Нет обязательных межтрековых зависимостей для подготовки локального изменения.",
           "permission": "local_development",
           "id": "OPS-15",
           "title": "Выравнять ограничения worker-контейнеров без изменения доставки",
-          "source_ids": [
-            "ARC20",
-            "ARC19"
-          ],
+          "source_ids": ["ARC20", "ARC19"],
           "current": "license/resource-release workers выровнены к push-worker профилю read_only/tmpfs/SIGTERM. Structural compose+contract PASS; disposable batch/restart proof остаётся внешним.",
           "goal": "Дать каждой worker-роли минимальные проверенные writable-пути и ресурсы, сохранив batch/retry/shutdown.",
           "scope_files": [
@@ -2612,15 +2236,8 @@
             "Не менять auth/notification semantics и не вводить внешнюю очередь."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "when_accepting_selected_worker_runtime_constraints"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["when_accepting_selected_worker_runtime_constraints"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "license/resource-release workers aligned to push-worker read_only/tmpfs/SIGTERM profile. Structural compose+contract PASS; disposable batch/restart proof still external."
         },
@@ -2635,9 +2252,7 @@
           "permission": "local_development",
           "id": "OPS-19",
           "title": "Уточнить контракт human resource versions для сравнения обновлений",
-          "source_ids": [
-            "ARC17"
-          ],
+          "source_ids": ["ARC17"],
           "current": "SemVer-like resource version helpers strip optional v for storage/compare; build ID/hash stay immutable; historical IDs are not rewritten.",
           "goal": "Выбрать канонический формат и сравнение новых resource releases, сохранив старые immutable идентификаторы и MTA compatibility отдельно.",
           "scope_files": [
@@ -2684,15 +2299,8 @@
             "Не утверждать отсутствие любой нормализации во всех путях; задача уточняет единый контракт."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-002",
-            "NX-003",
-            "NX-004",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "SemVer-like resource version helpers; strip optional v for storage/compare; fields stay separate; historical IDs not rewritten. validation + build-version-conflict + mta-version-target PASS."
         },
@@ -2704,10 +2312,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "F01",
-            "INT26"
-          ],
+          "source_ids": ["F01", "INT26"],
           "current": "Safe next return path: guest auth links несут next; acquire сохраняет productId; после входа нет auto-mutation. Open Library destination вынесен в UX-27 и исправлен отдельно.",
           "goal": "Один безопасный контракт return target для login/register/expired session: вернуть пользователя к тому же object/query/hash, перечитать права и состояние, дать явно завершить действие. Исправить destination «Открыть библиотеку» без большого redesign.",
           "scope_files": [
@@ -2795,15 +2400,8 @@
             "Подготовленная задача не разрешает GitHub push или production deploy."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_core_beta_acceptance"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["before_core_beta_acceptance"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Safe next return path helper; acquire preserves productId; guest auth links carry next; no auto-mutation after login."
         },
@@ -2815,10 +2413,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT01",
-            "INT08"
-          ],
+          "source_ids": ["INT01", "INT08"],
           "current": "Product follow подписан как Save без обещания release watch; на resource detail FollowButton отделён от watch. User/org/server/content сохраняют разные эффекты; self-follow запрещён.",
           "goal": "Назвать текущий product-follow «Сохранить» и вынести на resource detail; для остальных targetType использовать конкретный смысл. Независимое «Следить за ресурсом» допустимо только после определения реальной ленты его событий.",
           "scope_files": [
@@ -2840,9 +2435,7 @@
             "tests/discovery-follow-persistence.integration.test.ts",
             "behavior probe: save resource then publish build; проверить независимость watch и saved, и сохранение строгого unknown-state."
           ],
-          "dependencies": [
-            "FLOW-01"
-          ],
+          "dependencies": ["FLOW-01"],
           "dependency_notes": "PX09 отвечает за визуальную иерархию CTA; здесь контракт действия и серверное состояние. Новая resource-event feed требует отдельного decision, не скрытой реализации в rename.",
           "permission": "local_development",
           "evidence": [
@@ -2907,15 +2500,8 @@
             "Не начислять очки за follow/unfollow."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Product follow labeled Save (no release-watch promise); detail page wires FollowButton separate from watch; discovery/checking honesty from sibling. Focused discovery-follow + detail acquisition PASS."
         },
@@ -2927,11 +2513,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT02",
-            "INT03",
-            "INT04"
-          ],
+          "source_ids": ["INT02", "INT03", "INT04"],
           "current": "Public resource detail отдаёт release watch с guest return, suppression/settings и access/acquire paths; лимиты 100/20 честны; watch не меняет pinned version.",
           "goal": "Добавить управление с публичного resource detail; показать причину disabled/suppressed и переход к настройкам. Сохранить future-only, expectedRevision, bounded retry и понятные результаты массового управления.",
           "scope_files": [
@@ -2954,10 +2536,7 @@
             "tests/resource-release-watch-batch-repository.test.ts",
             "behavior probe: category off/on, access loss, no safe build, conflict and unknown response; сверить cursor и отсутствие backfill."
           ],
-          "dependencies": [
-            "FLOW-02",
-            "FLOW-09"
-          ],
+          "dependencies": ["FLOW-02", "FLOW-09"],
           "dependency_notes": "ARC/OPS notification-delivery задачи сохраняют worker guarantees; здесь entry point и effective-state contract. PX09 может задавать placement CTA.",
           "permission": "local_development",
           "evidence": [
@@ -3034,15 +2613,8 @@
             "Не обещать push при недоступном браузерном канале."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Public detail release watch with guest return, suppression/settings, access/acquire paths; batch limits honest. Watch http/interaction PASS."
         },
@@ -3054,9 +2626,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT05"
-          ],
+          "source_ids": ["INT05"],
           "current": "Discussion follow/unfollow copy явны; unfollow не выдаётся за mute; direct replies сохраняются до object mute (FLOW-05).",
           "goal": "Явно обозначить «Следить за обсуждением», причину получения уведомления и точный эффект отписки; сохранить прямые ответы до отдельного решения о mute.",
           "scope_files": [
@@ -3077,9 +2647,7 @@
             "tests/discussion-watch-persistence.integration.test.ts",
             "behavior probe: following/direct/self matrix with independent followsEnabled/contentEnabled."
           ],
-          "dependencies": [
-            "FLOW-09"
-          ],
+          "dependencies": ["FLOW-09"],
           "dependency_notes": "Object mute — только FLOW-05; resource Q&A — FLOW-12. Не расширять target model обсуждения ресурса в этой задаче.",
           "permission": "local_development",
           "evidence": [
@@ -3113,15 +2681,8 @@
             "Не обещать уведомления по всем прошлым комментариям."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Discussion follow/unfollow copy; no false mute; direct replies preserved. Focused discussion-watch suites PASS."
         },
@@ -3133,9 +2694,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT06"
-          ],
+          "source_ids": ["INT06"],
           "current": "Object-level mute/snooze is on tip (0088 / followWorkspaceService, id prefix omi). Suppresses follow and direct delivery without inventing backlog; security-exempt paths documented.",
           "goal": "Принять контракт object mute/snooze: target, срок, приоритет относительно direct/follow/category/channel, судьба событий во время паузы, возобновление и ограничения для security events. После решения реализовать отдельную настройку без удаления сохранённой связи.",
           "scope_files": [
@@ -3155,10 +2714,7 @@
             "behavior probe after decision: direct + followed recipient, mute expiry, category off, deleted target, account switch; доказать независимость связей.",
             "tests/discussion-watch-notice.test.ts (регрессионная база, не доказательство наличия mute сейчас)"
           ],
-          "dependencies": [
-            "FLOW-04",
-            "FLOW-09"
-          ],
+          "dependencies": ["FLOW-04", "FLOW-09"],
           "dependency_notes": "Schema-change требует ARC14/поддерживаемого migration workflow. UX-трек согласует control/copy; эта proposal не является закрытием дефекта unfollow.",
           "permission": "local_development",
           "evidence": [
@@ -3186,15 +2742,8 @@
             "Не добавлять бесконечную накопительную очередь на pause по умолчанию."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "OPS-06",
@@ -3212,9 +2761,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT07"
-          ],
+          "source_ids": ["INT07"],
           "current": "Content follow keeps publication in saved with notify_comments default true; quiet Save versus discussion watch are separate actions on tip.",
           "goal": "Добавить сохранение публикации без подписки на комментарии, отдельно от discussion follow. До реализации выбрать модель хранения и миграцию прежних content follows без изменения их намерения.",
           "scope_files": [
@@ -3234,10 +2781,7 @@
             "behavior probe after decision: four bookmark/follow combinations, old-link migration, deleted/private target, pagination and actor isolation.",
             "tests/saved-follows-page.test.tsx (база существующего saved UI)"
           ],
-          "dependencies": [
-            "FLOW-02",
-            "FLOW-07"
-          ],
+          "dependencies": ["FLOW-02", "FLOW-07"],
           "dependency_notes": "Новая модель хранения зависит от ARC14. Saved UI/навигация согласуются с UX-треком; product bookmark заново не строить.",
           "permission": "local_development",
           "evidence": [
@@ -3271,15 +2815,8 @@
             "Не дублировать public resource follow в ещё одну одинаковую кнопку."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "OPS-06",
@@ -3297,10 +2834,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT09",
-            "INT23"
-          ],
+          "source_ids": ["INT09", "INT23"],
           "current": "Saved/collections: empty vs filter-empty, Add-to-collection, batch/limit honesty; watch independence. Недоступные target остаются управляемыми заглушками без закрытых metadata.",
           "goal": "Улучшить доступность существующих операций: «В коллекцию» на уместных library surfaces, различимые empty/filter-empty/load-error/unavailable, понятный per-item batch result. Сохранить приватное владение и независимость от notifications.",
           "scope_files": [
@@ -3321,9 +2855,7 @@
             "tests/library-collections-persistence.integration.test.ts",
             "behavior probe: missing target, collection full, partial batch, retry same receipt, import validation."
           ],
-          "dependencies": [
-            "FLOW-02"
-          ],
+          "dependencies": ["FLOW-02"],
           "dependency_notes": "Collection query/history/performance остаются в ARC/OPS scope. Public/shared collections требуют другого решения и здесь не включены.",
           "permission": "local_development",
           "evidence": [
@@ -3369,15 +2901,8 @@
             "Не превращать private library collections в командный workspace или витрину."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Saved/collections: empty vs filter-empty; Add-to-collection; batch/limit honesty; watch independence. Focused collections/saved suites PASS (integration claimed by agent)."
         },
@@ -3389,10 +2914,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT10",
-            "INT11"
-          ],
+          "source_ids": ["INT10", "INT11"],
           "current": "Bell различает loading и empty после успеха; ошибки mark сохраняют confirmed counts; popover≠account-wide all-read; page selection≠account-wide; batch>25 блокируется. Переход по ссылке сам не меняет isRead.",
           "goal": "Отделить первую загрузку от empty/error, согласовать правило read-on-open/explicit-read и account-wide all-read. Сохранить ожидание серверного подтверждения, конфликтные ревизии, selection scope и корректные counters.",
           "scope_files": [
@@ -3413,9 +2935,7 @@
             "tests/notification-inbox-history-http.test.ts",
             "behavior probe: first-load latency/error, second-tab read mutation, all-read with more than six notices and unknown response."
           ],
-          "dependencies": [
-            "UX-01"
-          ],
+          "dependencies": ["UX-01"],
           "dependency_notes": "UI01 (UX-трек) владеет вкладками, URL state и составом списка. Не исправлять его параллельно вторым локальным фильтром; согласовать общие notification components. Сначала исправляется реальная unread-выдача; loading/read semantics интегрируются поверх её проверенного поведения.",
           "permission": "local_development",
           "evidence": [
@@ -3468,15 +2988,8 @@
             "Не обходить ограничения batch25/notificationMutation30min."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Bell loading vs empty after success; mark errors keep confirmed counts; popover≠all-read; page selection≠account-wide; batch>25 blocked. Focused 5 files / 65 tests PASS (docker Node 26)."
         },
@@ -3488,9 +3001,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT12"
-          ],
+          "source_ids": ["INT12"],
           "current": "Web Push отделён от inbox/category copy; explicit permission и состояния unsupported/unconfigured/denied/enabled/error сохранены. Security category не подчиняется object mute.",
           "goal": "Сделать effective notification contract понятным: какие события получать, создано ли inbox-сообщение, разрешён ли push текущего браузера. Согласовать resourceActivity/commerce naming и причины недоступности без новых каналов.",
           "scope_files": [
@@ -3540,15 +3051,8 @@
             "Не обещать exactly-once или гарантированное устройство-получение."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Web Push vs inbox/category copy separated; web-push-settings tests PASS."
         },
@@ -3560,9 +3064,7 @@
           "decision_status": "verification_required",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT13"
-          ],
+          "source_ids": ["INT13"],
           "current": "Guest claim/auth return preserves safe internal next and acquire/productId; expired/external redirects remain regression-covered.",
           "goal": "Сначала воспроизвести управляемый lost-response сценарий вне production и зафиксировать результат. Затем определить и реализовать actor-scoped intent/receipt protocol либо иной доказуемый способ сверки; сохранить draft/content/parent context и явную повторную отправку после входа.",
           "scope_files": [
@@ -3584,9 +3086,7 @@
             "packages/db/src/repositories/content-comments.test.ts",
             "behavior probe: pause response after commit, drop response, resend same intent; отдельно параллельный click, new intent same text и revoke before retry."
           ],
-          "dependencies": [
-            "FLOW-01"
-          ],
+          "dependencies": ["FLOW-01"],
           "dependency_notes": "Новая таблица/unique constraint требует принятого ARC14 migration workflow. Согласовать schema/transaction boundary с OPS/ARC; не выводить success только из появления похожего текста в ленте.",
           "permission": "local_development",
           "evidence": [
@@ -3627,12 +3127,7 @@
             "Только disposable/local test environment, без реальных сообщений."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": [
             "controlled_retry_verification; schema_fix_depends_on_chosen_design"
           ],
@@ -3653,10 +3148,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT14",
-            "INT15"
-          ],
+          "source_ids": ["INT14", "INT15"],
           "current": "Edit conflict сохраняет draft+copy; permalink return; delete vs moderation; search сохраняет draft. Reply/search/keyset/exact-comment links и expectedRevision остаются.",
           "goal": "Доработать recovery: локальный текст при конфликте, объяснение недоступной permalink-цели, видимый return к общей дискуссии, сохранение draft при поиске и различие удаления/модерации.",
           "scope_files": [
@@ -3677,9 +3169,7 @@
             "tests/discussion-discovery-persistence.integration.test.ts",
             "behavior probe: permalink to page>1, deleted parent/target, concurrent edit, search while draft exists, unavailable publication."
           ],
-          "dependencies": [
-            "FLOW-10"
-          ],
+          "dependencies": ["FLOW-10"],
           "dependency_notes": "UI-трек отвечает за визуальную вложенность/controls, здесь права, данные и recovery. Resource Q&A не включается до FLOW-12.",
           "permission": "local_development",
           "evidence": [
@@ -3738,15 +3228,8 @@
             "Не раскрывать закрытую модераторскую заметку."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Edit conflict keeps draft+copy; permalink return; delete vs moderation; search keeps draft. Contract/surface tests PASS."
         },
@@ -3758,9 +3241,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT16"
-          ],
+          "source_ids": ["INT16"],
           "current": "Public Q&A with thread follow, transactional fanout notices, and manager/staff removal on tip. Live DB upgrade for 0089 still an operational remainder.",
           "goal": "Принять target/lifecycle/moderation контракт resource question/thread с необязательным build context, ответом автора и отдельным thread-follow. Затем реализовать без смешивания с rating и private support.",
           "scope_files": [
@@ -3779,11 +3260,7 @@
           "verification": [
             "behavior probe after decision: resource/build visibility transitions, thread follow vs release-watch, question answered/resolved, abuse report and staff removal."
           ],
-          "dependencies": [
-            "FLOW-04",
-            "FLOW-10",
-            "FLOW-11"
-          ],
+          "dependencies": ["FLOW-04", "FLOW-10", "FLOW-11"],
           "dependency_notes": "Требует ARC14 при schema-change и согласованного moderation workload; public Q&A и support не объединять. Review metrics остаются самостоятельными.",
           "permission": "local_development",
           "evidence": [
@@ -3818,15 +3295,8 @@
             "Не добавлять reward за количество вопросов."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
             {
               "id": "OPS-06",
@@ -3844,9 +3314,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P3",
-          "source_ids": [
-            "INT17"
-          ],
+          "source_ids": ["INT17"],
           "current": "Reaction unknown/error honesty и guest return на tip; clicks≠points. Helpful/thanks/insight: одна выбранная реакция, self-reaction запрещён, author notice дедуплицируется.",
           "goal": "Завершить доступные подписи, guest return и unknown/error recovery вокруг существующего механизма; зафиксировать, что clicks не равны полезной активности и не создают очки.",
           "scope_files": [
@@ -3865,9 +3333,7 @@
             "tests/content-reaction-persistence.integration.test.ts",
             "behavior probe: change/remove/readd, author self, timeout and guest return."
           ],
-          "dependencies": [
-            "FLOW-01"
-          ],
+          "dependencies": ["FLOW-01"],
           "dependency_notes": "Репутация/очки/retention metrics — отдельное решение. UI может переиспользовать общий control standard без изменения данных reactions.",
           "permission": "local_development",
           "evidence": [
@@ -3901,15 +3367,8 @@
             "Лимит 30 изменений/мин сохраняется."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Reaction unknown/error honesty; guest return; clicks≠points. content-reaction-surface PASS."
         },
@@ -3921,9 +3380,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT18"
-          ],
+          "source_ids": ["INT18"],
           "current": "Search/discovery сохраняют URL context; failure возвращает 503 без empty payload; filters/keyset/error≠empty. Follow-state может быть unknown.",
           "goal": "Согласовать Back/refresh/filter reset и recovery на переходе из результата в объект; сделать активные фильтры и scope поиска явными, сохраняя unknown состояния связанных действий.",
           "scope_files": [
@@ -3977,15 +3434,8 @@
             "Не обещать public search по закрытым объектам."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Search preserves URL context; failure returns 503 without empty payload; discovery-search-behavior PASS."
         },
@@ -3997,9 +3447,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT19"
-          ],
+          "source_ids": ["INT19"],
           "current": "Privacy scope copy и guest preview; conflict сохраняет local toggles. showActivity/showProfessionalContacts с expectedUpdatedAt; это не full private account или block user.",
           "goal": "Уточнить scope двух настроек и дать безопасный просмотр публичного профиля от лица гостя; сохранять форму при конфликте и не обещать скрытие публичных ресурсов целиком.",
           "scope_files": [
@@ -4053,15 +3501,8 @@
             "Не трактовать display default=true как согласие на новый контактный канал."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Privacy scope copy; guest preview; conflict keeps local toggles. profile-privacy + users page PASS."
         },
@@ -4073,9 +3514,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT20"
-          ],
+          "source_ids": ["INT20"],
           "current": "Connect/Copy honesty на server surfaces: mtasa:// назван как intent, copy IP:port с ручным fallback; browser не получает подтверждение фактического входа. Unknown/stale observations честны.",
           "goal": "Назвать действие «Открыть в MTA», добавить copy IP:port с ручным fallback и честным результатом попытки; не превращать launch click в доказательство посещения.",
           "scope_files": [
@@ -4114,15 +3553,8 @@
             "Не учитывать этот клик как проверенное использование сервера."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Connect/Copy honesty on server surfaces; server-card tests PASS."
         },
@@ -4134,10 +3566,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "INT21",
-            "INT22"
-          ],
+          "source_ids": ["INT21", "INT22"],
           "current": "Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe остаётся открытым.",
           "goal": "Различать «скачать последнюю» и «скачать выбранную», сохранять явный выбор при unavailable fixed build; показывать только подтверждённый handoff с переходом к квитанции/инструкции/контекстному support.",
           "scope_files": [
@@ -4159,10 +3588,7 @@
             "tests/resource-release-control-interaction.test.tsx",
             "behavior probe: pinned old build plus new release, quarantine selected build, cancel before handoff and integrity failure."
           ],
-          "dependencies": [
-            "FLOW-01",
-            "FLOW-21"
-          ],
+          "dependencies": ["FLOW-01", "FLOW-21"],
           "dependency_notes": "PX09 отвечает за визуальную hierarchy/version CTA; support linkage согласуется с FLOW-19. Не менять established artifact verification protocol без ARC review.",
           "permission": "local_development",
           "evidence": [
@@ -4215,15 +3641,8 @@
             "Не подменять selected version автоматически."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open."
         },
@@ -4235,10 +3654,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT24",
-            "INT25"
-          ],
+          "source_ids": ["INT24", "INT25"],
           "current": "Exact review eligibility reason codes; access/follow не выдаются за verified-use; refresh после Follow. Removed и withdrawn различны.",
           "goal": "Показывать допустимые reason codes и следующие шаги; после Follow перечитывать review eligibility. Сохранить lifecycle/revision rules и честную подпись основания отзыва.",
           "scope_files": [
@@ -4260,9 +3676,7 @@
             "tests/resource-review-lifecycle.integration.test.ts",
             "behavior probe: role/ownership conflict, follow toggled in another tab, archived resource, removed review and reused revision."
           ],
-          "dependencies": [
-            "FLOW-02"
-          ],
+          "dependencies": ["FLOW-02"],
           "dependency_notes": "UX controls и F06 error-vs-empty не дублировать в параллельном server-review-panel edit. Реальная verified-use модель — отдельный decision.",
           "permission": "local_development",
           "evidence": [
@@ -4309,15 +3723,8 @@
             "Не начислять reward за отзывы."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Exact review eligibility reason codes; no fake verified-use; refresh after Follow. review pages/panel PASS."
         },
@@ -4329,9 +3736,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT27"
-          ],
+          "source_ids": ["INT27"],
           "current": "Support create присоединяет verified product/build/receipt context; closed→related path; idempotency/status/revision guards сохранены. Private requester/staff model без второго тикетного движка.",
           "goal": "Дать контекстные входы resource/build/download receipt, показать приложенный контекст перед отправкой и проверить связь сервером. Сохранить intent при unknown response и честный путь для closed кейса.",
           "scope_files": [
@@ -4353,9 +3758,7 @@
             "tests/support-command-session.integration.test.ts",
             "behavior probe: receipt-linked case, tampered context, response lost after commit, concurrent close and reply."
           ],
-          "dependencies": [
-            "FLOW-01"
-          ],
+          "dependencies": ["FLOW-01"],
           "dependency_notes": "Shared idempotency patterns могут помочь FLOW-10, но не переносить support schema механически. Commerce disputes/payment cases вне free-beta scope.",
           "permission": "local_development",
           "evidence": [
@@ -4402,15 +3805,8 @@
             "Не отправлять реальные сообщения staff в разработческой проверке."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Support create attaches verified product/build/receipt context; closed→related path; idempotency preserved. support route/validation PASS."
         },
@@ -4422,9 +3818,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "INT28"
-          ],
+          "source_ids": ["INT28"],
           "current": "Lifecycle UI показывает разрешённые переходы; restore archived / release suspended → draft, не auto-publish; unavailable build → support. FLOW-22 fresh-auth остаётся отдельным staff gate.",
           "goal": "Свести в workspace ресурс, выбранную сборку и следующий разрешённый шаг; различать archive/suspend/build unavailable и показывать корректный support path, без обещания auto-publication.",
           "scope_files": [
@@ -4446,9 +3840,7 @@
             "tests/resource-release-control-interaction.test.tsx",
             "behavior probe: archive→restore, suspend→release, build quarantine, role revoked while confirmation open."
           ],
-          "dependencies": [
-            "FLOW-22"
-          ],
+          "dependencies": ["FLOW-22"],
           "dependency_notes": "ARC/OPS lifecycle state machines остаются источником истины; UX status badges строятся из них. Не создавать новую независимую publish flag.",
           "permission": "local_development",
           "evidence": [
@@ -4489,15 +3881,8 @@
             "Не включать платную продажу при публикации ресурса."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Lifecycle UI allowed transitions; restore/release→draft not auto-publish; unavailable build→support. release-control repo/interaction PASS. Tip FLOW-22 HTTP fresh-auth + session-actor binding (6cefa74e) remain separate from lifecycle transition UI."
         },
@@ -4509,9 +3894,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "F08"
-          ],
+          "source_ids": ["F08"],
           "current": "Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; a controlled multi-connection barrier probe on disposable/live DB remains open (see PROBLEMS F08).",
           "goal": "Провести initiating token до final transaction и применить existing lockInitiatingSession с согласованным lock order; добавить контролируемую проверку revoke/expiry между initial auth и final gate.",
           "scope_files": [
@@ -4575,15 +3958,8 @@
             "Не считать истечение после уже начатой передачи обещанием отзыва bytes."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "controlled_security_verification_before_beta"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["controlled_security_verification_before_beta"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open."
         },
@@ -4595,9 +3971,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "F09"
-          ],
+          "source_ids": ["F09"],
           "current": "Admin/actions HTTP requires fresh current-password proof for critical staff actions per fresh-auth-policy; foreign/revoked session and role loss are rejected. Compromised-session absence is not claimed.",
           "goal": "Применить уже действующее правило staff_action→current_password к существующим критичным admin/actions минимальным серверным подтверждением текущего пароля; связать проверку с текущими actor/session и финальной транзакцией. Отдельный TTL/capability-token сервис для этого исправления не обязателен.",
           "scope_files": [
@@ -4653,15 +4027,8 @@
             "Не вводить новый proof-token сервис или ждать владельца по обратимой детали реализации, если прямое подтверждение текущим паролем реализует действующую policy."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "existing_staff_policy_enforcement_before_beta"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["existing_staff_policy_enforcement_before_beta"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "admin/actions requires current_password for all critical staff actions; build approve/reject recheck hash in txn. Tip HTTP enforcement covered by admin-actions-fresh-auth-http; session-actor binding wave (6cefa74e) binds related staff/mutation paths to initiating/displayed session. Fresh password ≠ mandatory 2FA."
         },
@@ -4673,10 +4040,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "UI01",
-            "UI16"
-          ],
+          "source_ids": ["UI01", "UI16"],
           "current": "Unread/All/Read — URL links, задающие inbox state; смена state сбрасывает cursor; surface tests покрывают выдачу. Общий Tabs primitive не обязателен для этого контракта.",
           "goal": "Синхронизировать All/Unread, URL и показанный список, сохранив доступность и корректную семантику route navigation.",
           "scope_files": [
@@ -4727,15 +4091,8 @@
             "Не создавать вторую семантику inbox и не выдавать code inspection за выполненный browser PASS."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_core_beta_acceptance"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["before_core_beta_acceptance"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Unread/All/Read are URL links driving inbox state; cursor cleared; surface tests 10/10."
         },
@@ -4747,11 +4104,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI02",
-            "UI03",
-            "UI10"
-          ],
+          "source_ids": ["UI02", "UI03", "UI10"],
           "current": "Button уже native button с focus/busy/disabled; Link CTA и карточки оформляются отдельно. Header controls имеют неодинаковые размеры.",
           "goal": "Согласовать Button, ссылку CTA и card link, сохранив семантику перехода и действия.",
           "scope_files": [
@@ -4822,15 +4175,8 @@
             "Независимый global-error остаётся разумным исключением."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Button/native action semantics + design-token contrast PASS."
         },
@@ -4842,11 +4188,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI05",
-            "UI06",
-            "UI09"
-          ],
+          "source_ids": ["UI05", "UI06", "UI09"],
           "current": "Input имеет label/error wiring, fieldClass оформляет native fields; серверная форма и сравнение коллекций используют дополнительные локальные рецепты.",
           "goal": "Общий control chrome и Field label/hint/error для input/select/textarea, включая disabled/readOnly.",
           "scope_files": [
@@ -4915,15 +4257,8 @@
             "Raw input включает checkbox/file/hidden; это не список неоформленных текстовых полей."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Field/Input aria-describedby hint/error; disabled/readOnly/pending chrome. ui-accessibility + server-details-form-fields PASS."
         },
@@ -4935,11 +4270,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI07",
-            "UI08",
-            "UI23"
-          ],
+          "source_ids": ["UI07", "UI08", "UI23"],
           "current": "Community/server forms блокируют поля при pending, сохраняют input при error и показывают localized confirmed/error. FollowButton по-прежнему различает checking/error/success.",
           "goal": "Не терять поздние правки и показывать локализованный pending/error/confirmed result.",
           "scope_files": [
@@ -5007,15 +4338,8 @@
             "Loading, reduced motion и honest success уже есть; их нужно сохранить."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Community/server forms lock while pending; keep input on error; localized confirmed/error. Focused form/a11y PASS."
         },
@@ -5027,11 +4351,7 @@
           "decision_status": "verification_required",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI11",
-            "UI12",
-            "UI21"
-          ],
+          "source_ids": ["UI11", "UI12", "UI21"],
           "current": "color-scheme, longhand typography и autofill styling на tip; theme-preference + design-token-contrast PASS. Browser autofill probe не записан как evidence.",
           "goal": "Проверить native controls и computed typography, исправить подтверждённые расхождения; отдельно оценить понятность theme cycle.",
           "scope_files": [
@@ -5098,15 +4418,8 @@
             "Не увеличивать всю типографику и не менять theme interaction без подтверждённой пользы."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "color-scheme + longhand typography + autofill styling. theme-preference + design-token-contrast PASS. Browser autofill probe not recorded."
         },
@@ -5118,10 +4431,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI13",
-            "UI15"
-          ],
+          "source_ids": ["UI13", "UI15"],
           "current": "ConfirmDialog + confirmAction is the native confirm pattern; window.confirm removed from apps/web. Destructive flows show title/object/consequences; Cancel does not submit; password/slug/revision/busy guards stay at call sites.",
           "goal": "Согласовать один native modal pattern и выборочное подтверждение с объектом/последствиями.",
           "scope_files": [
@@ -5153,9 +4463,7 @@
             "scripts/tests/shell-accessibility.playwright.mjs — actual native modal behavior.",
             "Поведенческая проверка Cancel/confirm/one command на безопасных fixtures."
           ],
-          "dependencies": [
-            "UX-02"
-          ],
+          "dependencies": ["UX-02"],
           "dependency_notes": "Destructive transition, полномочия и revision checks описывает docs/FLOWS.md.",
           "permission": "local_development",
           "evidence": [
@@ -5190,15 +4498,8 @@
             "Независимый modal bug исправляется без ожидания полного перехода."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Migrated remaining window.confirm call sites to confirmAction (moderation, quarantine, verification, org leave/remove, team directory). rg window.confirm apps/web is empty. dialog-accessibility PASS."
         },
@@ -5210,10 +4511,7 @@
           "decision_status": "verification_required",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI14",
-            "UI19"
-          ],
+          "source_ids": ["UI14", "UI19"],
           "current": "More menu имеет short-viewport scroll; SectionHeader задаёт wrap/gap. Playwright shell-accessibility этой волной не заявляется.",
           "goal": "Проверить достижимость содержимого и исправлять только доказанные responsive ограничения.",
           "scope_files": [
@@ -5260,15 +4558,8 @@
             "Не блокировать устранение подтверждённой недостижимости refactor UX-06."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "More menu short-viewport scroll + SectionHeader wrap. Playwright shell-accessibility not run this wave."
         },
@@ -5280,10 +4571,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI17",
-            "UI18"
-          ],
+          "source_ids": ["UI17", "UI18"],
           "current": "Native server-statistics table имеет named focusable scroll region/caption/scope. Shared DataTable минимален, выравнивает последнюю колонку и даёт numeric font всему body.",
           "goal": "Сохранить semantic table и доступный overflow, явно задавая тип/выравнивание колонок.",
           "scope_files": [
@@ -5336,15 +4624,8 @@
             "Отсутствие explicit scope у простой таблицы не объявляется автоматически нарушением."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "DataTable named overflow + column types; admin audit + statistics numeric. server-statistics-surface PASS."
         },
@@ -5356,10 +4637,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "UI20",
-            "PX04"
-          ],
+          "source_ids": ["UI20", "PX04"],
           "current": "Публичная attribution автора на resource cards/portfolio; различимые Trust/Publications переходы. developer/org/user page tests PASS.",
           "goal": "Показать публичное происхождение ресурса и различимые переходы профиля.",
           "scope_files": [
@@ -5407,15 +4685,8 @@
             "Принятая цель автора на card/detail подтверждена handbook34, а не одним аудитом."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Public author attribution on cards/portfolio; developer/org/user page tests PASS."
         },
@@ -5427,9 +4698,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI22"
-          ],
+          "source_ids": ["UI22"],
           "current": "Admin status/scan labels локализованы RU/EN через status-labels; raw enum values не менялись. Library и managed servers сохраняют свои localized labels.",
           "goal": "Согласовать RU/EN status labels без изменения backend enum и смысла badge.",
           "scope_files": [
@@ -5469,15 +4738,8 @@
             "Не менять enum ради подписи и не заявлять, что весь RU UI нелокализован."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Admin status/scan labels RU/EN via status-labels; enums unchanged. i18n-shell PASS."
         },
@@ -5489,10 +4751,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "UI04",
-            "F06"
-          ],
+          "source_ids": ["UI04", "F06"],
           "current": "Отказ загрузки server reviews показывает unavailable+retry, а не пустой total=0. Mutation/revision protections и post-save next step сохранены.",
           "goal": "Различать недоступную загрузку и успешный пустой результат server reviews, затем показывать актуальный результат сохранения и следующий шаг.",
           "scope_files": [
@@ -5539,15 +4798,8 @@
             "F06 здесь ограничен catch-fallback загрузки server reviews; не утверждается, что все страницы отзывов маскируют ошибки."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_core_beta_acceptance"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["before_core_beta_acceptance"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Server review load failure unavailable+retry, not empty total=0."
         },
@@ -5559,15 +4811,10 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "UI24"
-          ],
+          "source_ids": ["UI24"],
           "current": "global-error автономен от shell; opaque error.digest только когда присутствует; Retry/Home и RU/EN fallback без message/stack/secrets.",
           "goal": "Сохранить автономность и показать безопасный public reference, когда он реально доступен.",
-          "scope_files": [
-            "apps/web/src/app/global-error.tsx",
-            "apps/web/src/app/error.tsx"
-          ],
+          "scope_files": ["apps/web/src/app/global-error.tsx", "apps/web/src/app/error.tsx"],
           "acceptance": [
             "Retry/Home и локализация работают без shell/provider/основного CSS.",
             "Показан только согласованный безопасный reference; отсутствие ID не заполняется выдуманным значением.",
@@ -5605,15 +4852,8 @@
             "Reference — уже существующая цель UX handbook, а не новая incident-система."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Safe opaque error.digest reference only when present; global-error shell-free; no message/stack/secrets. error-boundary-public-reference + i18n-shell PASS."
         },
@@ -5625,10 +4865,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "UI25",
-            "F10"
-          ],
+          "source_ids": ["UI25", "F10"],
           "current": "Ready capture ждёт settled content (не GlobalLoading); loading/empty/error именованы отдельно. browser-page-ready focused PASS; полный Playwright PNG evidence остаётся disposable CI resource-browser run.",
           "goal": "Screenshot evidence подтверждает заданное состояние, а сценарий проверяет полезный результат.",
           "scope_files": [
@@ -5671,15 +4908,8 @@
             "Axe и screenshots не доказывают все flows/устройства."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_browser_acceptance"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["before_browser_acceptance"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Ready capture waits for settled content (no GlobalLoading); loading/empty/error named separately; metadata fixture/state. browser-page-ready 8/8 PASS. Full Playwright PNG evidence still needs disposable CI resource-browser run."
         },
@@ -5691,9 +4921,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX01"
-          ],
+          "source_ids": ["PX01"],
           "current": "Guest nav hides Workspace cluster/Admin (variant A); member Workspace and Admin follow capabilities on tip.",
           "goal": "Согласовать compact first view и personal changes summary реальных ответов/подписок/обновлений.",
           "scope_files": [
@@ -5711,12 +4939,7 @@
             "Behavior check guest/new/returning/opt-out/partial failure на safe fixtures.",
             "Пилот summary измеряет переход к полезному объекту; рост retention не объявляется заранее."
           ],
-          "dependencies": [
-            "UX-15",
-            "UX-16",
-            "FLOW-03",
-            "FLOW-08"
-          ],
+          "dependencies": ["UX-15", "UX-16", "FLOW-03", "FLOW-08"],
           "dependency_notes": "Sources/subscriptions/private projection согласуются с docs/FLOWS.md; GROW использует эту Home. Home summary читает эффективный watch state, а не только локальный enabled. Сводка ответов должна быть согласована с inbox/read semantics.",
           "permission": "local_development",
           "evidence": [
@@ -5739,15 +4962,8 @@
             "Не переопределять owner decision общей Home новым DailyMyMTA."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Home personal changes from watches/follows/replies; guest public-only; cookie opt-out. page + preference tests PASS."
         },
@@ -5759,16 +4975,10 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "PX02",
-            "F06"
-          ],
+          "source_ids": ["PX02", "F06"],
           "current": "Home server card: unknown≠0; partial aggregates подписаны; действия разделены Connect/View/Copy. Unknown не равен offline.",
           "goal": "Исправить смысл данных и сделать назначение server actions предсказуемым.",
-          "scope_files": [
-            "apps/web/src/app/page.tsx",
-            "apps/web/src/components/server-card.tsx"
-          ],
+          "scope_files": ["apps/web/src/app/page.tsx", "apps/web/src/components/server-card.tsx"],
           "acceptance": [
             "Unknown отличается от измеренного нуля; aggregate честно отмечает неполное покрытие.",
             "До клика понятно, где просмотр, Join или копирование адреса; название не запускает клиент неожиданно в согласованном варианте.",
@@ -5802,15 +5012,8 @@
             "Другие F06 honest-state проблемы остаются в своих FLOWS задачах."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "before_core_beta_acceptance"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["before_core_beta_acceptance"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Home unknown≠0; partial aggregates labeled; card actions split Connect/View/Copy."
         },
@@ -5822,9 +5025,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX03"
-          ],
+          "source_ids": ["PX03"],
           "current": "Market и Discover уже используют URL filters и типы сущностей.",
           "goal": "Согласовать фильтры и контекст выдачи без потери sharing/Back.",
           "scope_files": [
@@ -5864,15 +5065,8 @@
             "Saved searches и новая ranking модель не входят в эту унификацию."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Market/Discover URL filters; cursor reset; zero-result recovery. discovery-search + market/discover page tests PASS."
         },
@@ -5884,9 +5078,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX05"
-          ],
+          "source_ids": ["PX05"],
           "current": "Clear-filter CTAs and honest empty/filtered empty copy are on tip across primary filter surfaces.",
           "goal": "Согласовать delivery metadata и честное представление source/license/DRM.",
           "scope_files": [
@@ -5928,15 +5120,8 @@
             "Существующую licenseModel можно локализовать независимо от расширения."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "licenseModel RU/EN localized for all enum values; no Open/Closed/DRM invented. Source/DRM metadata remains owner choice (DECISIONS recommends B license-only beta). license-model-i18n + detail acquisition PASS."
         },
@@ -5948,9 +5133,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX06"
-          ],
+          "source_ids": ["PX06"],
           "current": "Acquire/install/review absence различаются на product surfaces; 0.0 и counters не выдаются за установку или неизмеренные события.",
           "goal": "Понятные рейтинги и счётчики без приписывания установки или других неизмеренных событий.",
           "scope_files": [
@@ -5983,15 +5166,8 @@
             "Не выводить смысл показателя из имени колонки или иконки."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Acquire/install/review absence distinguished on product surfaces; market page tests PASS."
         },
@@ -6003,9 +5179,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P3",
-          "source_ids": [
-            "PX07"
-          ],
+          "source_ids": ["PX07"],
           "current": "Loading/empty/error/success shells distinguish zero, unknown, and load failure on tip honesty wave surfaces.",
           "goal": "При принятии добавить accessible lightbox, сохранив original link.",
           "scope_files": [
@@ -6023,9 +5197,7 @@
             "tests/resource-media-pages.test.tsx; tests/resource-media-normalization.test.ts.",
             "Behavior check original/open/next/previous/close/failure на local media."
           ],
-          "dependencies": [
-            "UX-06"
-          ],
+          "dependencies": ["UX-06"],
           "dependency_notes": "",
           "permission": "local_development",
           "evidence": [
@@ -6047,15 +5219,8 @@
             "Lightbox — предложение; текущая галерея не считается отсутствующей."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Native dialog lightbox on resource gallery; original href preserved; focused tests PASS."
         },
@@ -6067,10 +5232,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX08",
-            "PX12"
-          ],
+          "source_ids": ["PX08", "PX12"],
           "current": "Disabled states and retry after error are honest on migrated forms; success confirms from the server.",
           "goal": "Структурированная инструкция и контекстная помощь по resource/version без обязательной compatibility metadata.",
           "scope_files": [
@@ -6090,9 +5252,7 @@
             "tests/product-dependency-surface.test.tsx; tests/resource-detail-acquisition-ui.test.tsx.",
             "Behavior check selected version, missing instructions, optional metadata и private support context."
           ],
-          "dependencies": [
-            "FLOW-19"
-          ],
+          "dependencies": ["FLOW-19"],
           "dependency_notes": "Version/download authorization/support permissions заданы docs/FLOWS.md. Контекстный help UI использует согласованный support object context.",
           "permission": "local_development",
           "evidence": [
@@ -6126,15 +5286,8 @@
             "Новые секции и контекстная помощь остаются proposal, не обязательным publishing gate."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_notes": "Public resource detail Help/Instructions section bound to current published download version; releaseNotes fenced blocks render as copyable plain code; optional compatibility shows unknown without auto-incompatible claims; support/Q&A links use FLOW-19 object context without private license/evidence.",
           "execution_updated_on": "2026-11-05"
         },
@@ -6146,9 +5299,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P1",
-          "source_ids": [
-            "PX09"
-          ],
+          "source_ids": ["PX09"],
           "current": "Free claim и cart с reviewDigest/receipts работают; оба action доступны на product page.",
           "goal": "Понятные single/batch acquire, guest return и version/download states без второй клиентской логики.",
           "scope_files": [
@@ -6167,9 +5318,7 @@
             "tests/free-resource-acquisition-surface.test.ts; tests/resource-detail-acquisition-ui.test.tsx; tests/resource-cart-receipts-pages.test.tsx.",
             "scripts/tests/resource-claim-download.playwright.mjs после соответствующей flow integration."
           ],
-          "dependencies": [
-            "FLOW-01"
-          ],
+          "dependencies": ["FLOW-01"],
           "dependency_notes": "Guest return, reviewDigest, replay/receipt и access guards подробно описаны docs/FLOWS.md; задача — UI integration. Неверный destination Open Library исправляется независимой UX-27 и не ждёт этого более широкого пути. Единый guest-return контракт нужен для одиночного и пакетного получения.",
           "permission": "local_development",
           "evidence": [
@@ -6191,15 +5340,8 @@
             "Не дублировать серверную семантику получения. Paid commerce остаётся выключенным."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-01",
           "execution_notes": "Single vs batch acquire intents; guest return without auto-claim; receipt/error states. free acquisition + cart receipts PASS."
         },
@@ -6211,9 +5353,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX10"
-          ],
+          "source_ids": ["PX10"],
           "current": "Keyboard and narrow-screen touch targets (min-h-11 / size=touch) are the tip floor for interactive CTAs in honesty waves.",
           "goal": "Краткий обзор реального publishing workflow с причиной и переходом к существующему исправлению.",
           "scope_files": [
@@ -6232,11 +5372,7 @@
             "apps/web/src/components/new-resource-form.test.tsx; tests/author-resource-draft.test.ts.",
             "tests/workspace-resource-ui-surface.test.tsx; scripts/tests/author-workspace.playwright.mjs."
           ],
-          "dependencies": [
-            "UX-03",
-            "UX-10",
-            "FLOW-20"
-          ],
+          "dependencies": ["UX-03", "UX-10", "FLOW-20"],
           "dependency_notes": "Publishing transitions/scanner/draft authority остаются в data/FLOWS. Readiness presentation использует тот же lifecycle и причины запрета.",
           "permission": "local_development",
           "evidence": [
@@ -6258,15 +5394,8 @@
             "Readiness overview — proposal, не уже принятое обязательное окно."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_notes": "Publication readiness panel on managed resource overview; domain summary + DB snapshot; focused tests PASS; author-workspace playwright not run.",
           "execution_updated_on": "2026-11-05"
         },
@@ -6278,10 +5407,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "PX11",
-            "F07"
-          ],
+          "source_ids": ["PX11", "F07"],
           "current": "Library destination and guest More ordering match shell-destination policy on tip.",
           "goal": "Согласовать guest/capability presentation и сгруппировать задачи без жёсткого выбора роли.",
           "scope_files": [
@@ -6324,12 +5450,7 @@
             "Needs_decision относится только к композиции guest/Workspace и capability presentation. Подтверждённый Open Library destination bug вынесен в UX-27 и исправляется независимо."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": [
             "fix_confirmed_destination_before_beta; navigation_redesign_is_optional"
           ],
@@ -6344,10 +5465,7 @@
           "decision_status": "existing_goal",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "F07",
-            "PX09"
-          ],
+          "source_ids": ["F07", "PX09"],
           "current": "Open Library на market/acquire success ведёт в /workspace/library. Подпись соответствует экрану назначения; guest/owner branching и acquisition receipts не менялись.",
           "goal": "Исправить destination существующей ссылки Open Library на /workspace/library без редизайна Workspace и изменения доступа.",
           "scope_files": [
@@ -6386,12 +5504,7 @@
             "Не вводить новый library route, реорганизацию навигации или повторный механизм получения."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-005",
-            "NX-006",
-            "NX-008",
-            "NX-011"
-          ],
+          "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": [
             "fix_confirmed_destination_before_beta; navigation_redesign_is_optional"
           ],
@@ -6406,9 +5519,7 @@
           "decision_status": "accepted_direction",
           "queue_state": "specified",
           "priority": "P2",
-          "source_ids": [
-            "RET01"
-          ],
+          "source_ids": ["RET01"],
           "current": "Growth pilots remain deferred without activation; GROW-01 direction accepted, pilots UX-24–26 / GROW-02…09 stay gated.",
           "goal": "До пилота отделить интерес, доставку, получение файла и подтверждённую пользу.",
           "scope_files": [
@@ -6450,13 +5561,8 @@
             "Внешние публикации, приглашения и рассылки не выполняются этим пакетом."
           ],
           "execution_state": "done",
-          "decision_refs": [
-            "NX-009",
-            "NX-011"
-          ],
-          "release_conditions": [
-            "scope_specific_acceptance_not_a_universal_launch_gate"
-          ],
+          "decision_refs": ["NX-009", "NX-011"],
+          "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
           "execution_notes": "Docs-only activation dictionary in RETENTION-PLAN (per-role confirmed outcomes; signup≠activated; windows). No pilot/analytics pipeline."
         }

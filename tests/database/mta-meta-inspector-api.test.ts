@@ -2,7 +2,10 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { metaInspectionLimits } from "../../apps/web/src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../../packages/security/src/rate-limit-policy";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: null as null | {

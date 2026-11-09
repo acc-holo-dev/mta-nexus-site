@@ -11,7 +11,12 @@ import {
 import { and, eq } from "drizzle-orm";
 import { expect, it } from "vitest";
 import { db } from "../../packages/db/src/client";
-import { auditEvents, builds, organizationMembers, organizations } from "../../packages/db/src/schema";
+import {
+  auditEvents,
+  builds,
+  organizationMembers,
+  organizations,
+} from "../../packages/db/src/schema";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 async function fixture() {

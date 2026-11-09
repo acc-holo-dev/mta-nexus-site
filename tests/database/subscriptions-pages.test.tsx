@@ -30,7 +30,9 @@ vi.mock("next/link", async () => {
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/subscriptions-service", () => ({
   subscriptionsService: {
     dashboard: state.dashboard,
@@ -52,7 +54,14 @@ import Account from "../../apps/web/src/app/workspace/subscriptions/page";
 import ReceiptLoading from "../../apps/web/src/app/workspace/subscriptions/receipts/[id]/loading";
 import Detail from "../../apps/web/src/app/workspace/subscriptions/receipts/[id]/page";
 import { subscriptionsCopy } from "../../apps/web/src/lib/subscriptions-i18n";
-import { activation, date, expiresAt, plan, receipt, subscription } from "../helpers/subscriptions-fixtures";
+import {
+  activation,
+  date,
+  expiresAt,
+  plan,
+  receipt,
+  subscription,
+} from "../helpers/subscriptions-fixtures";
 
 const context = { params: Promise.resolve({ id: receipt.id }), searchParams: Promise.resolve({}) },
   activateContext = {

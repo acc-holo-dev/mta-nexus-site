@@ -18,7 +18,10 @@ vi.mock("../../apps/web/src/lib/services/profile-privacy-service", () => ({
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
 import { GET, PATCH } from "../../apps/web/src/app/api/account/privacy/route";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../helpers/browser-mutation-headers";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const actor = { id: "actor", role: "user" };
 const input = {

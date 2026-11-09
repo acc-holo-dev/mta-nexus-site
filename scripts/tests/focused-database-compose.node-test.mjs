@@ -28,7 +28,10 @@ esac
     writeFileSync(log, "");
     const result = spawnSync(
       "bash",
-      ["scripts/run-focused-database-test-compose.sh", "tests/database/password-change-transaction.test.ts"],
+      [
+        "scripts/run-focused-database-test-compose.sh",
+        "tests/database/password-change-transaction.test.ts",
+      ],
       {
         encoding: "utf8",
         env: {
@@ -89,7 +92,10 @@ exit 0
     writeFileSync(log, "");
     const result = spawnSync(
       "bash",
-      ["scripts/run-focused-database-test-compose.sh", "tests/database/password-change-transaction.test.ts"],
+      [
+        "scripts/run-focused-database-test-compose.sh",
+        "tests/database/password-change-transaction.test.ts",
+      ],
       {
         encoding: "utf8",
         env: {
@@ -145,7 +151,10 @@ exit 0
     writeFileSync(log, "");
     const result = spawnSync(
       "bash",
-      ["scripts/run-focused-database-test-compose.sh", "tests/database/password-change-transaction.test.ts"],
+      [
+        "scripts/run-focused-database-test-compose.sh",
+        "tests/database/password-change-transaction.test.ts",
+      ],
       {
         encoding: "utf8",
         env: {

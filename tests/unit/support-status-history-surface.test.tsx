@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "apps/web/src/components/support-status-history.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "apps/web/src/components/support-status-history.tsx"),
+  "utf8",
+);
 
 it("marks the loading line as status inside the live region", () => {
   expect(source).toContain('aria-live="polite"');

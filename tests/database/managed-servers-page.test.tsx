@@ -16,7 +16,9 @@ vi.mock("@nexus/db", () => ({ serverRepository: { pageManagedByUser: state.page 
 vi.mock("../../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => {
   const actual =
     await importOriginal<
@@ -25,7 +27,9 @@ vi.mock("../../apps/web/src/lib/services/mta-master-directory-service", async (i
   return { ...actual, mtaMasterDirectoryService: { getDirectory: state.directory } };
 });
 
-import ManagedServersPage, { generateMetadata } from "../../apps/web/src/app/workspace/servers/page";
+import ManagedServersPage, {
+  generateMetadata,
+} from "../../apps/web/src/app/workspace/servers/page";
 
 const server = {
   id: "private-server",

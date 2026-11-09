@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { setupDiscoverySearchBehavior, sources } from "../helpers/discovery-search-behavior-harness";
+import {
+  setupDiscoverySearchBehavior,
+  sources,
+} from "../helpers/discovery-search-behavior-harness";
 
 vi.mock("@nexus/db", async () => {
   const { sources: harnessSources } = await import("../helpers/discovery-search-behavior-harness");
