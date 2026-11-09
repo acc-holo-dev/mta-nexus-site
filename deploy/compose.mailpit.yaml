@@ -3,7 +3,7 @@ services:
   mailpit-init:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
       target: development
     user: "0:0"
     restart: "no"
@@ -54,7 +54,7 @@ services:
   mail-worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
       target: development
     init: true
     restart: "no"

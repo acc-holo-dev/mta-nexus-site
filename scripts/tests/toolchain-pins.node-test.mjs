@@ -25,10 +25,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
 const rootPackage = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const dbPackage = JSON.parse(readFileSync(join(root, "packages/db/package.json"), "utf8"));
-const dockerfile = readFileSync(join(root, "Dockerfile"), "utf8");
-const composeProduction = readFileSync(join(root, "compose.production.yaml"), "utf8");
-const composeDev = readFileSync(join(root, "compose.yaml"), "utf8");
-const composeVerify = readFileSync(join(root, "compose.verify.yaml"), "utf8");
+const dockerfile = readFileSync(join(root, "deploy", "Dockerfile"), "utf8");
+const composeProduction = readFileSync(join(root, "deploy", "compose.production.yaml"), "utf8");
+const composeDev = readFileSync(join(root, "deploy", "compose.yaml"), "utf8");
+const composeVerify = readFileSync(join(root, "deploy", "compose.verify.yaml"), "utf8");
 const dependabot = readFileSync(join(root, ".github/dependabot.yml"), "utf8");
 const pnpmStore = join(root, "node_modules/.pnpm");
 
@@ -103,9 +103,9 @@ test("OPS-03 Node stages, PG18 volume, Dependabot docker updates, and pin schema
   }
 
   for (const [label, source] of [
-    ["compose.yaml", composeDev],
-    ["compose.production.yaml", composeProduction],
-    ["compose.verify.yaml", composeVerify],
+    ["deploy/compose.yaml", composeDev],
+    ["deploy/compose.production.yaml", composeProduction],
+    ["deploy/compose.verify.yaml", composeVerify],
   ]) {
     assert.match(source, /image:\s*postgres:18-alpine/u, label);
     assert.match(source, /pgdata:\/var\/lib\/postgresql\b/u, label);

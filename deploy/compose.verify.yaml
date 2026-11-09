@@ -20,7 +20,7 @@ services:
   verify:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
       target: development
     init: true
     restart: "no"

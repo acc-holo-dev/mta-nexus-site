@@ -146,7 +146,7 @@ function run() {
           "--project-name",
           "nexus-backup-contract",
           "--file",
-          join(root, "compose.production.yaml"),
+          join(root, "deploy", "compose.production.yaml"),
           "config",
           "--format",
           "json",

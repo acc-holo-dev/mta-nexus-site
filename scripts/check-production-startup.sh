@@ -55,7 +55,7 @@ pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
   "NEXUS_CI_ACCOUNT_MAIL_KEY=$mail_key" "NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY=$abuse_key"
   "NEXUS_CI_CADDYFILE=$NEXUS_CI_CADDYFILE"
   docker compose --env-file /dev/null -p "$project"
-  -f compose.production.yaml -f compose.production-ci.yaml)
+  -f deploy/compose.production.yaml -f deploy/compose.production-ci.yaml)
 owned=0
 cleanup() {
   status=$?

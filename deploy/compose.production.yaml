@@ -34,7 +34,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -74,7 +74,7 @@ services:
   push-worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     user: node
     init: true
     restart: unless-stopped
@@ -141,7 +141,7 @@ services:
   license-worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     user: node
     init: true
     restart: unless-stopped
@@ -179,7 +179,7 @@ services:
   resource-release-worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     user: node
     init: true
     restart: unless-stopped

@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 // Each invocation owns a new database. Never recreate a shared development or
 // test database: another developer or test run may still be using it.
-const compose = ["compose", "-p", "nexus-local", "-f", "compose.yaml"];
+const compose = ["compose", "-p", "nexus-local", "-f", "deploy/compose.yaml"];
 const database = `nexus_test_${randomUUID().replaceAll("-", "")}`;
 const databaseUrl = `postgres://nexus:nexus_secret@postgres:5432/${database}`;
 const app = [

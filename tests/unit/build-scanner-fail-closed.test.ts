@@ -22,7 +22,7 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("configures both ClamAV stacks to report files it could not fully scan", () => {
-    for (const path of ["compose.yaml", "compose.production.yaml"]) {
+    for (const path of ["deploy/compose.yaml", "deploy/compose.production.yaml"]) {
       const compose = read(path);
       expect(compose).toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
     }

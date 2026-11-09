@@ -11,8 +11,8 @@
 Установите Docker и Docker Compose. Рекомендуемый full Docker development stack:
 
 ```sh
-docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
-docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
+docker compose -p nexus-local -f deploy/compose.yaml up --build --detach --wait --wait-timeout 600
+docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
 При установленных Node.js 26.10.0 и pnpm 12.4.2:

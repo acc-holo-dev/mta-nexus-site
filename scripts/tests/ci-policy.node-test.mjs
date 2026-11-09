@@ -39,7 +39,7 @@ test("documentation does not trigger builds; executable docs/configuration do", 
     unitOnly: false,
     full: false,
   });
-  assert.deepEqual(classifyChanges(["compose.production.yaml"]), {
+  assert.deepEqual(classifyChanges(["deploy/compose.production.yaml"]), {
     code: true,
     unitOnly: false,
     full: true,
@@ -143,7 +143,7 @@ test("migration, database tooling, workflow and explicit release changes run ful
       "builds",
     ].map((name) => [`packages/db/src/repositories/${name}.ts`]),
     [".github/workflows/ci.yml"],
-    ["Dockerfile"],
+    ["deploy/Dockerfile"],
     ["tests/unit/mainline-repository-policy.test.ts"],
   ]) {
     const policy = classifyChanges(files);

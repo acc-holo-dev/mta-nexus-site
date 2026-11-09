@@ -326,10 +326,10 @@ const releaseManifest = buildReleaseManifest({
   },
   migrations: migrationFiles,
   overlays: [
-    "compose.production.yaml",
-    "compose.production-ci.yaml (CI only)",
-    "compose.recovery.yaml (optional)",
-    "compose.mail-worker.yaml (optional)",
+    "deploy/compose.production.yaml",
+    "deploy/compose.production-ci.yaml (CI only)",
+    "deploy/compose.recovery.yaml (optional)",
+    "deploy/compose.mail-worker.yaml (optional)",
   ],
   evidenceRefs: {
     coreReleaseEvidence: "artifacts/release-evidence.json",

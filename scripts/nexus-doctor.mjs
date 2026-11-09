@@ -135,7 +135,7 @@ export async function collectDoctor(options = {}) {
     memoryGiB: Number((memoryBytes / 1024 ** 3).toFixed(1)),
   };
 
-  for (const relativePath of ["package.json", "pnpm-lock.yaml", "compose.yaml", "Dockerfile"]) {
+  for (const relativePath of ["package.json", "pnpm-lock.yaml", "deploy/compose.yaml", "deploy/Dockerfile"]) {
     const present = await pathExists(resolve(root, relativePath));
     addCheck(
       checks,
@@ -378,7 +378,7 @@ export async function collectDoctor(options = {}) {
     };
     const composeConfig = await runCommand(
       "docker",
-      ["compose", "-f", "compose.yaml", "config", "--quiet"],
+      ["compose", "-f", "deploy/compose.yaml", "config", "--quiet"],
       { cwd: root, env: composeEnv, timeout: 30_000 },
     );
     addCheck(
@@ -386,11 +386,11 @@ export async function collectDoctor(options = {}) {
       "compose-config",
       composeConfig.ok ? "pass" : "fail",
       composeConfig.ok
-        ? "Local compose.yaml renders successfully without an implicit .env file."
-        : "Local compose.yaml did not render successfully.",
+        ? "Local deploy/compose.yaml renders successfully without an implicit .env file."
+        : "Local deploy/compose.yaml did not render successfully.",
       composeConfig.ok
-        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge compose.yaml with compose.production.yaml."
-        : "Inspect compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
+        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge deploy/compose.yaml with deploy/compose.production.yaml."
+        : "Inspect deploy/compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
     );
   }
 
