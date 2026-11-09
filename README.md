@@ -63,7 +63,7 @@ docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check
 
 **Начать здесь:** [Быстрый старт](docs/GETTING-STARTED.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Состояние](docs/CURRENT-STATE.md) · [Продукт](docs/PRODUCT.md).
 
-**Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Проблемы](docs/PROBLEMS.md).
+**Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Механика вклада](CONTRIBUTING.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Проблемы](docs/PROBLEMS.md).
 
 **Предметные контракты:** [Ресурсы](docs/RESOURCES.md) · [Сообщество](docs/COMMUNITY.md) · [Серверы/org](docs/SERVERS-ORGS.md) · [Trust/staff](docs/TRUST-STAFF.md) · [Коммерция](docs/COMMERCIAL-FUTURE.md).
 
