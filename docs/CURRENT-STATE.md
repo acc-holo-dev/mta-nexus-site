@@ -64,3 +64,5 @@ Node `26.11.1`, pnpm `12.4.2`; Docker `node:26-alpine`. PostgreSQL 18. См. [OP
 После значимой интеграции: tip `main`, доказательства CI/acceptance, открытые gates. История в Git — не копировать каждый tip-honesty merge сюда.
 
 **Источники:** [AGENT.md](AGENT.md), [PROBLEMS.md](PROBLEMS.md), [DECISIONS.md](DECISIONS.md), [ROADMAP.md](ROADMAP.md), `planning/tasks.json`, [AGENTS.md](../AGENTS.md).
+
+OPS-09 verification note: main + v* tags are guarded by rulesets; this docs-only change exercises the green CI-result path.
