@@ -33,4 +33,7 @@ services:
       - "127.0.0.1:8443:443"
     volumes:
       - ${NEXUS_CI_CADDYFILE:?use scripts/check-production-startup.sh}:/etc/caddy/Caddyfile:ro
-      - ./deploy/Caddyfile:/etc/caddy/ProductionCaddyfile:ro
+      # Relative to this overlay's own directory (deploy/), so the bind is a
+      # real file, not the auto-created empty directory that broke `caddy adapt`
+      # after the deploy/ relocation (read .../ProductionCaddyfile: is a directory).
+      - ./Caddyfile:/etc/caddy/ProductionCaddyfile:ro
