@@ -11,7 +11,7 @@
 | UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                              |
 | Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                               |
 | Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser |
-| Dev stack | Docker Compose (`compose.yaml`): app, PostgreSQL, ClamAV, push-worker                 |
+| Dev stack | Docker Compose [`deploy/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
 | CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo               |
 
 Модульный монолит на одной инстанции. Redis, внешние очереди и микросервисы не входят в текущую форму без измеренной необходимости.
@@ -106,4 +106,4 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Слои и безопасность                    | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                 |
 | Команды и ops                          | [OPERATIONS.md](OPERATIONS.md)                                                                                     |
 | Предметная глава (handbook, до DOC-04) | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                          |
-| Историческая очередь handbook          | [10-ROADMAP.md](ROADMAP.md)                                                                                        |
+| Историческая очередь handbook          | [Handbook — вступление и реестры](handbook/00-README.md)                                                            |
