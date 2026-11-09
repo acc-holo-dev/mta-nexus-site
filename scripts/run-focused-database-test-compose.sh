@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <tests/...integration.test.ts> [more test files...]" >&2
+  echo "Usage: $0 <tests/database/...integration.test.ts> [more test files...]" >&2
   exit 1
 fi
 

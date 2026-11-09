@@ -7,11 +7,11 @@ import {
 } from "@nexus/db";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../browser-mutation-headers";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   assignIntegrationStaffPassword,
   INTEGRATION_STAFF_PASSWORD,
-} from "../integration-staff-password";
+} from "./integration-staff-password";
 
 /** Mutable MTA directory snapshot returned by the suite-local `vi.mock` factory. */
 export const directoryState = {

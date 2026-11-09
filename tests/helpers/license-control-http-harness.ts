@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../browser-mutation-headers";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 /** Shared mock state for license-control HTTP suites. */
 export const licenseControlHttpState = {

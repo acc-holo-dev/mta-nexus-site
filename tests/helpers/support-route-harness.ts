@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "../browser-mutation-headers";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 /** Shared after() queue for support HTTP route suites. */
 export const supportRouteState = {

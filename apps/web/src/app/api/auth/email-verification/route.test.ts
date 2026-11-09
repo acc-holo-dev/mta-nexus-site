@@ -3,7 +3,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
-} from "../../../../../../../tests/browser-mutation-headers";
+} from "../../../../../../../tests/helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   getSession: vi.fn(),

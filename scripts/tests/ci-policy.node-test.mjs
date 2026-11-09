@@ -144,7 +144,7 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ].map((name) => [`packages/db/src/repositories/${name}.ts`]),
     [".github/workflows/ci.yml"],
     ["Dockerfile"],
-    ["tests/mainline-repository-policy.test.ts"],
+    ["tests/unit/mainline-repository-policy.test.ts"],
   ]) {
     const policy = classifyChanges(files);
     assert.equal(policy.full, true);

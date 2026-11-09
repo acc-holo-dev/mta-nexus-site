@@ -29,7 +29,7 @@ const fullAcceptancePaths = [
   /^apps\/web\/src\/app\/api\/auth\//,
   /^apps\/web\/src\/app\/api\/(?:follow|object-mute|products|support|workspace\/(?:organizations|reports))(?:\/|$)/,
   /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
-  /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
+  /^tests\/unit\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
 
 // Narrow unit profile: only shared UI and web components (and their colocated tests).
