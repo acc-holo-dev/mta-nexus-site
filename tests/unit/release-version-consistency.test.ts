@@ -43,7 +43,7 @@ describe("release workspace version consistency", () => {
     const nvmrc = readFileSync(resolve(process.cwd(), ".nvmrc"), "utf8").trim();
     const nodeVersion = readFileSync(resolve(process.cwd(), ".node-version"), "utf8").trim();
 
-    expect(nvmrc).toBe("26.10.0");
+    expect(nvmrc).toBe("26.11.1");
     expect(nodeVersion).toBe(nvmrc);
     expect(rootManifest.engines?.node).toMatch(/>=\s*26\.0\.0/u);
     expect(rootManifest.engines?.node).toMatch(/<\s*27/u);

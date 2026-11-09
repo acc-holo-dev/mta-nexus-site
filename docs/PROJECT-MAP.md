@@ -6,7 +6,7 @@
 
 | Слой      | Версия / выбор                                                                        |
 | --------- | ------------------------------------------------------------------------------------- |
-| Runtime   | Node.js 26.10.0 (`.nvmrc`), pnpm 12.4.2                                               |
+| Runtime   | Node.js 26.11.1 (`.nvmrc`), pnpm 12.4.2                                               |
 | App       | Next.js 16.4 + React 19.3 в `apps/web` (Turbopack default; `build:webpack` запасной)  |
 | UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                              |
 | Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                               |

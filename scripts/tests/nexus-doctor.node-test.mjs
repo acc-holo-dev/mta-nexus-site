@@ -17,8 +17,8 @@ async function fixtureRoot() {
         engines: { node: ">=26.0.0 <27", pnpm: ">=12.4.2" },
       }),
     ),
-    writeFile(join(root, ".nvmrc"), "26.10.0\n"),
-    writeFile(join(root, ".node-version"), "26.10.0\n"),
+    writeFile(join(root, ".nvmrc"), "26.11.1\n"),
+    writeFile(join(root, ".node-version"), "26.11.1\n"),
     writeFile(join(root, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n"),
     writeFile(join(root, "deploy", "compose.yaml"), "services: {}\n"),
     writeFile(join(root, "deploy", "Dockerfile"), "FROM scratch\n"),
@@ -38,7 +38,7 @@ test("healthy local prerequisites produce a passing report", async () => {
   try {
     const report = await collectDoctor({
       repositoryRoot: root,
-      nodeVersion: "26.10.0",
+      nodeVersion: "26.11.1",
       memoryBytes: 8 * 1024 ** 3,
       env: {},
       pathExists: async () => true,
@@ -55,7 +55,7 @@ test("healthy local prerequisites produce a passing report", async () => {
 
     assert.equal(report.status, "pass");
     assert(report.checks.every((check) => check.status === "pass"));
-    assert.equal(report.facts.nodePin, "26.10.0");
+    assert.equal(report.facts.nodePin, "26.11.1");
     assert.equal(report.facts.nodeMajorOk, true);
     assert.equal(report.facts.nodeExactMatch, true);
     assert.match(formatDoctor(report), /Result: PASS/u);
@@ -69,7 +69,7 @@ test("an unreadable Docker context cannot yield an overall pass", async () => {
   try {
     const report = await collectDoctor({
       repositoryRoot: root,
-      nodeVersion: "26.10.0",
+      nodeVersion: "26.11.1",
       memoryBytes: 8 * 1024 ** 3,
       env: {},
       pathExists: async () => true,
@@ -126,7 +126,7 @@ test("major-ok Node that differs from the exact pin warns in local mode", async 
     assert.equal(report.facts.nodeExactMatch, false);
     assert.match(
       report.checks.find((check) => check.id === "node-exact")?.hint ?? "",
-      /26\.10\.0/u,
+      /26\.11\.1/u,
     );
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -155,7 +155,7 @@ test("old host Node points to the repository pin", async () => {
 
     const node = report.checks.find((check) => check.id === "node");
     assert.equal(node?.status, "fail");
-    assert.match(node?.hint ?? "", /26\.10\.0/u);
+    assert.match(node?.hint ?? "", /26\.11\.1/u);
     assert.match(node?.hint ?? "", /nvm use/u);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -168,7 +168,7 @@ test("mismatched repository Node version files fail closed", async () => {
     await writeFile(join(root, ".node-version"), "26.9.0\n");
     const report = await collectDoctor({
       repositoryRoot: root,
-      nodeVersion: "26.10.0",
+      nodeVersion: "26.11.1",
       memoryBytes: 8 * 1024 ** 3,
       env: {},
       pathExists: async () => true,

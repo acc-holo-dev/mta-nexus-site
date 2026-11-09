@@ -45,7 +45,7 @@ function readPkg(...parts) {
 test("host/CI Node exact pin agrees and engines describe major-ok Node 26", () => {
   const nodePin = readExactNodePin(root);
   assert.equal(nodePin.ok, true);
-  assert.equal(nodePin.pin, "26.10.0");
+  assert.equal(nodePin.pin, "26.11.1");
   assert.equal(nodeMajorFromEngines(rootPackage.engines.node), 26);
   assert.match(rootPackage.engines.node, />=\s*26\.0\.0/u);
   assert.match(rootPackage.engines.node, /<\s*27/u);

@@ -74,7 +74,7 @@ describe("host toolchain version contract", () => {
     const nodeVersion = read(".node-version").trim();
     const pkg = JSON.parse(read("package.json"));
 
-    expect(nvm).toBe("26.10.0");
+    expect(nvm).toBe("26.11.1");
     expect(nodeVersion).toBe(nvm);
     expect(pkg.engines.node).toBe(">=26.0.0 <27");
     expect(pkg.packageManager).toBe("pnpm@12.4.2");

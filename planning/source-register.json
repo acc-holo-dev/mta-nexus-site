@@ -2601,7 +2601,7 @@
       "area": "Версии",
       "item": "Node: совместимость major и точная версия релизного окружения",
       "status": "Частично",
-      "current": "Файлы .nvmrc и .node-version задают 26.10.0; CI читает .nvmrc. Engines разрешает node >=26.0.0, doctor проверяет нижнюю границу major. Все три стадии Docker используют node:26-alpine. Major согласован; mutable tag не закрепляет exact patch/Alpine-сборку будущего rebuild. Различие фактических runtimes текущего CI не установлено.",
+      "current": "Файлы .nvmrc и .node-version задают 26.11.1; CI читает .nvmrc. Engines разрешает node >=26.0.0, doctor проверяет нижнюю границу major. Все три стадии Docker используют node:26-alpine. Major согласован; mutable tag не закрепляет exact patch/Alpine-сборку будущего rebuild. Различие фактических runtimes текущего CI не установлено.",
       "proposal": "Описать два режима: поддерживаемая ветка Node 26 для проекта и точный проверенный runtime релиза. Для релиза проверять согласованность pin-файлов, actual node --version внутри образа и выбранного base image. При желании ограничить engines поддерживаемой веткой; решение об обновлении patch принимать как обычное изменение с проверками.",
       "priority": "P2 — до следующего воспроизводимого релиза",
       "acceptance": "Release manifest содержит actual Node version и base image digest; необъяснимое расхождение с выбранным runtime блокирует приёмку. Локальные эксперименты с другой версией явно отделены от поддерживаемого релизного пути.",
