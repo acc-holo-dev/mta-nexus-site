@@ -3599,7 +3599,7 @@
           "queue_state": "specified",
           "priority": "P1",
           "source_ids": ["INT21", "INT22"],
-          "current": "Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe остаётся открытым.",
+          "current": "Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe закрыт (initiating-session-lock-barrier.test.ts, 4/4 PASS).",
           "goal": "Различать «скачать последнюю» и «скачать выбранную», сохранять явный выбор при unavailable fixed build; показывать только подтверждённый handoff с переходом к квитанции/инструкции/контекстному support.",
           "scope_files": [
             "apps/web/src/components/resource-download-button.tsx",
@@ -3676,7 +3676,7 @@
           "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
-          "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open."
+          "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe closed (initiating-session-lock-barrier.test.ts, 4/4 PASS)."
         },
         {
           "id": "FLOW-18",
@@ -3927,7 +3927,7 @@
           "queue_state": "specified",
           "priority": "P2",
           "source_ids": ["F08"],
-          "current": "Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; a controlled multi-connection barrier probe on disposable/live DB remains open (see PROBLEMS F08).",
+          "current": "Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; the controlled multi-connection barrier probe on disposable DB is CLOSED (4/4 PASS; holding the initiating session row FOR UPDATE makes a queued lockInitiatingSession block, and revoke/expire/remove of the row yields UnauthorizedError with no grant). Live/CI re-run stays open if a fresh SHA is promoted (see PROBLEMS F08).",
           "goal": "Провести initiating token до final transaction и применить existing lockInitiatingSession с согласованным lock order; добавить контролируемую проверку revoke/expiry между initial auth и final gate.",
           "scope_files": [
             "apps/web/src/app/api/products/[id]/builds/route.ts",
@@ -3992,8 +3992,8 @@
           "execution_state": "done",
           "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": ["controlled_security_verification_before_beta"],
-          "execution_updated_on": "2026-11-05",
-          "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open."
+          "execution_updated_on": "2026-11-10",
+          "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB is CLOSED (initiating-session-lock-barrier.test.ts, 4/4 PASS)."
         },
         {
           "id": "FLOW-22",
