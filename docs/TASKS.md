@@ -462,11 +462,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-25 — Рекламный слот маркирован и отделён от органики
 
-**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** частично (часть A выполнена, остальное — not_started). **Область полномочий:** local_development.
 
 **Исходные пункты:** AD02, AD03, AD04, AD05, AD06. **Решения обсуждения:** NX-010, NX-011.
 
 **Сейчас.** Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.
+
+**Часть A выполнена (PR #1172, merge `e54cde4d`).** SponsoredPlacementSlot renderer (`packages/ui/src/sponsored-placement-slot.tsx`) — маркированный `<section aria-label>`, `Реклама`/`Sponsored` и `Рекламодатель`/`Advertiser` до клика в RU/EN, инертный зарезервированный слот через `slotHeight` (без mobile layout shift), and `null`/zero-DOM для no-fill/error/expired/ineligible; серверное участие (`serveable`/`targetEligible`/`transition`) остаётся ВНЕ рендерера в `packages/db`. Рендерер инертен: не подключён к публичным страницам, флаг `NEXT_PUBLIC_AD_SLOT_RENDERER` выключен по умолчанию. Контракт — в `docs/UX-CONTRACT.md` (§Слот SponsoredPlacement). Не меняет органику/trust. Публичные позиции (Home/catalog/mobile), матрица запрещённых страниц и подключение к страницам — отдельное решение, ещё proposal.
 
 **Результат.** Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.
 

@@ -657,7 +657,7 @@
           "queue_state": "needs_decision",
           "priority": "P2",
           "source_ids": ["AD02", "AD03", "AD04", "AD05", "AD06"],
-          "current": "Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.",
+          "current": "Часть A (SponsoredPlacementSlot renderer + флаг + тест + контракт) выполнена и в main (PR #1172, merge e54cde4d) под выключенным NEXT_PUBLIC_AD_SLOT_RENDERER; органику не меняет. Публичные позиции Home/catalog/mobile, матрица запрещённых страниц и подключение к страницам — отдельное решение, ещё proposal.",
           "goal": "Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.",
           "scope_files": [
             "packages/ui/src/platform.tsx",
