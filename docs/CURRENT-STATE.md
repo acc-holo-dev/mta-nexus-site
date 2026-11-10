@@ -1,12 +1,12 @@
 # Проверенный срез проекта
 
-**Дата:** 9 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
+**Дата:** 10 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
 
 ## Текущий tip
 
-- **`origin/main` tip:** `f907a4ea` (pushed; CI для него не подтверждён в этой сессии). Не объявлять verified-green без SUCCESS CI на exact SHA.
-- **Последний verified-green tip:** `6cefa74e` / session-binding + order/storage/plan recovery — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393).
-- Длинная серия tip-honesty / ErrorState residual PR после `6cefa74e` живёт в Git history; этот файл больше не дублирует каждый merge.
+- **`origin/main` tip:** `9662378b` — merge PR #1163 (`fix/production-caddyfile`) → Local Docker startup gate fix. Верхний перенос `59f839cd` `deploy: fix Local Docker startup bake by correcting compose build paths`.
+- **Verified-green head:** `59f839cd`, required check `CI result` = `success` — [CI 42707064115](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42707064115). Merge `9662378b` несёт то же дерево.
+- **Local Docker startup gate:** цель достигнута и подтверждена. `pnpm test:unit` = 8247/8247; `docker compose config` разрешает build context в корень репозитория (`context: ../packages`, `../apps`; `dockerfile: deploy/Dockerfile`). Пуш и merge PR #1163 выполнены по указанию владельца.
 
 ## Оценка стадии
 
@@ -48,7 +48,7 @@
 
 - Green CI ≠ deploy. PASS только на exact SHA.
 - Upgrade contract target = `0089_resource_qa`. Local disposable migrate-to-tip PASS на compose Postgres; retained hosted CI upgrade artifact may still cite `0087_server_reviews` until the next hosted PASS.
-- GitHub: public; main protection на базе сверки отсутствовала. Settings не менять без поручения.
+- GitHub: public. Ruleset `Protect main (OPS-09)` по указанию владельца приведён к обычному виду: `required_status_checks` (CI result) + `deletion` + `non_fast_forward`, обязательное approving-review снято. Дальнейшие GitHub settings — только по поручению владельца.
 - Tracker: 64 done / 19 open. `done` ≠ production enablement.
 
 ## Приоритетные остатки
