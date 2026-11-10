@@ -743,7 +743,7 @@
           "queue_state": "needs_decision",
           "priority": "P3",
           "source_ids": ["AD08", "AD09"],
-          "current": "Opt-out/explainability — принятые направления; hide/report ads и единицы рекламных измерений ещё не реализованы.",
+          "current": "UX-26 часть A (контракт + opt-out-предпочтение) выпущена: секция UX-26 в docs/UX-CONTRACT.md (why-shown по типу причины без private/anti-abuse, contextual opt-out без behavioral-profile ranking, hidden placement не возвращается немедленно, report привязан к placement/target без чужих данных, единицы отдачи/показа/клика/действия с period/dedup/internal traffic/unknown, ad report не меняет organic reputation и не доказывает обязательства); settings-секция Advertising preferences даёт opt-out (cookie nexus_ad_opt_out in/out, SameSite=Lax) только за флагами advertisingLifecycleEnabled и rendererEnabled (выключены по умолчанию). Реализации hide/report и наблюдаемых единиц нет: telemetry/live-эксперимент — отдельное разрешение + ревью privacy/event schema.",
           "goal": "Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.",
           "scope_files": [
             "docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md",
