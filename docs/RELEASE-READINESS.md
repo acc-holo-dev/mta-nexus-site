@@ -37,12 +37,12 @@
 
 ### 2.1 Цепочка кандидата релиза
 
-| Шаг | Значение | Требуется для PASS |
-|---|---|---|
-| Merged main SHA | загруженный SHA несёт `full_acceptance` | статус PASS в `ci-evidence.json` на этот точный SHA |
-| `pnpm beta:fetch <sha>` | скачивает удержанные CI-артефакты для SHA через `gh` в `artifacts/` (gitignored) | ровно этот SHA; невалидный удержанный JSON **блокирует** harness |
-| `pnpm beta:candidate` | отчёт `artifacts/beta-candidate-evidence.json` на чистом checkout SHA | категории: `exact_sha_ci` (обязательная), `tls_and_runtime`, `mail`, `storage_and_scanner`, `browsers`, `database_upgrade` (`release-upgrade.json`), `backup_restore` (`backup-restore-evidence.json`, PASS только CI), `web_push` (опционально, внешняя), `observability` (опционально, внешняя), `legal surfaces` |
-| `pnpm release:verify` | расширенный release-evidence JSON | exit 1, если не `releaseCandidate=true` |
+| Шаг                     | Значение                                                                         | Требуется для PASS                                                                                                                                                                                                                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Merged main SHA         | загруженный SHA несёт `full_acceptance`                                          | статус PASS в `ci-evidence.json` на этот точный SHA                                                                                                                                                                                                                                                                 |
+| `pnpm beta:fetch <sha>` | скачивает удержанные CI-артефакты для SHA через `gh` в `artifacts/` (gitignored) | ровно этот SHA; невалидный удержанный JSON **блокирует** harness                                                                                                                                                                                                                                                    |
+| `pnpm beta:candidate`   | отчёт `artifacts/beta-candidate-evidence.json` на чистом checkout SHA            | категории: `exact_sha_ci` (обязательная), `tls_and_runtime`, `mail`, `storage_and_scanner`, `browsers`, `database_upgrade` (`release-upgrade.json`), `backup_restore` (`backup-restore-evidence.json`, PASS только CI), `web_push` (опционально, внешняя), `observability` (опционально, внешняя), `legal surfaces` |
+| `pnpm release:verify`   | расширенный release-evidence JSON                                                | exit 1, если не `releaseCandidate=true`                                                                                                                                                                                                                                                                             |
 
 Критично: отчёт `beta:candidate` ставит `openBetaLive=false` и `productionAuthorized=false`. Он
 **никогда** не заявляет, что открытая бета live, и никогда не авторизует production deploy.
@@ -82,14 +82,14 @@
 Эти gates невозможно закрыть с dev-хоста. Доказательства должны прийти из целевого окружения или
 из настроек прав/пакетов GitHub.
 
-| Задача | Природа | Требуемое доказательство |
-|---|---|---|
-| OPS-11 (private GHCR publish) | внешняя (permissions/packages) | реальный publish в private GHCR; на этом хосте нет достижимой конфигурации |
-| OPS-13 (F04 backup/recovery live drill) | **CI-only** | drill на disposable GitHub-hosted runner (`backup-restore-contract.mjs` `assertDisposableRunnerPolicy`: `GITHUB_ACTIONS=true` И `RUNNER_ENVIRONMENT=github-hosted`, docker context default). На Linux dev-хосте PASS-доказательство получить нельзя |
-| OPS-14 (F03 alerts live drill) | внешняя | live-цель для доставки реального алерта |
-| OPS-16 (release bundle publish) | зависит от OPS-11 | GitHub Releases + удержанные артефакты; git-side, но нужен private образ из OPS-11 |
-| OPS-17 (deploy exact digest + receipt) | внешняя | live-цель + авторизация deploy + сам deployment receipt; culminating gate F3 |
-| OPS-18 (single-instance capacity live) | внешняя (нет live-трафика на хосте) | live-окружение с реальной нагрузкой |
+| Задача                                  | Природа                             | Требуемое доказательство                                                                                                                                                                                                                            |
+| --------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OPS-11 (private GHCR publish)           | внешняя (permissions/packages)      | реальный publish в private GHCR; на этом хосте нет достижимой конфигурации                                                                                                                                                                          |
+| OPS-13 (F04 backup/recovery live drill) | **CI-only**                         | drill на disposable GitHub-hosted runner (`backup-restore-contract.mjs` `assertDisposableRunnerPolicy`: `GITHUB_ACTIONS=true` И `RUNNER_ENVIRONMENT=github-hosted`, docker context default). На Linux dev-хосте PASS-доказательство получить нельзя |
+| OPS-14 (F03 alerts live drill)          | внешняя                             | live-цель для доставки реального алерта                                                                                                                                                                                                             |
+| OPS-16 (release bundle publish)         | зависит от OPS-11                   | GitHub Releases + удержанные артефакты; git-side, но нужен private образ из OPS-11                                                                                                                                                                  |
+| OPS-17 (deploy exact digest + receipt)  | внешняя                             | live-цель + авторизация deploy + сам deployment receipt; culminating gate F3                                                                                                                                                                        |
+| OPS-18 (single-instance capacity live)  | внешняя (нет live-трафика на хосте) | live-окружение с реальной нагрузкой                                                                                                                                                                                                                 |
 
 Уточнение классов:
 
@@ -106,11 +106,11 @@
 
 Ни один из пунктов этого раздела **не** является блокером свободной открытой беты.
 
-| Область | Задача | Nature | Статус |
-|---|---|---|---|
-| OPS-20 | private object storage | deferred by design (см. OPS-05); вводить только при измеренной потребности или отдельно принятом future scope | не релиз-блокер |
-| GROW-02..09 | user-retention pilots (F4 GROW) | scope_specific | продуктовые пилоты, не блокируют открытую бету |
-| UX-24/25/26 | governed ad placements (F5) | требует продуктово-рекламного решения | явно не блокеры; реклама анонсируется отдельно |
+| Область     | Задача                          | Nature                                                                                                        | Статус                                         |
+| ----------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| OPS-20      | private object storage          | deferred by design (см. OPS-05); вводить только при измеренной потребности или отдельно принятом future scope | не релиз-блокер                                |
+| GROW-02..09 | user-retention pilots (F4 GROW) | scope_specific                                                                                                | продуктовые пилоты, не блокируют открытую бету |
+| UX-24/25/26 | governed ad placements (F5)     | требует продуктово-рекламного решения                                                                         | явно не блокеры; реклама анонсируется отдельно |
 
 ---
 
@@ -118,18 +118,18 @@
 
 Что блокирует подтверждение кандидата vs. постоянные остатки.
 
-| Gate | Блокирует подтверждение кандидата? | Класс закрытия |
-|---|---|---|
-| `full_acceptance` PASS на merged main SHA | Да (обязателен) | merge PR + CI |
-| Retained CI artifacts валидны на этот SHA | Да | `beta:fetch` / `gh` |
-| `beta:candidate` с `exact_sha_ci` PASS | Да | CI-only |
-| Deploy authorization | Да | persistent human gate |
-| Counsel review юридических формулировок | Да | persistent human gate |
-| Production alert routing (observability) на target env | Да | persistent human gate (не локальный фикс) |
-| Live push-provider подписка + soak | Да | внешняя |
-| GitHub visibility/package/retention для private GHCR (OPS-11) | Да (для OPS-16) | external permission gate |
-| Production deployment receipt (OPS-17) | Да | external gate |
-| OPS-20 / GROW-02..09 / UX-24/25/26 | Нет | вне scope релиза |
+| Gate                                                          | Блокирует подтверждение кандидата? | Класс закрытия                            |
+| ------------------------------------------------------------- | ---------------------------------- | ----------------------------------------- |
+| `full_acceptance` PASS на merged main SHA                     | Да (обязателен)                    | merge PR + CI                             |
+| Retained CI artifacts валидны на этот SHA                     | Да                                 | `beta:fetch` / `gh`                       |
+| `beta:candidate` с `exact_sha_ci` PASS                        | Да                                 | CI-only                                   |
+| Deploy authorization                                          | Да                                 | persistent human gate                     |
+| Counsel review юридических формулировок                       | Да                                 | persistent human gate                     |
+| Production alert routing (observability) на target env        | Да                                 | persistent human gate (не локальный фикс) |
+| Live push-provider подписка + soak                            | Да                                 | внешняя                                   |
+| GitHub visibility/package/retention для private GHCR (OPS-11) | Да (для OPS-16)                    | external permission gate                  |
+| Production deployment receipt (OPS-17)                        | Да                                 | external gate                             |
+| OPS-20 / GROW-02..09 / UX-24/25/26                            | Нет                                | вне scope релиза                          |
 
 Постоянные человеческие gates (не закрываются и не фабрикуются с dev-хоста): deploy authorization,
 ревью counsel, конфигурация prod alert-routing, live push soak, GitHub packages-настройки, live receipt.
@@ -153,14 +153,14 @@
 Эти gates нельзя закрыть с dev-хоста и/или в CI; доказательства требуют целевого окружения или
 отдельного решения владельца (подробнее §3 и §5):
 
-| Gate | Класс закрытия |
-|---|---|
-| Deploy authorization | persistent human gate — отдельное решение владельца |
-| Counsel review юридических формулировок `/terms`, `/privacy`, `/community-rules` | persistent human gate |
-| Production alert routing (observability) на target env (`WEB_PUSH_QUEUE_ALERT_*` пороги) | persistent human gate |
-| Live push-provider подписка + soak (`web_push`) | внешняя |
-| GitHub visibility/package/retention для private GHCR (OPS-11) | external permission gate |
-| Production deployment receipt (OPS-17) | external gate |
+| Gate                                                                                     | Класс закрытия                                      |
+| ---------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Deploy authorization                                                                     | persistent human gate — отдельное решение владельца |
+| Counsel review юридических формулировок `/terms`, `/privacy`, `/community-rules`         | persistent human gate                               |
+| Production alert routing (observability) на target env (`WEB_PUSH_QUEUE_ALERT_*` пороги) | persistent human gate                               |
+| Live push-provider подписка + soak (`web_push`)                                          | внешняя                                             |
+| GitHub visibility/package/retention для private GHCR (OPS-11)                            | external permission gate                            |
+| Production deployment receipt (OPS-17)                                                   | external gate                                       |
 
 Отсрочено, не релиз-блокеры: OPS-20, GROW-02..09, UX-24/25/26.
 

@@ -67,6 +67,7 @@ describe("mainline repository policy", () => {
       "PRODUCT.md",
       "PROJECT-MAP.md",
       "RELEASE-PLAN.md",
+      "RELEASE-READINESS.md",
       "RESOURCES.md",
       "RETENTION-PLAN.md",
       "ROADMAP.md",
