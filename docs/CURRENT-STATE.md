@@ -4,9 +4,9 @@
 
 ## Текущий tip
 
-- **`origin/main` tip:** `ab76f359` — merge PR #1168 (`chore/dehardcode-build-size`). Верхние переносы: `5a286c91` derives build-upload size-copy from the shared const; `dfe8af46` reuses `safePublishedBuildCondition` in the product build gate.
-- **Verified-green head:** `ab76f359`, required check `CI result` = `success`, `Sequential database tests` = `success` — [CI 42794049567](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42794049567). Browser smokes и production Docker/workflow gates на этом run зелёные; `Trusted GHCR publish prep` = `skipped` (var-гейт).
-- **Предыдущий tip/merge:** PR #1167 (`chore/reconcile-release-readiness-policy`, `f6c16aa0`, CI 42790103208) привёл `RELEASE-READINESS.md` к mainline doc policy; merge PR #1163 (`9662378b`) — fix Local Docker startup gate.
+- **`origin/main` tip:** `7c4b2fdf` — merge PR #1174 (`feat/ux26-adoptout-contract`, UX-26 часть A: opt-out-предпочтение + честный контракт измерений). Основной перенос `16cbe9de`: секция UX-26 в `docs/UX-CONTRACT.md`, settings-секция Advertising preferences с cookie `nexus_ad_opt_out` (in/out, SameSite=Lax) только за флагом `advertisingLifecycleEnabled` (выключен, рендер не активен), unit-тесты `ad-preference`. Telemetry/hide-report/единицы измерений остаются контрактом без кода.
+- **Verified-green head:** `16cbe9de` (head PR #1174), merge-gate `CI result` = `success` — [CI 42887634450](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42887634450): `Lint, types and parallel unit tests` / `Sequential database tests` / `Build production image once` green; browser smokes требовали production Docker/workflow gates. Пост-merge CI на `7c4b2fdf` (run 42889586338) повторно прогонялся на main.
+- **Предыдущий tip/merge:** PR #1168 (`ab76f359`, `chore/dehardcode-build-size`, CI 42794049567); PR #1167 (`f6c16aa0`, `chore/reconcile-release-readiness-policy`, CI 42790103208); PR #1163 (`9662378b`) — fix Local Docker startup gate.
 
 ## Оценка стадии
 
