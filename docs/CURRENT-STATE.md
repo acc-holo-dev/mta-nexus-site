@@ -4,9 +4,9 @@
 
 ## Текущий tip
 
-- **`origin/main` tip:** `9662378b` — merge PR #1163 (`fix/production-caddyfile`) → Local Docker startup gate fix. Верхний перенос `59f839cd` `deploy: fix Local Docker startup bake by correcting compose build paths`.
-- **Verified-green head:** `59f839cd`, required check `CI result` = `success` — [CI 42707064115](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42707064115). Merge `9662378b` несёт то же дерево.
-- **Local Docker startup gate:** цель достигнута и подтверждена. `pnpm test:unit` = 8247/8247; `docker compose config` разрешает build context в корень репозитория (`context: ../packages`, `../apps`; `dockerfile: deploy/Dockerfile`). Пуш и merge PR #1163 выполнены по указанию владельца.
+- **`origin/main` tip:** `ab76f359` — merge PR #1168 (`chore/dehardcode-build-size`). Верхние переносы: `5a286c91` derives build-upload size-copy from the shared const; `dfe8af46` reuses `safePublishedBuildCondition` in the product build gate.
+- **Verified-green head:** `ab76f359`, required check `CI result` = `success`, `Sequential database tests` = `success` — [CI 42794049567](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42794049567). Browser smokes и production Docker/workflow gates на этом run зелёные; `Trusted GHCR publish prep` = `skipped` (var-гейт).
+- **Предыдущий tip/merge:** PR #1167 (`chore/reconcile-release-readiness-policy`, `f6c16aa0`, CI 42790103208) привёл `RELEASE-READINESS.md` к mainline doc policy; merge PR #1163 (`9662378b`) — fix Local Docker startup gate.
 
 ## Оценка стадии
 
