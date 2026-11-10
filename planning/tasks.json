@@ -584,7 +584,7 @@
           "queue_state": "needs_decision",
           "priority": "P3",
           "source_ids": ["AD01", "AD07"],
-          "current": "Слой slot/placement разделён; start/end/capacity/audience/target/moderation и lifecycle статусы + причина pause реализованы за флагом NEXT_PUBLIC_ADVERTISING_LIFECYCLE (выключен). Оплата/продажа инвентаря/live кампании/external trackers — вне UX-24.",
+          "current": "Парт A выпущена и влита в main (4359b975): да-main слой slot/placement, lifecycle статусы (moderation/paused/live в источнике), причина pause и audit, fault = перед flag NEXT_PUBLIC_ADVERTISING_LIFECYCLE (выключен) и dark role admin; админ-секция placement на странице /admin за флагом; migration 0090 применима. CI (run 42876723508) зелёный, включая Sequential database tests/release-upgrade rehearsal на tip 0090. Оплата/продажа инвентаря/live кампании/external trackers — вне UX-24.",
           "goal": "Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.",
           "scope_files": [
             "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md",
@@ -638,7 +638,7 @@
             "Owner fixed-price direction не утверждает новые состояния/тарифы/live campaign.",
             "Не включать оплату, продажу инвентаря, production campaigns или внешние trackers."
           ],
-          "execution_state": "in_progress",
+          "execution_state": "done",
           "decision_refs": ["NX-010", "NX-011"],
           "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [
