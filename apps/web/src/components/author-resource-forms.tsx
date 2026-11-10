@@ -27,6 +27,7 @@ import {
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
+  MAX_BUILD_FILE_SIZE_BYTES,
 } from "../lib/build-file-validation";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
@@ -60,6 +61,7 @@ export function AuthorResourceForms({
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.authorResources;
   const publishing = dictionary.publishing;
+  const maxFileSizeMb = String(MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024));
   const router = useRouter();
   const fieldId = useId();
   const [saving, setSaving] = useState(false);
@@ -311,7 +313,7 @@ export function AuthorResourceForms({
       return;
     }
     if (exceedsBuildFileSizeLimit(file.size)) {
-      setUploadError(publishing.buildFileTooLarge.replace("{maxFileSize}", "64"));
+      setUploadError(publishing.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb));
       return;
     }
     setUploading(true);
@@ -331,7 +333,7 @@ export function AuthorResourceForms({
                 packageUnsafePath: buildPackageCopy(locale).path,
                 packageLimitExceeded: buildPackageCopy(locale).limit,
                 packageInspectorBusy: buildPackageCopy(locale).busy,
-                fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", "64"),
+                fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb),
                 malwareDetected: publishing.scannerMalwareDetected,
                 scanLimitExceeded: publishing.scannerLimitExceeded,
                 scannerUnavailable: publishing.scannerUnavailable,
@@ -574,7 +576,7 @@ export function AuthorResourceForms({
               className={fileClass}
             />
             <span className="block text-xs text-muted">
-              {publishing.buildFileRequirements.replace("{maxFileSize}", "64")}
+              {publishing.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb)}
             </span>
           </div>
         </fieldset>
