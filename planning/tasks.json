@@ -20,7 +20,7 @@
           "id": "OPS-09",
           "title": "Действующая защита main и release refs в public репозитории с проверяемым CI merge-gate",
           "source_ids": ["OPSNEW-09"],
-          "current": "Готово и проверено на public репозитории acc-holo-dev/mta-nexus-site (владелец выбрал public). Созданы и подтверждены активными два repository ruleset с bypass_actors=[] и current_user_can_bypass=never: Protect main (OPS-09) [id 26842428, refs/heads/main: pull_request required_approving_review_count=1, required_status_checks context=CI result strict=true, deletion, non_fast_forward]; Protect release tags v* (OPS-09) [id 26842432, refs/tags/v*: deletion, non_fast_forward]. Merge-gate проверен двумя scratch-PR от origin/main: провал CI (сломанный unit-тест) -> CI result failure -> merge BLOCKED; docs-only ветка -> CI result success на выбранном scope (тяжёлые jobs skipping) -> CI не блокирует. Scratch-PR закрыты, ветки удалены, main не менялся. Локальный main e53f93fa (hub-hygiene) в origin не отправлен.",
+          "current": "Готово и проверено на public репозитории acc-holo-dev/mta-nexus-site (владелец выбрал public). Созданы и подтверждены активными два repository ruleset с bypass_actors=[] и current_user_can_bypass=never: Protect main (OPS-09) [id 26842428, refs/heads/main: pull_request required_approving_review_count=1, required_status_checks context=CI result strict=true, deletion, non_fast_forward]; Protect release tags v* (OPS-09) [id 26842432, refs/tags/v*: deletion, non_fast_forward]. Merge-gate проверен двумя scratch-PR от origin/main: провал CI (сломанный unit-тест) -> CI result failure -> merge BLOCKED; docs-only ветка -> CI result success на выбранном scope (тяжёлые jobs skipping) -> CI не блокирует. Scratch-PR закрыты, ветки удалены, main не менялся. Локальный main e53f93fa (hub-hygiene) в origin не отправлен. [2026-11-10, Option A] Protect main (26842428) приведено к обычному виду: required_approving_review СНЯТО; остались required_status_checks(context=CI result, strict) + deletion + non_fast_forward; bypass_actors=[] и current_user_can_bypass=never (read-only GET). Release tags v* (26842432: deletion+non_fast_forward на refs/tags/v*) активен. CI merge-gate подтверждён влитыми PR #1163 и #1164 (CI result success); main=875eb3eb, дерево чистое, 0/0. Закрытие OPS-09 остаётся за принятием владельца (фулл acceptance не заявляется).",
           "goal": "После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.",
           "scope_files": [
             "external: GitHub repository visibility, plan-supported branch/tag rules and required CI checks"
@@ -3599,7 +3599,7 @@
           "queue_state": "specified",
           "priority": "P1",
           "source_ids": ["INT21", "INT22"],
-          "current": "Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe остаётся открытым.",
+          "current": "Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe закрыт (initiating-session-lock-barrier.test.ts, 4/4 PASS).",
           "goal": "Различать «скачать последнюю» и «скачать выбранную», сохранять явный выбор при unavailable fixed build; показывать только подтверждённый handoff с переходом к квитанции/инструкции/контекстному support.",
           "scope_files": [
             "apps/web/src/components/resource-download-button.tsx",
@@ -3676,7 +3676,7 @@
           "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "execution_updated_on": "2026-11-05",
-          "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open."
+          "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe closed (initiating-session-lock-barrier.test.ts, 4/4 PASS)."
         },
         {
           "id": "FLOW-18",
@@ -3927,7 +3927,7 @@
           "queue_state": "specified",
           "priority": "P2",
           "source_ids": ["F08"],
-          "current": "Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; a controlled multi-connection barrier probe on disposable/live DB remains open (see PROBLEMS F08).",
+          "current": "Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; the controlled multi-connection barrier probe on disposable DB is CLOSED (4/4 PASS; holding the initiating session row FOR UPDATE makes a queued lockInitiatingSession block, and revoke/expire/remove of the row yields UnauthorizedError with no grant). Live/CI re-run stays open if a fresh SHA is promoted (see PROBLEMS F08).",
           "goal": "Провести initiating token до final transaction и применить existing lockInitiatingSession с согласованным lock order; добавить контролируемую проверку revoke/expiry между initial auth и final gate.",
           "scope_files": [
             "apps/web/src/app/api/products/[id]/builds/route.ts",
@@ -3992,8 +3992,8 @@
           "execution_state": "done",
           "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
           "release_conditions": ["controlled_security_verification_before_beta"],
-          "execution_updated_on": "2026-11-05",
-          "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open."
+          "execution_updated_on": "2026-11-10",
+          "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB is CLOSED (initiating-session-lock-barrier.test.ts, 4/4 PASS)."
         },
         {
           "id": "FLOW-22",
