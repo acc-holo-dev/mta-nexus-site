@@ -62,6 +62,8 @@ be presented as automatic discovery.
 
 ## Sample acceptance probe (when GROW-02 exists)
 
+Traceability: filler probe is gated on the chosen starter-collection pilot and its pre-pilot brief — see [GROW-02 starter-collection pilot](GROW-02-STARTER-COLLECTION-PILOT.md). No probe result is claimed here yet.
+
 1. Build a snapshot of two entitled, trusted-clean builds.
 2. Change one pin explicitly → new digest, previous snapshot unchanged.
 3. Attempt to include a build the author cannot redistribute → rejected or marked `accessAtSnapshot: denied`.

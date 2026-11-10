@@ -18,18 +18,18 @@
           "dependency_notes": "Требуется решение владельца о тарифе/доступах; не зависит от покупок коммерческого контура NEXUS.",
           "permission": "github_settings",
           "id": "OPS-09",
-          "title": "Подготовить private repository с реально действующей защитой main и release refs",
+          "title": "Действующая защита main и release refs в public репозитории с проверяемым CI merge-gate",
           "source_ids": ["OPSNEW-09"],
-          "current": "Root подтвердил public personal repository, main без protection/rulesets; тариф неизвестен. Private branch protections/rulesets доступны personal Pro, но не Free.",
+          "current": "Готово и проверено на public репозитории acc-holo-dev/mta-nexus-site (владелец выбрал public). Созданы и подтверждены активными два repository ruleset с bypass_actors=[] и current_user_can_bypass=never: Protect main (OPS-09) [id 26842428, refs/heads/main: pull_request required_approving_review_count=1, required_status_checks context=CI result strict=true, deletion, non_fast_forward]; Protect release tags v* (OPS-09) [id 26842432, refs/tags/v*: deletion, non_fast_forward]. Merge-gate проверен двумя scratch-PR от origin/main: провал CI (сломанный unit-тест) -> CI result failure -> merge BLOCKED; docs-only ветка -> CI result success на выбранном scope (тяжёлые jobs skipping) -> CI не блокирует. Scratch-PR закрыты, ветки удалены, main не менялся. Локальный main e53f93fa (hub-hygiene) в origin не отправлен.",
           "goal": "После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.",
           "scope_files": [
             "external: GitHub repository visibility, plan-supported branch/tag rules and required CI checks"
           ],
           "acceptance": [
-            "Владелец выбрал personal Pro либо иной поддерживаемый ownership/план; платная покупка/transfer не подразумевается.",
-            "Только после явного разрешения проверены private visibility, доступ нужных людей/ИИ и действующий main rule: PR, CI result, force/delete ограничения и явный bypass policy.",
-            "Release refs защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку.",
-            "Private environment reviewers на Pro/Team не обещаются; manual deploy остаётся отдельно."
+            "Владелец явно выбрал оставить репозиторий public (private/pro покупка не требуется); дублирующее требование про выбор тарифа снято.",
+            "Проверено: действующий main rule с required check ровно CI result, force/delete ограничения, явный bypass policy (bypass_actors не настроен; git admin владельца — единственный неавтоматический override).",
+            "Release refs (v*) защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку (context жёстко равен battle job CI result).",
+            "Private environment reviewers не обещаются; manual deploy остаётся отдельно."
           ],
           "verification": [
             "Read-only сверка repository visibility, effective protection/rulesets и owner-plan доступности до и после разрешённого изменения.",
@@ -56,17 +56,49 @@
               "url": "https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments",
               "source_type": "official_web",
               "verified_as_of": "2026-11-01"
+            },
+            {
+              "path": "GitHub ruleset: Protect main (OPS-09)",
+              "lines": "rules required_status_checks[].context=CI result",
+              "url": "https://github.com/acc-holo-dev/mta-nexus-site/rules/26842428",
+              "source_type": "official_web",
+              "verified_as_of": "2026-11-09"
+            },
+            {
+              "path": "GitHub ruleset: Protect release tags v* (OPS-09)",
+              "lines": "deletion + non_fast_forward on refs/tags/v*",
+              "url": "https://github.com/acc-holo-dev/mta-nexus-site/rules/26842432",
+              "source_type": "official_web",
+              "verified_as_of": "2026-11-09"
+            },
+            {
+              "path": "Verification PR #1160 (RED): failing unit test",
+              "lines": "CI result failure -> mergeStateStatus BLOCKED",
+              "url": "https://github.com/acc-holo-dev/mta-nexus-site/pull/1160",
+              "source_type": "repository",
+              "verified_as_of": "2026-11-09",
+              "status": "closed_scratch_never_merged"
+            },
+            {
+              "path": "Verification PR #1161 (GREEN): docs-only",
+              "lines": "CI result success on selected scope; only approval remains",
+              "url": "https://github.com/acc-holo-dev/mta-nexus-site/pull/1161",
+              "source_type": "repository",
+              "verified_as_of": "2026-11-09",
+              "status": "closed_scratch_never_merged"
             }
           ],
           "limits": [
             "Черновик review package: specified не разрешает исполнение; текущие факты и ранее полученный CI PASS не являются приёмкой этой задачи.",
             "Permission обозначает требуемый отдельный допуск, а не выданное разрешение менять GitHub.",
             "Private не делает сайт закрытым: открытая бесплатная бета сохраняется.",
-            "Не вводить фиктивного второго reviewer, если независимого человека нет."
+            "Не вводить фиктивного второго reviewer, если независимого человека нет.",
+            "Single-owner override: у одного владельца нет возможности само-одобрить PR; 1 обязательный approval оставляет даже green PR заблокированным до одобрения. Фиктивного второго reviewer не вводить. Единственный реальный неавтоматический override для заблокированного merge — права GitHub admin самого владельца."
           ],
           "execution_state": "not_started",
           "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
-          "release_conditions": ["before_authorized_private_visibility_and_protection_change"]
+          "release_conditions": ["before_authorized_private_visibility_and_protection_change"],
+          "ticket_status": "implemented"
         },
         {
           "track": "operations_delivery",

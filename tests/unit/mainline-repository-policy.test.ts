@@ -60,6 +60,8 @@ describe("mainline repository policy", () => {
       "DOCS-MIGRATION.md",
       "FLOWS.md",
       "GETTING-STARTED.md",
+      "GROW-02-STARTER-COLLECTION-PILOT.md",
+      "GROW-07-DIGEST-PILOT.md",
       "OPERATIONS.md",
       "PROBLEMS.md",
       "PRODUCT.md",
