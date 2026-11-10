@@ -584,7 +584,7 @@
           "queue_state": "needs_decision",
           "priority": "P3",
           "source_ids": ["AD01", "AD07"],
-          "current": "Есть sponsored badge и fixed-price inventory target; законченный runtime placements не установлен. Конкретный lifecycle — предложение.",
+          "current": "Слой slot/placement разделён; start/end/capacity/audience/target/moderation и lifecycle статусы + причина pause реализованы за флагом NEXT_PUBLIC_ADVERTISING_LIFECYCLE (выключен). Оплата/продажа инвентаря/live кампании/external trackers — вне UX-24.",
           "goal": "Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.",
           "scope_files": [
             "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md",
@@ -638,7 +638,7 @@
             "Owner fixed-price direction не утверждает новые состояния/тарифы/live campaign.",
             "Не включать оплату, продажу инвентаря, production campaigns или внешние trackers."
           ],
-          "execution_state": "not_started",
+          "execution_state": "in_progress",
           "decision_refs": ["NX-010", "NX-011"],
           "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
           "conditional_dependencies": [

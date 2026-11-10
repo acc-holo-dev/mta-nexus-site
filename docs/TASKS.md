@@ -408,13 +408,13 @@ Release applicability: only_after_evidence_based_storage_trigger_and_selected_sc
 
 ## UX-24 — Управляемое рекламное размещение и его lifecycle
 
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** in_progress. **Область полномочий:** local_development.
 
 **Исходные пункты:** AD01, AD07. **Решения обсуждения:** NX-010, NX-011.
 
-**Сейчас.** Есть sponsored badge и fixed-price inventory target; законченный runtime placements не установлен. Конкретный lifecycle — предложение.
+**Сейчас.** Есть sponsored badge и fixed-price inventory target; runtime основа placements установлена за флагом `NEXT_PUBLIC_ADVERTISING_LIFECYCLE` (выключен по умолчанию). Slot/placement разделены; определены start/end/capacity/audience/target/moderation и lifecycle со статусами draft/pending_approval/scheduled/live/paused/ended/rejected/cancelled и причиной pause. Биллинг/самообслуживание/live кампании и external trackers — вне UX-24.
 
-**Результат.** Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.
+**Результат.** Принят и локально реализован admin-managed placement contract слоя slot/time/capacity/eligibility/audit за флагом (domain, schema, repository, admin-секция чтения). Вне производственных слотов; решение владельца остается за lifecycle контрактом.
 
 ### Область изменений
 
@@ -518,7 +518,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-26 — Причины показа контроль рекламы и честные измерения
 
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** in_progress. **Область полномочий:** local_development.
 
 **Исходные пункты:** AD08, AD09. **Решения обсуждения:** NX-010, NX-011.
 

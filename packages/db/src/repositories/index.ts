@@ -99,6 +99,7 @@ export { serverReviewsRepository } from "./server-reviews";
 export * from "./servers";
 export * from "./sessions";
 export * from "./social";
+export * from "./sponsored-placement";
 export * from "./storage-maintenance";
 export * from "./subscriptions";
 export * from "./support";
