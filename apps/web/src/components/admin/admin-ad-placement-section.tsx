@@ -23,9 +23,12 @@ function slotLabel(slot: AdSlotPlan): string {
 export function AdminAdPlacementSection({
   locale,
   slots,
+  rendererEnabled,
 }: {
   locale: Locale;
   slots: SlotSummary[];
+  /** Public SponsoredPlacementSlot renderer switch (off by default, UX-25 part A). */
+  rendererEnabled: boolean;
 }) {
   const enabledCount = slots.filter((s) => s.slot.enabled).length;
   return (
@@ -80,6 +83,15 @@ export function AdminAdPlacementSection({
             {locale === "ru"
               ? `Итого включено слотов: ${enabledCount}`
               : `Enabled slots total: ${enabledCount}`}
+          </li>
+          <li className="font-caption text-faint">
+            {locale === "ru"
+              ? rendererEnabled
+                ? "Публичный слот-рендер включён"
+                : "Публичный слот-рендер выключен (по умолчанию)"
+              : rendererEnabled
+                ? "Public slot renderer enabled"
+                : "Public slot renderer is off (default)"}
           </li>
         </ul>
       )}
