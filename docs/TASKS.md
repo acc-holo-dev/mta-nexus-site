@@ -524,7 +524,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** AD08, AD09. **Решения обсуждения:** NX-010, NX-011.
 
-**Сейчас.** Opt-out/explainability — принятые направления; hide/report ads и единицы рекламных измерений ещё не реализованы.
+**Сейчас.** Часть A выпущена: контракт UX-26 в docs/UX-CONTRACT.md (why shown по типу причины без private/anti-abuse; contextual opt-out без behavioral-profile ranking; hidden placement не возвращается немедленно; report привязан к placement/target без чужих данных; единицы отдачи/показа/клика/действия с period/dedup/internal traffic/unknown различены; ad report не меняет organic reputation и не доказывает обязательства). Settings-секция Advertising preferences даёт opt-out preference (cookie nexus_ad_opt_out, in/out, SameSite=Lax) только за флагами advertisingLifecycleEnabled и rendererEnabled (выключены по умолчанию) и честно сообщает, что публичного рендера нет. Реализации hide/report action'ов и наблюдаемых рекламных единиц нет: любое telemetry/live-эксперимент требует отдельного разрешения и ревью privacy/event schema.
 
 **Результат.** Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.
 
