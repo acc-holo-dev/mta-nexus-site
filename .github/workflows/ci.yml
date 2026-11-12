@@ -57,7 +57,7 @@ jobs:
           persist-credentials: false
       # pnpm must be on PATH before setup-node resolves `cache: pnpm` (store path).
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.1.1
         with:
           version: 12.4.2
       - name: Set up Node.js
@@ -108,7 +108,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.1.1
         with:
           version: 12.4.2
       - name: Set up Node.js
@@ -545,7 +545,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.1.1
         with:
           version: 12.4.2
       - name: Set up Node.js
