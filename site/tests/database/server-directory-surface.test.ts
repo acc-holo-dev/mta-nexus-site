@@ -3,6 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   listings: vi.fn(),
@@ -32,7 +34,7 @@ vi.mock("../../src/lib/services/server-service", () => ({
   serverService: { listServers: state.listings },
 }));
 
-vi.mock("../../src/components/mta-master-server-directory", async () => {
+vi.mock("../../src/features/servers/components/mta-master-server-directory", async () => {
   const ReactModule = await import("react");
   return {
     MtaMasterServerDirectory: ({

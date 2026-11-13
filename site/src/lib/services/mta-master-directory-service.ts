@@ -1,11 +1,11 @@
 import { readMtaMasterMirrorUrls } from "@nexus/config";
 import { normalizeMtaAddress } from "@nexus/domain";
 export { normalizeMtaAddress } from "@nexus/domain";
-import { MTA_MASTER_FRESH_TTL_MS } from "../mta-directory-cache";
-import type { MtaMasterServer } from "../mta-master-directory-shared";
+import { MTA_MASTER_FRESH_TTL_MS } from "../../features/servers/model";
+import type { MtaMasterServer } from "../../features/servers/model";
 
-export type { MtaMasterServer } from "../mta-master-directory-shared";
-export { mtaLiveStatus } from "../mta-master-directory-shared";
+export type { MtaMasterServer } from "../../features/servers/model";
+export { mtaLiveStatus } from "../../features/servers/model";
 
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
 const MASTER_TOTAL_TIMEOUT_MS = 10_000;

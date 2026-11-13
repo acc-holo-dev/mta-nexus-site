@@ -42,7 +42,7 @@ vi.mock("../../src/lib/services/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
 vi.mock("../../src/components/product-card", () => ({ ProductCard: () => null }));
-vi.mock("../../src/components/server-card", () => ({ ServerCard: () => null }));
+vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
 
 import { DirectoryFilters, DirectoryResults } from "../../src/components/discovery-directory";

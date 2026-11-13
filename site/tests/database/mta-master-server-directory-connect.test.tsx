@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { MtaMasterServerDirectory } from "../../src/components/mta-master-server-directory";
+import { MtaMasterServerDirectory } from "../../src/features/servers/client";
 import { getDictionary } from "../../src/lib/i18n";
 
 describe("MTA master directory connect honesty", () => {

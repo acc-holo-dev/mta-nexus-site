@@ -5,8 +5,8 @@ import { Button, ErrorState, TrustBadge } from "@nexus/ui";
 import { Copy, Gamepad2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
   players: number | undefined,

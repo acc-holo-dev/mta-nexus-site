@@ -16,7 +16,7 @@ import { FollowButton } from "../../../components/follow-button";
 import { ObjectReportForm } from "../../../components/object-report-form";
 import { ProductCard } from "../../../components/product-card";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
-import { ServerCard } from "../../../components/server-card";
+import { ServerCard } from "../../../features/servers/client";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";

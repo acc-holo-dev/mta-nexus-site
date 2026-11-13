@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   MTA_MASTER_FRESH_TTL_MS,
   mtaDirectoryHttpCacheControl,
-} from "../../src/lib/mta-directory-cache";
+} from "../../src/features/servers/model";
 
 const NOW = Date.parse("2026-10-09T12:00:00.000Z");
 const snapshot = (ageMs: number, isStale = false) => ({

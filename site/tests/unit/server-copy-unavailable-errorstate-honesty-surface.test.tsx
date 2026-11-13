@@ -10,8 +10,8 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
   "site/src/components/server-connect-controls.tsx",
-  "site/src/components/server-card.tsx",
-  "site/src/components/mta-master-server-directory.tsx",
+  "site/src/features/servers/components/server-card.tsx",
+  "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;
 
 it.each(surfaces)("locks copyUnavailable notice to ErrorState in %s", (relative) => {

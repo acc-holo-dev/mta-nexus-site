@@ -30,6 +30,50 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "servers-feature-public-api",
+      severity: "error",
+      comment:
+        "Other application modules consume the Servers pilot through client, server or model entrypoints.",
+      from: { path: "^site/src/(?!features/servers/)" },
+      to: { path: "^site/src/features/servers/(?!(?:client|server|model)\\.ts$)" },
+    },
+    {
+      name: "servers-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/servers/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "servers-client-isolation",
+      severity: "error",
+      comment:
+        "Client components and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
+      from: { path: "^site/src/features/servers/(?:client\\.ts$|components/|model(?:\\.ts$|/))" },
+      to: {
+        path: "^(?:site/src/(?:features/servers/server(?:\\.ts$|/)|lib/(?!i18n(?:\\.ts$|/)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "servers-model-is-pure",
+      severity: "error",
+      from: { path: "^site/src/features/servers/model(?:\\.ts$|/)" },
+      to: {
+        path: "^(?:site/src/(?!features/servers/model(?:\\.ts$|/))|site/packages/(?!domain/))",
+      },
+    },
+    {
+      name: "servers-model-has-no-framework",
+      severity: "error",
+      from: { path: "^site/src/features/servers/model(?:\\.ts$|/)" },
+      to: { path: "(?:^|/)node_modules/(?:react|react-dom|next)(?:/|$)" },
+    },
+    {
+      name: "servers-client-has-no-node-builtins",
+      severity: "error",
+      from: { path: "^site/src/features/servers/(?:client\\.ts$|components/|model(?:\\.ts$|/))" },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "http-handlers-use-services-for-db",
       severity: "error",
       comment:

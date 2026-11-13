@@ -31,21 +31,24 @@ site/tests/       → HTTP/UI/поведенческие Vitest-сюиты (~6MB
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
 
+Servers read-only pilot живёт в [`site/src/features/servers`](../site/src/features/servers/README.md);
+claim/management/collectors остаются в прежних модулях.
+
 Граница: HTTP → services → domain/validation → repositories. Пакеты не импортируют код приложения.
 
 ## Основные продуктовые поверхности
 
-| Область                   | Где смотреть                                                         |
-| ------------------------- | -------------------------------------------------------------------- |
-| Auth / Security Center    | `auth-service`, `site/packages/security`, workspace settings         |
-| Servers / directory       | `mta-master-directory-service`, `server-*`, `/servers`               |
-| Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources |
-| Library / collections     | `library-*`, `/workspace/library`                                    |
-| Community / content       | `content-service`, discussions, `/community`, articles               |
-| Orgs / teams              | `organization-*`, `/workspace/organizations`                         |
-| Moderation / trust        | reports, verification, admin queues                                  |
-| Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)          |
-| Commerce shell            | cart/checkout/orders **без** реальных платежей (open free beta)      |
+| Область                   | Где смотреть                                                           |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Auth / Security Center    | `auth-service`, `site/packages/security`, workspace settings           |
+| Servers / directory       | `features/servers/{client,server,model}`, прежние services, `/servers` |
+| Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources   |
+| Library / collections     | `library-*`, `/workspace/library`                                      |
+| Community / content       | `content-service`, discussions, `/community`, articles                 |
+| Orgs / teams              | `organization-*`, `/workspace/organizations`                           |
+| Moderation / trust        | reports, verification, admin queues                                    |
+| Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)            |
+| Commerce shell            | cart/checkout/orders **без** реальных платежей (open free beta)        |
 
 ## Запуск и проверки (кратко)
 

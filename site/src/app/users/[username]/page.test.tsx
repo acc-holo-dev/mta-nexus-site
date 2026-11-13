@@ -72,7 +72,7 @@ vi.mock("../../../components/product-card", () => ({
     </article>
   ),
 }));
-vi.mock("../../../components/server-card", () => ({
+vi.mock("../../../features/servers/client", () => ({
   ServerCard: ({ server }: { server: { name: string; slug?: string } }) => (
     <article>
       <a href={`/servers/${server.slug ?? "server"}`}>{server.name}</a>

@@ -25,7 +25,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("keeps MTA directory errors in the dictionary and requests uncached data", () => {
-    const source = read("site/src/components/mta-master-server-directory.tsx");
+    const source = read("site/src/features/servers/components/mta-master-server-directory.tsx");
 
     expect(source).toContain("copy.directoryTimeout");
     expect(source).toContain("copy.directoryFetchError");

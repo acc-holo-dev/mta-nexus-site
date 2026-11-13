@@ -108,7 +108,7 @@ vi.mock("../../packages/db/src/client", () => ({
 }));
 
 vi.mock("../../src/components/product-card", () => ({ ProductCard: () => null }));
-vi.mock("../../src/components/server-card", () => ({ ServerCard: () => null }));
+vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
 
 import DevelopersPage from "../../src/app/developers/page";

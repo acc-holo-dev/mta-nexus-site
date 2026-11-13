@@ -4,7 +4,8 @@
 локальное продолжение. Phase 1 проверена: `apps/web` → `site`. По следующему поручению
 Phase 2.1 проверена: `packages` → `site/packages`.
 Phase 2.2 проверена: `tests` → `site/tests`.
-Выполняется Phase 3: `deploy/configs` → `docker/config`. Владелец явно
+Phase 3 проверена: `deploy/configs` → `docker/config`.
+Выполняется Phase 4.1: read-only Servers pilot. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -319,3 +320,32 @@ upgrade, persistence и backup/restore; предыдущие PASS не заме�
 Dev-browser CI также проверяет HMR через read-only bind `site/src`: CSS probe
 alpha → beta → исходный CSS. Восстановление выполняется в finally и проверяется
 `git diff`; hosted guards сохраняются.
+
+### Phase 4.1: Servers read-only pilot
+
+Phase 3 прошла полный [CI #4635](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43379958936)
+на `17ddc793`: все 15 gates, 8 271 unit, 528 tooling и 1 155 DB tests, новый HMR
+и startup/persistence/backup/browser acceptance.
+
+Публичный каталог, две карточки и четыре чистые model modules группируются в
+`site/src/features/servers`. Server composition страницы также принадлежит feature;
+App Router остаётся тонким adapter без новых URLs. Public ports — `client`, `server`,
+`model`; server entry использует Next `server-only`. Полные implementation contracts
+— в [feature README](../site/src/features/servers/README.md).
+
+Services и их cache остаются на прежних местах. Чистый MTA type больше не импортируется
+клиентом/model из service module. API использует pure model entry и прежний service,
+сохраняя validation/status/headers/freshness. Raw observation и managed profile не
+сливаются; claim/management/reviews/collector code не переносится.
+
+Новые error rules закрывают private imports извне feature, feature→routing,
+client→server/services/infra, model→UI/app и Node core imports. Negative fixtures
+проверяют реальные value/type edges; реальный client/model dependency closure
+проверяется отдельно. CI sensitivity не маскирует feature под старые UI-only paths:
+изменения Servers pilot требуют полного контура, включая directory browser.
+
+`test:directory` исправляет прежний несуществующий aggregate service test на четыре
+реальные parse/transport/observations/endpoints suites; добавлены существующие pure
+model и directory UI suites. Полный состав unit/database до/после сохраняется после
+единственного rename `server-card.test.tsx`. Критерии — behavior/API/cache/error/zero/
+stale/RU/EN и browser keyboard/mobile, без redesign или новых business rules.

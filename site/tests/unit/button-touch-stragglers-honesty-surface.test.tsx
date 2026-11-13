@@ -12,7 +12,7 @@ const exclusive = [
   "site/src/components/resource-review-controls.tsx",
   "site/src/components/support-center.tsx",
   "site/src/components/order-case-page.tsx",
-  "site/src/components/mta-master-server-directory.tsx",
+  "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;
 
 it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-10", () => {
@@ -43,13 +43,13 @@ it("locks seller-sales apply and support create-case submit to size=touch", () =
   expect(read("site/src/components/support-center.tsx")).toMatch(
     /variant="primary"[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?variant="primary"/u,
   );
-  expect(read("site/src/components/mta-master-server-directory.tsx")).toMatch(
+  expect(read("site/src/features/servers/components/mta-master-server-directory.tsx")).toMatch(
     /onClick=\{resetFilters\}[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}/u,
   );
 });
 
 it("locks MTA directory empty chrome to EmptyState without size=sm stragglers", () => {
-  const source = read("site/src/components/mta-master-server-directory.tsx");
+  const source = read("site/src/features/servers/components/mta-master-server-directory.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("noMatchDescription");
   expect(source).toContain("noneDescription");

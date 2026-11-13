@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { selectMtaDirectoryPage } from "../../src/lib/mta-directory-page";
+import { selectMtaDirectoryPage } from "../../src/features/servers/model";
 import type { MtaMasterServer } from "../../src/lib/services/mta-master-directory-service";
 
 const text = fc.string({ unit: "binary", maxLength: 20 });

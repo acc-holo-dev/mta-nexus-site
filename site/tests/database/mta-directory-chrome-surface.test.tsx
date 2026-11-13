@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { ManagedServerVisibilityBatch } from "../../src/components/managed-server-visibility-batch";
-import { MtaMasterServerDirectory } from "../../src/components/mta-master-server-directory";
+import { MtaMasterServerDirectory } from "../../src/features/servers/client";
 import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
 
 describe("MTA directory/visibility chrome", () => {
@@ -41,7 +41,7 @@ describe("MTA directory/visibility chrome", () => {
   );
 
   it("locks directory resetFilters CTA to size=touch", () => {
-    const source = read("site/src/components/mta-master-server-directory.tsx");
+    const source = read("site/src/features/servers/components/mta-master-server-directory.tsx");
     expect(source).toContain("onClick={resetFilters}");
     expect(source).toMatch(
       /size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}|onClick=\{resetFilters\}[\s\S]{0,80}?size="touch"/u,
@@ -50,7 +50,7 @@ describe("MTA directory/visibility chrome", () => {
   });
 
   it("locks remaining directory Buttons to size=touch and empty results to EmptyState", () => {
-    const source = read("site/src/components/mta-master-server-directory.tsx");
+    const source = read("site/src/features/servers/components/mta-master-server-directory.tsx");
     expect(source).toContain("EmptyState");
     expect(source).toContain("copy.noMatchDescription");
     expect(source).toContain("copy.noneDescription");

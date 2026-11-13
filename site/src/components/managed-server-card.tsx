@@ -3,7 +3,7 @@ import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
-import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
+import { type MtaMasterServer, mtaLiveStatus } from "../features/servers/model";
 import { getServerActivityCopy } from "../lib/server-activity-view";
 import { serverContentCopy } from "../lib/server-content-copy";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";

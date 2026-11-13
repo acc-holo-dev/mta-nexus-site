@@ -20,6 +20,7 @@ const fullAcceptancePaths = [
   /^pnpm-(?:lock|workspace)\.yaml$/,
   /^\.(?:nvmrc|node-version)$/,
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
+  /^apps\/web\/src\/features\/servers\//,
   /^packages\/(?:config|security|storage)\//,
   /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans|order-operations|subscriptions|entitlements|resource-cart|community-reports|notifications|discussion-management|organization-governance|license-controls)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:library-collections|library-collection-(?:command|internals)|library-membership-batches|library-selection-batches)\.ts$/,

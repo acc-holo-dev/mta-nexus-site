@@ -22,7 +22,7 @@ import { productService } from "../lib/services/product-service";
 import { ArticleCard } from "./article-card";
 import { FollowButton } from "./follow-button";
 import { ProductCard } from "./product-card";
-import { ServerCard } from "./server-card";
+import { ServerCard } from "../features/servers/client";
 
 const observationLookupForSnapshot = cache((servers: readonly MtaMasterServer[]) =>
   indexMtaObservations(servers),

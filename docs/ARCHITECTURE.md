@@ -10,19 +10,40 @@
 
 ## Границы
 
-| Слой                       | Ответственность                                                                              |
-| -------------------------- | -------------------------------------------------------------------------------------------- |
-| `site/src/app`             | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
-| `site/src/lib/services`    | Пользовательские операции, оркестрация и правила сценария.                                   |
-| `site/packages/db`         | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
-| `site/packages/domain`     | Независимые доменные типы, ошибки, правила и события.                                        |
-| `site/packages/validation` | Общие схемы входных данных.                                                                  |
-| `site/packages/security`   | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
-| `site/packages/storage`    | Приватное хранение и проверка целостности файлов.                                            |
-| `site/packages/config`     | Проверка параметров окружения.                                                               |
-| `site/packages/ui`         | Общие элементы интерфейса без импортов серверных пакетов.                                    |
+| Слой                        | Ответственность                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------- |
+| `site/src/app`              | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
+| `site/src/features/servers` | Публичный read-only Servers pilot: UI, чистые проекции и server composition.                 |
+| `site/src/lib/services`     | Пользовательские операции, оркестрация и правила сценария.                                   |
+| `site/packages/db`          | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
+| `site/packages/domain`      | Независимые доменные типы, ошибки, правила и события.                                        |
+| `site/packages/validation`  | Общие схемы входных данных.                                                                  |
+| `site/packages/security`    | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
+| `site/packages/storage`     | Приватное хранение и проверка целостности файлов.                                            |
+| `site/packages/config`      | Проверка параметров окружения.                                                               |
+| `site/packages/ui`          | Общие элементы интерфейса без импортов серверных пакетов.                                    |
 
 Пакеты не импортируют приложение; domain не зависит от остальных пакетов. `dependency-cruiser` проверяет границы и циклы: SWC разбирает исходники, а отдельный TypeScript 6 выявляет зависимости типов. Проект компилируется TypeScript 7; поддержку его новых синтаксических конструкций анализатором нужно проверять при их использовании. HTTP-обработчик не должен становиться вторым репозиторием или обходить общие проверки.
+
+### Servers feature pilot
+
+`site/src/features/servers` объединяет публичный каталог и карточки. Публичный
+контракт — три entrypoints: `client.ts` (клиентский UI), `server.ts` (server-only
+composition страницы) и `model.ts` (чистые types/projections/pagination/cache helpers).
+[Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
+
+App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует
+feature server composition. Directory API использует чистую model entry, поэтому
+не получает RSC или БД через server barrel. Существующие `serverService` и
+`mtaMasterDirectoryService` остаются единственными реализациями сценариев и cache.
+Claim/ownership/management/collectors не входят в пилот.
+
+Внешний production-код обращается только к трём entrypoints. Feature не импортирует
+routing; client/model не импортируют services, request locale, server entry или
+infrastructure packages. Model не зависит от UI и Node builtins. Эти правила
+проверяются dependency-cruiser, включая type edges; отдельный tooling suite
+проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
+HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
 
 ### HTTP → service → repository
 

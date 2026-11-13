@@ -1,4 +1,4 @@
-import type { MtaMasterServer } from "./services/mta-master-directory-service";
+import type { MtaMasterServer } from "./mta-master-directory-shared";
 
 // A master-list array represents one immutable upstream snapshot. Reuse only
 // computed search strings for that snapshot; WeakMap lets replaced snapshots be

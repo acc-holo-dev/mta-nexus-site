@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/mta-master-server-directory.tsx";
+const surface = "site/src/features/servers/components/mta-master-server-directory.tsx";
 
 it("locks master directory stale notice to ErrorState", () => {
   const source = read(surface);

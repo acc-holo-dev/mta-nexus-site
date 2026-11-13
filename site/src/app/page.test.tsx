@@ -36,7 +36,7 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   };
 });
 
-vi.mock("../components/server-card", async () => {
+vi.mock("../features/servers/client", async () => {
   const React = await import("react");
   return {
     HomeNetworkServerCard: ({

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArticleCard } from "../components/article-card";
 import { HomePersonalChangesPanel } from "../components/home-personal-changes-panel";
 import { ProductCard } from "../components/product-card";
-import { HomeNetworkServerCard } from "../components/server-card";
+import { HomeNetworkServerCard } from "../features/servers/client";
 import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
 import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../lib/home-personal-preference";
 import { getDictionary } from "../lib/i18n";

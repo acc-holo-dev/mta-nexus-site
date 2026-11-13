@@ -1,7 +1,9 @@
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { mtaDirectoryHttpCacheControl } from "../../../../lib/mta-directory-cache";
-import { selectMtaDirectoryPage } from "../../../../lib/mta-directory-page";
+import {
+  mtaDirectoryHttpCacheControl,
+  selectMtaDirectoryPage,
+} from "../../../../features/servers/model";
 import {
   createRequestLogContext,
   jsonWithRequestId,
