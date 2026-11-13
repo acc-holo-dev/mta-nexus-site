@@ -1,6 +1,6 @@
 import type { PublicResourceVariants } from "@nexus/domain";
 import Link from "next/link";
-import { getResourceManagementCopy } from "../lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../../lib/resource-management-i18n";
 
 export function ResourceVariantChoices({
   group,

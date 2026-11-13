@@ -9,7 +9,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { ReverseDependencyList } from "../../src/components/reverse-dependency-list";
+import { ReverseDependencyList } from "../../src/features/resources/components/reverse-dependency-list";
 
 describe("reverse dependency list behavior", () => {
   it.each(["en", "ru"] as const)(

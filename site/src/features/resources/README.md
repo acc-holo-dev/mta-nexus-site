@@ -10,6 +10,7 @@ Services и repositories не дублируются и не переносят�
 
 | Entry                | Контракт                                                                                                    |
 | -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `detail-view.ts`     | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
 | `review-controls.ts` | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`    | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `client.ts`          | `ResourcePreview`, `ResourceGallery`, `ResourceQaPanel`; client components                                  |
@@ -85,3 +86,7 @@ Boundary suite — `scripts/tests/resources-feature-boundaries.node-test.mjs`.
 
 Review list/pager, review controls, Q&A panel и report form принадлежат Resources.
 Общий confirmAction, HTTP adapters, service и repository остаются прежними.
+
+Dependency/reverse-dependency, variants и version-help UI принадлежат Resources.
+`detail-view` предоставляет dependency UI workspace; чистые resolution helpers и
+shared copy/support components сохраняют прежние места. Списки не меняют server visibility.

@@ -63,6 +63,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
   write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
   write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
   write("site/src/app/evidence.ts", 'export { page } from "../features/resources/evidence";');
+  write("site/src/features/resources/detail-view.ts", 'export { page } from "./server";');
+  write("site/src/app/detail-view.ts", 'export { page } from "../features/resources/detail-view";');
   write(
     "site/src/features/resources/review-controls.ts",
     '"use client"; export { page } from "./server";',
@@ -157,6 +159,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/resources/detail-view.ts", "resources-view-isolation"],
     ["features/resources/review-controls.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
@@ -179,6 +182,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/detail-view.ts",
     "app/review-controls.ts",
     "app/reviews-view.ts",
     "app/media.ts",
@@ -202,6 +206,10 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   const result = cruise(root, [
     "site/src/features/resources/client.ts",
     "site/src/features/resources/evidence.ts",
+    "site/src/features/resources/detail-view.ts",
+    "site/src/features/resources/components/reverse-dependency-list.tsx",
+    "site/src/features/resources/components/resource-variant-choices.tsx",
+    "site/src/features/resources/components/resource-version-help-section.tsx",
     "site/src/features/resources/review-controls.ts",
     "site/src/features/resources/reviews-view.ts",
     "site/src/features/resources/view.ts",
@@ -234,6 +242,10 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   );
   visit("site/src/features/resources/client.ts");
   visit("site/src/features/resources/evidence.ts");
+  visit("site/src/features/resources/detail-view.ts");
+  visit("site/src/features/resources/components/reverse-dependency-list.tsx");
+  visit("site/src/features/resources/components/resource-variant-choices.tsx");
+  visit("site/src/features/resources/components/resource-version-help-section.tsx");
   visit("site/src/features/resources/review-controls.ts");
   visit("site/src/features/resources/reviews-view.ts");
   visit("site/src/features/resources/view.ts");

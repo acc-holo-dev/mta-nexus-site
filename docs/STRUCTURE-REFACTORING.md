@@ -11,7 +11,8 @@ Phase 4.3 проверена: Resources detail server composition.
 Phase 4.4 проверена: Resources versions/reviews server composition.
 Phase 4.5 проверена: Resources media/evidence presentation.
 Phase 4.6 проверена: Resources reviews/Q&A UI.
-Выполняется Phase 4.7: Resources review и Q&A forms. Владелец явно
+Phase 4.7 проверена: Resources review и Q&A forms.
+Выполняется Phase 4.8: Resources dependency и version-help UI. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -460,3 +461,7 @@ Media/evidence прошли [CI #4642](https://github.com/acc-holo-dev/mta-nexus
 ### Phase 4.7: Resources review и Q&A forms
 
 Reviews/Q&A UI прошли полный [CI #4643](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43488216449) на `9bef8629`. Review editor/report/decision и Q&A report form перенесены в Resources. `review-controls` сохраняет client boundary для library и moderation; feature использует private forms напрямую. ConfirmAction, HTTP adapters, services, repositories и серверная проверка прав не меняются. Тела компонентов сохранены после адаптации imports; client graph и negative fixtures защищают server boundary.
+
+### Phase 4.8: Resources dependency и version-help UI
+
+Review/Q&A forms прошли полный [CI #4644](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43491191721) на `8e6e0e4c`. Dependency/reverse-dependency lists, variants и version-help UI объединены в Resources; workspace использует `detail-view`. Shared resolution helpers, copy/support components, services и server visibility сохраняются. Тела компонентов сохранены после адаптации imports. Boundary fixtures проверяют public port и реальный transitive graph.

@@ -2,11 +2,11 @@ import type { ResourceVersionHelpProjection } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
-import type { Locale } from "../lib/i18n";
-import { getDictionary } from "../lib/i18n";
-import { licenseModelLabel } from "../lib/license-model-i18n";
-import { CopyablePlainCodeBlock } from "./copyable-plain-code-block";
-import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { licenseModelLabel } from "../../../lib/license-model-i18n";
+import { CopyablePlainCodeBlock } from "../../../components/copyable-plain-code-block";
+import { ResourceVersionHelpSupportLink } from "../../../components/resource-version-help-support-link";
 
 function renderSectionBody({
   paragraphs,

@@ -63,7 +63,7 @@ vi.mock("../../src/components/resource-compatibility-form", () => ({
 
 import CompatibilityPage from "../../src/app/workspace/resources/[id]/compatibility/page";
 import VariantsPage, { metadata } from "../../src/app/workspace/resources/[id]/variants/page";
-import { ResourceVariantChoices } from "../../src/components/resource-variant-choices";
+import { ResourceVariantChoices } from "../../src/features/resources/components/resource-variant-choices";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   revision = "2026-10-10T00:00:00.000Z";

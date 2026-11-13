@@ -1,7 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { getDictionary, type Locale } from "../lib/i18n";
-import type { ProductDependencyResolution } from "../lib/product-dependency-resolution";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import type { ProductDependencyResolution } from "../../../lib/product-dependency-resolution";
 
 export function ProductDependencyList({
   declared,

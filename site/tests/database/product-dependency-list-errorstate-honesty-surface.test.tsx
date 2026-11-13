@@ -12,11 +12,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { ProductDependencyList } from "../../src/components/product-dependency-list";
+import { ProductDependencyList } from "../../src/features/resources/detail-view";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/product-dependency-list.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/product-dependency-list.tsx"),
+  "utf8",
+);
 
 it("locks null catalogue resolution to ErrorState without inventing retry", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');

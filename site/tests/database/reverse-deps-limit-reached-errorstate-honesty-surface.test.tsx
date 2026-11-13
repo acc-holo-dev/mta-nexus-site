@@ -12,11 +12,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { ReverseDependencyList } from "../../src/components/reverse-dependency-list";
+import { ReverseDependencyList } from "../../src/features/resources/components/reverse-dependency-list";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/reverse-dependency-list.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/reverse-dependency-list.tsx"),
+  "utf8",
+);
 
 it("locks reverse-dependency limitReached to ErrorState without soft warning", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');

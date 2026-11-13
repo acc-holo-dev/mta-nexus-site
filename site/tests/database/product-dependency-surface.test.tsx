@@ -1,8 +1,8 @@
 import { buildResourceVersionHelp, splitInstructionPlainText } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ProductDependencyList } from "../../src/components/product-dependency-list";
-import { ResourceVersionHelpSection } from "../../src/components/resource-version-help-section";
+import { ProductDependencyList } from "../../src/features/resources/detail-view";
+import { ResourceVersionHelpSection } from "../../src/features/resources/components/resource-version-help-section";
 import { getDictionary } from "../../src/lib/i18n";
 import { buildProductDependencyResolution } from "../../src/lib/product-dependency-resolution";
 

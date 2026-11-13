@@ -187,7 +187,7 @@ vi.mock("../../src/features/resources/components/build-provenance-details", asyn
   };
 });
 
-vi.mock("../../src/components/product-dependency-list", async () => {
+vi.mock("../../src/features/resources/components/product-dependency-list", async () => {
   const ReactModule = await import("react");
   return {
     ProductDependencyList: () =>
@@ -197,7 +197,7 @@ vi.mock("../../src/components/product-dependency-list", async () => {
   };
 });
 
-vi.mock("../../src/components/reverse-dependency-list", async () => {
+vi.mock("../../src/features/resources/components/reverse-dependency-list", async () => {
   const ReactModule = await import("react");
   return {
     ReverseDependencyList: () =>

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
-import { ProductDependencyList } from "../../../../../components/product-dependency-list";
+import { ProductDependencyList } from "../../../../../features/resources/detail-view";
 import { ResourceCompatibilityForm } from "../../../../../components/resource-compatibility-form";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
