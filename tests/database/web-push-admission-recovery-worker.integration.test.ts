@@ -22,7 +22,7 @@ describe("web-push admission recovery: worker", () => {
     try {
       const result = spawnSync(
         process.execPath,
-        ["--import", "tsx", "packages/db/scripts/run-web-push-dispatcher.ts", "--once"],
+        ["--import", "tsx", "site/packages/db/scripts/run-web-push-dispatcher.ts", "--once"],
         {
           cwd: path.resolve(import.meta.dirname, "..", ".."),
           encoding: "utf8",

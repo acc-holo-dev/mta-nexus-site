@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { withOccurrenceKeys } from "../../packages/ui/src/list-keys";
+import { withOccurrenceKeys } from "../../site/packages/ui/src/list-keys";
 
 const keyed = (items: string[]) => withOccurrenceKeys(items, (item) => item);
 

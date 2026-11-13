@@ -3,7 +3,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -20,7 +20,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { resourceBuildWorkspaceRepository as repo } from "../../packages/db/src/repositories/resource-build-workspace";
+import { resourceBuildWorkspaceRepository as repo } from "../../site/packages/db/src/repositories/resource-build-workspace";
 const parent = ["prd_a", "Resource", "resource", "published", "usr_a", null];
 function build(status = "pending_review", revision = 3, notes: string | null = null) {
   return [
@@ -200,7 +200,7 @@ it("staff history rechecks the live role", async () => {
 });
 
 it("moderation also compares the reviewer-observed build revision under the product lock", async () => {
-  const { buildRepository } = await import("../../packages/db/src/repositories/builds");
+  const { buildRepository } = await import("../../site/packages/db/src/repositories/builds");
   state.rows = [
     [["prd_a"]],
     [["prd_a", "published", "usr_a", null]],

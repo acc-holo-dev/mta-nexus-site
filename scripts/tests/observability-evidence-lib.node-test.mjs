@@ -52,7 +52,7 @@ test("buildObservabilityReadinessEvidence passes on this repo with alert env", (
 });
 
 test("readiness accepts exactly the worker's threshold syntax and ranges", () => {
-  const worker = readFileSync("packages/db/scripts/run-web-push-dispatcher.ts", "utf8");
+  const worker = readFileSync("site/packages/db/scripts/run-web-push-dispatcher.ts", "utf8");
   const cases = [
     ["WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT", 99, "99"],
     ["WEB_PUSH_QUEUE_ALERT_DUE_JOBS", 50_000, "50_000"],

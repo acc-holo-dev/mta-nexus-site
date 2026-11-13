@@ -172,7 +172,7 @@ Pull requests use the following change-based scopes; the local commands remain a
 | Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                                                                                      |
-| `unit_ci`         | Only `packages/ui/**` and/or `site/src/components/**` (plus markdown)                                                                                         | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
+| `unit_ci`         | Only `site/packages/ui/**` and/or `site/src/components/**` (plus markdown)                                                                                    | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
 | `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
 | `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
 
@@ -330,7 +330,7 @@ production base. Supported scenarios (OPS-04 / ARC09):
 | Scanner                  | `clamav`                  | Keep available; not an application writer                       |
 
 Production rendered config must not carry development source bind-mounts
-(`./apps/...`, `./packages/...`). CI must not publish non-loopback host ports.
+(`./site/src/...`, `./site/packages/...`). CI must not publish non-loopback host ports.
 Static `docker compose config` with synthetic values confirms shape; it does not
 prove live readiness. Contract tests: `scripts/tests/compose-overlay-matrix.node-test.mjs`
 plus recovery/mail fixtures under `scripts/tests/*compose*`.
@@ -365,13 +365,13 @@ asserted PASS here.
 
 Schema history is forward-only ([ARCHITECTURE](ARCHITECTURE.md)): new changes are
 new SQL migrations; rolling back an image does not roll back the database. Applied
-SQL files and `packages/db/migrations/meta/_journal.json` are not rewritten.
+SQL files and `site/packages/db/migrations/meta/_journal.json` are not rewritten.
 
 **Current generator risk (OPS-06 / ARC14):** the journal contains migrations through
 the latest `0087_*` tag, while Drizzle meta snapshots still stop at `0000` /
 `0001`. Plain `pnpm db:generate` / `drizzle-kit generate` against that lag is
 unsafe in the main checkout and is refused by
-`packages/db/scripts/guard-db-generate.mjs`.
+`site/packages/db/scripts/guard-db-generate.mjs`.
 
 **Supported authoring path (manual/custom + guards):**
 
@@ -382,10 +382,10 @@ unsafe in the main checkout and is refused by
 3. Hand-author only the expected forward-only delta in the new SQL file. Keep
    retries/idempotency compatible with existing upgrade rehearsal.
 4. Update the release-upgrade contract target when the journal advances
-   (`packages/db/scripts/release-upgrade-contract.mjs` and
+   (`site/packages/db/scripts/release-upgrade-contract.mjs` and
    `scripts/tests/release-upgrade.node-test.mjs`).
 5. On hosted CI, run the existing disposable upgrade path
-   (`packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
+   (`site/packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
    working production database.
 
 Plain generate remains unsupported while snapshots lag. A disposable experiment
@@ -1227,7 +1227,7 @@ success. These reports extend the core release evidence; they are separate requi
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
 Upgrade evidence is versioned (`schemaVersion: 1` on newly written artifacts). The
-strict validator in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs)
+strict validator in [`release-upgrade-contract.mjs`](../site/packages/db/scripts/release-upgrade-contract.mjs)
 rejects missing/mismatched SHA, wrong `baseline`/`target`, incomplete `phase`
 (must be `complete`), and missing/false/wrong-type required boolean flags.
 Retained full-format CI artifacts that omit `schemaVersion` remain accepted when

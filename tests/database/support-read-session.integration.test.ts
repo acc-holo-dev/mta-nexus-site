@@ -9,7 +9,7 @@ import {
 } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { supportCaseMessages, supportCases, users } from "../../packages/db/src/schema";
+import { supportCaseMessages, supportCases, users } from "../../site/packages/db/src/schema";
 
 it("checks the initiating session in every private support read snapshot", async () => {
   const key = randomUUID().replaceAll("-", ""),

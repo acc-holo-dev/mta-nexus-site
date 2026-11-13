@@ -3,14 +3,14 @@ import { sql } from "drizzle-orm";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
-import { db } from "../../packages/db/src/client";
+import { db } from "../../site/packages/db/src/client";
 
 // Real PostgreSQL on disposable CI data. Never seed or write existing user data.
 describe("D1 account proof primitives: migration", () => {
   it("rehearses the additive migration with existing users/sessions and trusts no legacy flag", async () => {
     const schema = `d1_${randomUUID().replaceAll("-", "")}`;
     const migration = readFileSync(
-      resolve(process.cwd(), "packages/db/migrations/0012_account_recovery_proofs.sql"),
+      resolve(process.cwd(), "site/packages/db/migrations/0012_account_recovery_proofs.sql"),
       "utf8",
     );
     await db.transaction(async (tx) => {

@@ -3,7 +3,7 @@ import { access, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, it } from "vitest";
-import { checkDatabaseConnection } from "../../packages/db/src/client";
+import { checkDatabaseConnection } from "../../site/packages/db/src/client";
 
 async function waitFor(
   predicate: () => boolean | Promise<boolean>,
@@ -24,7 +24,7 @@ it("SIGTERM stops the ready loop, emits stopped, and removes the health file", a
   const healthFile = path.join(root, "health.json");
   const child = spawn(
     process.execPath,
-    ["--import", "tsx", "packages/db/scripts/run-web-push-dispatcher.ts", "--ready"],
+    ["--import", "tsx", "site/packages/db/scripts/run-web-push-dispatcher.ts", "--ready"],
     {
       cwd: path.resolve(import.meta.dirname, "..", ".."),
       env: {

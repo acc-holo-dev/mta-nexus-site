@@ -6,8 +6,8 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("public MTA observation model", () => {
   it("contains no active server-installed agent schema", () => {
-    const schema = read("packages/db/src/schema.ts");
-    const domain = read("packages/domain/src/entities.ts");
+    const schema = read("site/packages/db/src/schema.ts");
+    const domain = read("site/packages/domain/src/entities.ts");
 
     expect(schema).not.toContain("serverInstallations");
     expect(schema).not.toContain("serverHeartbeats");
@@ -17,9 +17,9 @@ describe("public MTA observation model", () => {
   });
 
   it("persists immutable sourced observations and permits unclaimed servers", () => {
-    const schema = read("packages/db/src/schema.ts");
-    const repository = read("packages/db/src/repositories/server-observations.ts");
-    const migration = read("packages/db/migrations/0010_public_server_observations.sql");
+    const schema = read("site/packages/db/src/schema.ts");
+    const repository = read("site/packages/db/src/repositories/server-observations.ts");
+    const migration = read("site/packages/db/migrations/0010_public_server_observations.sql");
 
     const compactSchema = schema.replace(/\s+/gu, "");
     expect(compactSchema).toContain('serverObservations=pgTable("server_observations"');
@@ -32,8 +32,8 @@ describe("public MTA observation model", () => {
   });
 
   it("models unavailable live values as unknown instead of zero", () => {
-    const schema = read("packages/db/src/schema.ts");
-    const migration = read("packages/db/migrations/0010_public_server_observations.sql");
+    const schema = read("site/packages/db/src/schema.ts");
+    const migration = read("site/packages/db/migrations/0010_public_server_observations.sql");
 
     expect(schema).toContain('currentPlayers: integer("current_players")');
     expect(schema).not.toContain('currentPlayers: integer("current_players").notNull().default(0)');

@@ -10,7 +10,7 @@ const captured = vi.hoisted(() => ({
   rows: [] as { id: string }[],
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select: () => ({
       from: () => ({
@@ -37,7 +37,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { ReportRepository } from "../../packages/db/src/repositories/reports";
+import { ReportRepository } from "../../site/packages/db/src/repositories/reports";
 
 const dialect = new PgDialect();
 

@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -31,12 +31,12 @@ vi.mock("../../packages/db/src/client", async () => {
 import {
   SubscriptionsRepository,
   subscriptionReceipt,
-} from "../../packages/db/src/repositories/subscriptions";
+} from "../../site/packages/db/src/repositories/subscriptions";
 import {
   accountSubscriptions,
   commercialPlans,
   subscriptionReceipts,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 import {
   activation,
   cancellation,

@@ -57,7 +57,7 @@ describe("build file format detection", () => {
 
   it("matches the storage limit and rejects oversized uploads", () => {
     const storage = readFileSync(
-      resolve(process.cwd(), "packages/storage/src/storage-service.ts"),
+      resolve(process.cwd(), "site/packages/storage/src/storage-service.ts"),
       "utf8",
     );
     expect(storage).toContain("MAX_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES");

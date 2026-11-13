@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 function readBuildsRepositoryModules(): string {
   return ["builds.ts", "builds-queries.ts", "builds-moderation.ts", "builds-lifecycle.ts"]
     .map((name) =>
-      readFileSync(resolve(process.cwd(), "packages/db/src/repositories", name), "utf8"),
+      readFileSync(resolve(process.cwd(), "site/packages/db/src/repositories", name), "utf8"),
     )
     .join("\n");
 }

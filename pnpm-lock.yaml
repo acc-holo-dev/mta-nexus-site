@@ -225,25 +225,25 @@ importers:
     dependencies:
       '@nexus/config':
         specifier: workspace:*
-        version: link:../packages/config
+        version: link:packages/config
       '@nexus/db':
         specifier: workspace:*
-        version: link:../packages/db
+        version: link:packages/db
       '@nexus/domain':
         specifier: workspace:*
-        version: link:../packages/domain
+        version: link:packages/domain
       '@nexus/security':
         specifier: workspace:*
-        version: link:../packages/security
+        version: link:packages/security
       '@nexus/storage':
         specifier: workspace:*
-        version: link:../packages/storage
+        version: link:packages/storage
       '@nexus/ui':
         specifier: workspace:*
-        version: link:../packages/ui
+        version: link:packages/ui
       '@nexus/validation':
         specifier: workspace:*
-        version: link:../packages/validation
+        version: link:packages/validation
       lucide-react:
         specifier: ^1.67.0
         version: 1.67.0(@types/react@19.3.0)(react@19.3.1)
@@ -288,7 +288,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/config:
+  site/packages/config:
     dependencies:
       zod:
         specifier: ^4.6.7
@@ -298,7 +298,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/db:
+  site/packages/db:
     dependencies:
       '@nexus/config':
         specifier: workspace:*
@@ -329,13 +329,13 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/domain:
+  site/packages/domain:
     devDependencies:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/security:
+  site/packages/security:
     dependencies:
       '@nexus/domain':
         specifier: workspace:*
@@ -348,7 +348,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/storage:
+  site/packages/storage:
     dependencies:
       '@nexus/config':
         specifier: workspace:*
@@ -364,7 +364,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/ui:
+  site/packages/ui:
     dependencies:
       clsx:
         specifier: ^2.1.1
@@ -389,7 +389,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/validation:
+  site/packages/validation:
     dependencies:
       '@nexus/domain':
         specifier: workspace:*

@@ -6,7 +6,7 @@ import { formatNotification } from "../../site/src/lib/notification-copy";
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("deep-links non-server verification resolutions to the requester application page", () => {
-  const source = readFileSync(resolve("packages/db/src/repositories/verification.ts"), "utf8");
+  const source = readFileSync(resolve("site/packages/db/src/repositories/verification.ts"), "utf8");
   expect(source).toContain("function verificationRequesterHref(requestId: string)");
   expect(source).toMatch(
     /return `\/workspace\/verification\/\$\{encodeURIComponent\(requestId\)\}`;/u,

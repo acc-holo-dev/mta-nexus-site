@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as Array<{ sql: string; params: unknown[] }>,
   rows: [] as string[][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   return {
     // Run the installed Drizzle SQL builder and row mapper without PostgreSQL.
@@ -14,7 +14,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { OrganizationRepository } from "../../packages/db/src/repositories/organizations";
+import { OrganizationRepository } from "../../site/packages/db/src/repositories/organizations";
 
 const repository = new OrganizationRepository();
 beforeEach(() => {

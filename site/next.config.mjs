@@ -28,9 +28,9 @@ const nextConfig = {
   outputFileTracingExcludes: {
     "/*": [
       "../site/src/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
-      "../packages/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
-      "../packages/db/migrations/**/*",
-      "../packages/db/scripts/**/*",
+      "./packages/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
+      "./packages/db/migrations/**/*",
+      "./packages/db/scripts/**/*",
       "../tests/**/*",
       "../scripts/**/*",
       "../docs/**/*",

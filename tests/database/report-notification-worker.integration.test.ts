@@ -5,16 +5,16 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { eq, inArray } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { db } from "../../packages/db/src/client";
-import { reportRepository } from "../../packages/db/src/repositories/reports";
-import { sessionRepository } from "../../packages/db/src/repositories/sessions";
-import { userRepository } from "../../packages/db/src/repositories/users";
+import { db } from "../../site/packages/db/src/client";
+import { reportRepository } from "../../site/packages/db/src/repositories/reports";
+import { sessionRepository } from "../../site/packages/db/src/repositories/sessions";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 import {
   auditEvents,
   notifications,
   reportNotificationDeliveries,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actors: string[] = [];
 afterEach(async () => {
@@ -84,7 +84,7 @@ it("the real worker delivers moderator inbox without VAPID or a surviving HTTP c
   try {
     const result = spawnSync(
       process.execPath,
-      ["--import", "tsx", "packages/db/scripts/run-web-push-dispatcher.ts", "--once"],
+      ["--import", "tsx", "site/packages/db/scripts/run-web-push-dispatcher.ts", "--once"],
       {
         cwd: path.resolve(import.meta.dirname, "..", ".."),
         encoding: "utf8",

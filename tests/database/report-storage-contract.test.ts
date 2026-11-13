@@ -7,7 +7,7 @@ import {
   reportNotificationDeliveries,
   reports,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const captured = vi.hoisted(() => ({
   inserts: [] as unknown[],
@@ -17,7 +17,7 @@ const captured = vi.hoisted(() => ({
   existing: null as { id: string } | null,
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (run: (tx: unknown) => Promise<unknown>) =>
       run({
@@ -67,12 +67,12 @@ vi.mock("../../packages/db/src/client", () => ({
     },
   },
 }));
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: vi.fn(),
 }));
 
-import { ReportRepository } from "../../packages/db/src/repositories/reports";
-import { UserRepository } from "../../packages/db/src/repositories/users";
+import { ReportRepository } from "../../site/packages/db/src/repositories/reports";
+import { UserRepository } from "../../site/packages/db/src/repositories/users";
 
 describe("report write and notification lookup", () => {
   it("stores the report and its audit entry using the same transaction", async () => {

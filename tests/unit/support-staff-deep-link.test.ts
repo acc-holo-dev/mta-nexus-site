@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { expect, it } from "vitest";
 
 const source = readFileSync(
-  resolve("packages/db/src/repositories/support-notification-delivery.ts"),
+  resolve("site/packages/db/src/repositories/support-notification-delivery.ts"),
   "utf8",
 );
 

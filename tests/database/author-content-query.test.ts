@@ -1,15 +1,15 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { content, users } from "../../packages/db/src/schema";
+import { content, users } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/repositories/publication-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/publication-notice", () => ({
   publicationNotice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,8 +28,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { authorContentRepository } from "../../packages/db/src/repositories/author-content";
-import { UserRepository } from "../../packages/db/src/repositories/users";
+import { authorContentRepository } from "../../site/packages/db/src/repositories/author-content";
+import { UserRepository } from "../../site/packages/db/src/repositories/users";
 
 const version = new Date("2026-10-10T12:00:00.000Z");
 const fixture = {

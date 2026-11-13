@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -24,7 +24,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { readLibraryCollectionComparison } from "../../packages/db/src/repositories/library-collection-comparison";
+import { readLibraryCollectionComparison } from "../../site/packages/db/src/repositories/library-collection-comparison";
 const date = "2026-10-12T00:00:00.000Z",
   query = { to: "lcol_b", page: 1, filter: "all" as const, q: "", transfer: "copy" as const };
 const ownedRows = () => [

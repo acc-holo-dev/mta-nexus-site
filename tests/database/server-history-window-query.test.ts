@@ -1,13 +1,13 @@
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { serverObservations } from "../../packages/db/src/schema";
+import { serverObservations } from "../../site/packages/db/src/schema";
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
   config: null as unknown,
   failure: null as Error | null,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,7 +28,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+import { ServerObservationRepository } from "../../site/packages/db/src/repositories/server-observations";
 const repository = new ServerObservationRepository();
 const now = new Date("2026-10-09T12:00:00Z");
 const sample = {

@@ -1,6 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { notifications } from "../../packages/db/src/schema";
+import { notifications } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
@@ -8,13 +8,13 @@ const state = vi.hoisted(() => ({
   transactions: 0,
 }));
 const mocks = vi.hoisted(() => ({ source: vi.fn(), push: vi.fn() }));
-vi.mock("../../packages/db/src/repositories/follow-workspace", () => ({
+vi.mock("../../site/packages/db/src/repositories/follow-workspace", () => ({
   followWorkspaceRepository: { discussionNoticeWithin: mocks.source },
 }));
-vi.mock("../../packages/db/src/repositories/web-push-outbox", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-outbox", () => ({
   enqueueWebPushOutboxForNotification: mocks.push,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -34,7 +34,7 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+import { NotificationRepository } from "../../site/packages/db/src/repositories/notifications";
 
 const repository = new NotificationRepository();
 const input = { recipientId: "reader", contentId: "article", commentId: "reply" };

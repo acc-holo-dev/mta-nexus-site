@@ -7,7 +7,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("editorial server metadata", () => {
   it("validates bounded profile links, media, taxonomy and locale fields", () => {
-    const migration = read("packages/db/migrations/0008_server_editorial_metadata.sql");
+    const migration = read("site/packages/db/migrations/0008_server_editorial_metadata.sql");
 
     const url = "https://example.com/image.png";
     expect(
@@ -35,7 +35,7 @@ describe("editorial server metadata", () => {
 
   it("allows owner edits and keeps metadata separate from official live state", () => {
     const route = read("site/src/app/api/servers/[id]/route.ts");
-    const repository = read("packages/db/src/repositories/servers.ts");
+    const repository = read("site/packages/db/src/repositories/servers.ts");
     const detail = read("site/src/app/servers/[slug]/page.tsx");
 
     // PATCH delegates field validation to the shared strict schema.

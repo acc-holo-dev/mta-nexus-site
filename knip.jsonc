@@ -17,10 +17,10 @@
       "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
       "next": true
     },
-    "packages/*": {
+    "site/packages/*": {
       "project": ["src/**/*.{ts,tsx}"]
     },
-    "packages/db": {
+    "site/packages/db": {
       // The worker integration test starts this fixture through a computed fork path.
       "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],

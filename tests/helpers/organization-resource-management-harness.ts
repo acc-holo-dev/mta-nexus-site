@@ -11,7 +11,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import { productService } from "../../site/src/lib/services/product-service";
 import { serverService } from "../../site/src/lib/services/server-service";
-import { assertProductMutationAuthority } from "../../packages/db/src/repositories/product-mutation-authority";
+import { assertProductMutationAuthority } from "../../site/packages/db/src/repositories/product-mutation-authority";
 
 export {
   assertProductMutationAuthority,

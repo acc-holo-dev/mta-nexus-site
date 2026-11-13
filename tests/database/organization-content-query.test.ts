@@ -7,10 +7,10 @@ const state = vi.hoisted(() => ({
   transactions: [] as unknown[],
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/repositories/publication-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/publication-notice", () => ({
   publicationNotice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -36,10 +36,10 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { authorContentRepository as author } from "../../packages/db/src/repositories/author-content";
-import { contentRepository } from "../../packages/db/src/repositories/content";
-import { organizationContentRepository as team } from "../../packages/db/src/repositories/organization-content";
-import { content, organizations } from "../../packages/db/src/schema";
+import { authorContentRepository as author } from "../../site/packages/db/src/repositories/author-content";
+import { contentRepository } from "../../site/packages/db/src/repositories/content";
+import { organizationContentRepository as team } from "../../site/packages/db/src/repositories/organization-content";
+import { content, organizations } from "../../site/packages/db/src/schema";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z";

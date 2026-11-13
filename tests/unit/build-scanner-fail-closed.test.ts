@@ -30,7 +30,7 @@ describe("build scanner fail-closed upload flow", () => {
 
   it("keeps non-clean builds impossible to approve", () => {
     const service = read("site/src/lib/services/product-service.ts");
-    const config = read("packages/config/src/index.ts");
+    const config = read("site/packages/config/src/index.ts");
 
     expect(service).toContain('build.scanStatus !== "clean"');
     expect(service).toContain('"BUILD_SCAN_NOT_CLEAN"');

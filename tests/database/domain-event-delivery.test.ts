@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { InMemoryEventBus, type NexusDomainEvent } from "../../packages/domain/src/events";
+import { InMemoryEventBus, type NexusDomainEvent } from "../../site/packages/domain/src/events";
 
 const event = {
   id: "evt_test",

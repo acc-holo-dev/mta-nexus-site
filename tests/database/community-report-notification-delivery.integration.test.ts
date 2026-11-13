@@ -18,7 +18,7 @@ import {
   reports,
   users,
   webPushOutbox,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 const actors: string[] = [];

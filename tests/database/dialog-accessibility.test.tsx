@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ConfirmDialog, Dialog, nextDialogFocusIndex } from "../../packages/ui/src/dialog";
+import { ConfirmDialog, Dialog, nextDialogFocusIndex } from "../../site/packages/ui/src/dialog";
 
 function attributeValues(markup: string, attribute: string) {
   return [...markup.matchAll(new RegExp(`${attribute}="([^"]+)"`, "gu"))].map((match) => match[1]);

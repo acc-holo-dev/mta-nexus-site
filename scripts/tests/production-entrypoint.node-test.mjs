@@ -11,10 +11,10 @@ function exercise(migrationExit, serverExit = 0, { withMigrations = true, config
     mkdirSync(join(root, "scripts"));
     mkdirSync(join(root, "bin"));
     mkdirSync(join(root, "site"), { recursive: true });
-    mkdirSync(join(root, "packages/db"), { recursive: true });
+    mkdirSync(join(root, "site/packages/db"), { recursive: true });
     if (withMigrations) {
-      mkdirSync(join(root, "packages/db/migrations"), { recursive: true });
-      writeFileSync(join(root, "packages/db/migrations/0000_test.sql"), "select 1;\n");
+      mkdirSync(join(root, "site/packages/db/migrations"), { recursive: true });
+      writeFileSync(join(root, "site/packages/db/migrations/0000_test.sql"), "select 1;\n");
     }
     writeFileSync(join(root, "calls"), "");
     copyFileSync(
@@ -55,8 +55,8 @@ test("runs migrations before the standalone server from isolated runtime directo
   const result = exercise(0);
   assert.equal(result.status, 0);
   assert.deepEqual(result.calls, [
-    `${result.root}/packages/db|--import tsx --input-type=module -e import '@nexus/config';`,
-    `${result.root}/packages/db|--import tsx src/migrate.ts`,
+    `${result.root}/site/packages/db|--import tsx --input-type=module -e import '@nexus/config';`,
+    `${result.root}/site/packages/db|--import tsx src/migrate.ts`,
     `${result.root}/site|server.js`,
   ]);
 });

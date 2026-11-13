@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   notices: [] as unknown[],
 }));
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -24,13 +24,13 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-vi.mock("../../packages/db/src/repositories/resource-qa-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/resource-qa-notice", () => ({
   notifyResourceQaEvent: async (_tx: unknown, input: unknown) => {
     state.notices.push(input);
   },
 }));
 
-import { resourceQaRepository as repo } from "../../packages/db/src/repositories/resource-qa";
+import { resourceQaRepository as repo } from "../../site/packages/db/src/repositories/resource-qa";
 
 const product = ["prd_a", "Resource", "resource", "published", 0, "usr_publisher", null];
 

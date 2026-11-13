@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,7 +28,7 @@ vi.mock("../../packages/db/src/client", async () => {
 import {
   exportLibraryCollection,
   previewLibraryCollectionImport,
-} from "../../packages/db/src/repositories/library-collection-manifests";
+} from "../../site/packages/db/src/repositories/library-collection-manifests";
 const date = "2026-10-12T00:00:00.000Z",
   collection = { id: "lcol_a", name: "Own & name", status: "active", revision: 7 };
 const manifest = () => ({

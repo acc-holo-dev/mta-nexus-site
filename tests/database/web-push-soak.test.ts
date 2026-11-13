@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   evaluateWebPushSoak,
   readWebPushSoakConfig,
-} from "../../packages/db/src/repositories/web-push-soak";
+} from "../../site/packages/db/src/repositories/web-push-soak";
 
 describe("Web Push production-duration soak contract", () => {
   it("uses a bounded production-like default configuration", () => {

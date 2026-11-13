@@ -25,7 +25,7 @@ export const libraryCollectionsHttpState = {
   membershipReceipt: vi.fn(),
 };
 
-/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createLibraryCollectionsHttpDbMock() {
   const state = libraryCollectionsHttpState;
   return {

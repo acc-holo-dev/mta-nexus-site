@@ -8,7 +8,7 @@ import {
   reports,
   sessions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 function deferred() {
   let resolve!: () => void;

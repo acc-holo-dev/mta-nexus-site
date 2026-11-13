@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
-import { libraryCollectionReceipts } from "../../packages/db/src/schema";
+import { libraryCollectionReceipts } from "../../site/packages/db/src/schema";
 import type {
   LibraryCollectionCommand,
   LibraryCollectionSnapshot,
-} from "../../packages/domain/src/library-collections";
+} from "../../site/packages/domain/src/library-collections";
 
 /** Shared pg-proxy query capture for library-collections-repository suites. */
 export const libraryCollectionsRepositoryState = {
@@ -14,7 +14,7 @@ export const libraryCollectionsRepositoryState = {
   failAudit: false,
 };
 
-/** Factory for `vi.mock("../packages/db/src/client", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("../../site/packages/db/src/client", …)` from suite files under `tests/unit` or `tests/database`. */
 export async function createLibraryCollectionsRepositoryDbMock() {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const state = libraryCollectionsRepositoryState;

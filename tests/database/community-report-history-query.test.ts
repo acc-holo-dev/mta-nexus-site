@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   config: undefined as unknown,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -27,7 +27,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { communityReportsRepository as reports } from "../../packages/db/src/repositories/community-reports";
+import { communityReportsRepository as reports } from "../../site/packages/db/src/repositories/community-reports";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   base = { period: "all" as const, group: "all" as const, query: "" },

@@ -7,7 +7,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("stores organization access notices with structured data and no raw org id in the message", () => {
   const source = readFileSync(
-    resolve("packages/db/src/repositories/organization-access-notice.ts"),
+    resolve("site/packages/db/src/repositories/organization-access-notice.ts"),
     "utf8",
   );
   expect(source).toContain('kind: "organization_access"');

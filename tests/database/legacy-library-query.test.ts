@@ -6,7 +6,7 @@ const captured = vi.hoisted(() => ({
   selection: null as Record<string, unknown> | null,
   filter: null as SQL | null,
 }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select(selection: Record<string, unknown>) {
       captured.selection = selection;
@@ -22,7 +22,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { LicenseRepository } from "../../packages/db/src/repositories/licenses";
+import { LicenseRepository } from "../../site/packages/db/src/repositories/licenses";
 
 describe("private legacy library lookup", () => {
   it("selects only product/date for the current user's active unexpired licenses", async () => {

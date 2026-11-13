@@ -15,7 +15,7 @@ import {
   orderCancellationReceipts,
   orders,
   payments,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 // Requires a disposable PostgreSQL database migrated through 0047. No payments
 // are sent to a provider; inserts below exercise the transactional safety gates.

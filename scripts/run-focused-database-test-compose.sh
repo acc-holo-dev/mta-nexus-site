@@ -103,8 +103,8 @@ echo "Running focused database tests: $*"
   -e AUTH_SECRET=development-only-secret-change-before-production \
   -e NODE_ENV=test \
   -v "$(pwd)/tests:/app/tests:ro" \
-  -v "$(pwd)/packages/db/src:/app/packages/db/src:ro" \
-  -v "$(pwd)/packages/db/migrations:/app/packages/db/migrations:ro" \
+  -v "$(pwd)/site/packages/db/src:/app/site/packages/db/src:ro" \
+  -v "$(pwd)/site/packages/db/migrations:/app/site/packages/db/migrations:ro" \
   -v "$(pwd)/scripts:/app/scripts:ro" \
   app \
   pnpm test:focus "$@"

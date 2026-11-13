@@ -41,7 +41,7 @@ payload_file="$work/j5-browser-resource.zip"
 node --input-type=module - "$payload_file" <<'NODE'
 import { randomBytes } from 'node:crypto';
 import { openSync, closeSync, writeFileSync } from 'node:fs';
-import { MAX_UPLOAD_FILE_SIZE_BYTES } from './packages/domain/src/upload-limits.ts';
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from './site/packages/domain/src/upload-limits.ts';
 const block = randomBytes(1024 * 1024);
 const file = openSync(process.argv[2], 'wx');
 try {

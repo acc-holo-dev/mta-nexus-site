@@ -4,7 +4,7 @@ import type { SQL } from "drizzle-orm";
 
 const captured = vi.hoisted(() => ({ conditions: [] as SQL[] }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select: () => ({
       from: () => ({
@@ -22,8 +22,8 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { ProductRepository } from "../../packages/db/src/repositories/products";
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ProductRepository } from "../../site/packages/db/src/repositories/products";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 
 const dialect = new PgDialect();
 const queries = () => captured.conditions.map((condition) => dialect.sqlToQuery(condition));

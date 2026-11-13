@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -23,8 +23,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { db } from "../../packages/db/src/client";
-import { followWorkspaceRepository as repository } from "../../packages/db/src/repositories/follow-workspace";
+import { db } from "../../site/packages/db/src/client";
+import { followWorkspaceRepository as repository } from "../../site/packages/db/src/repositories/follow-workspace";
 
 const stamp = "2026-10-12T00:00:00.123456Z";
 const notice = () =>

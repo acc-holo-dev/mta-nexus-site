@@ -4,20 +4,23 @@ import { generateId } from "@nexus/security";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { afterEach } from "vitest";
 import { authService } from "../../site/src/lib/services/auth-service";
-import { accountMailOutbox, accountMailQueueGate } from "../../packages/db/src/account-mail-schema";
-import { authChallenges } from "../../packages/db/src/account-recovery-schema";
-import { auditEvents, db, users } from "../../packages/db/src/client";
+import {
+  accountMailOutbox,
+  accountMailQueueGate,
+} from "../../site/packages/db/src/account-mail-schema";
+import { authChallenges } from "../../site/packages/db/src/account-recovery-schema";
+import { auditEvents, db, users } from "../../site/packages/db/src/client";
 import {
   digestAccountChallenge,
   accountChallengeRepository as proofs,
-} from "../../packages/db/src/repositories/account-challenges";
-import type { MailContext } from "../../packages/db/src/repositories/account-mail-crypto";
-import { AccountMailCipher } from "../../packages/db/src/repositories/account-mail-crypto";
+} from "../../site/packages/db/src/repositories/account-challenges";
+import type { MailContext } from "../../site/packages/db/src/repositories/account-mail-crypto";
+import { AccountMailCipher } from "../../site/packages/db/src/repositories/account-mail-crypto";
 import {
   AccountMailQueueFullError,
   accountMailOutboxRepository as queue,
-} from "../../packages/db/src/repositories/account-mail-outbox";
-import { userRepository } from "../../packages/db/src/repositories/users";
+} from "../../site/packages/db/src/repositories/account-mail-outbox";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 
 export const key = randomBytes(32);
 export const cipher = new AccountMailCipher("d2_test", { d2_test: key });

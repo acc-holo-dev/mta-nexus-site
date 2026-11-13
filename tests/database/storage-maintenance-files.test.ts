@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 
 let root: string, provider: LocalStorageProvider;
 const key = "assets/usr_test/ast_0123456789abcdef.zip",

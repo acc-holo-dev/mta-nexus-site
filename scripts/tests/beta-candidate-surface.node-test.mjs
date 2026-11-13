@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
-import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
+import { createReleaseUpgradeEvidence } from "../../site/packages/db/scripts/release-upgrade-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,
   evaluateBetaCandidate,

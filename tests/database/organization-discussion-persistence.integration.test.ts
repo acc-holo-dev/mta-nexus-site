@@ -17,7 +17,7 @@ import {
   organizationMembers,
   organizations,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actorIds: string[] = [],
   orgIds: string[] = [];

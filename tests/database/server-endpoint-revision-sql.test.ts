@@ -3,7 +3,7 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 
 const state = vi.hoisted(() => ({ values: null as Record<string, unknown> | null }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     update: () => ({
       set(values: Record<string, unknown>) {
@@ -13,7 +13,7 @@ vi.mock("../../packages/db/src/client", () => ({
     }),
   },
 }));
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 
 const repo = new ServerRepository();
 const dialect = new PgDialect();

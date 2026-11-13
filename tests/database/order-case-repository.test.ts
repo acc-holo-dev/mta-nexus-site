@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   notice: vi.fn(),
   session: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -23,13 +23,13 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: state.session,
 }));
-vi.mock("../../packages/db/src/repositories/support-requester-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/support-requester-notice", () => ({
   supportRequesterNotice: state.notice,
 }));
-import { orderCasesRepository as repo } from "../../packages/db/src/repositories/order-cases";
+import { orderCasesRepository as repo } from "../../site/packages/db/src/repositories/order-cases";
 const date = "2026-10-11T00:00:00.000Z",
   nextDate = "2026-10-11T00:00:00.001Z";
 const order = ["ord_a", "NEXUS-1", "completed", 1200, "USD", date];

@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@nexus/db", async () => ({
   db: { execute: mocks.execute, select: mocks.select, transaction: mocks.transaction },
-  comments: (await import("../../packages/db/src/schema")).comments,
+  comments: (await import("../../site/packages/db/src/schema")).comments,
   readDatabaseUrl: mocks.url,
 }));
 

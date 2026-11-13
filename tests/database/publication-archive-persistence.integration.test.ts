@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterEach, expect, it } from "vitest";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db, publicationFeedRepository as feed, userRepository } from "@nexus/db";
-import { content, servers, userProfilePreferences, users } from "../../packages/db/src/schema";
+import { content, servers, userProfilePreferences, users } from "../../site/packages/db/src/schema";
 import { publicationFeedService as service } from "../../site/src/lib/services/publication-feed-service";
 import {
   parsePublicationQuery,

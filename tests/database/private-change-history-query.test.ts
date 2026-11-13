@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { organizations } from "../../packages/db/src/schema";
+import { organizations } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   config: undefined as unknown,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -29,8 +29,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { organizationGovernanceRepository as team } from "../../packages/db/src/repositories/organization-governance";
-import { profileChangeHistoryRepository as profile } from "../../packages/db/src/repositories/profile-change-history";
+import { organizationGovernanceRepository as team } from "../../site/packages/db/src/repositories/organization-governance";
+import { profileChangeHistoryRepository as profile } from "../../site/packages/db/src/repositories/profile-change-history";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   base = { period: "all" as const, group: "all" as const, query: "" };

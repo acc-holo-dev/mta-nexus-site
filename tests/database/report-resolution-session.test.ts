@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,9 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { ReportRepository } from "../../packages/db/src/repositories/reports";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
-import { reports } from "../../packages/db/src/schema";
+import { ReportRepository } from "../../site/packages/db/src/repositories/reports";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
+import { reports } from "../../site/packages/db/src/schema";
 
 const row = (table: PgTable, values: Record<string, unknown>) =>
   Object.keys(getTableColumns(table)).map((key) => values[key] ?? null);

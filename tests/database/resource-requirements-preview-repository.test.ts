@@ -4,7 +4,7 @@ const h = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     h.queries.push({ sql, params });
@@ -24,7 +24,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { ResourceRequirementsRepository } from "../../packages/db/src/repositories/resource-requirements";
+import { ResourceRequirementsRepository } from "../../site/packages/db/src/repositories/resource-requirements";
 const repo = new ResourceRequirementsRepository();
 const date = "2026-10-12T00:00:00.000Z";
 const input = {

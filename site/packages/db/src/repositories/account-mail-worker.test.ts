@@ -23,7 +23,7 @@ import {
 import type { MailLease } from "./account-mail-worker";
 import { userRepository } from "./users";
 import { digestSessionToken } from "./sessions";
-import { authService } from "../../../../site/src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/auth-service";
 import { generateId, generateSessionToken } from "@nexus/security";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -167,7 +167,10 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
         sql`INSERT INTO users VALUES ('legacy', 'legacy@example.invalid', 'same-hash', false)`,
       );
       for (const file of ["0012_account_recovery_proofs.sql", "0013_account_mail_outbox.sql"]) {
-        const text = readFileSync(resolve(process.cwd(), "packages/db/migrations", file), "utf8");
+        const text = readFileSync(
+          resolve(process.cwd(), "site/packages/db/migrations", file),
+          "utf8",
+        );
         for (const part of text.split("--> statement-breakpoint"))
           if (part.trim()) await tx.execute(sql.raw(part));
       }
@@ -177,7 +180,7 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
       await tx.execute(sql`INSERT INTO account_mail_outbox (id, challenge_id, payload, expires_at)
         VALUES ('pending', 'proof', '{"opaque":"old-fixture"}'::jsonb, now() + interval '1 day')`);
       const migration = readFileSync(
-        resolve(process.cwd(), "packages/db/migrations/0014_account_mail_leases.sql"),
+        resolve(process.cwd(), "site/packages/db/migrations/0014_account_mail_leases.sql"),
         "utf8",
       );
       for (const part of migration.split("--> statement-breakpoint"))
@@ -274,7 +277,7 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
   it("recovers a committed claim after killing its worker process, rejecting the stale owner", async () => {
     const a = await fixture();
     const child = fork(
-      resolve(process.cwd(), "packages/db/src/repositories/account-mail-worker.fixture.ts"),
+      resolve(process.cwd(), "site/packages/db/src/repositories/account-mail-worker.fixture.ts"),
       [a.job.id],
       {
         execArgv: ["--import", "tsx"],

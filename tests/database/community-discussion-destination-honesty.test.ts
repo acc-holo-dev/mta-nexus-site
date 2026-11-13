@@ -7,7 +7,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("deep-links author removal notices to the discussion permalink", () => {
   const notice = readFileSync(
-    resolve("packages/db/src/repositories/discussion-moderation-notice.ts"),
+    resolve("site/packages/db/src/repositories/discussion-moderation-notice.ts"),
     "utf8",
   );
   expect(notice).toContain("function authorDiscussionHref(commentId: string)");
@@ -18,7 +18,7 @@ it("deep-links author removal notices to the discussion permalink", () => {
   expect(notice).not.toContain("#discussion");
   expect(notice).not.toMatch(/link:\s*"\/workspace\/discussions"/u);
   const management = readFileSync(
-    resolve("packages/db/src/repositories/discussion-management.ts"),
+    resolve("site/packages/db/src/repositories/discussion-management.ts"),
     "utf8",
   );
   expect(management).toMatch(/discussionModerationNotice\(tx, \{[\s\S]*commentId: current\.id,/u);
@@ -27,7 +27,7 @@ it("deep-links author removal notices to the discussion permalink", () => {
 
 it("exposes staff comment report moderationHref to the admin community discussion", () => {
   const source = readFileSync(
-    resolve("packages/db/src/repositories/admin-report-targets.ts"),
+    resolve("site/packages/db/src/repositories/admin-report-targets.ts"),
     "utf8",
   );
   expect(source).toMatch(

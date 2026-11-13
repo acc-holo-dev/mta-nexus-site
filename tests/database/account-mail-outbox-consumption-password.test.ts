@@ -5,10 +5,10 @@ import { generateSessionToken, hashPassword } from "@nexus/security";
 import { eq } from "drizzle-orm";
 import { describe, it } from "vitest";
 import { authService } from "../../site/src/lib/services/auth-service";
-import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-schema";
-import { auditEvents, db } from "../../packages/db/src/client";
-import { authRepository } from "../../packages/db/src/repositories/auth";
-import { userRepository } from "../../packages/db/src/repositories/users";
+import { accountRecoveryBindings } from "../../site/packages/db/src/account-recovery-schema";
+import { auditEvents, db } from "../../site/packages/db/src/client";
+import { authRepository } from "../../site/packages/db/src/repositories/auth";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 import {
   account,
   auditId,

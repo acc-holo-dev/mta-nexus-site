@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { historyPageBounds } from "../../packages/db/src/repositories/history-pagination";
+import { historyPageBounds } from "../../site/packages/db/src/repositories/history-pagination";
 import {
   effectiveLicenseStatus,
   formatHistoryAmount,

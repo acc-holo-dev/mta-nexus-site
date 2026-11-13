@@ -18,9 +18,9 @@ const fixture = vi.hoisted(() => ({
 }));
 vi.mock("@nexus/config", () => ({ config: fixture.config }));
 vi.mock("@nexus/security", () => ({ hashPassword: async () => "test-only-hash" }));
-vi.mock("../../packages/db/src/seed-baseline", () => ({ seedBaseline: fixture.persist }));
+vi.mock("../../site/packages/db/src/seed-baseline", () => ({ seedBaseline: fixture.persist }));
 
-import { runSeed } from "../../packages/db/src/seed";
+import { runSeed } from "../../site/packages/db/src/seed";
 
 let root: string;
 beforeEach(async () => {

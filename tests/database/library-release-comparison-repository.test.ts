@@ -4,7 +4,7 @@ const h = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     h.queries.push({ sql, params });
@@ -24,7 +24,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { readLibraryReleaseComparison } from "../../packages/db/src/repositories/library-release-comparison";
+import { readLibraryReleaseComparison } from "../../site/packages/db/src/repositories/library-release-comparison";
 const query = { from: "bld_a", to: "bld_b", returnPage: 2 },
   date = "2026-10-12T00:00:00.000Z";
 const build = (id: string, hash = "a".repeat(64)) => [

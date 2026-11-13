@@ -11,7 +11,7 @@ import { afterEach, expect, vi } from "vitest";
 import {
   reportNotificationDeliveryRepository as delivery,
   ReportNotificationDeliveryRepository,
-} from "../../packages/db/src/repositories/report-notification-delivery";
+} from "../../site/packages/db/src/repositories/report-notification-delivery";
 import {
   auditEvents,
   content,
@@ -20,7 +20,7 @@ import {
   reports,
   users,
   webPushOutbox,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 import { setNotificationPreferencesForTest } from "./notification-preferences-fixture";
 
 export {

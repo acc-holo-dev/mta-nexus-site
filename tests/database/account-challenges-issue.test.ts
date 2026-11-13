@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
-import { db, sessions } from "../../packages/db/src/client";
-import { digestAccountChallenge } from "../../packages/db/src/repositories/account-challenges";
-import { userRepository } from "../../packages/db/src/repositories/users";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
+import { db, sessions } from "../../site/packages/db/src/client";
+import { digestAccountChallenge } from "../../site/packages/db/src/repositories/account-challenges";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
 import {
   account,
   auditId,

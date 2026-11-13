@@ -11,7 +11,7 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../../site/src/lib/library-collections-query";
-import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
+import { libraryCollectionCommandSchema } from "../../site/packages/validation/src/library-collections";
 import {
   libraryCollectionsContractCreate as create,
   libraryCollectionsContractCurrent as current,

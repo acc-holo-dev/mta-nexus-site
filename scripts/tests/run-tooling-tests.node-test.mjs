@@ -14,8 +14,8 @@ test("tooling discovery includes nested suites, excluding Compose fixtures and s
       "scripts/tests/nested/a.node-test.mjs",
       "scripts/tests/nested/mail-worker-compose.node-test.mjs",
       "scripts/tests/nested/helper.mjs",
-      "packages/db/scripts/second/b.node-test.mjs",
-      "packages/db/scripts/recovery-compose.node-test.mjs",
+      "site/packages/db/scripts/second/b.node-test.mjs",
+      "site/packages/db/scripts/recovery-compose.node-test.mjs",
     ]) {
       const path = join(root, name);
       await mkdir(dirname(path), { recursive: true });
@@ -27,9 +27,9 @@ test("tooling discovery includes nested suites, excluding Compose fixtures and s
       "dir",
     );
     assert.deepEqual(discoverToolingTests(undefined, { root }), [
-      "packages/db/scripts/second/b.node-test.mjs",
       "scripts/tests/nested/a.node-test.mjs",
       "scripts/tests/z.node-test.mjs",
+      "site/packages/db/scripts/second/b.node-test.mjs",
     ]);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -49,7 +49,7 @@ test("empty tooling roots cause an unsuccessful CLI result", async () => {
   const root = await mkdtemp(join(tmpdir(), "nexus-tooling-empty-"));
   try {
     await mkdir(join(root, "scripts/tests"), { recursive: true });
-    await mkdir(join(root, "packages/db/scripts"), { recursive: true });
+    await mkdir(join(root, "site/packages/db/scripts"), { recursive: true });
     const result = spawnSync(process.execPath, [resolve("scripts/run-tooling-tests.mjs")], {
       cwd: root,
       encoding: "utf8",

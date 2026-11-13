@@ -7,7 +7,7 @@ const captured = vi.hoisted(() => ({
   filters: [] as SQL[],
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select(selection: unknown) {
       captured.selections.push(selection);
@@ -25,11 +25,11 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { UserRepository } from "../../packages/db/src/repositories/users";
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
-import { ProductRepository } from "../../packages/db/src/repositories/products";
-import { ContentRepository } from "../../packages/db/src/repositories/content";
-import { ReportRepository } from "../../packages/db/src/repositories/reports";
+import { UserRepository } from "../../site/packages/db/src/repositories/users";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
+import { ProductRepository } from "../../site/packages/db/src/repositories/products";
+import { ContentRepository } from "../../site/packages/db/src/repositories/content";
+import { ReportRepository } from "../../site/packages/db/src/repositories/reports";
 
 describe("admin aggregate metrics", () => {
   it("counts beyond listing caps using small scalar queries with the public safety gates", async () => {

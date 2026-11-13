@@ -15,7 +15,7 @@ import {
 } from "@nexus/db";
 import { eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
-import type { ResourceTransaction } from "../../packages/db/src/transaction";
+import type { ResourceTransaction } from "../../site/packages/db/src/transaction";
 
 async function identity() {
   const key = randomUUID().replaceAll("-", ""),

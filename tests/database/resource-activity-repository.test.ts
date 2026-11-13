@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   results: [] as unknown[][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -27,12 +27,12 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { ResourceActivityRepository } from "../../packages/db/src/repositories/resource-activity";
-import { ResourceDownloadAuthorizationRepository } from "../../packages/db/src/repositories/resource-download-authorization";
-import { OrderRepository } from "../../packages/db/src/repositories/orders";
-import { claimFreeResourceInTransaction } from "../../packages/db/src/repositories/entitlements";
-import { db } from "../../packages/db/src/client";
-import { builds, entitlements } from "../../packages/db/src/schema";
+import { ResourceActivityRepository } from "../../site/packages/db/src/repositories/resource-activity";
+import { ResourceDownloadAuthorizationRepository } from "../../site/packages/db/src/repositories/resource-download-authorization";
+import { OrderRepository } from "../../site/packages/db/src/repositories/orders";
+import { claimFreeResourceInTransaction } from "../../site/packages/db/src/repositories/entitlements";
+import { db } from "../../site/packages/db/src/client";
+import { builds, entitlements } from "../../site/packages/db/src/schema";
 
 const activity = new ResourceActivityRepository(),
   downloads = new ResourceDownloadAuthorizationRepository();

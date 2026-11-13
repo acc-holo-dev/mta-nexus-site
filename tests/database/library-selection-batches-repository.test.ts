@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
   session: vi.fn(),
   sessionQueryCount: 0,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -29,14 +29,14 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: state.session,
 }));
-vi.mock("../../packages/db/src/repositories/entitlements", () => ({
+vi.mock("../../site/packages/db/src/repositories/entitlements", () => ({
   lockUserDownloadAccess: state.access,
 }));
-import { LibrarySelectionBatchesRepository } from "../../packages/db/src/repositories/library-selection-batches";
-import { librarySelectionBatchReceipts } from "../../packages/db/src/schema";
+import { LibrarySelectionBatchesRepository } from "../../site/packages/db/src/repositories/library-selection-batches";
+import { librarySelectionBatchReceipts } from "../../site/packages/db/src/schema";
 const repo = new LibrarySelectionBatchesRepository(),
   date = "2026-10-12T00:00:00.000Z",
   choice = { mode: "fixed" as const, productIds: ["prd_a"] };

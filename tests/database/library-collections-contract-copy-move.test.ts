@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { confirmedCollectionCommand } from "../../site/src/lib/library-collections-confirmation";
-import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
+import { libraryCollectionCommandSchema } from "../../site/packages/validation/src/library-collections";
 import {
   libraryCollectionsContractCurrent as current,
   libraryCollectionsContractRequestId as requestId,
@@ -115,7 +115,7 @@ it("normalizes selected copy commands and verifies exact source proof in destina
     ),
   ).toBeNull();
   const migration = readFileSync(
-    "packages/db/migrations/0074_library_collection_item_copies.sql",
+    "site/packages/db/migrations/0074_library_collection_item_copies.sql",
     "utf8",
   );
   expect(migration).toContain("action='copy-items'");
@@ -124,7 +124,9 @@ it("normalizes selected copy commands and verifies exact source proof in destina
   expect(migration).toContain("user_id=NEW.user_id");
   expect(migration).toContain("receipts are immutable");
   expect(migration).toContain("BETWEEN 1 AND 20");
-  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  const journal = JSON.parse(
+    readFileSync("site/packages/db/migrations/meta/_journal.json", "utf8"),
+  );
   expect(
     journal.entries.filter(
       (entry: { tag: string }) => entry.tag === "0074_library_collection_item_copies",
@@ -170,7 +172,7 @@ it("requires the recorded source successor when confirming a move and excludes t
       .success,
   ).toBe(false);
   const migration = readFileSync(
-    "packages/db/migrations/0075_library_collection_item_moves.sql",
+    "site/packages/db/migrations/0075_library_collection_item_moves.sql",
     "utf8",
   );
   expect(migration).toContain("Move receipt must prove removal from its source");
@@ -181,7 +183,9 @@ it("requires the recorded source successor when confirming a move and excludes t
   );
   expect(migration).toContain("library_collection_receipts_source_history_idx");
   expect(migration).toContain("user_id=NEW.user_id");
-  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  const journal = JSON.parse(
+    readFileSync("site/packages/db/migrations/meta/_journal.json", "utf8"),
+  );
   expect(
     journal.entries.filter(
       (entry: { tag: string }) => entry.tag === "0075_library_collection_item_moves",

@@ -6,10 +6,10 @@ const state = vi.hoisted(() => ({
   enqueue: vi.fn(),
   clock: "2026-10-12T00:00:00.000Z",
 }));
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.enqueue,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,9 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
-import { builds, resourceReleaseEvents } from "../../packages/db/src/schema";
-import { buildRepository } from "../../packages/db/src/repositories/builds";
-import { resourceReleaseWorkerRepository as worker } from "../../packages/db/src/repositories/resource-release-worker";
+import { builds, resourceReleaseEvents } from "../../site/packages/db/src/schema";
+import { buildRepository } from "../../site/packages/db/src/repositories/builds";
+import { resourceReleaseWorkerRepository as worker } from "../../site/packages/db/src/repositories/resource-release-worker";
 function event() {
   const values: Record<string, unknown> = {
     sequence: "9007199254740993",

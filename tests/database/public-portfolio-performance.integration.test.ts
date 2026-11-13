@@ -3,8 +3,8 @@ import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 
 const active = vi.hoisted(() => ({ db: null as unknown }));
-vi.mock("../../packages/db/src/client", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../../packages/db/src/client")>();
+vi.mock("../../site/packages/db/src/client", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../site/packages/db/src/client")>();
   return {
     ...original,
     db: new Proxy(original.db, {
@@ -16,12 +16,12 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
-import { ProductRepository } from "../../packages/db/src/repositories/products";
-import { ContentRepository } from "../../packages/db/src/repositories/content";
+import { ProductRepository } from "../../site/packages/db/src/repositories/products";
+import { ContentRepository } from "../../site/packages/db/src/repositories/content";
 
 it("executes deep scoped portfolios on PostgreSQL and measures plans before/after additive indexes", async () => {
-  const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
-    "../../packages/db/src/client",
+  const { db } = await vi.importActual<typeof import("../../site/packages/db/src/client")>(
+    "../../site/packages/db/src/client",
   );
   await db.transaction(async (tx) => {
     active.db = tx;
@@ -76,7 +76,9 @@ it("executes deep scoped portfolios on PostgreSQL and measures plans before/afte
       };
       const before = await plans();
       await tx.execute(
-        sql.raw(readFileSync("packages/db/migrations/0026_public_portfolio_indexes.sql", "utf8")),
+        sql.raw(
+          readFileSync("site/packages/db/migrations/0026_public_portfolio_indexes.sql", "utf8"),
+        ),
       );
       const after = await plans();
       expect(JSON.stringify(after.organizationPage)).toContain(

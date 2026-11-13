@@ -211,7 +211,7 @@ function run() {
         ]),
       ).trim();
 
-    const migrationsDir = join(root, "packages", "db", "migrations");
+    const migrationsDir = join(root, "site", "packages", "db", "migrations");
     const migrationFiles = readdirSync(migrationsDir)
       .filter((name) => /^\d+.*\.sql$/u.test(name))
       .sort((a, b) => a.localeCompare(b));

@@ -17,7 +17,7 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("@nexus/security", async () => {
   // Exercise the real security policy, not a permissive mock of can().
-  const { can } = await import("../../packages/security/src/policy");
+  const { can } = await import("../../site/packages/security/src/policy");
   return { can, generateId: vi.fn((prefix: string) => `${prefix}_test`) };
 });
 

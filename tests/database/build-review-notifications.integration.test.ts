@@ -10,13 +10,13 @@ import {
 } from "@nexus/db";
 import { and, eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { db } from "../../packages/db/src/client";
+import { db } from "../../site/packages/db/src/client";
 import {
   auditEvents,
   builds,
   organizationMembers,
   organizations,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 async function fixture() {
@@ -204,7 +204,7 @@ it("rolls back build, product and audit when notification storage fails, then pe
   expect(await db.select().from(auditEvents).where(eq(auditEvents.targetId, f.buildId))).toEqual(
     [],
   );
-  const { notifications } = await import("../../packages/db/src/schema");
+  const { notifications } = await import("../../site/packages/db/src/schema");
   await db.delete(notifications).where(eq(notifications.id, id));
   expect(
     await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1, f.token),
@@ -239,7 +239,7 @@ it("notifies current organization managers once, respecting revocation and prefe
         role === "manager" || role === "reader" || role === "stale" ? ["manage_products"] : [],
     })),
   );
-  const { products } = await import("../../packages/db/src/schema");
+  const { products } = await import("../../site/packages/db/src/schema");
   await db.update(products).set({ organizationId: orgId }).where(eq(products.id, f.productId));
   await db
     .update(organizationMembers)

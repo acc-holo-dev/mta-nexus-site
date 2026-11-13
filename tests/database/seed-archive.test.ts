@@ -3,7 +3,7 @@ import { mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ensureSeedArchive } from "../../packages/db/src/seed-archive";
+import { ensureSeedArchive } from "../../site/packages/db/src/seed-archive";
 
 let root: string;
 const options = () => ({ NODE_ENV: "test", STORAGE_PROVIDER: "local", STORAGE_LOCAL_PATH: root });

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { db, followWorkspaceRepository, sessionRepository, userRepository } from "@nexus/db";
 import { and, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { objectNotificationMutes, users } from "../../packages/db/src/schema";
+import { objectNotificationMutes, users } from "../../site/packages/db/src/schema";
 
 it.each(["24h", null] as const)(
   "rejects mute %s after revocation during lock wait",

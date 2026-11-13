@@ -8,7 +8,7 @@ import { sessionRepository, digestSessionToken } from "./sessions";
 import { userRepository } from "./users";
 import { ConflictError, UnauthorizedError } from "@nexus/domain";
 import { generateId, generateSessionToken, hashPassword } from "@nexus/security";
-import { authService } from "../../../../site/src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/auth-service";
 
 type Mode = "selected" | "others";
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

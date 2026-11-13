@@ -3,10 +3,13 @@ import { setTimeout as delay } from "node:timers/promises";
 import { UnauthorizedError } from "@nexus/domain";
 import { eq, inArray, sql } from "drizzle-orm";
 import { describe, it } from "vitest";
-import { accountMailOutbox, accountMailQueueGate } from "../../packages/db/src/account-mail-schema";
-import { authChallenges } from "../../packages/db/src/account-recovery-schema";
-import { db, sessions } from "../../packages/db/src/client";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
+import {
+  accountMailOutbox,
+  accountMailQueueGate,
+} from "../../site/packages/db/src/account-mail-schema";
+import { authChallenges } from "../../site/packages/db/src/account-recovery-schema";
+import { db, sessions } from "../../site/packages/db/src/client";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
 import {
   account,
   cipher,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readDatabaseUrl } from "../../packages/db/src/database-config";
+import { readDatabaseUrl } from "../../site/packages/db/src/database-config";
 
 describe("isolated database configuration", () => {
   it("accepts a production worker with only a database URL", () => {

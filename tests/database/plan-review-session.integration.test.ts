@@ -15,7 +15,7 @@ import {
 } from "@nexus/db";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import type { ResourceTransaction } from "../../packages/db/src/transaction";
+import type { ResourceTransaction } from "../../site/packages/db/src/transaction";
 
 const createdUserIds = new Set<string>(),
   createdOrganizationIds = new Set<string>();

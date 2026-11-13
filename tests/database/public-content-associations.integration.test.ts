@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { authorContentRepository, contentRepository, db, userRepository } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { builds, content, products, servers, users } from "../../packages/db/src/schema";
+import { builds, content, products, servers, users } from "../../site/packages/db/src/schema";
 
 it("hides private or unsafe associations from all public projections and preserves public links", async () => {
   const suffix = randomUUID().replaceAll("-", "");

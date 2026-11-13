@@ -8,7 +8,7 @@ import { AccountMailCipher } from "../src/repositories/account-mail-crypto";
 import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
 import { AccountMailDispatcher } from "../src/repositories/account-mail-dispatcher";
 import { AccountMailSmtpTransport } from "../src/repositories/account-mail-smtp";
-import { authService } from "../../../site/src/lib/services/auth-service";
+import { authService } from "../../../src/lib/services/auth-service";
 import { userRepository } from "../src/repositories/users";
 import { generateId } from "../../security/src/index";
 

@@ -5,13 +5,13 @@ import { resolve } from "node:path";
 import { sql } from "drizzle-orm";
 import { describe, it } from "vitest";
 import { authService } from "../../site/src/lib/services/auth-service";
-import { db } from "../../packages/db/src/client";
+import { db } from "../../site/packages/db/src/client";
 import type {
   MailContext,
   MailPayload,
-} from "../../packages/db/src/repositories/account-mail-crypto";
-import { AccountMailCipher } from "../../packages/db/src/repositories/account-mail-crypto";
-import { userRepository } from "../../packages/db/src/repositories/users";
+} from "../../site/packages/db/src/repositories/account-mail-crypto";
+import { AccountMailCipher } from "../../site/packages/db/src/repositories/account-mail-crypto";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 import {
   account,
   cipher,
@@ -39,7 +39,7 @@ describe("D2a atomic encrypted mail enqueue: migration and enqueue", () => {
       await tx.execute(sql`CREATE TABLE sessions (id text PRIMARY KEY, user_id text, token text)`);
       for (const name of ["0012_account_recovery_proofs.sql"]) {
         for (const part of readFileSync(
-          resolve(process.cwd(), "packages/db/migrations", name),
+          resolve(process.cwd(), "site/packages/db/migrations", name),
           "utf8",
         ).split("--> statement-breakpoint")) {
           if (part.trim()) await tx.execute(sql.raw(part));
@@ -55,7 +55,7 @@ describe("D2a atomic encrypted mail enqueue: migration and enqueue", () => {
         (id,user_id,purpose,token_digest,email,credential_version,initiating_session_digest,expires_at)
         VALUES ('legacy-proof','legacy','email_verify',repeat('a',64),'legacy@example.invalid',0,repeat('b',64),now()+interval '1 hour')`);
       const migration = readFileSync(
-        resolve(process.cwd(), "packages/db/migrations/0013_account_mail_outbox.sql"),
+        resolve(process.cwd(), "site/packages/db/migrations/0013_account_mail_outbox.sql"),
         "utf8",
       );
       for (const part of migration.split("--> statement-breakpoint"))

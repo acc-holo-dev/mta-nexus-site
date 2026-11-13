@@ -69,7 +69,7 @@ export const contextSwitchingMocks = {
   ),
 };
 
-/** Factory for `vi.mock("../site/src/lib/services/auth-service", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("../site/src/lib/services/auth-service", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createContextSwitchingAuthMock() {
   return {
     authService: {
@@ -80,7 +80,7 @@ export function createContextSwitchingAuthMock() {
   };
 }
 
-/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createContextSwitchingDbMock() {
   return {
     organizationRepository: {
@@ -93,7 +93,7 @@ export function createContextSwitchingDbMock() {
   };
 }
 
-/** Factory for `vi.mock("@nexus/security", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/security", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createContextSwitchingSecurityMock() {
   return {
     consumeRateLimit: vi.fn(async () => ({

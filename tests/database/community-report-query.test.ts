@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: vi.fn(),
 }));
 
@@ -12,15 +12,15 @@ const state = vi.hoisted(() => ({
   notice: vi.fn(),
   reportNotice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/discussion-moderation-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/discussion-moderation-notice", () => ({
   discussionModerationNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/repositories/notifications", () => ({
+vi.mock("../../site/packages/db/src/repositories/notifications", () => ({
   notificationRepository: {
     createWithPushOutboxWithin: state.reportNotice,
   },
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -40,11 +40,11 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { communityReportsRepository as repository } from "../../packages/db/src/repositories/community-reports";
+import { communityReportsRepository as repository } from "../../site/packages/db/src/repositories/community-reports";
 import {
   discussionRevision,
   moderationDiscussionRevision,
-} from "../../packages/db/src/repositories/discussion-management";
+} from "../../site/packages/db/src/repositories/discussion-management";
 
 const time = "2026-10-10T00:00:00Z";
 const reportRow = [
@@ -352,7 +352,7 @@ it("requires the shared moderation notice to succeed and denies report-only muta
   await expect(repository.decide(decision)).rejects.toThrow("notice failure");
   expect(state.queries.some((query) => query.sql.startsWith('update "reports"'))).toBe(false);
   const { discussionManagementRepository } = await import(
-    "../../packages/db/src/repositories/discussion-management"
+    "../../site/packages/db/src/repositories/discussion-management"
   );
   state.queries = [];
   await expect(

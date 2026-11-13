@@ -5,7 +5,7 @@ import { auditEvents, db } from "../client";
 import { accountMailOutbox } from "../account-mail-schema";
 import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
-import { authService } from "../../../../site/src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/auth-service";
 import { userRepository } from "./users";
 import { generateId } from "@nexus/security";
 

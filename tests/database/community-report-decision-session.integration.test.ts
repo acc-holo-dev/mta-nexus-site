@@ -8,7 +8,7 @@ import {
 } from "@nexus/db";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
 import {
   auditEvents,
   comments,
@@ -17,7 +17,7 @@ import {
   reports,
   sessions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actors: string[] = [];
 const id = () => randomUUID();

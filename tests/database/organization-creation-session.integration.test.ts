@@ -7,7 +7,7 @@ import {
 } from "@nexus/db";
 import { eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { auditEvents, organizations, users } from "../../packages/db/src/schema";
+import { auditEvents, organizations, users } from "../../site/packages/db/src/schema";
 
 it("rolls back organization and membership if the initiating session expires during an audit wait", async () => {
   const key = randomUUID().replaceAll("-", "");

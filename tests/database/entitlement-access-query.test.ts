@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   results: [] as unknown[][][],
   failure: null as Error | null,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -25,7 +25,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { EntitlementRepository } from "../../packages/db/src/repositories/entitlements";
+import { EntitlementRepository } from "../../site/packages/db/src/repositories/entitlements";
 
 const repository = new EntitlementRepository();
 const now = new Date("2026-10-09T10:00:00Z");

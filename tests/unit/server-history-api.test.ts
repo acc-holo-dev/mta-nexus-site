@@ -28,7 +28,7 @@ describe("server observation history API", () => {
   });
 
   it("keeps master-list metadata from overwriting editorial profile fields", () => {
-    const repository = read("packages/db/src/repositories/server-observations.ts");
+    const repository = read("site/packages/db/src/repositories/server-observations.ts");
     const updateBlock = repository.slice(
       repository.indexOf(".update(servers)"),
       repository.indexOf(".where(and(", repository.indexOf(".update(servers)")),

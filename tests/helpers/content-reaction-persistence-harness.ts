@@ -9,7 +9,7 @@ import {
   reactions,
   servers,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const tokens = new Map<string, string>();
 const actorIds: string[] = [];

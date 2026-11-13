@@ -3,7 +3,7 @@ import { licenseArchiveQuery, licenseArchiveUrl } from "../../site/src/lib/licen
 import { licenseArchiveCsv } from "../../site/src/lib/license-archive-csv";
 import { licenseTermNotification } from "../../site/src/lib/license-maintenance-i18n";
 import { formatNotification } from "../../site/src/lib/notification-copy";
-import { licenseMaintenanceOptions } from "../../packages/db/src/license-maintenance-config";
+import { licenseMaintenanceOptions } from "../../site/packages/db/src/license-maintenance-config";
 it("strictly bounds buyer queries and preserves every active filter in navigation", () => {
   const query = licenseArchiveQuery(
     new URLSearchParams(

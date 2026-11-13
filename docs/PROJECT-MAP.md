@@ -20,13 +20,13 @@
 
 ```
 site          → страницы App Router, HTTP API, UI, lib/services (~75 сервисов)
-packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
-packages/validation → Zod/схемы входа
-packages/security → сессии, authz, идентификаторы, лимиты
-packages/db       → schema, migrations (~90 SQL), repositories (~170), workers
-packages/storage  → приватные артефакты и целостность
-packages/config   → проверка env
-packages/ui       → общие UI-примитивы без серверных импортов
+site/packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
+site/packages/validation → Zod/схемы входа
+site/packages/security → сессии, authz, идентификаторы, лимиты
+site/packages/db       → schema, migrations (~90 SQL), repositories (~170), workers
+site/packages/storage  → приватные артефакты и целостность
+site/packages/config   → проверка env
+site/packages/ui       → общие UI-примитивы без серверных импортов
 tests/            → HTTP/UI/поведенческие Vitest-сюиты (~6MB)
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
@@ -37,7 +37,7 @@ scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 
 | Область                   | Где смотреть                                                         |
 | ------------------------- | -------------------------------------------------------------------- |
-| Auth / Security Center    | `auth-service`, `packages/security`, workspace settings              |
+| Auth / Security Center    | `auth-service`, `site/packages/security`, workspace settings         |
 | Servers / directory       | `mta-master-directory-service`, `server-*`, `/servers`               |
 | Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources |
 | Library / collections     | `library-*`, `/workspace/library`                                    |

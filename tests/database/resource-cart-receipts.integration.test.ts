@@ -17,7 +17,7 @@ import {
   resourceAcquisitionEvents,
   resourceCartAcquisitions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 // Disposable isolated PostgreSQL migrated through 0058; these tests never
 // create completed payments, license terms, subscriptions or file deliveries.
 async function fixture() {

@@ -10,7 +10,7 @@ import {
   notifications,
   reactions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 import {
   actor,
   command,

@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateSessionToken, hashPassword } from "@nexus/security";
-import { db } from "../../packages/db/src/client";
-import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-schema";
-import { authRepository } from "../../packages/db/src/repositories/auth";
-import { userRepository } from "../../packages/db/src/repositories/users";
+import { db } from "../../site/packages/db/src/client";
+import { accountRecoveryBindings } from "../../site/packages/db/src/account-recovery-schema";
+import { authRepository } from "../../site/packages/db/src/repositories/auth";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 import { authService } from "../../site/src/lib/services/auth-service";
 import {
   account,

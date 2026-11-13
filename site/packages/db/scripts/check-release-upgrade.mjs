@@ -26,8 +26,8 @@ const url = new URL(process.env.DATABASE_URL);
 assert(["localhost", "127.0.0.1"].includes(url.hostname), "Only loopback PostgreSQL is allowed");
 assert.equal(url.pathname, "/mta_nexus_test", "Only the disposable CI service is allowed");
 
-const root = fileURLToPath(new URL("../../../", import.meta.url));
-const migrationsFolder = join(root, "packages/db/migrations");
+const root = fileURLToPath(new URL("../../../../", import.meta.url));
+const migrationsFolder = join(root, "site/packages/db/migrations");
 const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
 const upgradePlan = releaseUpgradePlan(journal);
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));

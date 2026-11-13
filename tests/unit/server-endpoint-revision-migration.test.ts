@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("server endpoint revision migration", () => {
   it("registers 0034 exactly once and preserves chronological migration history", () => {
-    const journal = JSON.parse(read("packages/db/migrations/meta/_journal.json"));
+    const journal = JSON.parse(read("site/packages/db/migrations/meta/_journal.json"));
     const entries = journal.entries as { idx: number; tag: string }[];
     const revisions = entries.filter((entry) => entry.tag === "0034_server_endpoint_revision");
     expect(revisions).toHaveLength(1);
@@ -17,7 +17,7 @@ describe("server endpoint revision migration", () => {
   });
 
   it("assigns revision zero to existing servers and null to legacy proofs", () => {
-    const migration = read("packages/db/migrations/0034_server_endpoint_revision.sql");
+    const migration = read("site/packages/db/migrations/0034_server_endpoint_revision.sql");
     expect(migration).toContain('"endpoint_revision" integer DEFAULT 0 NOT NULL');
     expect(migration).toContain(
       'ALTER TABLE "server_claim_challenges" ADD COLUMN "endpoint_revision" integer',
@@ -27,8 +27,8 @@ describe("server endpoint revision migration", () => {
   });
 
   it("requires durable endpoint revision checks in issue, consume and approval", () => {
-    const issue = read("packages/db/src/repositories/server-claim-challenges.ts");
-    const approval = read("packages/db/src/repositories/verification.ts");
+    const issue = read("site/packages/db/src/repositories/server-claim-challenges.ts");
+    const approval = read("site/packages/db/src/repositories/verification.ts");
     expect(issue).toContain("endpointRevision: server.endpointRevision");
     expect(issue).toContain("challenge.endpointRevision !== server.endpointRevision");
     expect(approval).toContain("proof.endpointRevision == null");

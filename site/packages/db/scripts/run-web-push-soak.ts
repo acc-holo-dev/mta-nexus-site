@@ -30,7 +30,7 @@ const userId = `usr_push_soak_long_${suffix}`;
 const sessionId = `ses_push_soak_long_${suffix}`;
 const notificationPrefix = `not_push_soak_long_${suffix}_`;
 const here = dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = resolve(here, "../../..");
+const repositoryRoot = resolve(here, "../../../..");
 const evidencePath = resolve(
   repositoryRoot,
   process.env.NEXUS_WEB_PUSH_SOAK_EVIDENCE_PATH?.trim() || "artifacts/web-push-soak-evidence.json",

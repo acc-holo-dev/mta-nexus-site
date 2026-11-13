@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
   conditions: [] as SQL[],
   order: [] as SQL[],
 }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select: (selection?: unknown) => ({
       from: () => ({
@@ -37,7 +37,7 @@ vi.mock("../../packages/db/src/client", () => ({
     }),
   },
 }));
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 const repository = new ServerRepository();
 const dialect = new PgDialect();
 beforeEach(() => {

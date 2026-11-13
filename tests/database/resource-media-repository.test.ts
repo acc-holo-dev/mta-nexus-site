@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -21,7 +21,7 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db };
 });
 
-import { resourceMediaRepository as repo } from "../../packages/db/src/repositories/resource-media";
+import { resourceMediaRepository as repo } from "../../site/packages/db/src/repositories/resource-media";
 
 const stamp = "2026-10-11T00:00:00.000Z";
 const parent = ["prd_a", "Private product", "draft", 0, "usr_a", null, stamp];

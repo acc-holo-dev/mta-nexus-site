@@ -3,7 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import { setTimeout as delay } from "node:timers/promises";
 import { db, sessions } from "../client";
 import { lockInitiatingSession } from "./initiating-session";
-import { authService } from "../../../../site/src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/auth-service";
 import { sessionRepository } from "./sessions";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateId, generateSessionToken } from "@nexus/security";

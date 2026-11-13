@@ -3,8 +3,8 @@ import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 
 const active = vi.hoisted(() => ({ db: null as unknown }));
-vi.mock("../../packages/db/src/client", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../../packages/db/src/client")>();
+vi.mock("../../site/packages/db/src/client", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../site/packages/db/src/client")>();
   return {
     ...original,
     db: new Proxy(original.db, {
@@ -16,11 +16,11 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
-import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+import { NotificationRepository } from "../../site/packages/db/src/repositories/notifications";
 
 it("measures inbox indexes on PostgreSQL and preserves recipient isolation and equal-time ordering", async () => {
-  const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
-    "../../packages/db/src/client",
+  const { db } = await vi.importActual<typeof import("../../site/packages/db/src/client")>(
+    "../../site/packages/db/src/client",
   );
   await db.transaction(async (tx) => {
     active.db = tx;
@@ -55,7 +55,7 @@ it("measures inbox indexes on PostgreSQL and preserves recipient isolation and e
       };
       const before = await plans();
       for (const statement of readFileSync(
-        "packages/db/migrations/0035_notification_inbox_indexes.sql",
+        "site/packages/db/migrations/0035_notification_inbox_indexes.sql",
         "utf8",
       ).split("--> statement-breakpoint")) {
         await tx.execute(sql.raw(statement));

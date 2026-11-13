@@ -2,8 +2,8 @@ import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 
 const active = vi.hoisted(() => ({ db: null as unknown }));
-vi.mock("../../packages/db/src/client", async (originalImport) => {
-  const original = await originalImport<typeof import("../../packages/db/src/client")>();
+vi.mock("../../site/packages/db/src/client", async (originalImport) => {
+  const original = await originalImport<typeof import("../../site/packages/db/src/client")>();
   return {
     ...original,
     db: new Proxy(original.db, {
@@ -16,16 +16,16 @@ vi.mock("../../packages/db/src/client", async (originalImport) => {
   };
 });
 
-import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+import { NotificationRepository } from "../../site/packages/db/src/repositories/notifications";
 
 const repository = new NotificationRepository();
 const filters = { query: "", state: "all" as const, category: "all" };
 type Transaction = Parameters<
-  Parameters<typeof import("../../packages/db/src/client").db.transaction>[0]
+  Parameters<typeof import("../../site/packages/db/src/client").db.transaction>[0]
 >[0];
 async function fixture(callback: (tx: Transaction) => Promise<void>) {
-  const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
-    "../../packages/db/src/client",
+  const { db } = await vi.importActual<typeof import("../../site/packages/db/src/client")>(
+    "../../site/packages/db/src/client",
   );
   await db.transaction(async (tx) => {
     active.db = tx;

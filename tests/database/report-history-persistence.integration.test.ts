@@ -10,7 +10,7 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { moderationDiscussionRevision } from "../../packages/db/src/repositories/discussion-management";
+import { moderationDiscussionRevision } from "../../site/packages/db/src/repositories/discussion-management";
 import {
   auditEvents,
   comments,
@@ -20,7 +20,7 @@ import {
   organizations,
   reports,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actors: string[] = [],
   teams: string[] = [];

@@ -8,7 +8,7 @@ const state = vi.hoisted(() => ({
   failTable: "",
   push: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -32,9 +32,9 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../../packages/db/src/repositories/initiating-session", async (original) => {
+vi.mock("../../site/packages/db/src/repositories/initiating-session", async (original) => {
   const actual =
-    await original<typeof import("../../packages/db/src/repositories/initiating-session")>();
+    await original<typeof import("../../site/packages/db/src/repositories/initiating-session")>();
   return {
     lockInitiatingSession: (
       tx: Parameters<typeof actual.lockInitiatingSession>[0],
@@ -44,16 +44,16 @@ vi.mock("../../packages/db/src/repositories/initiating-session", async (original
       token === "unit-token" ? Promise.resolve() : actual.lockInitiatingSession(tx, actor, token),
   };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
 
-import { db } from "../../packages/db/src/client";
-import { storeOrganizationAccessNotice } from "../../packages/db/src/repositories/organization-access-notice";
-import { organizationGovernanceRepository as repository } from "../../packages/db/src/repositories/organization-governance";
-import { organizationWorkspaceRepository as workspace } from "../../packages/db/src/repositories/organization-workspace";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
-import { organizations } from "../../packages/db/src/schema";
+import { db } from "../../site/packages/db/src/client";
+import { storeOrganizationAccessNotice } from "../../site/packages/db/src/repositories/organization-access-notice";
+import { organizationGovernanceRepository as repository } from "../../site/packages/db/src/repositories/organization-governance";
+import { organizationWorkspaceRepository as workspace } from "../../site/packages/db/src/repositories/organization-workspace";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
+import { organizations } from "../../site/packages/db/src/schema";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:01.000Z";

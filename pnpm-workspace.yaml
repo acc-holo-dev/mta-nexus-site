@@ -1,6 +1,6 @@
 packages:
   - "site"
-  - "packages/*"
+  - "site/packages/*"
 # Toolchain pins live outside this file: package.json#engines (Node major-ok),
 # .nvmrc/.node-version (exact host/CI Node), package.json#packageManager (exact pnpm).
 # Docker images use node:26-alpine for the same major branch, not the exact host patch.

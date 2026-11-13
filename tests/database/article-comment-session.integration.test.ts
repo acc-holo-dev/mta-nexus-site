@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 import {
   commentIdFromIntentKey,
   contentCommentsRepository,
-} from "../../packages/db/src/repositories/content-comments";
+} from "../../site/packages/db/src/repositories/content-comments";
 import {
   auditEvents,
   comments,
@@ -13,7 +13,7 @@ import {
   discussionNotificationDeliveries,
   sessions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 function deferred() {
   let resolve!: () => void;

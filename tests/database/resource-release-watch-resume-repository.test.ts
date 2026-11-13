@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -25,7 +25,7 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
-import { resumeResourceReleaseWatches as resume } from "../../packages/db/src/repositories/collection-release-watches";
+import { resumeResourceReleaseWatches as resume } from "../../site/packages/db/src/repositories/collection-release-watches";
 const stamp = "2026-10-12T00:00:00.000Z";
 const input = {
   userId: "usr_a",

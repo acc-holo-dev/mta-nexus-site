@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import { getTableConfig, PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
-import { safePublishedBuildCondition } from "../../packages/db/src/repositories/build-safety";
-import { builds, products } from "../../packages/db/src/schema";
+import { safePublishedBuildCondition } from "../../site/packages/db/src/repositories/build-safety";
+import { builds, products } from "../../site/packages/db/src/schema";
 
 const dialect = new PgDialect();
 

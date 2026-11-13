@@ -8,7 +8,7 @@ const caseId = `sup_${"a".repeat(24)}`;
 
 it("stores support requester notices with structured data and no raw case id in the message", () => {
   const source = readFileSync(
-    resolve("packages/db/src/repositories/support-requester-notice.ts"),
+    resolve("site/packages/db/src/repositories/support-requester-notice.ts"),
     "utf8",
   );
   expect(source).toContain('kind: "support_requester"');

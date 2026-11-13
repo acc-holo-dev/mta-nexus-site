@@ -4,13 +4,13 @@ import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexu
 import { beforeEach, expect, it, vi } from "vitest";
 import { confirmedLicenseControl } from "../../site/src/lib/license-control-confirmation";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createLicenseControlsDbMock } = await import("../helpers/license-controls-harness");
   return createLicenseControlsDbMock();
 });
 
-import { LicenseControlsRepository } from "../../packages/db/src/repositories/license-controls";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
+import { LicenseControlsRepository } from "../../site/packages/db/src/repositories/license-controls";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
 import {
   future,
   now,

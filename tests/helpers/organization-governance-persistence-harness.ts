@@ -16,8 +16,8 @@ import {
 import type { User } from "@nexus/domain";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach } from "vitest";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
-import { sessions } from "../../packages/db/src/schema";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
+import { sessions } from "../../site/packages/db/src/schema";
 
 export {
   and,

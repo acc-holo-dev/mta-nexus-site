@@ -1,14 +1,14 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import type { LibraryCollectionCommand } from "../../packages/domain/src/library-collections";
+import type { LibraryCollectionCommand } from "../../site/packages/domain/src/library-collections";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createLibraryCollectionsRepositoryDbMock } = await import(
     "../helpers/library-collections-repository-harness"
   );
   return createLibraryCollectionsRepositoryDbMock();
 });
 
-import { LibraryCollectionsRepository } from "../../packages/db/src/repositories/library-collections";
+import { LibraryCollectionsRepository } from "../../site/packages/db/src/repositories/library-collections";
 import {
   collection,
   collectionRow,

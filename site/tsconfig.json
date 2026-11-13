@@ -20,13 +20,13 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@nexus/config": ["../packages/config/src"],
-      "@nexus/domain": ["../packages/domain/src"],
-      "@nexus/validation": ["../packages/validation/src"],
-      "@nexus/security": ["../packages/security/src"],
-      "@nexus/storage": ["../packages/storage/src"],
-      "@nexus/db": ["../packages/db/src"],
-      "@nexus/ui": ["../packages/ui/src"]
+      "@nexus/config": ["./packages/config/src"],
+      "@nexus/domain": ["./packages/domain/src"],
+      "@nexus/validation": ["./packages/validation/src"],
+      "@nexus/security": ["./packages/security/src"],
+      "@nexus/storage": ["./packages/storage/src"],
+      "@nexus/db": ["./packages/db/src"],
+      "@nexus/ui": ["./packages/ui/src"]
     }
   },
   "include": [
@@ -36,5 +36,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "packages"]
 }

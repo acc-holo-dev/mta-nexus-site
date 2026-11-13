@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   now: "2026-10-10T12:00:00.000Z",
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -52,15 +52,19 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
 
-import { db } from "../../packages/db/src/client";
-import { assertOrganizationServerClaimAuthority } from "../../packages/db/src/repositories/server-claim-authority";
-import { ServerClaimChallengeRepository } from "../../packages/db/src/repositories/server-claim-challenges";
-import { VerificationRepository } from "../../packages/db/src/repositories/verification";
-import { serverClaimChallenges, servers, verificationRequests } from "../../packages/db/src/schema";
+import { db } from "../../site/packages/db/src/client";
+import { assertOrganizationServerClaimAuthority } from "../../site/packages/db/src/repositories/server-claim-authority";
+import { ServerClaimChallengeRepository } from "../../site/packages/db/src/repositories/server-claim-challenges";
+import { VerificationRepository } from "../../site/packages/db/src/repositories/verification";
+import {
+  serverClaimChallenges,
+  servers,
+  verificationRequests,
+} from "../../site/packages/db/src/schema";
 
 const row = (table: PgTable, values: Record<string, unknown>) =>
   Object.keys(getTableColumns(table)).map((key) => values[key] ?? null);

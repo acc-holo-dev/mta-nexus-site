@@ -7,7 +7,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import {
   DiscussionNotificationDeliveryRepository,
   discussionNotificationDeliveryRepository as delivery,
-} from "../../packages/db/src/repositories/discussion-notification-delivery";
+} from "../../site/packages/db/src/repositories/discussion-notification-delivery";
 import {
   auditEvents,
   comments,
@@ -16,7 +16,7 @@ import {
   discussionNotificationDeliveries as jobs,
   notifications,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actors: string[] = [];
 const publications: string[] = [];
@@ -233,7 +233,7 @@ it("delivers direct and follower notices with generic copy and current eligibili
     expect(JSON.stringify(row)).not.toContain(commenterId);
   }
   const dispatcher = await readFile(
-    path.resolve(import.meta.dirname, "../../packages/db/scripts/run-web-push-dispatcher.ts"),
+    path.resolve(import.meta.dirname, "../../site/packages/db/scripts/run-web-push-dispatcher.ts"),
     "utf8",
   );
   expect(dispatcher).toContain("discussionNotificationDeliveryRepository");

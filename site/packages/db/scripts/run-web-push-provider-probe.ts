@@ -41,7 +41,7 @@ if (!vapid) {
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = resolve(here, "../../..");
+const repositoryRoot = resolve(here, "../../../..");
 const evidencePath = resolve(
   repositoryRoot,
   process.env.NEXUS_WEB_PUSH_PROVIDER_EVIDENCE_PATH?.trim() ||

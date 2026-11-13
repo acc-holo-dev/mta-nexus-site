@@ -7,7 +7,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("deep-links publisher review and lifecycle notices to the concrete workspace build", () => {
   const notices = readFileSync(
-    resolve("packages/db/src/repositories/build-publisher-notices.ts"),
+    resolve("site/packages/db/src/repositories/build-publisher-notices.ts"),
     "utf8",
   );
   expect(notices).toContain("function publisherBuildHref(productId: string, buildId: string)");
@@ -15,7 +15,7 @@ it("deep-links publisher review and lifecycle notices to the concrete workspace 
     /return `\/workspace\/resources\/\$\{encodeURIComponent\(productId\)\}\/builds\/\$\{encodeURIComponent\(buildId\)\}`;/u,
   );
   const moderation = readFileSync(
-    resolve("packages/db/src/repositories/builds-moderation.ts"),
+    resolve("site/packages/db/src/repositories/builds-moderation.ts"),
     "utf8",
   );
   expect(moderation).toMatch(
@@ -23,7 +23,7 @@ it("deep-links publisher review and lifecycle notices to the concrete workspace 
   );
   expect(moderation).not.toMatch(/`\/workspace\/resources\/\$\{product\.id\}`\}, 'system'/u);
   const lifecycle = readFileSync(
-    resolve("packages/db/src/repositories/builds-lifecycle.ts"),
+    resolve("site/packages/db/src/repositories/builds-lifecycle.ts"),
     "utf8",
   );
   expect(lifecycle).toContain("notifyProductManagersWithin");

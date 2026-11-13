@@ -5,11 +5,13 @@ const state = vi.hoisted(() => ({
   options: [] as unknown[],
   claim: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/entitlements", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../../packages/db/src/repositories/entitlements")>()),
+vi.mock("../../site/packages/db/src/repositories/entitlements", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("../../site/packages/db/src/repositories/entitlements")
+  >()),
   claimFreeResourcesInTransaction: state.claim,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,8 +30,8 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
-import { resourceCartRepository as cart } from "../../packages/db/src/repositories/resource-cart";
-import { resourceCartReceiptsRepository as receipts } from "../../packages/db/src/repositories/resource-cart-receipts";
+import { resourceCartRepository as cart } from "../../site/packages/db/src/repositories/resource-cart";
+import { resourceCartReceiptsRepository as receipts } from "../../site/packages/db/src/repositories/resource-cart-receipts";
 const requestId = "11111111-1111-4111-8111-111111111111";
 const row = {
   productId: "prd_a",

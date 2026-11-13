@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WebPushDispatcher } from "../../packages/db/src/repositories/web-push-dispatcher";
+import { WebPushDispatcher } from "../../site/packages/db/src/repositories/web-push-dispatcher";
 
 const worker = {
   candidates: vi.fn(),

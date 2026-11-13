@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: vi.fn(),
 }));
 
@@ -11,12 +11,12 @@ const state = vi.hoisted(() => ({
   config: undefined as unknown,
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/repositories/notifications", () => ({
+vi.mock("../../site/packages/db/src/repositories/notifications", () => ({
   notificationRepository: {
     createWithPushOutboxWithin: async () => ({ notification: null }),
   },
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -42,7 +42,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { communityReportsRepository as repo } from "../../packages/db/src/repositories/community-reports";
+import { communityReportsRepository as repo } from "../../site/packages/db/src/repositories/community-reports";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   base = { period: "30" as const, group: "all" as const, query: "", view: "pending" as const },

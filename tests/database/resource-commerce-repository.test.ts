@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   results: [] as unknown[][][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -25,11 +25,11 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { products } from "../../packages/db/src/schema";
-import { ResourceCartRepository } from "../../packages/db/src/repositories/resource-cart";
-import { ProductLifecycleRepository } from "../../packages/db/src/repositories/product-lifecycle";
-import { BuildRepository } from "../../packages/db/src/repositories/builds";
-import { OrderRepository } from "../../packages/db/src/repositories/orders";
+import { products } from "../../site/packages/db/src/schema";
+import { ResourceCartRepository } from "../../site/packages/db/src/repositories/resource-cart";
+import { ProductLifecycleRepository } from "../../site/packages/db/src/repositories/product-lifecycle";
+import { BuildRepository } from "../../site/packages/db/src/repositories/builds";
+import { OrderRepository } from "../../site/packages/db/src/repositories/orders";
 
 const cart = new ResourceCartRepository();
 const lifecycle = new ProductLifecycleRepository();

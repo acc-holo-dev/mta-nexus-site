@@ -9,7 +9,7 @@ const mock = vi.hoisted(() => ({
   lockedMatch: true,
   insertCalls: 0,
 }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (fn: (tx: unknown) => Promise<unknown>) => {
       const tx = {
@@ -53,7 +53,7 @@ vi.mock("../../packages/db/src/client", () => ({
 }));
 vi.mock("@nexus/security", () => ({ generateId: () => "obs_test" }));
 
-import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+import { ServerObservationRepository } from "../../site/packages/db/src/repositories/server-observations";
 
 const repository = new ServerObservationRepository();
 const dialect = new PgDialect();

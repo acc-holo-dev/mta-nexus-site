@@ -3,7 +3,7 @@ import {
   compareLibraryReleases,
   comparablePackageSummary,
   type LibraryComparableRelease,
-} from "../../packages/domain/src/library-release-comparison";
+} from "../../site/packages/domain/src/library-release-comparison";
 import { libraryReleaseComparisonQuery } from "../../site/src/lib/library-release-comparison-query";
 const release = (id = "bld_a", hash = "a".repeat(64), size = 100): LibraryComparableRelease => ({
   id,

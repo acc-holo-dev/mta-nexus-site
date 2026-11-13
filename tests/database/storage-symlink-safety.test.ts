@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 
 let root: string;
 let outside: string;

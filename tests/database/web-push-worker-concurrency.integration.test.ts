@@ -11,11 +11,11 @@ import {
   webPushWorkerRepository,
   WEB_PUSH_MAX_ATTEMPTS,
 } from "@nexus/db";
-import { WebPushDispatcher } from "../../packages/db/src/repositories/web-push-dispatcher";
+import { WebPushDispatcher } from "../../site/packages/db/src/repositories/web-push-dispatcher";
 import type {
   WebPushNotificationPayload,
   WebPushSender,
-} from "../../packages/db/src/web-push-runtime";
+} from "../../site/packages/db/src/web-push-runtime";
 
 describe("Web Push concurrent worker soak", () => {
   it("delivers every overlapping candidate exactly once across four workers", async () => {

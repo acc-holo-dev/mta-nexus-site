@@ -8,7 +8,7 @@ const state = vi.hoisted(() => ({
   selects: [] as unknown[][],
   audit: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (run: (tx: unknown) => Promise<unknown>) =>
       run({
@@ -32,7 +32,7 @@ vi.mock("../../packages/db/src/client", () => ({
       }),
   },
 }));
-import { ProductRepository } from "../../packages/db/src/repositories/products";
+import { ProductRepository } from "../../site/packages/db/src/repositories/products";
 const repository = new ProductRepository();
 const dialect = new PgDialect();
 const actor = { id: "author", role: "developer" as const };

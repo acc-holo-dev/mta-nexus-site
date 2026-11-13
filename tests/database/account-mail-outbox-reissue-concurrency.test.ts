@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { UnauthorizedError } from "@nexus/domain";
 import { describe, it } from "vitest";
-import { accountMailOutbox } from "../../packages/db/src/account-mail-schema";
-import { db } from "../../packages/db/src/client";
+import { accountMailOutbox } from "../../site/packages/db/src/account-mail-schema";
+import { db } from "../../site/packages/db/src/client";
 import {
   AccountMailQueueFullError,
   account,

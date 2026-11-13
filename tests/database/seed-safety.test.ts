@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   assertDevelopmentSeedAllowed,
   DEMO_SEED_ACKNOWLEDGEMENT,
-} from "../../packages/db/src/seed-safety";
+} from "../../site/packages/db/src/seed-safety";
 
 const configuration = {
   NODE_ENV: "development",

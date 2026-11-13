@@ -308,7 +308,9 @@ test("release manifest requires valid unique migration names and SHA-256 hashes"
     assert.match(result.reason, /migration names and SHA-256/u);
   }
   assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: [valid] })).ok, true);
-  const actualMigrations = listMigrationEvidence(join(process.cwd(), "packages/db/migrations"));
+  const actualMigrations = listMigrationEvidence(
+    join(process.cwd(), "site/packages/db/migrations"),
+  );
   assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: actualMigrations })).ok, true);
 });
 

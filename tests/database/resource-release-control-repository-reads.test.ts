@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createResourceReleaseControlRepositoryDbMock } = await import(
     "../helpers/resource-release-control-repository-harness"
   );
   return createResourceReleaseControlRepositoryDbMock();
 });
 
-import { ResourceLibrarySelectionsRepository } from "../../packages/db/src/repositories/resource-library-selections";
-import { UserLibraryRepository } from "../../packages/db/src/repositories/user-library";
+import { ResourceLibrarySelectionsRepository } from "../../site/packages/db/src/repositories/resource-library-selections";
+import { UserLibraryRepository } from "../../site/packages/db/src/repositories/user-library";
 import {
   now,
   ownedRows,

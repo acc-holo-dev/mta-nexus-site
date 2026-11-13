@@ -10,10 +10,13 @@ import {
   RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION,
   RELEASE_UPGRADE_TARGET_TAG,
   releaseUpgradePlan,
-} from "../../packages/db/scripts/release-upgrade-contract.mjs";
+} from "../../site/packages/db/scripts/release-upgrade-contract.mjs";
 
 test("storage maintenance adds permanent guarded retirement without touching historic objects", () => {
-  const migration = readFileSync("packages/db/migrations/0061_storage_maintenance.sql", "utf8");
+  const migration = readFileSync(
+    "site/packages/db/migrations/0061_storage_maintenance.sql",
+    "utf8",
+  );
   assert.match(migration, /CREATE TABLE storage_maintenance_objects/u);
   assert.match(migration, /pg_advisory_xact_lock/u);
   assert.match(migration, /New storage references require a current snapshot/u);
@@ -29,7 +32,7 @@ test("storage maintenance adds permanent guarded retirement without touching his
 });
 
 test("gallery upgrade protects artifact identity, deferred ordering and future moderation", () => {
-  const migration = readFileSync("packages/db/migrations/0060_resource_media.sql", "utf8");
+  const migration = readFileSync("site/packages/db/migrations/0060_resource_media.sql", "utf8");
   assert.match(migration, /DEFERRABLE INITIALLY DEFERRED/u);
   assert.match(migration, /Gallery artifact identity is immutable/u);
   assert.match(migration, /FOR NO KEY UPDATE/u);
@@ -43,7 +46,10 @@ test("gallery upgrade protects artifact identity, deferred ordering and future m
 });
 
 test("package evidence upgrade preserves unknown historical bytes and immutable new reports", () => {
-  const migration = readFileSync("packages/db/migrations/0059_build_package_evidence.sql", "utf8");
+  const migration = readFileSync(
+    "site/packages/db/migrations/0059_build_package_evidence.sql",
+    "utf8",
+  );
   assert.match(migration, /ADD COLUMN package_evidence jsonb/u);
   assert.match(migration, /COALESCE/u);
   assert.match(migration, /sha256Hash' = sha256_hash/u);
@@ -64,7 +70,10 @@ test("package evidence upgrade preserves unknown historical bytes and immutable 
 });
 
 test("cart receipt migration preserves earlier uncertainty and immutable account-scoped evidence", () => {
-  const migration = readFileSync("packages/db/migrations/0058_resource_cart_receipts.sql", "utf8");
+  const migration = readFileSync(
+    "site/packages/db/migrations/0058_resource_cart_receipts.sql",
+    "utf8",
+  );
   assert.match(migration, /ADD COLUMN review_digest text/u);
   assert.match(migration, /ADD COLUMN review_snapshot jsonb/u);
   assert.match(migration, /review_digest IS NOT NULL AND review_digest ~/u);
@@ -80,7 +89,7 @@ test("cart receipt migration preserves earlier uncertainty and immutable account
 
 test("license recovery upgrade preserves historical uncertainty, original term and durable server identity", () => {
   const migration = readFileSync(
-    "packages/db/migrations/0053_license_binding_recovery.sql",
+    "site/packages/db/migrations/0053_license_binding_recovery.sql",
     "utf8",
   );
   assert.match(migration, /ADD COLUMN server_owner_id text/u);
@@ -100,12 +109,15 @@ test("license recovery upgrade preserves historical uncertainty, original term a
   assert.match(migration, /AFTER UPDATE OF status, expires_at ON licenses/u);
   assert.match(migration, /token_digest = NULL, token_issued_at = NULL/u);
   assert.match(migration, /NEW\.token_expires_at > parent\.expires_at/u);
-  const rehearsal = readFileSync("packages/db/scripts/check-release-upgrade.mjs", "utf8");
+  const rehearsal = readFileSync("site/packages/db/scripts/check-release-upgrade.mjs", "utf8");
   assert.match(rehearsal, /licenseBindingRecoverySchemaPresent = true/u);
 });
 
 test("purchase case upgrade adds immutable order context without changing historical financial states", () => {
-  const migration = readFileSync("packages/db/migrations/0052_commerce_order_cases.sql", "utf8");
+  const migration = readFileSync(
+    "site/packages/db/migrations/0052_commerce_order_cases.sql",
+    "utf8",
+  );
   assert.match(migration, /order_id text NOT NULL UNIQUE REFERENCES orders/u);
   assert.match(migration, /Purchase case context is immutable/u);
   assert.match(migration, /NEW\.revision := OLD\.revision \+ 1/u);
@@ -115,14 +127,14 @@ test("purchase case upgrade adds immutable order context without changing histor
     migration,
     /UPDATE (orders|payments|ledger_entries|licenses|entitlements)|DELETE FROM/u,
   );
-  const rehearsal = readFileSync("packages/db/scripts/check-release-upgrade.mjs", "utf8");
+  const rehearsal = readFileSync("site/packages/db/scripts/check-release-upgrade.mjs", "utf8");
   assert.match(rehearsal, /commerceOrderCaseSchemaPresent = true/u);
 });
 
-const script = "packages/db/scripts/check-release-upgrade.mjs";
+const script = "site/packages/db/scripts/check-release-upgrade.mjs";
 test("release watches upgrade adds future-only evidence and monotonic private progress", () => {
   const migration = readFileSync(
-    "packages/db/migrations/0057_resource_release_watches.sql",
+    "site/packages/db/migrations/0057_resource_release_watches.sql",
     "utf8",
   );
   assert.match(migration, /build_id text NOT NULL UNIQUE REFERENCES builds/u);
@@ -138,7 +150,7 @@ test("release watches upgrade adds future-only evidence and monotonic private pr
 });
 test("delivery upgrade preserves uncertainty and guards immutable terminal evidence", () => {
   const migration = readFileSync(
-    "packages/db/migrations/0056_resource_delivery_receipts.sql",
+    "site/packages/db/migrations/0056_resource_delivery_receipts.sql",
     "utf8",
   );
   assert.match(migration, /OLD\.status <> 'started'/u);
@@ -154,7 +166,7 @@ test("delivery upgrade preserves uncertainty and guards immutable terminal evide
 });
 test("editorial metadata upgrade withdraws stale review without backfilling publication trust", () => {
   const migration = readFileSync(
-    "packages/db/migrations/0055_resource_metadata_review.sql",
+    "site/packages/db/migrations/0055_resource_metadata_review.sql",
     "utf8",
   );
   assert.match(migration, /metadata_review_required boolean NOT NULL DEFAULT false/u);
@@ -174,7 +186,7 @@ test("editorial metadata upgrade withdraws stale review without backfilling publ
 });
 test("term maintenance upgrade adds exact-term idempotency without rewriting historical licenses", () => {
   const migration = readFileSync(
-    "packages/db/migrations/0054_license_term_maintenance.sql",
+    "site/packages/db/migrations/0054_license_term_maintenance.sql",
     "utf8",
   );
   assert.match(migration, /PRIMARY KEY \(license_id, event, expires_at\)/u);
@@ -223,8 +235,8 @@ for (const [name, overrides, expected] of [
   });
 }
 
-const journalUrl = new URL("../../packages/db/migrations/meta/_journal.json", import.meta.url);
-const migrationsUrl = new URL("../../packages/db/migrations/", import.meta.url);
+const journalUrl = new URL("../../site/packages/db/migrations/meta/_journal.json", import.meta.url);
+const migrationsUrl = new URL("../../site/packages/db/migrations/", import.meta.url);
 
 test("upgrade contract tracks the latest real migration journal", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
@@ -383,7 +395,7 @@ test("build workspace upgrade preserves identity and adds monotonic revisions an
   assert.match(migration, /CREATE TABLE user_profile_preferences/u);
   assert.match(migration, /show_professional_contacts boolean NOT NULL DEFAULT true/u);
   const rehearsal = readFileSync(
-    new URL("../../packages/db/scripts/check-release-upgrade.mjs", import.meta.url),
+    new URL("../../site/packages/db/scripts/check-release-upgrade.mjs", import.meta.url),
     "utf8",
   );
   assert.match(rehearsal, /- 'revision'/u);
@@ -608,15 +620,15 @@ test("upgrade evidence validator rejects missing, false, and wrong-type required
 
 test("forward-only authoring stays custom+guarded while meta snapshots lag the journal", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
-  const pkg = JSON.parse(readFileSync("packages/db/package.json", "utf8"));
-  const guard = readFileSync("packages/db/scripts/guard-db-generate.mjs", "utf8");
-  const drizzleConfig = readFileSync("packages/db/drizzle.config.ts", "utf8");
+  const pkg = JSON.parse(readFileSync("site/packages/db/package.json", "utf8"));
+  const guard = readFileSync("site/packages/db/scripts/guard-db-generate.mjs", "utf8");
+  const drizzleConfig = readFileSync("site/packages/db/drizzle.config.ts", "utf8");
   const ops = readFileSync("docs/OPERATIONS.md", "utf8");
 
   assert.ok(journal.entries.length >= 88);
-  assert.equal(existsSync("packages/db/migrations/meta/0000_snapshot.json"), true);
-  assert.equal(existsSync("packages/db/migrations/meta/0001_snapshot.json"), true);
-  assert.equal(existsSync("packages/db/migrations/meta/0002_snapshot.json"), false);
+  assert.equal(existsSync("site/packages/db/migrations/meta/0000_snapshot.json"), true);
+  assert.equal(existsSync("site/packages/db/migrations/meta/0001_snapshot.json"), true);
+  assert.equal(existsSync("site/packages/db/migrations/meta/0002_snapshot.json"), false);
   assert.equal(pkg.scripts.generate, "node scripts/guard-db-generate.mjs");
   assert.equal(pkg.scripts["generate:custom"], "node scripts/guard-db-generate.mjs --custom");
   assert.match(guard, /NEXUS_ALLOW_DB_GENERATE/u);

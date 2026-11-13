@@ -112,7 +112,7 @@ it("delivers served-receipt recipients idempotently with generic security copy",
   expect((await source(buildId)).completedAt).toBeInstanceOf(Date);
 
   const dispatcher = await readFile(
-    path.resolve(import.meta.dirname, "../../packages/db/scripts/run-web-push-dispatcher.ts"),
+    path.resolve(import.meta.dirname, "../../site/packages/db/scripts/run-web-push-dispatcher.ts"),
     "utf8",
   );
   expect(dispatcher).toContain("buildIncidentNotificationDeliveryRepository");

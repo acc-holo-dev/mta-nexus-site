@@ -15,7 +15,7 @@ import { afterEach, expect, vi } from "vitest";
 import {
   BuildIncidentNotificationDeliveryRepository,
   buildIncidentNotificationDeliveryRepository as delivery,
-} from "../../packages/db/src/repositories/build-incident-notification-delivery";
+} from "../../site/packages/db/src/repositories/build-incident-notification-delivery";
 import {
   auditEvents,
   builds,
@@ -25,7 +25,7 @@ import {
   products,
   sessions,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 export {
   BuildIncidentNotificationDeliveryRepository,

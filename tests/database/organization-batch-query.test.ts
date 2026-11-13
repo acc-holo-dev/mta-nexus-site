@@ -7,13 +7,13 @@ const state = vi.hoisted(() => ({
   notice: vi.fn(),
   fail: "",
 }));
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: async () => {},
 }));
-vi.mock("../../packages/db/src/repositories/organization-access-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     if (/^select "id" from "users" where "users"\."id" = \$1 for share/u.test(sql))
@@ -37,8 +37,8 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { organizationWorkspaceRepository as repository } from "../../packages/db/src/repositories/organization-workspace";
-import { organizations } from "../../packages/db/src/schema";
+import { organizationWorkspaceRepository as repository } from "../../site/packages/db/src/repositories/organization-workspace";
+import { organizations } from "../../site/packages/db/src/schema";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z";

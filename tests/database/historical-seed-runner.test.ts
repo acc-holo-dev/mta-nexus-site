@@ -11,9 +11,9 @@ const fixture = vi.hoisted(() => ({
 
 vi.mock("@nexus/config", () => ({ config: fixture.config }));
 vi.mock("@nexus/security", () => ({ hashPassword: fixture.hashPassword }));
-vi.mock("../../packages/db/src/historical-seed", () => ({ seedHistorical: fixture.persist }));
+vi.mock("../../site/packages/db/src/historical-seed", () => ({ seedHistorical: fixture.persist }));
 
-import { runHistoricalSeed } from "../../packages/db/src/seed-historical";
+import { runHistoricalSeed } from "../../site/packages/db/src/seed-historical";
 
 beforeEach(() => {
   fixture.config.NODE_ENV = "development";

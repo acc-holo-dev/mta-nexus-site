@@ -7,7 +7,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("routes quarantined-build notices to library versions instead of Security Center", () => {
   const source = readFileSync(
-    resolve("packages/db/src/repositories/build-incident-notification-delivery.ts"),
+    resolve("site/packages/db/src/repositories/build-incident-notification-delivery.ts"),
     "utf8",
   );
   expect(source).toContain("function buildIncidentDownloaderLink(productId: string)");

@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,19 +28,19 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
 
-import { db } from "../../packages/db/src/client";
+import { db } from "../../site/packages/db/src/client";
 import {
   developerExperienceRevision,
   developerProfileRepository,
-} from "../../packages/db/src/repositories/developer-profile";
-import { VerificationRepository } from "../../packages/db/src/repositories/verification";
-import { verificationTargetAuthority } from "../../packages/db/src/repositories/verification-authority";
-import { verificationWorkspaceRepository } from "../../packages/db/src/repositories/verification-workspace";
-import { verificationRequests } from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/repositories/developer-profile";
+import { VerificationRepository } from "../../site/packages/db/src/repositories/verification";
+import { verificationTargetAuthority } from "../../site/packages/db/src/repositories/verification-authority";
+import { verificationWorkspaceRepository } from "../../site/packages/db/src/repositories/verification-workspace";
+import { verificationRequests } from "../../site/packages/db/src/schema";
 
 const authority = (requesterId: string, type: string, targetId: string, applying: boolean) =>
   db.transaction((tx) => verificationTargetAuthority(tx, requesterId, type, targetId, applying));

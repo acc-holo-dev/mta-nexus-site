@@ -7,7 +7,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("deep-links staff verification notices to the focused queue card", () => {
   const source = readFileSync(
-    resolve("packages/db/src/repositories/verification-notification-delivery.ts"),
+    resolve("site/packages/db/src/repositories/verification-notification-delivery.ts"),
     "utf8",
   );
   expect(source).toMatch(/verificationId=\$\{encodeURIComponent\(verificationRequestId\)\}/u);

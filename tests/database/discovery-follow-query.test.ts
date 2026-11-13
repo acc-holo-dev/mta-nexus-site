@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -22,8 +22,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { followWorkspaceRepository as follows } from "../../packages/db/src/repositories/follow-workspace";
-import { publicDirectoryRepository as directory } from "../../packages/db/src/repositories/public-directory";
+import { followWorkspaceRepository as follows } from "../../site/packages/db/src/repositories/follow-workspace";
+import { publicDirectoryRepository as directory } from "../../site/packages/db/src/repositories/public-directory";
 
 beforeEach(() => {
   state.queries = [];

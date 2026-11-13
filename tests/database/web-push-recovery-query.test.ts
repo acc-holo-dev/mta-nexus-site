@@ -1,12 +1,12 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { webPushQueueGate } from "../../packages/db/src/schema";
+import { webPushQueueGate } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -15,8 +15,8 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: database };
 });
 
-import { db } from "../../packages/db/src/client";
-import { enqueueWebPushOutboxForNotification as enqueue } from "../../packages/db/src/repositories/web-push-outbox";
+import { db } from "../../site/packages/db/src/client";
+import { enqueueWebPushOutboxForNotification as enqueue } from "../../site/packages/db/src/repositories/web-push-outbox";
 
 const gate = (capacity: number) =>
   Object.keys(getTableColumns(webPushQueueGate)).map(

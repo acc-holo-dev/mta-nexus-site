@@ -37,7 +37,9 @@ describe("deterministic development startup contract", () => {
     expect(pushWorker).toContain("/app/scripts/check-web-push-worker-health.mjs");
     expect(compose).toContain("/app/scripts/check-license-worker-health.mjs");
     expect(compose).toContain("/app/scripts/check-resource-release-worker-health.mjs");
-    expect(compose).toContain("./packages/validation/src:/app/packages/validation/src:ro");
+    expect(compose).toContain(
+      "./site/packages/validation/src:/app/site/packages/validation/src:ro",
+    );
     expect(pkg.scripts["dev:docker:check"]).toContain("scripts/check-local-readiness.mjs");
     expect(pkg.scripts["dev:docker:check"]).toContain("check-web-push-worker-health.mjs");
     expect(pkg.scripts["dev:docker:check"]).toContain(
@@ -86,13 +88,13 @@ describe("beta version consistency", () => {
     const manifests = [
       "package.json",
       "site/package.json",
-      "packages/config/package.json",
-      "packages/db/package.json",
-      "packages/domain/package.json",
-      "packages/security/package.json",
-      "packages/storage/package.json",
-      "packages/ui/package.json",
-      "packages/validation/package.json",
+      "site/packages/config/package.json",
+      "site/packages/db/package.json",
+      "site/packages/domain/package.json",
+      "site/packages/security/package.json",
+      "site/packages/storage/package.json",
+      "site/packages/ui/package.json",
+      "site/packages/validation/package.json",
     ];
 
     for (const path of manifests) {

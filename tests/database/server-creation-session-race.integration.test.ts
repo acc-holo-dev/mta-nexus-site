@@ -2,7 +2,13 @@ import { randomUUID } from "node:crypto";
 import { db, serverRepository, sessionRepository, userRepository } from "@nexus/db";
 import { eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { auditEvents, organizations, servers, sessions, users } from "../../packages/db/src/schema";
+import {
+  auditEvents,
+  organizations,
+  servers,
+  sessions,
+  users,
+} from "../../site/packages/db/src/schema";
 
 function deferred() {
   let resolve!: () => void;

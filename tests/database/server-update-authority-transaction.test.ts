@@ -21,7 +21,7 @@ const state = vi.hoisted(() => ({
   audited: [] as Record<string, unknown>[],
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (work: (tx: unknown) => Promise<unknown>) => {
       const tx = {
@@ -74,7 +74,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 
 const repository = new ServerRepository();
 const audit = (id: string) => ({

@@ -51,7 +51,7 @@ vi.mock("../../../lib/services/auth-service", () => ({
 
 vi.mock("@nexus/db", async () => {
   // Keep the pure endpoint validator real without importing the database client.
-  const { parseWebPushEndpoint } = await import("../../../../../packages/db/src/web-push-runtime");
+  const { parseWebPushEndpoint } = await import("../../../../packages/db/src/web-push-runtime");
   return {
     notificationRepository,
     webPushSubscriptionRepository: pushRepository,

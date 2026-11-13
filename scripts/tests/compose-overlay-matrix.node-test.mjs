@@ -68,13 +68,34 @@ function sourceBindMounts(service) {
     (mount) =>
       mount.type === "bind" &&
       typeof mount.source === "string" &&
-      (/[/\\](?:apps|packages)[/\\]/u.test(mount.source) ||
-        mount.source.includes("/apps/") ||
-        mount.source.includes("/packages/") ||
-        mount.source.startsWith("./apps/") ||
-        mount.source.startsWith("./packages/")),
+      /(?:^|\/)(?:apps|packages|site\/(?:src|packages))(?:\/|$)/u.test(
+        mount.source.replaceAll("\\", "/"),
+      ),
   );
 }
+
+test("production mount guard recognizes legacy and nested source layouts", () => {
+  const sources = [
+    "./apps/web/src",
+    "/checkout/packages/db/src",
+    "./site/src",
+    "/checkout/site/src/app",
+    "site/packages/ui/src",
+    "C:\\checkout\\site\\packages\\db\\src",
+  ];
+  const volumes = sources.map((source) => ({ type: "bind", source }));
+  assert.deepEqual(sourceBindMounts({ volumes }), volumes);
+  assert.deepEqual(
+    sourceBindMounts({
+      volumes: [
+        { type: "volume", source: "uploads" },
+        { type: "bind", source: "/data/uploads" },
+        { type: "bind", source: "/run/secrets/mail-key" },
+      ],
+    }),
+    [],
+  );
+});
 
 test("OPERATIONS documents the supported Compose overlay matrix and writer inventory", () => {
   const ops = readFileSync(resolve(root, "docs/OPERATIONS.md"), "utf8");
@@ -106,19 +127,22 @@ test("OPERATIONS documents the guarded custom migration authoring path", () => {
 });
 
 test("db generate scripts stay guarded while snapshots lag the journal", () => {
-  const pkg = JSON.parse(readFileSync(resolve(root, "packages/db/package.json"), "utf8"));
+  const pkg = JSON.parse(readFileSync(resolve(root, "site/packages/db/package.json"), "utf8"));
   assert.equal(pkg.scripts.generate, "node scripts/guard-db-generate.mjs");
   assert.equal(pkg.scripts["generate:custom"], "node scripts/guard-db-generate.mjs --custom");
-  const guard = readFileSync(resolve(root, "packages/db/scripts/guard-db-generate.mjs"), "utf8");
+  const guard = readFileSync(
+    resolve(root, "site/packages/db/scripts/guard-db-generate.mjs"),
+    "utf8",
+  );
   assert.match(guard, /NEXUS_ALLOW_DB_GENERATE/u);
   assert.match(guard, /NEXUS_ALLOW_UNSAFE_DB_GENERATE/u);
   assert.match(guard, /--custom/u);
 
   const journal = JSON.parse(
-    readFileSync(resolve(root, "packages/db/migrations/meta/_journal.json"), "utf8"),
+    readFileSync(resolve(root, "site/packages/db/migrations/meta/_journal.json"), "utf8"),
   );
   const snapshots = ["0000_snapshot.json", "0001_snapshot.json"].map((name) =>
-    resolve(root, "packages/db/migrations/meta", name),
+    resolve(root, "site/packages/db/migrations/meta", name),
   );
   for (const path of snapshots) assert.equal(readFileSync(path, "utf8").length > 0, true);
   assert.ok(journal.entries.length > 2, "journal must advance past early snapshots");
@@ -133,15 +157,19 @@ test("plain generate exits non-zero without unsafe opt-in", () => {
   let status = 0;
   let stderr = "";
   try {
-    execFileSync(process.execPath, [resolve(root, "packages/db/scripts/guard-db-generate.mjs")], {
-      cwd: resolve(root, "packages/db"),
-      encoding: "utf8",
-      env: {
-        PATH: process.env.PATH,
-        NEXUS_ALLOW_DB_GENERATE: "",
-        NEXUS_ALLOW_UNSAFE_DB_GENERATE: "",
+    execFileSync(
+      process.execPath,
+      [resolve(root, "site/packages/db/scripts/guard-db-generate.mjs")],
+      {
+        cwd: resolve(root, "site/packages/db"),
+        encoding: "utf8",
+        env: {
+          PATH: process.env.PATH,
+          NEXUS_ALLOW_DB_GENERATE: "",
+          NEXUS_ALLOW_UNSAFE_DB_GENERATE: "",
+        },
       },
-    });
+    );
   } catch (error) {
     status = error.status;
     stderr = `${error.stdout ?? ""}${error.stderr ?? ""}`;
@@ -157,9 +185,9 @@ test("custom generate exits non-zero without NEXUS_ALLOW_DB_GENERATE", () => {
   try {
     execFileSync(
       process.execPath,
-      [resolve(root, "packages/db/scripts/guard-db-generate.mjs"), "--custom"],
+      [resolve(root, "site/packages/db/scripts/guard-db-generate.mjs"), "--custom"],
       {
-        cwd: resolve(root, "packages/db"),
+        cwd: resolve(root, "site/packages/db"),
         encoding: "utf8",
         env: {
           PATH: process.env.PATH,

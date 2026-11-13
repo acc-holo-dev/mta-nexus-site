@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { ValidationError } from "@nexus/domain";

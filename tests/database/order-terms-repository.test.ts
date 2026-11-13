@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,9 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { OrderTermsRepository } from "../../packages/db/src/repositories/order-terms";
-import { OrderRepository } from "../../packages/db/src/repositories/orders";
-import { SellerSalesRepository } from "../../packages/db/src/repositories/seller-sales";
+import { OrderTermsRepository } from "../../site/packages/db/src/repositories/order-terms";
+import { OrderRepository } from "../../site/packages/db/src/repositories/orders";
+import { SellerSalesRepository } from "../../site/packages/db/src/repositories/seller-sales";
 
 const repo = new OrderTermsRepository(),
   orders = new OrderRepository(),

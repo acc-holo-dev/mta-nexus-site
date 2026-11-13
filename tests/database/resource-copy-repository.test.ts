@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -32,8 +32,8 @@ import {
   ResourceCopiesRepository,
   resourceCopyPreview,
   resourceCopyReceipt,
-} from "../../packages/db/src/repositories/resource-copies";
-import { products, resourceDraftCopies, users } from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/repositories/resource-copies";
+import { products, resourceDraftCopies, users } from "../../site/packages/db/src/schema";
 import {
   date,
   command as initialCommand,

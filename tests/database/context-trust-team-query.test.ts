@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   transactions: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,12 +26,12 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/organization-access-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: vi.fn(),
 }));
-import { publicContextTrustRepository as trust } from "../../packages/db/src/repositories/public-context-trust";
-import { organizationTeamDirectoryRepository as team } from "../../packages/db/src/repositories/organization-team-directory";
-import { organizations } from "../../packages/db/src/schema";
+import { publicContextTrustRepository as trust } from "../../site/packages/db/src/repositories/public-context-trust";
+import { organizationTeamDirectoryRepository as team } from "../../site/packages/db/src/repositories/organization-team-directory";
+import { organizations } from "../../site/packages/db/src/schema";
 const time = "2026-10-11T00:00:00.123456Z";
 const org = {
   id: "org",

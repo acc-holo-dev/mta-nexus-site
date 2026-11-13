@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   config: null as unknown,
   failure: null as Error | null,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,7 +28,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 
 const repository = new ServerRepository();
 beforeEach(() => {

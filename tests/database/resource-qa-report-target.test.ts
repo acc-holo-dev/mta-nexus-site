@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
 }));
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -14,8 +14,8 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: database };
 });
 
-import { db } from "../../packages/db/src/client";
-import { lockPublicReportTarget } from "../../packages/db/src/repositories/report-target";
+import { db } from "../../site/packages/db/src/client";
+import { lockPublicReportTarget } from "../../site/packages/db/src/repositories/report-target";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

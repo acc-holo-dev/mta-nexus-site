@@ -1,20 +1,20 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Avatar } from "../../packages/ui/src/avatar";
-import { EmptyState } from "../../packages/ui/src/empty-state";
-import { ErrorState } from "../../packages/ui/src/error-state";
-import { fieldControlClass } from "../../packages/ui/src/field-classes";
-import { FilterBar } from "../../packages/ui/src/filter-bar";
-import { Field, Input } from "../../packages/ui/src/input";
+import { Avatar } from "../../site/packages/ui/src/avatar";
+import { EmptyState } from "../../site/packages/ui/src/empty-state";
+import { ErrorState } from "../../site/packages/ui/src/error-state";
+import { fieldControlClass } from "../../site/packages/ui/src/field-classes";
+import { FilterBar } from "../../site/packages/ui/src/filter-bar";
+import { Field, Input } from "../../site/packages/ui/src/input";
 import {
   DataTable,
   DataTableCell,
   DataTableHeader,
   PageHeader,
   SectionHeader,
-} from "../../packages/ui/src/platform";
-import { SearchField } from "../../packages/ui/src/search-field";
-import { nextTabIndex, Tabs } from "../../packages/ui/src/tabs";
+} from "../../site/packages/ui/src/platform";
+import { SearchField } from "../../site/packages/ui/src/search-field";
+import { nextTabIndex, Tabs } from "../../site/packages/ui/src/tabs";
 
 describe("Input accessibility wiring", () => {
   it("auto-generates a stable field id for labels and errors", () => {

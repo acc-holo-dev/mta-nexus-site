@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { UnauthorizedError } from "@nexus/domain";
-import { db } from "../../packages/db/src/client";
-import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-schema";
+import { db } from "../../site/packages/db/src/client";
+import { accountRecoveryBindings } from "../../site/packages/db/src/account-recovery-schema";
 import {
   account,
   challenge,

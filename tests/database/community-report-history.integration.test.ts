@@ -11,7 +11,7 @@ import {
 } from "@nexus/db";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { sessionRepository } from "../../packages/db/src/repositories/sessions";
+import { sessionRepository } from "../../site/packages/db/src/repositories/sessions";
 
 const actorIds: string[] = [],
   publicationIds: string[] = [],

@@ -16,7 +16,7 @@ import {
   payments,
   supportCases,
   supportCaseMessages,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 // Requires disposable PostgreSQL migrated through 0052. The completed payment
 // below is a recorded fixture only; no provider or financial executor is called.

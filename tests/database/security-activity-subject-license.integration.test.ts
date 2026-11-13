@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { SecurityCenterService } from "../../site/src/lib/services/security-center-service";
-import { auditEvents, licenses, products } from "../../packages/db/src/schema";
+import { auditEvents, licenses, products } from "../../site/packages/db/src/schema";
 import {
   clearFixtures,
   db,

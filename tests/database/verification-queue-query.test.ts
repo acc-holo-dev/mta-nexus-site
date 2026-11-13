@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   return {
     db: drizzle(async (sql, params) => {
@@ -15,9 +15,9 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { VerificationRepository } from "../../packages/db/src/repositories/verification";
-import { verificationApplicationRevision } from "../../packages/db/src/repositories/verification-application-version";
-import { verificationRequests } from "../../packages/db/src/schema";
+import { VerificationRepository } from "../../site/packages/db/src/repositories/verification";
+import { verificationApplicationRevision } from "../../site/packages/db/src/repositories/verification-application-version";
+import { verificationRequests } from "../../site/packages/db/src/schema";
 
 beforeEach(() => {
   state.queries = [];

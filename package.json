@@ -69,7 +69,7 @@
     "observability:live-drill:verify": "node scripts/check-observability-live-drill-evidence.mjs",
     "recovery:acceptance:verify": "node scripts/check-production-recovery-acceptance-evidence.mjs",
     "analyze:unused": "knip",
-    "analyze:architecture": "depcruise --config .dependency-cruiser.cjs site/src packages",
+    "analyze:architecture": "depcruise --config .dependency-cruiser.cjs site/src site/packages",
     "analyze:bundle": "pnpm --filter @nexus/web exec next experimental-analyze --output",
     "dev:mail": "pnpm dev:preflight && docker compose -p nexus-local -f deploy/compose.yaml -f deploy/compose.mailpit.yaml up --build --detach --wait --wait-timeout 600",
     "dev:mail:logs": "docker compose -p nexus-local -f deploy/compose.yaml -f deploy/compose.mailpit.yaml logs --tail 100 --follow app mail-worker mailpit",

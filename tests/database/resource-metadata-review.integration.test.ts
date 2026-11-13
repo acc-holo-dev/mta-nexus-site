@@ -16,7 +16,7 @@ import {
   entitlements,
   notifications,
   products,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 // Disposable PostgreSQL migrated through 0055. These fixtures issue no payments,
 // resource licenses or subscriptions and are excluded from the local unit run.
 function present<T>(value: T | null | undefined): T {

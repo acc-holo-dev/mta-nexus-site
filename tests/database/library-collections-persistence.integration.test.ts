@@ -772,7 +772,7 @@ it("inspects draft memberships privately and retains removal after access loss a
 
 it("reads whole owner commands by resource/window and retains their masked evidence after removal", async () => {
   const { readLibraryCollectionHistory } = await import(
-    "../../packages/db/src/repositories/library-collection-history"
+    "../../site/packages/db/src/repositories/library-collection-history"
   );
   const f = await fixture();
   const created = await f.command({
@@ -812,7 +812,7 @@ it("reads whole owner commands by resource/window and retains their masked evide
 
 it("compares archived own orphan sets and applies a reviewed missing-reference copy without new rights", async () => {
   const { readLibraryCollectionComparison } = await import(
-    "../../packages/db/src/repositories/library-collection-comparison"
+    "../../site/packages/db/src/repositories/library-collection-comparison"
   );
   const f = await copyFixture();
   const ids = [0, 1, 2].map(() => `prd_compare_missing_${randomUUID().replaceAll("-", "")}`) as [
@@ -882,7 +882,7 @@ it("compares archived own orphan sets and applies a reviewed missing-reference c
 // Membership groups require disposable PostgreSQL migrated through 0077.
 async function membershipBatchFixture() {
   const { applyLibraryMembershipBatch } = await import(
-    "../../packages/db/src/repositories/library-membership-batches"
+    "../../site/packages/db/src/repositories/library-membership-batches"
   );
   const f = await fixture(),
     a = await f.command({ requestId: randomUUID(), action: "create", name: "Membership source" }),
@@ -956,7 +956,7 @@ it("atomically updates resource membership in multiple own collections and repla
   ).toBe(true);
 });
 it("rolls back every membership, revision, child/parent receipt and audit when the required parent audit fails", async () => {
-  const { libraryMembershipBatchReceipts } = await import("../../packages/db/src/schema");
+  const { libraryMembershipBatchReceipts } = await import("../../site/packages/db/src/schema");
   const f = await membershipBatchFixture();
   const [existing] = await db
     .select()
@@ -1005,7 +1005,7 @@ it("rolls back every membership, revision, child/parent receipt and audit when t
 
 it("reads immutable whole membership groups after later collection edits and deletion of the resource, with stable owner-only detail", async () => {
   const { readLibraryMembershipHistory, readLibraryMembershipHistoryDetail } = await import(
-    "../../packages/db/src/repositories/library-membership-history"
+    "../../site/packages/db/src/repositories/library-membership-history"
   );
   const f = await membershipBatchFixture(),
     saved = await f.apply();
@@ -1061,7 +1061,7 @@ it("reads immutable whole membership groups after later collection edits and del
 
 it("exports own orphan references but imports only current own access, then rechecks access atomically when saving", async () => {
   const { exportLibraryCollection, previewLibraryCollectionImport } = await import(
-    "../../packages/db/src/repositories/library-collection-manifests"
+    "../../site/packages/db/src/repositories/library-collection-manifests"
   );
   const f = await fixture();
   const source = (
@@ -1176,7 +1176,7 @@ it("atomically swaps references in a full collection and replays original proof 
   expect(replay.replayed).toBe(true);
   expect(replay.receipt).toEqual(results[0]?.receipt);
   const { readLibraryCollectionHistory } = await import(
-    "../../packages/db/src/repositories/library-collection-history"
+    "../../site/packages/db/src/repositories/library-collection-history"
   );
   const history = await readLibraryCollectionHistory(f.userId, {
     page: 1,
@@ -1270,7 +1270,7 @@ async function restorationFixture() {
 }
 it("restores only recorded reconciliation differences, retaining later unrelated references/dates and original proof", async () => {
   const { readLibraryCollectionReceiptDetail } = await import(
-    "../../packages/db/src/repositories/library-collection-receipt-detail"
+    "../../site/packages/db/src/repositories/library-collection-receipt-detail"
   );
   const f = await restorationFixture();
   const detail = await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id);
@@ -1322,7 +1322,7 @@ it("restores only recorded reconciliation differences, retaining later unrelated
 });
 it("rechecks restoration addition access before removing current references and leaves no partial inverse receipt", async () => {
   const { readLibraryCollectionReceiptDetail } = await import(
-    "../../packages/db/src/repositories/library-collection-receipt-detail"
+    "../../site/packages/db/src/repositories/library-collection-receipt-detail"
   );
   const f = await restorationFixture(),
     detail = await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id),
@@ -1371,7 +1371,7 @@ it("rechecks restoration addition access before removing current references and 
 
 it("finds whole own resource memberships across active/archived collections and orphan references without private title search leakage", async () => {
   const { readLibraryCollectionInventory } = await import(
-    "../../packages/db/src/repositories/library-collection-inventory"
+    "../../site/packages/db/src/repositories/library-collection-inventory"
   );
   const f = await fixture(),
     fresh = await fixture();

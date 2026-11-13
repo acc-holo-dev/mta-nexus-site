@@ -54,7 +54,7 @@ it("delivers verification inbox through the shared worker repository without lea
   expect(JSON.stringify(stored)).not.toContain("PRIVATE_");
   expect(JSON.stringify(stored)).not.toContain(requesterId);
   const dispatcher = await readFile(
-    path.resolve(import.meta.dirname, "../../packages/db/scripts/run-web-push-dispatcher.ts"),
+    path.resolve(import.meta.dirname, "../../site/packages/db/scripts/run-web-push-dispatcher.ts"),
     "utf8",
   );
   expect(dispatcher).toContain("verificationNotificationDeliveryRepository");

@@ -1,14 +1,14 @@
 import { getTableColumns } from "drizzle-orm";
 import type { Build } from "@nexus/domain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { builds } from "../../packages/db/src/schema";
+import { builds } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   transactions: 0,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -29,7 +29,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { BuildRepository } from "../../packages/db/src/repositories/builds";
+import { BuildRepository } from "../../site/packages/db/src/repositories/builds";
 
 const repository = new BuildRepository();
 const pending: Omit<Build, "createdAt"> = {

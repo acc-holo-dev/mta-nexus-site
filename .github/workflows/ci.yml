@@ -150,7 +150,7 @@ jobs:
         id: upgrade_rehearsal
         run: |
           node --test scripts/tests/release-upgrade.node-test.mjs
-          node packages/db/scripts/check-release-upgrade.mjs
+          node site/packages/db/scripts/check-release-upgrade.mjs
         if: ${{ needs.plan.outputs.full == 'true' }}
       - name: Preserve upgrade rehearsal evidence
         if: ${{ always() && needs.plan.outputs.full == 'true' }}
@@ -213,12 +213,12 @@ jobs:
           export ACCOUNT_MAIL_BATCH_SIZE=2
           export ACCOUNT_MAIL_POLL_INTERVAL_MS=60000
 
-          node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once > /tmp/account-mail-once.json
+          node --import tsx site/packages/db/scripts/run-account-mail-dispatcher.ts --once > /tmp/account-mail-once.json
           grep -q '"status":"stopped"' /tmp/account-mail-once.json
           ! grep -F "$mail_key" /tmp/account-mail-once.json
           ! grep -F "$abuse_key" /tmp/account-mail-once.json
 
-          node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --ready > /tmp/account-mail-loop.json 2>/tmp/account-mail-loop.err &
+          node --import tsx site/packages/db/scripts/run-account-mail-dispatcher.ts --ready > /tmp/account-mail-loop.json 2>/tmp/account-mail-loop.err &
           worker=$!
           ready=0
           for attempt in $(seq 1 100); do
@@ -244,7 +244,7 @@ jobs:
           ! grep -F "$mail_key" /tmp/account-mail-loop.json
           ! grep -F "$abuse_key" /tmp/account-mail-loop.json
 
-          if env -u ACCOUNT_MAIL_KEY node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once >/tmp/account-mail-missing.out 2>/tmp/account-mail-missing.err; then
+          if env -u ACCOUNT_MAIL_KEY node --import tsx site/packages/db/scripts/run-account-mail-dispatcher.ts --once >/tmp/account-mail-missing.out 2>/tmp/account-mail-missing.err; then
             echo "worker unexpectedly accepted missing mail key"
             exit 1
           fi
@@ -253,7 +253,7 @@ jobs:
           echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
         if: ${{ needs.plan.outputs.full == 'true' }}
       - name: Verify Scenario Lab safety contract
-        run: node --test packages/db/scripts/scenario-lab-contract.node-test.mjs
+        run: node --test site/packages/db/scripts/scenario-lab-contract.node-test.mjs
         if: ${{ needs.plan.outputs.full == 'true' }}
       - name: Database behavior tests
         id: database_tests

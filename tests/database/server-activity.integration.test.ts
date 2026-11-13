@@ -2,8 +2,8 @@ import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 
 const active = vi.hoisted(() => ({ db: null as unknown }));
-vi.mock("../../packages/db/src/client", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../../packages/db/src/client")>();
+vi.mock("../../site/packages/db/src/client", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../site/packages/db/src/client")>();
   return {
     ...original,
     db: new Proxy(original.db, {
@@ -16,11 +16,11 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
   };
 });
 
-import { AuditRepository } from "../../packages/db/src/repositories/audit";
+import { AuditRepository } from "../../site/packages/db/src/repositories/audit";
 
 it("reads scoped private activity on PostgreSQL without losing tied or microsecond events", async () => {
-  const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
-    "../../packages/db/src/client",
+  const { db } = await vi.importActual<typeof import("../../site/packages/db/src/client")>(
+    "../../site/packages/db/src/client",
   );
   await db.transaction(
     async (tx) => {

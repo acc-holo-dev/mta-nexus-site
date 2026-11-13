@@ -1,12 +1,12 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { comments } from "../../packages/db/src/schema";
+import { comments } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -24,8 +24,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { contentRepository } from "../../packages/db/src/repositories/content";
-import { contentDiscussionRepository } from "../../packages/db/src/repositories/content-discussion";
+import { contentRepository } from "../../site/packages/db/src/repositories/content";
+import { contentDiscussionRepository } from "../../site/packages/db/src/repositories/content-discussion";
 
 const data = {
   id: "cmt",

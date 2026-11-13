@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("server control challenge migration contract", () => {
   it("persists digest/evidence metadata but no plaintext token column", () => {
-    const migration = read("packages/db/migrations/0019_server_claim_challenges.sql");
+    const migration = read("site/packages/db/migrations/0019_server_claim_challenges.sql");
 
     expect(migration).toContain('"token_digest" text NOT NULL');
     expect(migration).toContain('"source_fetched_at" timestamp with time zone');
@@ -17,7 +17,7 @@ describe("server control challenge migration contract", () => {
   });
 
   it("keeps migration 0019 in sequence when later migrations are added", () => {
-    const journal = JSON.parse(read("packages/db/migrations/meta/_journal.json"));
+    const journal = JSON.parse(read("site/packages/db/migrations/meta/_journal.json"));
     const challenge = journal.entries.find(
       (entry: { tag: string }) => entry.tag === "0019_server_claim_challenges",
     );

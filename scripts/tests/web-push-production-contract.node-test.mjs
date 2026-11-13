@@ -50,8 +50,8 @@ test("OPS-15 license and resource-release workers share push-worker hardening wi
   }
   assert.match(compose, /run-license-maintenance\.ts", "--loop"/u);
   assert.match(compose, /run-resource-release-worker\.ts", "--loop"/u);
-  assert.match(read("packages/db/scripts/run-license-maintenance.ts"), /SIGTERM/u);
-  assert.match(read("packages/db/scripts/run-resource-release-worker.ts"), /SIGTERM/u);
+  assert.match(read("site/packages/db/scripts/run-license-maintenance.ts"), /SIGTERM/u);
+  assert.match(read("site/packages/db/scripts/run-resource-release-worker.ts"), /SIGTERM/u);
   assert.match(
     read("scripts/check-license-worker-health.mjs"),
     /\/tmp\/nexus-license-worker-health\.json/u,

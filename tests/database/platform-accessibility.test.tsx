@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { Circle } from "lucide-react";
 import { describe, expect, it } from "vitest";
-import { StatCard, TrustBadge } from "../../packages/ui/src/platform";
+import { StatCard, TrustBadge } from "../../site/packages/ui/src/platform";
 
 describe("platform component non-text semantics", () => {
   it("keeps trust badge icons decorative because the visible label carries meaning", () => {

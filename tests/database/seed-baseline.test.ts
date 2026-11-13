@@ -5,7 +5,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 
 type Row = { id: string; [key: string]: unknown };
 const state = vi.hoisted(() => ({ rows: {} as Record<string, Row[]>, failAudit: false, locks: 0 }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (work: (tx: unknown) => Promise<unknown>) => {
       const rows = structuredClone(state.rows);
@@ -59,8 +59,8 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { seedBaseline } from "../../packages/db/src/seed-baseline";
-import { createSeedData } from "../../packages/db/src/seed-data";
+import { seedBaseline } from "../../site/packages/db/src/seed-baseline";
+import { createSeedData } from "../../site/packages/db/src/seed-data";
 
 function fixtures() {
   return createSeedData("test-password-hash", {

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createResourceReleaseControlRepositoryDbMock } = await import(
     "../helpers/resource-release-control-repository-harness"
   );
@@ -14,9 +14,9 @@ import {
   resourceModerationActionsFor,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
-import { unavailableBuildGuidance } from "../../packages/db/src/repositories/builds-lifecycle";
-import { ProductRepository } from "../../packages/db/src/repositories/products";
-import { ResourceModerationRepository } from "../../packages/db/src/repositories/resource-moderation";
+import { unavailableBuildGuidance } from "../../site/packages/db/src/repositories/builds-lifecycle";
+import { ProductRepository } from "../../site/packages/db/src/repositories/products";
+import { ResourceModerationRepository } from "../../site/packages/db/src/repositories/resource-moderation";
 import {
   command,
   liveSession,

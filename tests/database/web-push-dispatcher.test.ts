@@ -2,16 +2,16 @@ import { describe, expect, it, vi } from "vitest";
 import {
   WebPushDispatcher,
   type WebPushDispatchSummary,
-} from "../../packages/db/src/repositories/web-push-dispatcher";
+} from "../../site/packages/db/src/repositories/web-push-dispatcher";
 import type {
   PreparedWebPushJob,
   WebPushLease,
-} from "../../packages/db/src/repositories/web-push-worker";
+} from "../../site/packages/db/src/repositories/web-push-worker";
 import {
   WebPushPermanentPayloadError,
   WebPushPermanentSubscriptionError,
   parseWebPushEndpoint,
-} from "../../packages/db/src/web-push-runtime";
+} from "../../site/packages/db/src/web-push-runtime";
 
 function lease(id: string): WebPushLease {
   return {

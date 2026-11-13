@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -29,7 +29,7 @@ vi.mock("../../packages/db/src/client", async () => {
 import {
   readLibraryMembershipHistory,
   readLibraryMembershipHistoryDetail,
-} from "../../packages/db/src/repositories/library-membership-history";
+} from "../../site/packages/db/src/repositories/library-membership-history";
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
 const command = {

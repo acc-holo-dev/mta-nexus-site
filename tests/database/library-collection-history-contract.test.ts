@@ -3,7 +3,7 @@ import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,
 } from "../../site/src/lib/library-collection-history-query";
-import { libraryCollectionReceiptSchema } from "../../packages/validation/src/library-collections";
+import { libraryCollectionReceiptSchema } from "../../site/packages/validation/src/library-collections";
 it("defaults to a bounded thirty-day own history and preserves all filters in links", () => {
   expect(libraryCollectionHistoryQuery(new URLSearchParams())).toEqual({
     page: 1,

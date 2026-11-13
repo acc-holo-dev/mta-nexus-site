@@ -7,13 +7,13 @@ const state = vi.hoisted(() => ({
   lock: vi.fn(),
   push: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/notification-preference-lock", () => ({
+vi.mock("../../site/packages/db/src/repositories/notification-preference-lock", () => ({
   lockNotificationPreferencesForUsers: state.lock,
 }));
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -35,8 +35,8 @@ vi.mock("../../packages/db/src/client", async () => {
 });
 
 import { formatNotification } from "../../site/src/lib/notification-copy";
-import { db } from "../../packages/db/src/client";
-import { publicationNotice } from "../../packages/db/src/repositories/publication-notice";
+import { db } from "../../site/packages/db/src/client";
+import { publicationNotice } from "../../site/packages/db/src/repositories/publication-notice";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = {

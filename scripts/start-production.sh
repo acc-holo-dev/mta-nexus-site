@@ -22,7 +22,7 @@ fi
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
-cd "$root/packages/db"
+cd "$root/site/packages/db"
 test -d migrations
 test -n "$(find migrations -type f -name '*.sql' -print -quit)"
 # Validate the web process explicitly; the database client is also used by isolated workers.

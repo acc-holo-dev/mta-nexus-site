@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 
 const state = vi.hoisted(() => ({ provider: null as LocalStorageProvider | null, next: 0 }));
-vi.mock("../../packages/storage/src/provider-factory", () => ({
+vi.mock("../../site/packages/storage/src/provider-factory", () => ({
   getStorageProvider: () => {
     if (!state.provider) throw new Error("Test storage not initialized");
     return state.provider;
@@ -15,7 +15,7 @@ vi.mock("../../packages/storage/src/provider-factory", () => ({
 }));
 vi.mock("@nexus/security", () => ({ generateId: () => `ast_test_${++state.next}` }));
 
-import { StorageService } from "../../packages/storage/src/storage-service";
+import { StorageService } from "../../site/packages/storage/src/storage-service";
 
 let root: string;
 const service = new StorageService();

@@ -1,11 +1,11 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createLicenseControlsDbMock } = await import("../helpers/license-controls-harness");
   return createLicenseControlsDbMock();
 });
 
-import { LicenseControlsRepository } from "../../packages/db/src/repositories/license-controls";
+import { LicenseControlsRepository } from "../../site/packages/db/src/repositories/license-controls";
 import {
   future,
   now,

@@ -3,12 +3,12 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { setTimeout as delay } from "node:timers/promises";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateSessionToken } from "@nexus/security";
-import { db, sessions, users } from "../../packages/db/src/client";
+import { db, sessions, users } from "../../site/packages/db/src/client";
 import {
   accountRecoveryBindings,
   authChallenges,
-} from "../../packages/db/src/account-recovery-schema";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
+} from "../../site/packages/db/src/account-recovery-schema";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
 import {
   account,
   afterWait,

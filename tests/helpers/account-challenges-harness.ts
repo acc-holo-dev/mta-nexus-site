@@ -4,17 +4,17 @@ import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import { db, auditEvents } from "../../packages/db/src/client";
+import { db, auditEvents } from "../../site/packages/db/src/client";
 import {
   accountAuthState,
   accountRecoveryBindings,
   authChallenges,
-} from "../../packages/db/src/account-recovery-schema";
+} from "../../site/packages/db/src/account-recovery-schema";
 import {
   accountChallengeRepository as repo,
   type ConsumedProof,
-} from "../../packages/db/src/repositories/account-challenges";
-import { userRepository } from "../../packages/db/src/repositories/users";
+} from "../../site/packages/db/src/repositories/account-challenges";
+import { userRepository } from "../../site/packages/db/src/repositories/users";
 import { authService } from "../../site/src/lib/services/auth-service";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

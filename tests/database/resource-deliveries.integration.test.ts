@@ -15,7 +15,7 @@ import {
   products,
   resourceDeliveryReceipts,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 // Requires disposable PostgreSQL migrated through 0056; never run against an
 // operator's database. No payment, license issuance or subscription activation.
 function present<T>(value: T | null | undefined): T {

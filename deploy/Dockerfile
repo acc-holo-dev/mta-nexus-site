@@ -61,7 +61,7 @@ ENV NODE_ENV=production HOSTNAME=0.0.0.0
 COPY --from=build /app/site/.next/standalone/ /app/
 COPY --from=build /app/site/.next/static /app/site/.next/static
 # Keep the database runtime independently portable for migrations and the opt-in mail worker.
-COPY --from=build /runtime/db /app/packages/db
+COPY --from=build /runtime/db /app/site/packages/db
 COPY --from=build /app/scripts/start-production.sh /app/scripts/start-production.sh
 COPY --from=build /app/scripts/check-local-readiness.mjs /app/scripts/check-local-readiness.mjs
 COPY --from=build /app/scripts/check-account-mail-worker-health.mjs /app/scripts/check-account-mail-worker-health.mjs

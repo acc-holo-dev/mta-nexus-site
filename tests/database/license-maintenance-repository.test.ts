@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   results: [] as unknown[][][],
   push: vi.fn(),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -20,11 +20,11 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: database };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
-import { LicenseMaintenanceRepository } from "../../packages/db/src/repositories/license-maintenance";
-import { LicenseRepository } from "../../packages/db/src/repositories/licenses";
+import { LicenseMaintenanceRepository } from "../../site/packages/db/src/repositories/license-maintenance";
+import { LicenseRepository } from "../../site/packages/db/src/repositories/licenses";
 const repo = new LicenseMaintenanceRepository(),
   now = "2026-10-11T04:00:00.000Z",
   past = "2026-10-10T04:00:00.000Z",

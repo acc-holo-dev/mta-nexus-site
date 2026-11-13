@@ -22,8 +22,8 @@ function project(files) {
 }
 
 const databaseFiles = {
-  "packages/db/src/client.ts": 'import postgres from "postgres";',
-  "packages/db/src/index.ts": 'export { db } from "./client";',
+  "site/packages/db/src/client.ts": 'import postgres from "postgres";',
+  "site/packages/db/src/index.ts": 'export { db } from "./client";',
   "repository.ts": 'import { db } from "@nexus/db";',
 };
 
@@ -112,7 +112,7 @@ describe("isolated and shared-database test projects", () => {
     const root = project({
       ...databaseFiles,
       "types.test.ts":
-        'import type { db } from "@nexus/db";\nreadFileSync("packages/db/src/client.ts");',
+        'import type { db } from "@nexus/db";\nreadFileSync("site/packages/db/src/client.ts");',
     });
     assert.deepEqual(classifyTests(root).unit, ["types.test.ts"]);
   });
@@ -236,7 +236,9 @@ describe("isolated and shared-database test projects", () => {
   it("keeps all current repository tests and known shared queue suites", () => {
     const groups = classifyTests(process.cwd());
     assert.deepEqual([...groups.unit, ...groups.database].sort(), discoverTests(process.cwd()));
-    assert.ok(groups.database.includes("packages/db/src/repositories/account-mail-worker.test.ts"));
+    assert.ok(
+      groups.database.includes("site/packages/db/src/repositories/account-mail-worker.test.ts"),
+    );
     assert.ok(groups.database.includes("tests/database/password-change-transaction.test.ts"));
     // market-catalog-sql fully mocks the DB client (pure SQL-string construction),
     // so the classifier runs it in the parallel unit pool rather than serialized.

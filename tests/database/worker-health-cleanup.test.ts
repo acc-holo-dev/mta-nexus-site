@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, it } from "vitest";
-import { cleanupWorkerHealth } from "../../packages/db/scripts/worker-health-cleanup";
+import { cleanupWorkerHealth } from "../../site/packages/db/scripts/worker-health-cleanup";
 
 it("waits for an in-flight health rename before removing the snapshot", async () => {
   const directory = await mkdtemp(join(tmpdir(), "nexus-health-cleanup-"));

@@ -9,7 +9,7 @@ const captured = vi.hoisted(() => ({
   lock: null as SQL | null,
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (callback: (tx: unknown) => Promise<unknown>) =>
       callback({
@@ -46,11 +46,11 @@ vi.mock("../../packages/db/src/client", () => ({
       }),
   },
 }));
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: vi.fn(),
 }));
 
-import { VerificationRepository } from "../../packages/db/src/repositories/verification";
+import { VerificationRepository } from "../../site/packages/db/src/repositories/verification";
 import {
   auditEvents,
   organizationMembers,
@@ -58,7 +58,7 @@ import {
   users,
   verificationNotificationDeliveries,
   verificationRequests,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 describe("verification application serialization", () => {
   it("refuses a second application for the same target before writing an audit or request", async () => {

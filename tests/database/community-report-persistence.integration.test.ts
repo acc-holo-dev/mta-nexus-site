@@ -7,7 +7,7 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { sessionRepository } from "../../packages/db/src/repositories/sessions";
+import { sessionRepository } from "../../site/packages/db/src/repositories/sessions";
 import {
   auditEvents,
   comments,
@@ -15,7 +15,7 @@ import {
   products,
   reports,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 const actors: string[] = [],
   productIds: string[] = [];

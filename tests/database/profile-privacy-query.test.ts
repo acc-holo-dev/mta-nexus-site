@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,9 +28,9 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { developerProfileRepository as professional } from "../../packages/db/src/repositories/developer-profile";
-import { profilePrivacyRepository as privacy } from "../../packages/db/src/repositories/profile-privacy";
-import { publicationFeedRepository as feed } from "../../packages/db/src/repositories/publication-feed";
+import { developerProfileRepository as professional } from "../../site/packages/db/src/repositories/developer-profile";
+import { profilePrivacyRepository as privacy } from "../../site/packages/db/src/repositories/profile-privacy";
+import { publicationFeedRepository as feed } from "../../site/packages/db/src/repositories/publication-feed";
 
 const time = "2026-10-10T00:00:00.000Z",
   later = "2026-10-10T00:00:00.001Z";

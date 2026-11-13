@@ -7,7 +7,7 @@ const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 test("root and db package expose notifications:delivery operator CLI", () => {
   const root = JSON.parse(read("package.json"));
-  const db = JSON.parse(read("packages/db/package.json"));
+  const db = JSON.parse(read("site/packages/db/package.json"));
   assert.equal(
     root.scripts["notifications:delivery"],
     "pnpm --filter @nexus/db notifications:delivery",
@@ -19,7 +19,7 @@ test("root and db package expose notifications:delivery operator CLI", () => {
 });
 
 test("operator CLI validates reset ack before connecting and never bulk-resets", () => {
-  const script = read("packages/db/scripts/run-notification-delivery-operator.ts");
+  const script = read("site/packages/db/scripts/run-notification-delivery-operator.ts");
   assert.match(script, /assertResetAcknowledgement/u);
   assert.match(script, /Connect only after CLI options/u);
   assert.doesNotMatch(script, /reset all|UPDATE[\s\S]*attempts = 0(?![\s\S]*WHERE)/u);

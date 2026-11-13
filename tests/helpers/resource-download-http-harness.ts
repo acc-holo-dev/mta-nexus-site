@@ -43,7 +43,7 @@ export const resourceDownloadHttpDownloadStream = vi.fn();
 export const resourceDownloadHttpFindLatestPublishedBuild = vi.fn();
 export const resourceDownloadHttpFindPinnedPublishedBuild = vi.fn();
 
-/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createResourceDownloadHttpDbMock() {
   return {
     productRepository: {

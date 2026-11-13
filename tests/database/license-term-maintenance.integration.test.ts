@@ -8,7 +8,7 @@ import {
   notifications,
   notificationPreferences,
   products,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 // Disposable PostgreSQL migrated through 0054 only. These are explicit recorded
 // license fixtures, without provider, purchase, payout or entitlement issuance.

@@ -5,14 +5,14 @@ import { afterEach, expect, vi } from "vitest";
 import {
   verificationNotificationDeliveryRepository as delivery,
   VerificationNotificationDeliveryRepository,
-} from "../../packages/db/src/repositories/verification-notification-delivery";
+} from "../../site/packages/db/src/repositories/verification-notification-delivery";
 import {
   auditEvents,
   verificationNotificationDeliveries as jobs,
   notifications,
   users,
   verificationRequests,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 export {
   auditEvents,

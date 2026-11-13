@@ -20,7 +20,7 @@ import {
 import type { LibrarySelectionBatchCommand } from "@nexus/domain";
 import { asc, eq, sql } from "drizzle-orm";
 import { expect } from "vitest";
-import type { ResourceTransaction } from "../../packages/db/src/transaction";
+import type { ResourceTransaction } from "../../site/packages/db/src/transaction";
 
 export {
   batches,

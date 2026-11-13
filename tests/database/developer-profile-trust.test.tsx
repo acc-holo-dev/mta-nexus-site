@@ -72,7 +72,7 @@ vi.mock("@nexus/ui", () => ({
   ),
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select: () => ({
       from: () => ({
@@ -112,7 +112,7 @@ vi.mock("../../site/src/components/server-card", () => ({ ServerCard: () => null
 vi.mock("../../site/src/components/article-card", () => ({ ArticleCard: () => null }));
 
 import DevelopersPage from "../../site/src/app/developers/page";
-import { UserRepository } from "../../packages/db/src/repositories/users";
+import { UserRepository } from "../../site/packages/db/src/repositories/users";
 
 describe("creator directory trust behavior", () => {
   beforeEach(() => {

@@ -17,8 +17,8 @@ describe("production tracing and standalone runtime bounds", () => {
       "../docs/**/*",
       "../.git/**/*",
       "../.env*",
-      "../packages/db/migrations/**/*",
-      "../packages/db/scripts/**/*",
+      "./packages/db/migrations/**/*",
+      "./packages/db/scripts/**/*",
       "../uploads/**/*",
       "../.github/**/*",
       "../deploy/**/*",
@@ -30,8 +30,8 @@ describe("production tracing and standalone runtime bounds", () => {
   });
 
   it("keeps local storage and mail-secret file reads outside NFT project roots", () => {
-    const storage = read("packages/storage/src/local-provider.ts");
-    const mail = read("packages/db/src/repositories/account-mail-runtime.ts");
+    const storage = read("site/packages/storage/src/local-provider.ts");
+    const mail = read("site/packages/db/src/repositories/account-mail-runtime.ts");
     const dockerfile = read("deploy/Dockerfile");
 
     expect(storage).toContain("path.resolve(/* turbopackIgnore: true */ baseDir)");

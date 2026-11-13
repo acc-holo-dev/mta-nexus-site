@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { sessions, users } from "../../packages/db/src/schema";
+import { sessions, users } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
   fail: false,
 }));
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   return {
     db: drizzle(async (sql, params) => {
@@ -20,7 +20,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 vi.mock("@nexus/db", async () => ({
-  sessionRepository: (await import("../../packages/db/src/repositories/sessions"))
+  sessionRepository: (await import("../../site/packages/db/src/repositories/sessions"))
     .sessionRepository,
 }));
 
@@ -162,7 +162,7 @@ describe("authenticated session identity", () => {
 // Legacy callers still receive the full private session record when they need it.
 describe("legacy session lookup compatibility", () => {
   it("keeps the full session while excluding the user's password hash in SQL", async () => {
-    const { sessionRepository } = await import("../../packages/db/src/repositories/sessions");
+    const { sessionRepository } = await import("../../site/packages/db/src/repositories/sessions");
     state.rows = [joinedRow(new Date(NOW.getTime() + 1000), "usr_1", "ses_1", true)];
     expect(await sessionRepository.findValidSession(token)).toMatchObject({
       session: {
@@ -178,7 +178,7 @@ describe("legacy session lookup compatibility", () => {
     expect(state.queries[0].params).toEqual([storedToken, 1]);
   });
   it.each([-1, 0])("still denies expired legacy sessions (%s ms)", async (offset) => {
-    const { sessionRepository } = await import("../../packages/db/src/repositories/sessions");
+    const { sessionRepository } = await import("../../site/packages/db/src/repositories/sessions");
     state.rows = [joinedRow(new Date(NOW.getTime() + offset), "usr_1", "ses_1", true)];
     expect(await sessionRepository.findValidSession(token)).toBeNull();
   });
@@ -196,7 +196,7 @@ it.each(["not-a-date", "infinity", "-infinity"])(
 it.each(["not-a-date", "infinity", "-infinity"])(
   "fails closed for malformed or non-finite legacy expiry %s",
   async (value) => {
-    const { sessionRepository } = await import("../../packages/db/src/repositories/sessions");
+    const { sessionRepository } = await import("../../site/packages/db/src/repositories/sessions");
     const row = joinedRow(new Date(NOW.getTime() + 1000), "usr_1", "ses_1", true);
     row[Object.keys(getTableColumns(sessions)).indexOf("expiresAt")] = value;
     state.rows = [row];

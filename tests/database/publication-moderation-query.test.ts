@@ -5,10 +5,10 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   notice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/publication-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/publication-notice", () => ({
   publicationNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,8 +28,8 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { contentRepository } from "../../packages/db/src/repositories/content";
-import { content } from "../../packages/db/src/schema";
+import { contentRepository } from "../../site/packages/db/src/repositories/content";
+import { content } from "../../site/packages/db/src/schema";
 const time = "2026-10-11T00:00:00.000Z";
 const row = (extra: Record<string, unknown> = {}) =>
   Object.keys(getTableColumns(content)).map(

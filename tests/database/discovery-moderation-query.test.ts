@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   transactions: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -25,8 +25,8 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { publicDirectoryRepository as directory } from "../../packages/db/src/repositories/public-directory";
-import { communityModerationWorkspaceRepository as moderation } from "../../packages/db/src/repositories/community-moderation-workspace";
+import { publicDirectoryRepository as directory } from "../../site/packages/db/src/repositories/public-directory";
+import { communityModerationWorkspaceRepository as moderation } from "../../site/packages/db/src/repositories/community-moderation-workspace";
 const time = "2026-10-11T00:00:00.123456Z";
 const context = (parts: unknown[]) =>
   createHash("sha256").update(JSON.stringify(parts)).digest("hex");

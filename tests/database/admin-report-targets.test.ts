@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   selects: [] as Array<{ table: string; rows: unknown[] }>,
 }));
 
-vi.mock("../../packages/db/src/client", () => {
+vi.mock("../../site/packages/db/src/client", () => {
   function makeSelect(rows: unknown[]) {
     const chain: Record<string, unknown> = {};
     const self = () => chain;
@@ -26,7 +26,7 @@ vi.mock("../../packages/db/src/client", () => {
 });
 
 import type { Report } from "@nexus/domain";
-import { resolveAdminReportTargets } from "../../packages/db/src/repositories/admin-report-targets";
+import { resolveAdminReportTargets } from "../../site/packages/db/src/repositories/admin-report-targets";
 
 beforeEach(() => {
   state.selects = [];

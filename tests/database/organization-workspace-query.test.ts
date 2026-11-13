@@ -1,13 +1,13 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { organizationMembers, organizations } from "../../packages/db/src/schema";
+import { organizationMembers, organizations } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   config: null as unknown,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -27,9 +27,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/initiating-session", async (original) => {
+vi.mock("../../site/packages/db/src/repositories/initiating-session", async (original) => {
   const actual =
-    await original<typeof import("../../packages/db/src/repositories/initiating-session")>();
+    await original<typeof import("../../site/packages/db/src/repositories/initiating-session")>();
   return {
     lockInitiatingSession: (
       tx: Parameters<typeof actual.lockInitiatingSession>[0],
@@ -39,11 +39,11 @@ vi.mock("../../packages/db/src/repositories/initiating-session", async (original
       token === "unit-token" ? Promise.resolve() : actual.lockInitiatingSession(tx, actor, token),
   };
 });
-vi.mock("../../packages/db/src/repositories/organization-access-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: vi.fn(),
 }));
 
-import { organizationWorkspaceRepository as repository } from "../../packages/db/src/repositories/organization-workspace";
+import { organizationWorkspaceRepository as repository } from "../../site/packages/db/src/repositories/organization-workspace";
 
 const version = new Date("2026-10-10T12:00:00.000Z");
 const organization = {

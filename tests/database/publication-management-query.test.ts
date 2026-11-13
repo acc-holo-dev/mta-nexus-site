@@ -5,10 +5,10 @@ const state = vi.hoisted(() => ({
   failAudit: false,
   notice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/discussion-moderation-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/discussion-moderation-notice", () => ({
   discussionModerationNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -27,11 +27,11 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { publicationFeedRepository as feed } from "../../packages/db/src/repositories/publication-feed";
+import { publicationFeedRepository as feed } from "../../site/packages/db/src/repositories/publication-feed";
 import {
   discussionManagementRepository as management,
   discussionRevision,
-} from "../../packages/db/src/repositories/discussion-management";
+} from "../../site/packages/db/src/repositories/discussion-management";
 beforeEach(() => {
   state.queries = [];
   state.rows = [];

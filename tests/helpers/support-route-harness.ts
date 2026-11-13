@@ -40,7 +40,7 @@ export const supportMutationHeaders = {
   "x-nexus-actor-id": "usr_member",
 };
 
-/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/db", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createSupportRouteDbMock() {
   return {
     supportCaseRepository: {
@@ -58,7 +58,7 @@ export function createSupportRouteDbMock() {
   };
 }
 
-/** Factory for `vi.mock("@nexus/security", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("@nexus/security", …)` from suite files under `tests/unit` or `tests/database`. */
 export function createSupportRouteSecurityMock() {
   return {
     can: supportRouteMocks.can,

@@ -53,8 +53,8 @@ docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check
 ## Структура
 
 - `site` — страницы, интерфейс, HTTP API и сервисы.
-- `packages/db` — схема PostgreSQL, миграции, репозитории и работники.
-- `packages/domain`, `validation`, `security`, `storage`, `config`, `ui` — общие правила и компоненты.
+- `site/packages/db` — схема PostgreSQL, миграции, репозитории и работники.
+- `site/packages/domain`, `validation`, `security`, `storage`, `config`, `ui` — общие правила и компоненты.
 - `tests`, `scripts` — поведенческие проверки и инструменты эксплуатации.
 
 Слои и границы пакетов: [архитектура](docs/ARCHITECTURE.md). Таблица путей и CI: [карта проекта](docs/PROJECT-MAP.md).

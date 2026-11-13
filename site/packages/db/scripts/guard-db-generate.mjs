@@ -24,7 +24,7 @@ if (!custom) {
   if (!allowUnsafePlain) {
     console.error(`Refusing plain drizzle-kit generate.
 
-Meta snapshots lag the SQL journal (see packages/db/migrations/meta/).
+Meta snapshots lag the SQL journal (see site/packages/db/migrations/meta/).
 Supported authoring path:
   1. Work in a disposable checkout/branch (never rewrite applied SQL/journal).
   2. NEXUS_ALLOW_DB_GENERATE=1 pnpm --filter @nexus/db generate:custom -- --name <tag>

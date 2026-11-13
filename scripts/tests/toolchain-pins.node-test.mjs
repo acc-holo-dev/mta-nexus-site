@@ -24,7 +24,7 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
 const rootPackage = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-const dbPackage = JSON.parse(readFileSync(join(root, "packages/db/package.json"), "utf8"));
+const dbPackage = JSON.parse(readFileSync(join(root, "site/packages/db/package.json"), "utf8"));
 const dockerfile = readFileSync(join(root, "deploy", "Dockerfile"), "utf8");
 const composeProduction = readFileSync(join(root, "deploy", "compose.production.yaml"), "utf8");
 const composeDev = readFileSync(join(root, "deploy", "compose.yaml"), "utf8");

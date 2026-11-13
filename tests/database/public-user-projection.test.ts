@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { users } from "../../packages/db/src/schema";
+import { users } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
   failure: null as Error | null,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,9 +28,9 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { AuthRepository } from "../../packages/db/src/repositories/auth";
-import { toUserWithoutPassword } from "../../packages/db/src/repositories/public-user-projection";
-import { UserRepository } from "../../packages/db/src/repositories/users";
+import { AuthRepository } from "../../site/packages/db/src/repositories/auth";
+import { toUserWithoutPassword } from "../../site/packages/db/src/repositories/public-user-projection";
+import { UserRepository } from "../../site/packages/db/src/repositories/users";
 
 const repository = new UserRepository();
 const auth = new AuthRepository();

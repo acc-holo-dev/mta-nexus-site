@@ -7,11 +7,11 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("stores publication and reaction notices without raw content ids in messages", () => {
   const publication = readFileSync(
-    resolve("packages/db/src/repositories/publication-notice.ts"),
+    resolve("site/packages/db/src/repositories/publication-notice.ts"),
     "utf8",
   );
   const reaction = readFileSync(
-    resolve("packages/db/src/repositories/content-reaction-notice.ts"),
+    resolve("site/packages/db/src/repositories/content-reaction-notice.ts"),
     "utf8",
   );
   expect(publication).toContain('kind: "publication_activity"');

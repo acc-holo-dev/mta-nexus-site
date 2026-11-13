@@ -108,13 +108,13 @@ test("release evidence blocks migrations and DB tests before launching commands 
     "scripts/disposable-test-database.mjs",
     "scripts/toolchain-policy.mjs",
     "scripts/infra-image-policy.mjs",
-    "packages/db/scripts/release-upgrade-contract.mjs",
+    "site/packages/db/scripts/release-upgrade-contract.mjs",
   ]) {
     mkdirSync(dirname(join(root, file)), { recursive: true });
     copyFileSync(join(projectRoot, file), join(root, file));
   }
-  mkdirSync(join(root, "packages/db/migrations"), { recursive: true });
-  writeFileSync(join(root, "packages/db/migrations/0001.sql"), "select 1;\n");
+  mkdirSync(join(root, "site/packages/db/migrations"), { recursive: true });
+  writeFileSync(join(root, "site/packages/db/migrations/0001.sql"), "select 1;\n");
   writeFileSync(
     join(root, "package.json"),
     JSON.stringify({

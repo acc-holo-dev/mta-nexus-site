@@ -7,10 +7,10 @@ const state = vi.hoisted(() => ({
   config: null as unknown,
   notice: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/discussion-moderation-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/discussion-moderation-notice", () => ({
   discussionModerationNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -31,11 +31,11 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { communityModerationWorkspaceRepository as repository } from "../../packages/db/src/repositories/community-moderation-workspace";
+import { communityModerationWorkspaceRepository as repository } from "../../site/packages/db/src/repositories/community-moderation-workspace";
 import {
   discussionManagementRepository as management,
   moderationDiscussionRevision,
-} from "../../packages/db/src/repositories/discussion-management";
+} from "../../site/packages/db/src/repositories/discussion-management";
 
 const time = "2026-10-11T00:00:00.123456Z",
   publication = ["post", "Private publication", "guide", "post", "archived"];

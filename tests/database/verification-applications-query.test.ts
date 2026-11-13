@@ -8,7 +8,7 @@ const state = vi.hoisted(() => ({
   options: [] as unknown[],
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -33,15 +33,15 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
 
-import { developerExperienceRevision } from "../../packages/db/src/repositories/developer-profile";
-import { VerificationRepository } from "../../packages/db/src/repositories/verification";
-import { verificationApplicationRevision as version } from "../../packages/db/src/repositories/verification-application-version";
-import { verificationWorkspaceRepository as repo } from "../../packages/db/src/repositories/verification-workspace";
-import { verificationRequests } from "../../packages/db/src/schema";
+import { developerExperienceRevision } from "../../site/packages/db/src/repositories/developer-profile";
+import { VerificationRepository } from "../../site/packages/db/src/repositories/verification";
+import { verificationApplicationRevision as version } from "../../site/packages/db/src/repositories/verification-application-version";
+import { verificationWorkspaceRepository as repo } from "../../site/packages/db/src/repositories/verification-workspace";
+import { verificationRequests } from "../../site/packages/db/src/schema";
 
 const time = "2026-10-11T00:00:00.123456Z",
   filters = { query: "", status: "all", type: "all" },

@@ -9,7 +9,7 @@ import {
   resourceReleaseWatchesRepository as watches,
 } from "@nexus/db";
 import { and, count, eq, or, sql } from "drizzle-orm";
-import { resourceReleaseWorkerRepository as worker } from "../../packages/db/src/repositories/resource-release-worker";
+import { resourceReleaseWorkerRepository as worker } from "../../site/packages/db/src/repositories/resource-release-worker";
 import {
   auditEvents,
   builds,
@@ -20,7 +20,7 @@ import {
   resourceReleaseEvents,
   resourceReleaseWatches,
   users,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 // Isolated disposable PostgreSQL migrated through 0057. No purchase/provider,
 // license issuance, subscription activation or browser delivery is simulated.

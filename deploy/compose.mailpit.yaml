@@ -58,7 +58,7 @@ services:
       target: development
     init: true
     restart: "no"
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-account-mail-dispatcher.ts", "--ready"]
     stop_grace_period: 75s
     environment:
@@ -76,11 +76,11 @@ services:
       ACCOUNT_MAIL_POLL_INTERVAL_MS: 1000
     volumes:
       - dev_mail:/data/dev-mail:ro
-      - ../packages/db/src:/app/packages/db/src:ro
-      - ../packages/db/scripts:/app/packages/db/scripts:ro
-      - ../packages/config/src:/app/packages/config/src:ro
-      - ../packages/domain/src:/app/packages/domain/src:ro
-      - ../packages/security/src:/app/packages/security/src:ro
+      - ../site/packages/db/src:/app/site/packages/db/src:ro
+      - ../site/packages/db/scripts:/app/site/packages/db/scripts:ro
+      - ../site/packages/config/src:/app/site/packages/config/src:ro
+      - ../site/packages/domain/src:/app/site/packages/domain/src:ro
+      - ../site/packages/security/src:/app/site/packages/security/src:ro
     depends_on:
       app:
         condition: service_healthy

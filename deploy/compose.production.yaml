@@ -88,7 +88,7 @@ services:
     pids_limit: 128
     stop_signal: SIGTERM
     stop_grace_period: 75s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-web-push-dispatcher.ts", "--ready"]
     environment:
       NODE_ENV: production
@@ -156,7 +156,7 @@ services:
     pids_limit: 128
     stop_signal: SIGTERM
     stop_grace_period: 75s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-license-maintenance.ts", "--loop"]
     environment:
       NODE_ENV: production
@@ -194,7 +194,7 @@ services:
     pids_limit: 128
     stop_signal: SIGTERM
     stop_grace_period: 75s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-resource-release-worker.ts", "--loop"]
     environment:
       NODE_ENV: production

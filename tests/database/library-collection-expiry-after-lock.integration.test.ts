@@ -13,7 +13,7 @@ import {
 } from "@nexus/db";
 import { eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { applyLibraryMembershipBatch } from "../../packages/db/src/repositories/library-membership-batches";
+import { applyLibraryMembershipBatch } from "../../site/packages/db/src/repositories/library-membership-batches";
 
 function deferred() {
   let resolve!: () => void;

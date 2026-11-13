@@ -1,7 +1,8 @@
 # NEXUS: план архитектурного рефакторинга
 
 **Направление принято владельцем.** Phase 0 — foundation; затем разрешено автономное
-локальное продолжение. Phase 1 подготовлена: `apps/web` → `site`. Владелец явно
+локальное продолжение. Phase 1 проверена: `apps/web` → `site`. По следующему поручению
+выполняется Phase 2.1: `packages` → `site/packages`. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -102,7 +103,8 @@ pnpm-lock.yaml
 
 `@nexus/*` сохраняются. Корневые конфиги остаются, где нужны инструментам.
 `site/packages/config` и `config/env` имеют разные обязанности. На текущей границе
-подготовлен только app→site; пакеты, tests и инфраструктура остаются как на main.
+приложение и пакеты находятся в `site`; tests и инфраструктура остаются
+на прежних местах до отдельных этапов.
 
 ## 4. Migration Map и интеграционные границы
 
@@ -239,5 +241,24 @@ planning negatives, default build/image/runtime/anonymous browser/HMR. Эти р
 
 Новая версия использует Node 26.11.1/pnpm 12.4.2. Полный hosted CI запрашивается на
 отдельной ветке и draft PR по разрешению владельца; результаты должны быть привязаны
-к head SHA. Phase 2 ждёт принятия этой границы. До verified CI эта интеграция не
-объявляется полностью принятой; production и GitHub settings остаются вне scope.
+к head SHA. Phase 1 прошла полный [CI #4629](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43369295244)
+на head `db136afc`: 8 271 unit, 524 tooling, 1 155 DB tests и все browser/Compose gates.
+Phase 2.1 продолжена по поручению владельца в том же draft PR; её результат требует
+нового полного CI на новом SHA. Production и GitHub settings остаются вне scope.
+
+### Phase 2.1: граница пакетов
+
+Workspace — `site` + `site/packages/*`; package names и dependency versions сохраняются.
+Прежние importer keys и web links в lockfile меняются без нового разрешения зависимостей.
+TS aliases и Vitest DB marker используют вложенные пакеты; `site/tsconfig.json`
+исключает `packages` из автоматического include, сохраняя проверку импортированных
+модулей. Корневой typecheck продолжает проверять исходники пакетов.
+
+Next tracing root остаётся корнем репозитория: standalone entry — `/app/site/server.js`.
+Отдельный production DB payload разворачивается в `/app/site/packages/db`, включая SQL,
+tsx и worker entrypoints; все Compose working_dir и operator scripts используют этот путь.
+Исторические fixtures проверяют обе структуры; архитектурные ограничения не ослабляются.
+
+Состав до/после переноса сверяется по именам после единственного mapping `packages/` →
+`site/packages/`: 1 135 unit-файлов, 253 DB-файла, 69 tooling suites. SQL, package manifests
+и canonical tracker не меняют содержания. Tests остаются в корне; их перенос — Phase 2.2.

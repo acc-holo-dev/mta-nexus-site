@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 import { db, sessionRepository, userRepository, webPushSubscriptionRepository } from "@nexus/db";
 import { eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
-import { sessions, users, webPushSubscriptions } from "../../packages/db/src/schema";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
+import { sessions, users, webPushSubscriptions } from "../../site/packages/db/src/schema";
 
 function deferred() {
   let resolve!: () => void;

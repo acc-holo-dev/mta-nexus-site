@@ -10,7 +10,7 @@ import { afterEach, expect, vi } from "vitest";
 import {
   supportNotificationDeliveryRepository as delivery,
   SupportNotificationDeliveryRepository,
-} from "../../packages/db/src/repositories/support-notification-delivery";
+} from "../../site/packages/db/src/repositories/support-notification-delivery";
 import {
   auditEvents,
   supportNotificationDeliveries as jobs,
@@ -20,7 +20,7 @@ import {
   supportMutationRequests,
   users,
   webPushOutbox,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 export {
   auditEvents,

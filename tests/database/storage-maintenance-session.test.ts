@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -24,7 +24,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { StorageMaintenanceRepository } from "../../packages/db/src/repositories/storage-maintenance";
+import { StorageMaintenanceRepository } from "../../site/packages/db/src/repositories/storage-maintenance";
 
 const repo = new StorageMaintenanceRepository();
 const now = new Date("2026-10-26T12:00:00Z");

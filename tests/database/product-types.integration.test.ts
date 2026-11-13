@@ -2,9 +2,12 @@ import { readFileSync } from "node:fs";
 import { sql } from "drizzle-orm";
 import { expect, it } from "vitest";
 import { PRODUCT_TYPES } from "@nexus/domain";
-import { db } from "../../packages/db/src/client";
+import { db } from "../../site/packages/db/src/client";
 
-const migration = readFileSync("packages/db/migrations/0024_product_type_invariant.sql", "utf8");
+const migration = readFileSync(
+  "site/packages/db/migrations/0024_product_type_invariant.sql",
+  "utf8",
+);
 
 it("normalizes the legacy alias and enforces types on inserts and updates", async () => {
   await db.transaction(async (tx) => {

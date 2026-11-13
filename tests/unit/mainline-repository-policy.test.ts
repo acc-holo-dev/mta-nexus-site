@@ -117,8 +117,8 @@ describe("mainline repository policy", () => {
     const compose = read("deploy/compose.yaml");
     expect(compose).toContain('WATCHPACK_POLLING: "true"');
     expect(compose).toContain("./site/src:/app/site/src:ro");
-    expect(compose).toContain("./packages/db/src:/app/packages/db/src:ro");
-    expect(compose).toContain("./packages/ui/src:/app/packages/ui/src:ro");
+    expect(compose).toContain("./site/packages/db/src:/app/site/packages/db/src:ro");
+    expect(compose).toContain("./site/packages/ui/src:/app/site/packages/ui/src:ro");
   });
 
   it("documents main as the only maintained development branch", () => {

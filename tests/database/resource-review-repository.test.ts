@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   clock: null as null | (() => void),
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -24,7 +24,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { resourceReviewsRepository as repo } from "../../packages/db/src/repositories/resource-reviews";
+import { resourceReviewsRepository as repo } from "../../site/packages/db/src/repositories/resource-reviews";
 
 const product = ["prd_a", "Resource", "resource", "published", "usr_publisher", null];
 const input = {
@@ -265,7 +265,7 @@ it("removal, aggregate repair, report resolution and audit share one transaction
 });
 
 it("generic report reads and resolution exclude commercial review cases", async () => {
-  const { ReportRepository } = await import("../../packages/db/src/repositories/reports");
+  const { ReportRepository } = await import("../../site/packages/db/src/repositories/reports");
   const legacy = new ReportRepository();
   state.rows = [[], [], [], [["moderator"]], [], [["ses_a", "2099-01-01T00:00:00.000Z"]], []];
   await legacy.countOpen();

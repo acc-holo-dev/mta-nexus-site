@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   apply: vi.fn(),
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -34,9 +34,9 @@ vi.mock("../../packages/db/src/client", async () => {
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 
-vi.mock("../../packages/db/src/repositories/library-collection-command", async (original) => ({
+vi.mock("../../site/packages/db/src/repositories/library-collection-command", async (original) => ({
   ...(await original<
-    typeof import("../../packages/db/src/repositories/library-collection-command")
+    typeof import("../../site/packages/db/src/repositories/library-collection-command")
   >()),
   prepareLibraryCollectionCommand: async (...args: unknown[]) => {
     const result = await state.apply(...args);
@@ -44,8 +44,8 @@ vi.mock("../../packages/db/src/repositories/library-collection-command", async (
   },
 }));
 
-import { applyLibraryMembershipBatch } from "../../packages/db/src/repositories/library-membership-batches";
-import { libraryMembershipBatchReceipts } from "../../packages/db/src/schema";
+import { applyLibraryMembershipBatch } from "../../site/packages/db/src/repositories/library-membership-batches";
+import { libraryMembershipBatchReceipts } from "../../site/packages/db/src/schema";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",

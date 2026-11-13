@@ -1,6 +1,6 @@
 import type { Build, ResourceVariantCommand } from "@nexus/domain";
 import { getTableColumns } from "drizzle-orm";
-import type { builds, products, productVariantGroups } from "../../packages/db/src/schema";
+import type { builds, products, productVariantGroups } from "../../site/packages/db/src/schema";
 
 /** Shared pg-proxy query capture for resource-management repository suites. */
 export const resourceManagementState = {
@@ -9,7 +9,7 @@ export const resourceManagementState = {
   options: [] as unknown[],
 };
 
-/** Factory for `vi.mock("../packages/db/src/client", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("../../site/packages/db/src/client", …)` from suite files under `tests/unit` or `tests/database`. */
 export async function createResourceManagementDbMock() {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {

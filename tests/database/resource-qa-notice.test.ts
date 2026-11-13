@@ -7,13 +7,13 @@ const state = vi.hoisted(() => ({
   push: vi.fn(),
 }));
 
-vi.mock("../../packages/db/src/repositories/notification-preference-lock", () => ({
+vi.mock("../../site/packages/db/src/repositories/notification-preference-lock", () => ({
   lockNotificationPreferencesForUsers: state.lock,
 }));
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -29,8 +29,8 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { db } from "../../packages/db/src/client";
-import { notifyResourceQaEvent } from "../../packages/db/src/repositories/resource-qa-notice";
+import { db } from "../../site/packages/db/src/client";
+import { notifyResourceQaEvent } from "../../site/packages/db/src/repositories/resource-qa-notice";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

@@ -1,12 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
-import type { db as Database } from "../../packages/db/src/client";
-import { users, products, builds, auditEvents } from "../../packages/db/src/schema";
-import { createSeedData } from "../../packages/db/src/seed-data";
+import type { db as Database } from "../../site/packages/db/src/client";
+import { users, products, builds, auditEvents } from "../../site/packages/db/src/schema";
+import { createSeedData } from "../../site/packages/db/src/seed-data";
 
 type Transaction = Parameters<Parameters<typeof Database.transaction>[0]>[0];
 const scope = vi.hoisted(() => ({ tx: null as Transaction | null }));
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: (work: (tx: Transaction) => Promise<unknown>) => {
       if (!scope.tx) throw new Error("Isolated seed transaction not initialized");
@@ -14,11 +14,11 @@ vi.mock("../../packages/db/src/client", () => ({
     },
   },
 }));
-import { seedBaseline } from "../../packages/db/src/seed-baseline";
+import { seedBaseline } from "../../site/packages/db/src/seed-baseline";
 
 it("repeats and repairs the seed within isolated PostgreSQL tables", async () => {
-  const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
-    "../../packages/db/src/client",
+  const { db } = await vi.importActual<typeof import("../../site/packages/db/src/client")>(
+    "../../site/packages/db/src/client",
   );
   await db.transaction(async (tx) => {
     // LIKE copies indexes/checks but not foreign keys. These are disposable test tables.

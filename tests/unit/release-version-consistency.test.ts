@@ -5,13 +5,13 @@ import { resolve } from "node:path";
 const packagePaths = [
   "package.json",
   "site/package.json",
-  "packages/config/package.json",
-  "packages/db/package.json",
-  "packages/domain/package.json",
-  "packages/security/package.json",
-  "packages/storage/package.json",
-  "packages/ui/package.json",
-  "packages/validation/package.json",
+  "site/packages/config/package.json",
+  "site/packages/db/package.json",
+  "site/packages/domain/package.json",
+  "site/packages/security/package.json",
+  "site/packages/storage/package.json",
+  "site/packages/ui/package.json",
+  "site/packages/validation/package.json",
 ] as const;
 
 describe("release workspace version consistency", () => {

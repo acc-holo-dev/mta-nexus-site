@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 function readBuildsRepositoryModules(): string {
   return ["builds.ts", "builds-queries.ts", "builds-moderation.ts", "builds-lifecycle.ts"]
-    .map((name) => read(`packages/db/src/repositories/${name}`))
+    .map((name) => read(`site/packages/db/src/repositories/${name}`))
     .join("\n");
 }
 

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 
 let root: string;
 let storage: LocalStorageProvider;

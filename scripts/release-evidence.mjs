@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_UPGRADE_BASELINE_TAG,
   RELEASE_UPGRADE_TARGET_TAG,
-} from "../packages/db/scripts/release-upgrade-contract.mjs";
+} from "../site/packages/db/scripts/release-upgrade-contract.mjs";
 import { assertDisposableTestDatabase } from "./disposable-test-database.mjs";
 import { evaluateInfraImagePins, readInfraImagePins } from "./infra-image-policy.mjs";
 import {
@@ -31,7 +31,7 @@ const root = resolve(here, "..");
 const outputPath = join(root, "artifacts", "release-evidence.json");
 const packageJsonPath = join(root, "package.json");
 const lockfilePath = join(root, "pnpm-lock.yaml");
-const migrationsDir = join(root, "packages", "db", "migrations");
+const migrationsDir = join(root, "site", "packages", "db", "migrations");
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 

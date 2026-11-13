@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ queries: [] as { sql: string; params: unknown[] }[] }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   return {
     db: drizzle(async (sql, params) => {
@@ -11,7 +11,7 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { ContentRepository } from "../../packages/db/src/repositories/content";
+import { ContentRepository } from "../../site/packages/db/src/repositories/content";
 
 it("checks topic slug and ownership together in one bounded query", async () => {
   expect(

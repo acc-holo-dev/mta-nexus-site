@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mapPublicResourceAttribution } from "../../site/src/lib/public-resource-attribution";
-import { buttonClassName } from "../../packages/ui/src/button";
+import { buttonClassName } from "../../site/packages/ui/src/button";
 
 describe("mapPublicResourceAttribution", () => {
   it("maps public org and developer author paths without private fields", () => {

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import type { Readable } from "node:stream";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
+import { LocalStorageProvider } from "../../site/packages/storage/src/local-provider";
 
 let root: string;
 let storage: LocalStorageProvider;

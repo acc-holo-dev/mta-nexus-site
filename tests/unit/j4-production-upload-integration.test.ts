@@ -15,7 +15,7 @@ describe("J4 production upload integration candidate", () => {
     expect(caddy).toContain("max_size 68157440");
 
     expect(startup).toContain("test -f /app/site/server.js");
-    expect(startup).toContain("test -f /app/packages/db/node_modules/tsx/package.json");
+    expect(startup).toContain("test -f /app/site/packages/db/node_modules/tsx/package.json");
     expect(startup).toContain("production runtime unexpectedly contains pnpm");
     expect(startup).toContain("oversized-request.bin");
     expect(startup).toContain("oversized_code");
@@ -23,7 +23,7 @@ describe("J4 production upload integration candidate", () => {
   });
 
   it("keeps the database deploy payload executable without a runtime package manager", () => {
-    const dbPackage = JSON.parse(read("packages/db/package.json"));
+    const dbPackage = JSON.parse(read("site/packages/db/package.json"));
     const entrypoint = read("scripts/start-production.sh");
 
     expect(dbPackage.dependencies.tsx).toMatch(/^\^4\.\d+\.\d+$/u);

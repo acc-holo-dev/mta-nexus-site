@@ -13,7 +13,7 @@ import {
 import type { LibraryCollectionCommand } from "@nexus/domain";
 import { and, eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { readLibraryCollectionInventory } from "../../packages/db/src/repositories/library-collection-inventory";
+import { readLibraryCollectionInventory } from "../../site/packages/db/src/repositories/library-collection-inventory";
 
 function present<T>(value: T | undefined): T {
   if (value === undefined) throw Error("Missing fixture value");

@@ -6,13 +6,13 @@ const state = vi.hoisted(() => ({
   notice: vi.fn(),
   session: vi.fn(),
 }));
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: state.session,
 }));
-vi.mock("../../packages/db/src/repositories/content-reaction-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/content-reaction-notice", () => ({
   contentReactionNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -36,9 +36,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { contentReactionsRepository as reactions } from "../../packages/db/src/repositories/content-reactions";
-import { publicUserTrustRepository as trust } from "../../packages/db/src/repositories/public-user-trust";
-import { authorContentRepository } from "../../packages/db/src/repositories/author-content";
+import { contentReactionsRepository as reactions } from "../../site/packages/db/src/repositories/content-reactions";
+import { publicUserTrustRepository as trust } from "../../site/packages/db/src/repositories/public-user-trust";
+import { authorContentRepository } from "../../site/packages/db/src/repositories/author-content";
 const command = {
   actorId: "actor",
   currentToken: "actor-token",

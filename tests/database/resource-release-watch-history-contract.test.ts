@@ -85,7 +85,10 @@ it("strictly parses period, source and recorded-resource filters", () => {
     expect(() => query(new URLSearchParams(value))).toThrow();
 });
 it("registers a literal own-watch audit index suitable for prepared history queries", () => {
-  const sql = readFileSync("packages/db/migrations/0072_release_watch_history_index.sql", "utf8");
+  const sql = readFileSync(
+    "site/packages/db/migrations/0072_release_watch_history_index.sql",
+    "utf8",
+  );
   expect(sql).toContain("actor_id,created_at DESC,id DESC");
   expect(sql).toContain("actor_type='user'");
   for (const action of [
@@ -94,7 +97,9 @@ it("registers a literal own-watch audit index suitable for prepared history quer
     "library.collection_release_watches_enabled",
   ])
     expect(sql).toContain(action);
-  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  const journal = JSON.parse(
+    readFileSync("site/packages/db/migrations/meta/_journal.json", "utf8"),
+  );
   expect(
     journal.entries.filter(
       (entry: { tag: string }) => entry.tag === "0072_release_watch_history_index",
@@ -113,12 +118,14 @@ it("records group resume as enabled batch changes and indexes the expanded liter
     collection: null,
   });
   const migration = readFileSync(
-    "packages/db/migrations/0073_release_watch_resume_history.sql",
+    "site/packages/db/migrations/0073_release_watch_resume_history.sql",
     "utf8",
   );
   expect(migration).toContain("DROP INDEX audit_events_release_watch_history_idx");
   expect(migration).toContain("library.release_watches_resumed");
-  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  const journal = JSON.parse(
+    readFileSync("site/packages/db/migrations/meta/_journal.json", "utf8"),
+  );
   expect(
     journal.entries.filter(
       (entry: { tag: string }) => entry.tag === "0073_release_watch_resume_history",

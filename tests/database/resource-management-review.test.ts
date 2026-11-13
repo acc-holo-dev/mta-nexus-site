@@ -1,12 +1,12 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createResourceManagementDbMock } = await import("../helpers/resource-management-harness");
   return createResourceManagementDbMock();
 });
 
-import { BuildReviewDownloadRepository } from "../../packages/db/src/repositories/build-review-download";
-import { builds } from "../../packages/db/src/schema";
+import { BuildReviewDownloadRepository } from "../../site/packages/db/src/repositories/build-review-download";
+import { builds } from "../../site/packages/db/src/schema";
 import {
   artifact,
   resetResourceManagementState,

@@ -2,13 +2,13 @@ import { sameResourcePublisher } from "@nexus/domain";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createResourceManagementDbMock } = await import("../helpers/resource-management-harness");
   return createResourceManagementDbMock();
 });
 
-import { ResourceVariantsRepository } from "../../packages/db/src/repositories/resource-variants";
-import { productVariantGroups } from "../../packages/db/src/schema";
+import { ResourceVariantsRepository } from "../../site/packages/db/src/repositories/resource-variants";
+import { productVariantGroups } from "../../site/packages/db/src/schema";
 import {
   actor,
   input,

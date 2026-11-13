@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createLibraryCollectionsRepositoryDbMock } = await import(
     "../helpers/library-collections-repository-harness"
   );
   return createLibraryCollectionsRepositoryDbMock();
 });
 
-import { LibraryCollectionsRepository } from "../../packages/db/src/repositories/library-collections";
+import { LibraryCollectionsRepository } from "../../site/packages/db/src/repositories/library-collections";
 import {
   copyCommand,
   copyItems,

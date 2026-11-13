@@ -57,7 +57,7 @@ const submitState = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     submitState.queries.push({ sql, params });
@@ -74,8 +74,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { submitForReview } from "../../packages/db/src/repositories/builds-moderation";
-import { builds } from "../../packages/db/src/schema";
+import { submitForReview } from "../../site/packages/db/src/repositories/builds-moderation";
+import { builds } from "../../site/packages/db/src/schema";
 
 describe("build upload final initiating-session gate", () => {
   const pending: Omit<Build, "createdAt"> = {

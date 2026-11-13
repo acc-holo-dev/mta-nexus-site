@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
-import { libraryCollectionReconcilePreviewSchema } from "../../packages/validation/src/library-collections";
+import { libraryCollectionReconcilePreviewSchema } from "../../site/packages/validation/src/library-collections";
 const report = {
   schemaVersion: 1,
   generatedAt: "2026-10-13T00:00:00.000Z",
@@ -35,7 +35,7 @@ it("strictly validates union membership and masks inaccessible labels", () => {
 });
 it("retains prior immutable/move guards and adds bounded disjoint reconciliation postconditions", () => {
   const sql = readFileSync(
-    "packages/db/migrations/0078_library_collection_reconciliation.sql",
+    "site/packages/db/migrations/0078_library_collection_reconciliation.sql",
     "utf8",
   );
   expect(sql).toContain("action='reconcile-items'");

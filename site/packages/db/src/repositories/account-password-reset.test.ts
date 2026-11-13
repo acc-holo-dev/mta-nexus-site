@@ -6,7 +6,7 @@ import { accountMailOutbox } from "../account-mail-schema";
 import { authChallenges } from "../account-recovery-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { accountChallengeRepository } from "./account-challenges";
-import { authService } from "../../../../site/src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/auth-service";
 import { userRepository } from "./users";
 import { webPushSubscriptionRepository } from "./web-push-subscriptions";
 import { generateId } from "@nexus/security";

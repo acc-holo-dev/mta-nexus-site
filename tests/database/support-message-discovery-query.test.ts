@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { supportCases } from "../../packages/db/src/schema";
+import { supportCases } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   config: undefined as unknown,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -28,14 +28,14 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
+vi.mock("../../site/packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: vi
     .fn()
     .mockResolvedValue({ queued: 0, reason: "no_subscriptions" }),
 }));
 
-import { supportCaseRepository as cases } from "../../packages/db/src/repositories/support";
-import { supportMessageDiscoveryRepository as discovery } from "../../packages/db/src/repositories/support-message-discovery";
+import { supportCaseRepository as cases } from "../../site/packages/db/src/repositories/support";
+import { supportMessageDiscoveryRepository as discovery } from "../../site/packages/db/src/repositories/support-message-discovery";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

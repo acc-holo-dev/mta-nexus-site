@@ -30,13 +30,13 @@ describe("server ownership hardening surface", () => {
     expect(service).toContain("organizationRepository.findServerMembershipForUser(");
     expect(service).not.toContain("organizationRepository.listUserMemberships(actor.id)");
     expect(service).toContain('can(actor, "server.manage", server, {');
-    const orgRepo = read("packages/db/src/repositories/organizations.ts");
+    const orgRepo = read("site/packages/db/src/repositories/organizations.ts");
     expect(orgRepo).toContain("eq(organizationMembers.organizationId, organizationId)");
     expect(orgRepo).toContain("eq(organizationMembers.userId, userId)");
     expect(orgRepo).toContain(".limit(1)");
     expect(service).toContain("serverRepository.updateManagedWithAudit(");
     expect(service).not.toContain("await this.canManageServer(server, actor)");
-    const repo = read("packages/db/src/repositories/servers.ts");
+    const repo = read("site/packages/db/src/repositories/servers.ts");
     expect(repo).toContain('for("update")');
     expect(repo).toContain('for("share")');
     expect(repo).toContain('"SERVER_METADATA_CONFLICT"');
@@ -45,7 +45,7 @@ describe("server ownership hardening surface", () => {
   });
 
   it("serializes server claims in the repository and checks pending claims across requesters", () => {
-    const repository = read("packages/db/src/repositories/verification.ts");
+    const repository = read("site/packages/db/src/repositories/verification.ts");
     const route = read("site/src/app/api/verification/route.ts");
 
     expect(repository).toContain("pg_advisory_xact_lock");

@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import { PRODUCT_TYPES, isProductType } from "@nexus/domain";
 import { createProductSchema } from "@nexus/validation";
 import { getTableConfig, PgDialect } from "drizzle-orm/pg-core";
-import { products } from "../../packages/db/src/schema";
+import { products } from "../../site/packages/db/src/schema";
 import { parseMarketQuery } from "../../site/src/lib/market-query";
 import { getDictionary } from "../../site/src/lib/i18n";
 import {
@@ -31,7 +31,10 @@ it.each(["tool", "SCRIPT", "", null, ["script"], "unknown"])("rejects invalid ty
 });
 
 it("keeps the forward migration and schema constraint aligned with the registry", () => {
-  const migration = readFileSync("packages/db/migrations/0024_product_type_invariant.sql", "utf8");
+  const migration = readFileSync(
+    "site/packages/db/migrations/0024_product_type_invariant.sql",
+    "utf8",
+  );
   const typeList = migration.match(/type IN \(([^)]+)\)/)?.[1];
   if (!typeList) throw new Error("Migration lacks type constraint");
   const values = [...typeList.matchAll(/'([^']+)'/g)].map((match) => match[1]);

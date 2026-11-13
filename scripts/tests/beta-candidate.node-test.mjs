@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
+import { createReleaseUpgradeEvidence } from "../../site/packages/db/scripts/release-upgrade-contract.mjs";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "../backup-restore-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,

@@ -6,7 +6,7 @@ const state = vi.hoisted(() => ({
   results: [] as unknown[][],
   options: [] as unknown[],
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,13 +26,13 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { LedgerRepository } from "../../packages/db/src/repositories/ledger";
-import { PaymentRepository } from "../../packages/db/src/repositories/payments";
+import { LedgerRepository } from "../../site/packages/db/src/repositories/ledger";
+import { PaymentRepository } from "../../site/packages/db/src/repositories/payments";
 import {
   FinancialStatementsRepository,
   FinancialReviewRepository,
-} from "../../packages/db/src/repositories/financial-statements";
-import { ledgerEntries } from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/repositories/financial-statements";
+import { ledgerEntries } from "../../site/packages/db/src/schema";
 const ledger = new LedgerRepository(),
   statements = new FinancialStatementsRepository(),
   review = new FinancialReviewRepository(),

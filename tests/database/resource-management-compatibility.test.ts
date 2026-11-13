@@ -5,13 +5,13 @@ import {
   confirmedVariantCommand,
 } from "../../site/src/lib/resource-management-confirmation";
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { createResourceManagementDbMock } = await import("../helpers/resource-management-harness");
   return createResourceManagementDbMock();
 });
 
-import { ResourceCompatibilityRepository } from "../../packages/db/src/repositories/resource-compatibility";
-import { products } from "../../packages/db/src/schema";
+import { ResourceCompatibilityRepository } from "../../site/packages/db/src/repositories/resource-compatibility";
+import { products } from "../../site/packages/db/src/schema";
 import {
   input,
   parent,

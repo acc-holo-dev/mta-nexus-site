@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { libraryPageBounds } from "../../packages/db/src/repositories/library-page-bounds";
+import { libraryPageBounds } from "../../site/packages/db/src/repositories/library-page-bounds";
 import {
   libraryCopy,
   libraryHref,

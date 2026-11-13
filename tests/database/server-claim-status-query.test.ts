@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   config: null as unknown,
   failure: null as Error | null,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -26,7 +26,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { readManagedServerClaimStatus } from "../../packages/db/src/repositories/server-claim-status";
+import { readManagedServerClaimStatus } from "../../site/packages/db/src/repositories/server-claim-status";
 const actor = { id: "manager", role: "user" as const };
 beforeEach(() => {
   state.queries = [];

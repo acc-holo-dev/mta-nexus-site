@@ -64,14 +64,14 @@ services:
       # Keep dependency installation inside the image, but hot-reload application
       # and workspace source files from the host.
       - ../site/src:/app/site/src:ro
-      - ../packages/config/src:/app/packages/config/src:ro
-      - ../packages/db/src:/app/packages/db/src:ro
-      - ../packages/db/migrations:/app/packages/db/migrations:ro
-      - ../packages/domain/src:/app/packages/domain/src:ro
-      - ../packages/security/src:/app/packages/security/src:ro
-      - ../packages/storage/src:/app/packages/storage/src:ro
-      - ../packages/ui/src:/app/packages/ui/src:ro
-      - ../packages/validation/src:/app/packages/validation/src:ro
+      - ../site/packages/config/src:/app/site/packages/config/src:ro
+      - ../site/packages/db/src:/app/site/packages/db/src:ro
+      - ../site/packages/db/migrations:/app/site/packages/db/migrations:ro
+      - ../site/packages/domain/src:/app/site/packages/domain/src:ro
+      - ../site/packages/security/src:/app/site/packages/security/src:ro
+      - ../site/packages/storage/src:/app/site/packages/storage/src:ro
+      - ../site/packages/ui/src:/app/site/packages/ui/src:ro
+      - ../site/packages/validation/src:/app/site/packages/validation/src:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,7 +92,7 @@ services:
     init: true
     restart: "no"
     stop_grace_period: 30s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-web-push-dispatcher.ts", "--ready"]
     environment:
       NODE_ENV: development
@@ -108,12 +108,12 @@ services:
       WEB_PUSH_VAPID_PRIVATE_KEY: ${WEB_PUSH_VAPID_PRIVATE_KEY:-}
       WEB_PUSH_VAPID_SUBJECT: ${WEB_PUSH_VAPID_SUBJECT:-}
     volumes:
-      - ../packages/config/src:/app/packages/config/src:ro
-      - ../packages/db/src:/app/packages/db/src:ro
-      - ../packages/db/scripts:/app/packages/db/scripts:ro
-      - ../packages/domain/src:/app/packages/domain/src:ro
-      - ../packages/security/src:/app/packages/security/src:ro
-      - ../packages/validation/src:/app/packages/validation/src:ro
+      - ../site/packages/config/src:/app/site/packages/config/src:ro
+      - ../site/packages/db/src:/app/site/packages/db/src:ro
+      - ../site/packages/db/scripts:/app/site/packages/db/scripts:ro
+      - ../site/packages/domain/src:/app/site/packages/domain/src:ro
+      - ../site/packages/security/src:/app/site/packages/security/src:ro
+      - ../site/packages/validation/src:/app/site/packages/validation/src:ro
     depends_on:
       app:
         condition: service_healthy
@@ -132,7 +132,7 @@ services:
     init: true
     restart: unless-stopped
     stop_grace_period: 30s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-license-maintenance.ts", "--loop"]
     environment:
       NODE_ENV: development
@@ -141,11 +141,11 @@ services:
       NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE: ${NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE:-20}
       NEXUS_LICENSE_MAINTENANCE_INTERVAL_MS: ${NEXUS_LICENSE_MAINTENANCE_INTERVAL_MS:-60000}
     volumes:
-      - ../packages/db/src:/app/packages/db/src:ro
-      - ../packages/db/scripts:/app/packages/db/scripts:ro
-      - ../packages/domain/src:/app/packages/domain/src:ro
-      - ../packages/config/src:/app/packages/config/src:ro
-      - ../packages/validation/src:/app/packages/validation/src:ro
+      - ../site/packages/db/src:/app/site/packages/db/src:ro
+      - ../site/packages/db/scripts:/app/site/packages/db/scripts:ro
+      - ../site/packages/domain/src:/app/site/packages/domain/src:ro
+      - ../site/packages/config/src:/app/site/packages/config/src:ro
+      - ../site/packages/validation/src:/app/site/packages/validation/src:ro
     depends_on:
       app:
         condition: service_healthy
@@ -164,7 +164,7 @@ services:
     init: true
     restart: unless-stopped
     stop_grace_period: 30s
-    working_dir: /app/packages/db
+    working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-resource-release-worker.ts", "--loop"]
     environment:
       NODE_ENV: development
@@ -173,11 +173,11 @@ services:
       NEXUS_RESOURCE_RELEASE_WORKER_BATCH_SIZE: ${NEXUS_RESOURCE_RELEASE_WORKER_BATCH_SIZE:-20}
       NEXUS_RESOURCE_RELEASE_WORKER_INTERVAL_MS: ${NEXUS_RESOURCE_RELEASE_WORKER_INTERVAL_MS:-60000}
     volumes:
-      - ../packages/db/src:/app/packages/db/src:ro
-      - ../packages/db/scripts:/app/packages/db/scripts:ro
-      - ../packages/domain/src:/app/packages/domain/src:ro
-      - ../packages/config/src:/app/packages/config/src:ro
-      - ../packages/validation/src:/app/packages/validation/src:ro
+      - ../site/packages/db/src:/app/site/packages/db/src:ro
+      - ../site/packages/db/scripts:/app/site/packages/db/scripts:ro
+      - ../site/packages/domain/src:/app/site/packages/domain/src:ro
+      - ../site/packages/config/src:/app/site/packages/config/src:ro
+      - ../site/packages/validation/src:/app/site/packages/validation/src:ro
     depends_on:
       app:
         condition: service_healthy

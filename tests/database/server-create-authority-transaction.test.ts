@@ -9,11 +9,11 @@ const state = vi.hoisted(() => ({
   inserted: [] as Record<string, unknown>[],
 }));
 
-vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
+vi.mock("../../site/packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: vi.fn(async () => {}),
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     transaction: async (handler: (tx: unknown) => Promise<unknown>) => {
       const tx = {
@@ -51,7 +51,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { ServerRepository } from "../../site/packages/db/src/repositories/servers";
 
 const server = (organizationId: string | undefined = "org_1") => ({
   id: "srv_1",

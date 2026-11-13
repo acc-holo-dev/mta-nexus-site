@@ -25,7 +25,7 @@ export const OBSERVABILITY_ALERT_ENV_KEYS = Object.freeze([
   "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS",
 ]);
 
-// Mirrors readQueueAlertThreshold in packages/db/scripts/run-web-push-dispatcher.ts.
+// Mirrors readQueueAlertThreshold in site/packages/db/scripts/run-web-push-dispatcher.ts.
 const ALERT_THRESHOLD_LIMITS = Object.freeze({
   WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT: [1, 99],
   WEB_PUSH_QUEUE_ALERT_DUE_JOBS: [1, 50_000],

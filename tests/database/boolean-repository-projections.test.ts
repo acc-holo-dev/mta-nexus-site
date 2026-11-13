@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
 }));
 
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   return {
     db: drizzle(async (sql, params) => {
@@ -15,8 +15,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { SocialRepository } from "../../packages/db/src/repositories/social";
-import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+import { SocialRepository } from "../../site/packages/db/src/repositories/social";
+import { NotificationRepository } from "../../site/packages/db/src/repositories/notifications";
 
 beforeEach(() => {
   state.statements = [];

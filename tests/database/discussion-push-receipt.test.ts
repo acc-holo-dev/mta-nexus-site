@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   discussionPushReceipt,
   withDiscussionPushReceipt,
-} from "../../packages/db/src/repositories/discussion-push-receipt";
+} from "../../site/packages/db/src/repositories/discussion-push-receipt";
 
 it.each(["pending", "queued", "unavailable"] as const)(
   "accepts exact server admission evidence %s",

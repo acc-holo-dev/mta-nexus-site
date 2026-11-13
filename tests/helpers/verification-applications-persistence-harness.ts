@@ -14,8 +14,8 @@ import {
   verificationRequests,
 } from "@nexus/db";
 import { and, eq, sql } from "drizzle-orm";
-import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
-import { sessions, users } from "../../packages/db/src/schema";
+import { digestSessionToken } from "../../site/packages/db/src/repositories/sessions";
+import { sessions, users } from "../../site/packages/db/src/schema";
 
 export {
   and,

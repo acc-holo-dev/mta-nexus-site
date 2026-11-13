@@ -8,8 +8,8 @@ const webSrcRoot = path.join(repoRoot, "site/src");
 
 /** Canonical homes for live `role="alert"` chrome in `@nexus/ui`. */
 const ALLOWED_ALERT_SOURCES = [
-  "packages/ui/src/input.tsx",
-  "packages/ui/src/error-state.tsx",
+  "site/packages/ui/src/input.tsx",
+  "site/packages/ui/src/error-state.tsx",
 ] as const;
 
 /** Literal alert role bindings apps must not invent outside the allowed UI chrome. */

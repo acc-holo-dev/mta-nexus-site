@@ -16,7 +16,7 @@ import {
 import type { LibraryCollectionCommand } from "@nexus/domain";
 import { and, eq, sql } from "drizzle-orm";
 import { expect } from "vitest";
-import { applyLibraryMembershipBatch } from "../../packages/db/src/repositories/library-membership-batches";
+import { applyLibraryMembershipBatch } from "../../site/packages/db/src/repositories/library-membership-batches";
 
 export type { LibraryCollectionCommand };
 export {

@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
   rows: [] as { id: string; observedAt: Date }[],
 }));
 
-vi.mock("../../packages/db/src/client", () => ({
+vi.mock("../../site/packages/db/src/client", () => ({
   db: {
     select: () => {
       const query = {
@@ -32,7 +32,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+import { ServerObservationRepository } from "../../site/packages/db/src/repositories/server-observations";
 
 const dialect = new PgDialect();
 const repository = new ServerObservationRepository();

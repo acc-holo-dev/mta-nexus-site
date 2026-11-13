@@ -5,7 +5,7 @@ export const resourceReleaseControlRepositoryState = {
   options: [] as unknown[],
 };
 
-/** Factory for `vi.mock("../packages/db/src/client", …)` from suite files under `tests/`. */
+/** Factory for `vi.mock("../../site/packages/db/src/client", …)` from suite files under `tests/unit` or `tests/database`. */
 export async function createResourceReleaseControlRepositoryDbMock() {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const state = resourceReleaseControlRepositoryState;

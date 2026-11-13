@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { closeDatabaseConnection, db } from "../src/client";
 import { accountMailOutbox } from "../src/account-mail-schema";
-import { authService } from "../../../site/src/lib/services/auth-service";
+import { authService } from "../../../src/lib/services/auth-service";
 
 if (
   process.env.GITHUB_ACTIONS !== "true" ||

@@ -55,9 +55,9 @@ describe("fresh-auth requirements", () => {
 
   it("uses that rule at every ordinary recovery gate", () => {
     for (const path of [
-      "packages/db/src/repositories/account-challenges.ts",
-      "packages/db/src/repositories/account-email-enrollment.ts",
-      "packages/db/src/repositories/account-mail-worker.ts",
+      "site/packages/db/src/repositories/account-challenges.ts",
+      "site/packages/db/src/repositories/account-email-enrollment.ts",
+      "site/packages/db/src/repositories/account-mail-worker.ts",
     ]) {
       const source = readFileSync(path, "utf8");
       expect(source).toContain("ordinaryRecoveryEligible");

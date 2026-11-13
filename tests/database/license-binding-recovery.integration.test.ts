@@ -19,7 +19,7 @@ import {
   products,
   serverClaimChallenges,
   servers,
-} from "../../packages/db/src/schema";
+} from "../../site/packages/db/src/schema";
 
 // Requires disposable PostgreSQL migrated through 0053. Licenses and scanned
 // builds below are explicit recorded fixtures; no payment or scanner is invoked.

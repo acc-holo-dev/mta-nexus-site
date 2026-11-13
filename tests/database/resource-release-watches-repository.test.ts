@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   clock: "2026-10-12T00:00:00.000Z",
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -25,7 +25,7 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
-import { resourceReleaseWatchesRepository as repo } from "../../packages/db/src/repositories/resource-release-watches";
+import { resourceReleaseWatchesRepository as repo } from "../../site/packages/db/src/repositories/resource-release-watches";
 beforeEach(() => {
   state.sessionLive = true;
   state.queries = [];

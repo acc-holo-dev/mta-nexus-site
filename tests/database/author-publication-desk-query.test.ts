@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { content } from "../../packages/db/src/schema";
+import { content } from "../../site/packages/db/src/schema";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
@@ -11,13 +11,13 @@ const state = vi.hoisted(() => ({
   serverAccess: vi.fn(),
   failAudit: false,
 }));
-vi.mock("../../packages/db/src/repositories/publication-notice", () => ({
+vi.mock("../../site/packages/db/src/repositories/publication-notice", () => ({
   publicationNotice: state.notice,
 }));
-vi.mock("../../packages/db/src/repositories/server-content", () => ({
+vi.mock("../../site/packages/db/src/repositories/server-content", () => ({
   serverContentAccess: state.serverAccess,
 }));
-vi.mock("../../packages/db/src/client", async () => {
+vi.mock("../../site/packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
@@ -40,8 +40,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { authorContentRepository as repo } from "../../packages/db/src/repositories/author-content";
-import { publicationFeedRepository as feed } from "../../packages/db/src/repositories/publication-feed";
+import { authorContentRepository as repo } from "../../site/packages/db/src/repositories/author-content";
+import { publicationFeedRepository as feed } from "../../site/packages/db/src/repositories/publication-feed";
 
 const revision = "2026-10-11T00:00:00.123456Z",
   next = "2026-10-11T00:00:00.124456Z";
