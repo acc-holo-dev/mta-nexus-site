@@ -4,15 +4,15 @@
 
 ## Стек (факт кода)
 
-| Слой      | Версия / выбор                                                                        |
-| --------- | ------------------------------------------------------------------------------------- |
-| Runtime   | Node.js 26.10.0 (`.nvmrc`), pnpm 12.4.2                                               |
-| App       | Next.js 16.4 + React 19.3 в `site` (Turbopack default; `build:webpack` запасной)      |
-| UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                              |
-| Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                               |
-| Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser |
-| Dev stack | Docker Compose (`compose.yaml`): app, PostgreSQL, ClamAV, push-worker                 |
-| CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo               |
+| Слой      | Версия / выбор                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| Runtime   | Node.js 26.11.1 (`.nvmrc`), pnpm 12.4.2                                                                             |
+| App       | Next.js 16.4 + React 19.3 в `site` (Turbopack default; `build:webpack` запасной)                                    |
+| UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                                                            |
+| Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                                                             |
+| Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser                               |
+| Dev stack | Docker Compose [`deploy/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
+| CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo                                             |
 
 Модульный монолит на одной инстанции. Redis, внешние очереди и микросервисы не входят в текущую форму без измеренной необходимости.
 
@@ -85,12 +85,10 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 - Database Vitest: `maxWorkers: 1`, `isolate: true` — намеренно из‑за Proxy-моков клиента БД; ускорять только после замеров ([PROBLEMS](PROBLEMS.md)).
 - Платежи/payout/DRM: утверждённая цель, не runtime open free beta.
 
-## Подготовка изменения структуры
+## Изменение структуры
 
-[План архитектурного рефакторинга](STRUCTURE-REFACTORING.md) фиксирует Phase 0,
-инвентарь ссылок на конкретном SHA, целевую структуру и приёмку будущих переносов.
-Приложение локально перенесено в `site/` (Phase 1); пакеты, тесты и Docker
-остаются на прежних местах до следующих этапов. Результаты приёмки — в плане.
+[Технический план](STRUCTURE-REFACTORING.md) описывает foundation и локальный перенос
+приложения в `site/`; `deploy/`, `configs/` и `tests/{unit,database}` сохранены из main.
 
 ## Документы по роли
 
@@ -113,4 +111,4 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Слои и безопасность                    | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                 |
 | Команды и ops                          | [OPERATIONS.md](OPERATIONS.md)                                                                                     |
 | Предметная глава (handbook, до DOC-04) | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                          |
-| Историческая очередь handbook          | [10-ROADMAP.md](ROADMAP.md)                                                                                        |
+| Историческая очередь handbook          | [Handbook — вступление и реестры](handbook/00-README.md)                                                           |

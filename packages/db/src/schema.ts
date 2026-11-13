@@ -36,6 +36,9 @@ import {
   type SupportCaseCategory,
   type SupportCaseStatus,
   type SupportMessageAuthorRole,
+  type AdPlacementStatus,
+  type AdPlacementTargetType,
+  type AdSlotArea,
   type SupportRelatedType,
 } from "@nexus/domain";
 import { sql } from "drizzle-orm";
@@ -2457,5 +2460,71 @@ export const librarySelectionBatchReceipts = pgTable(
       sql`coalesce(jsonb_typeof(${table.command})='object' AND octet_length(${table.command}::text)<=8192 AND jsonb_typeof(${table.snapshot})='object' AND octet_length(${table.snapshot}::text)<=32768,false)`,
     ),
     check("library_selection_batch_receipts_time_check", sql`isfinite(${table.createdAt})`),
+  ],
+);
+
+// ---- UX-24: managed advertising placement (slot = reserved inventory, placement = booked instance) ----
+export const adSlots = pgTable(
+  "ad_slots",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    positionKey: text("position_key").notNull(),
+    area: text("area").$type<AdSlotArea>().notNull().default("any"),
+    capacity: integer("capacity").notNull().default(1),
+    enabled: boolean("enabled").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("ad_slots_position_key_idx").on(table.positionKey),
+    check("ad_slots_capacity_check", sql`${table.capacity} >= 1 AND ${table.capacity} <= 100`),
+  ],
+);
+
+export const adPlacements = pgTable(
+  "ad_placements",
+  {
+    id: text("id").primaryKey(),
+    slotId: text("slot_id")
+      .notNull()
+      .references(() => adSlots.id, { onDelete: "restrict" }),
+    advertiserUserId: text("advertiser_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    targetType: text("target_type").$type<AdPlacementTargetType>().notNull(),
+    targetId: text("target_id").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    maxImpressions: integer("max_impressions"),
+    audience: jsonb("audience").$type<string[]>(),
+    moderationBasis: text("moderation_basis"),
+    status: text("status").$type<AdPlacementStatus>().notNull().default("draft"),
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("ad_placements_slot_status_window_idx").on(
+      table.slotId,
+      table.status,
+      table.startsAt,
+      table.endsAt,
+    ),
+    index("ad_placements_target_idx").on(table.targetType, table.targetId),
+    check("ad_placements_target_type_check", sql`${table.targetType} IN ('product','server')`),
+    check(
+      "ad_placements_status_check",
+      sql`${table.status} IN ('draft','pending_approval','scheduled','live','paused','ended','rejected','cancelled')`,
+    ),
+    check("ad_placements_window_check", sql`${table.endsAt} > ${table.startsAt}`),
+    check(
+      "ad_placements_reason_check",
+      sql`((${table.status} = 'rejected' OR ${table.status} = 'paused') AND ${table.reason} IS NOT NULL) OR (${table.status} NOT IN ('rejected','paused') AND ${table.reason} IS NULL)`,
+    ),
+    check(
+      "ad_placements_impressions_check",
+      sql`${table.maxImpressions} IS NULL OR ${table.maxImpressions} > 0`,
+    ),
   ],
 );

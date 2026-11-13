@@ -305,6 +305,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: deploy/Dockerfile
           target: runtime
           tags: nexus-ci:${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
@@ -399,25 +400,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Validate developer verification Compose
-        run: COMPOSE_DISABLE_ENV_FILE=true docker compose -f compose.verify.yaml config --quiet
+        run: COMPOSE_DISABLE_ENV_FILE=true docker compose -f deploy/compose.verify.yaml config --quiet
       - name: Build and start the documented local stack
         run: |
           test ! -f .env
-          docker compose --env-file /dev/null -f compose.yaml config --quiet
-          docker compose --env-file /dev/null -f compose.yaml up --build --detach --wait --wait-timeout 600
+          docker compose --env-file /dev/null -f deploy/compose.yaml config --quiet
+          docker compose --env-file /dev/null -f deploy/compose.yaml up --build --detach --wait --wait-timeout 600
       - name: Check readiness, HTTP and local-only exposure
         run: |
-          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T app id -u)" != "0"
-          docker compose --env-file /dev/null -f compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
-          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          test "$(docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app id -u)" != "0"
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app node scripts/check-local-readiness.mjs
           curl --fail --silent --show-error --max-time 90 http://127.0.0.1:3000/ -o /tmp/nexus-local-home.html
           grep -qi '<html' /tmp/nexus-local-home.html
           for service in postgres clamav; do
-            id=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet "$service")
+            id=$(docker compose --env-file /dev/null -f deploy/compose.yaml ps --quiet "$service")
             test -n "$id"
             test -z "$(docker port "$id")"
           done
-          app=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          app=$(docker compose --env-file /dev/null -f deploy/compose.yaml ps --quiet app)
           test "$(docker port "$app" 3000/tcp)" = "127.0.0.1:3000"
           echo 'PASS: HTTP home, database, writable uploads, non-root app, loopback-only port'
       - name: Install dev-browser verification tools
@@ -432,39 +433,39 @@ jobs:
         run: node scripts/tests/dev-origin-hydration.playwright.mjs
       - name: Check migrations and preserve data across app replacement
         run: |
-          rows=$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')
+          rows=$(docker compose --env-file /dev/null -f deploy/compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')
           test "$rows" -gt 0
-          docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -c "CREATE TABLE beta002_ci_probe (id integer PRIMARY KEY, value text); INSERT INTO beta002_ci_probe VALUES (1, 'preserved');"
-          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta002-ci-probe', 'preserved', {flag:'wx'});"
-          before=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
-          docker compose --env-file /dev/null -f compose.yaml up --detach --force-recreate --no-deps --wait --wait-timeout 180 app
-          after=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -c "CREATE TABLE beta002_ci_probe (id integer PRIMARY KEY, value text); INSERT INTO beta002_ci_probe VALUES (1, 'preserved');"
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta002-ci-probe', 'preserved', {flag:'wx'});"
+          before=$(docker compose --env-file /dev/null -f deploy/compose.yaml ps --quiet app)
+          docker compose --env-file /dev/null -f deploy/compose.yaml up --detach --force-recreate --no-deps --wait --wait-timeout 180 app
+          after=$(docker compose --env-file /dev/null -f deploy/compose.yaml ps --quiet app)
           test -n "$after"
           test "$before" != "$after"
-          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
-          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
-          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f deploy/compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
+          test "$(docker compose --env-file /dev/null -f deploy/compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
           echo 'PASS: migrations applied, app replaced, database and uploads retained'
       - name: Verify optional development mail capture
         run: |
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml config --quiet
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml config --quiet
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
           for service in mail-worker mailpit; do
-            test "$(docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T "$service" id -u)" != "0"
+            test "$(docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml exec -T "$service" id -u)" != "0"
           done
-          mailpit=$(docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml ps --quiet mailpit)
+          mailpit=$(docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml ps --quiet mailpit)
           test "$(docker port "$mailpit" 8025/tcp)" = "127.0.0.1:8025"
           test -z "$(docker port "$mailpit" 1025/tcp)"
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts
       - name: Show local test diagnostics
         if: always()
         run: |
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml ps --all
-          docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml logs --no-color --tail 80
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml ps --all
+          docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml logs --no-color --tail 80
       - name: Remove only the disposable CI project
         if: always()
-        run: docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml down --volumes --timeout 15
+        run: docker compose --env-file /dev/null -f deploy/compose.yaml -f deploy/compose.mailpit.yaml down --volumes --timeout 15
     needs:
       - plan
     if: ${{ needs.plan.outputs.full == 'true' }}

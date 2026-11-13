@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from check_tracker import tracker_tasks
+
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = ROOT / "planning"
 DOCS = ROOT / "docs"
@@ -67,7 +69,7 @@ def main() -> int:
     if version.returncode or version.stdout.strip() != "Version: " + expected:
         raise RuntimeError("Backlog rendering requires project Biome " + expected)
     data = read("tasks.json")
-    tasks = data["tasks"]
+    tasks = tracker_tasks(data)
     byid = {t["id"]: t for t in tasks}
     ms = read("milestones.json")
     sources = read("source-register.json")["sources"]
@@ -99,6 +101,8 @@ def main() -> int:
 Сформирован из `planning/tasks.json`; вручную это представление не редактируется. База `{data['baseline_sha']}`, дата {data['as_of']}.
 
 **Рабочий tracker (DOC-03):** `{tracker.get('mode', 'unknown')}`. Живой статус исполнения — только в `planning/tasks.json`. Замороженный import baseline: `{tracker.get('import_baseline', 'planning/import-baseline/')}`. GitHub Issues: `{(tracker.get('issues_import') or {}).get('status', 'unknown')}` (нужен `github_settings`). Контракт: [TRACKER.md](../planning/TRACKER.md).
+
+Слои: live={len(data["layers"]["live"]["tasks"])}, history={len(data["layers"]["history"]["tasks"])}. Live — рабочая очередь, в которой могут оставаться недавно завершённые карточки.
 
 Счётчики исполнения: {", ".join(f"{k}={v}" for k, v in sorted(exec_counts.items()))}. Подготовленная карточка не является автоматическим поручением.
 
@@ -149,6 +153,21 @@ F6 намеренно не содержит детального execution backl
 Приёмка, реальные paths, проверки и источники — в [TASKS.md](TASKS.md). Связи исходного анализа — в [TRACEABILITY.md](TRACEABILITY.md).
 
 """
+    # Preserve the accepted six-theme organization of the live queue.
+    tracks = {
+        "documentation": "Документация", "engineering": "Инженерия",
+        "product_paths": "Пользовательские пути", "operations_delivery": "Эксплуатация и доставка",
+        "engagement_growth": "Участие и рост", "advertising": "Реклама",
+    }
+    head += "## Рабочая очередь и история\n\n"
+    for key, label in tracks.items():
+        subset = [t for t in data["layers"]["live"]["tasks"] if t["track"] == key]
+        if subset:
+            head += f"### {label}\n\n| ID | Задача | Исполнение |\n|---|---|---|\n"
+            for t in subset:
+                head += f"| {t['id']} | {cell(t['title'])} | {exec_labels[t['execution_state']]} |\n"
+            head += "\n"
+    head += "Завершённая история хранится в layers.history; карточки — в TASKS.md.\n\n"
     for phase in phases:
         subset = [t for t in tasks if t["phase"] == phase]
         if not subset:

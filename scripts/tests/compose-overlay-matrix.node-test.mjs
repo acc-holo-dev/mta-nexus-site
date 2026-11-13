@@ -189,7 +189,7 @@ test("supported Compose scenarios render predictable service inventories", () =>
 
 test("production config has no development source mounts", () => {
   const config = renderCompose(
-    ["compose.production.yaml"],
+    ["deploy/compose.production.yaml"],
     syntheticEnv(),
     "nexus-ops-matrix-prod-mounts",
   );
@@ -206,7 +206,7 @@ test("production config has no development source mounts", () => {
 
 test("production CI publishes only loopback ports and keeps the writer inventory", () => {
   const config = renderCompose(
-    ["compose.production.yaml", "compose.production-ci.yaml"],
+    ["deploy/compose.production.yaml", "deploy/compose.production-ci.yaml"],
     syntheticEnv(),
     "nexus-ops-matrix-ci",
   );
@@ -240,7 +240,11 @@ test("production CI publishes only loopback ports and keeps the writer inventory
 
 test("production recovery+mail overlay adds mail-worker without dropping base writers", () => {
   const config = renderCompose(
-    ["compose.production.yaml", "compose.recovery.yaml", "compose.mail-worker.yaml"],
+    [
+      "deploy/compose.production.yaml",
+      "deploy/compose.recovery.yaml",
+      "deploy/compose.mail-worker.yaml",
+    ],
     syntheticEnv(),
     "nexus-ops-matrix-mail",
   );

@@ -29,7 +29,7 @@ const fullAcceptancePaths = [
   /^apps\/web\/src\/app\/api\/auth\//,
   /^apps\/web\/src\/app\/api\/(?:follow|object-mute|products|support|workspace\/(?:organizations|reports))(?:\/|$)/,
   /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
-  /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
+  /^tests\/unit\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
 
 // Narrow unit profile: only shared UI and web components (and their colocated tests).
@@ -44,11 +44,17 @@ const unitOnlyPaths = [
 // sensitivity rules. Keep legacy paths covered until migration acceptance.
 function policyPath(file) {
   if (file.startsWith("site/packages/") || file.startsWith("site/tests/"))
-    return file.slice("site/".length);
+    return policyPath(file.slice("site/".length));
   if (file.startsWith("site/")) return `apps/web/${file.slice("site/".length)}`;
   if (file === "docker/Dockerfile") return "Dockerfile";
   if (/^docker\/compose[^/]*\.ya?ml$/u.test(file)) return file.slice("docker/".length);
   if (file.startsWith("docker/")) return `deploy/${file.slice("docker/".length)}`;
+  if (
+    /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/u.test(
+      file,
+    )
+  )
+    return file.replace("tests/", "tests/unit/");
   return file;
 }
 

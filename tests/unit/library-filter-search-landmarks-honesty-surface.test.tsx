@@ -1,0 +1,23 @@
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { expect, it } from "vitest";
+
+let root = dirname(fileURLToPath(import.meta.url));
+while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
+
+const filterSurfaces = [
+  "site/src/components/collection-releases-screen.tsx",
+  "site/src/app/workspace/library/collections/resources/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
+] as const;
+
+it("exposes search landmarks and touch-sized filter inputs on residual library filters", () => {
+  for (const path of filterSurfaces) {
+    const source = read(path);
+    expect(source, path).toMatch(/<search aria-label=\{(?:cc|v|c)\.search\}>/u);
+    expect(source, path).toContain('name="q"');
+    expect(source, path).toContain("min-h-11");
+  }
+});

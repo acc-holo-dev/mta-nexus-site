@@ -107,10 +107,13 @@ test("entrypoint aligns APP_URL with NEXT_PUBLIC_APP_URL before config validatio
 
 test("same prebuilt image contract: runtime origin comes from env, not the entrypoint", () => {
   const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
-  const dockerfile = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
-  const compose = readFileSync(new URL("../../compose.production.yaml", import.meta.url), "utf8");
+  const dockerfile = readFileSync(new URL("../../deploy/Dockerfile", import.meta.url), "utf8");
+  const compose = readFileSync(
+    new URL("../../deploy/compose.production.yaml", import.meta.url),
+    "utf8",
+  );
   const ciOverlay = readFileSync(
-    new URL("../../compose.production-ci.yaml", import.meta.url),
+    new URL("../../deploy/compose.production-ci.yaml", import.meta.url),
     "utf8",
   );
 
@@ -122,6 +125,6 @@ test("same prebuilt image contract: runtime origin comes from env, not the entry
   assert.match(ciOverlay, /NEXUS_CI_IMAGE:\?use scripts\/check-production-startup\.sh/u);
   // Two allowed HTTPS origins in the supported promotion path: DOMAIN-templated
   // production and the disposable CI origin — both consume a prebuilt runtime image.
-  assert.match(compose, /build:\s*\n\s*context:\s*\.\s*\n\s*dockerfile:\s*Dockerfile/u);
+  assert.match(compose, /build:\s*\n\s*context:\s*\.\s*\n\s*dockerfile:\s*deploy\/Dockerfile/u);
   assert.match(ciOverlay, /image:\s*\$\{NEXUS_CI_IMAGE/u);
 });

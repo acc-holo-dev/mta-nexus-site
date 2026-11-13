@@ -7,14 +7,14 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const recoveryDatabaseTests = [
-  "tests/notification-inbox-history.integration.test.ts",
-  "tests/discussion-watch-persistence.integration.test.ts",
-  "tests/discovery-follow-persistence.integration.test.ts",
-  "tests/notification-preference-serialization.integration.test.ts",
-  "tests/web-push-outbox.integration.test.ts",
-  "tests/web-push-outbox-capacity.integration.test.ts",
-  "tests/web-push-worker.integration.test.ts",
-  "tests/web-push-worker-concurrency.integration.test.ts",
+  "tests/database/notification-inbox-history.integration.test.ts",
+  "tests/database/discussion-watch-persistence.integration.test.ts",
+  "tests/database/discovery-follow-persistence.integration.test.ts",
+  "tests/database/notification-preference-serialization.integration.test.ts",
+  "tests/database/web-push-outbox.integration.test.ts",
+  "tests/database/web-push-outbox-capacity.integration.test.ts",
+  "tests/database/web-push-worker.integration.test.ts",
+  "tests/database/web-push-worker-concurrency.integration.test.ts",
 ];
 
 export function validateRecoveryDatabaseEnvironment(env) {

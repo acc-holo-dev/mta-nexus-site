@@ -237,7 +237,9 @@ describe("isolated and shared-database test projects", () => {
     const groups = classifyTests(process.cwd());
     assert.deepEqual([...groups.unit, ...groups.database].sort(), discoverTests(process.cwd()));
     assert.ok(groups.database.includes("packages/db/src/repositories/account-mail-worker.test.ts"));
-    assert.ok(groups.database.includes("tests/password-change-transaction.test.ts"));
-    assert.ok(groups.unit.includes("tests/market-catalog-sql.test.ts"));
+    assert.ok(groups.database.includes("tests/database/password-change-transaction.test.ts"));
+    // market-catalog-sql fully mocks the DB client (pure SQL-string construction),
+    // so the classifier runs it in the parallel unit pool rather than serialized.
+    assert.ok(groups.unit.includes("tests/database/market-catalog-sql.test.ts"));
   });
 });

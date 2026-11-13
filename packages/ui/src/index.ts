@@ -12,5 +12,6 @@ export * from "./list-keys";
 export * from "./platform";
 export * from "./search-field";
 export * from "./skeleton";
+export * from "./sponsored-placement-slot";
 export * from "./tabs";
 export * from "./utils";

@@ -1,4 +1,9 @@
-import { buildRepository, contentRepository, verificationRepository } from "@nexus/db";
+import {
+  AdPlacementRepository,
+  buildRepository,
+  contentRepository,
+  verificationRepository,
+} from "@nexus/db";
 import { can } from "@nexus/security";
 import {
   DataTable,
@@ -13,6 +18,7 @@ import {
 import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { AdminAdPlacementSection } from "../../components/admin/admin-ad-placement-section";
 import { AdminBuildsQuarantineSection } from "../../components/admin/admin-builds-quarantine-section";
 import { AdminHealthStats } from "../../components/admin/admin-health-stats";
 import { AdminReportsSection } from "../../components/admin/admin-reports-section";
@@ -22,6 +28,7 @@ import { PlatformSignIn } from "../../components/platform-sign-in";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";
 import { getFinancialCopy } from "../../lib/financial-i18n";
+import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../lib/feature-flags";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
@@ -182,6 +189,30 @@ export default async function AdminPage({
   const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
   const { builds: riskBuilds, hasMore: moreRiskBuilds } = riskBuildPageResult;
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
+  // UX-24: advertising placement lifecycle admin surface. Read-only inventory
+  // overview gated on the feature switch AND full admin role; hidden otherwise.
+  const adLifecycle =
+    advertisingLifecycleEnabled && adminUser.role === "admin"
+      ? await new AdPlacementRepository()
+          .listSlots()
+          .then(async (slots) => {
+            const repo = new AdPlacementRepository();
+            const summaries = await Promise.all(
+              slots.map(async (slot) => {
+                const placements = await repo.placementsForSlot(slot.id);
+                return {
+                  slot,
+                  pending: placements.filter((pl) => pl.status === "pending_approval").length,
+                  active: placements.filter((pl) =>
+                    ["scheduled", "live", "paused"].includes(pl.status),
+                  ).length,
+                };
+              }),
+            );
+            return summaries;
+          })
+          .catch(() => null)
+      : null;
   const chromeLinkClass =
     "inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -222,6 +253,14 @@ export default async function AdminPage({
       </header>
 
       <AdminHealthStats copy={copy} counts={health.counts} />
+
+      {adLifecycle ? (
+        <AdminAdPlacementSection
+          locale={locale}
+          slots={adLifecycle}
+          rendererEnabled={adSlotRendererEnabled}
+        />
+      ) : null}
 
       <AdminVerificationQueueSection
         locale={locale}

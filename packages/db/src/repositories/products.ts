@@ -11,6 +11,7 @@ import {
   products,
   users,
 } from "../schema";
+import { safePublishedBuildCondition } from "./build-safety";
 import { lockInitiatingSession } from "./initiating-session";
 import {
   assertBuildModerationAuthority,
@@ -23,12 +24,7 @@ function hasSafePublishedBuild() {
   return sql`exists (
     select 1
     from ${builds}
-    where ${builds.productId} = ${products.id}
-      and ${builds.status} = 'published'
-      and ${builds.scanStatus} = 'clean'
-      and ${builds.scanner} is not null
-      and btrim(${builds.scanner}) <> ''
-      and ${builds.scannedAt} is not null
+    where ${safePublishedBuildCondition(sql`${products.id}`)}
   )`;
 }
 

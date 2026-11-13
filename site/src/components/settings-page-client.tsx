@@ -10,6 +10,7 @@ import {
   parseNotificationPreferences,
 } from "../lib/notification-preferences-confirmation";
 import { profilePrivacyCopy } from "../lib/profile-privacy-copy";
+import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../lib/feature-flags";
 import {
   type SettingsRecoveryEmail,
   SettingsRequestError,
@@ -24,6 +25,7 @@ import { ProfileChangeHistoryLink } from "./private-change-history-controls";
 import { PublicProfileForm } from "./public-profile-form";
 import { SettingsActiveSessions } from "./settings-active-sessions";
 import { SettingsNotificationPreferencesSection } from "./settings-notification-preferences-section";
+import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
 
@@ -598,6 +600,10 @@ export function SettingsPageClient() {
         pushIdentity={pushIdentity}
         onPreferenceChange={updatePreference}
       />
+
+      {advertisingLifecycleEnabled && (
+        <SettingsAdvertisingPreferencesSection rendererEnabled={adSlotRendererEnabled} />
+      )}
 
       <SettingsRecoveryEmailSection
         copy={copy}

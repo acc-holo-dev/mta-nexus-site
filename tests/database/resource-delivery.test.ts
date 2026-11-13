@@ -1,0 +1,155 @@
+import type { Readable } from "node:stream";
+import { buildRepository, sessionRepository, userRepository } from "@nexus/db";
+import type { Product, User } from "@nexus/domain";
+import { storageService } from "@nexus/storage";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { commerceService } from "../../site/src/lib/services/commerce-service";
+import { productService } from "../../site/src/lib/services/product-service";
+import { assignIntegrationStaffPassword } from "../helpers/integration-staff-password";
+
+describe("free resource delivery lifecycle", () => {
+  const suffix = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const payload = Buffer.from("MTA Nexus integration build payload");
+  let author: User;
+  let player: User;
+  let product: Product;
+  let moderator: User;
+  let moderatorPasswordHash: string;
+  let storageKey: string | undefined;
+
+  beforeAll(async () => {
+    author = await userRepository.create({
+      id: `usr_delivery_author_${suffix}`,
+      email: `delivery_author_${suffix}@nexus.test`,
+      username: `delivery_author_${suffix}`,
+      displayName: "Delivery Author",
+      role: "developer",
+    });
+    player = await userRepository.create({
+      id: `usr_delivery_player_${suffix}`,
+      email: `delivery_player_${suffix}@nexus.test`,
+      username: `delivery_player_${suffix}`,
+      displayName: "Delivery Player",
+      role: "user",
+    });
+
+    moderator = await userRepository.create({
+      id: `usr_delivery_moderator_${suffix}`,
+      email: `delivery_moderator_${suffix}@nexus.test`,
+      username: `delivery_moderator_${suffix}`,
+      displayName: "Delivery Moderator",
+      role: "moderator",
+    });
+    await sessionRepository.create({
+      id: `ses_${author.id}`,
+      userId: author.id,
+      token: `tok_${author.id}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+
+    await sessionRepository.create({
+      id: `ses_${moderator.id}`,
+      userId: moderator.id,
+      token: `tok_${moderator.id}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    moderatorPasswordHash = await assignIntegrationStaffPassword(moderator.id);
+
+    await sessionRepository.create({
+      id: `ses_claim_${player.id}`,
+      userId: player.id,
+      token: `tok_${player.id}`,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
+
+    product = await productService.createProduct(
+      {
+        title: "Delivery Test Resource",
+        slug: `delivery-test-${suffix}`,
+        description: "A free resource used to verify binary delivery end to end.",
+        type: "script",
+        status: "draft",
+        authorId: author.id,
+        price: 0,
+        currency: "USD",
+        licenseModel: "unlimited",
+        tags: ["integration"],
+        currentVersion: "0.1.0",
+        isFeatured: false,
+        screenshots: [],
+        compatibility: { mtaMinVersion: "1.6.0" },
+      },
+      author,
+      `tok_${author.id}`,
+    );
+  });
+
+  afterAll(async () => {
+    if (storageKey) {
+      await storageService.deleteAsset(storageKey);
+    }
+  });
+
+  it("stores, publishes, claims, and reads the exact build bytes", async () => {
+    const asset = await storageService.uploadAsset({
+      data: payload,
+      fileName: "delivery-test.zip",
+      mimeType: "application/zip",
+      userId: author.id,
+      isPrivate: true,
+    });
+    storageKey = asset.key;
+
+    const build = await productService.releaseBuild(
+      {
+        productId: product.id,
+        version: "1.0.0",
+        releaseNotes: "Initial integration build",
+        storageKey: asset.key,
+        sha256Hash: asset.sha256Hash,
+        fileSizeBytes: asset.sizeBytes,
+        fileName: "delivery-test.zip",
+        mimeType: "application/zip",
+        scanStatus: "clean",
+        scanner: "integration-fixture",
+        scannedAt: new Date(),
+      },
+      author,
+      `tok_${author.id}`,
+    );
+    expect(build.status).toBe("pending_review");
+    expect(build.isSigned).toBe(false);
+
+    const approved = await productService.reviewBuild(
+      {
+        buildId: build.id,
+        expectedRevision: Number(build.revision),
+        decision: "approve",
+        notes: "Archive verified for open free beta",
+        expectedPasswordHash: moderatorPasswordHash,
+      },
+      moderator,
+      `tok_${moderator.id}`,
+    );
+    expect(approved.status).toBe("published");
+
+    const publishedBuilds = await buildRepository.listByProduct(product.id);
+    expect(publishedBuilds.some((candidate) => candidate.id === build.id)).toBe(true);
+
+    const claim = await commerceService.claimFreeResource({
+      user: player,
+      currentToken: `tok_${player.id}`,
+      productId: product.id,
+    });
+    expect(claim.alreadyClaimed).toBe(false);
+
+    const stored = await storageService.getDownloadStream(build.storageKey);
+    const chunks: Buffer[] = [];
+    for await (const chunk of stored.stream as Readable) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+
+    expect(Buffer.concat(chunks)).toEqual(payload);
+    expect(stored.meta?.sizeBytes).toBe(payload.length);
+  });
+});

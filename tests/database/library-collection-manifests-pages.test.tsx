@@ -1,0 +1,167 @@
+import { AppError } from "@nexus/domain";
+import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+import ReconcilePage, {
+  generateMetadata as reconcileMetadata,
+} from "../../site/src/app/workspace/library/collections/[id]/reconcile/page";
+
+const state = vi.hoisted(() => ({
+  actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
+  locale: "en" as "en" | "ru",
+  history: vi.fn(),
+}));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("next/navigation", () => ({
+  notFound: () => {
+    throw Error("NEXT_NOT_FOUND");
+  },
+  usePathname: () => "/workspace/library/collections/lcol_a/import",
+}));
+vi.mock("next/link", async () => {
+  const React = await import("react");
+  return {
+    default: ({ href, children, ...props }: { href: string; children: ReactNode }) =>
+      React.createElement("a", { href, ...props }, children),
+  };
+});
+vi.mock("../../site/src/lib/services/auth-service", () => ({
+  authService: { getSession: async () => state.actor },
+}));
+vi.mock("../../site/src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
+vi.mock("../../site/src/lib/services/library-collections-service", () => ({
+  libraryCollectionsService: { exportManifest: state.history },
+}));
+
+vi.mock("../../site/src/components/library-collection-import", () => ({
+  LibraryCollectionImport: ({
+    collection,
+    locale,
+  }: {
+    collection: { id: string };
+    locale: string;
+  }) => <div data-import={collection.id} data-locale={locale} />,
+}));
+
+import Page, {
+  dynamic,
+  generateMetadata,
+} from "../../site/src/app/workspace/library/collections/[id]/import/page";
+import { getDictionary } from "../../site/src/lib/i18n";
+import { libraryCollectionManifestsCopy } from "../../site/src/lib/library-collection-manifests-i18n";
+
+const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
+const screen = async (query: Record<string, string | string[] | undefined> = {}, id = "lcol_a") =>
+  renderToStaticMarkup(
+    await Page({ params: Promise.resolve({ id }), searchParams: Promise.resolve(query) }),
+  );
+beforeEach(() => {
+  vi.clearAllMocks();
+  state.actor = { id: "usr_a", role: "user" };
+  state.locale = "en";
+  state.history.mockResolvedValue({
+    schemaVersion: 1,
+    generatedAt: "2026-10-12T00:00:00.000Z",
+    collection,
+    productIds: ["PRIVATE-REFERENCE"],
+  });
+});
+it.each(["en", "ru"] as const)(
+  "renders a private import page with localized metadata and full export link in %s",
+  async (locale) => {
+    state.locale = locale;
+    const html = await screen();
+    expect(html).toContain(libraryCollectionManifestsCopy(locale).title);
+    expect(html).toContain("Private &amp; name");
+    expect(html).toContain('data-import="lcol_a"');
+    expect(html).toContain(`/api/library/collections/lcol_a/export`);
+    expect(html).not.toContain("PRIVATE-REFERENCE");
+    expect(state.history).toHaveBeenCalledWith(state.actor, "lcol_a");
+    expect(dynamic).toBe("force-dynamic");
+    expect(await generateMetadata()).toEqual({
+      title: `${libraryCollectionManifestsCopy(locale).title} | MTA NEXUS`,
+      robots: { index: false, follow: false },
+    });
+  },
+);
+it("authenticates before receipt or selector inspection", async () => {
+  state.actor = null;
+  const html = await screen({ userId: "other" });
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fimport"',
+  );
+  expect(state.history).not.toHaveBeenCalled();
+});
+it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(
+  "rejects all import selectors %o before own reads",
+  async (query) => {
+    const html = await screen(query);
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(libraryCollectionManifestsCopy("en").loadUnavailableDescription);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(state.history).not.toHaveBeenCalled();
+  },
+);
+it("shows ErrorState recovery when import export fails to load", async () => {
+  const copy = libraryCollectionManifestsCopy("en");
+  state.history.mockRejectedValue(new Error("import unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+});
+it("maps missing or foreign collection to the same unavailable page", async () => {
+  state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
+  await expect(screen({}, "lcol_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
+});
+
+it.each(["en", "ru"] as const)(
+  "renders the private reconciliation page with localized metadata in %s",
+  async (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(
+      await ReconcilePage({
+        params: Promise.resolve({ id: "lcol_a" }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(html).toContain(libraryCollectionManifestsCopy(locale).reconcileTitle);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(await reconcileMetadata()).toMatchObject({
+      title: `${libraryCollectionManifestsCopy(locale).reconcileTitle} | MTA NEXUS`,
+      robots: { index: false, follow: false },
+    });
+  },
+);
+it("shows ErrorState recovery when reconcile export fails to load", async () => {
+  const copy = libraryCollectionManifestsCopy("en");
+  state.history.mockRejectedValue(new Error("reconcile unavailable"));
+  const html = renderToStaticMarkup(
+    await ReconcilePage({
+      params: Promise.resolve({ id: "lcol_a" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.reconcileLoadUnavailable);
+  expect(html).toContain(copy.reconcileLoadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+});
+it.each(["en", "ru"] as const)(
+  "keeps the %s import success shell clipped with touch CTAs",
+  async (locale) => {
+    state.locale = locale;
+    const html = await screen();
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("min-w-0");
+  },
+);

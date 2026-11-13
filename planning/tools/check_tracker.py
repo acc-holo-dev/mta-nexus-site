@@ -19,6 +19,13 @@ def load(path: Path):
     return json.loads(path.read_text(encoding="utf8"))
 
 
+def tracker_tasks(data):
+    """Flatten current layers; legacy root tasks are supported only for Git evidence."""
+    if "layers" in data:
+        return [task for name in ("live", "history") for task in data["layers"][name]["tasks"]]
+    return data["tasks"]
+
+
 def validate_contract(data, schema) -> list[str]:
     """Validate structure before traversing task IDs or dependency edges."""
     Draft202012Validator.check_schema(schema)
@@ -28,9 +35,16 @@ def validate_contract(data, schema) -> list[str]:
     )
     if errors:
         return [f"schema {list(error.absolute_path)}: {error.message}" for error in errors]
-    tasks = data["tasks"]
+    tasks = tracker_tasks(data)
     ids = [task["id"] for task in tasks]
     problems = []
+    if not tasks:
+        problems.append("Tracker must contain tasks")
+    for name, layer in data["layers"].items():
+        if layer["count"] != len(layer["tasks"]):
+            problems.append(f"{name}: layer count mismatch")
+    if any(task["execution_state"] != "done" for task in data["layers"]["history"]["tasks"]):
+        problems.append("History layer must retain completed tasks")
     if len(ids) != len(set(ids)):
         problems.append("Duplicate task IDs in live tracker")
     graph = {task["id"]: task["dependencies"] for task in tasks}
@@ -77,7 +91,10 @@ def validate_specifications(data, frozen, evidence, load_commit) -> list[str]:
     digest_schema = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     entry_properties = {
         "id": {"type": "string", "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"},
-        "field": {"enum": ["verification", "scope_files"]},
+        "field": {"enum": sorted(set(frozen["tasks"][0]) - {
+            "id", "execution_state", "execution_notes", "execution_updated_on",
+            "current", "decision_status", "queue_state",
+        })},
         "baseline_sha256": digest_schema,
         "value_sha256": digest_schema,
         "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
@@ -109,7 +126,7 @@ def validate_specifications(data, frozen, evidence, load_commit) -> list[str]:
         "current", "decision_status", "queue_state",
     }
     frozen_by = {task["id"]: task for task in frozen["tasks"]}
-    for task in data["tasks"]:
+    for task in tracker_tasks(data):
         base = frozen_by.get(task["id"])
         if base is None:
             problems.append("Task missing from frozen baseline: " + task["id"])
@@ -130,7 +147,7 @@ def validate_specifications(data, frozen, evidence, load_commit) -> list[str]:
             commit = entry["commit"]
             if commit not in commits:
                 try:
-                    commits[commit] = {t["id"]: t for t in load_commit(commit)["tasks"]}
+                    commits[commit] = {t["id"]: t for t in tracker_tasks(load_commit(commit))}
                 except (OSError, ValueError, KeyError, TypeError, subprocess.CalledProcessError):
                     commits[commit] = {}
             if commits[commit].get(task["id"], {}).get(field) != task.get(field):
@@ -167,7 +184,7 @@ def main() -> int:
                          ensure_ascii=False, indent=2))
         return 1 if problems else 0
     checks.append("Draft 2020-12 JSON Schema and live dependency graph")
-    tasks = data["tasks"]
+    tasks = tracker_tasks(data)
     ids = [t["id"] for t in tasks]
     require(data.get("package_status") == "active_tracker", "Live tracker must be active_tracker")
     tracker = data.get("tracker") or {}
@@ -183,7 +200,7 @@ def main() -> int:
 
     frozen = load(baseline / "tasks.json")
     frozen_ids = [t["id"] for t in frozen["tasks"]]
-    require(frozen_ids == ids, "Live task ID set/order diverged from import-baseline")
+    require(set(frozen_ids) == set(ids), "Live task IDs diverged from import-baseline")
     require(frozen["package_status"] == "review_draft", "import-baseline must remain review_draft")
     require(
         all(t["execution_state"] == "not_started" for t in frozen["tasks"]),

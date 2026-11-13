@@ -24,7 +24,7 @@ export function parseSemver(value) {
   });
 }
 
-/** Accepts `>=26.0.0`, `>=26.0.0 <27`, `^26.0.0`, or an exact `26.10.0`. */
+/** Accepts `>=26.0.0`, `>=26.0.0 <27`, `^26.0.0`, or an exact `26.11.1`. */
 export function nodeMajorFromEngines(enginesNode) {
   const raw = String(enginesNode ?? "").trim();
   if (!raw) return null;

@@ -1,6 +1,6 @@
 export const RELEASE_UPGRADE_BASELINE_TAG = "0024_product_type_invariant";
 export const RELEASE_UPGRADE_FAILURE_TAG = "0027_build_quarantine";
-export const RELEASE_UPGRADE_TARGET_TAG = "0089_resource_qa";
+export const RELEASE_UPGRADE_TARGET_TAG = "0090_ad_placement_lifecycle";
 
 /** Current written evidence schema. Legacy retained CI artifacts may omit this field. */
 export const RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION = 1;

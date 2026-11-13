@@ -30,7 +30,7 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/src/lib/browser-request-guard.ts",
     "site/src/lib/browser-route-adapter.ts",
     "site/src/lib/license-bearer-route-adapter.ts",
-    "tests/browser-api-route-inventory.test.ts",
+    "tests/unit/browser-api-route-inventory.test.ts",
   ]) {
     assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
   }

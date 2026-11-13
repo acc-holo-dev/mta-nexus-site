@@ -26,7 +26,7 @@ function sampleManifest(overrides = {}) {
     appVersion: "1.2.0-beta.3",
     sha: sampleSha,
     lockfileSha256: sampleLock,
-    toolchain: { actual: { node: "26.10.0", pnpm: "12.4.2" } },
+    toolchain: { actual: { node: "26.11.1", pnpm: "12.4.2" } },
     postgresMajor: 18,
     schema: { baseline: "0024_product_type_invariant", target: "0089_resource_qa" },
     migrations: [{ name: "0001.sql", sha256: "c".repeat(64) }],

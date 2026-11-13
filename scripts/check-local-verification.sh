@@ -25,7 +25,7 @@ project="nexus-verify-$(date +%s)-$$"
   exit 2
 }
 
-compose=(docker compose -p "$project" -f compose.verify.yaml)
+compose=(docker compose -p "$project" -f deploy/compose.verify.yaml)
 owned=0
 
 cleanup() {

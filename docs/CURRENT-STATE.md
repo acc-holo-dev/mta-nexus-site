@@ -1,12 +1,12 @@
 # Проверенный срез проекта
 
-**Дата:** 6 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
+**Дата:** 10 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3`.
 
 ## Текущий tip
 
-- **`origin/main` tip:** обновлять после merge текущего pack. Не объявлять verified-green без SUCCESS CI на exact SHA.
-- **Последний verified-green tip:** `6cefa74e` / session-binding + order/storage/plan recovery — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393).
-- Длинная серия tip-honesty / ErrorState residual PR после `6cefa74e` живёт в Git history; этот файл больше не дублирует каждый merge.
+- **`origin/main` tip:** `7c4b2fdf` — merge PR #1174 (`feat/ux26-adoptout-contract`, UX-26 часть A: opt-out-предпочтение + честный контракт измерений). Основной перенос `16cbe9de`: секция UX-26 в `docs/UX-CONTRACT.md`, settings-секция Advertising preferences с cookie `nexus_ad_opt_out` (in/out, SameSite=Lax) только за флагом `advertisingLifecycleEnabled` (выключен, рендер не активен), unit-тесты `ad-preference`. Telemetry/hide-report/единицы измерений остаются контрактом без кода.
+- **Verified-green head:** `16cbe9de` (head PR #1174), merge-gate `CI result` = `success` — [CI 42887634450](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42887634450): `Lint, types and parallel unit tests` / `Sequential database tests` / `Build production image once` green; browser smokes требовали production Docker/workflow gates. Пост-merge CI на `7c4b2fdf` (run 42889586338) повторно прогонялся на main.
+- **Предыдущий tip/merge:** PR #1168 (`ab76f359`, `chore/dehardcode-build-size`, CI 42794049567); PR #1167 (`f6c16aa0`, `chore/reconcile-release-readiness-policy`, CI 42790103208); PR #1163 (`9662378b`) — fix Local Docker startup gate.
 
 ## Оценка стадии
 
@@ -34,7 +34,7 @@
 
 ## Старт для следующего агента
 
-1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Exact SHA → сначала GitHub CI для него. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
+1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Exact SHA → сначала GitHub CI для него. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started`). Markdown backlog (`docs/ROADMAP.md`, `docs/TASKS.md`, `docs/TRACEABILITY.md`) — производные представления, регенерируются из `planning/tasks.json`.
 2. Scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore`. Не вести параллельные handoff-журналы.
 3. Defaults владельца — [DECISIONS.md](DECISIONS.md). Ads/commerce/GROW пилоты не активированы. **ErrorState residual / tip-honesty micro-PRs — не приоритет**, пока владелец не вернёт эту очередь.
 4. Schema tip: **`0089_resource_qa`** (+ `0088_follow_mute_and_notify_comments`). Forward-only; не `pnpm db:generate` на живой БД. Q&A fixtures — `db:seed:historical`, не baseline seed.
@@ -48,7 +48,7 @@
 
 - Green CI ≠ deploy. PASS только на exact SHA.
 - Upgrade contract target = `0089_resource_qa`. Local disposable migrate-to-tip PASS на compose Postgres; retained hosted CI upgrade artifact may still cite `0087_server_reviews` until the next hosted PASS.
-- GitHub: public; main protection на базе сверки отсутствовала. Settings не менять без поручения.
+- GitHub: public. Ruleset `Protect main (OPS-09)` по указанию владельца приведён к обычному виду: `required_status_checks` (CI result) + `deletion` + `non_fast_forward`, обязательное approving-review снято. Дальнейшие GitHub settings — только по поручению владельца.
 - Tracker: 64 done / 19 open. `done` ≠ production enablement.
 
 ## Приоритетные остатки
@@ -57,7 +57,7 @@
 
 ## Версии и инфраструктура
 
-Node `26.10.0`, pnpm `12.4.2`; Docker `node:26-alpine`. PostgreSQL 18. См. [OPERATIONS.md](OPERATIONS.md), [RELEASE-PLAN.md](RELEASE-PLAN.md).
+Node `26.11.1`, pnpm `12.4.2`; Docker `node:26-alpine`. PostgreSQL 18. См. [OPERATIONS.md](OPERATIONS.md), [RELEASE-PLAN.md](RELEASE-PLAN.md).
 
 ## Как обновлять этот файл
 
