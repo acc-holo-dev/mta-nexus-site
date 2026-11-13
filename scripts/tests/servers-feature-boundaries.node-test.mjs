@@ -109,7 +109,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/model/node-leak.ts", "servers-client-has-no-node-builtins"],
     ["features/servers/server/routing-leak.ts", "servers-feature-does-not-import-routing"],
   ])
-    assert(rules("site/src/" + name).includes(rule), name + " escaped " + rule);
+    assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
     "app/page.ts",
     "app/client.ts",
@@ -117,7 +117,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "features/servers/server/page.ts",
     "features/servers/model/observation.ts",
   ])
-    assert.deepEqual(rules("site/src/" + name), [], name);
+    assert.deepEqual(rules(`site/src/${name}`), [], name);
   const gate = cruise(fixture, ["site/src", "site/packages"], "err");
   assert.notEqual(gate.status, 0, "Forbidden imports must fail the architecture gate");
   assert.match(`${gate.stdout}${gate.stderr}`, /servers-feature-public-api/u);
