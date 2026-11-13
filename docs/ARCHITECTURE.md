@@ -45,16 +45,18 @@ infrastructure packages. Model не зависит от UI и Node builtins. Э�
 проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
 HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
 
-### Resources catalog feature
+### Resources feature
 
-`site/src/features/resources` выделяет read-only `/market`, `/market/[slug]`, карточку и query model.
+`site/src/features/resources` выделяет read-only каталог, detail, публичные versions/reviews, карточку и query model.
 [Контракт feature](../site/src/features/resources/README.md) задаёт public `view`
 (RSC/client-compatible карточка), `server` (server-only page) и pure `model`.
 App Router сохраняет dynamic config; products API использует model и прежний service.
 Services/repositories и visibility/scan/access policy остаются прежними; detail client UI,
 publishing и download handlers не переносятся. Отдельный `detail-server` entry
 сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
-Каталог и detail не импортируют composition друг друга. Private imports и server leaks закрыты
+`versions-server` и `reviews-server` отвечают за публичные подстраницы; их metadata
+и dynamic config также остаются в routing. Все четыре server entries изолированы
+друг от друга и защищены `server-only`. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
 Все Resources feature paths требуют полного CI.
 

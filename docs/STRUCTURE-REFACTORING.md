@@ -7,7 +7,8 @@ Phase 2.2 проверена: `tests` → `site/tests`.
 Phase 3 проверена: `deploy/configs` → `docker/config`.
 Phase 4.1 проверена: read-only Servers pilot.
 Phase 4.2 проверена: read-only Resources catalog.
-Выполняется Phase 4.3: Resources detail server composition. Владелец явно
+Phase 4.3 проверена: Resources detail server composition.
+Выполняется Phase 4.4: Resources versions/reviews server composition. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -398,3 +399,27 @@ view/model остаются свободны от server dependencies. Behavior 
 входить через App Router; source-reading guards следуют за реализацией. Состав
 unit/database suite сохраняется. Критерии — metadata safety, manager/private/public,
 loading/error, RU/EN acquisition/download integrity и полный CI/browser.
+
+### Phase 4.4: Resources versions/reviews server composition
+
+Detail composition прошла полный [CI #4639](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43403779984)
+на `d9716522`: все 15 gates, 8 271 unit, 533 tooling и 1 155 DB tests,
+включая production image/startup/upgrade/persistence/backup и browser journeys.
+
+Публичные страницы `/market/[slug]/versions` и `/market/[slug]/reviews` передают
+SSR composition в Resources `server/versions-page.tsx` и `server/reviews-page.tsx`.
+Новые точные public entries — `versions-server.ts` и `reviews-server.ts`, оба
+защищены `server-only`. Metadata/dynamic config и loading остаются в App Router.
+
+Тела helpers/async operations/render сохранены после named export adaptation;
+imports пересчитаны относительно feature. Public visibility, trusted-clean SQL,
+manager/entitlement affordance, pinned buildId, noindex/nofollow, reviews pagination,
+legacy evidence и guest/auth return paths не меняются. Services/SQL и HTTP download/
+review mutations сохраняются; client components и private workspace не переносятся.
+
+Architecture guards расширены только двумя public server entries. Negative fixtures
+проверяют private imports и value/type leaks новых entries; реальные графы всех
+четырёх Resources server compositions проверяются на взаимную независимость.
+Состав unit/database tests сохраняется без rename; behavior tests входят через
+прежние App Router routes. Критерии — public release/review UI, SQL integration,
+review lifecycle, pinned download, metadata и полный CI/browser acceptance.

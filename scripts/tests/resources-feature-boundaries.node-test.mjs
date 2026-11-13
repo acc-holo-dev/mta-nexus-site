@@ -79,6 +79,27 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/app/detail-deep.ts",
     'export { detail } from "../features/resources/server/detail";',
   );
+  for (const scenario of ["versions", "reviews"]) {
+    write(
+      `site/src/features/resources/${scenario}-server.ts`,
+      `import "server-only"; export { value } from "./server/${scenario}"; export type Scope = string;`,
+    );
+    write(`site/src/features/resources/server/${scenario}.ts`, "export const value = 1;");
+    write(
+      `site/src/app/${scenario}.ts`,
+      `export { value } from "../features/resources/${scenario}-server";`,
+    );
+    write(
+      `site/src/app/${scenario}-deep.ts`,
+      `export { value } from "../features/resources/server/${scenario}";`,
+    );
+    write(
+      `site/src/features/resources/components/${scenario}-leak.ts`,
+      scenario === "versions"
+        ? `export type { Scope } from "../${scenario}-server";`
+        : `export { value } from "../${scenario}-server";`,
+    );
+  }
   write("site/src/app/page.ts", 'export { page } from "../features/resources/server";');
   write("site/src/app/view.ts", 'export { card } from "../features/resources/view";');
   write("site/src/lib/consumer.ts", 'export { domain } from "../features/resources/model";');
@@ -116,6 +137,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["app/versions-deep.ts", "resources-feature-public-api"],
+    ["app/reviews-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/versions-leak.ts", "resources-view-isolation"],
+    ["features/resources/components/reviews-leak.ts", "resources-view-isolation"],
     ["app/detail-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/detail-leak.ts", "resources-view-isolation"],
     ["app/deep.ts", "resources-feature-public-api"],
@@ -130,6 +155,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/versions.ts",
+    "app/reviews.ts",
     "app/detail.ts",
     "app/page.ts",
     "app/view.ts",
@@ -156,7 +183,7 @@ test("real view and model entrypoints have no transitive server dependencies", (
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|detail-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -175,11 +202,14 @@ test("real view and model entrypoints have no transitive server dependencies", (
   assert(visited.has("site/src/features/resources/model/market-query.ts"));
 });
 
-test("catalog and detail server entrypoints keep independent composition graphs", () => {
-  for (const [entry, ownPage, otherPage] of [
-    ["server.ts", "market-page.tsx", "detail-page.tsx"],
-    ["detail-server.ts", "detail-page.tsx", "market-page.tsx"],
-  ]) {
+test("Resources server entrypoints keep independent composition graphs", () => {
+  const entries = [
+    ["server.ts", "market-page.tsx"],
+    ["detail-server.ts", "detail-page.tsx"],
+    ["versions-server.ts", "versions-page.tsx"],
+    ["reviews-server.ts", "reviews-page.tsx"],
+  ];
+  for (const [entry, ownPage] of entries) {
     const source = `site/src/features/resources/${entry}`;
     assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
     const result = cruise(root, [source]);
@@ -188,7 +218,10 @@ test("catalog and detail server entrypoints keep independent composition graphs"
     assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
     const modules = new Set(graph.modules.map((module) => module.source));
     assert(modules.has(`site/src/features/resources/server/${ownPage}`), ownPage);
-    assert(!modules.has(`site/src/features/resources/server/${otherPage}`), otherPage);
+    for (const [otherEntry, otherPage] of entries) {
+      if (otherEntry !== entry)
+        assert(!modules.has(`site/src/features/resources/server/${otherPage}`), otherPage);
+    }
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
   }
 });
