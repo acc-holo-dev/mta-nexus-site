@@ -284,3 +284,8 @@ production CSS без новых utility classes из fixtures. Корневой
 Отрицательные fixtures проверяют, что `site/.next/standalone/site/tests` не исполняется,
 а чувствительные `site/tests/unit` требуют полного CI. Текущая граница требует нового
 полного прогона на своём SHA; предыдущий PASS не переносится автоматически.
+
+После переноса tests Knip обнаружил неиспользуемую корневую devDependency
+`lucide-react`: tests принадлежат `site`, где библиотека уже объявлена. Удалено
+только корневое дублирование и его importer link; версии в site/UI и lockfile
+resolutions сохраняются. Ignore для этого случая не добавляется.
