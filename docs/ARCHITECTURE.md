@@ -47,12 +47,14 @@ HTTP ограничения сохраняются. Новые Servers feature p
 
 ### Resources catalog feature
 
-`site/src/features/resources` выделяет read-only `/market`, карточку и query model.
+`site/src/features/resources` выделяет read-only `/market`, `/market/[slug]`, карточку и query model.
 [Контракт feature](../site/src/features/resources/README.md) задаёт public `view`
 (RSC/client-compatible карточка), `server` (server-only page) и pure `model`.
 App Router сохраняет dynamic config; products API использует model и прежний service.
-Services/repositories и visibility/scan/access policy остаются прежними; detail,
-publishing и download не переносятся. Private imports и server leaks закрыты
+Services/repositories и visibility/scan/access policy остаются прежними; detail client UI,
+publishing и download handlers не переносятся. Отдельный `detail-server` entry
+сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
+Каталог и detail не импортируют composition друг друга. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
 Все Resources feature paths требуют полного CI.
 

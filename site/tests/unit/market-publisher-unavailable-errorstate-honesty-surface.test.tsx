@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/app/market/[slug]/page.tsx";
+const surface = "site/src/features/resources/server/detail-page.tsx";
 
 it("locks market publisherUnavailable notice to ErrorState", () => {
   const source = read(surface);

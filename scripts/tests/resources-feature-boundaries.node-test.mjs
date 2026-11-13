@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -20,7 +20,7 @@ function cruise(cwd, entries, output = "json") {
   );
 }
 
-test("Resources catalog rejects private imports, server leaks and impure model edges", (t) => {
+test("Resources feature rejects private imports, server leaks and impure model edges", (t) => {
   const fixture = mkdtempSync(join(tmpdir(), "nexus-resources-boundary-"));
   t.after(() => rmSync(fixture, { recursive: true, force: true }));
   function write(name, content) {
@@ -65,6 +65,20 @@ test("Resources catalog rejects private imports, server leaks and impure model e
     "site/src/features/resources/server/page.ts",
     'import { db } from "../../../lib/services/session"; export const page = db;',
   );
+  write(
+    "site/src/features/resources/detail-server.ts",
+    'import "server-only"; export { detail } from "./server/detail";',
+  );
+  write("site/src/features/resources/server/detail.ts", "export const detail = 1;");
+  write("site/src/app/detail.ts", 'export { detail } from "../features/resources/detail-server";');
+  write(
+    "site/src/features/resources/components/detail-leak.ts",
+    'export { detail } from "../detail-server";',
+  );
+  write(
+    "site/src/app/detail-deep.ts",
+    'export { detail } from "../features/resources/server/detail";',
+  );
   write("site/src/app/page.ts", 'export { page } from "../features/resources/server";');
   write("site/src/app/view.ts", 'export { card } from "../features/resources/view";');
   write("site/src/lib/consumer.ts", 'export { domain } from "../features/resources/model";');
@@ -102,6 +116,8 @@ test("Resources catalog rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["app/detail-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/detail-leak.ts", "resources-view-isolation"],
     ["app/deep.ts", "resources-feature-public-api"],
     ["features/other/deep.ts", "resources-feature-public-api"],
     ["features/resources/components/server-leak.ts", "resources-view-isolation"],
@@ -114,6 +130,7 @@ test("Resources catalog rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/detail.ts",
     "app/page.ts",
     "app/view.ts",
     "lib/consumer.ts",
@@ -139,7 +156,7 @@ test("real view and model entrypoints have no transitive server dependencies", (
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/server(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|detail-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -156,4 +173,22 @@ test("real view and model entrypoints have no transitive server dependencies", (
   visit("site/src/features/resources/model.ts");
   assert(visited.has("site/src/features/resources/components/product-card.tsx"));
   assert(visited.has("site/src/features/resources/model/market-query.ts"));
+});
+
+test("catalog and detail server entrypoints keep independent composition graphs", () => {
+  for (const [entry, ownPage, otherPage] of [
+    ["server.ts", "market-page.tsx", "detail-page.tsx"],
+    ["detail-server.ts", "detail-page.tsx", "market-page.tsx"],
+  ]) {
+    const source = `site/src/features/resources/${entry}`;
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has(`site/src/features/resources/server/${ownPage}`), ownPage);
+    assert(!modules.has(`site/src/features/resources/server/${otherPage}`), otherPage);
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
 });

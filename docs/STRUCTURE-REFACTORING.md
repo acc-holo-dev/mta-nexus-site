@@ -6,7 +6,8 @@ Phase 2.1 проверена: `packages` → `site/packages`.
 Phase 2.2 проверена: `tests` → `site/tests`.
 Phase 3 проверена: `deploy/configs` → `docker/config`.
 Phase 4.1 проверена: read-only Servers pilot.
-Выполняется Phase 4.2: read-only Resources catalog. Владелец явно
+Phase 4.2 проверена: read-only Resources catalog.
+Выполняется Phase 4.3: Resources detail server composition. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -373,3 +374,27 @@ view/model→server/services/infra и impure model edges; реальное trans
 проверяется отдельно. Feature paths требуют full acceptance. Состав unit/database
 сохраняется после rename colocated card test. Критерии — каталог/SQL/HTTP/pagination,
 preview/card/consumers, RU/EN, empty/error и полный browser publishing/download flow.
+
+### Phase 4.3: Resources detail server composition
+
+Resources catalog прошёл полный [CI #4638](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43401017128)
+на `9697188d`: все 15 gates, 8 271 unit, 532 tooling и 1 155 DB tests,
+production image/startup/upgrade/persistence/backup и browser journeys.
+
+Composition `/market/[slug]` перенесена в Resources private `server/detail-page.tsx`.
+Отдельный public `detail-server.ts` защищён `server-only` и не расширяет граф
+каталожного `server.ts`. App Router сохраняет прежние generateMetadata и dynamic
+config, делегируя только page composition. URLs/loading сохраняются.
+
+Helpers, async calls и render body перенесены без изменения; metadata body остаётся
+побайтно прежним. Session, visibility, management/entitlement, build provenance,
+gallery, Save/mute/watch и Q&A/reviews используют существующие реализации.
+Services/SQL, HTTP claim/download, detail client components, editor и workers не
+переносятся. Read-only SSR composition не подменяет server download authority.
+
+Architecture guards включают новый public entry, его server isolation и negative
+value/type fixtures. Реальные graphs каталога/detail проверяются независимо;
+view/model остаются свободны от server dependencies. Behavior tests продолжают
+входить через App Router; source-reading guards следуют за реализацией. Состав
+unit/database suite сохраняется. Критерии — metadata safety, manager/private/public,
+loading/error, RU/EN acquisition/download integrity и полный CI/browser.

@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 describe("product detail management authority", () => {
   it("uses canonical product management instead of historical author attribution", () => {
     const page = readFileSync(
-      resolve(process.cwd(), "site/src/app/market/[slug]/page.tsx"),
+      resolve(process.cwd(), "site/src/features/resources/server/detail-page.tsx"),
       "utf8",
     );
 

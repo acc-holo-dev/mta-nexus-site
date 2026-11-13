@@ -79,7 +79,7 @@ module.exports = {
       comment:
         "Other application modules consume the Resources catalog through view, server or model entrypoints.",
       from: { path: "^site/src/(?!features/resources/)" },
-      to: { path: "^site/src/features/resources/(?!(?:view|server|model)\\.ts$)" },
+      to: { path: "^site/src/features/resources/(?!(?:view|server|detail-server|model)\\.ts$)" },
     },
     {
       name: "resources-feature-does-not-import-routing",
@@ -94,7 +94,7 @@ module.exports = {
         "Shared views and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: { path: "^site/src/features/resources/(?:view\\.ts$|components/|model(?:\\.ts$|/))" },
       to: {
-        path: "^(?:site/src/(?:features/resources/server(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|detail-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

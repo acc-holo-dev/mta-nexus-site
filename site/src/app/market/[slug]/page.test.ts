@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ thumbnail: "", missing: false, locale: "en" as "en" | "ru" }));

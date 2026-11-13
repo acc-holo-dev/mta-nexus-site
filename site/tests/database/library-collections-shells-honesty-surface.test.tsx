@@ -41,7 +41,7 @@ const clippedPages = [
   "site/src/app/workspace/library/collections/page.tsx",
   "site/src/app/workspace/library/collections/membership-history/page.tsx",
   "site/src/app/workspace/library/collections/membership-history/[id]/page.tsx",
-  "site/src/app/market/[slug]/page.tsx",
+  "site/src/features/resources/server/detail-page.tsx",
   "site/src/app/articles/page.tsx",
 ] as const;
 
@@ -73,7 +73,7 @@ it("locks library collections shells and exclusive market/articles pages to clip
 });
 
 it("locks market detail and articles shells to ErrorState/EmptyState honesty chrome", () => {
-  const market = read("site/src/app/market/[slug]/page.tsx");
+  const market = read("site/src/features/resources/server/detail-page.tsx");
   expect(market).toContain("ErrorState");
   expect(market).toContain("EmptyState");
   expect(market).toContain("pageShellClass");

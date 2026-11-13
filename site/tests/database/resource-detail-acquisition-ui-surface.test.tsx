@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { describe, expect, it, vi } from "vitest";
 
 // Keep unit classification: entry-level full mock cuts the @nexus/db import edge.
