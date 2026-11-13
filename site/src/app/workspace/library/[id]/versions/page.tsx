@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
+import { BuildProvenanceDetails } from "../../../../../features/resources/evidence";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";

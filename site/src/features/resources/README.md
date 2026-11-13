@@ -1,28 +1,33 @@
-# Resources: публичные страницы и модели
+# Resources: публичные страницы, UI и модели
 
 Read-only срез объединяет composition каталога, detail, публичной истории версий и
-отзывов, общую карточку ресурса и чистый разбор query/pagination. Detail/review UI
-components, editor, builds, download handlers и Q&A остаются в существующих модулях.
+отзывов, карточку, preview/gallery, build provenance/package evidence и чистые
+query/gallery/provenance helpers. Остальной detail/review UI, editor, builds,
+download handlers и Q&A остаются в существующих модулях.
 Services и repositories не дублируются и не переносятся.
 
 ## Публичные entrypoints
 
-| Entry                | Контракт                                                                                            |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                        |
-| `server.ts`          | `MarketPage`, Next `server-only` composition с request locale и существующим product service        |
-| `detail-server.ts`   | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration |
-| `versions-server.ts` | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance           |
-| `reviews-server.ts`  | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                         |
-| `model.ts`           | Query parsing, ссылки, размер и предел страницы; только pure domain dependency                      |
+| Entry                | Контракт                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `client.ts`          | `ResourcePreview`, `ResourceGallery`; прежние client components и lightbox                                  |
+| `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
+| `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                                |
+| `server.ts`          | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
+| `detail-server.ts`   | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
+| `versions-server.ts` | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
+| `reviews-server.ts`  | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
+| `model.ts`           | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
 
-`view` не добавляет `use client`: карточка сохраняет прежнюю семантику, а интерактивный
-`ResourcePreview` остаётся общим client component. Общие locale, безопасные preview
-URLs, labels и public attribution остаются в lib/components для остальных consumers.
+`view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
+совместимость. `client` экспортирует preview/gallery с прежними client directives;
+lightbox остаётся приватным. Общие locale, безопасные preview URLs и public attribution
+остаются в lib, общий native-dialog hook — в components. Внутри feature используются
+прямые implementation imports; workspace/media/build/library используют public ports.
 Внешний production-код использует только entrypoints; приватные implementation
-imports, feature→routing и view/model→server/services/infra запрещены анализатором.
+imports, feature→routing и client/evidence/view/model→server/services/infra запрещены анализатором.
 Model также не импортирует app helpers, UI, frameworks или Node builtins. Negative
-fixtures проверяют value/type edges; реальный view/model graph проверяется отдельно.
+fixtures проверяют value/type edges; реальные графы client/evidence/view/model проверяются отдельно.
 
 `server.ts` отвечает только за каталог; `detail-server.ts` — только за детальную
 страницу. Они не реэкспортируют друг друга: SSR hydration сессии, entitlement,
@@ -43,6 +48,13 @@ trusted-clean SQL selection, pagination, provenance и точный buildId кн
 и вход к авторской задаче. Metadata обеих страниц и dynamic config остаются в routes;
 у версий сохраняется `noindex/nofollow`. Loading shells остаются прежними.
 
+Preview сохраняет URL validation, failed decode/cached error fallback и прежний
+priority. Gallery сохраняет native links/modifier clicks, bounded navigation,
+RU/EN captions, native modal/focus/keyboard и fallback при ошибке изображения.
+Provenance/package evidence сохраняют различие clean/unknown/error/malicious,
+scanner/time, legacy/truncated/unchecked, signature flag и verification. Pure
+provenance projection не заменяет server download policy и не создаёт новый grant.
+
 ## Сохраняемое поведение
 
 - App Router сохраняет `/market` и `dynamic = "force-dynamic"`; GET products API
@@ -61,6 +73,10 @@ metadata safety и management-authority/honesty tests. Source-reading guards ч�
 History/reviews checks: public release page/query и PostgreSQL integration,
 review page/repository/lifecycle/browser-boundary, `pnpm test:resource` и pinned
 download HTTP. Все behavior tests продолжают входить через маршруты App Router.
+
+Presentation checks: preview/card/gallery, trust/provenance/package UI и honesty
+source guards, detail/versions/media consumers; PostgreSQL package-evidence и media
+lifecycle integrations. Состав suites сохранён после одного rename preview test.
 
 Boundary suite — `scripts/tests/resources-feature-boundaries.node-test.mjs`.
 Изменения feature требуют полного CI. Download authority, commerce и DRM не меняются.

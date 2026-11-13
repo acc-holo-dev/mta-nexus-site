@@ -8,7 +8,7 @@ import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { confirmAction } from "./confirm-action";
-import { ResourcePreview } from "./resource-preview";
+import { ResourcePreview } from "../features/resources/client";
 
 export function ResourceMediaEditor({
   initial,

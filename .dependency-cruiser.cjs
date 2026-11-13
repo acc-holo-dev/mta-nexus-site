@@ -80,7 +80,7 @@ module.exports = {
         "Other application modules consume the Resources feature through view, server or model entrypoints.",
       from: { path: "^site/src/(?!features/resources/)" },
       to: {
-        path: "^site/src/features/resources/(?!(?:view|server|(?:detail|versions|reviews)-server|model)\\.ts$)",
+        path: "^site/src/features/resources/(?!(?:view|client|evidence|server|(?:detail|versions|reviews)-server|model)\\.ts$)",
       },
     },
     {
@@ -94,9 +94,11 @@ module.exports = {
       severity: "error",
       comment:
         "Shared views and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
-      from: { path: "^site/src/features/resources/(?:view\\.ts$|components/|model(?:\\.ts$|/))" },
+      from: {
+        path: "^site/src/features/resources/(?:(?:view|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
+      },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -116,7 +118,9 @@ module.exports = {
     {
       name: "resources-view-has-no-node-builtins",
       severity: "error",
-      from: { path: "^site/src/features/resources/(?:view\\.ts$|components/|model(?:\\.ts$|/))" },
+      from: {
+        path: "^site/src/features/resources/(?:(?:view|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
+      },
       to: { dependencyTypes: ["core"] },
     },
     {

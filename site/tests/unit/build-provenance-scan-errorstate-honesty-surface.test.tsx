@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/build-provenance-details.tsx";
+const surface = "site/src/features/resources/components/build-provenance-details.tsx";
 
 it("locks non-clean build provenance scan notices to ErrorState", () => {
   const source = read(surface);

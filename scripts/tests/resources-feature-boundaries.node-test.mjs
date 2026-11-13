@@ -56,6 +56,13 @@ test("Resources feature rejects private imports, server leaks and impure model e
   write("site/src/features/resources/components/card.ts", "export const card = 1;");
   write("site/src/features/resources/model/query.ts", 'export { domain } from "@nexus/domain";');
   write("site/src/features/resources/model.ts", 'export { domain } from "./model/query";');
+  write(
+    "site/src/features/resources/client.ts",
+    '"use client"; export { card } from "./components/card"; export type { Session } from "../../lib/services/session";',
+  );
+  write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
+  write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
+  write("site/src/app/evidence.ts", 'export { page } from "../features/resources/evidence";');
   write("site/src/features/resources/view.ts", 'export { card } from "./components/card";');
   write(
     "site/src/features/resources/server.ts",
@@ -137,6 +144,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/resources/client.ts", "resources-view-isolation"],
+    ["features/resources/evidence.ts", "resources-view-isolation"],
     ["app/versions-deep.ts", "resources-feature-public-api"],
     ["app/reviews-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/versions-leak.ts", "resources-view-isolation"],
@@ -155,6 +164,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/media.ts",
+    "app/evidence.ts",
     "app/versions.ts",
     "app/reviews.ts",
     "app/detail.ts",
@@ -170,8 +181,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
   assert.match(`${gate.stdout}${gate.stderr}`, /resources-feature-public-api/u);
 });
 
-test("real view and model entrypoints have no transitive server dependencies", () => {
+test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/resources/client.ts",
+    "site/src/features/resources/evidence.ts",
     "site/src/features/resources/view.ts",
     "site/src/features/resources/model.ts",
   ]);
@@ -196,8 +209,23 @@ test("real view and model entrypoints have no transitive server dependencies", (
       visit(dependency.resolved);
     }
   }
+  assert.match(
+    readFileSync(resolve(root, "site/src/features/resources/client.ts"), "utf8"),
+    /"use client"/u,
+  );
+  visit("site/src/features/resources/client.ts");
+  visit("site/src/features/resources/evidence.ts");
   visit("site/src/features/resources/view.ts");
   visit("site/src/features/resources/model.ts");
+  for (const file of [
+    "components/resource-preview.tsx",
+    "components/resource-gallery-lightbox.tsx",
+    "components/build-provenance-details.tsx",
+    "components/build-package-evidence.tsx",
+    "model/build-provenance.ts",
+    "model/resource-gallery-interaction.ts",
+  ])
+    assert(visited.has(`site/src/features/resources/${file}`), file);
   assert(visited.has("site/src/features/resources/components/product-card.tsx"));
   assert(visited.has("site/src/features/resources/model/market-query.ts"));
 });

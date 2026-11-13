@@ -1,7 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
-import { getBuildProvenance } from "../lib/build-provenance";
-import { getDictionary, type Locale } from "../lib/i18n";
+import { getBuildProvenance } from "../model/build-provenance";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 
 const toneClass = {
   positive: "border-[color:var(--nexus-success)]/20 bg-success-soft text-success",

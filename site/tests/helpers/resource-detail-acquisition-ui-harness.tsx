@@ -91,7 +91,7 @@ vi.mock("../../src/components/resource-qa-panel", async () => {
   };
 });
 
-vi.mock("../../src/components/resource-preview", async () => {
+vi.mock("../../src/features/resources/components/resource-preview", async () => {
   const ReactModule = await import("react");
   return {
     ResourcePreview: ({ title }: { title: string }) =>
@@ -176,7 +176,7 @@ vi.mock("../../src/components/follow-button", async () => {
   };
 });
 
-vi.mock("../../src/components/build-provenance-details", async () => {
+vi.mock("../../src/features/resources/components/build-provenance-details", async () => {
   const ReactModule = await import("react");
   return {
     BuildProvenanceDetails: ({ build }: { build: { id: string } }) =>

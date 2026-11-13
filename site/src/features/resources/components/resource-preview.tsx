@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { safeResourceImageUrl } from "../lib/resource-image-url";
+import { safeResourceImageUrl } from "../../../lib/resource-image-url";
 
 export function ResourcePreview({
   src,

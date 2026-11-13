@@ -58,6 +58,10 @@ publishing и download handlers не переносятся. Отдельный 
 и dynamic config также остаются в routing. Все четыре server entries изолированы
 друг от друга и защищены `server-only`. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
+Public `client` содержит preview/gallery, нейтральный `evidence` — provenance/package
+UI; карточка остаётся в `view`. Pure gallery/provenance helpers входят в model.
+Сохраняются client directives и общий modal hook; UI evidence не заменяет выдачу
+по server policy. Все UI entrypoints проверяются на transitive server leaks.
 Все Resources feature paths требуют полного CI.
 
 ### HTTP → service → repository

@@ -4,9 +4,9 @@ import {
   buildPackageSummary,
 } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
-import { buildPackageCopy } from "../lib/build-package-i18n";
-import { getDictionary } from "../lib/i18n";
-import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
+import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getMtaMetaInspectorIssueMessage } from "../../../lib/mta-meta-inspector-messages";
 
 export function BuildPackageSummaryPanel({
   summary,

@@ -14,8 +14,8 @@ import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceBuildWorkspaceService } from "../lib/services/resource-build-workspace-service";
 import { BuildModerationControls } from "./build-moderation-controls";
-import { BuildPackageEvidencePanel } from "./build-package-evidence";
-import { BuildProvenanceDetails } from "./build-provenance-details";
+import { BuildPackageEvidencePanel } from "../features/resources/evidence";
+import { BuildProvenanceDetails } from "../features/resources/evidence";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceBuildControls } from "./resource-build-controls";
 

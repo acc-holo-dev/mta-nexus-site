@@ -9,7 +9,7 @@ import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceMediaService } from "../lib/services/resource-media-service";
 import { PlatformSignIn } from "./platform-sign-in";
-import { ResourceGallery } from "./resource-gallery";
+import { ResourceGallery } from "../features/resources/client";
 import { ResourceMediaEditor } from "./resource-media-editor";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";

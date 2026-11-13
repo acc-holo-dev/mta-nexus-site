@@ -19,7 +19,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../../components/resource-preview", () => ({
+vi.mock("./resource-preview", () => ({
   ResourcePreview: ({ title }: { title: string }) => <div data-testid="preview">{title}</div>,
 }));
 

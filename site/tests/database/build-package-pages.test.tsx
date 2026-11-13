@@ -31,7 +31,7 @@ import AdminResourceBuildPackageLoading from "../../src/app/admin/resources/[id]
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
-} from "../../src/components/build-package-evidence";
+} from "../../src/features/resources/evidence";
 import { BuildPackageScreen } from "../../src/components/build-package-screen";
 import { buildPackageCopy } from "../../src/lib/build-package-i18n";
 

@@ -8,7 +8,8 @@ Phase 3 проверена: `deploy/configs` → `docker/config`.
 Phase 4.1 проверена: read-only Servers pilot.
 Phase 4.2 проверена: read-only Resources catalog.
 Phase 4.3 проверена: Resources detail server composition.
-Выполняется Phase 4.4: Resources versions/reviews server composition. Владелец явно
+Phase 4.4 проверена: Resources versions/reviews server composition.
+Выполняется Phase 4.5: Resources media/evidence presentation. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -423,3 +424,29 @@ Architecture guards расширены только двумя public server ent
 Состав unit/database tests сохраняется без rename; behavior tests входят через
 прежние App Router routes. Критерии — public release/review UI, SQL integration,
 review lifecycle, pinned download, metadata и полный CI/browser acceptance.
+
+### Phase 4.5: Resources media/evidence presentation
+
+Versions/reviews composition прошли полный [CI #4640](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43406823905)
+на `df0eab11`: все 15 gates, 8 271 unit, 533 tooling и 1 155 DB tests,
+включая production/upgrade/persistence/backup и browser journeys.
+
+Preview, gallery/lightbox и build provenance/package evidence UI перенесены в
+Resources private components. Public `client.ts` сохраняет client directives
+preview/gallery; нейтральный `evidence.ts` сохраняет RSC/client compatibility.
+Card/detail/versions внутри feature используют прямые imports; media/build/library
+workspace — public ports. Common native-dialog hook и locale/URL/message adapters
+остаются на прежних местах; новых UI primitives или сетевых collectors нет.
+
+Чистые gallery interaction и build provenance helpers перенесены побайтно в model;
+публичные helpers доступны через model entry. Тела пяти UI modules сохранены после
+пересчёта imports. Legacy/unknown/scan error/signature и package truncated/missing
+states, decode fallback, modifier links, keyboard/focus и bounded arrows не меняются.
+Evidence UI не авторизует выдачу: SQL/service/HTTP download checks сохраняются.
+
+Architecture guards покрывают новые public ports и их value/type server leaks;
+real transitive closure проверяет client/evidence/view/model. Четыре server graph
+по-прежнему независимы. Source-reading guards следуют за private implementation;
+состав unit/database tests сохраняется после rename preview test. Критерии —
+preview/gallery/provenance/package behavior, workspace/detail/versions consumers,
+package/media SQL integrations и полный CI/browser acceptance.

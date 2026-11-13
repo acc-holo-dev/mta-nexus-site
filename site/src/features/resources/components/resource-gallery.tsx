@@ -2,8 +2,8 @@
 
 import type { ResourceMediaItem } from "@nexus/domain";
 import { useState } from "react";
-import { resourceMediaCopy } from "../lib/resource-media-i18n";
-import { shouldOpenGalleryLightbox } from "./resource-gallery-interaction";
+import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { shouldOpenGalleryLightbox } from "../model/resource-gallery-interaction";
 import { ResourceGalleryLightbox } from "./resource-gallery-lightbox";
 import { ResourcePreview } from "./resource-preview";
 

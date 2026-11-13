@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatProvenanceTimestamp, getBuildProvenance } from "../../src/lib/build-provenance";
+import { formatProvenanceTimestamp, getBuildProvenance } from "../../src/features/resources/model";
 
 describe("build provenance presentation", () => {
   it("keeps scan status, scanner identity and scan time as separate facts", () => {
