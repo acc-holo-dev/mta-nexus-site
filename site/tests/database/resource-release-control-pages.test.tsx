@@ -44,7 +44,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { page: state.updates, detail: state.versions },
 }));
-vi.mock("../../src/components/resource-download-button", () => ({
+vi.mock("../../src/features/resources/download", () => ({
   ResourceDownloadButton: ({ buildId }: { buildId?: string }) => (
     <button type="button" data-download={buildId}>
       Download

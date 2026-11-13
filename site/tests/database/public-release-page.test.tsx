@@ -62,7 +62,7 @@ vi.mock("../../src/lib/services/commerce-service", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/resource-download-button", async () => {
+vi.mock("../../src/features/resources/components/resource-download-button", async () => {
   const React = await import("react");
   return {
     ResourceDownloadButton: ({

@@ -18,7 +18,7 @@ import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { LibraryReleaseFollowLatest } from "./library-release-follow-latest";
 import { PlatformSignIn } from "./platform-sign-in";
-import { ResourceDownloadButton } from "./resource-download-button";
+import { ResourceDownloadButton } from "../features/resources/download";
 import { ResourceReleaseWatchControl } from "./resource-release-watch-control";
 export async function CollectionReleasesScreen({
   params,

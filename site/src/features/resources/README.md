@@ -13,6 +13,7 @@ Services и repositories не дублируются и не переносят�
 | `detail-view.ts`     | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
 | `review-controls.ts` | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`    | `ResourceReviewPager`; общая пагинация для workspace                                                        |
+| `download.ts`        | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
 | `client.ts`          | `ResourcePreview`, `ResourceGallery`, `ResourceQaPanel`; client components                                  |
 | `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
 | `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                                |
@@ -90,3 +91,9 @@ Review list/pager, review controls, Q&A panel и report form принадлеж�
 Dependency/reverse-dependency, variants и version-help UI принадлежат Resources.
 `detail-view` предоставляет dependency UI workspace; чистые resolution helpers и
 shared copy/support components сохраняют прежние места. Списки не меняют server visibility.
+
+Download UI принадлежит Resources и экспортируется через отдельный client port.
+Сетевой adapter, pin/hash/size/cancellation policy и authoritative HTTP/service
+checks сохраняют прежние реализации; UI не является разрешением на выдачу.
+Проверки: `pnpm test:resource-integrity`, consumers library/detail/versions и
+полный browser acceptance с exact-byte download, timeout и cancellation.

@@ -7,7 +7,7 @@ import { authEntryHref } from "../../../components/auth-return-path";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { ResourceDownloadButton } from "../../../components/resource-download-button";
+import { ResourceDownloadButton } from "../components/resource-download-button";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

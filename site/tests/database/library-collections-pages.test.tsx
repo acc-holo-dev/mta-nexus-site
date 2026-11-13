@@ -57,7 +57,7 @@ vi.mock("../../src/components/library-collection-command", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/resource-download-button", () => ({
+vi.mock("../../src/features/resources/download", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId?: string }) => (
     <button type="button" data-download={productId} data-build={buildId}>
       Download

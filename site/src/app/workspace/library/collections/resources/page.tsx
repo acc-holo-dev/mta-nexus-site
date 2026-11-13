@@ -10,7 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryReleaseFollowLatest } from "../../../../../components/library-release-follow-latest";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceDownloadButton } from "../../../../../features/resources/download";
 import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";

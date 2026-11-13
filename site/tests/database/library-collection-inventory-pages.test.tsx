@@ -31,7 +31,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 vi.mock("../../src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { inventory: state.history },
 }));
-vi.mock("../../src/components/resource-download-button", () => ({
+vi.mock("../../src/features/resources/download", () => ({
   ResourceDownloadButton: ({
     productId,
     buildId,

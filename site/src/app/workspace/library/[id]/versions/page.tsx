@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { BuildProvenanceDetails } from "../../../../../features/resources/evidence";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceDownloadButton } from "../../../../../features/resources/download";
 import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
 import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";

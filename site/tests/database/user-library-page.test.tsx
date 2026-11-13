@@ -37,7 +37,7 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/components/resource-download-button", async () => {
+vi.mock("../../src/features/resources/download", async () => {
   const React = await import("react");
   return {
     ResourceDownloadButton: ({

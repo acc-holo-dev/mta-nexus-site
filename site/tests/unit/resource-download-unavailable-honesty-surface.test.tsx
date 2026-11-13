@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/resource-download-button.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/resource-download-button.tsx"),
+  "utf8",
+);
 
 it("locks fixed-selection unavailableReason to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

@@ -24,7 +24,7 @@ import {
   libraryCollectionsLinkClass,
   libraryCollectionsSearchFieldClass,
 } from "./library-collections-screen-shared";
-import { ResourceDownloadButton } from "./resource-download-button";
+import { ResourceDownloadButton } from "../features/resources/download";
 
 export async function LibraryCollectionsDetailView({
   locale,

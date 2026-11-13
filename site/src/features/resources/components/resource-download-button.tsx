@@ -5,16 +5,16 @@ import { Download } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { getDictionary } from "../lib/i18n";
-import { resourceDeliveriesCopy } from "../lib/resource-deliveries-i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
 import {
   type DownloadFailure,
   fetchResourceDownload,
   ResourceDownloadError,
-} from "../lib/resource-download-client";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/resource-download-client";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { useNexusLocale } from "../../../components/locale-context";
 
 export function ResourceDownloadButton({
   productId,

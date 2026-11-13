@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceDownloadButton } from "../../../../../features/resources/download";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";

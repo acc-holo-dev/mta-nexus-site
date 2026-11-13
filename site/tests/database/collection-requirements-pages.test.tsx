@@ -23,7 +23,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 vi.mock("../../src/lib/services/resource-requirements-service", () => ({
   resourceRequirementsService: { collectionReport: state.report },
 }));
-vi.mock("../../src/components/resource-download-button", () => ({
+vi.mock("../../src/features/resources/download", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button" data-product={productId} data-build={buildId}>
       Download

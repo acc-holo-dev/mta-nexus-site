@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
-import { ResourceDownloadButton } from "./resource-download-button";
+import { ResourceDownloadButton } from "../features/resources/download";
 
 export function ResourceRequirementsReportBody({
   report,

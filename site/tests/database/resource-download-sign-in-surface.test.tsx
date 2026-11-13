@@ -92,7 +92,7 @@ vi.mock("../../src/lib/resource-download-client", async (original) => {
   };
 });
 
-import { ResourceDownloadButton } from "../../src/components/resource-download-button";
+import { ResourceDownloadButton } from "../../src/features/resources/download";
 import { fetchResourceDownload } from "../../src/lib/resource-download-client";
 
 type Element = ReactElement<Record<string, unknown>>;

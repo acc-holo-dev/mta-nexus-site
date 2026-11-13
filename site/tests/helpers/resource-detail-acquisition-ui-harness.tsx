@@ -102,7 +102,7 @@ vi.mock("../../src/features/resources/components/resource-preview", async () => 
   };
 });
 
-vi.mock("../../src/components/resource-download-button", async () => {
+vi.mock("../../src/features/resources/components/resource-download-button", async () => {
   const ReactModule = await import("react");
   return {
     ResourceDownloadButton: ({

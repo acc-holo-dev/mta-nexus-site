@@ -3,7 +3,7 @@ import { expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/resource" }));
 
-import { LocaleProvider } from "./locale-context";
+import { LocaleProvider } from "../../../components/locale-context";
 import { ResourceDownloadButton } from "./resource-download-button";
 
 it.each(["en", "ru"] as const)("renders latest download intent in %s", (locale) => {
