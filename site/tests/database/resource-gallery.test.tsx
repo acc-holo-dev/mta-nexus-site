@@ -6,10 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ResourceGallery } from "../../src/features/resources/client";
 import { ResourceGalleryLightbox } from "../../src/features/resources/components/resource-gallery-lightbox";
-import {
-  shouldOpenGalleryLightbox,
-  stepGalleryIndex,
-} from "../../src/features/resources/model";
+import { shouldOpenGalleryLightbox, stepGalleryIndex } from "../../src/features/resources/model";
 import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 import { clickedDialogBackdrop } from "../../src/components/use-modal-dialog";
 
@@ -205,7 +202,10 @@ describe("ResourceGalleryLightbox", () => {
 
   it("keeps close and nav icon controls at touch target size in source", () => {
     const source = readFileSync(
-      resolve(process.cwd(), "site/src/features/resources/components/resource-gallery-lightbox.tsx"),
+      resolve(
+        process.cwd(),
+        "site/src/features/resources/components/resource-gallery-lightbox.tsx",
+      ),
       "utf8",
     );
     const touchTargets = source.match(/min-h-11 min-w-11/gu) ?? [];
