@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Repository suites moved inside site; fixtures must not add production utilities. */
+@source not "../../tests";
 
 /* ============================================================
    NEXUS DESIGN TOKENS — TASK-002/003/026/027

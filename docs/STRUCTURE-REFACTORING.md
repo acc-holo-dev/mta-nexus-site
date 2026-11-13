@@ -277,7 +277,9 @@ Imports/mocks и helper paths пересчитаны от владельца ф�
 корневой cwd. Grouped/focused/isolated runners, Compose binds и workflow filters используют
 новые пути. CI sensitivity по-прежнему распознаёт обе стороны rename. Knip учитывает
 tests в workspace `site`; Next исключает их из автоматического TS include и standalone
-tracing. Корневой typecheck и Vitest продолжают проверять все тесты.
+tracing. Tailwind исключает `site/tests` из автоматического source scan, сохраняя
+production CSS без новых utility classes из fixtures. Корневой typecheck и Vitest
+продолжают проверять все тесты.
 
 Отрицательные fixtures проверяют, что `site/.next/standalone/site/tests` не исполняется,
 а чувствительные `site/tests/unit` требуют полного CI. Текущая граница требует нового
