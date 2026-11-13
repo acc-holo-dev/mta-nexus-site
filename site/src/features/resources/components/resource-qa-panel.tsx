@@ -9,14 +9,14 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CircleHelp, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { getDictionary } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { ResourceQaReportForm } from "./resource-qa-report-form";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { ResourceQaReportForm } from "../../../components/resource-qa-report-form";
 
 type BuildOption = { id: string; version: string };
 

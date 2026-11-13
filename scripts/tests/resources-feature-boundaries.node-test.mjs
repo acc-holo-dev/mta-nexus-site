@@ -63,6 +63,11 @@ test("Resources feature rejects private imports, server leaks and impure model e
   write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
   write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
   write("site/src/app/evidence.ts", 'export { page } from "../features/resources/evidence";');
+  write("site/src/features/resources/reviews-view.ts", 'export { page } from "./server";');
+  write(
+    "site/src/app/reviews-view.ts",
+    'export { page } from "../features/resources/reviews-view";',
+  );
   write("site/src/features/resources/view.ts", 'export { card } from "./components/card";');
   write(
     "site/src/features/resources/server.ts",
@@ -144,6 +149,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/evidence.ts", "resources-view-isolation"],
     ["app/versions-deep.ts", "resources-feature-public-api"],
@@ -164,6 +170,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/reviews-view.ts",
     "app/media.ts",
     "app/evidence.ts",
     "app/versions.ts",
@@ -185,6 +192,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   const result = cruise(root, [
     "site/src/features/resources/client.ts",
     "site/src/features/resources/evidence.ts",
+    "site/src/features/resources/reviews-view.ts",
     "site/src/features/resources/view.ts",
     "site/src/features/resources/model.ts",
   ]);
@@ -215,9 +223,12 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   );
   visit("site/src/features/resources/client.ts");
   visit("site/src/features/resources/evidence.ts");
+  visit("site/src/features/resources/reviews-view.ts");
   visit("site/src/features/resources/view.ts");
   visit("site/src/features/resources/model.ts");
   for (const file of [
+    "components/resource-qa-panel.tsx",
+    "components/resource-review-list.tsx",
     "components/resource-preview.tsx",
     "components/resource-gallery-lightbox.tsx",
     "components/build-provenance-details.tsx",

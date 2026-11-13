@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/resource-qa-panel.tsx";
+const surface = "site/src/features/resources/components/resource-qa-panel.tsx";
 
 it("locks resource QA writeError to ErrorState with stable id", () => {
   const source = read(surface);

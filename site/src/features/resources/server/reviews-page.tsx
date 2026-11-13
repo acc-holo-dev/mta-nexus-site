@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { ResourceReviewList, ResourceReviewPager } from "../../../components/resource-review-list";
+import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";

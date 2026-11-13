@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import { ResourceReviewPager } from "../../../../components/resource-review-list";
+import { ResourceReviewPager } from "../../../../features/resources/reviews-view";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceReviewCopy, resourceReviewState } from "../../../../lib/resource-review-i18n";

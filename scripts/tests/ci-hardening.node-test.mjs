@@ -33,6 +33,8 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/tests/unit/browser-api-route-inventory.test.ts",
     "site/src/features/resources/view.ts",
     "site/src/features/resources/client.ts",
+    "site/src/features/resources/reviews-view.ts",
+    "site/src/features/resources/components/resource-qa-panel.tsx",
     "site/src/features/resources/evidence.ts",
     "site/src/features/resources/components/resource-gallery-lightbox.tsx",
     "site/src/features/resources/model/build-provenance.ts",

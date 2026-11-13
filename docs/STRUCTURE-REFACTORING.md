@@ -9,7 +9,8 @@ Phase 4.1 проверена: read-only Servers pilot.
 Phase 4.2 проверена: read-only Resources catalog.
 Phase 4.3 проверена: Resources detail server composition.
 Phase 4.4 проверена: Resources versions/reviews server composition.
-Выполняется Phase 4.5: Resources media/evidence presentation. Владелец явно
+Phase 4.5 проверена: Resources media/evidence presentation.
+Выполняется Phase 4.6: Resources reviews/Q&A UI. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -450,3 +451,7 @@ real transitive closure проверяет client/evidence/view/model. Четы�
 состав unit/database tests сохраняется после rename preview test. Критерии —
 preview/gallery/provenance/package behavior, workspace/detail/versions consumers,
 package/media SQL integrations и полный CI/browser acceptance.
+
+### Phase 4.6: Resources reviews/Q&A UI
+
+Media/evidence прошли [CI #4642](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43412833391) на `e2050afc`. Список отзывов и Q&A panel объединены в Resources через `reviews-view` и `client`; общие формы, HTTP adapters, services и repositories остаются прежними. Public и workspace consumers используют явные порты, серверная авторизация и подтверждения сохраняются. Architecture suite проверяет транзитивные client/view зависимости и запрет server leaks.

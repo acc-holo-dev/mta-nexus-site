@@ -84,7 +84,7 @@ vi.mock("../../src/lib/services/resource-qa-service", () => ({
   },
 }));
 
-vi.mock("../../src/components/resource-qa-panel", async () => {
+vi.mock("../../src/features/resources/components/resource-qa-panel", async () => {
   const ReactModule = await import("react");
   return {
     ResourceQaPanel: () => ReactModule.createElement("div", { "data-testid": "resource-qa" }),

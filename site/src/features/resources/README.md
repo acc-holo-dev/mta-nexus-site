@@ -10,7 +10,8 @@ Services и repositories не дублируются и не переносят�
 
 | Entry                | Контракт                                                                                                    |
 | -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `client.ts`          | `ResourcePreview`, `ResourceGallery`; прежние client components и lightbox                                  |
+| `reviews-view.ts`    | `ResourceReviewPager`; общая пагинация для workspace                                                        |
+| `client.ts`          | `ResourcePreview`, `ResourceGallery`, `ResourceQaPanel`; client components                                  |
 | `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
 | `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                                |
 | `server.ts`          | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
@@ -80,3 +81,6 @@ lifecycle integrations. Состав suites сохранён после одно
 
 Boundary suite — `scripts/tests/resources-feature-boundaries.node-test.mjs`.
 Изменения feature требуют полного CI. Download authority, commerce и DRM не меняются.
+
+Review list/pager и Q&A panel принадлежат Resources. Существующие HTTP adapters,
+подтверждения, report form, service и repository остаются прежними.

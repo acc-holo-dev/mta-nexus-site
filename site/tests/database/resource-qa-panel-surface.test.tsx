@@ -5,7 +5,7 @@ import { expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/example" }));
 
-import { ResourceQaPanel } from "../../src/components/resource-qa-panel";
+import { ResourceQaPanel } from "../../src/features/resources/client";
 import { resourceQaCopy } from "../../src/lib/resource-qa-i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -110,10 +110,10 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
 });
 
 it("gates resolve and reopen writes behind confirmAction with localized copy", () => {
-  const source = read("site/src/components/resource-qa-panel.tsx");
+  const source = read("site/src/features/resources/components/resource-qa-panel.tsx");
   const i18n = read("site/src/lib/resource-qa-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "./confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
   expect(source).toContain("copy.resolveConfirmTitle");
   expect(source).toContain("copy.reopenConfirmTitle");
   expect(source).toContain("danger: false");

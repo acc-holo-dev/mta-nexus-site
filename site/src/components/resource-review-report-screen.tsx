@@ -13,7 +13,7 @@ import { authService } from "../lib/services/auth-service";
 import { resourceReviewService } from "../lib/services/resource-review-service";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceReviewDecisionForm } from "./resource-review-controls";
-import { ResourceReviewPager } from "./resource-review-list";
+import { ResourceReviewPager } from "../features/resources/reviews-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
 const navLinkClass =
