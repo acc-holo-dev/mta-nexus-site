@@ -8,7 +8,7 @@ Read-only срез объединяет composition `/market`, общую кар
 
 | Entry       | Контракт                                                                                     |
 | ----------- | -------------------------------------------------------------------------------------------- |
-| `view.ts`   | `ProductCard`, совместимая с RSC и Discovery                                      |
+| `view.ts`   | `ProductCard`, совместимая с RSC и Discovery                                                 |
 | `server.ts` | `MarketPage`, Next `server-only` composition с request locale и существующим product service |
 | `model.ts`  | Query parsing, ссылки, размер и предел страницы; только pure domain dependency               |
 

@@ -54,10 +54,7 @@ test("Resources catalog rejects private imports, server leaks and impure model e
     'export { db } from "@nexus/db"; export type Session = string;',
   );
   write("site/src/features/resources/components/card.ts", "export const card = 1;");
-  write(
-    "site/src/features/resources/model/query.ts",
-    'export { domain } from "@nexus/domain";',
-  );
+  write("site/src/features/resources/model/query.ts", 'export { domain } from "@nexus/domain";');
   write("site/src/features/resources/model.ts", 'export { domain } from "./model/query";');
   write("site/src/features/resources/view.ts", 'export { card } from "./components/card";');
   write(
@@ -72,10 +69,7 @@ test("Resources catalog rejects private imports, server leaks and impure model e
   write("site/src/app/view.ts", 'export { card } from "../features/resources/view";');
   write("site/src/lib/consumer.ts", 'export { domain } from "../features/resources/model";');
   write("site/src/app/deep.ts", 'export { card } from "../features/resources/components/card";');
-  write(
-    "site/src/features/other/deep.ts",
-    'export { domain } from "../resources/model/observation";',
-  );
+  write("site/src/features/other/deep.ts", 'export { domain } from "../resources/model/query";');
   write(
     "site/src/features/resources/components/server-leak.ts",
     'export { page } from "../server";',
