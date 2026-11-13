@@ -23,7 +23,7 @@ if ! docker_context=$(docker context show) || [[ "$docker_context" != "default" 
 fi
 
 PROJECT="nexus-local"
-COMPOSE=(docker compose -p "$PROJECT" -f deploy/compose.yaml)
+COMPOSE=(docker compose -p "$PROJECT" -f docker/compose.yaml)
 DB_NAME="nexus_focus_$(date +%s)_${RANDOM}"
 DATABASE_URL="postgres://nexus:nexus_secret@postgres:5432/${DB_NAME}"
 database_created=0

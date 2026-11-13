@@ -11,7 +11,7 @@
 | UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                                                            |
 | Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                                                             |
 | Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser                               |
-| Dev stack | Docker Compose [`deploy/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
+| Dev stack | Docker Compose [`docker/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
 | CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo                                             |
 
 Модульный монолит на одной инстанции. Redis, внешние очереди и микросервисы не входят в текущую форму без измеренной необходимости.
@@ -88,7 +88,8 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 ## Изменение структуры
 
 [Технический план](STRUCTURE-REFACTORING.md) описывает foundation и локальный перенос
-приложения в `site/`; `deploy/`, `configs/` и `tests/{unit,database}` сохранены из main.
+приложения, packages и tests в `site/`, инфраструктуры в `docker/`,
+шаблонов env в `config/env/`. Compose identity и данные сохраняются отдельно от путей.
 
 ## Документы по роли
 

@@ -40,7 +40,7 @@ import {
   assertProductionUploadBodyLimit,
   localCertificateConfig,
 } from './scripts/production-smoke-contract.mjs';
-const productionCaddy = readFileSync('deploy/Caddyfile', 'utf8');
+const productionCaddy = readFileSync('docker/Caddyfile', 'utf8');
 assertProductionUploadBodyLimit(productionCaddy);
 assertProductionOfflineCacheVary(productionCaddy);
 writeFileSync(
@@ -55,7 +55,7 @@ pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
   "NEXUS_CI_ACCOUNT_MAIL_KEY=$mail_key" "NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY=$abuse_key"
   "NEXUS_CI_CADDYFILE=$NEXUS_CI_CADDYFILE"
   docker compose --env-file /dev/null -p "$project"
-  -f deploy/compose.production.yaml -f deploy/compose.production-ci.yaml)
+  -f docker/compose.production.yaml -f docker/compose.production-ci.yaml)
 owned=0
 cleanup() {
   status=$?

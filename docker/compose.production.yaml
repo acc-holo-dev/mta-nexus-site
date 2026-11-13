@@ -1,3 +1,6 @@
+# Preserve the historical default project and volume identities.
+name: deploy
+
 services:
   clamav:
     image: clamav/clamav:1.5
@@ -33,8 +36,8 @@ services:
 
   app:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -73,8 +76,8 @@ services:
 
   push-worker:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     user: node
     init: true
     restart: unless-stopped
@@ -131,7 +134,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -140,8 +143,8 @@ services:
 
   license-worker:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     user: node
     init: true
     restart: unless-stopped
@@ -178,8 +181,8 @@ services:
 
   resource-release-worker:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     user: node
     init: true
     restart: unless-stopped

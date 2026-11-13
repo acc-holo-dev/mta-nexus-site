@@ -154,7 +154,7 @@ test("rejects public or implicit ACME issuers before Caddy starts", () => {
 });
 
 test("pins the production proxy body limit to the application build envelope", () => {
-  const caddy = readFileSync("deploy/Caddyfile", "utf8");
+  const caddy = readFileSync("docker/Caddyfile", "utf8");
   const storage = readFileSync("site/packages/storage/src/storage-service.ts", "utf8");
   const uploadRoute = readFileSync("site/src/app/api/products/[id]/builds/route.ts", "utf8");
   assert.equal(PRODUCTION_UPLOAD_ENVELOPE_BYTES, 65 * 1024 * 1024);
@@ -168,7 +168,7 @@ test("pins the production proxy body limit to the application build envelope", (
 });
 
 test("requires matching declared-length and streaming limits", () => {
-  const source = readFileSync("deploy/Caddyfile", "utf8");
+  const source = readFileSync("docker/Caddyfile", "utf8");
   assert.doesNotThrow(() => assertProductionUploadBodyLimit(source));
   assert.throws(() => assertProductionUploadBodyLimit(source.replace("> 68157440", "> 68157441")));
   assert.throws(() =>
@@ -179,7 +179,7 @@ test("requires matching declared-length and streaming limits", () => {
 });
 
 test("re-attaches Vary Cookie at the production proxy", () => {
-  const source = readFileSync("deploy/Caddyfile", "utf8");
+  const source = readFileSync("docker/Caddyfile", "utf8");
   assert.doesNotThrow(() => assertProductionOfflineCacheVary(source));
   assert.throws(
     () =>

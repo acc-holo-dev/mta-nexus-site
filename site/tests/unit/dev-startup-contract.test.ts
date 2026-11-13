@@ -16,7 +16,7 @@ describe("deterministic development startup contract", () => {
   });
 
   it("keeps the local stack private except for the loopback application port", () => {
-    const compose = read("deploy/compose.yaml");
+    const compose = read("docker/compose.yaml");
 
     const dollar = "$";
     expect(compose).toContain(`"127.0.0.1:${dollar}{NEXUS_DEV_PORT:-3000}:3000"`);
@@ -27,7 +27,7 @@ describe("deterministic development startup contract", () => {
   });
 
   it("keeps app and delivery workers under init with SIGTERM grace and health probes", () => {
-    const compose = read("deploy/compose.yaml");
+    const compose = read("docker/compose.yaml");
     const pkg = JSON.parse(read("package.json"));
     const pushWorker = compose.slice(compose.indexOf("\n  push-worker:"));
 

@@ -138,8 +138,8 @@ export async function collectDoctor(options = {}) {
   for (const relativePath of [
     "package.json",
     "pnpm-lock.yaml",
-    "deploy/compose.yaml",
-    "deploy/Dockerfile",
+    "docker/compose.yaml",
+    "docker/Dockerfile",
   ]) {
     const present = await pathExists(resolve(root, relativePath));
     addCheck(
@@ -151,6 +151,24 @@ export async function collectDoctor(options = {}) {
         : `Required project file is missing: ${relativePath}`,
     );
   }
+
+  const legacyComposeEnv = await pathExists(resolve(root, "deploy/.env"));
+  const currentComposeEnv = await pathExists(resolve(root, "docker/.env"));
+  const explicitEnvSelection =
+    Boolean(env.COMPOSE_ENV_FILES) ||
+    ["true", "1"].includes(String(env.COMPOSE_DISABLE_ENV_FILE).toLowerCase());
+  const strandedComposeEnv = legacyComposeEnv && !currentComposeEnv && !explicitEnvSelection;
+  addCheck(
+    checks,
+    "compose-env-location",
+    strandedComposeEnv ? "fail" : "pass",
+    strandedComposeEnv
+      ? "A legacy deploy/.env exists, but docker/.env is absent."
+      : "No implicit environment-file migration is required.",
+    strandedComposeEnv
+      ? "Preserve the existing values: move the reviewed env file to docker/.env or set COMPOSE_ENV_FILES to its absolute path. Do not overwrite it with the example template."
+      : undefined,
+  );
 
   let packageJson = {};
   try {
@@ -383,7 +401,7 @@ export async function collectDoctor(options = {}) {
     };
     const composeConfig = await runCommand(
       "docker",
-      ["compose", "-f", "deploy/compose.yaml", "config", "--quiet"],
+      ["compose", "-f", "docker/compose.yaml", "config", "--quiet"],
       { cwd: root, env: composeEnv, timeout: 30_000 },
     );
     addCheck(
@@ -391,11 +409,11 @@ export async function collectDoctor(options = {}) {
       "compose-config",
       composeConfig.ok ? "pass" : "fail",
       composeConfig.ok
-        ? "Local deploy/compose.yaml renders successfully without an implicit .env file."
-        : "Local deploy/compose.yaml did not render successfully.",
+        ? "Local docker/compose.yaml renders successfully without an implicit .env file."
+        : "Local docker/compose.yaml did not render successfully.",
       composeConfig.ok
-        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge deploy/compose.yaml with deploy/compose.production.yaml."
-        : "Inspect deploy/compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
+        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge docker/compose.yaml with docker/compose.production.yaml."
+        : "Inspect docker/compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
     );
   }
 

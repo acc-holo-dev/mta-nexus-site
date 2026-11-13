@@ -8,7 +8,7 @@ import { collectDoctor, formatDoctor } from "../nexus-doctor.mjs";
 
 async function fixtureRoot() {
   const root = await mkdtemp(join(tmpdir(), "nexus-doctor-"));
-  await mkdir(join(root, "deploy"), { recursive: true });
+  await mkdir(join(root, "docker"), { recursive: true });
   await Promise.all([
     writeFile(
       join(root, "package.json"),
@@ -20,8 +20,8 @@ async function fixtureRoot() {
     writeFile(join(root, ".nvmrc"), "26.11.1\n"),
     writeFile(join(root, ".node-version"), "26.11.1\n"),
     writeFile(join(root, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n"),
-    writeFile(join(root, "deploy", "compose.yaml"), "services: {}\n"),
-    writeFile(join(root, "deploy", "Dockerfile"), "FROM scratch\n"),
+    writeFile(join(root, "docker", "compose.yaml"), "services: {}\n"),
+    writeFile(join(root, "docker", "Dockerfile"), "FROM scratch\n"),
   ]);
   return root;
 }
@@ -49,7 +49,7 @@ test("healthy local prerequisites produce a passing report", async () => {
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: true, stdout: "default" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
 
@@ -59,6 +59,48 @@ test("healthy local prerequisites produce a passing report", async () => {
     assert.equal(report.facts.nodeMajorOk, true);
     assert.equal(report.facts.nodeExactMatch, true);
     assert.match(formatDoctor(report), /Result: PASS/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("stranded legacy Compose env fails without reading secrets and accepts explicit migration", async () => {
+  const root = await fixtureRoot();
+  try {
+    await mkdir(join(root, "deploy"));
+    await writeFile(join(root, "deploy/.env"), "PRIVATE_SENTINEL=must-never-print\n", {
+      mode: 0o600,
+    });
+    const options = {
+      repositoryRoot: root,
+      nodeVersion: "26.11.1",
+      memoryBytes: 8 * 1024 ** 3,
+      probePort: async () => ({ available: true, code: null }),
+      runCommand: commandRunner({
+        "pnpm --version": { ok: true, stdout: "12.4.2" },
+        "docker version --format {{.Server.Version}}": { ok: true, stdout: "29.0.0" },
+        "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
+        "docker compose version --short": { ok: true, stdout: "2.40.0" },
+        "docker context show": { ok: true, stdout: "default" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
+      }),
+    };
+    const blocked = await collectDoctor({ ...options, env: {} });
+    assert.equal(blocked.status, "fail");
+    assert.equal(
+      blocked.checks.find((check) => check.id === "compose-env-location")?.status,
+      "fail",
+    );
+    assert.doesNotMatch(formatDoctor(blocked), /must-never-print|PRIVATE_SENTINEL/u);
+    for (const env of [
+      { COMPOSE_ENV_FILES: join(root, "deploy/.env") },
+      { COMPOSE_DISABLE_ENV_FILE: "true" },
+    ]) {
+      const report = await collectDoctor({ ...options, env });
+      assert.equal(report.status, "pass");
+    }
+    await writeFile(join(root, "docker/.env"), "REVIEWED=1\n", { mode: 0o600 });
+    assert.equal((await collectDoctor({ ...options, env: {} })).status, "pass");
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -80,7 +122,7 @@ test("an unreadable Docker context cannot yield an overall pass", async () => {
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: false, stdout: "" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
     assert.equal(report.status, "warn");
@@ -115,7 +157,7 @@ test("major-ok Node that differs from the exact pin warns in local mode", async 
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: true, stdout: "default" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
 
@@ -149,7 +191,7 @@ test("old host Node points to the repository pin", async () => {
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: true, stdout: "default" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
 
@@ -179,7 +221,7 @@ test("mismatched repository Node version files fail closed", async () => {
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: true, stdout: "default" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
 
@@ -229,7 +271,7 @@ test("occupied port and non-default Docker context remain warnings", async () =>
         "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
         "docker compose version --short": { ok: true, stdout: "2.40.0" },
         "docker context show": { ok: true, stdout: "desktop-linux" },
-        "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
       }),
     });
 
@@ -281,7 +323,7 @@ test("compose validation does not forward application secrets", async () => {
     "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
     "docker compose version --short": { ok: true, stdout: "2.40.0" },
     "docker context show": { ok: true, stdout: "default" },
-    "docker compose -f deploy/compose.yaml config --quiet": { ok: true, stdout: "" },
+    "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
   };
 
   try {
@@ -301,7 +343,7 @@ test("compose validation does not forward application secrets", async () => {
       probePort: async () => ({ available: true, code: null }),
       runCommand: async (command, args, options = {}) => {
         const key = [command, ...args].join(" ");
-        if (key === "docker compose -f deploy/compose.yaml config --quiet") {
+        if (key === "docker compose -f docker/compose.yaml config --quiet") {
           composeEnvironment = options.env;
         }
         return values[key] ?? { ok: false, stdout: "" };

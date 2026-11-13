@@ -47,6 +47,10 @@ const moves = [
   ["compose.production.yaml", "docker/compose.production.yaml"],
   ["deploy/Caddyfile", "docker/Caddyfile"],
   ["deploy/infra-image-pins.json", "docker/infra-image-pins.json"],
+  ["deploy/Dockerfile", "docker/Dockerfile"],
+  ["deploy/compose.yaml", "docker/compose.yaml"],
+  ["deploy/compose.production.yaml", "docker/compose.production.yaml"],
+  ["configs/env/.env.example", "config/env/.env.example"],
 ];
 
 test("sensitive legacy and destination paths independently require full acceptance", () => {

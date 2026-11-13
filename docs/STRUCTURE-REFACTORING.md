@@ -3,7 +3,8 @@
 **Направление принято владельцем.** Phase 0 — foundation; затем разрешено автономное
 локальное продолжение. Phase 1 проверена: `apps/web` → `site`. По следующему поручению
 Phase 2.1 проверена: `packages` → `site/packages`.
-Выполняется Phase 2.2: `tests` → `site/tests`. Владелец явно
+Phase 2.2 проверена: `tests` → `site/tests`.
+Выполняется Phase 3: `deploy/configs` → `docker/config`. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -104,8 +105,8 @@ pnpm-lock.yaml
 
 `@nexus/*` сохраняются. Корневые конфиги остаются, где нужны инструментам.
 `site/packages/config` и `config/env` имеют разные обязанности. На текущей границе
-приложение, пакеты и tests находятся в `site`; инфраструктура остаётся
-в `deploy`/`configs` до отдельного этапа.
+приложение, пакеты и tests находятся в `site`; инфраструктура — в `docker`,
+шаблоны окружения — в `config/env`.
 
 ## 4. Migration Map и интеграционные границы
 
@@ -289,3 +290,32 @@ production CSS без новых utility classes из fixtures. Корневой
 `lucide-react`: tests принадлежат `site`, где библиотека уже объявлена. Удалено
 только корневое дублирование и его importer link; версии в site/UI и lockfile
 resolutions сохраняются. Ignore для этого случая не добавляется.
+
+### Phase 3: инфраструктурные пути
+
+Phase 2 прошла полный [CI #4634](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43375361978)
+на `7862cb60`: все 15 обязательных jobs, 8 271 unit, 525 tooling и 1 155 DB tests.
+`deploy` → `docker`, `configs` → `config`; Caddyfile и env template сохраняются
+побайтно, image digests/platform/status — без изменений (обновлён только self-path
+в инструкции pin file). Все script/CI/doctor/operator consumers переходят атомарно.
+Dependabot Docker ecosystem смотрит в `/docker`; CI sensitivity покрывает оба
+имени infrastructure/config directories и обе стороны rename.
+
+До/после сравниваются 11 rendered Compose scenarios: service settings, env,
+secret bindings, volumes/networks и default project остаются прежними. Обнаруженные
+старые production/verify `context: .` и `./deploy/Caddyfile` разрешались относительно
+YAML в неверные пути. Теперь context — `..`, Dockerfile — `docker/Dockerfile`,
+Caddy bind — `./Caddyfile`; реальные файлы проверяются, а не только строки config.
+
+`name: deploy` в трёх base files сохраняет историческую default identity;
+CLI `-p` и `COMPOSE_PROJECT_NAME` имеют прежний приоритет. Для старого ignored
+`deploy/.env` preflight исключает молчаливый возврат к defaults. Инструкция по
+сохранению env и абсолютным host-secret paths — [OPERATIONS](OPERATIONS.md#infrastructure-directory-migration).
+Данные, project names существующих установок и volumes не переименовываются.
+
+Приёмка этапа требует нового полного CI, включая image/startup/browser,
+upgrade, persistence и backup/restore; предыдущие PASS не заменяют новый SHA.
+
+Dev-browser CI также проверяет HMR через read-only bind `site/src`: CSS probe
+alpha → beta → исходный CSS. Восстановление выполняется в finally и проверяется
+`git diff`; hosted guards сохраняются.

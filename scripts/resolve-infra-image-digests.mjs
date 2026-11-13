@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OPS-03 helper: resolve selected base/infra image digests for a release candidate.
- * Writes deploy/infra-image-pins.json with status=resolved. Does not push images,
+ * Writes docker/infra-image-pins.json with status=resolved. Does not push images,
  * change Compose tags, or set productionAuthorized.
  *
  * Usage:
@@ -19,7 +19,7 @@ import {
 } from "./infra-image-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const pinPath = join(root, "deploy/infra-image-pins.json");
+const pinPath = join(root, "docker/infra-image-pins.json");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const platformIndex = args.indexOf("--platform");

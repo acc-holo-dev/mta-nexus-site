@@ -114,7 +114,7 @@ describe("mainline repository policy", () => {
   });
 
   it("keeps Docker DEV source mounts and polling enabled", () => {
-    const compose = read("deploy/compose.yaml");
+    const compose = read("docker/compose.yaml");
     expect(compose).toContain('WATCHPACK_POLLING: "true"');
     expect(compose).toContain("./site/src:/app/site/src:ro");
     expect(compose).toContain("./site/packages/db/src:/app/site/packages/db/src:ro");

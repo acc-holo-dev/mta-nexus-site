@@ -34,7 +34,7 @@ const nextConfig = {
       "./tests/**/*",
       "../scripts/**/*",
       "../docs/**/*",
-      "../deploy/**/*",
+      "../docker/**/*",
       "../.github/**/*",
       "../artifacts/**/*",
       "../uploads/**/*",

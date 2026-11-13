@@ -6,8 +6,8 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("J4 production upload integration candidate", () => {
   it("combines standalone runtime pruning with the exact proxy upload ceiling", () => {
-    const dockerfile = read("deploy/Dockerfile");
-    const caddy = read("deploy/Caddyfile");
+    const dockerfile = read("docker/Dockerfile");
+    const caddy = read("docker/Caddyfile");
     const startup = read("scripts/check-production-startup.sh");
 
     expect(dockerfile).toContain("site/.next/standalone/site/server.js");

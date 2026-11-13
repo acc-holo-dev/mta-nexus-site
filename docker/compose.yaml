@@ -1,3 +1,6 @@
+# Preserve the historical default project and volume identities.
+name: deploy
+
 # Local development only. Production uses compose.production.yaml explicitly.
 services:
   postgres:
@@ -35,7 +38,7 @@ services:
   app:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
     init: true
     # Leave a failed migration visible instead of restarting it indefinitely.
@@ -87,7 +90,7 @@ services:
   push-worker:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
     init: true
     restart: "no"
@@ -127,7 +130,7 @@ services:
   license-worker:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
     init: true
     restart: unless-stopped
@@ -159,7 +162,7 @@ services:
   resource-release-worker:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
     init: true
     restart: unless-stopped

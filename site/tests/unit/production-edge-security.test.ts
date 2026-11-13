@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("production edge security headers", () => {
   it("sets a conservative baseline at the TLS edge", () => {
-    const caddy = read("deploy/Caddyfile");
+    const caddy = read("docker/Caddyfile");
 
     expect(caddy).toContain('Strict-Transport-Security "max-age=31536000; includeSubDomains"');
     expect(caddy).toContain('X-Content-Type-Options "nosniff"');
@@ -19,7 +19,7 @@ describe("production edge security headers", () => {
   });
 
   it("keeps proxy identity and request-size enforcement intact", () => {
-    const caddy = read("deploy/Caddyfile");
+    const caddy = read("docker/Caddyfile");
 
     expect(caddy).toContain("max_size 68157440");
     expect(caddy).toContain("header_up X-Nexus-Proxy-Secret {$TRUSTED_PROXY_SECRET}");
@@ -28,13 +28,13 @@ describe("production edge security headers", () => {
   });
 
   it("does not ship an unsafe static CSP without a Next.js nonce strategy", () => {
-    const caddy = read("deploy/Caddyfile");
+    const caddy = read("docker/Caddyfile");
 
     expect(caddy).not.toContain("Content-Security-Policy");
   });
 
   it("binds the TLS edge to runtime DOMAIN for same-digest origin promotion", () => {
-    const caddy = read("deploy/Caddyfile");
+    const caddy = read("docker/Caddyfile");
 
     expect(caddy).toContain("{$DOMAIN}");
     expect(caddy).toMatch(/OPS-05|runtime \{\$DOMAIN\}/u);

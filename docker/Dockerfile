@@ -1,6 +1,6 @@
 # Node stages follow OPS-03 / toolchain policy: mutable major-branch tag node:26-alpine
 # (exact host/CI pin remains .nvmrc). Candidate digests are recorded in
-# deploy/infra-image-pins.json via scripts/resolve-infra-image-digests.mjs — not invented here.
+# docker/infra-image-pins.json via scripts/resolve-infra-image-digests.mjs — not invented here.
 # Local development image. Compose bind-mounts source directories for hot reload while keeping dependencies inside the image.
 FROM node:26-alpine AS development
 WORKDIR /app

@@ -11,7 +11,7 @@
     "updateProcess": [
       "Dependabot opens a docker ecosystem PR that changes the mutable tag or digest reference in Dockerfile/compose*.yaml.",
       "On an approved candidate SHA, resolve linux/amd64 (or the selected release platform) digests with docker buildx imagetools inspect <ref>.",
-      "Update deploy/infra-image-pins.json images[].digest/platform and set status to resolved; the diff is the reviewable pin change.",
+      "Update docker/infra-image-pins.json images[].digest/platform and set status to resolved; the diff is the reviewable pin change.",
       "Copy the same digests into the release manifest (OPS-08). Do not treat CI cache tags or :latest as deploy inputs.",
       "PostgreSQL major stays 18 with volume /var/lib/postgresql; engine major upgrades are a separate operator procedure from app schema migrations."
     ]

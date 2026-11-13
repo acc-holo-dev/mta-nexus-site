@@ -57,7 +57,7 @@ export COMPOSE_DISABLE_ENV_FILE=true
 phase=compose-contract
 echo 'D5 phase: compose contract'
 docker compose --env-file /dev/null \
-  -f deploy/compose.production.yaml -f deploy/compose.recovery.yaml -f deploy/compose.mail-worker.yaml \
+  -f docker/compose.production.yaml -f docker/compose.recovery.yaml -f docker/compose.mail-worker.yaml \
   config --format json > /tmp/nexus-d5-worker-compose.json
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 node scripts/tests/recovery-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json

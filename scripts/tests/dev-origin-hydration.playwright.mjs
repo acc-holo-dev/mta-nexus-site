@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 // Register before any i18n import: static ESM links resolve before hooks run.
@@ -105,6 +106,56 @@ try {
 
     await context.close();
     process.stdout.write(`PASS: ${origin.name} hydrated theme + client-side login POST\n`);
+  }
+
+  const cssFile = new URL("../../site/src/app/globals.css", import.meta.url);
+  const originalCss = readFileSync(cssFile);
+  const context = await browser.newContext();
+  try {
+    writeFileSync(
+      cssFile,
+      Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "alpha"; }\n')]),
+    );
+    const page = await context.newPage();
+    const socketReady = page
+      .waitForEvent("websocket", { timeout: 30_000 })
+      .then((socket) => socket.waitForEvent("framereceived", { timeout: 30_000 }));
+    await page.goto("http://localhost:3000/auth/login", { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(
+      () => document.querySelector("[data-theme-toggle]")?.getAttribute("data-hydrated") === "true",
+    );
+    await socketReady;
+    const waitForProbe = (value) =>
+      page.waitForFunction(
+        (expected) =>
+          getComputedStyle(document.documentElement)
+            .getPropertyValue("--nexus-infra-hmr-probe")
+            .includes(expected),
+        value,
+        { timeout: 45_000 },
+      );
+    await waitForProbe("alpha");
+    writeFileSync(
+      cssFile,
+      Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "beta"; }\n')]),
+    );
+    await waitForProbe("beta");
+    writeFileSync(cssFile, originalCss);
+    await page.waitForFunction(
+      () =>
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--nexus-infra-hmr-probe")
+          .trim() === "",
+      null,
+      { timeout: 45_000 },
+    );
+    process.stdout.write(
+      "PASS: read-only site/src bind delivers CSS hot reload alpha → beta → restored\n",
+    );
+  } finally {
+    writeFileSync(cssFile, originalCss);
+    assert.deepEqual(readFileSync(cssFile), originalCss);
+    await context.close();
   }
 } finally {
   await browser.close();

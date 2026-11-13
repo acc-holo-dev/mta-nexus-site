@@ -1,3 +1,6 @@
+# Preserve the historical default project and volume identities.
+name: deploy
+
 # Disposable developer verification stack.
 # This is not the normal local app and is not a production deployment file.
 services:
@@ -19,8 +22,8 @@ services:
 
   verify:
     build:
-      context: .
-      dockerfile: deploy/Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
       target: development
     init: true
     restart: "no"

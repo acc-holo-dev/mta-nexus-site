@@ -412,7 +412,7 @@ test("strict app image validation requires a resolved digest for the exact SHA a
 });
 
 test("strict infra validation requires the complete resolved pin inventory", () => {
-  const pins = JSON.parse(readFileSync("deploy/infra-image-pins.json", "utf8"));
+  const pins = JSON.parse(readFileSync("docker/infra-image-pins.json", "utf8"));
   const good = pins.images;
   const check = (infraImages) =>
     evaluateReleaseManifest(sampleManifest({ infraImages }), { requireResolvedInfra: true });

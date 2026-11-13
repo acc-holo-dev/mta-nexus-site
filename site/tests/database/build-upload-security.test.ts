@@ -70,7 +70,7 @@ describe("build file format detection", () => {
       resolve(process.cwd(), "site/src/app/api/products/[id]/builds/route.ts"),
       "utf8",
     );
-    const caddy = readFileSync(resolve(process.cwd(), "deploy/Caddyfile"), "utf8");
+    const caddy = readFileSync(resolve(process.cwd(), "docker/Caddyfile"), "utf8");
     const proxyLimit = caddy.match(/request_body\s*\{[^}]*max_size\s+(\d+)/u);
 
     expect(route).toContain("MAX_BUILD_MULTIPART_OVERHEAD_BYTES");

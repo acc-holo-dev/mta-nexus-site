@@ -27,10 +27,10 @@ This document covers development startup, verification and production boundaries
 
 ## 1. Supported DEV startup
 
-Use the `deploy/compose.yaml` overlay directly when you want a Docker-only startup:
+Use the `docker/compose.yaml` overlay directly when you want a Docker-only startup:
 
 ```bash
-docker compose -p nexus-local -f deploy/compose.yaml up --build --detach --wait --wait-timeout 600
+docker compose -p nexus-local -f docker/compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
 When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is shown below. Host tooling distinguishes **major-ok** (`package.json#engines.node`: `>=26.0.0 <27`) from the **exact** host/CI pin (`.nvmrc` and `.node-version`: `26.11.1`) and exact pnpm (`package.json#packageManager`: `pnpm@12.4.2`). `pnpm nexus:doctor` passes major-ok and warns on exact drift; release evidence requires exact matches. Docker images use `node:26-alpine` for the same major branch. Use the repository version files before running host-side commands:
@@ -300,6 +300,34 @@ Required properties include:
 - explicit recovery/email configuration before claiming email delivery is operational.
 
 Paid commerce remains disabled.
+
+### Infrastructure directory migration
+
+Compose files, Dockerfile, Caddyfile and image pins live in `docker/`; the env
+example lives in `config/env/.env.example`. Run commands from the repository root.
+All base build contexts resolve to that root; Caddy binds resolve to the real
+`docker/Caddyfile`, relative to the first Compose file.
+
+The base files intentionally keep `name: deploy`: this is the previous default
+Compose identity, independent of the directory name. Existing `--project-name`
+(`-p`) and `COMPOSE_PROJECT_NAME` overrides retain priority. Preserve the actual
+project name of an existing installation; no volume rename or cleanup is part
+of this migration. Local scripts continue to use `-p nexus-local`; CI uses its
+own disposable names.
+
+Git does not move ignored private files. If an existing `deploy/.env` remains,
+preserve its values: move the reviewed file to `docker/.env`, or select its
+absolute path explicitly with `COMPOSE_ENV_FILES` for the local pnpm wrappers.
+Do not overwrite a working env with the example template. Doctor fails when the
+legacy env would silently stop being loaded; it checks existence without reading
+or printing secrets. An explicit env selection or disabled implicit env loading
+is respected.
+
+Production commands must keep the existing absolute `--env-file` and project
+name. Review relative `NEXUS_*_HOST_FILE` bindings before changing the Compose
+base directory: use absolute paths to the existing protected files. The fixed
+container `/run/secrets` targets and stored keys do not change. Rendering with
+synthetic values verifies paths and shape; it does not authorize a live deploy.
 
 ### Compose overlay matrix
 
@@ -872,7 +900,7 @@ engine major upgrade is a separate operator procedure from application schema
 migrations.
 
 Release candidates record exact digests and platform in
-[`deploy/infra-image-pins.json`](../deploy/infra-image-pins.json). Resolve them
+[`docker/infra-image-pins.json`](../docker/infra-image-pins.json). Resolve them
 when preparing a candidate (does not publish images or authorize production):
 
 ```bash
@@ -1306,7 +1334,7 @@ set -eu
 umask 077
 dc() {
   docker compose --env-file "$PRODUCTION_ENV" --project-name "$PROJECT" \
-    --file "$RELEASE_DIR/compose.production.yaml" "$@"
+    --file "$RELEASE_DIR/docker/compose.production.yaml" "$@"
 }
 app_id=$(dc ps --quiet app)
 postgres_id=$(dc ps --quiet postgres)

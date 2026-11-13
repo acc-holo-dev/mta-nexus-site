@@ -12,6 +12,7 @@ const fullAcceptancePaths = [
   /^Dockerfile$/,
   /^compose[^/]*\.ya?ml$/,
   /^deploy\//,
+  /^configs?\//,
   /^packages\/db\/(?:migrations\/|scripts\/|src\/(?:[^/]+\/)*(?:[^/]*schema|migrate)\.ts$)/,
   /^scripts\//,
   /^vitest\.config\.ts$/,

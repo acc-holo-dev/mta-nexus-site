@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
@@ -24,7 +24,7 @@ function syntheticEnv(extra = {}) {
     NEXUS_CI_IMAGE: "mta-nexus:ops-matrix-test",
     NEXUS_CI_ACCOUNT_MAIL_KEY: "dGVzdC1jaS1hY2NvdW50LW1haWwta2V5LTMyYnl0ZXMhISE",
     NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY: "dGVzdC1jaS1yZWNvdmVyeS1hYnVzZS1rZXktMzJieXRlcw",
-    NEXUS_CI_CADDYFILE: resolve(root, "deploy/Caddyfile"),
+    NEXUS_CI_CADDYFILE: resolve(root, "docker/Caddyfile"),
     ACCOUNT_MAIL_KEY_ID: "ci",
     ACCOUNT_MAIL_KEY: "dGVzdC1hY2NvdW50LW1haWwta2V5LWZvci1tYXRyaXgtes",
     ACCOUNT_RECOVERY_ABUSE_KEY: "dGVzdC1yZWNvdmVyeS1hYnVzZS1rZXktbWF0cml4LXRlc3Q",
@@ -45,7 +45,8 @@ function renderCompose(files, env, projectName) {
   const emptyEnv = join(directory, "empty.env");
   try {
     writeFileSync(emptyEnv, "", { mode: 0o600 });
-    const args = ["compose", "--env-file", emptyEnv, "--project-name", projectName];
+    const args = ["compose", "--env-file", emptyEnv];
+    if (projectName) args.push("--project-name", projectName);
     for (const file of files) {
       args.push("--file", resolve(root, file));
     }
@@ -62,6 +63,81 @@ function renderCompose(files, env, projectName) {
     rmSync(directory, { recursive: true, force: true });
   }
 }
+
+test("infrastructure relocation preserves default and overridden project/volume identities", () => {
+  for (const file of [
+    "docker/compose.yaml",
+    "docker/compose.production.yaml",
+    "docker/compose.verify.yaml",
+  ]) {
+    for (const [envProject, cliProject, expected] of [
+      [undefined, undefined, "deploy"],
+      ["nexus-layout-env", undefined, "nexus-layout-env"],
+      ["nexus-layout-env", "nexus-layout-cli", "nexus-layout-cli"],
+    ]) {
+      const config = renderCompose(
+        [file],
+        syntheticEnv(envProject ? { COMPOSE_PROJECT_NAME: envProject } : {}),
+        cliProject,
+      );
+      assert.equal(config.name, expected, file);
+      for (const [name, volume] of Object.entries(config.volumes || {}))
+        assert.equal(volume.name, `${expected}_${name}`, file);
+      for (const [name, network] of Object.entries(config.networks || {}))
+        assert.equal(network.name, `${expected}_${name}`, file);
+    }
+  }
+});
+
+test("every infrastructure overlay resolves build, Caddy and secret host paths", () => {
+  const mail = [
+    "docker/compose.production.yaml",
+    "docker/compose.recovery.yaml",
+    "docker/compose.mail-worker.yaml",
+  ];
+  const overlays = [
+    "docker/compose.recovery-file-secrets.yaml",
+    "docker/compose.mail-worker-ca-file.yaml",
+    "docker/compose.mail-worker-auth-file-secret.yaml",
+    "docker/compose.mail-worker-rotation-file-secret.yaml",
+  ];
+  const secrets = Object.fromEntries(
+    [
+      "ACCOUNT_MAIL_KEY",
+      "ACCOUNT_RECOVERY_ABUSE_KEY",
+      "ACCOUNT_MAIL_PREVIOUS_KEY",
+      "ACCOUNT_MAIL_SMTP_PASSWORD",
+      "ACCOUNT_MAIL_SMTP_CA",
+    ].map((key) => [`NEXUS_${key}_HOST_FILE`, resolve(root, `temp/infra-render/${key}`)]),
+  );
+  const scenarios = [
+    ...SUPPORTED_COMPOSE_SCENARIOS.map((scenario) => scenario.files),
+    ["docker/compose.yaml", "docker/compose.mailpit.yaml"],
+    ...overlays.map((file) => [...mail, file]),
+    [...mail, ...overlays],
+  ];
+  for (const files of scenarios) {
+    const config = renderCompose(files, syntheticEnv(secrets), "nexus-layout-paths");
+    for (const service of Object.values(config.services)) {
+      if (service.build) {
+        assert.equal(service.build.context, root, files.join(", "));
+        const dockerfile = resolve(service.build.context, service.build.dockerfile);
+        assert.equal(dockerfile, resolve(root, "docker/Dockerfile"));
+        assert(statSync(dockerfile).isFile());
+      }
+      for (const mount of service.volumes || []) {
+        if (mount.type === "bind" && mount.target.startsWith("/etc/caddy/")) {
+          assert.equal(mount.source, resolve(root, "docker/Caddyfile"));
+          assert.equal(mount.read_only, true);
+          assert(statSync(mount.source).isFile());
+        }
+      }
+    }
+    for (const secret of Object.values(config.secrets || {})) {
+      assert(Object.values(secrets).includes(secret.file));
+    }
+  }
+});
 
 function sourceBindMounts(service) {
   return (service.volumes || []).filter(
@@ -217,7 +293,7 @@ test("supported Compose scenarios render predictable service inventories", () =>
 
 test("production config has no development source mounts", () => {
   const config = renderCompose(
-    ["deploy/compose.production.yaml"],
+    ["docker/compose.production.yaml"],
     syntheticEnv(),
     "nexus-ops-matrix-prod-mounts",
   );
@@ -234,7 +310,7 @@ test("production config has no development source mounts", () => {
 
 test("production CI publishes only loopback ports and keeps the writer inventory", () => {
   const config = renderCompose(
-    ["deploy/compose.production.yaml", "deploy/compose.production-ci.yaml"],
+    ["docker/compose.production.yaml", "docker/compose.production-ci.yaml"],
     syntheticEnv(),
     "nexus-ops-matrix-ci",
   );
@@ -269,9 +345,9 @@ test("production CI publishes only loopback ports and keeps the writer inventory
 test("production recovery+mail overlay adds mail-worker without dropping base writers", () => {
   const config = renderCompose(
     [
-      "deploy/compose.production.yaml",
-      "deploy/compose.recovery.yaml",
-      "deploy/compose.mail-worker.yaml",
+      "docker/compose.production.yaml",
+      "docker/compose.recovery.yaml",
+      "docker/compose.mail-worker.yaml",
     ],
     syntheticEnv(),
     "nexus-ops-matrix-mail",
