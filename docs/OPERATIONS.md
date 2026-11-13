@@ -278,7 +278,7 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 Use `pnpm analyze:architecture` and `pnpm analyze:unused` for dependency boundaries and unused code. Dependency-cruiser currently warns about TypeScript 7 compatibility; do not treat its result as complete without resolving that limitation.
 
-`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database. When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <tests/...integration.test.ts>` to create a disposable database on the Compose network, migrate it, run the focused files, and drop the database. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
+`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database. When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <site/tests/...integration.test.ts>` to create a disposable database on the Compose network, migrate it, run the focused files, and drop the database. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
 
 `pnpm ci:diagnose --run-id <id>` reads one GitHub Actions run and its annotations. It may require an appropriate read-only GitHub credential. A workflow with zero executed steps is not a successful test.
 
@@ -352,8 +352,8 @@ must not read `NEXT_PUBLIC_APP_URL` for links or CSRF. Caddy uses runtime
 
 ```bash
 node --test scripts/tests/production-entrypoint.node-test.mjs
-pnpm test:focus tests/config.test.ts tests/production-runtime-readiness.test.ts \
-  tests/production-tracing-bounds.test.ts tests/production-edge-security.test.ts
+pnpm test:focus site/tests/unit/config.test.ts site/tests/database/production-runtime-readiness.test.ts \
+  site/tests/unit/production-tracing-bounds.test.ts site/tests/unit/production-edge-security.test.ts
 ```
 
 Full disposable image rehearse remains `scripts/check-production-startup.sh` on a

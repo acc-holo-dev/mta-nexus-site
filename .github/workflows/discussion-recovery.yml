@@ -15,9 +15,9 @@ on:
       - site/packages/db/src/repositories/web-push-*.ts
       - site/packages/db/src/schema.ts
       - site/packages/db/migrations/**
-      - tests/database/discussion-*.integration.test.ts
-      - tests/database/notification-inbox-history.integration.test.ts
-      - tests/database/web-push-*.integration.test.ts
+      - site/tests/database/discussion-*.integration.test.ts
+      - site/tests/database/notification-inbox-history.integration.test.ts
+      - site/tests/database/web-push-*.integration.test.ts
   workflow_dispatch:
 permissions:
   contents: read

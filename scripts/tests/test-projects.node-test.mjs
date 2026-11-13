@@ -224,11 +224,13 @@ describe("isolated and shared-database test projects", () => {
       "valid.test.ts": "",
       "valid.spec.tsx": "",
       ".next/standalone/copied.test.ts": "",
+      "site/.next/standalone/site/tests/copied.test.ts": "",
+      "site/tests/valid.test.ts": "",
       "node_modules/dependency.test.ts": "",
       "dist/copied.test.ts": "",
     });
     const files = discoverTests(root);
-    assert.deepEqual(files, ["valid.spec.tsx", "valid.test.ts"]);
+    assert.deepEqual(files, ["site/tests/valid.test.ts", "valid.spec.tsx", "valid.test.ts"]);
     const groups = classifyTests(root);
     assert.deepEqual([...groups.unit, ...groups.database].sort(), files);
   });
@@ -239,9 +241,9 @@ describe("isolated and shared-database test projects", () => {
     assert.ok(
       groups.database.includes("site/packages/db/src/repositories/account-mail-worker.test.ts"),
     );
-    assert.ok(groups.database.includes("tests/database/password-change-transaction.test.ts"));
+    assert.ok(groups.database.includes("site/tests/database/password-change-transaction.test.ts"));
     // market-catalog-sql fully mocks the DB client (pure SQL-string construction),
     // so the classifier runs it in the parallel unit pool rather than serialized.
-    assert.ok(groups.unit.includes("tests/database/market-catalog-sql.test.ts"));
+    assert.ok(groups.unit.includes("site/tests/database/market-catalog-sql.test.ts"));
   });
 });

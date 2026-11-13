@@ -6,7 +6,7 @@ import {
   response,
   sample,
   textOf,
-} from "../../../tests/helpers/notification-bell-interaction-harness";
+} from "../../tests/helpers/notification-bell-interaction-harness";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],

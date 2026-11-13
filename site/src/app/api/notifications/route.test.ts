@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
-} from "../../../../../tests/helpers/browser-mutation-headers";
+} from "../../../../tests/helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_notifications" } as { id: string } | null,

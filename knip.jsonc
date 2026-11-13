@@ -3,8 +3,8 @@
   "workspaces": {
     ".": {
       // Operational scripts and browser/Node fixtures are invoked by CI and shell.
-      "entry": ["scripts/**/*.{mjs,ts}", "tests/**/*.test.{ts,tsx}", "playwright.ci.config.mjs"],
-      "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.{ts,tsx}", "*.{mjs,cjs,ts}"],
+      "entry": ["scripts/**/*.{mjs,ts}", "playwright.ci.config.mjs"],
+      "project": ["scripts/**/*.{mjs,ts}", "*.{mjs,cjs,ts}"],
       // Browser checks install Playwright into an isolated prefix in the shell runners.
       // `postgres` is consumed by root operational scripts via the @nexus/db workspace install.
       "ignoreDependencies": ["@playwright/test", "@axe-core/playwright", "postgres"],
@@ -13,8 +13,8 @@
       "ignoreBinaries": ["openssl", "pwsh"]
     },
     "site": {
-      "entry": ["scripts/**/*.ts"],
-      "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
+      "entry": ["scripts/**/*.ts", "tests/**/*.test.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts", "tests/**/*.{ts,tsx}"],
       "next": true
     },
     "site/packages/*": {

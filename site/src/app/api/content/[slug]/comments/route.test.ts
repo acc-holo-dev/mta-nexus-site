@@ -44,7 +44,7 @@ import { NextRequest } from "next/server";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
-} from "../../../../../../../tests/helpers/browser-mutation-headers";
+} from "../../../../../../tests/helpers/browser-mutation-headers";
 import { POST } from "./route";
 
 function expectPrivate(response: Response) {

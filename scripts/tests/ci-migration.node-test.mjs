@@ -30,6 +30,18 @@ const moves = [
   ],
   ["tests/mainline-repository-policy.test.ts", "site/tests/mainline-repository-policy.test.ts"],
   ["tests/browser-api-route-inventory.test.ts", "site/tests/browser-api-route-inventory.test.ts"],
+  [
+    "tests/unit/mainline-repository-policy.test.ts",
+    "site/tests/unit/mainline-repository-policy.test.ts",
+  ],
+  [
+    "tests/unit/browser-api-route-inventory.test.ts",
+    "site/tests/unit/browser-api-route-inventory.test.ts",
+  ],
+  [
+    "tests/unit/j4-production-upload-integration.test.ts",
+    "site/tests/unit/j4-production-upload-integration.test.ts",
+  ],
   ["Dockerfile", "docker/Dockerfile"],
   ["compose.yaml", "docker/compose.yaml"],
   ["compose.production.yaml", "docker/compose.production.yaml"],

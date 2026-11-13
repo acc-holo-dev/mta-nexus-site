@@ -27,7 +27,7 @@ site/packages/db       → schema, migrations (~90 SQL), repositories (~170), wo
 site/packages/storage  → приватные артефакты и целостность
 site/packages/config   → проверка env
 site/packages/ui       → общие UI-примитивы без серверных импортов
-tests/            → HTTP/UI/поведенческие Vitest-сюиты (~6MB)
+site/tests/       → HTTP/UI/поведенческие Vitest-сюиты (~6MB)
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
 

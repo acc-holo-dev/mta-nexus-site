@@ -5,7 +5,7 @@ import {
   notificationBellDictionary,
   response,
   sample,
-} from "../../../tests/helpers/notification-bell-interaction-harness";
+} from "../../tests/helpers/notification-bell-interaction-harness";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],

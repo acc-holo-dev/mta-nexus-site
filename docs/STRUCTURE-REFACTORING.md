@@ -2,7 +2,8 @@
 
 **Направление принято владельцем.** Phase 0 — foundation; затем разрешено автономное
 локальное продолжение. Phase 1 проверена: `apps/web` → `site`. По следующему поручению
-выполняется Phase 2.1: `packages` → `site/packages`. Владелец явно
+Phase 2.1 проверена: `packages` → `site/packages`.
+Выполняется Phase 2.2: `tests` → `site/tests`. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -103,8 +104,8 @@ pnpm-lock.yaml
 
 `@nexus/*` сохраняются. Корневые конфиги остаются, где нужны инструментам.
 `site/packages/config` и `config/env` имеют разные обязанности. На текущей границе
-приложение и пакеты находятся в `site`; tests и инфраструктура остаются
-на прежних местах до отдельных этапов.
+приложение, пакеты и tests находятся в `site`; инфраструктура остаётся
+в `deploy`/`configs` до отдельного этапа.
 
 ## 4. Migration Map и интеграционные границы
 
@@ -261,4 +262,23 @@ tsx и worker entrypoints; все Compose working_dir и operator scripts исп
 
 Состав до/после переноса сверяется по именам после единственного mapping `packages/` →
 `site/packages/`: 1 135 unit-файлов, 253 DB-файла, 69 tooling suites. SQL, package manifests
-и canonical tracker не меняют содержания. Tests остаются в корне; их перенос — Phase 2.2.
+и canonical tracker не меняют содержания. Эта граница прошла полный
+[CI #4630](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43372084200)
+на `d1a0c34a`: 8 271 unit, 525 tooling и 1 155 DB tests, все browser/Compose gates.
+
+### Phase 2.2: граница тестов
+
+`tests/{unit,database,helpers}` → `site/tests/{unit,database,helpers}` без смены
+классификации и assertion contracts. Проверка до/после сохраняет все 1 135 unit-файлов,
+253 DB-файла и 69 tooling suites после единственного mapping `tests/` → `site/tests/`.
+Колокированные тесты приложения и пакетов остаются на своих местах.
+
+Imports/mocks и helper paths пересчитаны от владельца файла; worker tests сохраняют
+корневой cwd. Grouped/focused/isolated runners, Compose binds и workflow filters используют
+новые пути. CI sensitivity по-прежнему распознаёт обе стороны rename. Knip учитывает
+tests в workspace `site`; Next исключает их из автоматического TS include и standalone
+tracing. Корневой typecheck и Vitest продолжают проверять все тесты.
+
+Отрицательные fixtures проверяют, что `site/.next/standalone/site/tests` не исполняется,
+а чувствительные `site/tests/unit` требуют полного CI. Текущая граница требует нового
+полного прогона на своём SHA; предыдущий PASS не переносится автоматически.

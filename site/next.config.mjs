@@ -31,7 +31,7 @@ const nextConfig = {
       "./packages/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
       "./packages/db/migrations/**/*",
       "./packages/db/scripts/**/*",
-      "../tests/**/*",
+      "./tests/**/*",
       "../scripts/**/*",
       "../docs/**/*",
       "../deploy/**/*",
