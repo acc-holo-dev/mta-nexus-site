@@ -31,6 +31,14 @@
   },
   "overrides": [
     {
+      "includes": ["site/src/app/globals.css"],
+      "css": {
+        "parser": {
+          "tailwindDirectives": true
+        }
+      }
+    },
+    {
       "includes": ["site/src/app/api/**"],
       "linter": {
         "rules": {
