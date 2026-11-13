@@ -3,10 +3,10 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
-import { GuestAuthLinks } from "./guest-auth-links";
+import type { Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
 

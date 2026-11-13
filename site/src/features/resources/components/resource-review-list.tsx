@@ -3,7 +3,7 @@ import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { ResourceReviewReportForm } from "../../../components/resource-review-controls";
+import { ResourceReviewReportForm } from "./resource-review-controls";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

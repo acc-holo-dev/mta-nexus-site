@@ -16,7 +16,7 @@ import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { ResourceQaReportForm } from "../../../components/resource-qa-report-form";
+import { ResourceQaReportForm } from "./resource-qa-report-form";
 
 type BuildOption = { id: string; version: string };
 

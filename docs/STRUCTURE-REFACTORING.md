@@ -10,7 +10,8 @@ Phase 4.2 проверена: read-only Resources catalog.
 Phase 4.3 проверена: Resources detail server composition.
 Phase 4.4 проверена: Resources versions/reviews server composition.
 Phase 4.5 проверена: Resources media/evidence presentation.
-Выполняется Phase 4.6: Resources reviews/Q&A UI. Владелец явно
+Phase 4.6 проверена: Resources reviews/Q&A UI.
+Выполняется Phase 4.7: Resources review и Q&A forms. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -455,3 +456,7 @@ package/media SQL integrations и полный CI/browser acceptance.
 ### Phase 4.6: Resources reviews/Q&A UI
 
 Media/evidence прошли [CI #4642](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43412833391) на `e2050afc`. Список отзывов и Q&A panel объединены в Resources через `reviews-view` и `client`; общие формы, HTTP adapters, services и repositories остаются прежними. Public и workspace consumers используют явные порты, серверная авторизация и подтверждения сохраняются. Architecture suite проверяет транзитивные client/view зависимости и запрет server leaks.
+
+### Phase 4.7: Resources review и Q&A forms
+
+Reviews/Q&A UI прошли полный [CI #4643](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43488216449) на `9bef8629`. Review editor/report/decision и Q&A report form перенесены в Resources. `review-controls` сохраняет client boundary для library и moderation; feature использует private forms напрямую. ConfirmAction, HTTP adapters, services, repositories и серверная проверка прав не меняются. Тела компонентов сохранены после адаптации imports; client graph и negative fixtures защищают server boundary.

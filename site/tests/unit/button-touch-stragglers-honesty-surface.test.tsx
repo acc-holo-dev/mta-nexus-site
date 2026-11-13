@@ -9,7 +9,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
   "site/src/components/seller-sales-report.tsx",
-  "site/src/components/resource-review-controls.tsx",
+  "site/src/features/resources/components/resource-review-controls.tsx",
   "site/src/components/support-center.tsx",
   "site/src/components/order-case-page.tsx",
   "site/src/features/servers/components/mta-master-server-directory.tsx",
@@ -25,7 +25,7 @@ it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-
 });
 
 it("locks resource-review primary submit CTAs to size=touch", () => {
-  const source = read("site/src/components/resource-review-controls.tsx");
+  const source = read("site/src/features/resources/components/resource-review-controls.tsx");
   const touchSubmits = source.match(/<Button\s+type="submit"\s+size="touch"/gu) ?? [];
   expect(touchSubmits.length).toBeGreaterThanOrEqual(3);
 });

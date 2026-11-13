@@ -3,20 +3,20 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
-} from "../lib/resource-review-confirmation";
+} from "../../../lib/resource-review-confirmation";
 import {
   type ResourceReviewEligibilityReason,
   resourceReviewCopy,
   resourceReviewEligibilityCopy,
   resourceReviewError,
   resourceReviewState,
-} from "../lib/resource-review-i18n";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/resource-review-i18n";
+import { confirmAction } from "../../../components/confirm-action";
 
 const nativeFieldClass =
   "rounded border border-base bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

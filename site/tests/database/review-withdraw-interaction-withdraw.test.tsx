@@ -25,7 +25,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourceReviewEditor } from "../../src/components/resource-review-controls";
+import { ResourceReviewEditor } from "../../src/features/resources/review-controls";
 
 const { withdrawButton } = createReviewWithdrawInteractionHelpers(
   harness,

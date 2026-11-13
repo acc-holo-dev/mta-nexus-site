@@ -22,7 +22,7 @@ vi.mock("next/link", () => ({
 import {
   ResourceReviewDecisionForm,
   ResourceReviewEditor,
-} from "../../src/components/resource-review-controls";
+} from "../../src/features/resources/review-controls";
 import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 
 const { renderDecision, submit } = createResourceReviewControlsInteractionHelpers(

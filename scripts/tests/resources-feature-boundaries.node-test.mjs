@@ -63,6 +63,14 @@ test("Resources feature rejects private imports, server leaks and impure model e
   write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
   write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
   write("site/src/app/evidence.ts", 'export { page } from "../features/resources/evidence";');
+  write(
+    "site/src/features/resources/review-controls.ts",
+    '"use client"; export { page } from "./server";',
+  );
+  write(
+    "site/src/app/review-controls.ts",
+    'export { page } from "../features/resources/review-controls";',
+  );
   write("site/src/features/resources/reviews-view.ts", 'export { page } from "./server";');
   write(
     "site/src/app/reviews-view.ts",
@@ -149,6 +157,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/resources/review-controls.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/evidence.ts", "resources-view-isolation"],
@@ -170,6 +179,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/review-controls.ts",
     "app/reviews-view.ts",
     "app/media.ts",
     "app/evidence.ts",
@@ -192,6 +202,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   const result = cruise(root, [
     "site/src/features/resources/client.ts",
     "site/src/features/resources/evidence.ts",
+    "site/src/features/resources/review-controls.ts",
     "site/src/features/resources/reviews-view.ts",
     "site/src/features/resources/view.ts",
     "site/src/features/resources/model.ts",
@@ -223,10 +234,13 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   );
   visit("site/src/features/resources/client.ts");
   visit("site/src/features/resources/evidence.ts");
+  visit("site/src/features/resources/review-controls.ts");
   visit("site/src/features/resources/reviews-view.ts");
   visit("site/src/features/resources/view.ts");
   visit("site/src/features/resources/model.ts");
   for (const file of [
+    "components/resource-qa-report-form.tsx",
+    "components/resource-review-controls.tsx",
     "components/resource-qa-panel.tsx",
     "components/resource-review-list.tsx",
     "components/resource-preview.tsx",
