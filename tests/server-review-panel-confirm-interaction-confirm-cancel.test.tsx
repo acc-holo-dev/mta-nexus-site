@@ -13,18 +13,18 @@ const harness = vi.hoisted(() => ({
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ServerReviewPanel } from "../apps/web/src/components/server-review-panel";
-import { serverReviewCopy } from "../apps/web/src/lib/server-review-i18n";
+import { ServerReviewPanel } from "../site/src/components/server-review-panel";
+import { serverReviewCopy } from "../site/src/lib/server-review-i18n";
 
 const { render, control } = createServerReviewPanelConfirmInteractionHelpers(
   harness,

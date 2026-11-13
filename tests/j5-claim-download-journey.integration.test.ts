@@ -3,8 +3,8 @@ import { NextRequest } from "next/server";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { POST as claimResource } from "../apps/web/src/app/api/resources/claim/route";
-import { GET as downloadResource } from "../apps/web/src/app/api/products/[id]/download/route";
+import { POST as claimResource } from "../site/src/app/api/resources/claim/route";
+import { GET as downloadResource } from "../site/src/app/api/products/[id]/download/route";
 
 describe("J5 free resource claim-to-download journey", () => {
   beforeEach(() => {

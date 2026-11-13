@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -15,28 +15,28 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/releases",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { releases: h.releases },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button" data-product={productId} data-build={buildId}>
       Download
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+vi.mock("../site/src/components/library-release-follow-latest", () => ({
   LibraryReleaseFollowLatest: ({ productId }: { productId: string }) => (
     <button type="button" data-follow-latest={productId}>
       Use latest
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+vi.mock("../site/src/components/resource-release-watch-control", () => ({
   ResourceReleaseWatchControl: ({ watch }: { watch: { productId: string; enabled: boolean } }) => (
     <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
       Watch
@@ -44,9 +44,9 @@ vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
   ),
 }));
 
-import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
-import { collectionReleasesCopy } from "../apps/web/src/lib/collection-releases-i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+import { CollectionReleasesScreen } from "../site/src/components/collection-releases-screen";
+import { collectionReleasesCopy } from "../site/src/lib/collection-releases-i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
 
 const item = {
   productId: "prd_a",

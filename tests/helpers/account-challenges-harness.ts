@@ -15,7 +15,7 @@ import {
   type ConsumedProof,
 } from "../../packages/db/src/repositories/account-challenges";
 import { userRepository } from "../../packages/db/src/repositories/users";
-import { authService } from "../../apps/web/src/lib/services/auth-service";
+import { authService } from "../../site/src/lib/services/auth-service";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export const password = "Synthetic-D1-known-password!";

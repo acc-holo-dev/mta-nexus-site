@@ -8,7 +8,7 @@ import {
 import { storageService } from "@nexus/storage";
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
-import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
+import { GET } from "../site/src/app/api/products/[id]/download/route";
 
 function downloadRequest(token: string, productId: string, buildId?: string) {
   const url = new URL(`http://nexus.test/api/products/${productId}/download`);

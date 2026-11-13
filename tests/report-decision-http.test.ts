@@ -14,14 +14,14 @@ const mocks = vi.hoisted(() => ({
   findById: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: async () => mocks.user,
     confirmStaffActionPassword: async () => ({ expectedPasswordHash: "hash_mod" }),
   },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/product-service", () => ({ productService: {} }));
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {
@@ -37,7 +37,7 @@ vi.mock("@nexus/db", () => ({
   verificationRepository: {},
 }));
 
-import { POST } from "../apps/web/src/app/api/admin/actions/route";
+import { POST } from "../site/src/app/api/admin/actions/route";
 
 function request(action = "resolve", notes = "Reviewed supporting evidence") {
   const req = new NextRequest("https://nexus.test/api/admin/actions", {

@@ -13,7 +13,7 @@ import {
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
 import { beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../apps/web/src/lib/services/commerce-service";
+import { commerceService } from "../site/src/lib/services/commerce-service";
 
 describe("Nexus 1.3 Security & Trust Hardening", () => {
   const ts = Date.now().toString(36);
@@ -233,7 +233,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   });
 
   it("Server management: live availability is sourced from the official directory", async () => {
-    const source = await import("../apps/web/src/lib/services/mta-master-directory-service");
+    const source = await import("../site/src/lib/services/mta-master-directory-service");
     expect(source.mtaMasterDirectoryService).toBeDefined();
     expect(typeof source.mtaMasterDirectoryService.getDirectory).toBe("function");
   });

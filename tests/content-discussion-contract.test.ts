@@ -1,17 +1,17 @@
 import { expect, it, vi } from "vitest";
-import { submitContentCommentRequest } from "../apps/web/src/lib/content-comment-client";
+import { submitContentCommentRequest } from "../site/src/lib/content-comment-client";
 import {
   discussionCommentSchema,
   encodeDiscussionCursor,
   parseDiscussionCursor,
-} from "../apps/web/src/lib/content-discussion-contract";
+} from "../site/src/lib/content-discussion-contract";
 import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../apps/web/src/lib/content-discussion-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+} from "../site/src/lib/content-discussion-copy";
+import { getDictionary } from "../site/src/lib/i18n";
+import { formatNotification } from "../site/src/lib/notification-copy";
 
 it("round trips exact microsecond cursors through URL query encoding", () => {
   const cursor = { createdAt: "2026-10-10T12:00:00.000123Z", id: "id/with spaces" };

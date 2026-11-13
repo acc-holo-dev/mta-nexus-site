@@ -15,16 +15,16 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
 
-import { LibraryReleaseComparisonScreen } from "../apps/web/src/components/library-release-comparison-screen";
-import { libraryReleaseComparisonCopy } from "../apps/web/src/lib/library-release-comparison-i18n";
+import { LibraryReleaseComparisonScreen } from "../site/src/components/library-release-comparison-screen";
+import { libraryReleaseComparisonCopy } from "../site/src/lib/library-release-comparison-i18n";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,

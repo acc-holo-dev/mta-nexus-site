@@ -1,8 +1,8 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { communityReportCopy } from "../site/src/lib/community-report-copy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const harness = vi.hoisted(() => ({ slots: [] as unknown[], cursor: 0 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/guide" }));
@@ -36,7 +36,7 @@ vi.mock("react", async (importOriginal) => {
   };
 });
 
-import { CommunityReportForm } from "../apps/web/src/components/community-report-form";
+import { CommunityReportForm } from "../site/src/components/community-report-form";
 
 beforeEach(() => {
   harness.slots = [];

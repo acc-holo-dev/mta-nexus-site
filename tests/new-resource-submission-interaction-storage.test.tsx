@@ -12,12 +12,12 @@ const h = vi.hoisted(() => ({
   file: null as File | null,
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
+import { NewResourceForm } from "../site/src/components/new-resource-form";
 
 const { render, mount, submit } = createNewResourceSubmissionInteractionHelpers(h, NewResourceForm);
 

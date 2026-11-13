@@ -9,22 +9,22 @@ const mocks = vi.hoisted(() => ({
   manage: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
+vi.mock("../site/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page, resolve: mocks.resolve },
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { manageComment: mocks.manage },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as following } from "../apps/web/src/app/api/workspace/feed/route";
-import { GET as activity } from "../apps/web/src/app/api/activity/[kind]/[handle]/route";
-import { PATCH, DELETE } from "../apps/web/src/app/api/content/[slug]/comments/[id]/route";
+import { GET as following } from "../site/src/app/api/workspace/feed/route";
+import { GET as activity } from "../site/src/app/api/activity/[kind]/[handle]/route";
+import { PATCH, DELETE } from "../site/src/app/api/content/[slug]/comments/[id]/route";
 const actor = { id: "actor", role: "user" },
   expectedRevision = "a".repeat(64);
 const comment = { params: Promise.resolve({ slug: "article", id: "comment" }) };

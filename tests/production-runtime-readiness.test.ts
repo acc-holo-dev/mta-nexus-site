@@ -11,7 +11,7 @@ vi.mock("@nexus/db", () => ({
   checkDatabaseConnection,
 }));
 
-import { GET } from "../apps/web/src/app/api/health/route";
+import { GET } from "../site/src/app/api/health/route";
 
 function healthResponse(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {

@@ -24,9 +24,9 @@ test("SEC-002 build-incident delivery lands with explicit quarantine opt-in", ()
     read("packages/db/src/repositories/builds-lifecycle.ts"),
     /buildIncidentNotificationDeliveries/u,
   );
-  assert.match(read("apps/web/src/app/api/admin/actions/route.ts"), /notifyAffectedDownloaders/u);
+  assert.match(read("site/src/app/api/admin/actions/route.ts"), /notifyAffectedDownloaders/u);
   assert.match(
-    read("apps/web/src/components/build-quarantine-controls.tsx"),
+    read("site/src/components/build-quarantine-controls.tsx"),
     /notifyAffectedDownloaders/u,
   );
   assert.match(read("packages/db/scripts/run-web-push-dispatcher.ts"), /build-incident-delivery/u);

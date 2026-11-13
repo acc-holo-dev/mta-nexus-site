@@ -25,22 +25,22 @@ const getDirectory = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     getArticleBySlug,
     getComments,
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory,
   },
 }));
 
-import { POST as checkoutPOST } from "../apps/web/src/app/api/checkout/route";
-import { GET as contentGET } from "../apps/web/src/app/api/content/[slug]/route";
-import { GET as mtaGET } from "../apps/web/src/app/api/mta/servers/route";
+import { POST as checkoutPOST } from "../site/src/app/api/checkout/route";
+import { GET as contentGET } from "../site/src/app/api/content/[slug]/route";
+import { GET as mtaGET } from "../site/src/app/api/mta/servers/route";
 
 describe("public and disabled API correlation boundaries", () => {
   beforeEach(() => {

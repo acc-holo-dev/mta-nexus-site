@@ -22,10 +22,10 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     detail: async (_user: unknown, productId: string) => ({
       productId,
@@ -35,21 +35,21 @@ vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => (
     }),
   },
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+vi.mock("../site/src/components/resource-release-watch-control", () => ({
   ResourceReleaseWatchControl: () => <span>Release watch</span>,
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { page: state.updates, detail: state.versions },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ buildId }: { buildId?: string }) => (
     <button type="button" data-download={buildId}>
       Download
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/library-release-selection-controls", () => ({
+vi.mock("../site/src/components/library-release-selection-controls", () => ({
   LibraryReleaseSelectionControls: ({
     revision,
     versions,
@@ -62,7 +62,7 @@ vi.mock("../apps/web/src/components/library-release-selection-controls", () => (
     </span>
   ),
 }));
-vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+vi.mock("../site/src/components/library-release-follow-latest", () => ({
   LibraryReleaseFollowLatest: ({
     productId,
     revision,
@@ -75,7 +75,7 @@ vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+vi.mock("../site/src/components/resource-release-watch-control", () => ({
   ResourceReleaseWatchControl: ({
     watch,
   }: {
@@ -87,9 +87,9 @@ vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
   ),
 }));
 
-import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
-import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+import Versions from "../site/src/app/workspace/library/[id]/versions/page";
+import Updates, { metadata } from "../site/src/app/workspace/library/updates/page";
+import { getResourceReleaseControlCopy } from "../site/src/lib/resource-release-control-i18n";
 
 const input = {
   params: Promise.resolve({ id: "prd_a" }),
@@ -234,7 +234,7 @@ it("shows EmptyState honesty when no approved versions are available", async () 
 });
 it("clips the library versions loading shell", async () => {
   const { default: VersionsLoading } = await import(
-    "../apps/web/src/app/workspace/library/[id]/versions/loading"
+    "../site/src/app/workspace/library/[id]/versions/loading"
   );
   const copy = getResourceReleaseControlCopy("en");
   const html = renderToStaticMarkup(await VersionsLoading());

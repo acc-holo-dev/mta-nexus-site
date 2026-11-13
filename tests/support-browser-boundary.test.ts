@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
@@ -23,15 +23,12 @@ vi.mock("@nexus/db", () => ({
   },
   userRepository: { listModeratorIds: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../site/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
 
-import { POST as createCase } from "../apps/web/src/app/api/support/route";
-import {
-  PATCH as updateCase,
-  POST as addMessage,
-} from "../apps/web/src/app/api/support/[id]/route";
+import { POST as createCase } from "../site/src/app/api/support/route";
+import { PATCH as updateCase, POST as addMessage } from "../site/src/app/api/support/[id]/route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const context = { params: Promise.resolve({ id: caseId }) };

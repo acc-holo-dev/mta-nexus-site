@@ -17,22 +17,22 @@ vi.mock("@nexus/db", () => ({
   },
   communityModerationWorkspaceRepository: { page: mocks.page, detail: mocks.detail },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({ productService: {} }));
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { moderateContent: mocks.command },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {},
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ can: mocks.allowed }));
-import { discoveryService as discovery } from "../apps/web/src/lib/services/discovery-service";
-import { communityModerationService as moderation } from "../apps/web/src/lib/services/community-moderation-service";
+import { discoveryService as discovery } from "../site/src/lib/services/discovery-service";
+import { communityModerationService as moderation } from "../site/src/lib/services/community-moderation-service";
 import {
   parseDiscoveryStreamQuery,
   discoveryStreamHref,
-} from "../apps/web/src/lib/discovery-stream-contract";
+} from "../site/src/lib/discovery-stream-contract";
 import {
   parseModerationQuery,
   parseModerationDetailQuery,
@@ -41,9 +41,9 @@ import {
   moderationDetailSchema,
   moderationHref,
   confirmsModerationCommand,
-} from "../apps/web/src/lib/community-moderation-contract";
-import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
-import { discoveryStreamCopy } from "../apps/web/src/lib/discovery-stream-copy";
+} from "../site/src/lib/community-moderation-contract";
+import { moderationCopy } from "../site/src/lib/community-moderation-copy";
+import { discoveryStreamCopy } from "../site/src/lib/discovery-stream-copy";
 const time = "2026-10-11T00:00:00.123456Z",
   date = new Date(time),
   actor = { id: "actor", role: "moderator" } as User;

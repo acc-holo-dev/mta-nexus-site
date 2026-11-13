@@ -12,7 +12,7 @@ const state = vi.hoisted(() => ({
   history: vi.fn(),
   detail: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
@@ -28,11 +28,11 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { GET as estimate } from "../apps/web/src/app/api/subscriptions/account/estimate/route";
-import { GET as history } from "../apps/web/src/app/api/subscriptions/account/history/route";
-import { GET as download } from "../apps/web/src/app/api/subscriptions/account/receipts/[id]/export/route";
-import { GET as detail } from "../apps/web/src/app/api/subscriptions/account/receipts/[id]/route";
-import { GET as dashboard, POST } from "../apps/web/src/app/api/subscriptions/account/route";
+import { GET as estimate } from "../site/src/app/api/subscriptions/account/estimate/route";
+import { GET as history } from "../site/src/app/api/subscriptions/account/history/route";
+import { GET as download } from "../site/src/app/api/subscriptions/account/receipts/[id]/export/route";
+import { GET as detail } from "../site/src/app/api/subscriptions/account/receipts/[id]/route";
+import { GET as dashboard, POST } from "../site/src/app/api/subscriptions/account/route";
 import { activation, cancellation, date, receipt, subscription } from "./subscriptions-fixtures";
 
 const base = "/api/subscriptions/account",

@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ command: vi.fn(), preview: vi.fn(), history: vi.fn() }));
 vi.mock("@nexus/db", () => ({ librarySelectionBatchesRepository: state }));
 vi.mock("@nexus/security", () => ({ generateId: (prefix: string) => `${prefix}_fixture` }));
-import { librarySelectionBatchesService as service } from "../apps/web/src/lib/services/library-selection-batches-service";
+import { librarySelectionBatchesService as service } from "../site/src/lib/services/library-selection-batches-service";
 
 const actor = { id: "usr_a" } as User;
 const command = {

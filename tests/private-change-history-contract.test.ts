@@ -2,19 +2,19 @@ import { expect, it } from "vitest";
 import {
   organizationChangeHistorySchema,
   parseOrganizationChangeHistoryQuery,
-} from "../apps/web/src/lib/organization-governance-contract";
+} from "../site/src/lib/organization-governance-contract";
 import {
   privateChangeHistoryCopy,
   privateChangeHistoryError,
-} from "../apps/web/src/lib/private-change-history-copy";
+} from "../site/src/lib/private-change-history-copy";
 import {
   changeHistoryHref,
   encodeChangeHistoryCursor,
-} from "../apps/web/src/lib/private-change-history-query";
+} from "../site/src/lib/private-change-history-query";
 import {
   parseProfileChangeHistoryQuery,
   profileChangeHistorySchema,
-} from "../apps/web/src/lib/profile-change-history-contract";
+} from "../site/src/lib/profile-change-history-contract";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   context = "a".repeat(64);

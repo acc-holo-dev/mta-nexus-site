@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/verification-workspace.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/verification-workspace.tsx"), "utf8");
 
 /** Honesty lock: verification workspace write/intent notices → ErrorState with stable ids. */
 it("locks verification workspace write and unconfirmed-submit notices to ErrorState with stable ids", () => {

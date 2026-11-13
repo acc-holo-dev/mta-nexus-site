@@ -10,38 +10,38 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import ServerTrustLoading from "../apps/web/src/app/servers/[slug]/trust/loading";
-import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
-import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
-import { serverContentCopy } from "../apps/web/src/lib/server-content-copy";
-import { serverObservationBrowserCopy } from "../apps/web/src/lib/server-observation-browser-copy";
-import { serverPublicationHistoryCopy } from "../apps/web/src/lib/server-publication-history-copy";
-import { serverStatisticsCopy } from "../apps/web/src/lib/server-statistics-copy";
-import { serverWorkspaceCopy } from "../apps/web/src/lib/server-workspace-copy";
+import ServerTrustLoading from "../site/src/app/servers/[slug]/trust/loading";
+import { getLicenseControlCopy } from "../site/src/lib/license-control-i18n";
+import { contextTrustCopy } from "../site/src/lib/public-context-trust-copy";
+import { serverContentCopy } from "../site/src/lib/server-content-copy";
+import { serverObservationBrowserCopy } from "../site/src/lib/server-observation-browser-copy";
+import { serverPublicationHistoryCopy } from "../site/src/lib/server-publication-history-copy";
+import { serverStatisticsCopy } from "../site/src/lib/server-statistics-copy";
+import { serverWorkspaceCopy } from "../site/src/lib/server-workspace-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedPages = [
-  "apps/web/src/app/workspace/servers/[id]/activity/page.tsx",
-  "apps/web/src/app/workspace/servers/[id]/statistics/page.tsx",
-  "apps/web/src/app/workspace/servers/[id]/observations/page.tsx",
-  "apps/web/src/app/workspace/servers/[id]/content/new/page.tsx",
-  "apps/web/src/app/workspace/servers/[id]/content/[contentId]/page.tsx",
-  "apps/web/src/app/workspace/servers/[id]/content/[contentId]/history/page.tsx",
-  "apps/web/src/app/servers/[slug]/trust/page.tsx",
-  "apps/web/src/app/workspace/licenses/[id]/history/page.tsx",
+  "site/src/app/workspace/servers/[id]/activity/page.tsx",
+  "site/src/app/workspace/servers/[id]/statistics/page.tsx",
+  "site/src/app/workspace/servers/[id]/observations/page.tsx",
+  "site/src/app/workspace/servers/[id]/content/new/page.tsx",
+  "site/src/app/workspace/servers/[id]/content/[contentId]/page.tsx",
+  "site/src/app/workspace/servers/[id]/content/[contentId]/history/page.tsx",
+  "site/src/app/servers/[slug]/trust/page.tsx",
+  "site/src/app/workspace/licenses/[id]/history/page.tsx",
 ] as const;
 
 const clippedLoadings = [
-  "apps/web/src/app/workspace/servers/[id]/statistics/loading.tsx",
-  "apps/web/src/app/workspace/servers/[id]/observations/loading.tsx",
-  "apps/web/src/app/servers/[slug]/trust/loading.tsx",
+  "site/src/app/workspace/servers/[id]/statistics/loading.tsx",
+  "site/src/app/workspace/servers/[id]/observations/loading.tsx",
+  "site/src/app/servers/[slug]/trust/loading.tsx",
 ] as const;
 
 it("locks residual workspace server page shells to clipped min-w-0 frames", () => {
@@ -87,8 +87,8 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks managed statistics and observations loading shells to honest busy copy", () => {
-  const statistics = read("apps/web/src/components/server-statistics-page.tsx");
-  const observations = read("apps/web/src/components/server-observation-browser-page.tsx");
+  const statistics = read("site/src/components/server-statistics-page.tsx");
+  const observations = read("site/src/components/server-observation-browser-page.tsx");
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
   expect(statistics).toContain("aria-busy");
@@ -97,23 +97,23 @@ it("locks managed statistics and observations loading shells to honest busy copy
   expect(observations).toContain("copy.loading");
   expect(observations).toContain("aria-busy");
   expect(observations).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/workspace/servers/[id]/statistics/loading.tsx")).toContain(
+  expect(read("site/src/app/workspace/servers/[id]/statistics/loading.tsx")).toContain(
     "overflow-x-clip",
   );
-  expect(read("apps/web/src/app/workspace/servers/[id]/observations/loading.tsx")).toContain(
+  expect(read("site/src/app/workspace/servers/[id]/observations/loading.tsx")).toContain(
     "overflow-x-clip",
   );
 });
 
 it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", () => {
   const surfaces = [
-    "apps/web/src/components/server-workspace-history-screen.tsx",
-    "apps/web/src/components/server-statistics-page.tsx",
-    "apps/web/src/components/server-observation-browser-page.tsx",
-    "apps/web/src/components/server-content-editor-page.tsx",
-    "apps/web/src/components/context-publication-history-screen.tsx",
-    "apps/web/src/components/public-context-trust-page.tsx",
-    "apps/web/src/components/license-history-page.tsx",
+    "site/src/components/server-workspace-history-screen.tsx",
+    "site/src/components/server-statistics-page.tsx",
+    "site/src/components/server-observation-browser-page.tsx",
+    "site/src/components/server-content-editor-page.tsx",
+    "site/src/components/context-publication-history-screen.tsx",
+    "site/src/components/public-context-trust-page.tsx",
+    "site/src/components/license-history-page.tsx",
   ];
   for (const surface of surfaces) {
     const source = read(surface);
@@ -122,16 +122,12 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
     expect(source).toContain("min-w-0");
     expect(source).toContain("min-h-11");
   }
-  expect(read("apps/web/src/components/server-workspace-history-screen.tsx")).toContain(
+  expect(read("site/src/components/server-workspace-history-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/server-observation-browser-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("apps/web/src/components/server-observation-browser-page.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("apps/web/src/components/context-publication-history-screen.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("apps/web/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
 });
 
 it("locks residual honesty copy for server and license residual shells", () => {
@@ -151,12 +147,12 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(getLicenseControlCopy("ru").loadUnavailableHint.length).toBeGreaterThan(0);
   expect(getLicenseControlCopy("en").noHistoryHint.length).toBeGreaterThan(0);
   expect(getLicenseControlCopy("ru").noHistoryHint.length).toBeGreaterThan(0);
-  expect(read("apps/web/src/lib/server-workspace-copy.ts")).toContain("historyUnavailableHint");
-  expect(read("apps/web/src/lib/server-statistics-copy.ts")).toContain("unavailableHint");
-  expect(read("apps/web/src/lib/server-observation-browser-copy.ts")).toContain("unavailableHint");
-  expect(read("apps/web/src/lib/server-publication-history-copy.ts")).toContain("unavailableHint");
-  expect(read("apps/web/src/lib/server-content-copy.ts")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/lib/public-context-trust-copy.ts")).toContain("unavailableHint");
-  expect(read("apps/web/src/lib/license-control-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/lib/license-control-i18n.ts")).toContain("noHistoryHint");
+  expect(read("site/src/lib/server-workspace-copy.ts")).toContain("historyUnavailableHint");
+  expect(read("site/src/lib/server-statistics-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/lib/server-observation-browser-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/lib/server-publication-history-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/lib/server-content-copy.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/lib/public-context-trust-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/lib/license-control-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/lib/license-control-i18n.ts")).toContain("noHistoryHint");
 });

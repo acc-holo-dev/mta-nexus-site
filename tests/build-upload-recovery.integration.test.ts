@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 import type { Build } from "@nexus/domain";
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 describe("exact pending build retry lookup", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

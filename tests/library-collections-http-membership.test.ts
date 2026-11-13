@@ -16,7 +16,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "./helpers/library-collections-http-harness"
   );
@@ -28,10 +28,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", async () => {
 import {
   POST as membershipBatch,
   GET as resourceMemberships,
-} from "../apps/web/src/app/api/library/[id]/collections/route";
-import { GET as membershipReceipt } from "../apps/web/src/app/api/library/collections/membership-history/[id]/route";
-import { GET as membershipHistoryExport } from "../apps/web/src/app/api/library/collections/membership-history/export/route";
-import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
+} from "../site/src/app/api/library/[id]/collections/route";
+import { GET as membershipReceipt } from "../site/src/app/api/library/collections/membership-history/[id]/route";
+import { GET as membershipHistoryExport } from "../site/src/app/api/library/collections/membership-history/export/route";
+import { GET as membershipHistory } from "../site/src/app/api/library/collections/membership-history/route";
 import {
   installLibraryCollectionsHttpLifecycle,
   libraryCollectionsHttpPost as post,

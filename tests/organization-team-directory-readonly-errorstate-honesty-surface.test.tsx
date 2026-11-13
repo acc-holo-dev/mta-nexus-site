@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { OrganizationTeamDirectory } from "../apps/web/src/components/organization-team-directory";
-import type { OrganizationTeamPage } from "../apps/web/src/lib/organization-team-contract";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
+import { OrganizationTeamDirectory } from "../site/src/components/organization-team-directory";
+import type { OrganizationTeamPage } from "../site/src/lib/organization-team-contract";
+import { getOrganizationCopy } from "../site/src/lib/organization-workspace-copy";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -17,7 +17,7 @@ vi.mock("next/link", () => ({
 /** Honesty lock: organization team directory soft muted readonly → ErrorState alert. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/components/organization-team-directory.tsx"),
+  join(root, "site/src/components/organization-team-directory.tsx"),
   "utf8",
 );
 

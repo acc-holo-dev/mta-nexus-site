@@ -5,10 +5,7 @@ import { expect, it } from "vitest";
 
 /** Honesty lock: details uploadBlocked soft secondary readonly → ErrorState. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/author-resource-forms.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/author-resource-forms.tsx"), "utf8");
 
 it("locks author resource details readonly notice to ErrorState without soft secondary caption", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');

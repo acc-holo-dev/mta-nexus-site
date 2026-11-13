@@ -10,20 +10,20 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import ImportLoading from "../apps/web/src/app/workspace/library/collections/[id]/import/loading";
-import ReconcileLoading from "../apps/web/src/app/workspace/library/collections/[id]/reconcile/loading";
-import CollectionsError from "../apps/web/src/app/workspace/library/collections/error";
-import HistoryLoading from "../apps/web/src/app/workspace/library/collections/history/loading";
-import ReceiptLoading from "../apps/web/src/app/workspace/library/collections/receipts/[id]/loading";
-import { libraryCollectionHistoryCopy } from "../apps/web/src/lib/library-collection-history-i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+import ImportLoading from "../site/src/app/workspace/library/collections/[id]/import/loading";
+import ReconcileLoading from "../site/src/app/workspace/library/collections/[id]/reconcile/loading";
+import CollectionsError from "../site/src/app/workspace/library/collections/error";
+import HistoryLoading from "../site/src/app/workspace/library/collections/history/loading";
+import ReceiptLoading from "../site/src/app/workspace/library/collections/receipts/[id]/loading";
+import { libraryCollectionHistoryCopy } from "../site/src/lib/library-collection-history-i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -73,12 +73,12 @@ it.each(["en", "ru"] as const)(
 
 it("locks residual collections page sources to ErrorState/EmptyState honesty chrome", () => {
   const pages = [
-    "apps/web/src/app/workspace/library/collections/[id]/compare/page.tsx",
-    "apps/web/src/app/workspace/library/collections/[id]/import/page.tsx",
-    "apps/web/src/app/workspace/library/collections/[id]/reconcile/page.tsx",
-    "apps/web/src/app/workspace/library/collections/receipts/[id]/page.tsx",
-    "apps/web/src/app/workspace/library/collections/history/page.tsx",
-    "apps/web/src/app/workspace/library/collections/error.tsx",
+    "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
+    "site/src/app/workspace/library/collections/[id]/import/page.tsx",
+    "site/src/app/workspace/library/collections/[id]/reconcile/page.tsx",
+    "site/src/app/workspace/library/collections/receipts/[id]/page.tsx",
+    "site/src/app/workspace/library/collections/history/page.tsx",
+    "site/src/app/workspace/library/collections/error.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
@@ -88,29 +88,27 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("apps/web/src/app/workspace/library/collections/history/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/collections/history/page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("apps/web/src/app/workspace/library/collections/[id]/compare/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/collections/[id]/compare/page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("apps/web/src/app/workspace/library/collections/receipts/[id]/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/collections/receipts/[id]/page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("apps/web/src/app/workspace/library/collections/[id]/import/loading.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/collections/[id]/import/loading.tsx")).toContain(
     "overflow-x-clip",
   );
-  expect(
-    read("apps/web/src/app/workspace/library/collections/[id]/reconcile/loading.tsx"),
-  ).toContain("overflow-x-clip");
-  expect(
-    read("apps/web/src/app/workspace/library/collections/receipts/[id]/loading.tsx"),
-  ).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/workspace/library/collections/history/loading.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/collections/[id]/reconcile/loading.tsx")).toContain(
     "overflow-x-clip",
   );
-  expect(read("apps/web/src/lib/library-collections-i18n.ts")).toContain(
-    "loadUnavailableDescription",
+  expect(read("site/src/app/workspace/library/collections/receipts/[id]/loading.tsx")).toContain(
+    "overflow-x-clip",
   );
-  expect(read("apps/web/src/lib/library-collection-history-i18n.ts")).toContain("emptyHint");
+  expect(read("site/src/app/workspace/library/collections/history/loading.tsx")).toContain(
+    "overflow-x-clip",
+  );
+  expect(read("site/src/lib/library-collections-i18n.ts")).toContain("loadUnavailableDescription");
+  expect(read("site/src/lib/library-collection-history-i18n.ts")).toContain("emptyHint");
 });

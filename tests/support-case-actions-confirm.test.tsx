@@ -2,11 +2,11 @@ import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 
-import { SupportCaseActions } from "../apps/web/src/components/support-case-actions";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { supportWorkspaceCopy } from "../apps/web/src/lib/support-workspace-copy";
+import { SupportCaseActions } from "../site/src/components/support-case-actions";
+import { getDictionary } from "../site/src/lib/i18n";
+import { supportWorkspaceCopy } from "../site/src/lib/support-workspace-copy";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,

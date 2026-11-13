@@ -24,19 +24,19 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/seller-sales-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/seller-sales-service", () => ({
   sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
 }));
 
-import DetailLoading from "../apps/web/src/app/workspace/sales/report/[id]/loading";
-import Detail from "../apps/web/src/app/workspace/sales/report/[id]/page";
-import ReportLoading from "../apps/web/src/app/workspace/sales/report/loading";
-import Page, { metadata } from "../apps/web/src/app/workspace/sales/report/page";
-import { sellerSalesCopy } from "../apps/web/src/lib/seller-sales-i18n";
+import DetailLoading from "../site/src/app/workspace/sales/report/[id]/loading";
+import Detail from "../site/src/app/workspace/sales/report/[id]/page";
+import ReportLoading from "../site/src/app/workspace/sales/report/loading";
+import Page, { metadata } from "../site/src/app/workspace/sales/report/page";
+import { sellerSalesCopy } from "../site/src/lib/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   sale = {

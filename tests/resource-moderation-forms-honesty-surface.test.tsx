@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
@@ -12,34 +12,34 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
   }),
 }));
 
-import { BuildModerationControls } from "../apps/web/src/components/build-moderation-controls";
-import { BuildQuarantineControls } from "../apps/web/src/components/build-quarantine-controls";
-import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
-import { ReportModerationControls } from "../apps/web/src/components/report-moderation-controls";
+import { BuildModerationControls } from "../site/src/components/build-moderation-controls";
+import { BuildQuarantineControls } from "../site/src/components/build-quarantine-controls";
+import { NewResourceForm } from "../site/src/components/new-resource-form";
+import { ReportModerationControls } from "../site/src/components/report-moderation-controls";
 
 const exclusive = [
-  "apps/web/src/components/new-resource-form.tsx",
-  "apps/web/src/components/author-resource-forms.tsx",
-  "apps/web/src/components/resource-media-editor.tsx",
-  "apps/web/src/components/resource-compatibility-form.tsx",
-  "apps/web/src/components/resource-variants-form.tsx",
-  "apps/web/src/components/resource-copy-form.tsx",
-  "apps/web/src/components/resource-lifecycle-controls.tsx",
-  "apps/web/src/components/resource-moderation-controls.tsx",
-  "apps/web/src/components/build-moderation-controls.tsx",
-  "apps/web/src/components/build-quarantine-controls.tsx",
-  "apps/web/src/components/content-moderation-controls.tsx",
-  "apps/web/src/components/report-moderation-controls.tsx",
-  "apps/web/src/components/verification-moderation-controls.tsx",
-  "apps/web/src/components/resource-release-watch-control.tsx",
-  "apps/web/src/components/resource-release-watch-batch-controls.tsx",
+  "site/src/components/new-resource-form.tsx",
+  "site/src/components/author-resource-forms.tsx",
+  "site/src/components/resource-media-editor.tsx",
+  "site/src/components/resource-compatibility-form.tsx",
+  "site/src/components/resource-variants-form.tsx",
+  "site/src/components/resource-copy-form.tsx",
+  "site/src/components/resource-lifecycle-controls.tsx",
+  "site/src/components/resource-moderation-controls.tsx",
+  "site/src/components/build-moderation-controls.tsx",
+  "site/src/components/build-quarantine-controls.tsx",
+  "site/src/components/content-moderation-controls.tsx",
+  "site/src/components/report-moderation-controls.tsx",
+  "site/src/components/verification-moderation-controls.tsx",
+  "site/src/components/resource-release-watch-control.tsx",
+  "site/src/components/resource-release-watch-batch-controls.tsx",
 ] as const;
 
 it("locks resource and moderation form sources to ErrorState honesty chrome", () => {
@@ -52,7 +52,7 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
 });
 
 it("locks resource media editor reorder/remove CTAs to size=touch", () => {
-  const source = read("apps/web/src/components/resource-media-editor.tsx");
+  const source = read("site/src/components/resource-media-editor.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain('size="touch"');
   expect(source).not.toContain('size="sm"');
@@ -60,7 +60,7 @@ it("locks resource media editor reorder/remove CTAs to size=touch", () => {
 });
 
 it("locks resource variants reorder/remove to size=touch and noCandidates to EmptyState", () => {
-  const source = read("apps/web/src/components/resource-variants-form.tsx");
+  const source = read("site/src/components/resource-variants-form.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("copy.noCandidates");
   expect(source).toContain("copy.noCandidatesHint");
@@ -69,14 +69,14 @@ it("locks resource variants reorder/remove to size=touch and noCandidates to Emp
   expect(source).not.toContain('size="sm"');
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(3);
 
-  const i18n = read("apps/web/src/lib/resource-management-i18n.ts");
+  const i18n = read("site/src/lib/resource-management-i18n.ts");
   expect(i18n).toContain("noCandidates:");
   expect(i18n).toContain("noCandidatesHint:");
   expect(i18n.match(/noCandidatesHint:/gu)?.length).toBe(2);
 });
 
 it("locks new resource post-create CTA to size=touch", () => {
-  const source = read("apps/web/src/components/new-resource-form.tsx");
+  const source = read("site/src/components/new-resource-form.tsx");
   expect(source).toMatch(
     /onClick=\{startNewSubmission\}[\s\S]{0,80}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{startNewSubmission\}/u,
   );
@@ -86,7 +86,7 @@ it("locks new resource post-create CTA to size=touch", () => {
 });
 
 it("locks new resource native controls to fieldControlClass without h-10 chrome", () => {
-  const source = read("apps/web/src/components/new-resource-form.tsx");
+  const source = read("site/src/components/new-resource-form.tsx");
   expect(source).toContain("fieldControlClass");
   expect(source).toContain('className: "min-h-11"');
   expect(source).not.toContain("h-10");
@@ -95,27 +95,25 @@ it("locks new resource native controls to fieldControlClass without h-10 chrome"
 });
 
 it("keeps additive honesty descriptions for form failure recovery", () => {
-  expect(read("apps/web/src/lib/i18n/en/publishing.ts")).toContain("createErrorDescription");
-  expect(read("apps/web/src/lib/i18n/ru/publishing.ts")).toContain("createErrorDescription");
-  expect(read("apps/web/src/lib/i18n/en/workspace.ts")).toContain("failedDescription");
-  expect(read("apps/web/src/lib/i18n/ru/workspace.ts")).toContain("uploadFailedDescription");
-  expect(read("apps/web/src/lib/resource-management-i18n.ts")).toContain("actionFailedDescription");
-  expect(read("apps/web/src/lib/resource-commerce-i18n.ts")).toContain("actionFailedDescription");
-  expect(read("apps/web/src/lib/resource-release-control-i18n.ts")).toContain(
+  expect(read("site/src/lib/i18n/en/publishing.ts")).toContain("createErrorDescription");
+  expect(read("site/src/lib/i18n/ru/publishing.ts")).toContain("createErrorDescription");
+  expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("failedDescription");
+  expect(read("site/src/lib/i18n/ru/workspace.ts")).toContain("uploadFailedDescription");
+  expect(read("site/src/lib/resource-management-i18n.ts")).toContain("actionFailedDescription");
+  expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("actionFailedDescription");
+  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
     "actionFailedDescription",
   );
-  expect(read("apps/web/src/lib/resource-media-i18n.ts")).toContain("errorDescription");
-  expect(read("apps/web/src/lib/resource-copy-i18n.ts")).toContain("errorDescription");
-  expect(read("apps/web/src/lib/resource-release-watches-i18n.ts")).toContain("failedDescription");
-  expect(read("apps/web/src/lib/community-moderation-copy.ts")).toContain(
+  expect(read("site/src/lib/resource-media-i18n.ts")).toContain("errorDescription");
+  expect(read("site/src/lib/resource-copy-i18n.ts")).toContain("errorDescription");
+  expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain("failedDescription");
+  expect(read("site/src/lib/community-moderation-copy.ts")).toContain("decisionFailedDescription");
+  expect(read("site/src/lib/verification-workspace-copy.ts")).toContain(
     "decisionFailedDescription",
   );
-  expect(read("apps/web/src/lib/verification-workspace-copy.ts")).toContain(
-    "decisionFailedDescription",
-  );
-  expect(read("apps/web/src/lib/resource-build-workspace-i18n.ts")).toContain("failedDescription");
-  expect(read("apps/web/src/lib/i18n/en/admin.ts")).toContain("quarantineBuildFailedDescription");
-  expect(read("apps/web/src/lib/i18n/ru/admin.ts")).toContain("reportDecisionFailedDescription");
+  expect(read("site/src/lib/resource-build-workspace-i18n.ts")).toContain("failedDescription");
+  expect(read("site/src/lib/i18n/en/admin.ts")).toContain("quarantineBuildFailedDescription");
+  expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("reportDecisionFailedDescription");
 });
 
 it.each(["en", "ru"] as const)(

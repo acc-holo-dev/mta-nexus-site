@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { organizationContentCopy } from "../apps/web/src/lib/organization-content-copy";
-import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+import { organizationContentCopy } from "../site/src/lib/organization-content-copy";
+import { getUserPlatformCopy } from "../site/src/lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -16,18 +16,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: () => undefined, refresh: () => undefined }),
   usePathname: () => "/workspace/organizations/org/content",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+vi.mock("../site/src/lib/services/organization-content-service", () => ({
   organizationContentService: mocks,
 }));
 
-import Page, {
-  generateMetadata,
-} from "../apps/web/src/app/workspace/organizations/[id]/content/page";
-import { OrganizationContentEditorPage } from "../apps/web/src/components/organization-content-editor-page";
+import Page, { generateMetadata } from "../site/src/app/workspace/organizations/[id]/content/page";
+import { OrganizationContentEditorPage } from "../site/src/components/organization-content-editor-page";
 
 const organization = { id: "org", name: "Team", slug: "team" };
 const content = {

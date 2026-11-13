@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
-import { Footer } from "../apps/web/src/components/footer";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { Footer } from "../site/src/components/footer";
+import { getDictionary } from "../site/src/lib/i18n";
 
 describe("footer legal link reflow", () => {
   it.each(["en", "ru"] as const)(

@@ -20,7 +20,7 @@ vi.mock("@nexus/db", () => ({
   verificationWorkspaceRepository: mocks,
 }));
 
-import { verificationWorkspaceService as service } from "../apps/web/src/lib/services/verification-workspace-service";
+import { verificationWorkspaceService as service } from "../site/src/lib/services/verification-workspace-service";
 
 const actor = { id: "actor", role: "developer" } as User,
   time = new Date("2026-10-10T00:00:00Z");

@@ -15,22 +15,22 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND_BOUNDARY");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../apps/web/src/components/moderated-discussion-removal", () => ({
+vi.mock("../site/src/components/moderated-discussion-removal", () => ({
   ModeratedDiscussionRemoval: () => <div data-removal="available" />,
 }));
 
-import DiscussionReportsLoading from "../apps/web/src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
-import DiscussionLoading from "../apps/web/src/app/admin/community/[id]/discussion/loading";
-import { ModeratedDiscussionScreen } from "../apps/web/src/components/moderated-discussion-screen";
-import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
-import { moderatedDiscussionCopy } from "../apps/web/src/lib/moderated-discussion-copy";
+import DiscussionReportsLoading from "../site/src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
+import DiscussionLoading from "../site/src/app/admin/community/[id]/discussion/loading";
+import { ModeratedDiscussionScreen } from "../site/src/components/moderated-discussion-screen";
+import { moderationCopy } from "../site/src/lib/community-moderation-copy";
+import { moderatedDiscussionCopy } from "../site/src/lib/moderated-discussion-copy";
 
 const time = "2026-10-11T00:00:00.000Z",
   publication = {

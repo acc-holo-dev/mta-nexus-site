@@ -6,8 +6,8 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("server observation history API", () => {
   it("offers bounded windows and refuses to describe missing listings as downtime", () => {
-    const route = read("apps/web/src/app/api/servers/[id]/history/route.ts");
-    const service = read("apps/web/src/lib/services/server-history-service.ts");
+    const route = read("site/src/app/api/servers/[id]/history/route.ts");
+    const service = read("site/src/lib/services/server-history-service.ts");
 
     expect(route).toContain('z.enum(["24h", "7d", "30d"])');
     expect(route).toContain('"Cache-Control": "no-store"');
@@ -19,8 +19,8 @@ describe("server observation history API", () => {
   });
 
   it("keeps the GET history surface read-only", () => {
-    const route = read("apps/web/src/app/api/servers/[id]/history/route.ts");
-    const service = read("apps/web/src/lib/services/server-history-service.ts");
+    const route = read("site/src/app/api/servers/[id]/history/route.ts");
+    const service = read("site/src/lib/services/server-history-service.ts");
 
     expect(route).toContain("serverHistoryService.getHistory");
     expect(service).not.toContain(".record(");

@@ -14,21 +14,21 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/requirements",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-requirements-service", () => ({
+vi.mock("../site/src/lib/services/resource-requirements-service", () => ({
   resourceRequirementsService: { collectionReport: state.report },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button" data-product={productId} data-build={buildId}>
       Download
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
+vi.mock("../site/src/components/resource-cart-controls", () => ({
   AddResourceToCart: ({ productId }: { productId: string }) => (
     <button type="button" data-cart={productId}>
       Add to cart
@@ -36,9 +36,9 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
   ),
 }));
 
-import { CollectionRequirementsScreen as screen } from "../apps/web/src/components/collection-requirements-screen";
-import { collectionRequirementsCopy } from "../apps/web/src/lib/collection-requirements-i18n";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { CollectionRequirementsScreen as screen } from "../site/src/components/collection-requirements-screen";
+import { collectionRequirementsCopy } from "../site/src/lib/collection-requirements-i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",

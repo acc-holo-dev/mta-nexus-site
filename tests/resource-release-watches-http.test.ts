@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   command: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate, generateId: () => "aud_a" }));
@@ -20,8 +20,8 @@ vi.mock("@nexus/db", () => ({
     command: state.command,
   },
 }));
-import { GET as page } from "../apps/web/src/app/api/library/watches/route";
-import { GET as detail, POST as command } from "../apps/web/src/app/api/library/watches/[id]/route";
+import { GET as page } from "../site/src/app/api/library/watches/route";
+import { GET as detail, POST as command } from "../site/src/app/api/library/watches/[id]/route";
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const request = (body: unknown, headers?: Record<string, string>) =>
   new NextRequest("https://nexus.test/api/library/watches/prd_a", {

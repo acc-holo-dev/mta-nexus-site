@@ -34,7 +34,7 @@ vi.mock("../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { formatNotification } from "../site/src/lib/notification-copy";
 import { db } from "../packages/db/src/client";
 import { publicationNotice } from "../packages/db/src/repositories/publication-notice";
 

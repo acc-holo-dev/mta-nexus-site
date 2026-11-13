@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { formatNotification } from "../site/src/lib/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 

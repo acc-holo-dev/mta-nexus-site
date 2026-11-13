@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -43,28 +43,28 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService,
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/components/server-details-form", async () => {
+vi.mock("../site/src/components/server-details-form", async () => {
   const React = await import("react");
   return {
     ServerDetailsForm: () => React.createElement("div", { "data-testid": "server-details-form" }),
   };
 });
 
-vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
+vi.mock("../site/src/components/server-claim-control-panel", async () => {
   const React = await import("react");
   return {
     ServerClaimControlPanel: () =>
@@ -74,9 +74,9 @@ vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   };
 });
 
-import ServerWorkspaceLayout from "../apps/web/src/app/workspace/servers/[id]/layout";
-import ServerManagementPage from "../apps/web/src/app/workspace/servers/[id]/page";
-import { getServerWorkspaceNavCopy } from "../apps/web/src/lib/server-workspace-nav-i18n";
+import ServerWorkspaceLayout from "../site/src/app/workspace/servers/[id]/layout";
+import ServerManagementPage from "../site/src/app/workspace/servers/[id]/page";
+import { getServerWorkspaceNavCopy } from "../site/src/lib/server-workspace-nav-i18n";
 
 async function renderManagedServer(id = "srv_managed") {
   const params = Promise.resolve({ id });

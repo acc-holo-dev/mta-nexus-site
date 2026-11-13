@@ -7,9 +7,9 @@ import {
   reactionPageHref,
   reactionPageSchema,
   reactionStateSchema,
-} from "../apps/web/src/lib/content-reaction-contract";
-import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
-import { trustCopy } from "../apps/web/src/lib/public-user-trust-copy";
+} from "../site/src/lib/content-reaction-contract";
+import { reactionCopy } from "../site/src/lib/content-reaction-copy";
+import { trustCopy } from "../site/src/lib/public-user-trust-copy";
 const mutation = {
   contentId: "content",
   actorId: "actor",

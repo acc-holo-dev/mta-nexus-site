@@ -3,12 +3,12 @@ import {
   confirmedPrivacyUpdate,
   parseEditablePrivacy,
   profilePrivacyUpdateSchema,
-} from "../apps/web/src/lib/profile-privacy-contract";
+} from "../site/src/lib/profile-privacy-contract";
 import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../apps/web/src/lib/profile-privacy-copy";
+} from "../site/src/lib/profile-privacy-copy";
 
 const previous = {
   id: "user",

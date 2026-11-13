@@ -1,8 +1,8 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../apps/web/src/components/shell-destination-policy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import type { ShellAuthSession } from "../site/src/components/shell-destination-policy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
 const auth = vi.hoisted(() => ({
@@ -28,41 +28,41 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/use-auth-session", () => ({
+vi.mock("../site/src/components/use-auth-session", () => ({
   useAuthSession: () => auth.session,
 }));
 
-vi.mock("../apps/web/src/components/account-controls", async () => {
+vi.mock("../site/src/components/account-controls", async () => {
   const ReactModule = await import("react");
   return {
     AccountControls: () => ReactModule.createElement("span", { "data-mock": "account" }),
   };
 });
 
-vi.mock("../apps/web/src/components/locale-switcher", async () => {
+vi.mock("../site/src/components/locale-switcher", async () => {
   const ReactModule = await import("react");
   return {
     LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "locale" }),
   };
 });
 
-vi.mock("../apps/web/src/components/notification-bell", async () => {
+vi.mock("../site/src/components/notification-bell", async () => {
   const ReactModule = await import("react");
   return {
     NotificationBell: () => ReactModule.createElement("span", { "data-mock": "notifications" }),
   };
 });
 
-vi.mock("../apps/web/src/components/theme-toggle", async () => {
+vi.mock("../site/src/components/theme-toggle", async () => {
   const ReactModule = await import("react");
   return {
     ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "theme" }),
   };
 });
 
-import { MobileNav } from "../apps/web/src/components/mobile-nav";
-import { NexusShell } from "../apps/web/src/components/nexus-shell";
-import { Sidebar } from "../apps/web/src/components/sidebar";
+import { MobileNav } from "../site/src/components/mobile-nav";
+import { NexusShell } from "../site/src/components/nexus-shell";
+import { Sidebar } from "../site/src/components/sidebar";
 
 describe("pre-release shell accessibility behavior", () => {
   beforeEach(() => {

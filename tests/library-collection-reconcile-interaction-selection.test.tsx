@@ -14,8 +14,8 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
-import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
+import { LibraryCollectionReconcileForm } from "../site/src/components/library-collection-reconcile";
+import { libraryCollectionManifestsCopy } from "../site/src/lib/library-collection-manifests-i18n";
 
 const { collection, fixture, state, render, check, submit } =
   createLibraryCollectionReconcileInteractionHelpers(harness, LibraryCollectionReconcileForm);

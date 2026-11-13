@@ -13,16 +13,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/watches/history",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { history: h.history },
 }));
 
-import Page, { metadata } from "../apps/web/src/app/workspace/library/watches/history/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import Page, { metadata } from "../site/src/app/workspace/library/watches/history/page";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const screen = async () =>
   renderToStaticMarkup(
@@ -106,7 +106,7 @@ it("requires sign-in and rejects duplicate filters before reading audit records"
 });
 it("offers to clear filters when a filtered watch history view is empty", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../apps/web/src/lib/resource-release-watch-history-i18n"
+    "../site/src/lib/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockResolvedValue({
@@ -130,7 +130,7 @@ it("offers to clear filters when a filtered watch history view is empty", async 
 
 it("shows an honest recovery state when release watch history fails to load", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../apps/web/src/lib/resource-release-watch-history-i18n"
+    "../site/src/lib/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockRejectedValue(new Error("history unavailable"));

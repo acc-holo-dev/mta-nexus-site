@@ -23,11 +23,11 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/license-control-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/license-control-service", () => ({
   licenseControlService: {
     detail: state.detail,
     servers: state.servers,
@@ -37,30 +37,30 @@ vi.mock("../apps/web/src/lib/services/license-control-service", () => ({
     history: state.history,
   },
 }));
-vi.mock("../apps/web/src/components/license-control-panel", () => ({
+vi.mock("../site/src/components/license-control-panel", () => ({
   LicenseControlPanel: (props: unknown) => {
     state.panel(props);
     return <section>Controls</section>;
   },
 }));
 
-import AdminLicenseHistoryLoading from "../apps/web/src/app/admin/licenses/[id]/history/loading";
-import AdminLicenseDetailLoading from "../apps/web/src/app/admin/licenses/[id]/loading";
-import ModeratorPage from "../apps/web/src/app/admin/licenses/[id]/page";
-import LicensesLoading from "../apps/web/src/app/admin/licenses/loading";
-import MaintenanceLoading from "../apps/web/src/app/admin/licenses/maintenance/loading";
-import MaintenancePage from "../apps/web/src/app/admin/licenses/maintenance/page";
-import QueuePage from "../apps/web/src/app/admin/licenses/page";
-import WorkspaceLicenseHistoryLoading from "../apps/web/src/app/workspace/licenses/[id]/history/loading";
-import OwnerLicenseLoading from "../apps/web/src/app/workspace/licenses/[id]/loading";
-import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
+import AdminLicenseHistoryLoading from "../site/src/app/admin/licenses/[id]/history/loading";
+import AdminLicenseDetailLoading from "../site/src/app/admin/licenses/[id]/loading";
+import ModeratorPage from "../site/src/app/admin/licenses/[id]/page";
+import LicensesLoading from "../site/src/app/admin/licenses/loading";
+import MaintenanceLoading from "../site/src/app/admin/licenses/maintenance/loading";
+import MaintenancePage from "../site/src/app/admin/licenses/maintenance/page";
+import QueuePage from "../site/src/app/admin/licenses/page";
+import WorkspaceLicenseHistoryLoading from "../site/src/app/workspace/licenses/[id]/history/loading";
+import OwnerLicenseLoading from "../site/src/app/workspace/licenses/[id]/loading";
+import OwnerPage, { metadata } from "../site/src/app/workspace/licenses/[id]/page";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
-} from "../apps/web/src/components/license-history-page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
+} from "../site/src/components/license-history-page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getLicenseControlCopy } from "../site/src/lib/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../site/src/lib/license-maintenance-i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {

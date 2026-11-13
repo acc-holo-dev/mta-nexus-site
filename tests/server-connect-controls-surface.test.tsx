@@ -3,8 +3,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ServerConnectControls } from "../apps/web/src/components/server-connect-controls";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { ServerConnectControls } from "../site/src/components/server-connect-controls";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
@@ -50,7 +50,7 @@ describe("ServerConnectControls", () => {
   });
 
   it("locks copy address CTA to size=touch / min-h-11 without size=sm", () => {
-    const source = read("apps/web/src/components/server-connect-controls.tsx");
+    const source = read("site/src/components/server-connect-controls.tsx");
     expect(source).toContain('size="touch"');
     expect(source).toContain("min-h-11");
     expect(source).toMatch(/min-h-11|size="touch"/u);

@@ -22,12 +22,12 @@ vi.mock("react", async (original) => ({
   useEffect: () => {},
 }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/lib/user-platform-client", async (original) => ({
-  ...(await original<typeof import("../apps/web/src/lib/user-platform-client")>()),
+vi.mock("../site/src/lib/user-platform-client", async (original) => ({
+  ...(await original<typeof import("../site/src/lib/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
-import { DeveloperProfileEditor } from "../apps/web/src/components/developer-profile-editor";
+import { DeveloperProfileEditor } from "../site/src/components/developer-profile-editor";
 
 type Element = ReactElement<Record<string, unknown>>;
 function descendants(node: ReactNode): Element[] {

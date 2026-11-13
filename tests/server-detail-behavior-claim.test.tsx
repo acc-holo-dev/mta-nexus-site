@@ -5,7 +5,7 @@ import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 import { mocks, setupServerDetailBehavior, state } from "./helpers/server-detail-behavior-harness";
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
   return {
     authService: { getSession: harnessMocks.session },
@@ -47,7 +47,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/server-service", async () => {
+vi.mock("../site/src/lib/services/server-service", async () => {
   const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
   return {
     serverService: {
@@ -56,7 +56,7 @@ vi.mock("../apps/web/src/lib/services/server-service", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../site/src/lib/services/mta-master-directory-service", async () => {
   const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
   return {
     mtaMasterDirectoryService: {
@@ -67,7 +67,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () =>
   };
 });
 
-vi.mock("../apps/web/src/lib/services/server-history-service", async () => {
+vi.mock("../site/src/lib/services/server-history-service", async () => {
   const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
   return {
     serverHistoryService: {
@@ -76,7 +76,7 @@ vi.mock("../apps/web/src/lib/services/server-history-service", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/content-service", async () => {
+vi.mock("../site/src/lib/services/content-service", async () => {
   const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
   return {
     contentService: {
@@ -85,12 +85,12 @@ vi.mock("../apps/web/src/lib/services/content-service", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
 
-vi.mock("../apps/web/src/components/server-follow-button", async () => {
+vi.mock("../site/src/components/server-follow-button", async () => {
   const React = await import("react");
   return {
     ServerFollowButton: ({ serverId, serverName }: { serverId: string; serverName: string }) =>
@@ -105,7 +105,7 @@ vi.mock("../apps/web/src/components/server-follow-button", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/server-history-panel", async () => {
+vi.mock("../site/src/components/server-history-panel", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: ({ history, locale }: { history: unknown; locale: string }) =>
@@ -117,7 +117,7 @@ vi.mock("../apps/web/src/components/server-history-panel", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/server-updates-panel", async () => {
+vi.mock("../site/src/components/server-updates-panel", async () => {
   const React = await import("react");
   return {
     ServerUpdatesPanel: ({ updates }: { updates: unknown }) =>
@@ -128,7 +128,7 @@ vi.mock("../apps/web/src/components/server-updates-panel", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
+vi.mock("../site/src/components/server-claim-control-panel", async () => {
   const React = await import("react");
   return {
     ServerClaimControlPanel: ({ serverId }: { serverId: string }) =>
@@ -139,7 +139,7 @@ vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/server-connect-controls", async () => {
+vi.mock("../site/src/components/server-connect-controls", async () => {
   const React = await import("react");
   return {
     ServerConnectControls: ({
@@ -163,7 +163,7 @@ vi.mock("../apps/web/src/components/server-connect-controls", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/server-review-panel", async () => {
+vi.mock("../site/src/components/server-review-panel", async () => {
   const React = await import("react");
   return {
     ServerReviewPanel: ({ serverId }: { serverId: string }) =>
@@ -174,7 +174,7 @@ vi.mock("../apps/web/src/components/server-review-panel", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/server-review-service", () => ({
+vi.mock("../site/src/lib/services/server-review-service", () => ({
   serverReviewService: {
     publicPage: vi.fn(async () => ({
       reviews: [],
@@ -186,7 +186,7 @@ vi.mock("../apps/web/src/lib/services/server-review-service", () => ({
   },
 }));
 
-import ServerDetailPage from "../apps/web/src/app/servers/[slug]/page";
+import ServerDetailPage from "../site/src/app/servers/[slug]/page";
 
 setupServerDetailBehavior();
 

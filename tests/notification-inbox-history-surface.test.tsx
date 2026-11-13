@@ -9,19 +9,19 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", session: vi.fn(),
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/notifications" }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
+vi.mock("../site/src/lib/services/notification-inbox-service", () => ({
   notificationInboxService: { page: state.page },
 }));
 
-import Loading from "../apps/web/src/app/notifications/loading";
-import Page, { generateMetadata } from "../apps/web/src/app/notifications/page";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { notificationInboxCopy } from "../apps/web/src/lib/notification-inbox-copy";
+import Loading from "../site/src/app/notifications/loading";
+import Page, { generateMetadata } from "../site/src/app/notifications/page";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { getDictionary } from "../site/src/lib/i18n";
+import { notificationInboxCopy } from "../site/src/lib/notification-inbox-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();

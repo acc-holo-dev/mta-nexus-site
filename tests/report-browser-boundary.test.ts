@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
@@ -18,15 +18,15 @@ vi.mock("@nexus/db", () => ({
   userRepository: { findById: vi.fn(), listModeratorIds: vi.fn() },
   communityReportsRepository: { page: vi.fn(), submit: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../site/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: { page: vi.fn(), submit: vi.fn() },
 }));
 
-import { POST as createPublicReport } from "../apps/web/src/app/api/reports/route";
-import { POST as createWorkspaceReport } from "../apps/web/src/app/api/workspace/reports/route";
+import { POST as createPublicReport } from "../site/src/app/api/reports/route";
+import { POST as createWorkspaceReport } from "../site/src/app/api/workspace/reports/route";
 
 const mutations = [
   ["public report", "POST", createPublicReport],

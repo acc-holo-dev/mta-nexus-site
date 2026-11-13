@@ -12,8 +12,8 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
-import { LibraryCollectionImport } from "../apps/web/src/components/library-collection-import";
+import { LibraryCollectionBatchForm } from "../site/src/components/library-collection-batch";
+import { LibraryCollectionImport } from "../site/src/components/library-collection-import";
 
 const { manifest, response, render, textarea, inspect, readFile, child } =
   createLibraryCollectionImportInteractionHelpers(

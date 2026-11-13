@@ -4,25 +4,25 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
   getClientIp: () => "unknown",
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { createServer: vi.fn(), updateServer: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: vi.fn() },
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),
   mtaLiveStatus: vi.fn(),
 }));
 
-import { POST as registerServer } from "../apps/web/src/app/api/servers/route";
-import { PATCH as updateServer } from "../apps/web/src/app/api/servers/[id]/route";
+import { POST as registerServer } from "../site/src/app/api/servers/route";
+import { PATCH as updateServer } from "../site/src/app/api/servers/[id]/route";
 
 const context = { params: Promise.resolve({ id: "srv_a" }) };
 const mutations = [

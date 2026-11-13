@@ -1,4 +1,4 @@
-import { GET as getServiceWorker } from "../../apps/web/src/app/sw.js/route";
+import { GET as getServiceWorker } from "../../site/src/app/sw.js/route";
 import { createServiceWorkerHarness, makeServiceWorkerRequest } from "./service-worker-harness";
 
 export { createServiceWorkerHarness, makeServiceWorkerRequest };

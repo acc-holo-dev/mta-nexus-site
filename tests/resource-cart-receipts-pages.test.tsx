@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { ResourceCartControls } from "../apps/web/src/components/resource-cart-controls";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { ResourceCartControls } from "../site/src/components/resource-cart-controls";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -16,14 +16,14 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/acquisitions/receipts",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-cart-receipts-service", () => ({
+vi.mock("../site/src/lib/services/resource-cart-receipts-service", () => ({
   resourceCartReceiptsService: { page: state.page, detail: state.detail },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button">
       {productId}:{buildId}
@@ -31,11 +31,11 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
   ),
 }));
 
-import Detail from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/page";
-import DetailLoading from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/loading";
-import Page, { generateMetadata } from "../apps/web/src/app/workspace/acquisitions/receipts/page";
-import ListLoading from "../apps/web/src/app/workspace/acquisitions/receipts/loading";
-import { resourceCartReceiptsCopy } from "../apps/web/src/lib/resource-cart-receipts-i18n";
+import Detail from "../site/src/app/workspace/acquisitions/receipts/[id]/page";
+import DetailLoading from "../site/src/app/workspace/acquisitions/receipts/[id]/loading";
+import Page, { generateMetadata } from "../site/src/app/workspace/acquisitions/receipts/page";
+import ListLoading from "../site/src/app/workspace/acquisitions/receipts/loading";
+import { resourceCartReceiptsCopy } from "../site/src/lib/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
 beforeEach(() => {

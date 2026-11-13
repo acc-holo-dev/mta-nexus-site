@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
 
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),
@@ -9,22 +9,22 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.pageDiscussion },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
 
-import Page from "../apps/web/src/app/articles/[slug]/page";
+import Page from "../site/src/app/articles/[slug]/page";
 
-vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+vi.mock("../site/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
+import { ContentDiscussion } from "../site/src/components/content-discussion";
 
 const item = {
   id: "older",

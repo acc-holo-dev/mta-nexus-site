@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confirmsAdminAction } from "../apps/web/src/lib/admin-action-confirmation";
+import { confirmsAdminAction } from "../site/src/lib/admin-action-confirmation";
 
 describe("admin mutation confirmation", () => {
   const body = {

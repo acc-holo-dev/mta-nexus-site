@@ -13,19 +13,17 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("@nexus/db", () => ({ serverRepository: { pageManagedByUser: state.page } }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/mta-master-directory-service", async (importOriginal) => {
   const actual =
-    await importOriginal<
-      typeof import("../apps/web/src/lib/services/mta-master-directory-service")
-    >();
+    await importOriginal<typeof import("../site/src/lib/services/mta-master-directory-service")>();
   return { ...actual, mtaMasterDirectoryService: { getDirectory: state.directory } };
 });
 
-import ManagedServersPage, { generateMetadata } from "../apps/web/src/app/workspace/servers/page";
+import ManagedServersPage, { generateMetadata } from "../site/src/app/workspace/servers/page";
 
 const server = {
   id: "private-server",

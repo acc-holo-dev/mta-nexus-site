@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   resourceAttachmentFileName,
   reviewerAttachmentFileName,
-} from "../apps/web/src/lib/resource-attachment-filename";
+} from "../site/src/lib/resource-attachment-filename";
 
 describe("safe download response filenames", () => {
   it("keeps ordinary release filenames and allowlisted extensions", () => {

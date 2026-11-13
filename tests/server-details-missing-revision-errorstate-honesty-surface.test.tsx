@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/server-details-form.tsx";
+const surface = "site/src/components/server-details-form.tsx";
 
 it("locks missing saved revision to ErrorState alert", () => {
   const source = read(surface);

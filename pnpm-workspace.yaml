@@ -1,5 +1,5 @@
 packages:
-  - "apps/*"
+  - "site"
   - "packages/*"
 # Toolchain pins live outside this file: package.json#engines (Node major-ok),
 # .nvmrc/.node-version (exact host/CI Node), package.json#packageManager (exact pnpm).

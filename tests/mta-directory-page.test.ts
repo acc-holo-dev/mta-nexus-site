@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { selectMtaDirectoryPage } from "../apps/web/src/lib/mta-directory-page";
-import type { MtaMasterServer } from "../apps/web/src/lib/services/mta-master-directory-service";
+import { selectMtaDirectoryPage } from "../site/src/lib/mta-directory-page";
+import type { MtaMasterServer } from "../site/src/lib/services/mta-master-directory-service";
 
 const text = fc.string({ unit: "binary", maxLength: 20 });
 const optionalText = fc.option(text, { nil: undefined });

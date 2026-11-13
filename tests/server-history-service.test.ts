@@ -5,8 +5,8 @@ vi.mock("@nexus/db", () => ({
   serverObservationRepository: { readWindow: state.readWindow },
   serverRepository: {},
 }));
-import { serverHistoryService } from "../apps/web/src/lib/services/server-history-service";
-import { parseServerHistoryWindow } from "../apps/web/src/lib/server-history-window";
+import { serverHistoryService } from "../site/src/lib/services/server-history-service";
+import { parseServerHistoryWindow } from "../site/src/lib/server-history-window";
 const listing = { id: "server", name: "Server", slug: "server", visibility: "public" as const };
 const end = new Date("2026-10-09T12:00:00Z");
 const sample = { id: "sample", observedAt: end, currentPlayers: 2, maxPlayers: 64 };

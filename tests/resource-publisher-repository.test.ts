@@ -24,7 +24,7 @@ vi.mock("../packages/db/src/client", async () => {
   return { db: database };
 });
 import { resourcePublisherRepository as repo } from "../packages/db/src/repositories/resource-publisher";
-import { resourcePublisherQuery } from "../apps/web/src/lib/resource-publisher-query";
+import { resourcePublisherQuery } from "../site/src/lib/resource-publisher-query";
 beforeEach(() => {
   state.queries = [];
   state.rows = [];

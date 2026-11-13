@@ -15,14 +15,14 @@ const h = vi.hoisted(() => ({
   actor: "usr_a",
   confirm: vi.fn(async () => true),
 }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction: h.confirm }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction: h.confirm }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { CommercialPlanForm } from "../apps/web/src/components/commercial-plan-form";
+import { CommercialPlanForm } from "../site/src/components/commercial-plan-form";
 
 const { mount, prepare, submit, acknowledgementButton } =
   createCommercialPlanFormConfirmInteractionHelpers(h, CommercialPlanForm);

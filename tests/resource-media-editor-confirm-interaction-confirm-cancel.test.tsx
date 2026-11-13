@@ -10,10 +10,10 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { ResourceMediaEditor } from "../apps/web/src/components/resource-media-editor";
+import { ResourceMediaEditor } from "../site/src/components/resource-media-editor";
 
 const { render, removeButton } = createResourceMediaEditorConfirmInteractionHelpers(
   harness,

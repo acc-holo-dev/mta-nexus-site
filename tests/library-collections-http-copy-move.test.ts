@@ -15,7 +15,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "./helpers/library-collections-http-harness"
   );
@@ -24,11 +24,11 @@ vi.mock("../apps/web/src/lib/services/auth-service", async () => {
   };
 });
 
-import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
-import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
-import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
-import { POST as command } from "../apps/web/src/app/api/library/collections/[id]/route";
-import { POST as create } from "../apps/web/src/app/api/library/collections/route";
+import { GET as copyPreview } from "../site/src/app/api/library/collections/[id]/copy/route";
+import { GET as copyItemsPage } from "../site/src/app/api/library/collections/[id]/copy-items/route";
+import { GET as moveItemsPage } from "../site/src/app/api/library/collections/[id]/move-items/route";
+import { POST as command } from "../site/src/app/api/library/collections/[id]/route";
+import { POST as create } from "../site/src/app/api/library/collections/route";
 import {
   libraryCollectionsHttpBase as base,
   libraryCollectionsHttpContext as context,

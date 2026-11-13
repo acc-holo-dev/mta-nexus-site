@@ -3,7 +3,7 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   developers: [] as Array<Record<string, unknown>>,
@@ -14,18 +14,18 @@ const state = vi.hoisted(() => ({
 const directoryPage = vi.hoisted(() => vi.fn());
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
-vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { page: directoryPage },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => null,
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
@@ -107,11 +107,11 @@ vi.mock("../packages/db/src/client", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
-vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
-vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
+vi.mock("../site/src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../site/src/components/server-card", () => ({ ServerCard: () => null }));
+vi.mock("../site/src/components/article-card", () => ({ ArticleCard: () => null }));
 
-import DevelopersPage from "../apps/web/src/app/developers/page";
+import DevelopersPage from "../site/src/app/developers/page";
 import { UserRepository } from "../packages/db/src/repositories/users";
 
 describe("creator directory trust behavior", () => {

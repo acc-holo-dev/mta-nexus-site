@@ -4,26 +4,26 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { LibraryCollectionsErrorPanel } from "../apps/web/src/components/library-collections-error-panel";
-import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
-import { libraryMembershipBatchesCopy } from "../apps/web/src/lib/library-membership-batches-i18n";
-import { librarySelectionBatchesCopy } from "../apps/web/src/lib/library-selection-batches-i18n";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+import { LibraryCollectionsErrorPanel } from "../site/src/components/library-collections-error-panel";
+import { libraryCollectionManifestsCopy } from "../site/src/lib/library-collection-manifests-i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
+import { libraryMembershipBatchesCopy } from "../site/src/lib/library-membership-batches-i18n";
+import { librarySelectionBatchesCopy } from "../site/src/lib/library-selection-batches-i18n";
+import { getResourceReleaseControlCopy } from "../site/src/lib/resource-release-control-i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const forms = [
-  "apps/web/src/components/library-collection-batch.tsx",
-  "apps/web/src/components/library-collection-command.tsx",
-  "apps/web/src/components/library-collection-import.tsx",
-  "apps/web/src/components/library-collection-item-copy.tsx",
-  "apps/web/src/components/library-collection-reconcile.tsx",
-  "apps/web/src/components/library-collections-error-panel.tsx",
-  "apps/web/src/components/library-membership-batch.tsx",
-  "apps/web/src/components/library-release-command.tsx",
-  "apps/web/src/components/library-selection-batch-controls.tsx",
+  "site/src/components/library-collection-batch.tsx",
+  "site/src/components/library-collection-command.tsx",
+  "site/src/components/library-collection-import.tsx",
+  "site/src/components/library-collection-item-copy.tsx",
+  "site/src/components/library-collection-reconcile.tsx",
+  "site/src/components/library-collections-error-panel.tsx",
+  "site/src/components/library-membership-batch.tsx",
+  "site/src/components/library-release-command.tsx",
+  "site/src/components/library-selection-batch-controls.tsx",
 ] as const;
 
 it("locks library form sources to ErrorState honesty without plain alert paragraphs", () => {
@@ -45,19 +45,17 @@ it("keeps additive action-error copy for library form locales", () => {
   expect(getResourceReleaseControlCopy("en").errors.actionErrorDescription.length).toBeGreaterThan(
     20,
   );
-  expect(read("apps/web/src/lib/library-collections-i18n.ts")).toContain("actionErrorDescription");
-  expect(read("apps/web/src/lib/library-collection-manifests-i18n.ts")).toContain(
+  expect(read("site/src/lib/library-collections-i18n.ts")).toContain("actionErrorDescription");
+  expect(read("site/src/lib/library-collection-manifests-i18n.ts")).toContain(
     "previewErrorDescription",
   );
-  expect(read("apps/web/src/lib/library-membership-batches-i18n.ts")).toContain(
+  expect(read("site/src/lib/library-membership-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("apps/web/src/lib/library-selection-batches-i18n.ts")).toContain(
+  expect(read("site/src/lib/library-selection-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("apps/web/src/lib/resource-release-control-i18n.ts")).toContain(
-    "actionErrorDescription",
-  );
+  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain("actionErrorDescription");
 });
 
 it("renders collections error panel with ErrorState description and touch recovery", () => {

@@ -2,9 +2,9 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import fixtures from "./fixtures/build-packages.json";
 import { buildPackageSummary } from "@nexus/domain";
-import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
-import { buildPackageCopy } from "../apps/web/src/lib/build-package-i18n";
-import { getResourceSubmissionErrorMessage } from "../apps/web/src/lib/publishing-error-message";
+import { inspectBuildPackage } from "../site/src/lib/services/build-package-inspection";
+import { buildPackageCopy } from "../site/src/lib/build-package-i18n";
+import { getResourceSubmissionErrorMessage } from "../site/src/lib/publishing-error-message";
 
 const bytes = (name: keyof typeof fixtures) => Buffer.from(fixtures[name], "base64");
 const inspect = (data: Uint8Array) => inspectBuildPackage({ bytes: data, format: "zip" });

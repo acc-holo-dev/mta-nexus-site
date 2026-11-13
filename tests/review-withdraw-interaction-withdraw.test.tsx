@@ -13,7 +13,7 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
@@ -25,7 +25,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourceReviewEditor } from "../apps/web/src/components/resource-review-controls";
+import { ResourceReviewEditor } from "../site/src/components/resource-review-controls";
 
 const { withdrawButton } = createReviewWithdrawInteractionHelpers(
   harness,

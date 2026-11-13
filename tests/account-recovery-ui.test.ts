@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 import {
   parseAccountRecoveryLocation,
   recoveryJsonRequest,
-} from "../apps/web/src/lib/account-recovery-browser";
+} from "../site/src/lib/account-recovery-browser";
 import {
   PASSWORD_RESET_NEUTRAL_RESPONSE,
   PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
@@ -11,7 +11,7 @@ import {
   passwordResetRemainingFloorMs,
   passwordResetTargetMs,
   waitForPasswordResetFloor,
-} from "../apps/web/src/lib/account-recovery-request-policy";
+} from "../site/src/lib/account-recovery-request-policy";
 
 const validChallenge = "ach_recovery_fixture";
 const validToken = "A".repeat(43);

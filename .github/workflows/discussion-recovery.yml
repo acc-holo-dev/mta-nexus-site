@@ -6,9 +6,9 @@ on:
       - .github/workflows/discussion-recovery.yml
       - scripts/verify-discussion-recovery.mjs
       - scripts/tests/discussion-recovery-verification.node-test.mjs
-      - apps/web/scripts/discussion-replay-*.ts
-      - apps/web/scripts/replay-discussion-notifications.ts
-      - apps/web/src/lib/services/discussion-*.ts
+      - site/scripts/discussion-replay-*.ts
+      - site/scripts/replay-discussion-notifications.ts
+      - site/src/lib/services/discussion-*.ts
       - packages/db/src/repositories/notifications.ts
       - packages/db/src/repositories/discussion-push-receipt.ts
       - packages/db/src/repositories/follow-workspace.ts

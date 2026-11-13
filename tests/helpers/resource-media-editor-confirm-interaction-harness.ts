@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { resourceMediaCopy } from "../../apps/web/src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../site/src/lib/resource-media-i18n";
 import {
   type FlatTestElement,
   findTestButton,

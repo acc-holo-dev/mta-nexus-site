@@ -16,20 +16,20 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND_BOUNDARY");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
+vi.mock("../site/src/lib/services/server-content-service", () => ({
   serverContentService: state,
 }));
-vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+vi.mock("../site/src/lib/services/organization-content-service", () => ({
   organizationContentService: state,
 }));
-vi.mock("../apps/web/src/components/author-publication-restore", () => ({
+vi.mock("../site/src/components/author-publication-restore", () => ({
   AuthorPublicationRestore: ({
     organizationId,
     serverId,
@@ -39,10 +39,10 @@ vi.mock("../apps/web/src/components/author-publication-restore", () => ({
   }) => <div data-restore={organizationId ?? serverId} />,
 }));
 
-import { DiscussionReportsScreen as Reports } from "../apps/web/src/components/discussion-reports-screen";
-import { OrganizationPublicationHistoryScreen as History } from "../apps/web/src/components/organization-publication-history-screen";
-import { discussionReportsCopy } from "../apps/web/src/lib/discussion-reports-copy";
-import { organizationPublicationHistoryCopy } from "../apps/web/src/lib/organization-publication-history-copy";
+import { DiscussionReportsScreen as Reports } from "../site/src/components/discussion-reports-screen";
+import { OrganizationPublicationHistoryScreen as History } from "../site/src/components/organization-publication-history-screen";
+import { discussionReportsCopy } from "../site/src/lib/discussion-reports-copy";
+import { organizationPublicationHistoryCopy } from "../site/src/lib/organization-publication-history-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   publication = {
@@ -269,10 +269,10 @@ it.each(["ru", "en"] as const)(
     const { organization: _organization, ...data } = history;
     state.history.mockResolvedValue({ ...data, server: { id: "srv", name: "Server" } });
     const { ServerPublicationHistoryScreen } = await import(
-      "../apps/web/src/components/server-publication-history-screen"
+      "../site/src/components/server-publication-history-screen"
     );
     const { serverPublicationHistoryCopy } = await import(
-      "../apps/web/src/lib/server-publication-history-copy"
+      "../site/src/lib/server-publication-history-copy"
     );
     const html = renderToStaticMarkup(
       await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" }),
@@ -286,7 +286,7 @@ it.each(["ru", "en"] as const)(
 );
 it("refuses mismatched server DTOs and suppresses restore without current archive proof", async () => {
   const { ServerPublicationHistoryScreen } = await import(
-    "../apps/web/src/components/server-publication-history-screen"
+    "../site/src/components/server-publication-history-screen"
   );
   const { organization: _organization, ...data } = history;
   state.history.mockResolvedValue({ ...data, server: { id: "foreign", name: "Private server" } });

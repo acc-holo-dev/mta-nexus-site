@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
   rateGate: null as Promise<void> | null,
   rateEntered: null as (() => void) | null,
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
@@ -20,18 +20,18 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { recoverCreatedServer: state.find, createServer: state.create },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {},
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),
   mtaLiveStatus: vi.fn(),
 }));
 
-import { GET } from "../apps/web/src/app/api/servers/recovery/route";
-import { POST } from "../apps/web/src/app/api/servers/route";
+import { GET } from "../site/src/app/api/servers/recovery/route";
+import { POST } from "../site/src/app/api/servers/route";
 
 const nonce = "a".repeat(32);
 function recovery(actor = "usr_a", query = `nonce=${nonce}`) {

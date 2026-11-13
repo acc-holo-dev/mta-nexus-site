@@ -18,11 +18,11 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/servers/server/statistics",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/server-statistics-service", () => ({
+vi.mock("../site/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { read: state.read },
 }));
 
@@ -30,10 +30,10 @@ import {
   ServerStatisticsLoading,
   ServerStatisticsPage,
   serverStatisticsMetadata,
-} from "../apps/web/src/components/server-statistics-page";
-import { ServerStatisticsPanel } from "../apps/web/src/components/server-statistics-panel";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { serverStatisticsCopy } from "../apps/web/src/lib/server-statistics-copy";
+} from "../site/src/components/server-statistics-page";
+import { ServerStatisticsPanel } from "../site/src/components/server-statistics-panel";
+import { getDictionary } from "../site/src/lib/i18n";
+import { serverStatisticsCopy } from "../site/src/lib/server-statistics-copy";
 
 beforeEach(() => {
   state.locale = "ru";

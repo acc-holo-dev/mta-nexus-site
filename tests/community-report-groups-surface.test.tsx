@@ -16,30 +16,30 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-groups-service", () => ({
+vi.mock("../site/src/lib/services/community-report-groups-service", () => ({
   communityReportGroupsService: { page: mock.groups },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: { publicationReports: mock.reports },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { CommunityReportGroups } from "../apps/web/src/components/community-report-groups";
+import { CommunityReportGroups } from "../site/src/components/community-report-groups";
 import {
   CommunityReportGroupsPage,
   reportGroupsMetadata,
-} from "../apps/web/src/components/community-report-groups-page";
+} from "../site/src/components/community-report-groups-page";
 import {
   PublicationReportsPage,
   publicationReportsMetadata,
-} from "../apps/web/src/components/publication-reports-page";
-import type { ReportGroupsPage } from "../apps/web/src/lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../apps/web/src/lib/community-report-groups-copy";
-import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
+} from "../site/src/components/publication-reports-page";
+import type { ReportGroupsPage } from "../site/src/lib/community-report-groups-contract";
+import { reportGroupsCopy } from "../site/src/lib/community-report-groups-copy";
+import { reportBatchCopy } from "../site/src/lib/report-batch-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = {

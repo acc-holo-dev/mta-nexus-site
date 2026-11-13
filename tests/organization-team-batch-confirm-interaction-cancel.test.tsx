@@ -16,11 +16,11 @@ const harness = vi.hoisted(() => ({
   committed: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { OrganizationTeamBatch } from "../apps/web/src/components/organization-team-batch";
-import { organizationBatchCopy } from "../apps/web/src/lib/organization-batch-copy";
+import { OrganizationTeamBatch } from "../site/src/components/organization-team-batch";
+import { organizationBatchCopy } from "../site/src/lib/organization-batch-copy";
 
 const { click, prepareRemoveReview } = createOrganizationTeamBatchConfirmInteractionHelpers(
   harness,

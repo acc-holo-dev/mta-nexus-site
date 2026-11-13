@@ -21,7 +21,7 @@ vi.mock("@nexus/security", async () => {
   return { can, generateId: vi.fn((prefix: string) => `${prefix}_test`) };
 });
 
-import { serverService } from "../apps/web/src/lib/services/server-service";
+import { serverService } from "../site/src/lib/services/server-service";
 
 const actor = (id: string, role: User["role"] = "user") =>
   ({

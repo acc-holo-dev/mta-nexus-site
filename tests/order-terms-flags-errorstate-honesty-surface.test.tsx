@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 /** Honesty lock for order-terms consistency flags ErrorState. Actions retrigger. */
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/order-terms-report.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/order-terms-report.tsx"), "utf8");
 
 it("locks order-terms consistency flags to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');

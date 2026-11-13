@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/app/servers/[slug]/page.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/app/servers/[slug]/page.tsx"), "utf8");
 
 it("locks server directory staleSnapshot notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { ErrorState, TrustBadge } from "@nexus/ui"');

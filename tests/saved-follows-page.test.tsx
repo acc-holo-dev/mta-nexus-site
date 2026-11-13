@@ -10,14 +10,14 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/saved",
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/follow-workspace-service", () => ({
+vi.mock("../site/src/lib/services/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.page },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/components/follow-workspace", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/components/follow-workspace", () => ({
   FollowWorkspace: ({
     initial,
     type,
@@ -38,9 +38,9 @@ vi.mock("../apps/web/src/components/follow-workspace", () => ({
   ),
 }));
 
-import SavedLoading from "../apps/web/src/app/workspace/saved/loading";
-import SavedPage, { generateMetadata } from "../apps/web/src/app/workspace/saved/page";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import SavedLoading from "../site/src/app/workspace/saved/loading";
+import SavedPage, { generateMetadata } from "../site/src/app/workspace/saved/page";
+import { followCopy } from "../site/src/lib/follow-workspace-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -10,24 +10,24 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import RequirementsLoading from "../apps/web/src/app/workspace/library/[id]/requirements/loading";
-import VersionsLoading from "../apps/web/src/app/workspace/library/[id]/versions/loading";
-import ReviewDetailLoading from "../apps/web/src/app/workspace/library/review/[id]/loading";
-import ReviewsLoading from "../apps/web/src/app/workspace/library/reviews/loading";
-import WatchHistoryLoading from "../apps/web/src/app/workspace/library/watches/history/loading";
-import WatchesLoading from "../apps/web/src/app/workspace/library/watches/loading";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
-import { resourceReleaseWatchHistoryCopy } from "../apps/web/src/lib/resource-release-watch-history-i18n";
-import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
-import { resourceRequirementsCopy } from "../apps/web/src/lib/resource-requirements-i18n";
-import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
+import RequirementsLoading from "../site/src/app/workspace/library/[id]/requirements/loading";
+import VersionsLoading from "../site/src/app/workspace/library/[id]/versions/loading";
+import ReviewDetailLoading from "../site/src/app/workspace/library/review/[id]/loading";
+import ReviewsLoading from "../site/src/app/workspace/library/reviews/loading";
+import WatchHistoryLoading from "../site/src/app/workspace/library/watches/history/loading";
+import WatchesLoading from "../site/src/app/workspace/library/watches/loading";
+import { getResourceReleaseControlCopy } from "../site/src/lib/resource-release-control-i18n";
+import { resourceReleaseWatchHistoryCopy } from "../site/src/lib/resource-release-watch-history-i18n";
+import { resourceReleaseWatchesCopy } from "../site/src/lib/resource-release-watches-i18n";
+import { resourceRequirementsCopy } from "../site/src/lib/resource-requirements-i18n";
+import { resourceReviewCopy } from "../site/src/lib/resource-review-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -73,11 +73,11 @@ it.each(["en", "ru"] as const)(
 
 it("locks library watches honesty page sources to ErrorState/EmptyState chrome", () => {
   const pages = [
-    "apps/web/src/app/workspace/library/watches/page.tsx",
-    "apps/web/src/app/workspace/library/watches/history/page.tsx",
-    "apps/web/src/app/workspace/library/reviews/page.tsx",
-    "apps/web/src/app/workspace/library/review/[id]/page.tsx",
-    "apps/web/src/app/workspace/library/[id]/versions/page.tsx",
+    "site/src/app/workspace/library/watches/page.tsx",
+    "site/src/app/workspace/library/watches/history/page.tsx",
+    "site/src/app/workspace/library/reviews/page.tsx",
+    "site/src/app/workspace/library/review/[id]/page.tsx",
+    "site/src/app/workspace/library/[id]/versions/page.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
@@ -87,29 +87,27 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("apps/web/src/app/workspace/library/watches/page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/app/workspace/library/watches/history/page.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("apps/web/src/app/workspace/library/reviews/page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/app/workspace/library/[id]/versions/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/library/watches/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/library/watches/history/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/library/reviews/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/library/[id]/versions/page.tsx")).toContain("EmptyState");
   for (const loading of [
-    "apps/web/src/app/workspace/library/watches/loading.tsx",
-    "apps/web/src/app/workspace/library/watches/history/loading.tsx",
-    "apps/web/src/app/workspace/library/reviews/loading.tsx",
-    "apps/web/src/app/workspace/library/review/[id]/loading.tsx",
-    "apps/web/src/app/workspace/library/[id]/versions/loading.tsx",
-    "apps/web/src/app/workspace/library/[id]/requirements/loading.tsx",
+    "site/src/app/workspace/library/watches/loading.tsx",
+    "site/src/app/workspace/library/watches/history/loading.tsx",
+    "site/src/app/workspace/library/reviews/loading.tsx",
+    "site/src/app/workspace/library/review/[id]/loading.tsx",
+    "site/src/app/workspace/library/[id]/versions/loading.tsx",
+    "site/src/app/workspace/library/[id]/requirements/loading.tsx",
   ]) {
     expect(read(loading)).toContain("overflow-x-clip");
     expect(read(loading)).toContain("min-w-0");
   }
-  expect(read("apps/web/src/lib/resource-release-watches-i18n.ts")).toContain(
+  expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain(
     "loadUnavailableDescription",
   );
-  expect(read("apps/web/src/lib/resource-release-watch-history-i18n.ts")).toContain("emptyHint");
-  expect(read("apps/web/src/lib/resource-review-i18n.ts")).toContain("ownEmptyHint");
-  expect(read("apps/web/src/lib/resource-release-control-i18n.ts")).toContain(
+  expect(read("site/src/lib/resource-release-watch-history-i18n.ts")).toContain("emptyHint");
+  expect(read("site/src/lib/resource-review-i18n.ts")).toContain("ownEmptyHint");
+  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
     "versionsLoadUnavailable",
   );
 });

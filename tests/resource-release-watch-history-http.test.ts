@@ -5,13 +5,13 @@ const h = vi.hoisted(() => ({
   rate: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
 vi.mock("@nexus/db", () => ({ resourceReleaseWatchesRepository: { history: h.history } }));
-import { GET as read } from "../apps/web/src/app/api/library/watches/history/route";
-import { GET as download } from "../apps/web/src/app/api/library/watches/history/export/route";
+import { GET as read } from "../site/src/app/api/library/watches/history/route";
+import { GET as download } from "../site/src/app/api/library/watches/history/export/route";
 const request = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/history${query}`);
 beforeEach(() => {

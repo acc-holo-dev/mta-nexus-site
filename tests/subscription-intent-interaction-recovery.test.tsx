@@ -18,11 +18,11 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { SubscriptionControls } from "../apps/web/src/components/subscription-controls";
+import { SubscriptionControls } from "../site/src/components/subscription-controls";
 
 const { accountPosts } = createSubscriptionIntentInteractionHelpers(h, SubscriptionControls);
 
@@ -65,7 +65,7 @@ it("recovers a lost cancellation on the dashboard without automatically sending 
     dispatchEvent: () => true,
   });
   h.fetch.mockResolvedValueOnce(reply({ authenticated: true, user: { id: "usr_a" } }));
-  const { SubscriptionRecovery } = await import("../apps/web/src/components/subscription-recovery");
+  const { SubscriptionRecovery } = await import("../site/src/components/subscription-recovery");
   function recoveryRender() {
     h.cursor = 0;
     h.effects = [];

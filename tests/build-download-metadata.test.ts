@@ -9,13 +9,13 @@ import { ValidationError } from "@nexus/domain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), finish: vi.fn(), hash: "" }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => ({ id: "admin", role: "admin" }) },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { canManageProduct: async () => true },
 }));
 vi.mock("@nexus/security", () => ({
@@ -61,8 +61,8 @@ vi.mock("@nexus/db", () => {
     auditRepository: { record: mocks.audit },
   };
 });
-import { GET as publicDownload } from "../apps/web/src/app/api/products/[id]/download/route";
-import { GET as reviewDownload } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
+import { GET as publicDownload } from "../site/src/app/api/products/[id]/download/route";
+import { GET as reviewDownload } from "../site/src/app/api/admin/builds/[buildId]/download/route";
 
 describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   const request = (signal?: AbortSignal) => {

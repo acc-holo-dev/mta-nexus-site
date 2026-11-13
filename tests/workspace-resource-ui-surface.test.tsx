@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getResourceCommerceCopy } from "../apps/web/src/lib/resource-commerce-i18n";
-import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
-import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
-import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
-import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getResourceCommerceCopy } from "../site/src/lib/resource-commerce-i18n";
+import { resourceCopyCopy } from "../site/src/lib/resource-copy-i18n";
+import { getResourceManagementCopy } from "../site/src/lib/resource-management-i18n";
+import { getResourcePublisherCopy } from "../site/src/lib/resource-publisher-i18n";
+import { getUserPlatformCopy } from "../site/src/lib/user-platform-copy";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
@@ -29,8 +29,8 @@ const localeState = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: localeState.locale,
@@ -123,14 +123,14 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
-import { PublicProfileForm } from "../apps/web/src/components/public-profile-form";
-import { ResourceCompatibilityForm } from "../apps/web/src/components/resource-compatibility-form";
-import { ResourceCopyForm } from "../apps/web/src/components/resource-copy-form";
-import { ResourceLifecycleControls } from "../apps/web/src/components/resource-lifecycle-controls";
-import { ResourcePublicationReadinessPanel } from "../apps/web/src/components/resource-publication-readiness-panel";
-import { ResourcePublisherFilters } from "../apps/web/src/components/resource-publisher-filters";
-import { getResourcePublicationReadinessCopy } from "../apps/web/src/lib/resource-publication-readiness-i18n";
+import { NewResourceForm } from "../site/src/components/new-resource-form";
+import { PublicProfileForm } from "../site/src/components/public-profile-form";
+import { ResourceCompatibilityForm } from "../site/src/components/resource-compatibility-form";
+import { ResourceCopyForm } from "../site/src/components/resource-copy-form";
+import { ResourceLifecycleControls } from "../site/src/components/resource-lifecycle-controls";
+import { ResourcePublicationReadinessPanel } from "../site/src/components/resource-publication-readiness-panel";
+import { ResourcePublisherFilters } from "../site/src/components/resource-publisher-filters";
+import { getResourcePublicationReadinessCopy } from "../site/src/lib/resource-publication-readiness-i18n";
 
 describe("workspace and resource UI surface", () => {
   it.each(["en", "ru"] as const)(
@@ -182,7 +182,7 @@ describe("workspace and resource UI surface", () => {
   );
 
   it("locks publisher filter native selects to min-h-11 without h-10 chrome", () => {
-    const source = read("apps/web/src/components/resource-publisher-filters.tsx");
+    const source = read("site/src/components/resource-publisher-filters.tsx");
     expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
     expect(source).not.toContain("h-10");
   });

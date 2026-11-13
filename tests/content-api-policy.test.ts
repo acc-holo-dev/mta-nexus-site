@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
   can: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 
@@ -33,14 +33,14 @@ vi.mock("@nexus/db", () => ({
   productRepository: { findById: mocks.findProduct },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: {
     getServerById: vi.fn(),
     canManageServer: vi.fn(),
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { canManageProduct: vi.fn() },
 }));
 
@@ -50,7 +50,7 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
-import { GET, POST } from "../apps/web/src/app/api/content/route";
+import { GET, POST } from "../site/src/app/api/content/route";
 
 function request(body: Record<string, unknown>, token = "session") {
   const req = new NextRequest("http://nexus.test/api/content", {

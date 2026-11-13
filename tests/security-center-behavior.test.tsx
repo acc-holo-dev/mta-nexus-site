@@ -47,11 +47,11 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: auth,
 }));
 
@@ -61,9 +61,9 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import SecurityPage from "../apps/web/src/app/security/page";
-import { SECURITY_ACTIVITY_ACTIONS } from "../apps/web/src/lib/security-activity";
-import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
+import SecurityPage from "../site/src/app/security/page";
+import { SECURITY_ACTIVITY_ACTIONS } from "../site/src/lib/security-activity";
+import { SecurityCenterService } from "../site/src/lib/services/security-center-service";
 
 describe("Security Center behavior", () => {
   beforeEach(() => {

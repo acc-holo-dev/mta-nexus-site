@@ -6,7 +6,7 @@ import {
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
-} from "../apps/web/src/lib/library-selection-batches-confirmation";
+} from "../site/src/lib/library-selection-batches-confirmation";
 import { expect, it } from "vitest";
 const choice = { mode: "fixed" as const, productIds: ["prd_a"] };
 const previous = { revision: 0, mode: "latest" as const, buildId: null };

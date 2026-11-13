@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const sources = vi.hoisted(() => ({
   servers: vi.fn(),
@@ -22,10 +22,10 @@ vi.mock("next/link", async () => {
       ReactModule.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => sources.locale,
 }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: {
     page: async (input: { query: string; page: number }) => ({
       type: "servers",
@@ -36,17 +36,15 @@ vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
   },
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
-vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../site/src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/product-service", () => ({ productService: {} }));
+vi.mock("../site/src/lib/services/mta-master-directory-service", async (importOriginal) => {
   const actual =
-    await importOriginal<
-      typeof import("../apps/web/src/lib/services/mta-master-directory-service")
-    >();
+    await importOriginal<typeof import("../site/src/lib/services/mta-master-directory-service")>();
   let snapshot: readonly unknown[] | null = null;
   let lookup: ReturnType<typeof actual.indexMtaObservations> | null = null;
   return {
@@ -62,8 +60,8 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (impo
   };
 });
 
-import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
-import DiscoverPage from "../apps/web/src/app/discover/page";
+import { discoveryCopy } from "../site/src/lib/discovery-copy";
+import DiscoverPage from "../site/src/app/discover/page";
 
 async function loadResults(query = "") {
   const shell = await DiscoverPage({

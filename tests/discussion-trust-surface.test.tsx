@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { OwnDiscussionDetail } from "../apps/web/src/components/own-discussion-detail";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
-import { ownDiscussionCopy } from "../apps/web/src/lib/discussion-workspace-copy";
-import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+import { OwnDiscussionDetail } from "../site/src/components/own-discussion-detail";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
+import { ownDiscussionCopy } from "../site/src/lib/discussion-workspace-copy";
+import { approvalCopy } from "../site/src/lib/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -20,25 +20,25 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/discussions",
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../site/src/lib/services/discussion-workspace-service", () => ({
   discussionWorkspaceService: { page: mocks.page, own: mocks.own },
 }));
-vi.mock("../apps/web/src/lib/services/public-verification-history-service", () => ({
+vi.mock("../site/src/lib/services/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 
-import UserTrustHistoryLoading from "../apps/web/src/app/users/[username]/trust/history/loading";
+import UserTrustHistoryLoading from "../site/src/app/users/[username]/trust/history/loading";
 import HistoryPage, {
   generateMetadata as historyMetadata,
-} from "../apps/web/src/app/users/[username]/trust/history/page";
-import DetailPage from "../apps/web/src/app/workspace/discussions/[id]/page";
-import DiscussionsLoading from "../apps/web/src/app/workspace/discussions/loading";
-import OwnPage, { generateMetadata } from "../apps/web/src/app/workspace/discussions/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/app/users/[username]/trust/history/page";
+import DetailPage from "../site/src/app/workspace/discussions/[id]/page";
+import DiscussionsLoading from "../site/src/app/workspace/discussions/loading";
+import OwnPage, { generateMetadata } from "../site/src/app/workspace/discussions/page";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const item = {
     id: "comment",

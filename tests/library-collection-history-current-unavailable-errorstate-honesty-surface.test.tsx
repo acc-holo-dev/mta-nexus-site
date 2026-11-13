@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 /** Honesty lock: collection history muted noCurrent → ErrorState. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/app/workspace/library/collections/history/page.tsx"),
+  join(root, "site/src/app/workspace/library/collections/history/page.tsx"),
   "utf8",
 );
 

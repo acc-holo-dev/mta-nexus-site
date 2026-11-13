@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/resource-build-controls.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/resource-build-controls.tsx"), "utf8");
 
 it("locks resource build uncertain failures to ErrorState with touch reload", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');

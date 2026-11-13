@@ -8,12 +8,12 @@ const mocks = vi.hoisted(() => ({
   updateProductDetails: vi.fn(),
   consumeRateLimit: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: mocks }));
+vi.mock("../site/src/lib/services/product-service", () => ({ productService: mocks }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.consumeRateLimit }));
-import { PATCH } from "../apps/web/src/app/api/products/[id]/route";
+import { PATCH } from "../site/src/app/api/products/[id]/route";
 const input = {
   title: "My resource",
   shortDescription: "Summary",

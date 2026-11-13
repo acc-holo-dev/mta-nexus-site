@@ -30,7 +30,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 const staffPasswordHash = "hash_mod";
 

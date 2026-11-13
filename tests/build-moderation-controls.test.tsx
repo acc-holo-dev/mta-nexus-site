@@ -1,20 +1,20 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { buildModerationUiState } from "../apps/web/src/lib/build-moderation-ui";
+import { getDictionary } from "../site/src/lib/i18n";
+import { buildModerationUiState } from "../site/src/lib/build-moderation-ui";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),
   }),
 }));
 
-import { BuildModerationControls } from "../apps/web/src/components/build-moderation-controls";
+import { BuildModerationControls } from "../site/src/components/build-moderation-controls";
 
 describe("build moderation control behavior", () => {
   it("requires review notes and trusted clean provenance before approval", () => {

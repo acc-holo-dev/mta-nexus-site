@@ -5,10 +5,10 @@ import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const workspace = readFileSync(
-  join(root, "apps/web/src/components/verification-workspace.tsx"),
+  join(root, "site/src/components/verification-workspace.tsx"),
   "utf8",
 );
-const page = readFileSync(join(root, "apps/web/src/app/workspace/verification/page.tsx"), "utf8");
+const page = readFileSync(join(root, "site/src/app/workspace/verification/page.tsx"), "utf8");
 
 /** Honesty lock: verification workspace unavailable fallback → ErrorState with stable id. */
 it("locks verification workspace unavailable notices to ErrorState with stable id", () => {

@@ -17,31 +17,31 @@ const state = vi.hoisted(() => ({
   history: vi.fn(),
   restore: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/organization-workspace-service", () => ({
+vi.mock("../site/src/lib/services/organization-workspace-service", () => ({
   organizationWorkspaceService: state,
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+vi.mock("../site/src/lib/services/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: state,
 }));
-vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
+vi.mock("../site/src/lib/services/server-content-service", () => ({
   serverContentService: state,
 }));
 
-import { POST as preview } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route";
-import { POST as batch } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route";
-import { GET as history } from "../apps/web/src/app/api/workspace/servers/[id]/content/[contentId]/history/route";
-import { POST as restore } from "../apps/web/src/app/api/workspace/servers/[id]/content/[contentId]/restore/route";
+import { POST as preview } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route";
+import { POST as batch } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route";
+import { GET as history } from "../site/src/app/api/workspace/servers/[id]/content/[contentId]/history/route";
+import { POST as restore } from "../site/src/app/api/workspace/servers/[id]/content/[contentId]/restore/route";
 
 const discussion = { params: Promise.resolve({ id: "post", commentId: "comment" }) },
   server = { params: Promise.resolve({ id: "srv", contentId: "post" }) };

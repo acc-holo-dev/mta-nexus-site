@@ -3,8 +3,8 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../apps/web/src/components/shell-destination-policy";
-import { parseHomePersonalPreference } from "../apps/web/src/lib/home-personal-preference";
+} from "../site/src/components/shell-destination-policy";
+import { parseHomePersonalPreference } from "../site/src/lib/home-personal-preference";
 
 describe("home personal preference", () => {
   it("defaults to show and only hides on the explicit cookie value", () => {

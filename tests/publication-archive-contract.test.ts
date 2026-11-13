@@ -4,7 +4,7 @@ import {
   parsePublicationQuery,
   publicationHref,
   publicationPageSchema,
-} from "../apps/web/src/lib/publication-feed-contract";
+} from "../site/src/lib/publication-feed-contract";
 const cursor = {
   version: 1,
   createdAt: "2026-10-11T00:00:00.123456Z",

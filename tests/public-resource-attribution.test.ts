@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapPublicResourceAttribution } from "../apps/web/src/lib/public-resource-attribution";
+import { mapPublicResourceAttribution } from "../site/src/lib/public-resource-attribution";
 import { buttonClassName } from "../packages/ui/src/button";
 
 describe("mapPublicResourceAttribution", () => {

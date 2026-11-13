@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -23,10 +23,10 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
-import { GET as statement } from "../apps/web/src/app/api/finance/route";
-import { GET as scopes } from "../apps/web/src/app/api/finance/scopes/route";
-import { GET as review } from "../apps/web/src/app/api/admin/commerce/reconciliation/route";
-import { GET as detail } from "../apps/web/src/app/api/admin/commerce/reconciliation/[id]/route";
+import { GET as statement } from "../site/src/app/api/finance/route";
+import { GET as scopes } from "../site/src/app/api/finance/scopes/route";
+import { GET as review } from "../site/src/app/api/admin/commerce/reconciliation/route";
+import { GET as detail } from "../site/src/app/api/admin/commerce/reconciliation/[id]/route";
 const get = (path: string) => new NextRequest(`https://nexus.test${path}`),
   context = { params: Promise.resolve({ id: "ord_a" }) };
 beforeEach(() => {

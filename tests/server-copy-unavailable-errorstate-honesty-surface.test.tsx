@@ -8,9 +8,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
-  "apps/web/src/components/server-connect-controls.tsx",
-  "apps/web/src/components/server-card.tsx",
-  "apps/web/src/components/mta-master-server-directory.tsx",
+  "site/src/components/server-connect-controls.tsx",
+  "site/src/components/server-card.tsx",
+  "site/src/components/mta-master-server-directory.tsx",
 ] as const;
 
 it.each(surfaces)("locks copyUnavailable notice to ErrorState in %s", (relative) => {

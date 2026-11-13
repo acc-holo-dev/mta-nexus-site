@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
 }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
   };
@@ -71,8 +71,8 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { RegisterServerForm } from "../apps/web/src/components/register-server-form";
-import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
+import { RegisterServerForm } from "../site/src/components/register-server-form";
+import { ServerDetailsForm } from "../site/src/components/server-details-form";
 
 describe("server forms use the same editable MTA metadata", () => {
   it("renders persisted HTTP port and map in the owner editor", () => {

@@ -18,18 +18,18 @@ const state = vi.hoisted(() => ({
 vi.mock("@nexus/db", () => ({ resourceMediaRepository: { authorizeImage: state.authorize } }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.storage } }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-media-service", () => ({
+vi.mock("../site/src/lib/services/resource-media-service", () => ({
   resourceMediaService: { managed: state.managed, upload: state.upload, command: state.command },
 }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
 
-import { GET, PATCH, POST } from "../apps/web/src/app/api/products/[id]/media/route";
-import { resourceMediaImage } from "../apps/web/src/lib/resource-media-image-http";
+import { GET, PATCH, POST } from "../site/src/app/api/products/[id]/media/route";
+import { resourceMediaImage } from "../site/src/lib/resource-media-image-http";
 
 const stamp = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ id: "prd_a" }) };

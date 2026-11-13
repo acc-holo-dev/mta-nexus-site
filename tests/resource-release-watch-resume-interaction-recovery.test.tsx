@@ -15,10 +15,10 @@ const h = vi.hoisted(() => ({
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 
-import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
-import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
+import { ResourceReleaseWatchBatchControls } from "../site/src/components/resource-release-watch-batch-controls";
+import { resourceReleaseWatchesCopy } from "../site/src/lib/resource-release-watches-i18n";
 
 const helpers = createResourceReleaseWatchResumeInteractionHelpers(
   h,

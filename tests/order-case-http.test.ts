@@ -12,16 +12,16 @@ const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.auth },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/services/order-case-service", () => ({ orderCaseService: mocks }));
+vi.mock("../site/src/lib/services/order-case-service", () => ({ orderCaseService: mocks }));
 
-import { POST as reviewPost } from "../apps/web/src/app/api/admin/commerce/order-cases/[id]/route";
-import { GET as queueGet } from "../apps/web/src/app/api/admin/commerce/order-cases/route";
-import { GET as caseGet } from "../apps/web/src/app/api/order-cases/[id]/route";
-import { GET, POST } from "../apps/web/src/app/api/orders/[id]/support/route";
+import { POST as reviewPost } from "../site/src/app/api/admin/commerce/order-cases/[id]/route";
+import { GET as queueGet } from "../site/src/app/api/admin/commerce/order-cases/route";
+import { GET as caseGet } from "../site/src/app/api/order-cases/[id]/route";
+import { GET, POST } from "../site/src/app/api/orders/[id]/support/route";
 
 const actor = { id: "usr_a", role: "user" },
   context = { params: Promise.resolve({ id: "ord_a" }) };

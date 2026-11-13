@@ -14,11 +14,11 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { SubscriptionControls } from "../apps/web/src/components/subscription-controls";
+import { SubscriptionControls } from "../site/src/components/subscription-controls";
 
 const { render, mount } = createSubscriptionIntentInteractionHelpers(h, SubscriptionControls);
 

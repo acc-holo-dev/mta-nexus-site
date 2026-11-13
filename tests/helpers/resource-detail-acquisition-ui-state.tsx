@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, vi } from "vitest";
-import { LocaleProvider } from "../../apps/web/src/components/locale-context";
+import { LocaleProvider } from "../../site/src/components/locale-context";
 
 type AcquisitionLocale = "en" | "ru";
 

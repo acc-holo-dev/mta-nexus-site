@@ -4,9 +4,9 @@ import {
   resourceCartReceiptId,
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,
-} from "../apps/web/src/lib/resource-cart-receipts-query";
-import { confirmedResourceCartReview } from "../apps/web/src/lib/resource-cart-review-confirmation";
-import { resourceCartReceiptsCsv } from "../apps/web/src/lib/resource-cart-receipts-csv";
+} from "../site/src/lib/resource-cart-receipts-query";
+import { confirmedResourceCartReview } from "../site/src/lib/resource-cart-review-confirmation";
+import { resourceCartReceiptsCsv } from "../site/src/lib/resource-cart-receipts-csv";
 const requestId = "11111111-1111-4111-8111-111111111111";
 const item = {
   productId: "prd_a",

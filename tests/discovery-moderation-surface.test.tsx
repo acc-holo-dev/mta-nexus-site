@@ -35,41 +35,41 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({
   can: (actor: { role: string }) => ["moderator", "admin"].includes(actor.role),
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { stream: mocks.stream },
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: { page: mocks.page, detail: mocks.detail },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: mocks.directory },
   indexMtaObservations: () => () => null,
   mtaLiveStatus: () => "unknown",
 }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: mocks.locale, dictionary: getDictionary(mocks.locale) }),
   };
 });
-vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
-vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
-vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../site/src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../site/src/components/article-card", () => ({ ArticleCard: () => null }));
+vi.mock("../site/src/components/follow-button", () => ({ FollowButton: () => null }));
 
-import { generateMetadata as moderationMetadata } from "../apps/web/src/app/admin/community/page";
-import StreamLoading from "../apps/web/src/app/discover/stream/loading";
+import { generateMetadata as moderationMetadata } from "../site/src/app/admin/community/page";
+import StreamLoading from "../site/src/app/discover/stream/loading";
 import StreamPage, {
   generateMetadata as streamMetadata,
-} from "../apps/web/src/app/discover/stream/page";
-import { CommunityModerationScreen } from "../apps/web/src/components/community-moderation-screen";
-import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
-import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
-import { discoveryStreamCopy } from "../apps/web/src/lib/discovery-stream-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/app/discover/stream/page";
+import { CommunityModerationScreen } from "../site/src/components/community-moderation-screen";
+import { ContentModerationControls } from "../site/src/components/content-moderation-controls";
+import { moderationCopy } from "../site/src/lib/community-moderation-copy";
+import { discoveryStreamCopy } from "../site/src/lib/discovery-stream-copy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const time = "2026-10-11T00:00:00.000Z",
   item = {

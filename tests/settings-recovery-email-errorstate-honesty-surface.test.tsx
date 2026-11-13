@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/settings-recovery-email-section.tsx";
+const surface = "site/src/components/settings-recovery-email-section.tsx";
 
 it("locks recovery unavailable and not-verified notices to ErrorState", () => {
   const source = read(surface);

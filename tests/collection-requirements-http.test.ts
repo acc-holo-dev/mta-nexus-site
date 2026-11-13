@@ -8,15 +8,15 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-requirements-service", () => ({
+vi.mock("../site/src/lib/services/resource-requirements-service", () => ({
   resourceRequirementsService: { collectionReport: state.report },
 }));
 
-import { GET as download } from "../apps/web/src/app/api/library/collections/[id]/requirements/export/route";
-import { GET as read } from "../apps/web/src/app/api/library/collections/[id]/requirements/route";
+import { GET as download } from "../site/src/app/api/library/collections/[id]/requirements/export/route";
+import { GET as read } from "../site/src/app/api/library/collections/[id]/requirements/route";
 
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 function request(query = "") {

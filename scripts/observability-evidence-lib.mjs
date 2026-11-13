@@ -14,7 +14,7 @@ export const OBSERVABILITY_REQUIRED_SCRIPTS = Object.freeze([
   "scripts/check-account-mail-worker-health.mjs",
   "scripts/check-license-worker-health.mjs",
   "scripts/check-resource-release-worker-health.mjs",
-  "apps/web/src/lib/observability.ts",
+  "site/src/lib/observability.ts",
   "docs/OPERATIONS.md",
 ]);
 
@@ -119,7 +119,7 @@ export function buildObservabilityReadinessEvidence({
     if (!ok) failures.push(`runbook:${needle}`);
   }
 
-  const structuredLogging = existsSync(resolve(repoRoot, "apps/web/src/lib/observability.ts"));
+  const structuredLogging = existsSync(resolve(repoRoot, "site/src/lib/observability.ts"));
   if (!structuredLogging) failures.push("structured_logging_module");
 
   const verdict = Object.freeze({

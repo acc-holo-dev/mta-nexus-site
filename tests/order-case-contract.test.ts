@@ -1,11 +1,11 @@
 import { expect, it } from "vitest";
 import { orderCaseCreateSchema, orderCaseReviewSchema } from "@nexus/validation";
-import { orderCaseQuery, orderCasePageQuery } from "../apps/web/src/lib/order-case-query";
+import { orderCaseQuery, orderCasePageQuery } from "../site/src/lib/order-case-query";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
-} from "../apps/web/src/lib/order-case-response";
+} from "../site/src/lib/order-case-response";
 const requestId = "00000000-0000-4000-8000-000000000000",
   caseId = `sup_${"a".repeat(24)}`;
 const draft = {

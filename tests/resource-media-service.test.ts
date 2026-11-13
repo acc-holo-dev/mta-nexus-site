@@ -8,11 +8,11 @@ vi.mock("@nexus/db", () => ({ resourceMediaRepository: { add: state.add } }));
 vi.mock("@nexus/storage", () => ({
   storageService: { uploadAsset: state.upload, deleteAsset: state.remove },
 }));
-vi.mock("../apps/web/src/lib/services/build-scanner-service", () => ({
+vi.mock("../site/src/lib/services/build-scanner-service", () => ({
   buildScannerService: { scan: state.scan },
 }));
 
-import { resourceMediaService as service } from "../apps/web/src/lib/services/resource-media-service";
+import { resourceMediaService as service } from "../site/src/lib/services/resource-media-service";
 
 const input = {
   productId: "prd_a",

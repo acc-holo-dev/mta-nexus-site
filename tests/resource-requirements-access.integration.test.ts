@@ -23,7 +23,7 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
-import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../site/src/lib/services/build-package-inspection";
 import { resourceReleaseWorkerRepository } from "../packages/db/src/repositories/resource-release-worker";
 import archives from "./fixtures/build-packages.json";
 

@@ -1,9 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import {
-  GuestAuthLinks,
-  platformSignInFocusClass,
-} from "../apps/web/src/components/guest-auth-links";
+import { GuestAuthLinks, platformSignInFocusClass } from "../site/src/components/guest-auth-links";
 
 it("renders paired login and register links with shared focus styling", () => {
   const html = renderToStaticMarkup(

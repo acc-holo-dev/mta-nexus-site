@@ -11,7 +11,7 @@ const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
 const deleteAsset = vi.hoisted(() => vi.fn());
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_attacker",
@@ -23,14 +23,14 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     assertCanReleaseBuild: preflight,
     releaseBuild,
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/build-scanner-service", () => ({
+vi.mock("../site/src/lib/services/build-scanner-service", () => ({
   buildScannerService: {
     scan,
   },
@@ -52,7 +52,7 @@ vi.mock("@nexus/security", () => ({
   })),
 }));
 
-import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
+import { POST } from "../site/src/app/api/products/[id]/builds/route";
 
 function invalidBodyRequest() {
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {

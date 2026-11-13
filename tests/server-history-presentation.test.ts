@@ -3,7 +3,7 @@ import {
   formatHistoryIntervalUtc,
   serverHistoryChartSlots,
   serverHistoryBarPercent,
-} from "../apps/web/src/lib/server-history-presentation";
+} from "../site/src/lib/server-history-presentation";
 
 describe("complete-window history chart", () => {
   it("keeps missing intervals unknown and preserves a measured zero", () => {

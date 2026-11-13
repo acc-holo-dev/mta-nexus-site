@@ -1,10 +1,10 @@
 import { buildResourceVersionHelp, splitInstructionPlainText } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ProductDependencyList } from "../apps/web/src/components/product-dependency-list";
-import { ResourceVersionHelpSection } from "../apps/web/src/components/resource-version-help-section";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { buildProductDependencyResolution } from "../apps/web/src/lib/product-dependency-resolution";
+import { ProductDependencyList } from "../site/src/components/product-dependency-list";
+import { ResourceVersionHelpSection } from "../site/src/components/resource-version-help-section";
+import { getDictionary } from "../site/src/lib/i18n";
+import { buildProductDependencyResolution } from "../site/src/lib/product-dependency-resolution";
 
 const mocks = vi.hoisted(() => ({
   findPublishedFreeBySlugs: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("@nexus/security", () => ({
   can: vi.fn(() => false),
 }));
 
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 describe("resource dependency resolution behavior", () => {
   beforeEach(() => {

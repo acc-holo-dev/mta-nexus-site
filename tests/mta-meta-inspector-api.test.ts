@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { metaInspectionLimits } from "../apps/web/src/lib/mta-meta-inspector";
+import { metaInspectionLimits } from "../site/src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../packages/security/src/rate-limit-policy";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
@@ -14,7 +14,7 @@ const state = vi.hoisted(() => ({
 
 const rate = vi.hoisted(() => vi.fn());
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -25,7 +25,7 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: rate,
 }));
 
-import { POST } from "../apps/web/src/app/api/resources/inspect-meta/route";
+import { POST } from "../site/src/app/api/resources/inspect-meta/route";
 
 function request(
   body = '<meta><info name="NEXUS" /></meta>',

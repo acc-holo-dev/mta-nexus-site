@@ -10,19 +10,19 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import BuildLoading from "../apps/web/src/app/workspace/resources/[id]/builds/[buildId]/loading";
-import PackageLoading from "../apps/web/src/app/workspace/resources/[id]/builds/[buildId]/package/loading";
-import CompatibilityLoading from "../apps/web/src/app/workspace/resources/[id]/compatibility/loading";
-import MediaLoading from "../apps/web/src/app/workspace/resources/[id]/media/loading";
-import RequirementsLoading from "../apps/web/src/app/workspace/resources/[id]/requirements/loading";
-import ResourcesLoading from "../apps/web/src/app/workspace/resources/loading";
-import NewResourceLoading from "../apps/web/src/app/workspace/resources/new/loading";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
+import BuildLoading from "../site/src/app/workspace/resources/[id]/builds/[buildId]/loading";
+import PackageLoading from "../site/src/app/workspace/resources/[id]/builds/[buildId]/package/loading";
+import CompatibilityLoading from "../site/src/app/workspace/resources/[id]/compatibility/loading";
+import MediaLoading from "../site/src/app/workspace/resources/[id]/media/loading";
+import RequirementsLoading from "../site/src/app/workspace/resources/[id]/requirements/loading";
+import ResourcesLoading from "../site/src/app/workspace/resources/loading";
+import NewResourceLoading from "../site/src/app/workspace/resources/new/loading";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getResourceManagementCopy } from "../site/src/lib/resource-management-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -61,7 +61,7 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks residual resources page sources to ErrorState/EmptyState honesty chrome", () => {
-  const inventory = read("apps/web/src/app/workspace/resources/page.tsx");
+  const inventory = read("site/src/app/workspace/resources/page.tsx");
   expect(inventory).toContain("ErrorState");
   expect(inventory).toContain("EmptyState");
   expect(inventory).toContain("overflow-x-clip");
@@ -72,7 +72,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(inventory).toContain("emptyFilterHint");
   expect(inventory).not.toContain('role="alert"');
 
-  const compatibility = read("apps/web/src/app/workspace/resources/[id]/compatibility/page.tsx");
+  const compatibility = read("site/src/app/workspace/resources/[id]/compatibility/page.tsx");
   expect(compatibility).toContain("ErrorState");
   expect(compatibility).toContain("overflow-x-clip");
   expect(compatibility).toContain("min-w-0");
@@ -80,7 +80,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(compatibility).toContain("loadUnavailableHint");
   expect(compatibility).not.toContain('role="alert"');
 
-  const manage = read("apps/web/src/app/workspace/resources/[id]/page.tsx");
+  const manage = read("site/src/app/workspace/resources/[id]/page.tsx");
   expect(manage).toContain("ErrorState");
   expect(manage).toContain("EmptyState");
   expect(manage).toContain("overflow-x-clip");
@@ -92,11 +92,11 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(manage).not.toContain('role="alert"');
 
   const clippedDelegates = [
-    "apps/web/src/app/workspace/resources/new/page.tsx",
-    "apps/web/src/app/workspace/resources/[id]/media/page.tsx",
-    "apps/web/src/app/workspace/resources/[id]/requirements/page.tsx",
-    "apps/web/src/app/workspace/resources/[id]/builds/[buildId]/page.tsx",
-    "apps/web/src/app/workspace/resources/[id]/builds/[buildId]/package/page.tsx",
+    "site/src/app/workspace/resources/new/page.tsx",
+    "site/src/app/workspace/resources/[id]/media/page.tsx",
+    "site/src/app/workspace/resources/[id]/requirements/page.tsx",
+    "site/src/app/workspace/resources/[id]/builds/[buildId]/page.tsx",
+    "site/src/app/workspace/resources/[id]/builds/[buildId]/package/page.tsx",
   ];
   for (const page of clippedDelegates) {
     const source = read(page);
@@ -105,21 +105,21 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   }
 
   const loadings = [
-    "apps/web/src/app/workspace/resources/loading.tsx",
-    "apps/web/src/app/workspace/resources/new/loading.tsx",
-    "apps/web/src/app/workspace/resources/[id]/media/loading.tsx",
-    "apps/web/src/app/workspace/resources/[id]/compatibility/loading.tsx",
-    "apps/web/src/app/workspace/resources/[id]/requirements/loading.tsx",
-    "apps/web/src/app/workspace/resources/[id]/builds/[buildId]/loading.tsx",
-    "apps/web/src/app/workspace/resources/[id]/builds/[buildId]/package/loading.tsx",
+    "site/src/app/workspace/resources/loading.tsx",
+    "site/src/app/workspace/resources/new/loading.tsx",
+    "site/src/app/workspace/resources/[id]/media/loading.tsx",
+    "site/src/app/workspace/resources/[id]/compatibility/loading.tsx",
+    "site/src/app/workspace/resources/[id]/requirements/loading.tsx",
+    "site/src/app/workspace/resources/[id]/builds/[buildId]/loading.tsx",
+    "site/src/app/workspace/resources/[id]/builds/[buildId]/package/loading.tsx",
   ];
   for (const loading of loadings) {
     expect(read(loading)).toContain("overflow-x-clip");
     expect(read(loading)).toContain("min-w-0");
   }
 
-  expect(read("apps/web/src/lib/i18n/en/workspace.ts")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/lib/i18n/ru/workspace.ts")).toContain("emptyFilterHint");
+  expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/lib/i18n/ru/workspace.ts")).toContain("emptyFilterHint");
   expect(getResourceManagementCopy("en").loadUnavailableHint.length).toBeGreaterThan(0);
   expect(getResourceManagementCopy("ru").loadUnavailableHint.length).toBeGreaterThan(0);
 });

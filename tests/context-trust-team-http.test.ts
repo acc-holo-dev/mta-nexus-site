@@ -7,21 +7,21 @@ const mocks = vi.hoisted(() => ({
   team: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/public-context-trust-service", () => ({
+vi.mock("../site/src/lib/services/public-context-trust-service", () => ({
   publicContextTrustService: { page: mocks.trust },
 }));
-vi.mock("../apps/web/src/lib/services/organization-team-service", () => ({
+vi.mock("../site/src/lib/services/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as trust } from "../apps/web/src/app/api/trust/[kind]/[slug]/route";
-import { GET as team } from "../apps/web/src/app/api/workspace/organizations/[id]/team/route";
+import { GET as trust } from "../site/src/app/api/trust/[kind]/[slug]/route";
+import { GET as team } from "../site/src/app/api/workspace/organizations/[id]/team/route";
 const actor = { id: "actor", role: "admin" },
   organization = { params: Promise.resolve({ id: "org" }) },
   context = (kind = "servers") => ({ params: Promise.resolve({ kind, slug: "server" }) });

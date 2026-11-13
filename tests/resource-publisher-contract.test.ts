@@ -5,7 +5,7 @@ import {
   resourcePublisherHistoryQuery,
   resourcePublisherQuery,
   resourcePublisherUrl,
-} from "../apps/web/src/lib/resource-publisher-query";
+} from "../site/src/lib/resource-publisher-query";
 
 it("derives inventory totals for empty versus filtered empty-state copy", () => {
   expect(publisherInventoryTotal({ draft: 2, published: 3 })).toBe(5);

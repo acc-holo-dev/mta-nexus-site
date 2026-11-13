@@ -1,13 +1,22 @@
 """Render read-only Markdown views of the canonical task specifications."""
 from __future__ import annotations
 
+import argparse
 import collections
 import json
+import os
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = ROOT / "planning"
 DOCS = ROOT / "docs"
+CHECK_ONLY = False
+STALE = []
+RENDERED = {}
+BIOME_CLI = ROOT / "node_modules/@biomejs/biome/bin/biome"
 
 
 def read(name: str):
@@ -15,7 +24,20 @@ def read(name: str):
 
 
 def write(name: str, text: str) -> None:
-    (DOCS / name).write_text(text.rstrip() + "\n", encoding="utf8")
+    result = subprocess.run(
+        ["node", str(BIOME_CLI), "format", "--stdin-file-path=docs/" + name],
+        input=text.rstrip() + "\n", text=True, capture_output=True, cwd=ROOT,
+    )
+    if result.returncode:
+        raise RuntimeError(f"Biome formatting failed for {name}: {result.stderr}")
+    rendered = result.stdout
+    target = DOCS / name
+    if CHECK_ONLY:
+        if not target.is_file() or target.read_text(encoding="utf8") != rendered:
+            STALE.append(name)
+    else:
+        # Finish formatting every view before publishing any of them.
+        RENDERED[name] = rendered
 
 
 def cell(s) -> str:
@@ -26,7 +48,24 @@ def bullets(values) -> str:
     return "\n".join("- " + str(x) for x in values)
 
 
-def main() -> None:
+def main() -> int:
+    global DOCS, CHECK_ONLY, BIOME_CLI
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Report drift without writing files")
+    parser.add_argument("--output-dir", type=Path, default=DOCS)
+    parser.add_argument("--biome-cli", type=Path,
+                        default=Path(os.environ.get("NEXUS_BIOME_CLI", str(BIOME_CLI))),
+                        help="Installed project Biome JS CLI (also NEXUS_BIOME_CLI)")
+    args = parser.parse_args()
+    BIOME_CLI = args.biome_cli.resolve()
+    DOCS, CHECK_ONLY = args.output_dir, args.check
+    STALE.clear()
+    RENDERED.clear()
+    expected = json.loads((ROOT / "package.json").read_text(encoding="utf8"))["devDependencies"]["@biomejs/biome"]
+    version = subprocess.run(["node", str(BIOME_CLI), "--version"],
+                             text=True, capture_output=True, cwd=ROOT)
+    if version.returncode or version.stdout.strip() != "Version: " + expected:
+        raise RuntimeError("Backlog rendering requires project Biome " + expected)
     data = read("tasks.json")
     tasks = data["tasks"]
     byid = {t["id"]: t for t in tasks}
@@ -195,6 +234,21 @@ F6 намеренно не содержит детального execution backl
         "`planning/retention-directions.json`.\n"
     )
     write("TRACEABILITY.md", trace)
+    if not CHECK_ONLY:
+        DOCS.mkdir(parents=True, exist_ok=True)
+        for name, rendered in RENDERED.items():
+            target = DOCS / name
+            temporary = None
+            try:
+                with tempfile.NamedTemporaryFile(mode="w", encoding="utf8", dir=DOCS,
+                                                 prefix=".backlog-", delete=False) as output:
+                    temporary = Path(output.name)
+                    output.write(rendered)
+                temporary.chmod(target.stat().st_mode & 0o777 if target.exists() else 0o644)
+                temporary.replace(target)
+            finally:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
     print(
         json.dumps(
             {
@@ -207,6 +261,10 @@ F6 намеренно не содержит детального execution backl
         )
     )
 
+    if CHECK_ONLY:
+        print(json.dumps({"status": "FAIL" if STALE else "PASS", "stale": STALE}))
+    return 1 if STALE else 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -24,7 +24,7 @@ vi.mock("../packages/db/src/client", async () => {
   return { db };
 });
 import { resourceDeliveriesRepository as repo } from "../packages/db/src/repositories/resource-deliveries";
-import { resourceDeliveriesQuery } from "../apps/web/src/lib/resource-deliveries-query";
+import { resourceDeliveriesQuery } from "../site/src/lib/resource-deliveries-query";
 beforeEach(() => {
   state.queries = [];
   state.rows = [];

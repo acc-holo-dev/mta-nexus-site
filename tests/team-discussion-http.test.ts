@@ -15,30 +15,30 @@ const state = vi.hoisted(() => ({
   history: vi.fn(),
   restore: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/organization-workspace-service", () => ({
+vi.mock("../site/src/lib/services/organization-workspace-service", () => ({
   organizationWorkspaceService: state,
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+vi.mock("../site/src/lib/services/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-import { GET as reports } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/route";
+import { GET as reports } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/route";
 import {
   GET as detail,
   POST as remove,
-} from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/route";
-import { GET as page } from "../apps/web/src/app/api/admin/community/[id]/discussion/route";
-import { GET as history } from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/history/route";
-import { POST as restore } from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route";
-import { POST as preview } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/preview/route";
-import { POST as batch } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/route";
+} from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/route";
+import { GET as page } from "../site/src/app/api/admin/community/[id]/discussion/route";
+import { GET as history } from "../site/src/app/api/workspace/organizations/[id]/content/[contentId]/history/route";
+import { POST as restore } from "../site/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route";
+import { POST as preview } from "../site/src/app/api/workspace/organizations/[id]/members/batch/preview/route";
+import { POST as batch } from "../site/src/app/api/workspace/organizations/[id]/members/batch/route";
 
 const teamContext = { params: Promise.resolve({ id: "org", contentId: "post" }) };
 const context = { params: Promise.resolve({ id: "org", commentId: "comment" }) };

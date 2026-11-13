@@ -10,54 +10,54 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import RequirementsLoading from "../apps/web/src/app/workspace/library/[id]/requirements/loading";
-import CompareLoading from "../apps/web/src/app/workspace/library/[id]/versions/compare/loading";
-import CollectionAddLoading from "../apps/web/src/app/workspace/library/collections/[id]/add/loading";
-import CollectionCopyLoading from "../apps/web/src/app/workspace/library/collections/[id]/copy/loading";
-import CollectionCopyItemsLoading from "../apps/web/src/app/workspace/library/collections/[id]/copy-items/loading";
-import CollectionHistoryLoading from "../apps/web/src/app/workspace/library/collections/[id]/history/loading";
-import CollectionDetailLoading from "../apps/web/src/app/workspace/library/collections/[id]/loading";
-import CollectionMoveItemsLoading from "../apps/web/src/app/workspace/library/collections/[id]/move-items/loading";
-import CollectionReleasesLoading from "../apps/web/src/app/workspace/library/collections/[id]/releases/loading";
-import CollectionRequirementsLoading from "../apps/web/src/app/workspace/library/collections/[id]/requirements/loading";
-import CollectionVersionsHistoryLoading from "../apps/web/src/app/workspace/library/collections/[id]/versions/history/loading";
-import CollectionVersionsLoading from "../apps/web/src/app/workspace/library/collections/[id]/versions/loading";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
-import { resourceRequirementsCopy } from "../apps/web/src/lib/resource-requirements-i18n";
+import RequirementsLoading from "../site/src/app/workspace/library/[id]/requirements/loading";
+import CompareLoading from "../site/src/app/workspace/library/[id]/versions/compare/loading";
+import CollectionAddLoading from "../site/src/app/workspace/library/collections/[id]/add/loading";
+import CollectionCopyLoading from "../site/src/app/workspace/library/collections/[id]/copy/loading";
+import CollectionCopyItemsLoading from "../site/src/app/workspace/library/collections/[id]/copy-items/loading";
+import CollectionHistoryLoading from "../site/src/app/workspace/library/collections/[id]/history/loading";
+import CollectionDetailLoading from "../site/src/app/workspace/library/collections/[id]/loading";
+import CollectionMoveItemsLoading from "../site/src/app/workspace/library/collections/[id]/move-items/loading";
+import CollectionReleasesLoading from "../site/src/app/workspace/library/collections/[id]/releases/loading";
+import CollectionRequirementsLoading from "../site/src/app/workspace/library/collections/[id]/requirements/loading";
+import CollectionVersionsHistoryLoading from "../site/src/app/workspace/library/collections/[id]/versions/history/loading";
+import CollectionVersionsLoading from "../site/src/app/workspace/library/collections/[id]/versions/loading";
+import { getDictionary } from "../site/src/lib/i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
+import { resourceRequirementsCopy } from "../site/src/lib/resource-requirements-i18n";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedDetailPages = [
-  "apps/web/src/app/workspace/library/collections/[id]/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/add/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/copy/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/copy-items/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/move-items/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/history/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/releases/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/requirements/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/versions/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/versions/history/page.tsx",
-  "apps/web/src/app/workspace/library/[id]/requirements/page.tsx",
-  "apps/web/src/app/workspace/library/[id]/versions/compare/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/add/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/copy/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/copy-items/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/move-items/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/history/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/releases/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/requirements/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/versions/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/versions/history/page.tsx",
+  "site/src/app/workspace/library/[id]/requirements/page.tsx",
+  "site/src/app/workspace/library/[id]/versions/compare/page.tsx",
 ] as const;
 
 const delegatedHonestyScreens = [
-  "apps/web/src/components/collection-releases-screen.tsx",
-  "apps/web/src/components/collection-requirements-screen.tsx",
-  "apps/web/src/components/library-selection-batch-screen.tsx",
-  "apps/web/src/components/resource-requirements-screen.tsx",
-  "apps/web/src/components/library-release-comparison-screen.tsx",
+  "site/src/components/collection-releases-screen.tsx",
+  "site/src/components/collection-requirements-screen.tsx",
+  "site/src/components/library-selection-batch-screen.tsx",
+  "site/src/components/resource-requirements-screen.tsx",
+  "site/src/components/library-release-comparison-screen.tsx",
 ] as const;
 
 it("locks library collection detail route shells to clipped min-w-0 frames", () => {
@@ -78,17 +78,13 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("apps/web/src/components/collection-releases-screen.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/components/collection-requirements-screen.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("apps/web/src/components/library-selection-batch-screen.tsx")).toContain(
-    "EmptyState",
-  );
+  expect(read("site/src/components/collection-releases-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/collection-requirements-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/library-selection-batch-screen.tsx")).toContain("EmptyState");
 });
 
 it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
-  const source = read("apps/web/src/components/collection-requirements-screen.tsx");
+  const source = read("site/src/components/collection-requirements-screen.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toContain("inline-flex min-h-11 items-center");
   expect(source).toContain("unavailableItemCount");

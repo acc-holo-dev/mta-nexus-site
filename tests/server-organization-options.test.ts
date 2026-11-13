@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseServerOrganizations } from "../apps/web/src/lib/server-organization-options";
+import { parseServerOrganizations } from "../site/src/lib/server-organization-options";
 
 const owned = { id: "org_owned", name: "My Organization", slug: "my-organization" };
 const delegated = { id: "org_manager", name: "Delegated Team", slug: "delegated-team" };

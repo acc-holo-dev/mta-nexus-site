@@ -3,10 +3,10 @@ import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
-} from "../apps/web/src/lib/resource-release-watches-query";
-import { resourceReleaseNotification } from "../apps/web/src/lib/resource-release-watches-i18n";
+} from "../site/src/lib/resource-release-watches-query";
+import { resourceReleaseNotification } from "../site/src/lib/resource-release-watches-i18n";
 import { resourceReleaseWorkerOptions } from "../packages/db/src/resource-release-worker-config";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { formatNotification } from "../site/src/lib/notification-copy";
 it("accepts only explicit revision-scoped opt-in commands without worker or account selectors", () => {
   expect(resourceReleaseWatchCommandSchema.parse({ enabled: true, expectedRevision: 0 })).toEqual({
     enabled: true,

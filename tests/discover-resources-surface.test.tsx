@@ -15,29 +15,29 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));
 vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.viewer },
 }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { page: mocks.page },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: async () => null },
   indexMtaObservations: () => () => null,
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { getPublicAttributions: mocks.attributions },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => "en",
 }));
 
-import DiscoverPage from "../apps/web/src/app/discover/page";
-import { DirectoryFilters, DirectoryResults } from "../apps/web/src/components/discovery-directory";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
-import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import DiscoverPage from "../site/src/app/discover/page";
+import { DirectoryFilters, DirectoryResults } from "../site/src/components/discovery-directory";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { parseDiscoverQuery } from "../site/src/lib/discover-query";
+import { discoveryCopy } from "../site/src/lib/discovery-copy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 function resourceProduct() {
   return {

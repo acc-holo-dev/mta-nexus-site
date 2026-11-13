@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { AdminReportsSection } from "../apps/web/src/components/admin/admin-reports-section";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { AdminReportsSection } from "../site/src/components/admin/admin-reports-section";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -11,7 +11,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/report-moderation-controls", () => ({
+vi.mock("../site/src/components/report-moderation-controls", () => ({
   ReportModerationControls: ({ reportId }: { reportId: string }) => (
     <button type="button" data-report={reportId}>
       Decide
@@ -19,7 +19,7 @@ vi.mock("../apps/web/src/components/report-moderation-controls", () => ({
   ),
 }));
 
-vi.mock("../apps/web/src/components/admin/admin-resource-qa-report-actions", () => ({
+vi.mock("../site/src/components/admin/admin-resource-qa-report-actions", () => ({
   AdminResourceQaReportActions: ({
     reportId,
     productId,
@@ -35,7 +35,7 @@ vi.mock("../apps/web/src/components/admin/admin-resource-qa-report-actions", () 
   ),
 }));
 
-vi.mock("../apps/web/src/components/report-evidence-links", () => ({
+vi.mock("../site/src/components/report-evidence-links", () => ({
   ReportEvidenceLinks: () => null,
 }));
 

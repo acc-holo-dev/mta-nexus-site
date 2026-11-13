@@ -10,45 +10,45 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import AdminReportHistoryLoading from "../apps/web/src/app/admin/reports/[id]/history/loading";
-import AdminResourceBuildLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/loading";
-import AdminResourceBuildPackageLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/package/loading";
-import AdminResourceDetailLoading from "../apps/web/src/app/admin/resources/[id]/loading";
-import AdminResourceMediaLoading from "../apps/web/src/app/admin/resources/[id]/media/loading";
-import AdminResourceRequirementsLoading from "../apps/web/src/app/admin/resources/[id]/requirements/loading";
-import AdminResourcesLoading from "../apps/web/src/app/admin/resources/loading";
-import AdminSupportMessagesLoading from "../apps/web/src/app/admin/support/[id]/messages/loading";
-import { buildPackageCopy } from "../apps/web/src/lib/build-package-i18n";
-import { reportHistoryCopy } from "../apps/web/src/lib/community-report-history-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getResourceBuildWorkspaceCopy } from "../apps/web/src/lib/resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
-import { resourceRequirementsCopy } from "../apps/web/src/lib/resource-requirements-i18n";
-import { supportMessageCopy } from "../apps/web/src/lib/support-message-discovery-copy";
+import AdminReportHistoryLoading from "../site/src/app/admin/reports/[id]/history/loading";
+import AdminResourceBuildLoading from "../site/src/app/admin/resources/[id]/builds/[buildId]/loading";
+import AdminResourceBuildPackageLoading from "../site/src/app/admin/resources/[id]/builds/[buildId]/package/loading";
+import AdminResourceDetailLoading from "../site/src/app/admin/resources/[id]/loading";
+import AdminResourceMediaLoading from "../site/src/app/admin/resources/[id]/media/loading";
+import AdminResourceRequirementsLoading from "../site/src/app/admin/resources/[id]/requirements/loading";
+import AdminResourcesLoading from "../site/src/app/admin/resources/loading";
+import AdminSupportMessagesLoading from "../site/src/app/admin/support/[id]/messages/loading";
+import { buildPackageCopy } from "../site/src/lib/build-package-i18n";
+import { reportHistoryCopy } from "../site/src/lib/community-report-history-copy";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getResourceBuildWorkspaceCopy } from "../site/src/lib/resource-build-workspace-i18n";
+import { resourceMediaCopy } from "../site/src/lib/resource-media-i18n";
+import { getResourceReleaseControlCopy } from "../site/src/lib/resource-release-control-i18n";
+import { resourceRequirementsCopy } from "../site/src/lib/resource-requirements-i18n";
+import { supportMessageCopy } from "../site/src/lib/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "apps/web/src/app/admin/resources/[id]/media/page.tsx",
-  "apps/web/src/app/admin/resources/[id]/requirements/page.tsx",
-  "apps/web/src/app/admin/resources/[id]/builds/[buildId]/page.tsx",
-  "apps/web/src/app/admin/resources/[id]/builds/[buildId]/package/page.tsx",
+  "site/src/app/admin/resources/[id]/media/page.tsx",
+  "site/src/app/admin/resources/[id]/requirements/page.tsx",
+  "site/src/app/admin/resources/[id]/builds/[buildId]/page.tsx",
+  "site/src/app/admin/resources/[id]/builds/[buildId]/package/page.tsx",
 ] as const;
 
 const clippedResourceLoadings = [
-  "apps/web/src/app/admin/resources/loading.tsx",
-  "apps/web/src/app/admin/resources/[id]/loading.tsx",
-  "apps/web/src/app/admin/resources/[id]/media/loading.tsx",
-  "apps/web/src/app/admin/resources/[id]/requirements/loading.tsx",
-  "apps/web/src/app/admin/resources/[id]/builds/[buildId]/loading.tsx",
-  "apps/web/src/app/admin/resources/[id]/builds/[buildId]/package/loading.tsx",
+  "site/src/app/admin/resources/loading.tsx",
+  "site/src/app/admin/resources/[id]/loading.tsx",
+  "site/src/app/admin/resources/[id]/media/loading.tsx",
+  "site/src/app/admin/resources/[id]/requirements/loading.tsx",
+  "site/src/app/admin/resources/[id]/builds/[buildId]/loading.tsx",
+  "site/src/app/admin/resources/[id]/builds/[buildId]/package/loading.tsx",
 ] as const;
 
 it("locks admin resource route shells to clipped min-w-0 frames", () => {
@@ -130,14 +130,14 @@ it.each([
 );
 
 it("keeps leftover admin support messages and report history loadings as clipped re-exports", () => {
-  expect(read("apps/web/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
     'from "../../../../support/[id]/messages/loading"',
   );
-  expect(read("apps/web/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("apps/web/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
+  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
     "overflow-x-clip",
   );
 });

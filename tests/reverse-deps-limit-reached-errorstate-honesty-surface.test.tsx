@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -12,13 +12,10 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { ReverseDependencyList } from "../apps/web/src/components/reverse-dependency-list";
+import { ReverseDependencyList } from "../site/src/components/reverse-dependency-list";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/reverse-dependency-list.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/reverse-dependency-list.tsx"), "utf8");
 
 it("locks reverse-dependency limitReached to ErrorState without soft warning", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');

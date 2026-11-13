@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { OrganizationWorkspacePanel } from "../apps/web/src/components/organization-workspace";
-import type { OrganizationWorkspace } from "../apps/web/src/lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
+import { OrganizationWorkspacePanel } from "../site/src/components/organization-workspace";
+import type { OrganizationWorkspace } from "../site/src/lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../site/src/lib/organization-workspace-copy";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -20,10 +20,7 @@ vi.mock("next/navigation", () => ({
 
 /** Honesty lock: organization workspace soft muted readonly → ErrorState alert. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/organization-workspace.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/organization-workspace.tsx"), "utf8");
 
 const workspace: OrganizationWorkspace = {
   organization: {

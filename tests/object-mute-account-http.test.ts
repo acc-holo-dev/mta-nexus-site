@@ -2,17 +2,17 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const calls = vi.hoisted(() => ({ set: vi.fn(), user: { id: "actor_b" } }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => calls.user) },
 }));
-vi.mock("../apps/web/src/lib/services/follow-workspace-service", () => ({
+vi.mock("../site/src/lib/services/follow-workspace-service", () => ({
   followWorkspaceService: { setObjectMute: calls.set },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "omi_test",
 }));
-import { POST } from "../apps/web/src/app/api/object-mute/route";
+import { POST } from "../site/src/app/api/object-mute/route";
 beforeEach(() => {
   vi.clearAllMocks();
   stubBrowserMutationOrigin();

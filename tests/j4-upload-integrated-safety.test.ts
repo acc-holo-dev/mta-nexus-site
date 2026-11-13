@@ -12,7 +12,7 @@ function readBuildsRepositoryModules(): string {
 
 describe("integrated J4 build upload safety contract", () => {
   it("orders cheap authorization and input guards before body parsing and scanner/storage work", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     const auth = route.indexOf("authService.getSession(token)");
     const rate = route.indexOf('consumeRateLimit("buildUpload", user.id)');
@@ -49,7 +49,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("keeps malicious and scanner-error verdicts fail-closed before storage", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     const malicious = route.indexOf('scan.status === "malicious"');
     const unavailable = route.indexOf('scan.status === "error"');
@@ -65,7 +65,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("retains a second organization-aware authorization check at the mutation boundary", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');
@@ -78,8 +78,8 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("uses a backpressure-aware bounded ClamAV INSTREAM transport", () => {
-    const scanner = read("apps/web/src/lib/services/build-scanner-service.ts");
-    const transport = read("apps/web/src/lib/services/clamav-instream.ts");
+    const scanner = read("site/src/lib/services/build-scanner-service.ts");
+    const transport = read("site/src/lib/services/clamav-instream.ts");
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).toContain("const CLAMAV_MAX_RESPONSE_BYTES = 8 * 1024");
@@ -89,7 +89,7 @@ describe("integrated J4 build upload safety contract", () => {
 
   it("keeps moderation on the deterministic serialized publication path", () => {
     const repository = readBuildsRepositoryModules();
-    const service = read("apps/web/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/product-service.ts");
 
     const dollar = "$";
     expect(repository).toContain(`.set({ updatedAt: sql\`${dollar}{products.updatedAt}\` })`);
@@ -105,7 +105,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("keeps reviewer artifact access private and limited to pending clean builds", () => {
-    const route = read("apps/web/src/app/api/admin/builds/[buildId]/download/route.ts");
+    const route = read("site/src/app/api/admin/builds/[buildId]/download/route.ts");
 
     expect(route).toContain('can(actor, "admin.moderation")');
     expect(route).toContain('build.status !== "pending_review"');
@@ -117,7 +117,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("requires build review context and writes the decision audit only in the transactional moderation path", () => {
-    const route = read("apps/web/src/app/api/admin/actions/route.ts");
+    const route = read("site/src/app/api/admin/actions/route.ts");
     const repository = readBuildsRepositoryModules();
 
     expect(route).toContain('targetType: z.literal("build")');

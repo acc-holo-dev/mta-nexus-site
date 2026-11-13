@@ -1,7 +1,7 @@
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
@@ -20,8 +20,8 @@ const localeState = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: localeState.locale,
@@ -113,9 +113,9 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { RegisterServerForm } from "../apps/web/src/components/register-server-form";
-import { ServerClaimControlPanel } from "../apps/web/src/components/server-claim-control-panel";
-import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
+import { RegisterServerForm } from "../site/src/components/register-server-form";
+import { ServerClaimControlPanel } from "../site/src/components/server-claim-control-panel";
+import { ServerDetailsForm } from "../site/src/components/server-details-form";
 
 describe("server workspace UI surface", () => {
   it.each(["en", "ru"] as const)(

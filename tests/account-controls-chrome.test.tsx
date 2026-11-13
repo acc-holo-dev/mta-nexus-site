@@ -8,7 +8,7 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
   confirm: vi.fn(),
 }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 vi.mock("react", async (original) => ({
@@ -40,15 +40,15 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
-import { AccountControls } from "../apps/web/src/components/account-controls";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { AccountControls } from "../site/src/components/account-controls";
+import { getDictionary } from "../site/src/lib/i18n";
 import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 function render() {

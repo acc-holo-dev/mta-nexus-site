@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
   command: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: mocks.auth,
     confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
@@ -24,17 +24,17 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_a",
   };
 });
-vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../site/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: mocks.detail, command: mocks.command },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { reviewBuild: mocks.review },
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
 vi.mock("@nexus/db", () => ({
@@ -42,9 +42,9 @@ vi.mock("@nexus/db", () => ({
   reportRepository: {},
   verificationRepository: {},
 }));
-import { GET, PATCH } from "../apps/web/src/app/api/products/[id]/builds/[buildId]/route";
-import { GET as staffGet } from "../apps/web/src/app/api/admin/resources/[id]/builds/[buildId]/route";
-import { POST as moderate } from "../apps/web/src/app/api/admin/actions/route";
+import { GET, PATCH } from "../site/src/app/api/products/[id]/builds/[buildId]/route";
+import { GET as staffGet } from "../site/src/app/api/admin/resources/[id]/builds/[buildId]/route";
+import { POST as moderate } from "../site/src/app/api/admin/actions/route";
 const actor = { id: "usr_a", role: "developer" },
   params = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const command = { action: "withdraw", expectedRevision: 3, reason: " Fix notes " };

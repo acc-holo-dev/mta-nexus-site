@@ -6,7 +6,7 @@ import { db } from "../packages/db/src/client";
 import { accountRecoveryBindings } from "../packages/db/src/account-recovery-schema";
 import { authRepository } from "../packages/db/src/repositories/auth";
 import { userRepository } from "../packages/db/src/repositories/users";
-import { authService } from "../apps/web/src/lib/services/auth-service";
+import { authService } from "../site/src/lib/services/auth-service";
 import {
   account,
   auditId,

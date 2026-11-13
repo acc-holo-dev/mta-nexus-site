@@ -18,10 +18,10 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
 vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_generated`,
   consumeRateLimit: async (...args: unknown[]) => {
@@ -42,13 +42,13 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST as removeAnswer } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/answers/[answerId]/remove/route";
-import { POST as answer } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/answers/route";
-import { POST as follow } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/follow/route";
-import { POST as removeThread } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/remove/route";
-import { POST as resolve } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/resolve/route";
-import { GET as detail } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/route";
-import { POST as ask, GET as list } from "../apps/web/src/app/api/products/[id]/qa/route";
+import { POST as removeAnswer } from "../site/src/app/api/products/[id]/qa/[threadId]/answers/[answerId]/remove/route";
+import { POST as answer } from "../site/src/app/api/products/[id]/qa/[threadId]/answers/route";
+import { POST as follow } from "../site/src/app/api/products/[id]/qa/[threadId]/follow/route";
+import { POST as removeThread } from "../site/src/app/api/products/[id]/qa/[threadId]/remove/route";
+import { POST as resolve } from "../site/src/app/api/products/[id]/qa/[threadId]/resolve/route";
+import { GET as detail } from "../site/src/app/api/products/[id]/qa/[threadId]/route";
+import { POST as ask, GET as list } from "../site/src/app/api/products/[id]/qa/route";
 
 const productContext = { params: Promise.resolve({ id: "prd_a" }) };
 const threadContext = { params: Promise.resolve({ id: "prd_a", threadId: "rqt_a" }) };

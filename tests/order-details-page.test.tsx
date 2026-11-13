@@ -13,18 +13,18 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { getBuyerOrderDetails: state.details },
 }));
 
-import PurchaseDetailLoading from "../apps/web/src/app/workspace/purchases/[id]/loading";
-import Page from "../apps/web/src/app/workspace/purchases/[id]/page";
-import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import PurchaseDetailLoading from "../site/src/app/workspace/purchases/[id]/loading";
+import Page from "../site/src/app/workspace/purchases/[id]/page";
+import { getCommerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const input = {
   params: Promise.resolve({ id: "ord_a" }),

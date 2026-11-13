@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks resource build history empty chrome to EmptyState", () => {
-  const source = read("apps/web/src/components/resource-build-screen.tsx");
+  const source = read("site/src/components/resource-build-screen.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("copy.noHistory");
   expect(source).toContain("copy.history");

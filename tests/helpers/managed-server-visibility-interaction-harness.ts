@@ -5,7 +5,7 @@ import {
   flattenReactTestTree,
   type FlatTestElement,
 } from "./flatten-react-test-tree";
-import { serverWorkspaceCopy } from "../../apps/web/src/lib/server-workspace-copy";
+import { serverWorkspaceCopy } from "../../site/src/lib/server-workspace-copy";
 
 export type ManagedServerVisibilityHarness = {
   slots: unknown[];

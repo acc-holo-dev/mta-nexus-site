@@ -14,18 +14,18 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-media-service", () => ({
+vi.mock("../site/src/lib/services/resource-media-service", () => ({
   resourceMediaService: { managed: state.managed },
 }));
 
-import AdminResourceMediaLoading from "../apps/web/src/app/admin/resources/[id]/media/loading";
-import { ResourceMediaEditor } from "../apps/web/src/components/resource-media-editor";
-import { ResourceMediaScreen } from "../apps/web/src/components/resource-media-screen";
-import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
+import AdminResourceMediaLoading from "../site/src/app/admin/resources/[id]/media/loading";
+import { ResourceMediaEditor } from "../site/src/components/resource-media-editor";
+import { ResourceMediaScreen } from "../site/src/components/resource-media-screen";
+import { resourceMediaCopy } from "../site/src/lib/resource-media-i18n";
 
 const initial: ManagedResourceMedia = {
   product: {

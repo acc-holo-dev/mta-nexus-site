@@ -5,7 +5,7 @@ import {
   libraryHref,
   parseLibraryFilter,
   parseLibraryPage,
-} from "../apps/web/src/lib/library-view";
+} from "../site/src/lib/library-view";
 
 describe("bounded library routing", () => {
   it("clamps oversized page numbers and page-size requests without changing totals", () => {

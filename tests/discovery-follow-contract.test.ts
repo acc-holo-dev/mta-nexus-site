@@ -3,15 +3,15 @@ import {
   discoverHref,
   parseDiscoverApiQuery,
   parseDiscoverQuery,
-} from "../apps/web/src/lib/discover-query";
-import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
+} from "../site/src/lib/discover-query";
+import { discoveryCopy } from "../site/src/lib/discovery-copy";
 import {
   followCommandSchema,
   followPageSchema,
   parseFollowQuery,
-} from "../apps/web/src/lib/follow-workspace-contract";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+} from "../site/src/lib/follow-workspace-contract";
+import { followCopy } from "../site/src/lib/follow-workspace-copy";
+import { formatNotification } from "../site/src/lib/notification-copy";
 
 it("preserves all active server filters across canonical page links", () => {
   const state = parseDiscoverQuery({

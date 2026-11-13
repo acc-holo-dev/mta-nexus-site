@@ -10,24 +10,24 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import AdminReportHistoryLoading from "../apps/web/src/app/admin/reports/[id]/history/loading";
-import AdminSupportMessagesLoading from "../apps/web/src/app/admin/support/[id]/messages/loading";
-import { reportHistoryCopy } from "../apps/web/src/lib/community-report-history-copy";
-import { supportMessageCopy } from "../apps/web/src/lib/support-message-discovery-copy";
+import AdminReportHistoryLoading from "../site/src/app/admin/reports/[id]/history/loading";
+import AdminSupportMessagesLoading from "../site/src/app/admin/support/[id]/messages/loading";
+import { reportHistoryCopy } from "../site/src/lib/community-report-history-copy";
+import { supportMessageCopy } from "../site/src/lib/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "apps/web/src/app/workspace/reports/[id]/page.tsx",
-  "apps/web/src/app/workspace/reports/[id]/history/page.tsx",
-  "apps/web/src/app/workspace/library/version-history/page.tsx",
-  "apps/web/src/app/dev/page.tsx",
+  "site/src/app/workspace/reports/[id]/page.tsx",
+  "site/src/app/workspace/reports/[id]/history/page.tsx",
+  "site/src/app/workspace/library/version-history/page.tsx",
+  "site/src/app/dev/page.tsx",
 ] as const;
 
 it("locks residual page shells to clipped min-w-0 frames", () => {
@@ -40,31 +40,27 @@ it("locks residual page shells to clipped min-w-0 frames", () => {
 });
 
 it("keeps residual report and version-history routes as thin clipped shells around honest screens", () => {
-  expect(read("apps/web/src/app/workspace/reports/[id]/page.tsx")).toContain(
-    "CommunityReportScreen",
-  );
-  expect(read("apps/web/src/app/workspace/reports/[id]/history/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/reports/[id]/page.tsx")).toContain("CommunityReportScreen");
+  expect(read("site/src/app/workspace/reports/[id]/history/page.tsx")).toContain(
     "CommunityReportHistoryPage",
   );
-  expect(read("apps/web/src/app/workspace/library/version-history/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/library/version-history/page.tsx")).toContain(
     "LibraryReleaseHistoryScreen",
   );
-  expect(read("apps/web/src/components/community-report-screen.tsx")).toContain("ErrorState");
-  expect(read("apps/web/src/components/community-report-history-page.tsx")).toContain("ErrorState");
-  expect(read("apps/web/src/components/library-release-history-screen.tsx")).toContain(
-    "ErrorState",
-  );
+  expect(read("site/src/components/community-report-screen.tsx")).toContain("ErrorState");
+  expect(read("site/src/components/community-report-history-page.tsx")).toContain("ErrorState");
+  expect(read("site/src/components/library-release-history-screen.tsx")).toContain("ErrorState");
 });
 
 it("keeps admin support messages and report history loadings as clipped re-exports", () => {
-  expect(read("apps/web/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
     'from "../../../../support/[id]/messages/loading"',
   );
-  expect(read("apps/web/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("apps/web/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
+  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
     "overflow-x-clip",
   );
 });
@@ -99,7 +95,7 @@ it.each([
 );
 
 it("locks /dev diagnostics shell clipped without raw alert failure chrome", () => {
-  const source = read("apps/web/src/app/dev/page.tsx");
+  const source = read("site/src/app/dev/page.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
   expect(source).toContain("pageShellClass");

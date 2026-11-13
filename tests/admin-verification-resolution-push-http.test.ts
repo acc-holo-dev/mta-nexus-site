@@ -18,7 +18,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: afterMock };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -30,7 +30,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
@@ -38,11 +38,11 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
 
@@ -74,7 +74,7 @@ vi.mock("@nexus/security", async () => {
 });
 
 import { NextRequest } from "next/server";
-import { POST } from "../apps/web/src/app/api/admin/actions/route";
+import { POST } from "../site/src/app/api/admin/actions/route";
 
 function request(action: "approve" | "reject") {
   return new NextRequest("http://nexus.test/api/admin/actions", {

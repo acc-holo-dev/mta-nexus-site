@@ -4,18 +4,17 @@ import type { ResourceMediaItem } from "@nexus/domain";
 import { createElement, createRef, type MouseEvent, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { ResourceGallery } from "../apps/web/src/components/resource-gallery";
-import { ResourceGalleryLightbox } from "../apps/web/src/components/resource-gallery-lightbox";
+import { ResourceGallery } from "../site/src/components/resource-gallery";
+import { ResourceGalleryLightbox } from "../site/src/components/resource-gallery-lightbox";
 import {
   shouldOpenGalleryLightbox,
   stepGalleryIndex,
-} from "../apps/web/src/components/resource-gallery-interaction";
-import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
-import { clickedDialogBackdrop } from "../apps/web/src/components/use-modal-dialog";
+} from "../site/src/components/resource-gallery-interaction";
+import { resourceMediaCopy } from "../site/src/lib/resource-media-i18n";
+import { clickedDialogBackdrop } from "../site/src/components/use-modal-dialog";
 
-vi.mock("../apps/web/src/components/use-modal-dialog", async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import("../apps/web/src/components/use-modal-dialog")>();
+vi.mock("../site/src/components/use-modal-dialog", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../site/src/components/use-modal-dialog")>();
   return {
     ...original,
     useModalDialog: () => createRef<HTMLDialogElement>(),
@@ -206,7 +205,7 @@ describe("ResourceGalleryLightbox", () => {
 
   it("keeps close and nav icon controls at touch target size in source", () => {
     const source = readFileSync(
-      resolve(process.cwd(), "apps/web/src/components/resource-gallery-lightbox.tsx"),
+      resolve(process.cwd(), "site/src/components/resource-gallery-lightbox.tsx"),
       "utf8",
     );
     const touchTargets = source.match(/min-h-11 min-w-11/gu) ?? [];

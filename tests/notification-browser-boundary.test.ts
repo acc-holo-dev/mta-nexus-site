@@ -5,7 +5,7 @@ const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
   getSessionIdentity: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "wps_a",
@@ -23,7 +23,7 @@ vi.mock("@nexus/db", () => ({
     listForSession: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
+vi.mock("../site/src/lib/services/notification-inbox-service", () => ({
   notificationInboxService: {
     page: vi.fn(),
     command: vi.fn(),
@@ -33,13 +33,13 @@ vi.mock("@nexus/config", () => ({
   readWebPushVapidConfig: () => null,
 }));
 
-import { PATCH as inboxCommand } from "../apps/web/src/app/api/notifications/inbox/route";
-import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
-import { PATCH as preferences } from "../apps/web/src/app/api/notifications/preferences/route";
+import { PATCH as inboxCommand } from "../site/src/app/api/notifications/inbox/route";
+import { POST as markRead } from "../site/src/app/api/notifications/mark-read/route";
+import { PATCH as preferences } from "../site/src/app/api/notifications/preferences/route";
 import {
   DELETE as pushDelete,
   POST as pushSubscribe,
-} from "../apps/web/src/app/api/notifications/push/route";
+} from "../site/src/app/api/notifications/push/route";
 
 const mutations = [
   ["inbox command", "PATCH", inboxCommand, "getSession"],

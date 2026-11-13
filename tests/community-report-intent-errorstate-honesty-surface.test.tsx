@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/community-report-form.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/community-report-form.tsx"), "utf8");
 
 it("routes unconfirmed community-report intent through ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

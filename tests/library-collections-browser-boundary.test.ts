@@ -4,12 +4,12 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
 }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: {
     command: vi.fn(),
     membershipBatch: vi.fn(),
@@ -20,27 +20,27 @@ vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
     resourceMemberships: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../site/src/lib/services/library-selection-batches-service", () => ({
   librarySelectionBatchesService: {
     command: vi.fn(),
     preview: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     collectionPage: vi.fn(),
     enableCollectionBatch: vi.fn(),
   },
 }));
 
-import { POST as createCollection } from "../apps/web/src/app/api/library/collections/route";
-import { POST as commandCollection } from "../apps/web/src/app/api/library/collections/[id]/route";
-import { POST as membershipBatch } from "../apps/web/src/app/api/library/[id]/collections/route";
-import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
-import { POST as reconcilePreview } from "../apps/web/src/app/api/library/collections/[id]/reconcile-preview/route";
-import { POST as applyVersions } from "../apps/web/src/app/api/library/collections/[id]/versions/route";
-import { POST as previewVersions } from "../apps/web/src/app/api/library/collections/[id]/versions/preview/route";
-import { POST as enableWatches } from "../apps/web/src/app/api/library/collections/[id]/watches/route";
+import { POST as createCollection } from "../site/src/app/api/library/collections/route";
+import { POST as commandCollection } from "../site/src/app/api/library/collections/[id]/route";
+import { POST as membershipBatch } from "../site/src/app/api/library/[id]/collections/route";
+import { POST as importPreview } from "../site/src/app/api/library/collections/[id]/import-preview/route";
+import { POST as reconcilePreview } from "../site/src/app/api/library/collections/[id]/reconcile-preview/route";
+import { POST as applyVersions } from "../site/src/app/api/library/collections/[id]/versions/route";
+import { POST as previewVersions } from "../site/src/app/api/library/collections/[id]/versions/preview/route";
+import { POST as enableWatches } from "../site/src/app/api/library/collections/[id]/watches/route";
 
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 const mutations = [

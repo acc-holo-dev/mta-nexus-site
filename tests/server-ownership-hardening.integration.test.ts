@@ -10,9 +10,9 @@ import {
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { PATCH as updateServer } from "../apps/web/src/app/api/servers/[id]/route";
-import { POST as registerServer } from "../apps/web/src/app/api/servers/route";
-import { POST as requestVerification } from "../apps/web/src/app/api/verification/route";
+import { PATCH as updateServer } from "../site/src/app/api/servers/[id]/route";
+import { POST as registerServer } from "../site/src/app/api/servers/route";
+import { POST as requestVerification } from "../site/src/app/api/verification/route";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 function jsonRequest(

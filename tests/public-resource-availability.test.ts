@@ -28,7 +28,7 @@ vi.mock("@nexus/domain", async () => {
   };
 });
 
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 function product(overrides: Record<string, unknown> = {}) {
   return {

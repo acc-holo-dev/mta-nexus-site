@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
@@ -15,13 +15,13 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: { findById: vi.fn(), listUserMemberships: vi.fn() },
   productRepository: { findById: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { getServerById: vi.fn(), canManageServer: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { canManageProduct: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     getArticleBySlug: vi.fn(),
     addComment: vi.fn(),
@@ -29,20 +29,20 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
     manageComment: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+vi.mock("../site/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: vi.fn(), set: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/discussion-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/discussion-follow-notification-service", () => ({
   notifyDiscussionReplies: vi.fn(),
 }));
 
-import { POST as createContent } from "../apps/web/src/app/api/content/route";
-import { POST as createComment } from "../apps/web/src/app/api/content/[slug]/comments/route";
+import { POST as createContent } from "../site/src/app/api/content/route";
+import { POST as createComment } from "../site/src/app/api/content/[slug]/comments/route";
 import {
   DELETE as deleteComment,
   PATCH as editComment,
-} from "../apps/web/src/app/api/content/[slug]/comments/[id]/route";
-import { PUT as setReaction } from "../apps/web/src/app/api/content/[slug]/reactions/route";
+} from "../site/src/app/api/content/[slug]/comments/[id]/route";
+import { PUT as setReaction } from "../site/src/app/api/content/[slug]/reactions/route";
 
 const context = { params: Promise.resolve({ slug: "article", id: "cmt_a" }) };
 const mutations = [

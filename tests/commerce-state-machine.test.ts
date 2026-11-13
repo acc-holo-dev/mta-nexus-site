@@ -7,7 +7,7 @@ import {
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
 import { beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../apps/web/src/lib/services/commerce-service";
+import { commerceService } from "../site/src/lib/services/commerce-service";
 
 describe("safe resource acquisition", () => {
   const suffix = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;

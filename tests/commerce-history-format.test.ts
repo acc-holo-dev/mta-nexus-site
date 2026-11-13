@@ -7,8 +7,8 @@ import {
   licenseStatusLabel,
   orderStatusLabel,
   parseHistoryPage,
-} from "../apps/web/src/lib/commerce-history-format";
-import { commerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
+} from "../site/src/lib/commerce-history-format";
+import { commerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
 
 describe("bounded private commerce history", () => {
   it("bounds pages without accepting large or malformed offsets", () => {

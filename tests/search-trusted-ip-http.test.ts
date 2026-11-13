@@ -1,14 +1,14 @@
 import { consumeRateLimit } from "@nexus/security";
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { GET } from "../apps/web/src/app/api/search/route";
+import { GET } from "../site/src/app/api/search/route";
 
 vi.mock("@nexus/security", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@nexus/security")>()),
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { search: vi.fn(async () => []) },
 }));
 

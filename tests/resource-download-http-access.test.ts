@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest";
 
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { resourceDownloadHttpState } = await import("./helpers/resource-download-http-harness");
   return {
     authService: {
@@ -9,7 +9,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/commerce-service", async () => {
+vi.mock("../site/src/lib/services/commerce-service", async () => {
   const { resourceDownloadHttpState } = await import("./helpers/resource-download-http-harness");
   return {
     commerceService: {
@@ -18,7 +18,7 @@ vi.mock("../apps/web/src/lib/services/commerce-service", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/product-service", async () => {
+vi.mock("../site/src/lib/services/product-service", async () => {
   const { resourceDownloadHttpState } = await import("./helpers/resource-download-http-harness");
   return {
     productService: {
@@ -54,7 +54,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => "aud_http_download"),
 }));
 
-import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
+import { GET } from "../site/src/app/api/products/[id]/download/route";
 import {
   resourceDownloadHttpContext as context,
   resourceDownloadHttpDownloadStream as downloadStream,

@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/author-resource-forms.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/author-resource-forms.tsx"), "utf8");
 
 /** Honesty lock: new-version uploadBlocked PRODUCT_STATE_CHANGED → ErrorState. */
 it("locks author resource uploadBlocked product-state change to ErrorState", () => {

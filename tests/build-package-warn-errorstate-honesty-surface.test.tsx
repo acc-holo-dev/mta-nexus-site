@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/build-package-screen.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/build-package-screen.tsx"), "utf8");
 
 it("locks legacy/no-baseline package notices to ErrorState without fake retry", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

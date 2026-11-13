@@ -3,7 +3,7 @@ import {
   parseBoundedJson,
   readBoundedText,
   SUPPORT_JSON_MAX_BYTES,
-} from "../apps/web/src/lib/bounded-json";
+} from "../site/src/lib/bounded-json";
 
 const url = "https://nexus.test/api/support";
 const encode = (text: string) => new TextEncoder().encode(text);

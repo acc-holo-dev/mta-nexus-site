@@ -5,10 +5,10 @@ vi.mock("@nexus/db", () => ({
   contentReactionsRepository: { state: mocks.state, set: mocks.set, page: mocks.page },
   publicUserTrustRepository: { find: mocks.trust },
 }));
-import { contentReactionService as service } from "../apps/web/src/lib/services/content-reaction-service";
-import { publicUserTrustService as trust } from "../apps/web/src/lib/services/public-user-trust-service";
-import { publicUserTrustSchema } from "../apps/web/src/lib/public-user-trust-contract";
-import { parseReactionPage } from "../apps/web/src/lib/content-reaction-contract";
+import { contentReactionService as service } from "../site/src/lib/services/content-reaction-service";
+import { publicUserTrustService as trust } from "../site/src/lib/services/public-user-trust-service";
+import { publicUserTrustSchema } from "../site/src/lib/public-user-trust-contract";
+import { parseReactionPage } from "../site/src/lib/content-reaction-contract";
 const actor = { id: "actor", role: "user" } as User;
 const time = "2026-10-11T00:00:00.123456Z";
 beforeEach(() => {

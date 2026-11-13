@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   detail: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
@@ -20,9 +20,9 @@ vi.mock("@nexus/db", () => ({
   commercialPlanRepository: {},
 }));
 
-import { GET as download } from "../apps/web/src/app/api/subscriptions/reviews/[id]/export/route";
-import { GET as detail } from "../apps/web/src/app/api/subscriptions/reviews/[id]/route";
-import { GET as history, POST } from "../apps/web/src/app/api/subscriptions/reviews/route";
+import { GET as download } from "../site/src/app/api/subscriptions/reviews/[id]/export/route";
+import { GET as detail } from "../site/src/app/api/subscriptions/reviews/[id]/route";
+import { GET as history, POST } from "../site/src/app/api/subscriptions/reviews/route";
 
 const base = "/api/subscriptions/reviews",
   context = { params: Promise.resolve({ id: "prev_a" }) };

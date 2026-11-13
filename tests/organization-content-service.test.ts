@@ -9,8 +9,8 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("@nexus/security", () => ({ generateId: (prefix: string) => `${prefix}_generated` }));
 
-import { authorContentService as author } from "../apps/web/src/lib/services/author-content-service";
-import { organizationContentService as service } from "../apps/web/src/lib/services/organization-content-service";
+import { authorContentService as author } from "../site/src/lib/services/author-content-service";
+import { organizationContentService as service } from "../site/src/lib/services/organization-content-service";
 
 const actor = { id: "editor" } as User;
 const input = {

@@ -7,16 +7,16 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
   report: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/db", () => ({ orderTermsRepository: { report: state.report } }));
 
-import { GET as adminExport } from "../apps/web/src/app/api/admin/commerce/orders/[id]/terms/export/route";
-import { GET as admin } from "../apps/web/src/app/api/admin/commerce/orders/[id]/terms/route";
-import { GET as buyerExport } from "../apps/web/src/app/api/orders/[id]/terms/export/route";
-import { GET as buyer } from "../apps/web/src/app/api/orders/[id]/terms/route";
+import { GET as adminExport } from "../site/src/app/api/admin/commerce/orders/[id]/terms/export/route";
+import { GET as admin } from "../site/src/app/api/admin/commerce/orders/[id]/terms/route";
+import { GET as buyerExport } from "../site/src/app/api/orders/[id]/terms/export/route";
+import { GET as buyer } from "../site/src/app/api/orders/[id]/terms/route";
 
 const context = { params: Promise.resolve({ id: "ord_a" }) },
   request = (url: string) => new NextRequest(`https://nexus.test${url}`),

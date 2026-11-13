@@ -10,7 +10,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => `not_generated_${++id}`),
 }));
 
-import { dispatchNotificationsBestEffort } from "../apps/web/src/lib/services/notification-dispatch-service";
+import { dispatchNotificationsBestEffort } from "../site/src/lib/services/notification-dispatch-service";
 
 describe("notification dispatch service", () => {
   beforeEach(() => {

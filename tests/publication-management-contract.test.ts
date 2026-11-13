@@ -3,18 +3,18 @@ import {
   parsePublicationQuery,
   publicationPageQuery,
   publicationPageSchema,
-} from "../apps/web/src/lib/publication-feed-contract";
+} from "../site/src/lib/publication-feed-contract";
 import {
   discussionEditSchema,
   discussionRemoveSchema,
-} from "../apps/web/src/lib/content-discussion-contract";
-import { confirmsDiscussionMutation } from "../apps/web/src/lib/discussion-mutation-confirmation";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+} from "../site/src/lib/content-discussion-contract";
+import { confirmsDiscussionMutation } from "../site/src/lib/discussion-mutation-confirmation";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 import {
   getDiscussionCopy,
   discussionError,
   discussionMutationError,
-} from "../apps/web/src/lib/content-discussion-copy";
+} from "../site/src/lib/content-discussion-copy";
 it.each([
   "?type=bad",
   "?source=bad",

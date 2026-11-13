@@ -43,7 +43,7 @@ docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-
 
 ## Структура
 
-- `apps/web` — страницы, интерфейс, HTTP API и сервисы.
+- `site` — страницы, интерфейс, HTTP API и сервисы.
 - `packages/db` — схема PostgreSQL, миграции, репозитории и работники.
 - `packages/domain`, `validation`, `security`, `storage`, `config`, `ui` — общие правила и компоненты.
 - `tests`, `scripts` — поведенческие проверки и инструменты эксплуатации.

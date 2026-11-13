@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ResourceQaReportForm } from "../apps/web/src/components/resource-qa-report-form";
-import { resourceQaCopy } from "../apps/web/src/lib/resource-qa-i18n";
+import { ResourceQaReportForm } from "../site/src/components/resource-qa-report-form";
+import { resourceQaCopy } from "../site/src/lib/resource-qa-i18n";
 
 describe("ResourceQaReportForm", () => {
   it.each(["en", "ru"] as const)("shows a report CTA for signed-in users in %s", (locale) => {

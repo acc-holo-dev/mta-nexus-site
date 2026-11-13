@@ -3,17 +3,17 @@ import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { statisticsFixture } from "./helpers/server-statistics-fixture";
 const state = vi.hoisted(() => ({ read: vi.fn(), session: vi.fn(), rate: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/server-statistics-service", () => ({
+vi.mock("../site/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { read: state.read },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-import { GET as publicGet } from "../apps/web/src/app/api/servers/[id]/statistics/route";
-import { GET as managedGet } from "../apps/web/src/app/api/workspace/servers/[id]/statistics/route";
-import { GET as publicExport } from "../apps/web/src/app/api/servers/[id]/statistics/export/route";
-import { GET as managedExport } from "../apps/web/src/app/api/workspace/servers/[id]/statistics/export/route";
+import { GET as publicGet } from "../site/src/app/api/servers/[id]/statistics/route";
+import { GET as managedGet } from "../site/src/app/api/workspace/servers/[id]/statistics/route";
+import { GET as publicExport } from "../site/src/app/api/servers/[id]/statistics/export/route";
+import { GET as managedExport } from "../site/src/app/api/workspace/servers/[id]/statistics/export/route";
 const params = { params: Promise.resolve({ id: "server" }) };
 const request = (query = "", cookie = "") =>
   new NextRequest(`https://nexus.test/api/servers/server/statistics${query}`, {

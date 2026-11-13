@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import { licenseArchiveQuery, licenseArchiveUrl } from "../apps/web/src/lib/license-archive-query";
-import { licenseArchiveCsv } from "../apps/web/src/lib/license-archive-csv";
-import { licenseTermNotification } from "../apps/web/src/lib/license-maintenance-i18n";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { licenseArchiveQuery, licenseArchiveUrl } from "../site/src/lib/license-archive-query";
+import { licenseArchiveCsv } from "../site/src/lib/license-archive-csv";
+import { licenseTermNotification } from "../site/src/lib/license-maintenance-i18n";
+import { formatNotification } from "../site/src/lib/notification-copy";
 import { licenseMaintenanceOptions } from "../packages/db/src/license-maintenance-config";
 it("strictly bounds buyer queries and preserves every active filter in navigation", () => {
   const query = licenseArchiveQuery(

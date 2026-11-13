@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
@@ -18,10 +18,10 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: { findById: vi.fn(), listUserMemberships: vi.fn() },
   userRepository: { listModeratorIds: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../site/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: {
     overview: vi.fn(),
     apply: vi.fn(),
@@ -30,9 +30,9 @@ vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
   },
 }));
 
-import { POST as createPublicRequest } from "../apps/web/src/app/api/verification/route";
-import { POST as createWorkspaceRequest } from "../apps/web/src/app/api/workspace/verification/route";
-import { PATCH as amendRequest } from "../apps/web/src/app/api/workspace/verification/[id]/route";
+import { POST as createPublicRequest } from "../site/src/app/api/verification/route";
+import { POST as createWorkspaceRequest } from "../site/src/app/api/workspace/verification/route";
+import { PATCH as amendRequest } from "../site/src/app/api/workspace/verification/[id]/route";
 
 const context = { params: Promise.resolve({ id: "ver_a" }) };
 const mutations = [

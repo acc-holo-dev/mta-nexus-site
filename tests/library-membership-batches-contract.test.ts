@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { libraryMembershipBatchCommandSchema } from "../packages/validation/src/library-collections";
-import { confirmedMembershipBatch } from "../apps/web/src/lib/library-membership-batch-confirmation";
+import { confirmedMembershipBatch } from "../site/src/lib/library-membership-batch-confirmation";
 const requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
   childUUID = "77ca0352-de64-4af9-9e54-7d3c56fe8d89";
 const change = {

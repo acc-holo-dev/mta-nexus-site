@@ -10,22 +10,22 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-history-service", () => ({
+vi.mock("../site/src/lib/services/community-report-history-service", () => ({
   communityReportHistoryService: { page: mock.page },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { CommunityReportHistory } from "../apps/web/src/components/community-report-history";
+import { CommunityReportHistory } from "../site/src/components/community-report-history";
 import {
   CommunityReportHistoryPage,
   reportHistoryMetadata,
-} from "../apps/web/src/components/community-report-history-page";
-import type { ReportHistoryPage } from "../apps/web/src/lib/community-report-history-contract";
-import { reportHistoryCopy } from "../apps/web/src/lib/community-report-history-copy";
+} from "../site/src/components/community-report-history-page";
+import type { ReportHistoryPage } from "../site/src/lib/community-report-history-contract";
+import { reportHistoryCopy } from "../site/src/lib/community-report-history-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = { period: "all" as const, group: "all" as const, query: "" };

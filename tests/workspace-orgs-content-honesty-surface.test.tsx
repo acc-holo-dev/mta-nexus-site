@@ -10,37 +10,37 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import ActivityLoading from "../apps/web/src/app/workspace/organizations/[id]/activity/loading";
-import ContentHistoryLoading from "../apps/web/src/app/workspace/organizations/[id]/content/[contentId]/history/loading";
-import ContentDetailLoading from "../apps/web/src/app/workspace/organizations/[id]/content/[contentId]/loading";
-import ContentLoading from "../apps/web/src/app/workspace/organizations/[id]/content/loading";
-import ContentNewLoading from "../apps/web/src/app/workspace/organizations/[id]/content/new/loading";
-import { organizationGovernanceCopy } from "../apps/web/src/lib/organization-governance-copy";
-import { organizationPublicationHistoryCopy } from "../apps/web/src/lib/organization-publication-history-copy";
+import ActivityLoading from "../site/src/app/workspace/organizations/[id]/activity/loading";
+import ContentHistoryLoading from "../site/src/app/workspace/organizations/[id]/content/[contentId]/history/loading";
+import ContentDetailLoading from "../site/src/app/workspace/organizations/[id]/content/[contentId]/loading";
+import ContentLoading from "../site/src/app/workspace/organizations/[id]/content/loading";
+import ContentNewLoading from "../site/src/app/workspace/organizations/[id]/content/new/loading";
+import { organizationGovernanceCopy } from "../site/src/lib/organization-governance-copy";
+import { organizationPublicationHistoryCopy } from "../site/src/lib/organization-publication-history-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedOrgPages = [
-  "apps/web/src/app/workspace/organizations/[id]/activity/page.tsx",
-  "apps/web/src/app/workspace/organizations/[id]/content/new/page.tsx",
-  "apps/web/src/app/workspace/organizations/[id]/content/[contentId]/page.tsx",
-  "apps/web/src/app/workspace/organizations/[id]/content/[contentId]/history/page.tsx",
+  "site/src/app/workspace/organizations/[id]/activity/page.tsx",
+  "site/src/app/workspace/organizations/[id]/content/new/page.tsx",
+  "site/src/app/workspace/organizations/[id]/content/[contentId]/page.tsx",
+  "site/src/app/workspace/organizations/[id]/content/[contentId]/history/page.tsx",
 ] as const;
 
 const clippedSubscriptionPages = [
-  "apps/web/src/app/workspace/subscriptions/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/activate/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/history/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/reviews/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/reviews/new/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/reviews/[id]/page.tsx",
-  "apps/web/src/app/workspace/subscriptions/receipts/[id]/page.tsx",
+  "site/src/app/workspace/subscriptions/page.tsx",
+  "site/src/app/workspace/subscriptions/activate/page.tsx",
+  "site/src/app/workspace/subscriptions/history/page.tsx",
+  "site/src/app/workspace/subscriptions/reviews/page.tsx",
+  "site/src/app/workspace/subscriptions/reviews/new/page.tsx",
+  "site/src/app/workspace/subscriptions/reviews/[id]/page.tsx",
+  "site/src/app/workspace/subscriptions/receipts/[id]/page.tsx",
 ] as const;
 
 it("locks workspace org activity and content page shells to clipped min-w-0 frames", () => {
@@ -53,7 +53,7 @@ it("locks workspace org activity and content page shells to clipped min-w-0 fram
 });
 
 it("exposes a search landmark on the workspace organizations directory filter", () => {
-  expect(read("apps/web/src/app/workspace/organizations/page.tsx")).toContain(
+  expect(read("site/src/app/workspace/organizations/page.tsx")).toContain(
     "<search aria-label={copy.search}>",
   );
 });
@@ -66,12 +66,10 @@ it("locks residual workspace subscription page shells to clipped min-w-0 frames"
     expect(source).toContain("pageShellClass");
     expect(source).toContain("ErrorState");
   }
-  expect(read("apps/web/src/app/workspace/subscriptions/page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/app/workspace/subscriptions/history/page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/app/workspace/subscriptions/reviews/page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/app/workspace/subscriptions/reviews/new/page.tsx")).toContain(
-    "EmptyState",
-  );
+  expect(read("site/src/app/workspace/subscriptions/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/subscriptions/history/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/subscriptions/reviews/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/app/workspace/subscriptions/reviews/new/page.tsx")).toContain("EmptyState");
 });
 
 it.each([
@@ -105,24 +103,22 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks organization content honesty chrome through shared surfaces and additive i18n", () => {
-  expect(read("apps/web/src/components/organization-history.tsx")).toContain("ErrorState");
-  expect(read("apps/web/src/components/organization-history.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/components/organization-content-editor-page.tsx")).toContain(
+  expect(read("site/src/components/organization-history.tsx")).toContain("ErrorState");
+  expect(read("site/src/components/organization-history.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/organization-content-editor-page.tsx")).toContain("ErrorState");
+  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
     "ErrorState",
   );
-  expect(read("apps/web/src/components/context-publication-history-screen.tsx")).toContain(
-    "ErrorState",
-  );
-  expect(read("apps/web/src/components/context-publication-history-screen.tsx")).toContain(
+  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("apps/web/src/components/context-publication-history-screen.tsx")).toContain(
+  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
     "historyEmptyHint",
   );
-  expect(read("apps/web/src/lib/organization-publication-history-copy.ts")).toContain(
+  expect(read("site/src/lib/organization-publication-history-copy.ts")).toContain(
     "historyEmptyHint",
   );
-  expect(read("apps/web/src/lib/organization-publication-history-copy.ts")).toContain("loading:");
+  expect(read("site/src/lib/organization-publication-history-copy.ts")).toContain("loading:");
   expect(organizationPublicationHistoryCopy("en").historyEmptyHint.length).toBeGreaterThan(0);
   expect(organizationPublicationHistoryCopy("ru").historyEmptyHint.length).toBeGreaterThan(0);
   expect(organizationPublicationHistoryCopy("en").loading.length).toBeGreaterThan(0);

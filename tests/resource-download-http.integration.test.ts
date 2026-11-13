@@ -11,7 +11,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { GET as downloadResource } from "../apps/web/src/app/api/products/[id]/download/route";
+import { GET as downloadResource } from "../site/src/app/api/products/[id]/download/route";
 
 describe("resource download HTTP integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

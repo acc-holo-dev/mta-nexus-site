@@ -2,13 +2,13 @@ import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ listPublicPage: vi.fn(), getProductById: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { listPublicPage: mocks.listPublicPage, getProductById: mocks.getProductById },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: {} }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService: {} }));
 
-import { GET as getProduct } from "../apps/web/src/app/api/products/[id]/route";
-import { GET } from "../apps/web/src/app/api/products/route";
+import { GET as getProduct } from "../site/src/app/api/products/[id]/route";
+import { GET } from "../site/src/app/api/products/route";
 
 describe("public resource catalog HTTP", () => {
   it("returns bounded uncached pages and validates category and sort", async () => {

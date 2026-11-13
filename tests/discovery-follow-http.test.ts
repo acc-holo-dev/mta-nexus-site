@@ -32,22 +32,22 @@ vi.mock("@nexus/db", () => ({
   socialRepository: { isFollowing: mocks.isFollowing },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate, generateId: () => "generated" }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { page: mocks.discover },
 }));
-vi.mock("../apps/web/src/lib/services/follow-workspace-service", () => ({
+vi.mock("../site/src/lib/services/follow-workspace-service", () => ({
   followWorkspaceService: { page: mocks.follows },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../site/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.notifications,
 }));
 
-import { GET as discover } from "../apps/web/src/app/api/discover/route";
-import { DELETE, GET as followState, POST } from "../apps/web/src/app/api/follow/route";
-import { GET as follows } from "../apps/web/src/app/api/workspace/follows/route";
+import { GET as discover } from "../site/src/app/api/discover/route";
+import { DELETE, GET as followState, POST } from "../site/src/app/api/follow/route";
+import { GET as follows } from "../site/src/app/api/workspace/follows/route";
 
 function request(path: string, method = "GET", body?: unknown, locale = "en", headers = {}) {
   return new NextRequest(`http://nexus.test${path}`, {

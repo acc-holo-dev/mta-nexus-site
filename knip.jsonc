@@ -12,7 +12,7 @@
       // optional system runtime for the PowerShell local-verification mock test.
       "ignoreBinaries": ["openssl", "pwsh"]
     },
-    "apps/web": {
+    "site": {
       "entry": ["scripts/**/*.ts"],
       "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
       "next": true

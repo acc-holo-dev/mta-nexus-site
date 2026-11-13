@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/own-discussion-detail.tsx";
+const surface = "site/src/components/own-discussion-detail.tsx";
 
 it("locks own-discussion readonly notice to ErrorState without soft muted caption", () => {
   const source = read(surface);

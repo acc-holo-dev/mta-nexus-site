@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/resource-cart-controls.tsx";
+const surface = "site/src/components/resource-cart-controls.tsx";
 
 it("locks cart item unavailable title to ErrorState", () => {
   const source = read(surface);

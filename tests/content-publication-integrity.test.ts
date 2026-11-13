@@ -6,14 +6,14 @@ const mocks = vi.hoisted(() => ({
   comments: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     getArticleBySlug: mocks.article,
     getComments: mocks.comments,
   },
 }));
 
-import { GET } from "../apps/web/src/app/api/content/[slug]/route";
+import { GET } from "../site/src/app/api/content/[slug]/route";
 
 describe("published content detail HTTP behavior", () => {
   beforeEach(() => {

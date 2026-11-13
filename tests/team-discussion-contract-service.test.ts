@@ -13,7 +13,7 @@ vi.mock("@nexus/db", () => ({
   communityModerationWorkspaceRepository: state,
   discussionManagementRepository: state,
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
 
 import {
   confirmsModeratedDiscussionRemoval,
@@ -21,17 +21,17 @@ import {
   moderatedDiscussionHref,
   moderatedDiscussionRemoveSchema,
   parseModeratedDiscussionQuery,
-} from "../apps/web/src/lib/moderated-discussion-contract";
-import { moderatedDiscussionCopy } from "../apps/web/src/lib/moderated-discussion-copy";
+} from "../site/src/lib/moderated-discussion-contract";
+import { moderatedDiscussionCopy } from "../site/src/lib/moderated-discussion-copy";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
   organizationBatchCommandInput,
   organizationBatchPreviewInput,
-} from "../apps/web/src/lib/organization-batch-contract";
-import { organizationBatchCopy } from "../apps/web/src/lib/organization-batch-copy";
-import { communityModerationService as moderation } from "../apps/web/src/lib/services/community-moderation-service";
-import { organizationWorkspaceService as teams } from "../apps/web/src/lib/services/organization-workspace-service";
+} from "../site/src/lib/organization-batch-contract";
+import { organizationBatchCopy } from "../site/src/lib/organization-batch-copy";
+import { communityModerationService as moderation } from "../site/src/lib/services/community-moderation-service";
+import { organizationWorkspaceService as teams } from "../site/src/lib/services/organization-workspace-service";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z",

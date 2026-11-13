@@ -18,8 +18,8 @@ import {
   previewDiscussionReplay,
   readDiscussionReplayPage,
   resolveDiscussionReplayDatabaseIdentity as resolve,
-} from "../apps/web/scripts/discussion-replay-database";
-import { discussionReplayDatabaseIdentity } from "../apps/web/scripts/discussion-replay-options";
+} from "../site/scripts/discussion-replay-database";
+import { discussionReplayDatabaseIdentity } from "../site/scripts/discussion-replay-options";
 
 const scope = { databaseName: "nexus", databaseOid: "123", commentsOid: "456", followsOid: "789" };
 const url = "postgres://worker:PRIVATE_PASSWORD@db.example/nexus";

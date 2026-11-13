@@ -2,11 +2,11 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ articles: vi.fn(), community: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
 }));
 
-import { GET } from "../apps/web/src/app/api/content/catalog/route";
+import { GET } from "../site/src/app/api/content/catalog/route";
 
 beforeEach(() => {
   vi.clearAllMocks();

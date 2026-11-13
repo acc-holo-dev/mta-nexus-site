@@ -23,15 +23,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/i18n-server", async () => {
+vi.mock("../site/src/lib/i18n-server", async () => {
   const { state: harnessState } = await import("./helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { state: harnessState } = await import("./helpers/resource-review-pages-harness");
   return { authService: { getSession: async () => harnessState.actor } };
 });
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     getProductBySlug: async () => ({
       id: "prd_a",
@@ -56,12 +56,12 @@ vi.mock("@nexus/db", async () => {
 
 setupResourceReviewPages();
 
-import ReviewDetailLoading from "../apps/web/src/app/admin/commerce/reviews/[id]/loading";
-import ReviewsLoading from "../apps/web/src/app/admin/commerce/reviews/loading";
-import Public from "../apps/web/src/app/market/[slug]/reviews/page";
-import { ResourceReviewReportScreen } from "../apps/web/src/components/resource-review-report-screen";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
+import ReviewDetailLoading from "../site/src/app/admin/commerce/reviews/[id]/loading";
+import ReviewsLoading from "../site/src/app/admin/commerce/reviews/loading";
+import Public from "../site/src/app/market/[slug]/reviews/page";
+import { ResourceReviewReportScreen } from "../site/src/components/resource-review-report-screen";
+import { getDictionary } from "../site/src/lib/i18n";
+import { resourceReviewCopy } from "../site/src/lib/resource-review-i18n";
 
 it.each(["en", "ru"] as const)(
   "public %s reviews expose public authors, distinguish legacy evidence and preserve pages",
@@ -234,7 +234,7 @@ it.each(["en", "ru"] as const)(
 );
 it("clips the public reviews loading shell", async () => {
   const { default: MarketReviewsLoading } = await import(
-    "../apps/web/src/app/market/[slug]/reviews/loading"
+    "../site/src/app/market/[slug]/reviews/loading"
   );
   const html = renderToStaticMarkup(await MarketReviewsLoading());
   expect(html).toContain("min-w-0");

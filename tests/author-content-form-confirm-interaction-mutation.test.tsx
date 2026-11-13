@@ -18,7 +18,7 @@ const harness = vi.hoisted(() => ({
   replace: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh, replace: harness.replace }),
@@ -29,8 +29,8 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { AuthorContentForm } from "../apps/web/src/components/author-content-form";
-import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+import { AuthorContentForm } from "../site/src/components/author-content-form";
+import { getUserPlatformCopy } from "../site/src/lib/user-platform-copy";
 
 const { render, archiveButton } = createAuthorContentFormConfirmInteractionHelpers(
   harness,

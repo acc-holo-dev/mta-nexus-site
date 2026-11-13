@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { DiscussionComposeWriteFeedback } from "../apps/web/src/components/content-discussion-compose-feedback";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
-import type { DiscussionComposeDraft } from "../apps/web/src/lib/discussion-compose-draft";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { DiscussionComposeWriteFeedback } from "../site/src/components/content-discussion-compose-feedback";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
+import type { DiscussionComposeDraft } from "../site/src/lib/discussion-compose-draft";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
@@ -16,13 +16,13 @@ const restoredDraft: DiscussionComposeDraft = {
   savedAt: Date.now(),
 };
 
-vi.mock("../apps/web/src/lib/discussion-compose-draft", () => ({
+vi.mock("../site/src/lib/discussion-compose-draft", () => ({
   readDiscussionComposeDraft: () => restoredDraft,
   writeDiscussionComposeDraft: vi.fn(),
   clearDiscussionComposeDraft: vi.fn(),
 }));
 
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
+import { ContentDiscussion } from "../site/src/components/content-discussion";
 
 it("announces a session draft restore in the compose form", () => {
   const html = renderToStaticMarkup(

@@ -14,20 +14,20 @@ module.exports = {
       name: "packages-do-not-import-apps",
       severity: "error",
       // CI scenario scripts may orchestrate the app; package source must not depend on it.
-      from: { path: "^packages/[^/]+/src/" },
-      to: { path: "^apps/" },
+      from: { path: "^(?:site/)?packages/[^/]+/src/" },
+      to: { path: "^(?:apps/|site/(?!packages/))" },
     },
     {
       name: "domain-is-independent",
       severity: "error",
-      from: { path: "^packages/domain/" },
-      to: { path: "^(apps/|packages/(?!domain/))" },
+      from: { path: "^(?:site/)?packages/domain/" },
+      to: { path: "^(?:apps/|site/(?!packages/)|(?:site/)?packages/(?!domain/))" },
     },
     {
       name: "ui-does-not-import-server-packages",
       severity: "error",
-      from: { path: "^packages/ui/" },
-      to: { path: "^packages/(db|storage|security|config)/" },
+      from: { path: "^(?:site/)?packages/ui/" },
+      to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
       name: "http-handlers-use-services-for-db",
@@ -35,10 +35,10 @@ module.exports = {
       comment:
         "API routes must not take a new direct @nexus/db dependency outside the documented read/health or grandfathered service-required lists in docs/ARCHITECTURE.md.",
       from: {
-        path: "^apps/web/src/app/api/",
+        path: "^(?:apps/web|site)/src/app/api/",
         pathNot: HTTP_DB_EXCEPTION_PATH,
       },
-      to: { path: "^packages/db/" },
+      to: { path: "^(?:site/)?packages/db/" },
     },
     {
       name: "no-unresolved-imports",

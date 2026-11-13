@@ -16,11 +16,11 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/lib/organization-workspace-client", () => ({
+vi.mock("../site/src/lib/organization-workspace-client", () => ({
   organizationRequest: h.request,
 }));
 
-import { OrganizationProfileForm } from "../apps/web/src/components/organization-profile-form";
+import { OrganizationProfileForm } from "../site/src/components/organization-profile-form";
 
 const { render, mount, fillFields, submit } = createOrganizationCreateRecoveryInteractionHelpers(
   h,
@@ -28,7 +28,7 @@ const { render, mount, fillFields, submit } = createOrganizationCreateRecoveryIn
 );
 
 it("unlocks a first request rejected before creation", async () => {
-  const { PlatformRequestError } = await import("../apps/web/src/lib/user-platform-client");
+  const { PlatformRequestError } = await import("../site/src/lib/user-platform-client");
   await mount();
   fillFields();
   h.request.mockRejectedValueOnce(

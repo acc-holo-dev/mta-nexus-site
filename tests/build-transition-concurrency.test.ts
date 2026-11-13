@@ -14,7 +14,7 @@ describe("build state transition concurrency", () => {
   it("uses a compare-and-set update for moderation and retirement", () => {
     const repository = readBuildsRepositoryModules();
     const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/product-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/product-service.ts"),
       "utf8",
     );
 

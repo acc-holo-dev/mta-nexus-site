@@ -16,12 +16,12 @@ const h = vi.hoisted(() => ({
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
 
-import { ResourceReleaseWatchControl } from "../apps/web/src/components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../site/src/components/resource-release-watch-control";
 
 const helpers = createResourceReleaseWatchInteractionHelpers(
   h,

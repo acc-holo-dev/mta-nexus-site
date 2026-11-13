@@ -17,11 +17,11 @@ vi.mock("next/link", async () => {
   };
 });
 
-import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
-import ErrorPage from "../apps/web/src/app/error";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { readSafePublicErrorReference } from "../apps/web/src/lib/safe-public-error-reference";
+import GlobalError, { detectGlobalErrorLocale } from "../site/src/app/global-error";
+import ErrorPage from "../site/src/app/error";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { getDictionary } from "../site/src/lib/i18n";
+import { readSafePublicErrorReference } from "../site/src/lib/safe-public-error-reference";
 
 const SECRET = "super-secret-token-do-not-leak";
 const STACK_LINE = "    at boom (/app/secret.ts:1:1)";

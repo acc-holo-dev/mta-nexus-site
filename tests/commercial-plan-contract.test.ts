@@ -10,12 +10,12 @@ import {
   confirmedCommercialPlan,
   confirmedOrderCancellation,
   parseCommercialAmount,
-} from "../apps/web/src/lib/commercial-confirmation";
+} from "../site/src/lib/commercial-confirmation";
 import {
   commercialAdminQuery,
   commercialCatalogQuery,
   commercialQuoteQuery,
-} from "../apps/web/src/lib/commercial-plan-query";
+} from "../site/src/lib/commercial-plan-query";
 
 const terms = {
   titleRu: "Тариф",

@@ -40,8 +40,8 @@ ENV NODE_ENV=production \
 COPY . .
 RUN pnpm install --frozen-lockfile --prod=false
 RUN pnpm build \
-    && test -f apps/web/.next/standalone/apps/web/server.js \
-    && test -d apps/web/.next/static
+    && test -f site/.next/standalone/site/server.js \
+    && test -d site/.next/static
 # Migrations and the optional mail worker intentionally remain TypeScript.
 # Deploy only their production dependency graph instead of copying the whole workspace.
 RUN pnpm --filter @nexus/db --prod deploy /runtime/db \
@@ -58,8 +58,8 @@ FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production HOSTNAME=0.0.0.0
 # The standalone tree contains the traced Next.js server and runtime dependencies.
-COPY --from=build /app/apps/web/.next/standalone/ /app/
-COPY --from=build /app/apps/web/.next/static /app/apps/web/.next/static
+COPY --from=build /app/site/.next/standalone/ /app/
+COPY --from=build /app/site/.next/static /app/site/.next/static
 # Keep the database runtime independently portable for migrations and the opt-in mail worker.
 COPY --from=build /runtime/db /app/packages/db
 COPY --from=build /app/scripts/start-production.sh /app/scripts/start-production.sh

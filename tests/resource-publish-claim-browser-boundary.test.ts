@@ -4,31 +4,31 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
   getClientIp: () => "unknown",
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { claimFreeResource: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/server-claim-service", () => ({
+vi.mock("../site/src/lib/services/server-claim-service", () => ({
   serverClaimService: { issueChallenge: vi.fn(), verifyChallenge: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { transitionResource: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../site/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { command: vi.fn(), detail: vi.fn() },
 }));
 
-import { POST as claim } from "../apps/web/src/app/api/resources/claim/route";
-import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
-import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
-import { POST as lifecycle } from "../apps/web/src/app/api/products/[id]/lifecycle/route";
-import { PATCH as versionCommand } from "../apps/web/src/app/api/products/[id]/builds/[buildId]/route";
+import { POST as claim } from "../site/src/app/api/resources/claim/route";
+import { POST as issueChallenge } from "../site/src/app/api/servers/[id]/claim-challenge/route";
+import { POST as verifyChallenge } from "../site/src/app/api/servers/[id]/claim-challenge/verify/route";
+import { POST as lifecycle } from "../site/src/app/api/products/[id]/lifecycle/route";
+import { PATCH as versionCommand } from "../site/src/app/api/products/[id]/builds/[buildId]/route";
 
 const serverContext = { params: Promise.resolve({ id: "srv_a" }) };
 const productContext = { params: Promise.resolve({ id: "prd_a" }) };

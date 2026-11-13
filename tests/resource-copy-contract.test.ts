@@ -1,12 +1,12 @@
 import { resourceCopyCommandSchema, resourceCopyMetadataSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedResourceCopy } from "../apps/web/src/lib/resource-copy-confirmation";
-import { resourceCopyCopy, resourceCopyError } from "../apps/web/src/lib/resource-copy-i18n";
+import { confirmedResourceCopy } from "../site/src/lib/resource-copy-confirmation";
+import { resourceCopyCopy, resourceCopyError } from "../site/src/lib/resource-copy-i18n";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
   resourceCopyId,
-} from "../apps/web/src/lib/resource-copy-query";
+} from "../site/src/lib/resource-copy-query";
 import { command, metadata, receipt, sourceId, targetId } from "./resource-copy-fixtures";
 
 it("normalizes editable fields and refuses ownership, price, status and artifact injection", () => {

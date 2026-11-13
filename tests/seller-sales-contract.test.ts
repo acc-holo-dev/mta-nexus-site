@@ -1,11 +1,11 @@
 import { type SellerSale, sellerSaleEvidence, sellerSalesWindow } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { sellerSalesCsv } from "../apps/web/src/lib/seller-sales-csv";
+import { sellerSalesCsv } from "../site/src/lib/seller-sales-csv";
 import {
   sellerSalesPageQuery,
   sellerSalesQuery,
   sellerSalesUrl,
-} from "../apps/web/src/lib/seller-sales-query";
+} from "../site/src/lib/seller-sales-query";
 
 const base = {
   orderAmount: 100,

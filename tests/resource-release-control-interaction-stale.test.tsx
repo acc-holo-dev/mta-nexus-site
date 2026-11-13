@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import type { Locale } from "../apps/web/src/lib/i18n";
+import type { Locale } from "../site/src/lib/i18n";
 import {
   ack,
   createResourceReleaseControlInteractionHelpers,
@@ -22,11 +22,11 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 
-import { LibraryReleaseSelectionControls } from "../apps/web/src/components/library-release-selection-controls";
+import { LibraryReleaseSelectionControls } from "../site/src/components/library-release-selection-controls";
 
 const { render, button, click } = createResourceReleaseControlInteractionHelpers(
   harness,

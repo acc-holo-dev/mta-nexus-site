@@ -4,7 +4,7 @@ import { UnauthorizedError } from "@nexus/domain";
 import { generateSessionToken, hashPassword } from "@nexus/security";
 import { eq } from "drizzle-orm";
 import { describe, it } from "vitest";
-import { authService } from "../apps/web/src/lib/services/auth-service";
+import { authService } from "../site/src/lib/services/auth-service";
 import { accountRecoveryBindings } from "../packages/db/src/account-recovery-schema";
 import { auditEvents, db } from "../packages/db/src/client";
 import { authRepository } from "../packages/db/src/repositories/auth";

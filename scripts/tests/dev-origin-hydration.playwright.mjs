@@ -10,7 +10,7 @@ assert(process.env.NEXUS_BROWSER_TOOLS);
 
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { chromium } = require("@playwright/test");
-const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n.ts");
 
 const dictionary = getDictionary("en");
 const origins = [

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(resolve(process.cwd(), "apps/web/src/app/globals.css"), "utf8");
+const css = readFileSync(resolve(process.cwd(), "site/src/app/globals.css"), "utf8");
 
 function block(pattern: RegExp): string {
   const match = css.match(pattern);

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  mtaEndpointKey,
-  mtaListingProfileRecord,
-} from "../apps/web/src/lib/mta-listing-profile-map";
+import { mtaEndpointKey, mtaListingProfileRecord } from "../site/src/lib/mta-listing-profile-map";
 
 describe("mta listing profile map", () => {
   it("normalizes addresses when building endpoint keys and slug records", () => {

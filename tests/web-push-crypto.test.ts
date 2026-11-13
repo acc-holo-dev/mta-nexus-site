@@ -6,7 +6,7 @@ import { WebPushPermanentPayloadError, WebPushPermanentSubscriptionError } from 
 import {
   createVapidAuthorization,
   encryptWebPushMessage,
-} from "../apps/web/src/lib/services/web-push-crypto";
+} from "../site/src/lib/services/web-push-crypto";
 
 function decode(value: string) {
   return Buffer.from(value, "base64url");

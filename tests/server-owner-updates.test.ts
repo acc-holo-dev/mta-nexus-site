@@ -18,13 +18,13 @@ const updateServer = vi.hoisted(() =>
 );
 const getManagedServerDetails = vi.hoisted(() => vi.fn());
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: {
     updateServer,
     getManagedServerDetails,
@@ -37,7 +37,7 @@ vi.mock("@nexus/security", () => ({
   })),
 }));
 
-import { GET, PATCH } from "../apps/web/src/app/api/servers/[id]/route";
+import { GET, PATCH } from "../site/src/app/api/servers/[id]/route";
 
 function request(body: unknown, headers: Record<string, string> = {}) {
   return new NextRequest("https://nexus.test/api/servers/srv_1", {

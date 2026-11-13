@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { reactionCopy } from "../../apps/web/src/lib/content-reaction-copy";
+import { reactionCopy } from "../../site/src/lib/content-reaction-copy";
 import {
   type FlatTestElement,
   findTestButton,

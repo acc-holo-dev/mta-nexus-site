@@ -4,19 +4,19 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: {
     previewVisibility: vi.fn(),
     saveVisibility: vi.fn(),
   },
 }));
 
-import { POST as previewVisibility } from "../apps/web/src/app/api/workspace/servers/visibility/preview/route";
-import { POST as saveVisibility } from "../apps/web/src/app/api/workspace/servers/visibility/route";
+import { POST as previewVisibility } from "../site/src/app/api/workspace/servers/visibility/preview/route";
+import { POST as saveVisibility } from "../site/src/app/api/workspace/servers/visibility/route";
 
 const mutations = [
   ["server visibility preview", previewVisibility],

@@ -23,7 +23,7 @@ vi.mock("@nexus/db", async () => ({
   sessionRepository: (await import("../packages/db/src/repositories/sessions")).sessionRepository,
 }));
 
-import { authService } from "../apps/web/src/lib/services/auth-service";
+import { authService } from "../site/src/lib/services/auth-service";
 
 const NOW = new Date("2026-10-09T09:00:00Z");
 const token = "raw-session-token";

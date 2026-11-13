@@ -19,12 +19,12 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import "./helpers/resource-detail-acquisition-ui-harness";
-import ProductDetailPage, { generateMetadata } from "../apps/web/src/app/market/[slug]/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
-import { authService } from "../apps/web/src/lib/services/auth-service";
-import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { resourceReviewService } from "../apps/web/src/lib/services/resource-review-service";
+import ProductDetailPage, { generateMetadata } from "../site/src/app/market/[slug]/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getRequestLocale } from "../site/src/lib/i18n-server";
+import { authService } from "../site/src/lib/services/auth-service";
+import { commerceService } from "../site/src/lib/services/commerce-service";
+import { resourceReviewService } from "../site/src/lib/services/resource-review-service";
 import {
   deferred,
   productService,

@@ -7,10 +7,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
-  "apps/web/src/components/resource-build-screen.tsx",
-  "apps/web/src/app/workspace/resources/page.tsx",
-  "apps/web/src/app/workspace/resources/[id]/page.tsx",
-  "apps/web/src/app/workspace/resources/[id]/history/page.tsx",
+  "site/src/components/resource-build-screen.tsx",
+  "site/src/app/workspace/resources/page.tsx",
+  "site/src/app/workspace/resources/[id]/page.tsx",
+  "site/src/app/workspace/resources/[id]/history/page.tsx",
 ] as const;
 
 it.each(surfaces)(

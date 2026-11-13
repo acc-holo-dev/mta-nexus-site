@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -48,13 +48,13 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: {
     listServers: mocks.servers,
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: mocks.directory,
   },
@@ -62,13 +62,13 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   mtaLiveStatus: vi.fn(() => "unknown"),
 }));
 
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: {
     search: mocks.search,
   },
 }));
 
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: vi.fn(() => "203.0.113.10"),
 }));
 
@@ -78,13 +78,13 @@ vi.mock("@nexus/security", () => ({
   can: vi.fn(() => false),
 }));
 
-import { GET as getAuthContext } from "../apps/web/src/app/api/auth/context/route";
-import { GET as getContent } from "../apps/web/src/app/api/content/route";
-import { GET as getNotificationPreferences } from "../apps/web/src/app/api/notifications/preferences/route";
-import { GET as getNotifications } from "../apps/web/src/app/api/notifications/route";
-import { GET as getSearch } from "../apps/web/src/app/api/search/route";
-import { GET as getDirectory } from "../apps/web/src/app/api/servers/directory/route";
-import { GET as getServers } from "../apps/web/src/app/api/servers/route";
+import { GET as getAuthContext } from "../site/src/app/api/auth/context/route";
+import { GET as getContent } from "../site/src/app/api/content/route";
+import { GET as getNotificationPreferences } from "../site/src/app/api/notifications/preferences/route";
+import { GET as getNotifications } from "../site/src/app/api/notifications/route";
+import { GET as getSearch } from "../site/src/app/api/search/route";
+import { GET as getDirectory } from "../site/src/app/api/servers/directory/route";
+import { GET as getServers } from "../site/src/app/api/servers/route";
 
 function request(path: string) {
   const value = new NextRequest(`https://nexus.test${path}`);

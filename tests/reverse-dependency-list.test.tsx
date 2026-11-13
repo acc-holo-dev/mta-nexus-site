@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -9,7 +9,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { ReverseDependencyList } from "../apps/web/src/components/reverse-dependency-list";
+import { ReverseDependencyList } from "../site/src/components/reverse-dependency-list";
 
 describe("reverse dependency list behavior", () => {
   it.each(["en", "ru"] as const)(

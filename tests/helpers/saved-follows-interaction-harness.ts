@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { FollowPage } from "../../apps/web/src/lib/follow-workspace-contract";
-import { followCopy } from "../../apps/web/src/lib/follow-workspace-copy";
+import type { FollowPage } from "../../site/src/lib/follow-workspace-contract";
+import { followCopy } from "../../site/src/lib/follow-workspace-copy";
 
 type SavedFollowsHarness = {
   slots: unknown[];

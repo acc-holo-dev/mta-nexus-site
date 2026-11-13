@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { EditableContent } from "../../apps/web/src/lib/user-platform-client";
-import { getUserPlatformCopy } from "../../apps/web/src/lib/user-platform-copy";
+import type { EditableContent } from "../../site/src/lib/user-platform-client";
+import { getUserPlatformCopy } from "../../site/src/lib/user-platform-copy";
 
 type AuthorContentFormConfirmHarness = {
   slots: unknown[];

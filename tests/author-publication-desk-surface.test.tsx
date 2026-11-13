@@ -15,27 +15,27 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/author-content-service", () => ({
+vi.mock("../site/src/lib/services/author-content-service", () => ({
   authorContentService: { desk: state.desk, history: state.history },
 }));
-vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
+vi.mock("../site/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { page: state.feed },
 }));
 
 import History, {
   generateMetadata as historyMetadata,
-} from "../apps/web/src/app/workspace/content/[id]/history/page";
-import Loading from "../apps/web/src/app/workspace/content/loading";
-import Desk, { generateMetadata as deskMetadata } from "../apps/web/src/app/workspace/content/page";
-import Following from "../apps/web/src/app/workspace/feed/page";
-import { FollowWorkspace } from "../apps/web/src/components/follow-workspace";
-import { PublicationFeed } from "../apps/web/src/components/publication-feed";
-import { authorPublicationDeskCopy } from "../apps/web/src/lib/author-publication-desk-copy";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+} from "../site/src/app/workspace/content/[id]/history/page";
+import Loading from "../site/src/app/workspace/content/loading";
+import Desk, { generateMetadata as deskMetadata } from "../site/src/app/workspace/content/page";
+import Following from "../site/src/app/workspace/feed/page";
+import { FollowWorkspace } from "../site/src/components/follow-workspace";
+import { PublicationFeed } from "../site/src/components/publication-feed";
+import { authorPublicationDeskCopy } from "../site/src/lib/author-publication-desk-copy";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 const revision = "2026-10-11T00:00:00.123456Z";
 const cursor = JSON.stringify({

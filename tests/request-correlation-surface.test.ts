@@ -18,11 +18,11 @@ describe("request correlation lint policy", () => {
     };
 
     const policy = config.overrides?.find((override) =>
-      override.includes?.includes("apps/web/src/app/api/**"),
+      override.includes?.includes("site/src/app/api/**"),
     );
 
     expect(policy).toBeTruthy();
-    expect(policy?.includes).toEqual(["apps/web/src/app/api/**"]);
+    expect(policy?.includes).toEqual(["site/src/app/api/**"]);
     expect(policy?.linter?.rules?.suspicious?.noConsole).toBe("error");
   });
 });

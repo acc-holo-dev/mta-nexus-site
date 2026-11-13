@@ -1,4 +1,4 @@
-vi.mock("../apps/web/src/components/library-membership-batch", () => ({
+vi.mock("../site/src/components/library-membership-batch", () => ({
   LibraryMembershipBatchForm: () => <div data-membership-batch="review" />,
 }));
 
@@ -26,14 +26,14 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { resourceMemberships: state.report },
 }));
-vi.mock("../apps/web/src/components/library-collection-command", () => ({
+vi.mock("../site/src/components/library-collection-command", () => ({
   LibraryCollectionCommandForm: ({
     collection,
     action,
@@ -60,9 +60,9 @@ vi.mock("../apps/web/src/components/library-collection-command", () => ({
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/[id]/collections/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+} from "../site/src/app/workspace/library/[id]/collections/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
 
 const collection = {
   id: "lcol_a",

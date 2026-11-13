@@ -5,8 +5,8 @@ import {
   buildCommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
-} from "../apps/web/src/lib/community-topic-submission";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/lib/community-topic-submission";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   pathname: "/community",
@@ -34,29 +34,29 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),
   }),
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession } }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService: { getSession } }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     pageCommunity: listCommunityTopics,
   },
 }));
 
-import NewCommunityTopicPage from "../apps/web/src/app/community/new/page";
-import CommunityPage from "../apps/web/src/app/community/page";
-import { CommunityTopicForm } from "../apps/web/src/components/community-topic-form";
-import { Sidebar } from "../apps/web/src/components/sidebar";
+import NewCommunityTopicPage from "../site/src/app/community/new/page";
+import CommunityPage from "../site/src/app/community/page";
+import { CommunityTopicForm } from "../site/src/components/community-topic-form";
+import { Sidebar } from "../site/src/components/sidebar";
 
 describe("community topic submission behavior", () => {
   beforeEach(() => {

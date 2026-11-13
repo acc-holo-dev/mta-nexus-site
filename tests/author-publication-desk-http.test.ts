@@ -10,17 +10,17 @@ const state = vi.hoisted(() => ({
   restore: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/author-content-service", () => ({
+vi.mock("../site/src/lib/services/author-content-service", () => ({
   authorContentService: { desk: state.desk, history: state.history, restore: state.restore },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-import { GET as history } from "../apps/web/src/app/api/workspace/content/[id]/history/route";
-import { POST as restore } from "../apps/web/src/app/api/workspace/content/[id]/restore/route";
-import { GET as desk } from "../apps/web/src/app/api/workspace/content/desk/route";
+import { GET as history } from "../site/src/app/api/workspace/content/[id]/history/route";
+import { POST as restore } from "../site/src/app/api/workspace/content/[id]/restore/route";
+import { GET as desk } from "../site/src/app/api/workspace/content/desk/route";
 
 const params = { params: Promise.resolve({ id: "article" }) },
   revision = "2026-10-11T00:00:00.123456Z";

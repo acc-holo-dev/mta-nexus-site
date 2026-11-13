@@ -12,19 +12,19 @@ vi.mock("@nexus/security", async (importOriginal) => {
     consumeRateLimit: vi.fn(async () => ({ success: licenseControlHttpState.allowed })),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { licenseControlHttpState } = await import("./helpers/license-control-http-harness");
   return {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 
-import { GET as staffActivity } from "../apps/web/src/app/api/admin/licenses/[id]/activity/route";
-import { GET as activity } from "../apps/web/src/app/api/licenses/[id]/activity/route";
-import { GET as detail } from "../apps/web/src/app/api/licenses/[id]/route";
-import { GET as runtimeConfig } from "../apps/web/src/app/api/licenses/[id]/runtime-config/route";
-import { GET as servers } from "../apps/web/src/app/api/licenses/[id]/servers/route";
+import { GET as staffActivity } from "../site/src/app/api/admin/licenses/[id]/activity/route";
+import { GET as activity } from "../site/src/app/api/licenses/[id]/activity/route";
+import { GET as detail } from "../site/src/app/api/licenses/[id]/route";
+import { GET as runtimeConfig } from "../site/src/app/api/licenses/[id]/runtime-config/route";
+import { GET as servers } from "../site/src/app/api/licenses/[id]/servers/route";
 import {
   licenseControlHttpContext as context,
   installLicenseControlHttpLifecycle,

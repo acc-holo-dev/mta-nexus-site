@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { ObjectReportForm } from "../apps/web/src/components/object-report-form";
-import { platformReportCopy } from "../apps/web/src/lib/platform-report-i18n";
+import { ObjectReportForm } from "../site/src/components/object-report-form";
+import { platformReportCopy } from "../site/src/lib/platform-report-i18n";
 
 vi.mock("@nexus/ui", async () => {
   const React = await import("react");
@@ -16,7 +16,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/guest-auth-links", () => ({
+vi.mock("../site/src/components/guest-auth-links", () => ({
   GuestAuthLinks: ({ signInLabel }: { signInLabel: string }) => (
     <a href="/auth/login">{signInLabel}</a>
   ),

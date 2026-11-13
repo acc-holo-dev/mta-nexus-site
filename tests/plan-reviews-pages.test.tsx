@@ -26,11 +26,11 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/plan-reviews-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/plan-reviews-service", () => ({
   planReviewsService: {
     detail: state.detail,
     page: state.page,
@@ -38,17 +38,17 @@ vi.mock("../apps/web/src/lib/services/plan-reviews-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
 import { commercialFeeEstimate } from "@nexus/domain";
-import ReviewDetailLoading from "../apps/web/src/app/workspace/subscriptions/reviews/[id]/loading";
-import Detail from "../apps/web/src/app/workspace/subscriptions/reviews/[id]/page";
-import ReviewsLoading from "../apps/web/src/app/workspace/subscriptions/reviews/loading";
-import New from "../apps/web/src/app/workspace/subscriptions/reviews/new/page";
-import History from "../apps/web/src/app/workspace/subscriptions/reviews/page";
-import { planReviewsCopy } from "../apps/web/src/lib/plan-reviews-i18n";
+import ReviewDetailLoading from "../site/src/app/workspace/subscriptions/reviews/[id]/loading";
+import Detail from "../site/src/app/workspace/subscriptions/reviews/[id]/page";
+import ReviewsLoading from "../site/src/app/workspace/subscriptions/reviews/loading";
+import New from "../site/src/app/workspace/subscriptions/reviews/new/page";
+import History from "../site/src/app/workspace/subscriptions/reviews/page";
+import { planReviewsCopy } from "../site/src/lib/plan-reviews-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const terms = {

@@ -3,31 +3,31 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const auth = vi.hoisted(() => ({ getSession: vi.fn(async () => null) }));
 const rate = vi.hoisted(() => vi.fn());
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: auth }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService: auth }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: rate }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({ commerceService: {} }));
-vi.mock("../apps/web/src/lib/services/commercial-plan-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({ commerceService: {} }));
+vi.mock("../site/src/lib/services/commercial-plan-service", () => ({
   commercialPlanService: {},
   orderOperationsService: {},
 }));
-vi.mock("../apps/web/src/lib/services/order-case-service", () => ({ orderCaseService: {} }));
-vi.mock("../apps/web/src/lib/services/subscriptions-service", () => ({ subscriptionsService: {} }));
-vi.mock("../apps/web/src/lib/services/plan-reviews-service", () => ({ planReviewsService: {} }));
-vi.mock("../apps/web/src/lib/services/resource-review-service", () => ({
+vi.mock("../site/src/lib/services/order-case-service", () => ({ orderCaseService: {} }));
+vi.mock("../site/src/lib/services/subscriptions-service", () => ({ subscriptionsService: {} }));
+vi.mock("../site/src/lib/services/plan-reviews-service", () => ({ planReviewsService: {} }));
+vi.mock("../site/src/lib/services/resource-review-service", () => ({
   resourceReviewService: {},
 }));
 
-import { POST as orderCase } from "../apps/web/src/app/api/admin/commerce/order-cases/[id]/route";
-import { POST as editPlan } from "../apps/web/src/app/api/admin/commerce/plans/[id]/route";
-import { POST as createPlan } from "../apps/web/src/app/api/admin/commerce/plans/route";
-import { POST as reviewReport } from "../apps/web/src/app/api/admin/commerce/reviews/[id]/route";
-import { POST as checkout } from "../apps/web/src/app/api/checkout/route";
-import { POST as cancel } from "../apps/web/src/app/api/orders/[id]/cancel/route";
-import { POST as support } from "../apps/web/src/app/api/orders/[id]/support/route";
-import { POST as acquire } from "../apps/web/src/app/api/resources/cart/acquire/route";
-import { POST as add, DELETE as remove } from "../apps/web/src/app/api/resources/cart/route";
-import { POST as subscription } from "../apps/web/src/app/api/subscriptions/account/route";
-import { POST as planReview } from "../apps/web/src/app/api/subscriptions/reviews/route";
+import { POST as orderCase } from "../site/src/app/api/admin/commerce/order-cases/[id]/route";
+import { POST as editPlan } from "../site/src/app/api/admin/commerce/plans/[id]/route";
+import { POST as createPlan } from "../site/src/app/api/admin/commerce/plans/route";
+import { POST as reviewReport } from "../site/src/app/api/admin/commerce/reviews/[id]/route";
+import { POST as checkout } from "../site/src/app/api/checkout/route";
+import { POST as cancel } from "../site/src/app/api/orders/[id]/cancel/route";
+import { POST as support } from "../site/src/app/api/orders/[id]/support/route";
+import { POST as acquire } from "../site/src/app/api/resources/cart/acquire/route";
+import { POST as add, DELETE as remove } from "../site/src/app/api/resources/cart/route";
+import { POST as subscription } from "../site/src/app/api/subscriptions/account/route";
+import { POST as planReview } from "../site/src/app/api/subscriptions/reviews/route";
 
 const context = { params: Promise.resolve({ id: "target_a" }) };
 const routes = [

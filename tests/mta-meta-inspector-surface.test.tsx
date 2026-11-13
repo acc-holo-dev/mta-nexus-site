@@ -1,12 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
@@ -18,8 +18,8 @@ import {
   metaInspectorClientPolicy,
   metaInspectorPreview,
   requestMtaMetaInspection,
-} from "../apps/web/src/components/mta-meta-inspector-panel";
-import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
+} from "../site/src/components/mta-meta-inspector-panel";
+import { NewResourceForm } from "../site/src/components/new-resource-form";
 
 describe("author-facing MTA meta inspector", () => {
   it.each(["en", "ru"] as const)(

@@ -12,7 +12,7 @@ vi.mock("@nexus/db", () => ({
   productRepository: {},
   organizationRepository: {},
 }));
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 const input = {
   productId: "prd_target",

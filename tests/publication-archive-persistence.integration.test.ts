@@ -3,11 +3,11 @@ import { afterEach, expect, it } from "vitest";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db, publicationFeedRepository as feed, userRepository } from "@nexus/db";
 import { content, servers, userProfilePreferences, users } from "../packages/db/src/schema";
-import { publicationFeedService as service } from "../apps/web/src/lib/services/publication-feed-service";
+import { publicationFeedService as service } from "../site/src/lib/services/publication-feed-service";
 import {
   parsePublicationQuery,
   publicationPageQuery,
-} from "../apps/web/src/lib/publication-feed-contract";
+} from "../site/src/lib/publication-feed-contract";
 const actorIds: string[] = [],
   serverIds: string[] = [];
 afterEach(async () => {

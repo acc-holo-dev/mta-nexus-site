@@ -1,11 +1,11 @@
 import { expect, it } from "vitest";
 import { licenseOwnerCommandSchema, licenseReleaseCheckSchema } from "@nexus/validation";
-import { confirmedLicenseControl } from "../apps/web/src/lib/license-control-confirmation";
-import { licenseRuntimePage } from "../apps/web/src/lib/license-runtime-query";
+import { confirmedLicenseControl } from "../site/src/lib/license-control-confirmation";
+import { licenseRuntimePage } from "../site/src/lib/license-runtime-query";
 import {
   confirmLicenseRelease,
   parseLicenseRuntimeContext,
-} from "../apps/web/src/lib/license-runtime-response";
+} from "../site/src/lib/license-runtime-response";
 
 const checkedAt = "2026-10-11T01:00:00.000Z";
 const command = {

@@ -13,11 +13,11 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
@@ -25,8 +25,8 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/articles/article",
 }));
 
-import { ContentFollowControls } from "../apps/web/src/components/content-follow-controls";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { ContentFollowControls } from "../site/src/components/content-follow-controls";
+import { followCopy } from "../site/src/lib/follow-workspace-copy";
 
 const { render, saveToggle } = createContentFollowControlsInteractionHelpers(
   harness,

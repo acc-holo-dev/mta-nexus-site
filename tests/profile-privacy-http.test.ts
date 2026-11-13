@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../apps/web/src/lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../site/src/lib/profile-privacy-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -9,15 +9,15 @@ const mocks = vi.hoisted(() => ({
   own: vi.fn(),
   update: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
+vi.mock("../site/src/lib/services/profile-privacy-service", () => ({
   profilePrivacyService: { own: mocks.own, update: mocks.update },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
-import { GET, PATCH } from "../apps/web/src/app/api/account/privacy/route";
+import { GET, PATCH } from "../site/src/app/api/account/privacy/route";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const actor = { id: "actor", role: "user" };

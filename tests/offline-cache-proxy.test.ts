@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
-import { config, proxy } from "../apps/web/src/proxy";
+import { config, proxy } from "../site/src/proxy";
 
 function request(pathname: string, options: { cookie?: string; method?: string } = {}) {
   return new NextRequest(`https://nexus.test${pathname}`, {

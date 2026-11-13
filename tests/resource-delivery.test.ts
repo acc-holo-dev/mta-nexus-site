@@ -3,8 +3,8 @@ import { buildRepository, sessionRepository, userRepository } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
 import { storageService } from "@nexus/storage";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { productService } from "../apps/web/src/lib/services/product-service";
+import { commerceService } from "../site/src/lib/services/commerce-service";
+import { productService } from "../site/src/lib/services/product-service";
 import { assignIntegrationStaffPassword } from "./integration-staff-password";
 
 describe("free resource delivery lifecycle", () => {

@@ -25,30 +25,30 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   resourceModerationService: {
     page: state.staff,
     detail: state.staffDetail,
     publisherHistory: state.publisher,
   },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { getManagedProduct: state.managed },
 }));
-vi.mock("../apps/web/src/components/resource-moderation-controls", () => ({
+vi.mock("../site/src/components/resource-moderation-controls", () => ({
   ResourceModerationControls: ({ product }: { product: { status: string } }) => (
     <span data-status={product.status}>Moderation</span>
   ),
 }));
 
-import StaffDetail from "../apps/web/src/app/admin/resources/[id]/page";
-import Staff from "../apps/web/src/app/admin/resources/page";
-import Publisher from "../apps/web/src/app/workspace/resources/[id]/moderation/page";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+import StaffDetail from "../site/src/app/admin/resources/[id]/page";
+import Staff from "../site/src/app/admin/resources/page";
+import Publisher from "../site/src/app/workspace/resources/[id]/moderation/page";
+import { getResourceReleaseControlCopy } from "../site/src/lib/resource-release-control-i18n";
 
 const input = {
   params: Promise.resolve({ id: "prd_a" }),

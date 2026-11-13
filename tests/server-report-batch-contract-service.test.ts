@@ -20,15 +20,15 @@ import {
   confirmsReportBatchPreview,
   reportBatchCommandInput,
   reportBatchPreviewInput,
-} from "../apps/web/src/lib/report-batch-contract";
-import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
+} from "../site/src/lib/report-batch-contract";
+import { reportBatchCopy } from "../site/src/lib/report-batch-copy";
 import {
   confirmedServerPublicationRestore,
   serverPublicationHistorySchema,
-} from "../apps/web/src/lib/server-publication-history-contract";
-import { serverPublicationHistoryCopy } from "../apps/web/src/lib/server-publication-history-copy";
-import { communityReportService as reports } from "../apps/web/src/lib/services/community-report-service";
-import { serverContentService as servers } from "../apps/web/src/lib/services/server-content-service";
+} from "../site/src/lib/server-publication-history-contract";
+import { serverPublicationHistoryCopy } from "../site/src/lib/server-publication-history-copy";
+import { communityReportService as reports } from "../site/src/lib/services/community-report-service";
+import { serverContentService as servers } from "../site/src/lib/services/server-content-service";
 
 const actor = { id: "staff", role: "moderator" } as User,
   time = "2026-10-11T00:00:00.123456Z",

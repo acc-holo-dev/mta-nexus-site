@@ -14,13 +14,13 @@ const harness = vi.hoisted(() => ({
   refresh: vi.fn(),
   confirm: vi.fn(async () => true),
 }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction: harness.confirm }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction: harness.confirm }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: harness.push, refresh: harness.refresh }),
 }));
 
-import { LibraryCollectionCommandForm } from "../apps/web/src/components/library-collection-command";
+import { LibraryCollectionCommandForm } from "../site/src/components/library-collection-command";
 
 const { render, mount, changeName, submit, collectionPosts } =
   createLibraryCollectionCreateRecoveryInteractionHelpers(harness, LibraryCollectionCommandForm);

@@ -16,14 +16,14 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: harness.locale, dictionary: getDictionary(harness.locale) }),
   };
 });
 
-import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
+import { ServerDetailsForm } from "../site/src/components/server-details-form";
 
 const { render, submit } = createServerDetailsDraftInteractionHelpers(harness, ServerDetailsForm);
 

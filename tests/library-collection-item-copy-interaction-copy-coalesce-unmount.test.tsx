@@ -15,7 +15,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { LibraryCollectionItemCopyForm } from "../apps/web/src/components/library-collection-item-copy";
+import { LibraryCollectionItemCopyForm } from "../site/src/components/library-collection-item-copy";
 
 const { render, submit, reviewed, success } = createLibraryCollectionItemCopyInteractionHelpers(
   harness,

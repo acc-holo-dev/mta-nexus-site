@@ -7,7 +7,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: supportRouteAfterMock };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { supportRouteMocks } = await import("./helpers/support-route-harness");
   return { authService: { getSession: supportRouteMocks.session } };
 });
@@ -22,16 +22,13 @@ vi.mock("@nexus/db", async () => {
   return createSupportRouteDbMock();
 });
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", async () => {
+vi.mock("../site/src/lib/services/notification-dispatch-service", async () => {
   const { supportRouteMocks } = await import("./helpers/support-route-harness");
   return { dispatchNotificationsBestEffort: supportRouteMocks.dispatch };
 });
 
-import {
-  POST as addMessage,
-  PATCH as updateCase,
-} from "../apps/web/src/app/api/support/[id]/route";
-import { POST as createCase } from "../apps/web/src/app/api/support/route";
+import { POST as addMessage, PATCH as updateCase } from "../site/src/app/api/support/[id]/route";
+import { POST as createCase } from "../site/src/app/api/support/route";
 import {
   expectSupportPrivate,
   installSupportRouteLifecycle,

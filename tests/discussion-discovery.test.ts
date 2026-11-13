@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { parseDiscussionQuery } from "../apps/web/src/lib/content-discussion-contract";
+import { parseDiscussionQuery } from "../site/src/lib/content-discussion-contract";
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],

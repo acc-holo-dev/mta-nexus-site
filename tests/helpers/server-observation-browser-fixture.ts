@@ -1,4 +1,4 @@
-import type { ServerObservationBrowserResult } from "../../apps/web/src/lib/services/server-statistics-service";
+import type { ServerObservationBrowserResult } from "../../site/src/lib/services/server-statistics-service";
 import { statisticsFixture } from "./server-statistics-fixture";
 export function observationBrowserFixture(): ServerObservationBrowserResult {
   const report = statisticsFixture();

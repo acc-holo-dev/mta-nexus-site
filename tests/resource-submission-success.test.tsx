@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -17,7 +17,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourceSubmissionSuccess } from "../apps/web/src/components/resource-submission-success";
+import { ResourceSubmissionSuccess } from "../site/src/components/resource-submission-success";
 
 describe("resource submission success state", () => {
   it.each(["en", "ru"] as const)(

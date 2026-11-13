@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { AddResourceToCart } from "../apps/web/src/components/resource-cart-controls";
-import { ResourceReleaseWatchControl } from "../apps/web/src/components/resource-release-watch-control";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { AddResourceToCart } from "../site/src/components/resource-cart-controls";
+import { ResourceReleaseWatchControl } from "../site/src/components/resource-release-watch-control";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/market/resource",

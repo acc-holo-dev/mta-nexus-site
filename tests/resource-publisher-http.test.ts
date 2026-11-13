@@ -7,15 +7,15 @@ const state = vi.hoisted(() => ({
   inventory: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/db", () => ({
   resourcePublisherRepository: { inventory: state.inventory, history: state.history },
 }));
-import { GET as inventory } from "../apps/web/src/app/api/workspace/resources/route";
-import { GET as history } from "../apps/web/src/app/api/products/[id]/history/route";
+import { GET as inventory } from "../site/src/app/api/workspace/resources/route";
+import { GET as history } from "../site/src/app/api/products/[id]/history/route";
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 beforeEach(() => {
   vi.clearAllMocks();

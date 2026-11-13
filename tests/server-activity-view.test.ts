@@ -8,7 +8,7 @@ import {
   getServerActivityCopy,
   parseServerActivityCursor,
   serverActivityHref,
-} from "../apps/web/src/lib/server-activity-view";
+} from "../site/src/lib/server-activity-view";
 
 it.each([undefined, null, [], ["aud_1"], "", " ", "a/b", "<script>", "a".repeat(129), 123])(
   "rejects invalid or ambiguous URL cursor %j",

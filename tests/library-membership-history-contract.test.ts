@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
-} from "../apps/web/src/lib/library-membership-history-query";
+} from "../site/src/lib/library-membership-history-query";
 it("defaults to bounded thirty-day group history and round-trips all selectors", () => {
   expect(libraryMembershipHistoryQuery(new URLSearchParams())).toEqual({
     page: 1,

@@ -4,7 +4,7 @@ import {
   isPublicWebPushAddress,
   parseWebPushEndpoint,
   resolveWebPushTarget,
-} from "../apps/web/src/lib/services/web-push-endpoint-policy";
+} from "../site/src/lib/services/web-push-endpoint-policy";
 
 describe("Web Push endpoint policy", () => {
   it("accepts an ordinary HTTPS push-service endpoint", () => {

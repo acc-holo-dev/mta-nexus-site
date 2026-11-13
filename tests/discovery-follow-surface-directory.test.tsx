@@ -17,19 +17,19 @@ vi.mock("@nexus/db", async () => {
     followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "./helpers/discovery-follow-surface-harness"
   );
   return { authService: { getSession: mocks.viewer } };
 });
-vi.mock("../apps/web/src/lib/services/discovery-service", async () => {
+vi.mock("../site/src/lib/services/discovery-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "./helpers/discovery-follow-surface-harness"
   );
   return { discoveryService: { page: mocks.page } };
 });
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../site/src/lib/services/mta-master-directory-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "./helpers/discovery-follow-surface-harness"
   );
@@ -38,18 +38,18 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () =>
     indexMtaObservations: () => () => null,
   };
 });
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
-vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
-vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
-vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
+vi.mock("../site/src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../site/src/components/server-card", () => ({ ServerCard: () => null }));
+vi.mock("../site/src/components/article-card", () => ({ ArticleCard: () => null }));
 
-import { DirectoryFilters, DirectoryResults } from "../apps/web/src/components/discovery-directory";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
-import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
-import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { DirectoryFilters, DirectoryResults } from "../site/src/components/discovery-directory";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { parseDiscoverQuery } from "../site/src/lib/discover-query";
+import { discoveryCopy } from "../site/src/lib/discovery-copy";
+import { followActionCopy, followCopy } from "../site/src/lib/follow-workspace-copy";
 
 setupDiscoveryFollowSurface();
 
@@ -203,8 +203,8 @@ it.each([
   ["update", "ru", "Обновление"],
 ] as const)("localizes %s cards in %s", async (type, locale, label) => {
   const { ArticleCard } = await vi.importActual<
-    typeof import("../apps/web/src/components/article-card")
-  >("../apps/web/src/components/article-card");
+    typeof import("../site/src/components/article-card")
+  >("../site/src/components/article-card");
   const article: Content = {
     id: "content",
     slug: "entry",

@@ -6,17 +6,17 @@ const state = vi.hoisted(() => ({
   allowed: true,
   find: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
-vi.mock("../apps/web/src/lib/services/community-topic-recovery-service", () => ({
+vi.mock("../site/src/lib/services/community-topic-recovery-service", () => ({
   communityTopicRecoveryService: { findOwned: state.find },
 }));
 
-import { GET } from "../apps/web/src/app/api/content/recovery/route";
+import { GET } from "../site/src/app/api/content/recovery/route";
 
 function request(query = "slug=my-topic-123", actor = "usr_a") {
   return new NextRequest(`https://nexus.test/api/content/recovery?${query}`, {

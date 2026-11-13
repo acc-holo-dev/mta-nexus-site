@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,
-} from "../apps/web/src/lib/library-collection-history-query";
+} from "../site/src/lib/library-collection-history-query";
 import { libraryCollectionReceiptSchema } from "../packages/validation/src/library-collections";
 it("defaults to a bounded thirty-day own history and preserves all filters in links", () => {
   expect(libraryCollectionHistoryQuery(new URLSearchParams())).toEqual({

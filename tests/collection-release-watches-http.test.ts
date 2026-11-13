@@ -8,14 +8,14 @@ const h = vi.hoisted(() => ({
   page: vi.fn(),
   enable: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => "aud_a" }));
 vi.mock("@nexus/db", () => ({
   resourceReleaseWatchesRepository: { collectionPage: h.page, enableCollectionBatch: h.enable },
 }));
-import { GET, POST } from "../apps/web/src/app/api/library/collections/[id]/watches/route";
+import { GET, POST } from "../site/src/app/api/library/collections/[id]/watches/route";
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 const command = {
   expectedCollectionRevision: 3,

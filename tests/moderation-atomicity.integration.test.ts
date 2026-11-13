@@ -17,7 +17,7 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
+import { POST as adminAction } from "../site/src/app/api/admin/actions/route";
 
 function adminRequest(token: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/admin/actions", {

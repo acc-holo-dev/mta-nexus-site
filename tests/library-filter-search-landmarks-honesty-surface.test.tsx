@@ -7,9 +7,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const filterSurfaces = [
-  "apps/web/src/components/collection-releases-screen.tsx",
-  "apps/web/src/app/workspace/library/collections/resources/page.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/compare/page.tsx",
+  "site/src/components/collection-releases-screen.tsx",
+  "site/src/app/workspace/library/collections/resources/page.tsx",
+  "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
 ] as const;
 
 it("exposes search landmarks and touch-sized filter inputs on residual library filters", () => {

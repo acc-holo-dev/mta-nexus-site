@@ -10,24 +10,21 @@ vi.mock("@nexus/db", () => ({
   discussionWorkspaceRepository: { page: mocks.page, find: mocks.find, mutate: mocks.mutate },
   publicVerificationHistoryRepository: { page: mocks.approvals },
 }));
-import { discussionWorkspaceService as own } from "../apps/web/src/lib/services/discussion-workspace-service";
-import { publicVerificationHistoryService as approvals } from "../apps/web/src/lib/services/public-verification-history-service";
+import { discussionWorkspaceService as own } from "../site/src/lib/services/discussion-workspace-service";
+import { publicVerificationHistoryService as approvals } from "../site/src/lib/services/public-verification-history-service";
 import {
   ownDiscussionHref,
   ownDiscussionPageSchema,
   ownDiscussionSchema,
   parseOwnDiscussionQuery,
-} from "../apps/web/src/lib/discussion-workspace-contract";
+} from "../site/src/lib/discussion-workspace-contract";
 import {
   approvalPageHref,
   parseApprovalQuery,
   publicApprovalPageSchema,
-} from "../apps/web/src/lib/public-verification-history-contract";
-import {
-  ownDiscussionCopy,
-  ownDiscussionError,
-} from "../apps/web/src/lib/discussion-workspace-copy";
-import { approvalCopy, approvalError } from "../apps/web/src/lib/public-verification-history-copy";
+} from "../site/src/lib/public-verification-history-contract";
+import { ownDiscussionCopy, ownDiscussionError } from "../site/src/lib/discussion-workspace-copy";
+import { approvalCopy, approvalError } from "../site/src/lib/public-verification-history-copy";
 const actor = { id: "actor", role: "user" } as User,
   time = "2026-10-11T00:00:00.123456Z";
 const row = {

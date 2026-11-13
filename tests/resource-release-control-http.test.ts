@@ -15,7 +15,7 @@ const state = vi.hoisted(() => ({
   publisher: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -42,14 +42,14 @@ vi.mock("@nexus/security", () => ({
 import {
   POST as moderate,
   GET as staffDetail,
-} from "../apps/web/src/app/api/admin/resources/[id]/route";
-import { GET as staffPage } from "../apps/web/src/app/api/admin/resources/route";
+} from "../site/src/app/api/admin/resources/[id]/route";
+import { GET as staffPage } from "../site/src/app/api/admin/resources/route";
 import {
   GET as libraryDetail,
   POST as select,
-} from "../apps/web/src/app/api/library/releases/[id]/route";
-import { GET as libraryPage } from "../apps/web/src/app/api/library/releases/route";
-import { GET as publisher } from "../apps/web/src/app/api/products/[id]/moderation/route";
+} from "../site/src/app/api/library/releases/[id]/route";
+import { GET as libraryPage } from "../site/src/app/api/library/releases/route";
+import { GET as publisher } from "../site/src/app/api/products/[id]/moderation/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   fixed = { mode: "fixed", expectedRevision: 0, buildId: "bld_a" };

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -31,11 +31,11 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -62,7 +62,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/admin-service", () => ({
+vi.mock("../site/src/lib/services/admin-service", () => ({
   adminService: {
     getSystemHealthMetrics: mocks.health,
     listReports: mocks.listReports,
@@ -70,7 +70,7 @@ vi.mock("../apps/web/src/lib/services/admin-service", () => ({
   },
 }));
 
-import AdminPage from "../apps/web/src/app/admin/page";
+import AdminPage from "../site/src/app/admin/page";
 
 describe("moderation queue admin boundary", () => {
   beforeEach(() => {

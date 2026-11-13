@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { recordedLibraryRelease } from "../packages/domain/src/library-release-history";
-import { libraryReleaseHistoryQuery } from "../apps/web/src/lib/library-release-history-query";
+import { libraryReleaseHistoryQuery } from "../site/src/lib/library-release-history-query";
 it("projects only recorded selection fields and an origin label", () => {
   expect(
     recordedLibraryRelease({

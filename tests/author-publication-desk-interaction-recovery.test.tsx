@@ -16,14 +16,14 @@ const harness = vi.hoisted(() => ({
   reload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { AuthorPublicationRestore } from "../apps/web/src/components/author-publication-restore";
-import { authorPublicationDeskCopy } from "../apps/web/src/lib/author-publication-desk-copy";
+import { AuthorPublicationRestore } from "../site/src/components/author-publication-restore";
+import { authorPublicationDeskCopy } from "../site/src/lib/author-publication-desk-copy";
 
 const { render, button, click, errorState, hasErrorAlert } =
   createAuthorPublicationDeskInteractionHelpers(harness, AuthorPublicationRestore, confirmAction);

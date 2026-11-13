@@ -15,12 +15,12 @@ const harness = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 
-import { ResourceVariantsForm } from "../apps/web/src/components/resource-variants-form";
-import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
+import { ResourceVariantsForm } from "../site/src/components/resource-variants-form";
+import { getResourceManagementCopy } from "../site/src/lib/resource-management-i18n";
 
 const { render, edit, submit } = createResourceVariantsDraftInteractionHelpers(
   harness,

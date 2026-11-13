@@ -12,23 +12,21 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/verification",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: mocks,
 }));
 
-import DeveloperSettingsPage from "../apps/web/src/app/settings/developer/page";
-import VerificationPage, {
-  generateMetadata,
-} from "../apps/web/src/app/workspace/verification/page";
-import { DeveloperExperience } from "../apps/web/src/components/developer-experience";
-import { DeveloperProfileEditor } from "../apps/web/src/components/developer-profile-editor";
-import { VerificationWorkspace } from "../apps/web/src/components/verification-workspace";
-import type { VerificationOverview } from "../apps/web/src/lib/verification-workspace-contract";
-import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+import DeveloperSettingsPage from "../site/src/app/settings/developer/page";
+import VerificationPage, { generateMetadata } from "../site/src/app/workspace/verification/page";
+import { DeveloperExperience } from "../site/src/components/developer-experience";
+import { DeveloperProfileEditor } from "../site/src/components/developer-profile-editor";
+import { VerificationWorkspace } from "../site/src/components/verification-workspace";
+import type { VerificationOverview } from "../site/src/lib/verification-workspace-contract";
+import { verificationCopy } from "../site/src/lib/verification-workspace-copy";
 
 const filters = { page: 2, view: "history" as const, type: "developer", query: "" };
 const overview: VerificationOverview = {
@@ -181,7 +179,7 @@ it("shows errors without presenting a failed read as empty history or editable d
 });
 it("clips the verification centre loading shell on narrow layouts", async () => {
   const { default: VerificationLoading } = await import(
-    "../apps/web/src/app/workspace/verification/loading"
+    "../site/src/app/workspace/verification/loading"
   );
   const html = renderToStaticMarkup(await VerificationLoading());
   expect(html).toContain("overflow-x-clip");

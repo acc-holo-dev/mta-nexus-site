@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../apps/web/src/lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../site/src/lib/profile-privacy-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -18,23 +18,23 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
+vi.mock("../site/src/lib/services/profile-privacy-service", () => ({
   profilePrivacyService: { own: state.own },
 }));
-vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
+vi.mock("../site/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 
-import PrivacyPage, { generateMetadata } from "../apps/web/src/app/settings/privacy/page";
+import PrivacyPage, { generateMetadata } from "../site/src/app/settings/privacy/page";
 import UserActivity, {
   generateMetadata as activityMetadata,
-} from "../apps/web/src/app/users/[username]/activity/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+} from "../site/src/app/users/[username]/activity/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 const saved = {
   id: "actor",

@@ -15,13 +15,10 @@ import {
   serverVisibilityCommand,
   serverVisibilityInput,
   serverWorkspaceHistoryHref,
-} from "../apps/web/src/lib/server-workspace-contract";
-import {
-  serverWorkspaceCopy,
-  serverWorkspaceError,
-} from "../apps/web/src/lib/server-workspace-copy";
-import { serverService } from "../apps/web/src/lib/services/server-service";
-import { serverWorkspaceHistoryService } from "../apps/web/src/lib/services/server-workspace-history-service";
+} from "../site/src/lib/server-workspace-contract";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../site/src/lib/server-workspace-copy";
+import { serverService } from "../site/src/lib/services/server-service";
+import { serverWorkspaceHistoryService } from "../site/src/lib/services/server-workspace-history-service";
 
 const time = "2026-10-12T00:00:00.123456Z",
   next = "2026-10-12T00:00:00.124456Z",

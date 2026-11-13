@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
-const webSrcRoot = path.join(repoRoot, "apps/web/src");
+const webSrcRoot = path.join(repoRoot, "site/src");
 
 /** Canonical homes for live `role="alert"` chrome in `@nexus/ui`. */
 const ALLOWED_ALERT_SOURCES = [
@@ -31,7 +31,7 @@ function listAppSourceFiles(dir: string): string[] {
 }
 
 describe("ui field alert honesty policy", () => {
-  it("forbids raw role=alert under apps/web/src production sources", () => {
+  it("forbids raw role=alert under site/src production sources", () => {
     const offenders = listAppSourceFiles(webSrcRoot)
       .filter((file) => RAW_ROLE_ALERT.test(readFileSync(file, "utf8")))
       .map((file) => path.relative(repoRoot, file).split(path.sep).join("/"))

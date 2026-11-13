@@ -18,7 +18,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { eventBus } from "@nexus/domain";
-import { serverService } from "../apps/web/src/lib/services/server-service";
+import { serverService } from "../site/src/lib/services/server-service";
 
 const actor = { id: "usr_1", role: "user" } as User;
 const input = {

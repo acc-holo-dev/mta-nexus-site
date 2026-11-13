@@ -11,7 +11,7 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({
   default: ({ children, ...props }: { children: ReactNode; href: string }) => (
@@ -22,8 +22,8 @@ vi.mock("next/link", () => ({
 import {
   ResourceReviewDecisionForm,
   ResourceReviewEditor,
-} from "../apps/web/src/components/resource-review-controls";
-import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
+} from "../site/src/components/resource-review-controls";
+import { resourceReviewCopy } from "../site/src/lib/resource-review-i18n";
 
 const { renderDecision, submit } = createResourceReviewControlsInteractionHelpers(
   harness,

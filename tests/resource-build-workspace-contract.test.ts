@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { resourceBuildTargetStatus, type BuildStatus } from "@nexus/domain";
 import { resourceBuildCommandSchema } from "@nexus/validation";
-import { confirmedBuildCommand } from "../apps/web/src/lib/resource-build-workspace-response";
+import { confirmedBuildCommand } from "../site/src/lib/resource-build-workspace-response";
 const states: BuildStatus[] = [
   "draft",
   "testing",

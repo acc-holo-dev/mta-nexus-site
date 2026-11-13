@@ -13,19 +13,19 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn(),
   scan: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_author", role: "developer" })),
   },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     assertCanReleaseBuild: mocks.authorize,
     releaseBuild: mocks.release,
     recoverPendingBuildUpload: mocks.recover,
   },
 }));
-vi.mock("../apps/web/src/lib/services/build-scanner-service", () => ({
+vi.mock("../site/src/lib/services/build-scanner-service", () => ({
   buildScannerService: { scan: mocks.scan },
 }));
 vi.mock("@nexus/storage", () => ({
@@ -34,7 +34,7 @@ vi.mock("@nexus/storage", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: vi.fn(async () => ({ success: true })) }));
 
-import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
+import { POST } from "../site/src/app/api/products/[id]/builds/route";
 
 function request() {
   const form = new FormData();

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { confirmedCollectionCommand } from "../apps/web/src/lib/library-collections-confirmation";
+import { confirmedCollectionCommand } from "../site/src/lib/library-collections-confirmation";
 import {
   libraryCollectionsContractCreate as create,
   libraryCollectionsContractCurrent as current,

@@ -9,7 +9,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import { beforeAll, describe, expect, it } from "vitest";
-import { drainPublicationNotificationDelivery } from "../apps/web/src/lib/services/server-follow-notification-service";
+import { drainPublicationNotificationDelivery } from "../site/src/lib/services/server-follow-notification-service";
 import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 describe("server follower publication notification integration", () => {

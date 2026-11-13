@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("build upload preflight authorization", () => {
   it("authorizes the product target before parsing, reading, scanning or storing the upload", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     const preflight = route.indexOf("productService.assertCanReleaseBuild(productId, user)");
     const contentLength = route.indexOf('request.headers.get("content-length")');
@@ -26,7 +26,7 @@ describe("build upload preflight authorization", () => {
   });
 
   it("keeps a second authorization check inside releaseBuild", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');

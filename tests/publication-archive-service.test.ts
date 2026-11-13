@@ -3,12 +3,12 @@ const state = vi.hoisted(() => ({ page: vi.fn(), resolve: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   publicationFeedRepository: { page: state.page, resolvePublicScope: state.resolve },
 }));
-import { publicationFeedService as service } from "../apps/web/src/lib/services/publication-feed-service";
+import { publicationFeedService as service } from "../site/src/lib/services/publication-feed-service";
 import {
   parsePublicationQuery,
   publicationPageQuery,
   type PublicationQuery,
-} from "../apps/web/src/lib/publication-feed-contract";
+} from "../site/src/lib/publication-feed-contract";
 const scope = { kind: "server" as const, id: "server" };
 const boundary = { createdAt: "2026-10-11T00:00:00.123456Z", id: "boundary" };
 beforeEach(() => {

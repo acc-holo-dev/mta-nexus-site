@@ -14,21 +14,21 @@ const harness = vi.hoisted(() => ({
   reload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
   };
 });
 
-import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
-import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { ContentModerationControls } from "../site/src/components/content-moderation-controls";
+import { moderationCopy } from "../site/src/lib/community-moderation-copy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const { render, button, click, ready } = createCommunityModerationInteractionHelpers(
   harness,

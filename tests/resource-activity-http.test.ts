@@ -3,11 +3,11 @@ import { NextRequest } from "next/server";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import { resourceActivityCsv } from "../apps/web/src/lib/resource-activity-csv";
+import { resourceActivityCsv } from "../site/src/lib/resource-activity-csv";
 import {
   parseAcquisitionHistoryQuery,
   parseResourceActivityQuery,
-} from "../apps/web/src/lib/resource-activity-query";
+} from "../site/src/lib/resource-activity-query";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },
@@ -18,16 +18,16 @@ const state = vi.hoisted(() => ({
   download: vi.fn(),
   claim: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-activity-service", () => ({
+vi.mock("../site/src/lib/services/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true, claimFreeResource: state.claim },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { canManageProduct: async () => false },
 }));
 vi.mock("@nexus/security", async (importOriginal) => ({
@@ -56,11 +56,11 @@ vi.mock("@nexus/db", () => ({
   buildRepository: { findLatestPublishedByProduct: async () => build },
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
-import { GET as history } from "../apps/web/src/app/api/acquisitions/route";
-import { GET as report } from "../apps/web/src/app/api/products/[id]/activity/route";
-import { GET as csv } from "../apps/web/src/app/api/products/[id]/activity/export/route";
-import { GET as download } from "../apps/web/src/app/api/products/[id]/download/route";
-import { POST as claim } from "../apps/web/src/app/api/resources/claim/route";
+import { GET as history } from "../site/src/app/api/acquisitions/route";
+import { GET as report } from "../site/src/app/api/products/[id]/activity/route";
+import { GET as csv } from "../site/src/app/api/products/[id]/activity/export/route";
+import { GET as download } from "../site/src/app/api/products/[id]/download/route";
+import { POST as claim } from "../site/src/app/api/resources/claim/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const activity = {

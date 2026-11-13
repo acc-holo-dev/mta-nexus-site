@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
-import { PublicationFeed } from "../apps/web/src/components/publication-feed";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+import { ContentDiscussion } from "../site/src/components/content-discussion";
+import { PublicationFeed } from "../site/src/components/publication-feed";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
 import {
   type PublicationPage,
   publicationPageQuery,
-} from "../apps/web/src/lib/publication-feed-contract";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+} from "../site/src/lib/publication-feed-contract";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -25,22 +25,22 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/topic",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session, getUserById: mocks.author },
 }));
-vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
+vi.mock("../site/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page, resolve: mocks.resolve },
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.discussion },
 }));
 
-import ArticlePage from "../apps/web/src/app/articles/[slug]/page";
-import UserActivity from "../apps/web/src/app/users/[username]/activity/page";
-import FollowingPage from "../apps/web/src/app/workspace/feed/page";
+import ArticlePage from "../site/src/app/articles/[slug]/page";
+import UserActivity from "../site/src/app/users/[username]/activity/page";
+import FollowingPage from "../site/src/app/workspace/feed/page";
 
-vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+vi.mock("../site/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 const time = "2026-10-10T12:00:00.000Z";

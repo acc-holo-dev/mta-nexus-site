@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "fol_a",
@@ -13,11 +13,11 @@ vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: { setFollowingAuthenticated: vi.fn(), states: vi.fn() },
   socialRepository: { isFollowing: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../site/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
 
-import { DELETE, POST } from "../apps/web/src/app/api/follow/route";
+import { DELETE, POST } from "../site/src/app/api/follow/route";
 
 const mutations = [
   ["follow", "POST", POST],

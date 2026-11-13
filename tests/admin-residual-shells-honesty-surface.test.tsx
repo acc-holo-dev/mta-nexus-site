@@ -10,41 +10,41 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import AdminLicenseDetailLoading from "../apps/web/src/app/admin/licenses/[id]/loading";
-import AdminReportHistoryLoading from "../apps/web/src/app/admin/reports/[id]/history/loading";
-import AdminSupportMessagesLoading from "../apps/web/src/app/admin/support/[id]/messages/loading";
-import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
-import { reportHistoryCopy } from "../apps/web/src/lib/community-report-history-copy";
-import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
-import { supportMessageCopy } from "../apps/web/src/lib/support-message-discovery-copy";
+import AdminLicenseDetailLoading from "../site/src/app/admin/licenses/[id]/loading";
+import AdminReportHistoryLoading from "../site/src/app/admin/reports/[id]/history/loading";
+import AdminSupportMessagesLoading from "../site/src/app/admin/support/[id]/messages/loading";
+import { getCommerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
+import { reportHistoryCopy } from "../site/src/lib/community-report-history-copy";
+import { getLicenseControlCopy } from "../site/src/lib/license-control-i18n";
+import { supportMessageCopy } from "../site/src/lib/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "apps/web/src/app/admin/licenses/[id]/history/page.tsx",
-  "apps/web/src/app/admin/community/page.tsx",
-  "apps/web/src/app/admin/community/[id]/page.tsx",
-  "apps/web/src/app/admin/community/[id]/reports/page.tsx",
-  "apps/web/src/app/admin/community/[id]/discussion/page.tsx",
-  "apps/web/src/app/admin/community/[id]/discussion/[commentId]/page.tsx",
-  "apps/web/src/app/admin/community/[id]/discussion/[commentId]/reports/page.tsx",
-  "apps/web/src/app/admin/support/page.tsx",
-  "apps/web/src/app/admin/support/[id]/page.tsx",
-  "apps/web/src/app/admin/support/[id]/messages/page.tsx",
-  "apps/web/src/app/admin/reports/page.tsx",
-  "apps/web/src/app/admin/reports/[id]/page.tsx",
-  "apps/web/src/app/admin/reports/[id]/history/page.tsx",
-  "apps/web/src/app/admin/reports/targets/page.tsx",
-  "apps/web/src/app/admin/commerce/order-cases/page.tsx",
-  "apps/web/src/app/admin/commerce/order-cases/[id]/page.tsx",
-  "apps/web/src/app/admin/commerce/reviews/page.tsx",
-  "apps/web/src/app/admin/commerce/reviews/[id]/page.tsx",
+  "site/src/app/admin/licenses/[id]/history/page.tsx",
+  "site/src/app/admin/community/page.tsx",
+  "site/src/app/admin/community/[id]/page.tsx",
+  "site/src/app/admin/community/[id]/reports/page.tsx",
+  "site/src/app/admin/community/[id]/discussion/page.tsx",
+  "site/src/app/admin/community/[id]/discussion/[commentId]/page.tsx",
+  "site/src/app/admin/community/[id]/discussion/[commentId]/reports/page.tsx",
+  "site/src/app/admin/support/page.tsx",
+  "site/src/app/admin/support/[id]/page.tsx",
+  "site/src/app/admin/support/[id]/messages/page.tsx",
+  "site/src/app/admin/reports/page.tsx",
+  "site/src/app/admin/reports/[id]/page.tsx",
+  "site/src/app/admin/reports/[id]/history/page.tsx",
+  "site/src/app/admin/reports/targets/page.tsx",
+  "site/src/app/admin/commerce/order-cases/page.tsx",
+  "site/src/app/admin/commerce/order-cases/[id]/page.tsx",
+  "site/src/app/admin/commerce/reviews/page.tsx",
+  "site/src/app/admin/commerce/reviews/[id]/page.tsx",
 ] as const;
 
 it("locks residual admin route shells to clipped min-w-0 frames", () => {
@@ -57,7 +57,7 @@ it("locks residual admin route shells to clipped min-w-0 frames", () => {
 });
 
 it("locks admin license detail honesty chrome with ErrorState recovery", () => {
-  const source = read("apps/web/src/app/admin/licenses/[id]/page.tsx");
+  const source = read("site/src/app/admin/licenses/[id]/page.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
@@ -68,7 +68,7 @@ it("locks admin license detail honesty chrome with ErrorState recovery", () => {
 });
 
 it("locks admin license detail loading shell to clipped busy copy", async () => {
-  const source = read("apps/web/src/app/admin/licenses/[id]/loading.tsx");
+  const source = read("site/src/app/admin/licenses/[id]/loading.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
   const copy = getLicenseControlCopy("en");
@@ -112,20 +112,20 @@ it.each([
 );
 
 it("keeps admin support messages and report history loadings as clipped re-exports", () => {
-  expect(read("apps/web/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/support/[id]/messages/loading.tsx")).toContain(
     'from "../../../../support/[id]/messages/loading"',
   );
-  expect(read("apps/web/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("apps/web/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
+  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
+  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
     "overflow-x-clip",
   );
 });
 
 it("locks admin builds quarantine actionable links to min-h-11 touch targets", () => {
-  const source = read("apps/web/src/components/admin/admin-builds-quarantine-section.tsx");
+  const source = read("site/src/components/admin/admin-builds-quarantine-section.tsx");
   expect(source).toContain("touchLinkClass");
   expect(source).toContain("inline-flex min-h-11 items-center");
   expect(source).not.toContain('className="text-accent underline');

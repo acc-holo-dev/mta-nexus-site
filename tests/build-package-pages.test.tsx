@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../site/src/lib/services/build-package-inspection";
 import packageFixtures from "./fixtures/build-packages.json";
 
 const state = vi.hoisted(() => ({
@@ -16,22 +16,22 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/build-package-service", () => ({
+vi.mock("../site/src/lib/services/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
 
 import { buildPackageSummary } from "@nexus/domain";
-import AdminResourceBuildPackageLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/package/loading";
+import AdminResourceBuildPackageLoading from "../site/src/app/admin/resources/[id]/builds/[buildId]/package/loading";
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
-} from "../apps/web/src/components/build-package-evidence";
-import { BuildPackageScreen } from "../apps/web/src/components/build-package-screen";
-import { buildPackageCopy } from "../apps/web/src/lib/build-package-i18n";
+} from "../site/src/components/build-package-evidence";
+import { BuildPackageScreen } from "../site/src/components/build-package-screen";
+import { buildPackageCopy } from "../site/src/lib/build-package-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private title>" },

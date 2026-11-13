@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { ResourceDownloadError } from "../apps/web/src/lib/resource-download-client";
+import { getDictionary } from "../site/src/lib/i18n";
+import { ResourceDownloadError } from "../site/src/lib/resource-download-client";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -34,7 +34,7 @@ vi.mock("react", async (original) => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/resource" }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),
@@ -84,16 +84,16 @@ vi.mock("@nexus/ui", async () => {
       ),
   };
 });
-vi.mock("../apps/web/src/lib/resource-download-client", async (original) => {
-  const actual = await original<typeof import("../apps/web/src/lib/resource-download-client")>();
+vi.mock("../site/src/lib/resource-download-client", async (original) => {
+  const actual = await original<typeof import("../site/src/lib/resource-download-client")>();
   return {
     ...actual,
     fetchResourceDownload: vi.fn(),
   };
 });
 
-import { ResourceDownloadButton } from "../apps/web/src/components/resource-download-button";
-import { fetchResourceDownload } from "../apps/web/src/lib/resource-download-client";
+import { ResourceDownloadButton } from "../site/src/components/resource-download-button";
+import { fetchResourceDownload } from "../site/src/lib/resource-download-client";
 
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {

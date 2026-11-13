@@ -33,20 +33,20 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: {
     canManageServer: vi.fn(async () => state.canManage),
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   matchesMtaEndpoint: mocks.matchesEndpoint,
   mtaMasterDirectoryService: {
     getDirectory: vi.fn(async () => state.directory),
   },
 }));
 
-import { serverClaimService } from "../apps/web/src/lib/services/server-claim-service";
+import { serverClaimService } from "../site/src/lib/services/server-claim-service";
 
 const requester = {
   id: "usr_claimant",

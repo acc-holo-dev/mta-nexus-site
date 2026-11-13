@@ -14,21 +14,21 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-requirements-service", () => ({
+vi.mock("../site/src/lib/services/resource-requirements-service", () => ({
   resourceRequirementsService: { report: state.report },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button" data-product={productId} data-build={buildId}>
       Download
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
+vi.mock("../site/src/components/resource-cart-controls", () => ({
   AddResourceToCart: ({ productId }: { productId: string }) => (
     <button type="button" data-cart={productId}>
       Add to cart
@@ -36,9 +36,9 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
   ),
 }));
 
-import AdminResourceRequirementsLoading from "../apps/web/src/app/admin/resources/[id]/requirements/loading";
-import { ResourceRequirementsScreen as screen } from "../apps/web/src/components/resource-requirements-screen";
-import { resourceRequirementsCopy } from "../apps/web/src/lib/resource-requirements-i18n";
+import AdminResourceRequirementsLoading from "../site/src/app/admin/resources/[id]/requirements/loading";
+import { ResourceRequirementsScreen as screen } from "../site/src/components/resource-requirements-screen";
+import { resourceRequirementsCopy } from "../site/src/lib/resource-requirements-i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -198,7 +198,7 @@ it("clips honest loading shells on narrow layouts", async () => {
 });
 it("clips the library requirements loading shell with honest copy", async () => {
   const { default: LibraryRequirementsLoading } = await import(
-    "../apps/web/src/app/workspace/library/[id]/requirements/loading"
+    "../site/src/app/workspace/library/[id]/requirements/loading"
   );
   const copy = resourceRequirementsCopy("en");
   const html = renderToStaticMarkup(await LibraryRequirementsLoading());

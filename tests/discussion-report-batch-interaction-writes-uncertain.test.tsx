@@ -18,12 +18,12 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 
-import { DiscussionReportBatch } from "../apps/web/src/components/discussion-report-batch";
-import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
+import { DiscussionReportBatch } from "../site/src/components/discussion-report-batch";
+import { reportBatchCopy } from "../site/src/lib/report-batch-copy";
 
 const { render, click, commitBatch, review } = createDiscussionReportBatchInteractionHelpers(
   harness,

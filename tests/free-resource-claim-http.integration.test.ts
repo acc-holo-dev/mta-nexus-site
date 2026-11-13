@@ -8,7 +8,7 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { POST as claimResource } from "../apps/web/src/app/api/resources/claim/route";
+import { POST as claimResource } from "../site/src/app/api/resources/claim/route";
 
 describe("free resource claim HTTP integration", () => {
   beforeEach(() => {

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   NOTIFICATION_INBOX_SELECTION_LIMIT,
   notificationInboxCommandSchema,
-} from "../apps/web/src/lib/notification-inbox-contract";
-import { parseNotificationReadTarget } from "../apps/web/src/lib/notification-read";
+} from "../site/src/lib/notification-inbox-contract";
+import { parseNotificationReadTarget } from "../site/src/lib/notification-read";
 
 describe("notification read target", () => {
   it.each(["", "{}", " { } "])(

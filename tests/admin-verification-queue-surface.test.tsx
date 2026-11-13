@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { AdminVerificationQueueSection } from "../apps/web/src/components/admin/admin-verification-queue-section";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { AdminVerificationQueueSection } from "../site/src/components/admin/admin-verification-queue-section";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -15,7 +15,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/verification-moderation-controls", () => ({
+vi.mock("../site/src/components/verification-moderation-controls", () => ({
   VerificationModerationControls: ({ requestId }: { requestId: string }) => (
     <button type="button" data-verification={requestId}>
       Decide

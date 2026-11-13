@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { createContextSwitchingAuthMock } = await import("./helpers/context-switching-harness");
   return createContextSwitchingAuthMock();
 });
@@ -17,7 +17,7 @@ vi.mock("@nexus/security", async () => {
   return createContextSwitchingSecurityMock();
 });
 
-import { POST } from "../apps/web/src/app/api/auth/context/route";
+import { POST } from "../site/src/app/api/auth/context/route";
 import {
   contextSwitchingMocks,
   expectContextSwitchingPrivateCorrelation as expectPrivateCorrelation,

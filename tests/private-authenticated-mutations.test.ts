@@ -6,11 +6,11 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("private authenticated mutation responses", () => {
   it.each([
-    "apps/web/src/app/api/auth/context/route.ts",
-    "apps/web/src/app/api/auth/login/route.ts",
-    "apps/web/src/app/api/auth/register/route.ts",
-    "apps/web/src/app/api/verification/route.ts",
-    "apps/web/src/app/api/notifications/preferences/route.ts",
+    "site/src/app/api/auth/context/route.ts",
+    "site/src/app/api/auth/login/route.ts",
+    "site/src/app/api/auth/register/route.ts",
+    "site/src/app/api/verification/route.ts",
+    "site/src/app/api/notifications/preferences/route.ts",
   ])("%s uses one private no-store response contract", (path) => {
     const source = read(path);
 
@@ -20,15 +20,15 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps login and registration session cookies hardened", () => {
-    const cookiePolicy = read("apps/web/src/lib/session-cookie.ts");
+    const cookiePolicy = read("site/src/lib/session-cookie.ts");
     expect(cookiePolicy).toContain("httpOnly: true");
     expect(cookiePolicy).toContain('secure: process.env.NODE_ENV === "production"');
     expect(cookiePolicy).toContain('sameSite: "lax"');
     expect(cookiePolicy).toContain('path: "/"');
 
     for (const path of [
-      "apps/web/src/app/api/auth/login/route.ts",
-      "apps/web/src/app/api/auth/register/route.ts",
+      "site/src/app/api/auth/login/route.ts",
+      "site/src/app/api/auth/register/route.ts",
     ]) {
       const source = read(path);
       expect(source).toContain("sessionCookieOptions");
@@ -38,7 +38,7 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps context switching non-optimistic", () => {
-    const source = read("apps/web/src/components/context-switcher.tsx");
+    const source = read("site/src/components/context-switcher.tsx");
 
     const requestStart = source.indexOf('fetch("/api/auth/context"');
     const confirmation = source.indexOf("data?.success !== true");

@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { fetchServerStatisticsCsv } from "../apps/web/src/lib/server-statistics-download";
-import { serverStatisticsCopy } from "../apps/web/src/lib/server-statistics-copy";
+import { fetchServerStatisticsCsv } from "../site/src/lib/server-statistics-download";
+import { serverStatisticsCopy } from "../site/src/lib/server-statistics-copy";
 afterEach(() => vi.unstubAllGlobals());
 it("downloads only confirmed CSV and uses the existing private request policy", async () => {
   const fetcher = vi

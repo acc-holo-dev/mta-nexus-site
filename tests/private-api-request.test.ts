@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { privateApiRequest } from "../apps/web/src/lib/private-api-request";
+import { privateApiRequest } from "../site/src/lib/private-api-request";
 
 describe("private browser API request policy", () => {
   it("defaults to a same-origin non-cacheable GET", () => {

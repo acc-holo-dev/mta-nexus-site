@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("shared client localization and request hardening", () => {
   it("localizes workspace context switching and hardens both requests", () => {
-    const source = read("apps/web/src/components/context-switcher.tsx");
+    const source = read("site/src/components/context-switcher.tsx");
 
     expect(source).toContain("useNexusLocale");
     expect(source).toContain("dictionary.workspaceContext");
@@ -25,7 +25,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("keeps MTA directory errors in the dictionary and requests uncached data", () => {
-    const source = read("apps/web/src/components/mta-master-server-directory.tsx");
+    const source = read("site/src/components/mta-master-server-directory.tsx");
 
     expect(source).toContain("copy.directoryTimeout");
     expect(source).toContain("copy.directoryFetchError");
@@ -41,7 +41,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("confirms password changes before ending other sessions", () => {
-    const source = read("apps/web/src/components/settings-page-client.tsx");
+    const source = read("site/src/components/settings-page-client.tsx");
 
     expect(source).toContain("changePasswordConfirmTitle");
     expect(source).toContain("await confirmAction({");
@@ -51,7 +51,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("uses the hardened request contract for login and registration", () => {
-    const source = read("apps/web/src/components/auth-form.tsx");
+    const source = read("site/src/components/auth-form.tsx");
 
     expect(source).toContain('cache: "no-store"');
     expect(source).toContain('credentials: "same-origin"');

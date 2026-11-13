@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/build-provenance-details.tsx";
+const surface = "site/src/components/build-provenance-details.tsx";
 
 it("locks non-clean build provenance scan notices to ErrorState", () => {
   const source = read(surface);

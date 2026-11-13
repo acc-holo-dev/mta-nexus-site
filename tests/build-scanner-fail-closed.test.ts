@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("build scanner fail-closed upload flow", () => {
   it("rejects malicious, scan-limit, and scanner-error verdicts before private storage", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     const malicious = route.indexOf('scan.status === "malicious"');
     const scanLimits = route.indexOf('scan.status === "rejected"');
@@ -29,7 +29,7 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("keeps non-clean builds impossible to approve", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/product-service.ts");
     const config = read("packages/config/src/index.ts");
 
     expect(service).toContain('build.scanStatus !== "clean"');
@@ -38,8 +38,8 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("moves INSTREAM framing into a backpressure-aware transport helper", () => {
-    const scanner = read("apps/web/src/lib/services/build-scanner-service.ts");
-    const transport = read("apps/web/src/lib/services/clamav-instream.ts");
+    const scanner = read("site/src/lib/services/build-scanner-service.ts");
+    const transport = read("site/src/lib/services/clamav-instream.ts");
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).not.toContain("socket.write(length)");

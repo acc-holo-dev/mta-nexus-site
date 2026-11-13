@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 /** Honesty lock for verification application amend soft notice ErrorState (stable id + alert role via ErrorState). */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/components/verification-application-amend.tsx"),
+  join(root, "site/src/components/verification-application-amend.tsx"),
   "utf8",
 );
 

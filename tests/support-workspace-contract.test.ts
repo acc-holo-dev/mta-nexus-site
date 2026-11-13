@@ -1,20 +1,17 @@
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
-import {
-  confirmSupportStatusChanged,
-  parseSupportThread,
-} from "../apps/web/src/lib/support-response";
+import { formatNotification } from "../site/src/lib/notification-copy";
+import { confirmSupportStatusChanged, parseSupportThread } from "../site/src/lib/support-response";
 import {
   publicationSupportHref,
   supportActivitySchema,
   supportHref,
   supportQuery,
-} from "../apps/web/src/lib/support-workspace-contract";
+} from "../site/src/lib/support-workspace-contract";
 import {
   supportWorkspaceCopy,
   supportWorkspaceError,
-} from "../apps/web/src/lib/support-workspace-copy";
+} from "../site/src/lib/support-workspace-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";

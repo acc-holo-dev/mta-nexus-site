@@ -18,15 +18,15 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: harness.push, refresh: harness.refresh }),
 }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: harness.locale, dictionary: getDictionary(harness.locale) }),
   };
 });
 
-import { CommunityTopicForm } from "../apps/web/src/components/community-topic-form";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { CommunityTopicForm } from "../site/src/components/community-topic-form";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const { render, mount, submit } = createCommunityTopicIntentInteractionHelpers(
   harness,

@@ -4,16 +4,16 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
-vi.mock("../apps/web/src/lib/services/storage-maintenance-service", () => ({
+vi.mock("../site/src/lib/services/storage-maintenance-service", () => ({
   storageMaintenanceService: { discover: vi.fn(), cleanup: vi.fn() },
 }));
 
-import { POST as discover } from "../apps/web/src/app/api/admin/storage/discovery/route";
-import { POST as cleanup } from "../apps/web/src/app/api/admin/storage/objects/[id]/cleanup/route";
+import { POST as discover } from "../site/src/app/api/admin/storage/discovery/route";
+import { POST as cleanup } from "../site/src/app/api/admin/storage/objects/[id]/cleanup/route";
 
 const context = { params: Promise.resolve({ id: "smo_a" }) };
 const mutations = [

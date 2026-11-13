@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/order-cancellation-form.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/order-cancellation-form.tsx"), "utf8");
 
 /** Honesty lock: order cancellation unconfirmed retry role=note → ErrorState. */
 it("locks order cancellation unconfirmed retry to ErrorState", () => {

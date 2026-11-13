@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("development diagnostics", () => {
   it("is unavailable in production and reports only sanitized runtime state", () => {
-    const page = read("apps/web/src/app/dev/page.tsx");
+    const page = read("site/src/app/dev/page.tsx");
 
     expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain("notFound()");
@@ -47,7 +47,7 @@ describe("development diagnostics", () => {
   });
 
   it("only exposes the navigation entry outside production", () => {
-    const sidebar = read("apps/web/src/components/sidebar.tsx");
+    const sidebar = read("site/src/components/sidebar.tsx");
     expect(sidebar).toContain('process.env.NODE_ENV !== "production"');
     expect(sidebar).toContain('href: "/dev"');
     expect(sidebar).toContain("dictionary.nav.devTools");

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -47,17 +47,17 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { pageManagedByUser: repos.managedServers },
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: repos.directory,
   },
@@ -70,8 +70,8 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   ),
 }));
 
-import WorkspaceLoading from "../apps/web/src/app/workspace/loading";
-import WorkspacePage from "../apps/web/src/app/workspace/page";
+import WorkspaceLoading from "../site/src/app/workspace/loading";
+import WorkspacePage from "../site/src/app/workspace/page";
 
 describe("workspace live telemetry behavior", () => {
   const dictionary = getDictionary("en");
@@ -354,7 +354,7 @@ describe("workspace live telemetry behavior", () => {
   it.each(["en", "ru"] as const)(
     "renders an honest workspace loading shell with clipped overflow in %s",
     async (locale) => {
-      const { getRequestLocale } = await import("../apps/web/src/lib/i18n-server");
+      const { getRequestLocale } = await import("../site/src/lib/i18n-server");
       vi.mocked(getRequestLocale).mockResolvedValueOnce(locale);
       const copy = getDictionary(locale).workspace;
       const html = renderToStaticMarkup(await WorkspaceLoading());

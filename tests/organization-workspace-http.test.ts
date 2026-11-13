@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({ organizationWorkspaceRepository: mocks }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
@@ -25,17 +25,17 @@ vi.mock("@nexus/security", () => ({
   generateId: (p: string) => `${p}_new`,
 }));
 
-import { POST as leave } from "../apps/web/src/app/api/workspace/organizations/[id]/leave/route";
+import { POST as leave } from "../site/src/app/api/workspace/organizations/[id]/leave/route";
 import {
   PATCH as change,
   DELETE as remove,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route";
-import { POST as add } from "../apps/web/src/app/api/workspace/organizations/[id]/members/route";
+} from "../site/src/app/api/workspace/organizations/[id]/members/[userId]/route";
+import { POST as add } from "../site/src/app/api/workspace/organizations/[id]/members/route";
 import {
   PATCH as profile,
   GET as workspace,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/route";
-import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/organizations/route";
+} from "../site/src/app/api/workspace/organizations/[id]/route";
+import { POST as create, GET as list } from "../site/src/app/api/workspace/organizations/route";
 
 const version = "2026-10-10T12:00:00.000Z";
 const fields = { name: "Team", description: "Description", logoUrl: "", websiteUrl: "" };

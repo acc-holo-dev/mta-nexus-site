@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../site/src/lib/services/mta-master-directory-service", async () => {
   const { directoryState: state } = await import("./helpers/server-control-challenge-harness");
   return {
     mtaMasterDirectoryService: {
@@ -17,10 +17,10 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () =>
 });
 
 import { db, serverClaimChallenges, serverRepository, verificationRequests } from "@nexus/db";
-import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
-import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
-import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
-import { POST as genericVerification } from "../apps/web/src/app/api/verification/route";
+import { POST as adminAction } from "../site/src/app/api/admin/actions/route";
+import { POST as issueChallenge } from "../site/src/app/api/servers/[id]/claim-challenge/route";
+import { POST as verifyChallenge } from "../site/src/app/api/servers/[id]/claim-challenge/verify/route";
+import { POST as genericVerification } from "../site/src/app/api/verification/route";
 import {
   directoryState,
   post,

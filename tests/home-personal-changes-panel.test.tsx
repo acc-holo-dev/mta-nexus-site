@@ -6,8 +6,8 @@ import {
   HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID,
   HomePersonalChangesPanel,
   type HomePersonalCopy,
-} from "../apps/web/src/components/home-personal-changes-panel";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/components/home-personal-changes-panel";
+import { getDictionary } from "../site/src/lib/i18n";
 
 vi.mock("@nexus/ui", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@nexus/ui")>();
@@ -33,7 +33,7 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   };
 });
 
-vi.mock("../apps/web/src/components/home-personal-opt-out", () => ({
+vi.mock("../site/src/components/home-personal-opt-out", () => ({
   HomePersonalOptOut: ({ describedBy }: { describedBy?: string }) => (
     <button type="button" aria-describedby={describedBy} className="min-h-11" />
   ),

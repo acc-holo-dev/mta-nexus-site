@@ -10,20 +10,20 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../site/src/lib/services/library-selection-batches-service", () => ({
   librarySelectionBatchesService: {
     preview: state.preview,
     command: state.command,
     history: state.history,
   },
 }));
-import { POST as apply } from "../apps/web/src/app/api/library/collections/[id]/versions/route";
-import { POST as review } from "../apps/web/src/app/api/library/collections/[id]/versions/preview/route";
-import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/versions/history/route";
-import { GET as download } from "../apps/web/src/app/api/library/collections/[id]/versions/history/export/route";
+import { POST as apply } from "../site/src/app/api/library/collections/[id]/versions/route";
+import { POST as review } from "../site/src/app/api/library/collections/[id]/versions/preview/route";
+import { GET as history } from "../site/src/app/api/library/collections/[id]/versions/history/route";
+import { GET as download } from "../site/src/app/api/library/collections/[id]/versions/history/export/route";
 const context = { params: Promise.resolve({ id: "lcol_a" }) },
   body = { mode: "fixed", productIds: ["prd_a"] };
 function request(section = "", method = "POST", headers: Record<string, string> = {}, query = "") {

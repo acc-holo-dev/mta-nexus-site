@@ -8,7 +8,7 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
   for (const file of [
     ".nvmrc",
     ".node-version",
-    "apps/web/package.json",
+    "site/package.json",
     "packages/db/package.json",
     "packages/security/src/auth.ts",
     "packages/db/src/repositories/initiating-session.ts",
@@ -24,17 +24,17 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "packages/db/src/repositories/license-controls.ts",
     "packages/storage/src/local-provider.ts",
     "packages/config/src/env.ts",
-    "apps/web/next.config.mjs",
-    "apps/web/src/app/api/auth/login/route.ts",
-    "apps/web/src/lib/browser-request-policy.ts",
-    "apps/web/src/lib/browser-request-guard.ts",
-    "apps/web/src/lib/browser-route-adapter.ts",
-    "apps/web/src/lib/license-bearer-route-adapter.ts",
+    "site/next.config.mjs",
+    "site/src/app/api/auth/login/route.ts",
+    "site/src/lib/browser-request-policy.ts",
+    "site/src/lib/browser-request-guard.ts",
+    "site/src/lib/browser-route-adapter.ts",
+    "site/src/lib/license-bearer-route-adapter.ts",
     "tests/browser-api-route-inventory.test.ts",
   ]) {
     assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
   }
-  assert.deepEqual(classifyChanges(["apps/web/src/components/server-card.tsx"]), {
+  assert.deepEqual(classifyChanges(["site/src/components/server-card.tsx"]), {
     code: true,
     unitOnly: true,
     full: false,

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "baseline_sha": "385e577e7443cf7d7b817419ce5c3b8afe87b690",
+  "amendments": [
+    {
+      "id": "OPS-13",
+      "field": "verification",
+      "baseline_sha256": "4290ee28d622704767618daee2e9bacd35401ee8886fc678e461f2773c3f95db",
+      "value_sha256": "d39366c6d316105d288564b794d96887aabc063424b332d79384caea63540e44",
+      "commit": "45d59aff2b473f41b576d638b1ee94f8efa260db",
+      "reason": "Добавлены проверки recovery evidence без объявления production gate завершённым."
+    },
+    {
+      "id": "OPS-14",
+      "field": "verification",
+      "baseline_sha256": "098d40d3a47b9ecbdcde19f47745b2b51d1774e48bd06cc8ad6e85a3fd1af635",
+      "value_sha256": "c958587b4167989fcf8d4b31ba2fc07ae0891fff9522f1a8abd9450afea43217",
+      "commit": "45d59aff2b473f41b576d638b1ee94f8efa260db",
+      "reason": "Добавлены проверки live-drill evidence; fixture PASS не закрывает внешний gate."
+    },
+    {
+      "id": "UX-06",
+      "field": "scope_files",
+      "baseline_sha256": "dae4a814f051a63cb6ba22eb8811450c9a0100201a7b6154a717d68b84f8d7d0",
+      "value_sha256": "31ec9c193c5de62c03b2d1a238d3e3391a875e14d293b5a0190a222eca8ba659",
+      "commit": "bb64d7cdcd9da8c636bf842264f2a968d9d49872",
+      "reason": "Уточнён фактический охват native confirm UI после выполненной реализации."
+    },
+    {
+      "id": "GROW-08",
+      "field": "scope_files",
+      "baseline_sha256": "8b6eda7aee668543301d81853b3a679fa0b474d8e8ca7a0e0fa5a9da142ff7b6",
+      "value_sha256": "31666ccbb984a21c424df3fa0f9c24bd241d2094a95b0b9469429f8d9febc241",
+      "commit": "e5610f4aa91e685090785aacd119f7e66f17a6d4",
+      "reason": "В scope добавлен подготовленный документ SERVER-PACK-SPEC без активации feature."
+    }
+  ]
+}

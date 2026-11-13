@@ -1,10 +1,10 @@
 import { expect, it } from "vitest";
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
-import { confirmedResourceReleaseWatchBatch } from "../apps/web/src/lib/resource-release-watch-batch-confirmation";
+import { confirmedResourceReleaseWatchBatch } from "../site/src/lib/resource-release-watch-batch-confirmation";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
-} from "../apps/web/src/lib/resource-release-watches-query";
+} from "../site/src/lib/resource-release-watches-query";
 const command = {
   items: [
     { productId: "prd_a", expectedRevision: 1 },

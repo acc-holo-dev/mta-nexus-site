@@ -10,15 +10,15 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import ReportsLoading from "../apps/web/src/app/workspace/reports/loading";
-import SalesLoading from "../apps/web/src/app/workspace/sales/loading";
-import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
-import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
-import { sellerSalesCopy } from "../apps/web/src/lib/seller-sales-i18n";
+import ReportsLoading from "../site/src/app/workspace/reports/loading";
+import SalesLoading from "../site/src/app/workspace/sales/loading";
+import { getCommerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
+import { communityReportCopy } from "../site/src/lib/community-report-copy";
+import { sellerSalesCopy } from "../site/src/lib/seller-sales-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -66,7 +66,7 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () => {
-  const source = read("apps/web/src/app/workspace/sales/page.tsx");
+  const source = read("site/src/app/workspace/sales/page.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("EmptyState");
   expect(source).toContain("overflow-x-clip");
@@ -81,7 +81,7 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
 });
 
 it("locks sales report honesty chrome with ErrorState recovery and no plain alert", () => {
-  const source = read("apps/web/src/app/workspace/sales/report/page.tsx");
+  const source = read("site/src/app/workspace/sales/report/page.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
@@ -94,7 +94,7 @@ it("locks sales report honesty chrome with ErrorState recovery and no plain aler
 });
 
 it("locks seller sales report apply CTA to size=touch", () => {
-  const source = read("apps/web/src/components/seller-sales-report.tsx");
+  const source = read("site/src/components/seller-sales-report.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
   expect(source).toContain("min-h-11");
@@ -102,7 +102,7 @@ it("locks seller sales report apply CTA to size=touch", () => {
 });
 
 it("locks seller sales report filter panel as a localized search landmark with touch select chrome", () => {
-  const source = read("apps/web/src/components/seller-sales-report.tsx");
+  const source = read("site/src/components/seller-sales-report.tsx");
   expect(source).toContain("<search aria-label={c.filters}>");
   expect(source).toMatch(
     /<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u,
@@ -117,7 +117,7 @@ it("locks seller sales report filter panel as a localized search landmark with t
 });
 
 it("locks additive seller sales honesty copy for report recovery", () => {
-  const i18n = read("apps/web/src/lib/seller-sales-i18n.ts");
+  const i18n = read("site/src/lib/seller-sales-i18n.ts");
   expect(i18n).toContain("loadUnavailableHint");
   expect(i18n).toContain("invalidDescription");
   expect(i18n).toContain("filters:");
@@ -132,7 +132,7 @@ it("locks additive seller sales honesty copy for report recovery", () => {
 });
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
-  const source = read("apps/web/src/app/workspace/reports/page.tsx");
+  const source = read("site/src/app/workspace/reports/page.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
   expect(source).toContain("pageShellClass");
@@ -142,8 +142,8 @@ it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", ()
 
 it("keeps colocated sales and reports loadings clipped", () => {
   for (const loading of [
-    "apps/web/src/app/workspace/sales/loading.tsx",
-    "apps/web/src/app/workspace/reports/loading.tsx",
+    "site/src/app/workspace/sales/loading.tsx",
+    "site/src/app/workspace/reports/loading.tsx",
   ]) {
     const source = read(loading);
     expect(source).toContain("overflow-x-clip");
@@ -152,7 +152,7 @@ it("keeps colocated sales and reports loadings clipped", () => {
 });
 
 it("locks additive sales honesty copy in commerce history i18n", () => {
-  const history = read("apps/web/src/lib/commerce-history-i18n.ts");
+  const history = read("site/src/lib/commerce-history-i18n.ts");
   expect(history).toContain("salesLoadUnavailable");
   expect(history).toContain("salesLoadUnavailableHint");
   expect(history).toContain("emptySalesHint");

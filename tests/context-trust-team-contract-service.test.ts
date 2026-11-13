@@ -6,22 +6,22 @@ vi.mock("@nexus/db", () => ({
   organizationTeamDirectoryRepository: { page: mocks.team },
   organizationWorkspaceRepository: {},
 }));
-import { publicContextTrustService as trust } from "../apps/web/src/lib/services/public-context-trust-service";
-import { organizationTeamService as team } from "../apps/web/src/lib/services/organization-team-service";
+import { publicContextTrustService as trust } from "../site/src/lib/services/public-context-trust-service";
+import { organizationTeamService as team } from "../site/src/lib/services/organization-team-service";
 import {
   parseContextKind,
   parseContextTrustQuery,
   contextTrustHref,
   publicContextTrustSchema,
-} from "../apps/web/src/lib/public-context-trust-contract";
+} from "../site/src/lib/public-context-trust-contract";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
-} from "../apps/web/src/lib/organization-team-contract";
-import { confirmsOrganizationMemberMutation } from "../apps/web/src/lib/organization-member-confirmation";
-import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
-import { organizationTeamCopy } from "../apps/web/src/lib/organization-team-copy";
+} from "../site/src/lib/organization-team-contract";
+import { confirmsOrganizationMemberMutation } from "../site/src/lib/organization-member-confirmation";
+import { contextTrustCopy } from "../site/src/lib/public-context-trust-copy";
+import { organizationTeamCopy } from "../site/src/lib/organization-team-copy";
 const time = "2026-10-11T00:00:00.123456Z",
   actor = { id: "actor", role: "admin" } as User;
 const organization = {

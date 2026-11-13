@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { Locale } from "../../apps/web/src/lib/i18n";
+import type { Locale } from "../../site/src/lib/i18n";
 
 type LibraryReleaseComparisonInteractionHarness = {
   slots: unknown[];

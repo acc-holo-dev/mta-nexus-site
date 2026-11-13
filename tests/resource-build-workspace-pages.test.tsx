@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -16,21 +16,21 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../site/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
 
-import AdminResourceBuildLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/loading";
-import { generateMetadata } from "../apps/web/src/app/workspace/resources/[id]/builds/[buildId]/page";
-import { ResourceBuildScreen } from "../apps/web/src/components/resource-build-screen";
-import { getResourceBuildWorkspaceCopy } from "../apps/web/src/lib/resource-build-workspace-i18n";
+import AdminResourceBuildLoading from "../site/src/app/admin/resources/[id]/builds/[buildId]/loading";
+import { generateMetadata } from "../site/src/app/workspace/resources/[id]/builds/[buildId]/page";
+import { ResourceBuildScreen } from "../site/src/components/resource-build-screen";
+import { getResourceBuildWorkspaceCopy } from "../site/src/lib/resource-build-workspace-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private resource>", slug: "resource", status: "published" },

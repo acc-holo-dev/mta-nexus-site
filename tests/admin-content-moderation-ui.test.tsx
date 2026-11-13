@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -12,10 +12,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh }),
 }));
 
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const actual = await vi.importActual<typeof import("../apps/web/src/lib/i18n")>(
-    "../apps/web/src/lib/i18n",
-  );
+vi.mock("../site/src/components/locale-context", async () => {
+  const actual =
+    await vi.importActual<typeof import("../site/src/lib/i18n")>("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: state.locale,
@@ -24,7 +23,7 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
   };
 });
 
-import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
+import { ContentModerationControls } from "../site/src/components/content-moderation-controls";
 
 describe("admin content moderation controls", () => {
   beforeEach(() => {

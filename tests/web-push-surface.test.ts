@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GET as getServiceWorker } from "../apps/web/src/app/sw.js/route";
+import { GET as getServiceWorker } from "../site/src/app/sw.js/route";
 import {
   createServiceWorkerHarness,
   makeServiceWorkerRequest,

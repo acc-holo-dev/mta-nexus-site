@@ -3,7 +3,7 @@ import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,
   INBOX_EXPORT_MAX_BYTES,
-} from "../apps/web/src/lib/notification-inbox-export-client";
+} from "../site/src/lib/notification-inbox-export-client";
 
 const filters = {
   query: "topic",

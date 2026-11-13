@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { vi } from "vitest";
 
-vi.mock("../../apps/web/src/lib/services/resource-management-service", () => ({
+vi.mock("../../site/src/lib/services/resource-management-service", () => ({
   resourceManagementService: { publicVariants: vi.fn(async () => null) },
 }));
 
@@ -36,14 +36,14 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/lib/i18n-server", async () => {
+vi.mock("../../site/src/lib/i18n-server", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     getRequestLocale: vi.fn(async () => state.locale),
   };
 });
 
-vi.mock("../../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../../site/src/lib/services/auth-service", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     authService: {
@@ -52,7 +52,7 @@ vi.mock("../../apps/web/src/lib/services/auth-service", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/lib/services/commerce-service", async () => {
+vi.mock("../../site/src/lib/services/commerce-service", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     commerceService: {
@@ -61,18 +61,18 @@ vi.mock("../../apps/web/src/lib/services/commerce-service", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/lib/services/resource-review-service", () => ({
+vi.mock("../../site/src/lib/services/resource-review-service", () => ({
   resourceReviewService: {
     publicPage: vi.fn(async () => ({ reviews: [], total: 0, page: 1, totalPages: 1 })),
   },
 }));
 
-vi.mock("../../apps/web/src/lib/services/product-service", async () => {
+vi.mock("../../site/src/lib/services/product-service", async () => {
   const { productService } = await import("./resource-detail-acquisition-ui-state");
   return { productService };
 });
 
-vi.mock("../../apps/web/src/lib/services/resource-qa-service", () => ({
+vi.mock("../../site/src/lib/services/resource-qa-service", () => ({
   resourceQaService: {
     publicPage: vi.fn(async () => ({
       threads: [],
@@ -84,14 +84,14 @@ vi.mock("../../apps/web/src/lib/services/resource-qa-service", () => ({
   },
 }));
 
-vi.mock("../../apps/web/src/components/resource-qa-panel", async () => {
+vi.mock("../../site/src/components/resource-qa-panel", async () => {
   const ReactModule = await import("react");
   return {
     ResourceQaPanel: () => ReactModule.createElement("div", { "data-testid": "resource-qa" }),
   };
 });
 
-vi.mock("../../apps/web/src/components/resource-preview", async () => {
+vi.mock("../../site/src/components/resource-preview", async () => {
   const ReactModule = await import("react");
   return {
     ResourcePreview: ({ title }: { title: string }) =>
@@ -102,7 +102,7 @@ vi.mock("../../apps/web/src/components/resource-preview", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/components/resource-download-button", async () => {
+vi.mock("../../site/src/components/resource-download-button", async () => {
   const ReactModule = await import("react");
   return {
     ResourceDownloadButton: ({
@@ -123,7 +123,7 @@ vi.mock("../../apps/web/src/components/resource-download-button", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/components/resource-release-watch-control", async () => {
+vi.mock("../../site/src/components/resource-release-watch-control", async () => {
   const ReactModule = await import("react");
   return {
     ResourceReleaseWatchControl: ({ guest, hasAccess }: { guest?: boolean; hasAccess?: boolean }) =>
@@ -135,7 +135,7 @@ vi.mock("../../apps/web/src/components/resource-release-watch-control", async ()
   };
 });
 
-vi.mock("../../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     detail: vi.fn(async () => ({
       productId: "prd_detail",
@@ -163,7 +163,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../../apps/web/src/components/follow-button", async () => {
+vi.mock("../../site/src/components/follow-button", async () => {
   const ReactModule = await import("react");
   return {
     FollowButton: ({ targetType, targetId }: { targetType: string; targetId: string }) =>
@@ -176,7 +176,7 @@ vi.mock("../../apps/web/src/components/follow-button", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/components/build-provenance-details", async () => {
+vi.mock("../../site/src/components/build-provenance-details", async () => {
   const ReactModule = await import("react");
   return {
     BuildProvenanceDetails: ({ build }: { build: { id: string } }) =>
@@ -187,7 +187,7 @@ vi.mock("../../apps/web/src/components/build-provenance-details", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/components/product-dependency-list", async () => {
+vi.mock("../../site/src/components/product-dependency-list", async () => {
   const ReactModule = await import("react");
   return {
     ProductDependencyList: () =>
@@ -197,7 +197,7 @@ vi.mock("../../apps/web/src/components/product-dependency-list", async () => {
   };
 });
 
-vi.mock("../../apps/web/src/components/reverse-dependency-list", async () => {
+vi.mock("../../site/src/components/reverse-dependency-list", async () => {
   const ReactModule = await import("react");
   return {
     ReverseDependencyList: () =>

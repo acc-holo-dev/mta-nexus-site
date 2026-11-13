@@ -20,11 +20,11 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 
-import { OrganizationTeamBatch } from "../apps/web/src/components/organization-team-batch";
+import { OrganizationTeamBatch } from "../site/src/components/organization-team-batch";
 
 const { render, click, prepareTeam } = createTeamBatchInteractionHelpers(
   harness,

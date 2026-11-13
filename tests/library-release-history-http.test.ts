@@ -6,15 +6,15 @@ const h = vi.hoisted(() => ({
   rate: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
-import { GET } from "../apps/web/src/app/api/library/releases/history/route";
-import { GET as download } from "../apps/web/src/app/api/library/releases/history/export/route";
+import { GET } from "../site/src/app/api/library/releases/history/route";
+import { GET as download } from "../site/src/app/api/library/releases/history/export/route";
 const request = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/releases/history${query}`);
 beforeEach(() => {

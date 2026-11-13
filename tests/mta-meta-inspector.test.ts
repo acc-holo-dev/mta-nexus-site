@@ -3,7 +3,7 @@ import {
   MetaInspectionInputError,
   inspectMtaMetaXml,
   metaInspectionLimits,
-} from "../apps/web/src/lib/mta-meta-inspector";
+} from "../site/src/lib/mta-meta-inspector";
 
 describe("MTA meta.xml inspector", () => {
   it("extracts documented resource structure without inventing security verdicts", () => {

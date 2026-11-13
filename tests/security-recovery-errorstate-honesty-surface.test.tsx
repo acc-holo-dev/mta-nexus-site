@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/app/security/page.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/app/security/page.tsx"), "utf8");
 
 /** Honesty lock for security-center recovery unavailable / needs-verification notices. */
 it("locks security recovery unavailable and needs-verification to ErrorState", () => {

@@ -12,27 +12,27 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/organization-governance-service", () => ({
+vi.mock("../site/src/lib/services/organization-governance-service", () => ({
   organizationGovernanceService: mocks,
 }));
 
 import HistoryPage, {
   generateMetadata,
-} from "../apps/web/src/app/workspace/organizations/[id]/activity/page";
-import { OrganizationHistoryView } from "../apps/web/src/components/organization-history";
-import { OrganizationOwnershipTransfer } from "../apps/web/src/components/organization-ownership-transfer";
-import { OrganizationWorkspacePanel } from "../apps/web/src/components/organization-workspace";
+} from "../site/src/app/workspace/organizations/[id]/activity/page";
+import { OrganizationHistoryView } from "../site/src/components/organization-history";
+import { OrganizationOwnershipTransfer } from "../site/src/components/organization-ownership-transfer";
+import { OrganizationWorkspacePanel } from "../site/src/components/organization-workspace";
 import {
   confirmOwnershipTransfer,
   type OrganizationHistory,
   ownershipTransferSchema,
-} from "../apps/web/src/lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../apps/web/src/lib/organization-governance-copy";
-import type { OrganizationWorkspace } from "../apps/web/src/lib/organization-workspace-contract";
+} from "../site/src/lib/organization-governance-contract";
+import { organizationGovernanceCopy } from "../site/src/lib/organization-governance-copy";
+import type { OrganizationWorkspace } from "../site/src/lib/organization-workspace-contract";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:01.000Z";

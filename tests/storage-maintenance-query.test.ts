@@ -5,7 +5,7 @@ import {
   storageOffset,
   storageParse,
   storageQuery,
-} from "../apps/web/src/lib/storage-maintenance-query";
+} from "../site/src/lib/storage-maintenance-query";
 
 it("defaults to a private bounded inventory", () => {
   expect(storageQuery(new URLSearchParams())).toEqual({ page: 1, view: "all" });

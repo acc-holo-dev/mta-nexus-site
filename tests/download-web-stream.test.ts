@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 import { expect, it } from "vitest";
-import { toDownloadWebStream } from "../apps/web/src/lib/download-web-stream";
+import { toDownloadWebStream } from "../site/src/lib/download-web-stream";
 
 it("backpressures four unread 64 MiB downloads using bytes rather than chunk count", async () => {
   const fixtures = Array.from({ length: 4 }, () => {

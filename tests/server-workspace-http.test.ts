@@ -11,22 +11,22 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
   browseRate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { previewVisibility: state.preview, saveVisibility: state.save },
 }));
-vi.mock("../apps/web/src/lib/services/server-workspace-history-service", () => ({
+vi.mock("../site/src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.history },
 }));
-vi.mock("../apps/web/src/lib/server-content-api", () => ({ serverContentRate: state.browseRate }));
+vi.mock("../site/src/lib/server-content-api", () => ({ serverContentRate: state.browseRate }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-import { GET as exportPage } from "../apps/web/src/app/api/workspace/servers/[id]/activity/export/route";
-import { GET as history } from "../apps/web/src/app/api/workspace/servers/[id]/activity/route";
-import { POST as preview } from "../apps/web/src/app/api/workspace/servers/visibility/preview/route";
-import { POST as save } from "../apps/web/src/app/api/workspace/servers/visibility/route";
+import { GET as exportPage } from "../site/src/app/api/workspace/servers/[id]/activity/export/route";
+import { GET as history } from "../site/src/app/api/workspace/servers/[id]/activity/route";
+import { POST as preview } from "../site/src/app/api/workspace/servers/visibility/preview/route";
+import { POST as save } from "../site/src/app/api/workspace/servers/visibility/route";
 
 const time = "2026-10-12T00:00:00.123456Z",
   scope = { params: Promise.resolve({ id: "server" }) },

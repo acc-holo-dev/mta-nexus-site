@@ -10,20 +10,20 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import OrderCaseDetailLoading from "../apps/web/src/app/workspace/order-cases/[id]/loading";
-import OrderCasesLoading from "../apps/web/src/app/workspace/order-cases/loading";
-import PurchaseDetailLoading from "../apps/web/src/app/workspace/purchases/[id]/loading";
-import PurchaseSupportLoading from "../apps/web/src/app/workspace/purchases/[id]/support/loading";
-import PurchasesLoading from "../apps/web/src/app/workspace/purchases/loading";
-import ReviewReportDetailLoading from "../apps/web/src/app/workspace/review-reports/[id]/loading";
-import ReviewReportsLoading from "../apps/web/src/app/workspace/review-reports/loading";
-import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
-import { orderCaseCopy } from "../apps/web/src/lib/order-case-i18n";
-import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
+import OrderCaseDetailLoading from "../site/src/app/workspace/order-cases/[id]/loading";
+import OrderCasesLoading from "../site/src/app/workspace/order-cases/loading";
+import PurchaseDetailLoading from "../site/src/app/workspace/purchases/[id]/loading";
+import PurchaseSupportLoading from "../site/src/app/workspace/purchases/[id]/support/loading";
+import PurchasesLoading from "../site/src/app/workspace/purchases/loading";
+import ReviewReportDetailLoading from "../site/src/app/workspace/review-reports/[id]/loading";
+import ReviewReportsLoading from "../site/src/app/workspace/review-reports/loading";
+import { getCommerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
+import { orderCaseCopy } from "../site/src/lib/order-case-i18n";
+import { resourceReviewCopy } from "../site/src/lib/resource-review-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -99,8 +99,8 @@ it.each(["en", "ru"] as const)(
 
 it("locks purchases and order-case honesty chrome in exclusive page sources", () => {
   const purchasesPages = [
-    "apps/web/src/app/workspace/purchases/page.tsx",
-    "apps/web/src/app/workspace/purchases/[id]/page.tsx",
+    "site/src/app/workspace/purchases/page.tsx",
+    "site/src/app/workspace/purchases/[id]/page.tsx",
   ];
   for (const page of purchasesPages) {
     const source = read(page);
@@ -113,7 +113,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).not.toContain('role="alert"');
   }
 
-  const terms = read("apps/web/src/app/workspace/purchases/[id]/terms/page.tsx");
+  const terms = read("site/src/app/workspace/purchases/[id]/terms/page.tsx");
   expect(terms).toContain("ErrorState");
   expect(terms).toContain("overflow-x-clip");
   expect(terms).toContain("min-w-0");
@@ -123,11 +123,11 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(terms).not.toContain('<p role="alert"');
 
   const shellPages = [
-    "apps/web/src/app/workspace/purchases/[id]/support/page.tsx",
-    "apps/web/src/app/workspace/order-cases/page.tsx",
-    "apps/web/src/app/workspace/order-cases/[id]/page.tsx",
-    "apps/web/src/app/workspace/review-reports/page.tsx",
-    "apps/web/src/app/workspace/review-reports/[id]/page.tsx",
+    "site/src/app/workspace/purchases/[id]/support/page.tsx",
+    "site/src/app/workspace/order-cases/page.tsx",
+    "site/src/app/workspace/order-cases/[id]/page.tsx",
+    "site/src/app/workspace/review-reports/page.tsx",
+    "site/src/app/workspace/review-reports/[id]/page.tsx",
   ];
   for (const page of shellPages) {
     const source = read(page);
@@ -136,13 +136,13 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   }
 
   for (const loading of [
-    "apps/web/src/app/workspace/purchases/loading.tsx",
-    "apps/web/src/app/workspace/purchases/[id]/loading.tsx",
-    "apps/web/src/app/workspace/purchases/[id]/support/loading.tsx",
-    "apps/web/src/app/workspace/order-cases/loading.tsx",
-    "apps/web/src/app/workspace/order-cases/[id]/loading.tsx",
-    "apps/web/src/app/workspace/review-reports/loading.tsx",
-    "apps/web/src/app/workspace/review-reports/[id]/loading.tsx",
+    "site/src/app/workspace/purchases/loading.tsx",
+    "site/src/app/workspace/purchases/[id]/loading.tsx",
+    "site/src/app/workspace/purchases/[id]/support/loading.tsx",
+    "site/src/app/workspace/order-cases/loading.tsx",
+    "site/src/app/workspace/order-cases/[id]/loading.tsx",
+    "site/src/app/workspace/review-reports/loading.tsx",
+    "site/src/app/workspace/review-reports/[id]/loading.tsx",
   ]) {
     const source = read(loading);
     expect(source).toContain("overflow-x-clip");
@@ -150,24 +150,24 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).toContain('"en" | "ru"');
   }
 
-  const history = read("apps/web/src/lib/commerce-history-i18n.ts");
+  const history = read("site/src/lib/commerce-history-i18n.ts");
   expect(history).toContain("purchasesLoadUnavailable");
   expect(history).toContain("purchasesLoadUnavailableHint");
   expect(history).toContain("orderLoadUnavailable");
   expect(history).toContain("orderLoadUnavailableHint");
   expect(history).toContain("emptyPurchasesHint");
   expect(history).toContain("emptyItemsHint");
-  expect(read("apps/web/src/lib/order-case-i18n.ts")).toContain("loading:");
-  expect(read("apps/web/src/lib/order-case-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/lib/resource-review-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/components/order-case-page.tsx")).toContain("loadUnavailableHint");
-  expect(read("apps/web/src/components/resource-review-report-screen.tsx")).toContain(
+  expect(read("site/src/lib/order-case-i18n.ts")).toContain("loading:");
+  expect(read("site/src/lib/order-case-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/lib/resource-review-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/components/order-case-page.tsx")).toContain("loadUnavailableHint");
+  expect(read("site/src/components/resource-review-report-screen.tsx")).toContain(
     "loadUnavailableHint",
   );
 });
 
 it("locks order-case filter apply and selects to touch targets", () => {
-  const source = read("apps/web/src/components/order-case-page.tsx");
+  const source = read("site/src/components/order-case-page.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
   expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");

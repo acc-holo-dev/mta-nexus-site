@@ -23,10 +23,10 @@ vi.mock("@nexus/db", () => ({
   },
   licenseRepository: { pageUserHistory: state.licenses },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/link", async () => {
@@ -44,14 +44,14 @@ vi.mock("next/link", async () => {
   };
 });
 
-import LicensesLoading from "../apps/web/src/app/workspace/licenses/loading";
-import Licenses, { metadata as licensesMeta } from "../apps/web/src/app/workspace/licenses/page";
-import PurchasesLoading from "../apps/web/src/app/workspace/purchases/loading";
-import Purchases, { metadata as purchasesMeta } from "../apps/web/src/app/workspace/purchases/page";
-import Sales, { metadata as salesMeta } from "../apps/web/src/app/workspace/sales/page";
-import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
+import LicensesLoading from "../site/src/app/workspace/licenses/loading";
+import Licenses, { metadata as licensesMeta } from "../site/src/app/workspace/licenses/page";
+import PurchasesLoading from "../site/src/app/workspace/purchases/loading";
+import Purchases, { metadata as purchasesMeta } from "../site/src/app/workspace/purchases/page";
+import Sales, { metadata as salesMeta } from "../site/src/app/workspace/sales/page";
+import { getCommerceHistoryCopy } from "../site/src/lib/commerce-history-i18n";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getLicenseMaintenanceCopy } from "../site/src/lib/license-maintenance-i18n";
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });

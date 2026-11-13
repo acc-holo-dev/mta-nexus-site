@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { privateRequest } from "../apps/web/src/lib/private-request";
+import { privateRequest } from "../site/src/lib/private-request";
 
 describe("private request policy", () => {
   it("enforces same-origin credentials and no-store", () => {

@@ -6,19 +6,19 @@ vi.mock("@nexus/db", () => ({
 import {
   serverStatisticsService,
   type ServerStatisticsResult,
-} from "../apps/web/src/lib/services/server-statistics-service";
+} from "../site/src/lib/services/server-statistics-service";
 import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
-} from "../apps/web/src/lib/server-statistics-contract";
+} from "../site/src/lib/server-statistics-contract";
 import {
   serverStatisticsCsv,
   serverStatisticsIntervals,
-} from "../apps/web/src/lib/server-statistics-export";
+} from "../site/src/lib/server-statistics-export";
 import {
   serverStatisticsCopy,
   serverStatisticsError,
-} from "../apps/web/src/lib/server-statistics-copy";
+} from "../site/src/lib/server-statistics-copy";
 const summary = {
   observationCount: 100,
   knownPlayerCount: 90,

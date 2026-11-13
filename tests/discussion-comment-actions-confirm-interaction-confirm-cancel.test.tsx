@@ -12,18 +12,18 @@ const harness = vi.hoisted(() => ({
   onSaved: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../apps/web/src/lib/user-platform-client", async (original) => {
-  const actual = await original<typeof import("../apps/web/src/lib/user-platform-client")>();
+vi.mock("../site/src/lib/user-platform-client", async (original) => {
+  const actual = await original<typeof import("../site/src/lib/user-platform-client")>();
   return {
     ...actual,
     platformRequest: harness.request,
   };
 });
 
-import { DiscussionCommentActions } from "../apps/web/src/components/discussion-comment-actions";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+import { DiscussionCommentActions } from "../site/src/components/discussion-comment-actions";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
 
 const { render, control, submit, seedModeratorRemove } =
   createDiscussionCommentActionsConfirmInteractionHelpers(

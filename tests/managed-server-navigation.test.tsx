@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../apps/web/src/components/shell-destination-policy";
+import type { ShellAuthSession } from "../site/src/components/shell-destination-policy";
 
 const state = vi.hoisted(() => ({
   path: "/workspace/servers",
@@ -13,11 +13,11 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => state.path }));
-vi.mock("../apps/web/src/components/use-auth-session", () => ({
+vi.mock("../site/src/components/use-auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
-import { FooterContribute } from "../apps/web/src/components/footer-contribute";
+import { FooterContribute } from "../site/src/components/footer-contribute";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -26,9 +26,9 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../apps/web/src/components/shell-destination-policy";
-import { Sidebar } from "../apps/web/src/components/sidebar";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/components/shell-destination-policy";
+import { Sidebar } from "../site/src/components/sidebar";
+import { getDictionary } from "../site/src/lib/i18n";
 
 beforeEach(() => {
   state.path = "/workspace/servers";
@@ -108,10 +108,7 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
 });
 
 it("keeps mobile More menu session checking and staff admin labels in source", () => {
-  const source = readFileSync(
-    resolve(process.cwd(), "apps/web/src/components/mobile-nav.tsx"),
-    "utf8",
-  );
+  const source = readFileSync(resolve(process.cwd(), "site/src/components/mobile-nav.tsx"), "utf8");
   expect(source).toContain("dictionary.nav.checkingSession");
   expect(source).toContain('href: "/workspace/library"');
   expect(source).toContain('href: "/workspace/resources/new"');

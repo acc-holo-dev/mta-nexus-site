@@ -34,24 +34,21 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { getManagedProduct: state.findManagedProduct },
 }));
 
 import { consumeRateLimit } from "@nexus/security";
-import { GET as reviewer } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
+import { GET as reviewer } from "../site/src/app/api/admin/builds/[buildId]/download/route";
 import {
   POST as compatibility,
   GET as readCompatibility,
-} from "../apps/web/src/app/api/products/[id]/compatibility/route";
-import { GET as candidates } from "../apps/web/src/app/api/products/[id]/variants/candidates/route";
-import {
-  GET as managed,
-  POST as variants,
-} from "../apps/web/src/app/api/products/[id]/variants/route";
+} from "../site/src/app/api/products/[id]/compatibility/route";
+import { GET as candidates } from "../site/src/app/api/products/[id]/variants/candidates/route";
+import { GET as managed, POST as variants } from "../site/src/app/api/products/[id]/variants/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   revision = "2026-10-10T00:00:00.000Z";

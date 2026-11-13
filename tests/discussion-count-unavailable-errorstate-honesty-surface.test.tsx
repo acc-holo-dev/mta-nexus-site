@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/content-discussion.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/content-discussion.tsx"), "utf8");
 
 /** Honesty lock for discussion countUnavailable notice. */
 it("locks discussion countUnavailable to ErrorState", () => {

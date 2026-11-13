@@ -12,19 +12,19 @@ const mocks = vi.hoisted(() => ({
   replay: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({ closeDatabaseConnection: mocks.close }));
-vi.mock("../apps/web/scripts/discussion-replay-database", () => ({
+vi.mock("../site/scripts/discussion-replay-database", () => ({
   resolveDiscussionReplayDatabaseIdentity: mocks.identity,
   assertDiscussionReplayClosedWindow: mocks.clock,
   previewDiscussionReplay: mocks.preview,
   readDiscussionReplayPage: mocks.page,
 }));
-vi.mock("../apps/web/scripts/discussion-replay-storage", () => ({
+vi.mock("../site/scripts/discussion-replay-storage", () => ({
   withDiscussionReplayCheckpoint: mocks.storage,
 }));
-vi.mock("../apps/web/src/lib/services/discussion-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/discussion-follow-notification-service", () => ({
   notifyDiscussionReplies: mocks.deliver,
 }));
-vi.mock("../apps/web/src/lib/services/discussion-notification-replay", () => ({
+vi.mock("../site/src/lib/services/discussion-notification-replay", () => ({
   replayDiscussionNotifications: mocks.replay,
 }));
 
@@ -73,7 +73,7 @@ afterEach(() => {
   }
   vi.restoreAllMocks();
 });
-const invoke = () => import("../apps/web/scripts/replay-discussion-notifications");
+const invoke = () => import("../site/scripts/replay-discussion-notifications");
 it.each([false, true])(
   "routes preview policy repair=%s without checkpoint/dispatcher/worker side effects",
   async (repairPush) => {

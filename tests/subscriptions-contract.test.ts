@@ -10,15 +10,15 @@ import {
   expectedSubscriptionReceiptId,
   confirmedSubscriptionEstimate,
   confirmedSubscriptionReceipt,
-} from "../apps/web/src/lib/subscription-confirmation";
-import { subscriptionError, subscriptionsCopy } from "../apps/web/src/lib/subscriptions-i18n";
+} from "../site/src/lib/subscription-confirmation";
+import { subscriptionError, subscriptionsCopy } from "../site/src/lib/subscriptions-i18n";
 import {
   subscriptionActivationQuery,
   subscriptionEstimateQuery,
   subscriptionId,
   subscriptionPageParams,
   subscriptionsQuery,
-} from "../apps/web/src/lib/subscriptions-query";
+} from "../site/src/lib/subscriptions-query";
 import {
   activation,
   cancellation,

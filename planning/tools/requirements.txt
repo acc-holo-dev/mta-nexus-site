@@ -1,0 +1,2 @@
+# Development-only: standards-compliant JSON Schema validation; no app dependency.
+jsonschema==4.26.0

@@ -24,10 +24,10 @@ import {
   previewDiscussionReplay,
   readDiscussionReplayPage,
   resolveDiscussionReplayDatabaseIdentity,
-} from "../apps/web/scripts/discussion-replay-database";
-import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
-import { notifyDiscussionReplies } from "../apps/web/src/lib/services/discussion-follow-notification-service";
-import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
+} from "../site/scripts/discussion-replay-database";
+import { withDiscussionReplayCheckpoint } from "../site/scripts/discussion-replay-storage";
+import { notifyDiscussionReplies } from "../site/src/lib/services/discussion-follow-notification-service";
+import { replayDiscussionNotifications } from "../site/src/lib/services/discussion-notification-replay";
 import { discussionPushReceipt } from "../packages/db/src/repositories/discussion-push-receipt";
 import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 

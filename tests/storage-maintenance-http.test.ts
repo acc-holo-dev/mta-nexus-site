@@ -12,18 +12,18 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   cleanup: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/storage-maintenance-service", () => ({
+vi.mock("../site/src/lib/services/storage-maintenance-service", () => ({
   storageMaintenanceService: state,
 }));
 
-import { POST as discover } from "../apps/web/src/app/api/admin/storage/discovery/route";
-import { GET as namespaces } from "../apps/web/src/app/api/admin/storage/namespaces/route";
-import { POST as cleanup } from "../apps/web/src/app/api/admin/storage/objects/[id]/cleanup/route";
-import { GET as list } from "../apps/web/src/app/api/admin/storage/route";
+import { POST as discover } from "../site/src/app/api/admin/storage/discovery/route";
+import { GET as namespaces } from "../site/src/app/api/admin/storage/namespaces/route";
+import { POST as cleanup } from "../site/src/app/api/admin/storage/objects/[id]/cleanup/route";
+import { GET as list } from "../site/src/app/api/admin/storage/route";
 
 const context = { params: Promise.resolve({ id: "smo_a" }) };
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {

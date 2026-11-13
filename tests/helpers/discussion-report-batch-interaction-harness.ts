@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
-import { reportBatchCopy } from "../../apps/web/src/lib/report-batch-copy";
+import { reportBatchCopy } from "../../site/src/lib/report-batch-copy";
 import {
   type FlatTestElement,
   findTestButton,

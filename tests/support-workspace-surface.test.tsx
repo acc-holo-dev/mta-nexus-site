@@ -5,17 +5,17 @@ const mocks = vi.hoisted(() => ({ session: vi.fn(), locale: "en" as "ru" | "en" 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { SupportCaseActions } from "../apps/web/src/components/support-case-actions";
-import { SupportCenter } from "../apps/web/src/components/support-center";
-import { SupportPageSurface, supportMetadata } from "../apps/web/src/components/support-page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { supportWorkspaceCopy } from "../apps/web/src/lib/support-workspace-copy";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { SupportCaseActions } from "../site/src/components/support-case-actions";
+import { SupportCenter } from "../site/src/components/support-center";
+import { SupportPageSurface, supportMetadata } from "../site/src/components/support-page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { supportWorkspaceCopy } from "../site/src/lib/support-workspace-copy";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,

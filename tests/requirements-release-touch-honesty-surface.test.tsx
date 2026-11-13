@@ -7,10 +7,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "apps/web/src/components/resource-requirements-screen.tsx",
-  "apps/web/src/components/collection-releases-screen.tsx",
-  "apps/web/src/components/build-package-screen.tsx",
-  "apps/web/src/components/library-release-history-screen.tsx",
+  "site/src/components/resource-requirements-screen.tsx",
+  "site/src/components/collection-releases-screen.tsx",
+  "site/src/components/build-package-screen.tsx",
+  "site/src/components/library-release-history-screen.tsx",
 ] as const;
 
 it("locks residual requirements/release filter submit CTAs to size=touch", () => {

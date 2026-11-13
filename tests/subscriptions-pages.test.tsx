@@ -27,11 +27,11 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/subscriptions-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/subscriptions-service", () => ({
   subscriptionsService: {
     dashboard: state.dashboard,
     scopes: state.scopes,
@@ -40,18 +40,18 @@ vi.mock("../apps/web/src/lib/services/subscriptions-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import ActivateLoading from "../apps/web/src/app/workspace/subscriptions/activate/loading";
-import Activate from "../apps/web/src/app/workspace/subscriptions/activate/page";
-import History from "../apps/web/src/app/workspace/subscriptions/history/page";
-import SubscriptionsLoading from "../apps/web/src/app/workspace/subscriptions/loading";
-import Account from "../apps/web/src/app/workspace/subscriptions/page";
-import ReceiptLoading from "../apps/web/src/app/workspace/subscriptions/receipts/[id]/loading";
-import Detail from "../apps/web/src/app/workspace/subscriptions/receipts/[id]/page";
-import { subscriptionsCopy } from "../apps/web/src/lib/subscriptions-i18n";
+import ActivateLoading from "../site/src/app/workspace/subscriptions/activate/loading";
+import Activate from "../site/src/app/workspace/subscriptions/activate/page";
+import History from "../site/src/app/workspace/subscriptions/history/page";
+import SubscriptionsLoading from "../site/src/app/workspace/subscriptions/loading";
+import Account from "../site/src/app/workspace/subscriptions/page";
+import ReceiptLoading from "../site/src/app/workspace/subscriptions/receipts/[id]/loading";
+import Detail from "../site/src/app/workspace/subscriptions/receipts/[id]/page";
+import { subscriptionsCopy } from "../site/src/lib/subscriptions-i18n";
 import { activation, date, expiresAt, plan, receipt, subscription } from "./subscriptions-fixtures";
 
 const context = { params: Promise.resolve({ id: receipt.id }), searchParams: Promise.resolve({}) },

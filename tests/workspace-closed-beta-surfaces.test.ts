@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   showAdminDestination,
   showWorkspaceTools,
-} from "../apps/web/src/components/shell-destination-policy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/components/shell-destination-policy";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   session: null as null | { id: string; username: string; role: string },
@@ -40,25 +40,25 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { listActivePublicByIds: repos.servers },
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.session),
   },
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: repos.directory },
   indexMtaObservations: vi.fn(() => () => undefined),
 }));
 
-import LicensesPage from "../apps/web/src/app/workspace/licenses/page";
-import PurchasesPage from "../apps/web/src/app/workspace/purchases/page";
-import SalesPage from "../apps/web/src/app/workspace/sales/page";
-import SavedPage from "../apps/web/src/app/workspace/saved/page";
+import LicensesPage from "../site/src/app/workspace/licenses/page";
+import PurchasesPage from "../site/src/app/workspace/purchases/page";
+import SalesPage from "../site/src/app/workspace/sales/page";
+import SavedPage from "../site/src/app/workspace/saved/page";
 
 describe("open free-beta workspace behavior", () => {
   beforeEach(() => {

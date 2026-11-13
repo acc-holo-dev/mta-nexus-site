@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/mta-master-server-directory.tsx";
+const surface = "site/src/components/mta-master-server-directory.tsx";
 
 it("locks master directory stale notice to ErrorState", () => {
   const source = read(surface);

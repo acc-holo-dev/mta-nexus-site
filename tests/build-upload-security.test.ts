@@ -7,7 +7,7 @@ import {
   validateBuildFileSelection,
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
-} from "../apps/web/src/lib/build-file-validation";
+} from "../site/src/lib/build-file-validation";
 import { MAX_BUILD_MULTIPART_OVERHEAD_BYTES, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
@@ -67,7 +67,7 @@ describe("build file format detection", () => {
 
   it("keeps the reverse proxy headroom aligned with the multipart upload envelope", () => {
     const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/builds/route.ts"),
+      resolve(process.cwd(), "site/src/app/api/products/[id]/builds/route.ts"),
       "utf8",
     );
     const caddy = readFileSync(resolve(process.cwd(), "deploy/Caddyfile"), "utf8");
@@ -109,7 +109,7 @@ describe("build file format detection", () => {
 describe("build upload hardening", () => {
   it("checks archive signatures before storage", () => {
     const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/builds/route.ts"),
+      resolve(process.cwd(), "site/src/app/api/products/[id]/builds/route.ts"),
       "utf8",
     );
 

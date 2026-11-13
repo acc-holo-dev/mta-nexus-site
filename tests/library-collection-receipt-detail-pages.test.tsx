@@ -22,15 +22,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { receiptDetail: state.history },
 }));
 
-vi.mock("../apps/web/src/components/library-collection-restore", () => ({
+vi.mock("../site/src/components/library-collection-restore", () => ({
   LibraryCollectionRestoreControls: ({
     receiptId,
     preview,
@@ -43,8 +43,8 @@ vi.mock("../apps/web/src/components/library-collection-restore", () => ({
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/collections/receipts/[id]/page";
-import { libraryCollectionReceiptsCopy } from "../apps/web/src/lib/library-collection-receipts-i18n";
+} from "../site/src/app/workspace/library/collections/receipts/[id]/page";
+import { libraryCollectionReceiptsCopy } from "../site/src/lib/library-collection-receipts-i18n";
 
 const date = "2026-10-13T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",

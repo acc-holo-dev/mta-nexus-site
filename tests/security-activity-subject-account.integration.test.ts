@@ -1,7 +1,7 @@
 import { auditEvents, auditRepository, db } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
-import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
+import { SecurityCenterService } from "../site/src/lib/services/security-center-service";
 import { setupSecurityActivitySubject } from "./helpers/security-activity-subject-harness";
 
 setupSecurityActivitySubject();

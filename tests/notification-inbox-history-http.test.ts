@@ -9,15 +9,15 @@ const state = vi.hoisted(() => ({
   command: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
+vi.mock("../site/src/lib/services/notification-inbox-service", () => ({
   notificationInboxService: { page: state.page, command: state.command },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-import { GET, PATCH } from "../apps/web/src/app/api/notifications/inbox/route";
+import { GET, PATCH } from "../site/src/app/api/notifications/inbox/route";
 
 const value = { isRead: true, items: [{ id: "owned", expectedIsRead: false }] };
 const request = (

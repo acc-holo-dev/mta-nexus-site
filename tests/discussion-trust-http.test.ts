@@ -10,26 +10,22 @@ const mocks = vi.hoisted(() => ({
   approvals: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../site/src/lib/services/discussion-workspace-service", () => ({
   discussionWorkspaceService: { page: mocks.page, own: mocks.own, mutate: mocks.mutate },
 }));
-vi.mock("../apps/web/src/lib/services/public-verification-history-service", () => ({
+vi.mock("../site/src/lib/services/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as page } from "../apps/web/src/app/api/workspace/discussions/route";
-import {
-  GET as own,
-  PATCH,
-  DELETE,
-} from "../apps/web/src/app/api/workspace/discussions/[id]/route";
-import { GET as approvals } from "../apps/web/src/app/api/users/[username]/trust/history/route";
+import { GET as page } from "../site/src/app/api/workspace/discussions/route";
+import { GET as own, PATCH, DELETE } from "../site/src/app/api/workspace/discussions/[id]/route";
+import { GET as approvals } from "../site/src/app/api/users/[username]/trust/history/route";
 const actor = { id: "actor", role: "admin" },
   revision = "a".repeat(64),
   comment = { params: Promise.resolve({ id: "comment" }) },

@@ -18,12 +18,12 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/lib/organization-workspace-client", () => ({
+vi.mock("../site/src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationProfileForm } from "../apps/web/src/components/organization-profile-form";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
+import { OrganizationProfileForm } from "../site/src/components/organization-profile-form";
+import { getOrganizationCopy } from "../site/src/lib/organization-workspace-copy";
 
 const { render, edit } = createOrganizationProfileDraftInteractionHelpers(
   harness,

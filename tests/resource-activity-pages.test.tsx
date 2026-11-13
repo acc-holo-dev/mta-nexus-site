@@ -30,25 +30,25 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...rest }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/resource-activity-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
 
-import History, { metadata as historyMeta } from "../apps/web/src/app/workspace/acquisitions/page";
+import History, { metadata as historyMeta } from "../site/src/app/workspace/acquisitions/page";
 import Activity, {
   metadata as activityMeta,
-} from "../apps/web/src/app/workspace/resources/[id]/activity/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getResourceActivityCopy } from "../apps/web/src/lib/resource-activity-i18n";
+} from "../site/src/app/workspace/resources/[id]/activity/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getResourceActivityCopy } from "../site/src/lib/resource-activity-i18n";
 import {
   acquisitionPage,
   acquisitionSource,
   resourceActivityDays,
-} from "../apps/web/src/lib/resource-activity-view";
+} from "../site/src/lib/resource-activity-view";
 
 const now = new Date("2026-10-10T12:00:00Z");
 beforeEach(() => {
@@ -165,7 +165,7 @@ it("hides activity when current management permission is lost", async () => {
   await expect(Activity(activityInput)).rejects.toThrow("NEXT_NOT_FOUND");
 });
 it("shows an honest recovery state when publisher activity fails", async () => {
-  const { getResourceActivityCopy } = await import("../apps/web/src/lib/resource-activity-i18n");
+  const { getResourceActivityCopy } = await import("../site/src/lib/resource-activity-i18n");
   state.report.mockRejectedValue(new Error("activity unavailable"));
   const copy = getResourceActivityCopy("en");
   const html = renderToStaticMarkup(await Activity(activityInput));

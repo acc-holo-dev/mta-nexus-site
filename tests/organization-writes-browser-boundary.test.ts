@@ -4,12 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: (prefix: string) => `${prefix}_new`,
 }));
-vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+vi.mock("../site/src/lib/services/organization-content-service", () => ({
   organizationContentService: {
     page: vi.fn(),
     get: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
     restore: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/organization-workspace-service", () => ({
+vi.mock("../site/src/lib/services/organization-workspace-service", () => ({
   organizationWorkspaceService: {
     list: vi.fn(),
     get: vi.fn(),
@@ -31,29 +31,29 @@ vi.mock("../apps/web/src/lib/services/organization-workspace-service", () => ({
     batchMembers: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/organization-governance-service", () => ({
+vi.mock("../site/src/lib/services/organization-governance-service", () => ({
   organizationGovernanceService: {
     transfer: vi.fn(),
   },
 }));
 
-import { POST as restoreContent } from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route";
+import { POST as restoreContent } from "../site/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route";
 import {
   DELETE as archiveContent,
   PATCH as editContent,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/route";
-import { POST as createContent } from "../apps/web/src/app/api/workspace/organizations/[id]/content/route";
-import { POST as leaveOrganization } from "../apps/web/src/app/api/workspace/organizations/[id]/leave/route";
+} from "../site/src/app/api/workspace/organizations/[id]/content/[contentId]/route";
+import { POST as createContent } from "../site/src/app/api/workspace/organizations/[id]/content/route";
+import { POST as leaveOrganization } from "../site/src/app/api/workspace/organizations/[id]/leave/route";
 import {
   PATCH as changeMember,
   DELETE as removeMember,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route";
-import { POST as previewMembers } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/preview/route";
-import { POST as batchMembers } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/route";
-import { POST as addMember } from "../apps/web/src/app/api/workspace/organizations/[id]/members/route";
-import { POST as transferOwnership } from "../apps/web/src/app/api/workspace/organizations/[id]/ownership/route";
-import { PATCH as updateOrganization } from "../apps/web/src/app/api/workspace/organizations/[id]/route";
-import { POST as createOrganization } from "../apps/web/src/app/api/workspace/organizations/route";
+} from "../site/src/app/api/workspace/organizations/[id]/members/[userId]/route";
+import { POST as previewMembers } from "../site/src/app/api/workspace/organizations/[id]/members/batch/preview/route";
+import { POST as batchMembers } from "../site/src/app/api/workspace/organizations/[id]/members/batch/route";
+import { POST as addMember } from "../site/src/app/api/workspace/organizations/[id]/members/route";
+import { POST as transferOwnership } from "../site/src/app/api/workspace/organizations/[id]/ownership/route";
+import { PATCH as updateOrganization } from "../site/src/app/api/workspace/organizations/[id]/route";
+import { POST as createOrganization } from "../site/src/app/api/workspace/organizations/route";
 
 const context = {
   params: Promise.resolve({ id: "org", contentId: "content", userId: "member" }),

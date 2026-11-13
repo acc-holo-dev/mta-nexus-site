@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { resourceReleaseWatchesCopy } from "../../apps/web/src/lib/resource-release-watches-i18n";
+import { resourceReleaseWatchesCopy } from "../../site/src/lib/resource-release-watches-i18n";
 
 type ResourceReleaseWatchInteractionHarness = {
   slots: unknown[];

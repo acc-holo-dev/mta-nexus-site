@@ -17,26 +17,26 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/order-case-service", () => ({ orderCaseService: state }));
-vi.mock("../apps/web/src/components/support-case-thread", () => ({
+vi.mock("../site/src/lib/services/order-case-service", () => ({ orderCaseService: state }));
+vi.mock("../site/src/components/support-case-thread", () => ({
   SupportCaseThread: ({ caseId }: { caseId: string }) => (
     <div data-case={caseId}>Existing conversation</div>
   ),
 }));
 
-import OrderCaseDetailLoading from "../apps/web/src/app/admin/commerce/order-cases/[id]/loading";
-import OrderCasesLoading from "../apps/web/src/app/admin/commerce/order-cases/loading";
+import OrderCaseDetailLoading from "../site/src/app/admin/commerce/order-cases/[id]/loading";
+import OrderCasesLoading from "../site/src/app/admin/commerce/order-cases/loading";
 import {
   OrderCaseCreatePage,
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
-} from "../apps/web/src/components/order-case-page";
-import { orderCaseCopy } from "../apps/web/src/lib/order-case-i18n";
+} from "../site/src/components/order-case-page";
+import { orderCaseCopy } from "../site/src/lib/order-case-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const evidence = {

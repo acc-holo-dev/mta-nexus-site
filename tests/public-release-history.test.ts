@@ -4,12 +4,12 @@ import {
   parseDownloadBuildSelection,
   resourceDownloadUrl,
   validDownloadBuildId,
-} from "../apps/web/src/lib/build-download-selection";
+} from "../site/src/lib/build-download-selection";
 import {
   parseReleaseHistoryPage,
   releaseHistoryCopy,
   releaseHistoryHref,
-} from "../apps/web/src/lib/public-release-history";
+} from "../site/src/lib/public-release-history";
 
 describe("bounded published build archive", () => {
   it("clamps excessive pages and never allows unbounded page sizes", () => {

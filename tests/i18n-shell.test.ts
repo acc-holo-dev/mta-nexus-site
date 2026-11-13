@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { adminStatusLabel } from "../apps/web/src/app/admin/status-labels";
-import { getDictionary, resolveLocale } from "../apps/web/src/lib/i18n";
+import { adminStatusLabel } from "../site/src/app/admin/status-labels";
+import { getDictionary, resolveLocale } from "../site/src/lib/i18n";
 
 describe("RU/EN shell foundation", () => {
   it("resolves only supported locales", () => {

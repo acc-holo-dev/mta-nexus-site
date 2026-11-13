@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   confirmedCreatedServer,
   confirmedUpdatedServer,
-} from "../apps/web/src/lib/server-mutation-confirmation";
+} from "../site/src/lib/server-mutation-confirmation";
 
 describe("server mutation confirmation", () => {
   it("confirms only a 201 creation for the requested slug", () => {

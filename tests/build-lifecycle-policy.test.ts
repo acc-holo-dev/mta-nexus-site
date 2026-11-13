@@ -22,7 +22,7 @@ const command = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -37,11 +37,11 @@ vi.mock("@nexus/security", async (importOriginal) => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../site/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { command, detail: vi.fn() },
 }));
 
-import { PATCH } from "../apps/web/src/app/api/products/[id]/builds/[buildId]/route";
+import { PATCH } from "../site/src/app/api/products/[id]/builds/[buildId]/route";
 
 const retireBody = {
   action: "retire" as const,

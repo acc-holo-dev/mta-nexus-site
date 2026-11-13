@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
-} from "../apps/web/src/lib/support-idempotency";
+} from "../site/src/lib/support-idempotency";
 
 describe("support request idempotency contract", () => {
   const key = "12345678-1234-4234-8234-123456789abc";

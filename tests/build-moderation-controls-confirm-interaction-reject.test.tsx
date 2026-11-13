@@ -15,21 +15,21 @@ const harness = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
-import { BuildModerationControls } from "../apps/web/src/components/build-moderation-controls";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+import { BuildModerationControls } from "../site/src/components/build-moderation-controls";
+import { getDictionary } from "../site/src/lib/i18n";
+import { verificationCopy } from "../site/src/lib/verification-workspace-copy";
 
 const { render, actionButton, seedControls } =
   createBuildModerationControlsConfirmInteractionHelpers(

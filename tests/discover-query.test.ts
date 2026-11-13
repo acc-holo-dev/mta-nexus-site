@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DISCOVER_TYPES,
-  discoverHref,
-  parseDiscoverQuery,
-} from "../apps/web/src/lib/discover-query";
+import { DISCOVER_TYPES, discoverHref, parseDiscoverQuery } from "../site/src/lib/discover-query";
 
 describe("discover query contract", () => {
   it("defaults to servers and keeps entity families explicit", () => {

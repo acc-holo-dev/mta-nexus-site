@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confirmedCreatedResource } from "../apps/web/src/lib/new-resource-response";
+import { confirmedCreatedResource } from "../site/src/lib/new-resource-response";
 
 const request = {
   title: "Resource title",

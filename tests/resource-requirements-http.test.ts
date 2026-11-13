@@ -8,17 +8,17 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-requirements-service", () => ({
+vi.mock("../site/src/lib/services/resource-requirements-service", () => ({
   resourceRequirementsService: { report: state.report },
 }));
 
-import { GET as moderator } from "../apps/web/src/app/api/admin/resources/[id]/requirements/route";
-import { GET as download } from "../apps/web/src/app/api/library/[id]/requirements/export/route";
-import { GET as read } from "../apps/web/src/app/api/library/[id]/requirements/route";
-import { GET as publisher } from "../apps/web/src/app/api/products/[id]/requirements/route";
+import { GET as moderator } from "../site/src/app/api/admin/resources/[id]/requirements/route";
+import { GET as download } from "../site/src/app/api/library/[id]/requirements/export/route";
+import { GET as read } from "../site/src/app/api/library/[id]/requirements/route";
+import { GET as publisher } from "../site/src/app/api/products/[id]/requirements/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 function request(query = "") {

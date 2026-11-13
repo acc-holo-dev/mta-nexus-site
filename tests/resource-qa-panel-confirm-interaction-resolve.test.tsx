@@ -16,12 +16,12 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/example" }));
 
-import { ResourceQaPanel } from "../apps/web/src/components/resource-qa-panel";
-import { resourceQaCopy } from "../apps/web/src/lib/resource-qa-i18n";
+import { ResourceQaPanel } from "../site/src/components/resource-qa-panel";
+import { resourceQaCopy } from "../site/src/lib/resource-qa-i18n";
 
 const { render, control } = createResourceQaPanelConfirmInteractionHelpers(
   harness,

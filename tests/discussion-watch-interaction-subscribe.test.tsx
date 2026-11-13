@@ -16,13 +16,13 @@ const harness = vi.hoisted(() => ({
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 
-import { FollowButton } from "../apps/web/src/components/follow-button";
+import { FollowButton } from "../site/src/components/follow-button";
 
 const { render, toggle } = createDiscussionWatchInteractionHelpers(
   harness,

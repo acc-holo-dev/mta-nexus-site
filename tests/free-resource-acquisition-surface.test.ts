@@ -4,7 +4,7 @@ const redirect = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({ redirect }));
 
-import CheckoutCompatibilityRedirect from "../apps/web/src/app/checkout/page";
+import CheckoutCompatibilityRedirect from "../site/src/app/checkout/page";
 
 describe("free resource acquisition compatibility redirect", () => {
   beforeEach(() => {

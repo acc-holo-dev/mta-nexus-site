@@ -23,7 +23,7 @@ import {
 import type { MailLease } from "./account-mail-worker";
 import { userRepository } from "./users";
 import { digestSessionToken } from "./sessions";
-import { authService } from "../../../../apps/web/src/lib/services/auth-service";
+import { authService } from "../../../../site/src/lib/services/auth-service";
 import { generateId, generateSessionToken } from "@nexus/security";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

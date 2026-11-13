@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { confirmedServerReview } from "../apps/web/src/lib/server-review-confirmation";
+import { confirmedServerReview } from "../site/src/lib/server-review-confirmation";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
@@ -15,10 +15,10 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
 vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_generated`,
   consumeRateLimit: async (...args: unknown[]) => {
@@ -35,12 +35,9 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST as moderate } from "../apps/web/src/app/api/admin/servers/reviews/[id]/route";
-import { GET as mine } from "../apps/web/src/app/api/servers/[id]/reviews/mine/route";
-import {
-  POST as mutate,
-  GET as publicPage,
-} from "../apps/web/src/app/api/servers/[id]/reviews/route";
+import { POST as moderate } from "../site/src/app/api/admin/servers/reviews/[id]/route";
+import { GET as mine } from "../site/src/app/api/servers/[id]/reviews/mine/route";
+import { POST as mutate, GET as publicPage } from "../site/src/app/api/servers/[id]/reviews/route";
 
 const context = { params: Promise.resolve({ id: "srv_a" }) };
 const adminContext = { params: Promise.resolve({ id: "cmt_a" }) };

@@ -10,7 +10,7 @@ vi.mock("@nexus/db", () => ({
   serverObservationRepository: { readWindow: repositories.readWindow },
 }));
 
-import { serverHistoryService } from "../apps/web/src/lib/services/server-history-service";
+import { serverHistoryService } from "../site/src/lib/services/server-history-service";
 
 const listing = {
   id: "srv_known",

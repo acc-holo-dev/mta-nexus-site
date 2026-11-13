@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   libraryCollectionComparisonQuery,
   libraryCollectionComparisonSuffix,
-} from "../apps/web/src/lib/library-collection-comparison-query";
+} from "../site/src/lib/library-collection-comparison-query";
 import { libraryCollectionComparisonQuerySchema } from "../packages/validation/src/library-collections";
 it("defaults to choosing a destination and round-trips a reviewed comparison query", () => {
   expect(libraryCollectionComparisonQuery(new URLSearchParams())).toEqual({

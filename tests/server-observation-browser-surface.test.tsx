@@ -18,21 +18,21 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/servers/server/observations",
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/server-statistics-service", () => ({
+vi.mock("../site/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 
 import {
   ServerObservationBrowserLoading,
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
-} from "../apps/web/src/components/server-observation-browser-page";
-import { ServerObservationPeriodControls } from "../apps/web/src/components/server-observation-period-controls";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+} from "../site/src/components/server-observation-browser-page";
+import { ServerObservationPeriodControls } from "../site/src/components/server-observation-period-controls";
+import { getDictionary } from "../site/src/lib/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

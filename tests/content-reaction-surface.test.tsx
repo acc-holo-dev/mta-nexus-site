@@ -1,11 +1,11 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { ContentReactions } from "../apps/web/src/components/content-reactions";
-import { PublicUserTrustPanel } from "../apps/web/src/components/public-user-trust";
-import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { trustCopy } from "../apps/web/src/lib/public-user-trust-copy";
+import { ContentReactions } from "../site/src/components/content-reactions";
+import { PublicUserTrustPanel } from "../site/src/components/public-user-trust";
+import { reactionCopy } from "../site/src/lib/content-reaction-copy";
+import { getDictionary } from "../site/src/lib/i18n";
+import { trustCopy } from "../site/src/lib/public-user-trust-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -20,22 +20,22 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/guide",
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+vi.mock("../site/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { page: mocks.page },
 }));
-vi.mock("../apps/web/src/lib/services/public-user-trust-service", () => ({
+vi.mock("../site/src/lib/services/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 
 import TrustPage, {
   generateMetadata as trustMetadata,
-} from "../apps/web/src/app/users/[username]/trust/page";
-import ReactionsLoading from "../apps/web/src/app/workspace/reactions/loading";
-import ReactionsPage, { generateMetadata } from "../apps/web/src/app/workspace/reactions/page";
+} from "../site/src/app/users/[username]/trust/page";
+import ReactionsLoading from "../site/src/app/workspace/reactions/loading";
+import ReactionsPage, { generateMetadata } from "../site/src/app/workspace/reactions/page";
 
 const saved = {
   contentId: "content",
@@ -253,9 +253,7 @@ it("clips public trust panels and loading shells on narrow layouts", async () =>
   expect(panel).toContain("overflow-x-clip");
   expect(panel).toContain("min-w-0");
   expect(panel).toContain("min-h-11");
-  const { default: TrustLoading } = await import(
-    "../apps/web/src/app/users/[username]/trust/loading"
-  );
+  const { default: TrustLoading } = await import("../site/src/app/users/[username]/trust/loading");
   const loading = renderToStaticMarkup(await TrustLoading());
   expect(loading).toContain("overflow-x-clip");
   expect(loading).toContain("min-w-0");

@@ -2,12 +2,12 @@ import { expect, it } from "vitest";
 import {
   communityReportPageQuery,
   parseCommunityReportQuery,
-} from "../apps/web/src/lib/community-report-contract";
+} from "../site/src/lib/community-report-contract";
 import {
   parseReportHistoryQuery,
   reportHistoryPageSchema,
-} from "../apps/web/src/lib/community-report-history-contract";
-import { encodeChangeHistoryCursor } from "../apps/web/src/lib/private-change-history-query";
+} from "../site/src/lib/community-report-history-contract";
+import { encodeChangeHistoryCursor } from "../site/src/lib/private-change-history-query";
 
 it("accepts canonical exact-time filtered cursors and rejects ambiguous history queries", () => {
   const cursor = {

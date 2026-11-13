@@ -12,17 +12,17 @@ vi.mock("@nexus/security", async (importOriginal) => {
     consumeRateLimit: vi.fn(async () => ({ success: licenseControlHttpState.allowed })),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { licenseControlHttpState } = await import("./helpers/license-control-http-harness");
   return {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 
-import { GET as maintenance } from "../apps/web/src/app/api/admin/licenses/maintenance/route";
-import { GET as archiveExport } from "../apps/web/src/app/api/licenses/export/route";
-import { GET as archive } from "../apps/web/src/app/api/licenses/route";
+import { GET as maintenance } from "../site/src/app/api/admin/licenses/maintenance/route";
+import { GET as archiveExport } from "../site/src/app/api/licenses/export/route";
+import { GET as archive } from "../site/src/app/api/licenses/route";
 import {
   installLicenseControlHttpLifecycle,
   revision,

@@ -3,15 +3,15 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ session: vi.fn(), exportPage: vi.fn(), rate: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
+vi.mock("../site/src/lib/services/notification-inbox-service", () => ({
   notificationInboxService: { exportPage: state.exportPage },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-import { GET } from "../apps/web/src/app/api/notifications/inbox/export/route";
+import { GET } from "../site/src/app/api/notifications/inbox/export/route";
 
 const at = "2026-10-13T00:00:00.123456Z";
 const report = {

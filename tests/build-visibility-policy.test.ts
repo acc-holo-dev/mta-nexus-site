@@ -35,7 +35,7 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 const outsider = {
   id: "usr_outsider",

@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 describe("public product listing hardening", () => {
   it("bounds the free public catalog and prevents caching", () => {
     const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/route.ts"),
+      resolve(process.cwd(), "site/src/app/api/products/route.ts"),
       "utf8",
     );
     const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/product-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/product-service.ts"),
       "utf8",
     );
 

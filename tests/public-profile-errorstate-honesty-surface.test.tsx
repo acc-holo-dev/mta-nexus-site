@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/public-profile-form.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/public-profile-form.tsx"), "utf8");
 
 it("locks public profile form failures to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Avatar, Button, ErrorState, Input } from "@nexus/ui"');

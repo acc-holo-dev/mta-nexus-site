@@ -5,15 +5,15 @@ import {
   communityReportPageQuery,
   confirmsReportDecision,
   parseCommunityReportQuery,
-} from "../apps/web/src/lib/community-report-contract";
+} from "../site/src/lib/community-report-contract";
 import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
   communityReportMutationError,
-} from "../apps/web/src/lib/community-report-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+} from "../site/src/lib/community-report-copy";
+import { getDictionary } from "../site/src/lib/i18n";
+import { formatNotification } from "../site/src/lib/notification-copy";
 
 const report = {
   targetType: "comment",

@@ -17,12 +17,12 @@ vi.mock("react", async (original) => ({
   useEffect: () => {},
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return { useNexusLocale: () => ({ dictionary: getDictionary("en") }) };
 });
 
-import { ContextSwitcher } from "../apps/web/src/components/context-switcher";
+import { ContextSwitcher } from "../site/src/components/context-switcher";
 
 function render() {
   harness.cursor = 0;

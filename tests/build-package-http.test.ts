@@ -7,22 +7,22 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   page: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.rate })),
 }));
-vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../site/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
-vi.mock("../apps/web/src/lib/services/build-package-service", () => ({
+vi.mock("../site/src/lib/services/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
-import { GET as report } from "../apps/web/src/app/api/products/[id]/builds/[buildId]/package/route";
-import { GET as staffReport } from "../apps/web/src/app/api/admin/resources/[id]/builds/[buildId]/package/route";
-import { GET as files } from "../apps/web/src/app/api/products/[id]/builds/[buildId]/package/files/route";
-import { GET as staffFiles } from "../apps/web/src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
+import { GET as report } from "../site/src/app/api/products/[id]/builds/[buildId]/package/route";
+import { GET as staffReport } from "../site/src/app/api/admin/resources/[id]/builds/[buildId]/package/route";
+import { GET as files } from "../site/src/app/api/products/[id]/builds/[buildId]/package/files/route";
+import { GET as staffFiles } from "../site/src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
 const context = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const request = (suffix = "") =>
   new NextRequest(`http://nexus.test/api/products/prd_a/builds/bld_a/package${suffix}`);

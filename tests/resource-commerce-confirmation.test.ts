@@ -4,8 +4,8 @@ import {
   confirmedCartAcquisition,
   confirmedResourceCart,
   confirmedResourceClaim,
-} from "../apps/web/src/lib/resource-commerce-confirmation";
-import { resourceCommerceError } from "../apps/web/src/lib/resource-commerce-i18n";
+} from "../site/src/lib/resource-commerce-confirmation";
+import { resourceCommerceError } from "../site/src/lib/resource-commerce-i18n";
 
 it("accepts only a confirmed acquisition of the exact selected resources", () => {
   const result = {

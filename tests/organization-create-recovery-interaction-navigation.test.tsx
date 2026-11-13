@@ -16,11 +16,11 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../apps/web/src/lib/organization-workspace-client", () => ({
+vi.mock("../site/src/lib/organization-workspace-client", () => ({
   organizationRequest: h.request,
 }));
 
-import { OrganizationProfileForm } from "../apps/web/src/components/organization-profile-form";
+import { OrganizationProfileForm } from "../site/src/components/organization-profile-form";
 
 const { render, checkResultButton } = createOrganizationCreateRecoveryInteractionHelpers(
   h,

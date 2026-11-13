@@ -3,8 +3,8 @@ import { resolve } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { AuthForm } from "../apps/web/src/components/auth-form";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { AuthForm } from "../site/src/components/auth-form";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -95,9 +95,9 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
   });
 
   it("uses shared @nexus/ui Input/Button/ErrorState on auth and recovery screens", () => {
-    const auth = read("apps/web/src/components/auth-form.tsx");
-    const forgot = read("apps/web/src/app/auth/forgot-password/page.tsx");
-    const reset = read("apps/web/src/app/auth/reset-password/page.tsx");
+    const auth = read("site/src/components/auth-form.tsx");
+    const forgot = read("site/src/app/auth/forgot-password/page.tsx");
+    const reset = read("site/src/app/auth/reset-password/page.tsx");
 
     for (const source of [auth, forgot, reset]) {
       expect(source).toContain('from "@nexus/ui"');

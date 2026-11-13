@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 /** Honesty lock for commercial-plan unknown prior-operation marker via ErrorState. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/commercial-plan-form.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/commercial-plan-form.tsx"), "utf8");
 
 it("locks commercial-plan unknown operation marker to ErrorState without soft note", () => {
   expect(source).toContain("ErrorState");

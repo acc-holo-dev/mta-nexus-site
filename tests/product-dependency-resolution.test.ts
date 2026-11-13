@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildProductDependencyResolution,
   normalizeDependencySlugs,
-} from "../apps/web/src/lib/product-dependency-resolution";
+} from "../site/src/lib/product-dependency-resolution";
 
 describe("product dependency resolution model", () => {
   it("normalizes, deduplicates and bounds declared slugs", () => {

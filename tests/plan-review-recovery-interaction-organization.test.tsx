@@ -16,11 +16,11 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
 
-import { PlanReviewForm } from "../apps/web/src/components/plan-review-form";
+import { PlanReviewForm } from "../site/src/components/plan-review-form";
 
 const { render, mount, submit } = createPlanReviewRecoveryInteractionHelpers(h, PlanReviewForm);
 

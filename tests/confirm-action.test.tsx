@@ -24,7 +24,7 @@ vi.mock("react-dom/client", () => ({
   createRoot: () => root,
 }));
 
-import { confirmAction } from "../apps/web/src/components/confirm-action";
+import { confirmAction } from "../site/src/components/confirm-action";
 
 const request = {
   title: "Confirm",

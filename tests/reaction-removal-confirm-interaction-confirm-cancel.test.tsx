@@ -14,11 +14,11 @@ const harness = vi.hoisted(() => ({
   actorId: "actor",
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { ReactionRemoval } from "../apps/web/src/components/reaction-removal";
-import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
+import { ReactionRemoval } from "../site/src/components/reaction-removal";
+import { reactionCopy } from "../site/src/lib/content-reaction-copy";
 
 const { render, removeButton } = createReactionRemovalConfirmInteractionHelpers(
   harness,

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getResourcePublisherNavCopy } from "../apps/web/src/lib/resource-publisher-nav-i18n";
-import { getServerWorkspaceNavCopy } from "../apps/web/src/lib/server-workspace-nav-i18n";
+import { getResourcePublisherNavCopy } from "../site/src/lib/resource-publisher-nav-i18n";
+import { getServerWorkspaceNavCopy } from "../site/src/lib/server-workspace-nav-i18n";
 
 const nav = vi.hoisted(() => ({
   pathname: "/workspace/resources/prd_a/media",
@@ -27,8 +27,8 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourcePublisherWorkspaceNav } from "../apps/web/src/components/resource-publisher-workspace-nav";
-import { ServerWorkspaceNav } from "../apps/web/src/components/server-workspace-nav";
+import { ResourcePublisherWorkspaceNav } from "../site/src/components/resource-publisher-workspace-nav";
+import { ServerWorkspaceNav } from "../site/src/components/server-workspace-nav";
 
 describe("workspace publisher and server navigation", () => {
   beforeEach(() => {

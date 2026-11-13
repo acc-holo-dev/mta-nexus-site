@@ -16,7 +16,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "./helpers/library-collections-http-harness"
   );
@@ -25,13 +25,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", async () => {
   };
 });
 
-import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
-import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/history/route";
-import {
-  POST as command,
-  GET as detail,
-} from "../apps/web/src/app/api/library/collections/[id]/route";
-import { POST as create, GET as list } from "../apps/web/src/app/api/library/collections/route";
+import { GET as candidates } from "../site/src/app/api/library/collections/[id]/candidates/route";
+import { GET as history } from "../site/src/app/api/library/collections/[id]/history/route";
+import { POST as command, GET as detail } from "../site/src/app/api/library/collections/[id]/route";
+import { POST as create, GET as list } from "../site/src/app/api/library/collections/route";
 import {
   libraryCollectionsHttpBase as base,
   libraryCollectionsHttpContext as context,

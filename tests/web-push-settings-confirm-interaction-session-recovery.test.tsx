@@ -20,17 +20,17 @@ const harness = vi.hoisted(() => ({
   } | null,
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
-import { WebPushSettings } from "../apps/web/src/components/web-push-settings";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { WebPushSettings } from "../site/src/components/web-push-settings";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const { render, renderEnabled, disableButton, disableButtonOrEnable } =
   createWebPushSettingsConfirmInteractionHelpers(harness, WebPushSettings, confirmAction);

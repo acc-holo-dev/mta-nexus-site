@@ -11,7 +11,7 @@ const mock = vi.hoisted(() => ({
   previewPublicationBatch: vi.fn(),
   decidePublicationBatch: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/security", () => ({
@@ -28,10 +28,10 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST as preview } from "../apps/web/src/app/api/admin/community/[id]/reports/batch/preview/route";
-import { POST as commit } from "../apps/web/src/app/api/admin/community/[id]/reports/batch/route";
-import { GET as reports } from "../apps/web/src/app/api/admin/community/[id]/reports/route";
-import { GET as groups } from "../apps/web/src/app/api/admin/reports/targets/route";
+import { POST as preview } from "../site/src/app/api/admin/community/[id]/reports/batch/preview/route";
+import { POST as commit } from "../site/src/app/api/admin/community/[id]/reports/batch/route";
+import { GET as reports } from "../site/src/app/api/admin/community/[id]/reports/route";
+import { GET as groups } from "../site/src/app/api/admin/reports/targets/route";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   context = { params: Promise.resolve({ id: "post" }) },

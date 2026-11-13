@@ -9,20 +9,20 @@ const state = vi.hoisted(() => ({
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { createServer: state.create },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: vi.fn() },
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),
   mtaLiveStatus: vi.fn(),
 }));
 
-import { POST } from "../apps/web/src/app/api/servers/route";
+import { POST } from "../site/src/app/api/servers/route";
 
 beforeEach(() => {
   stubBrowserMutationOrigin();

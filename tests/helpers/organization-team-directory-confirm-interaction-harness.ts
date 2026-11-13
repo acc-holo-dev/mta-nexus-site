@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { OrganizationTeamPage } from "../../apps/web/src/lib/organization-team-contract";
+import type { OrganizationTeamPage } from "../../site/src/lib/organization-team-contract";
 import { type FlatTestElement, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type OrganizationTeamDirectoryConfirmHarness = {

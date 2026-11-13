@@ -18,13 +18,13 @@ const harness = vi.hoisted(() => ({
   committed: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { ModeratedDiscussionRemoval } from "../apps/web/src/components/moderated-discussion-removal";
+import { ModeratedDiscussionRemoval } from "../site/src/components/moderated-discussion-removal";
 
 const { render, button, click, prepareComment } = createModerationRemovalInteractionHelpers(
   harness,

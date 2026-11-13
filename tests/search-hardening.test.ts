@@ -4,10 +4,7 @@ import { describe, expect, it } from "vitest";
 
 describe("public search hardening", () => {
   it("validates, rate-limits and bounds public search responses", () => {
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/search/route.ts"),
-      "utf8",
-    );
+    const route = readFileSync(resolve(process.cwd(), "site/src/app/api/search/route.ts"), "utf8");
 
     expect(route).toMatch(
       /consumeRateLimit\(\s*"search",\s*getTrustedRequestIp\(request\),?\s*\)/u,
@@ -24,7 +21,7 @@ describe("public search hardening", () => {
 
   it("bounds every discovery source and the final result set", () => {
     const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/discovery-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/discovery-service.ts"),
       "utf8",
     );
 

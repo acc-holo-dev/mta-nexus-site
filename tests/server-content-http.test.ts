@@ -11,10 +11,10 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
+vi.mock("../site/src/lib/services/server-content-service", () => ({
   serverContentService: mocks,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
@@ -23,8 +23,8 @@ import {
   DELETE,
   GET,
   PATCH,
-} from "../apps/web/src/app/api/workspace/servers/[id]/content/[contentId]/route";
-import { GET as list, POST } from "../apps/web/src/app/api/workspace/servers/[id]/content/route";
+} from "../site/src/app/api/workspace/servers/[id]/content/[contentId]/route";
+import { GET as list, POST } from "../site/src/app/api/workspace/servers/[id]/content/route";
 
 const actor = { id: "actor", role: "user" },
   context = { params: Promise.resolve({ id: "srv", contentId: "content" }) };

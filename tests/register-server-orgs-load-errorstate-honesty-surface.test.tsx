@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/register-server-form.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/register-server-form.tsx"), "utf8");
 
 it("routes organization lookup outages through ErrorState with touch retry", () => {
   expect(source).toContain(

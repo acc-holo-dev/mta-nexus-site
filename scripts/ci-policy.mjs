@@ -40,6 +40,18 @@ const unitOnlyPaths = [
   /^apps\/web\/src\/components\/.+\.(?:test|spec)\.[cm]?[jt]sx?$/,
 ];
 
+// Interpret both sides of each approved structural move using the current
+// sensitivity rules. Keep legacy paths covered until migration acceptance.
+function policyPath(file) {
+  if (file.startsWith("site/packages/") || file.startsWith("site/tests/"))
+    return file.slice("site/".length);
+  if (file.startsWith("site/")) return `apps/web/${file.slice("site/".length)}`;
+  if (file === "docker/Dockerfile") return "Dockerfile";
+  if (/^docker\/compose[^/]*\.ya?ml$/u.test(file)) return file.slice("docker/".length);
+  if (file.startsWith("docker/")) return `deploy/${file.slice("docker/".length)}`;
+  return file;
+}
+
 function isDocumentation(file) {
   return documentationPath.test(file);
 }
@@ -52,6 +64,7 @@ export function classifyChanges(
   files,
   { explicitFull = false, release = false, mainPush = false } = {},
 ) {
+  files = files.map(policyPath);
   const code = files.some((file) => !isDocumentation(file));
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),

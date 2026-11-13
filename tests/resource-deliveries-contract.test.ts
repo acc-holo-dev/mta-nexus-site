@@ -6,8 +6,8 @@ import {
   publisherDeliveriesQuery,
   resourceDeliveryId,
   deliverySearchParams,
-} from "../apps/web/src/lib/resource-deliveries-query";
-import { resourceDeliveriesCsv } from "../apps/web/src/lib/resource-deliveries-csv";
+} from "../site/src/lib/resource-deliveries-query";
+import { resourceDeliveriesCsv } from "../site/src/lib/resource-deliveries-csv";
 it("preserves bounded private selectors through pagination and exports", () => {
   const query = resourceDeliveriesQuery(
     new URLSearchParams("status=failed&days=30&resourceId=prd_one&page=2"),

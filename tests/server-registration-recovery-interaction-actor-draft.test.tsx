@@ -14,12 +14,12 @@ const h = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return { useNexusLocale: () => ({ locale: h.locale, dictionary: getDictionary(h.locale) }) };
 });
 
-import { RegisterServerForm } from "../apps/web/src/components/register-server-form";
+import { RegisterServerForm } from "../site/src/components/register-server-form";
 
 const { render } = createServerRegistrationRecoveryInteractionHelpers(h, RegisterServerForm);
 

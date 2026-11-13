@@ -7,7 +7,7 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "apps/web/src/components/own-discussion-detail.tsx";
+const surface = "site/src/components/own-discussion-detail.tsx";
 
 it("locks unavailable publication notice to ErrorState alert", () => {
   const source = read(surface);

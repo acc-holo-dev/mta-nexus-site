@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { OrganizationWorkspace } from "../../apps/web/src/lib/organization-workspace-contract";
+import type { OrganizationWorkspace } from "../../site/src/lib/organization-workspace-contract";
 import { type FlatTestElement, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type OrganizationOwnershipTransferConfirmHarness = {

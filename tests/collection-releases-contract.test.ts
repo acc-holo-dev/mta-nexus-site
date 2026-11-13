@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { collectionReleasesQuery } from "../apps/web/src/lib/collection-releases-query";
-import { collectionReleasesCopy } from "../apps/web/src/lib/collection-releases-i18n";
+import { collectionReleasesQuery } from "../site/src/lib/collection-releases-query";
+import { collectionReleasesCopy } from "../site/src/lib/collection-releases-i18n";
 it("bounds filters, pages and literal private searches", () => {
   expect(collectionReleasesQuery(new URLSearchParams())).toEqual({ page: 1, q: "", filter: "all" });
   expect(

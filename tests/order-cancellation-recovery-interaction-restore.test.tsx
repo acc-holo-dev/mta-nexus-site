@@ -16,11 +16,11 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { OrderCancellationForm } from "../apps/web/src/components/order-cancellation-form";
+import { OrderCancellationForm } from "../site/src/components/order-cancellation-form";
 
 const { mount, prepare, submit, cancelPosts } = createOrderCancellationRecoveryInteractionHelpers(
   h,

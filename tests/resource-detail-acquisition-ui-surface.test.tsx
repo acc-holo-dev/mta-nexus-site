@@ -19,9 +19,9 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import "./helpers/resource-detail-acquisition-ui-harness";
-import ProductDetailPage from "../apps/web/src/app/market/[slug]/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { licenseModelLabel } from "../apps/web/src/lib/license-model-i18n";
+import ProductDetailPage from "../site/src/app/market/[slug]/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { licenseModelLabel } from "../site/src/lib/license-model-i18n";
 import {
   build,
   product,

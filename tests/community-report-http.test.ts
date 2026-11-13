@@ -11,18 +11,18 @@ const mocks = vi.hoisted(() => ({
   decide: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
-import { PATCH, GET as staffDetail } from "../apps/web/src/app/api/admin/reports/[id]/route";
-import { GET as staffList } from "../apps/web/src/app/api/admin/reports/route";
-import { GET as ownDetail } from "../apps/web/src/app/api/workspace/reports/[id]/route";
-import { GET as ownList, POST } from "../apps/web/src/app/api/workspace/reports/route";
+import { PATCH, GET as staffDetail } from "../site/src/app/api/admin/reports/[id]/route";
+import { GET as staffList } from "../site/src/app/api/admin/reports/route";
+import { GET as ownDetail } from "../site/src/app/api/workspace/reports/[id]/route";
+import { GET as ownList, POST } from "../site/src/app/api/workspace/reports/route";
 
 const actor = { id: "actor", role: "user" },
   context = { params: Promise.resolve({ id: "report" }) };

@@ -2,16 +2,16 @@ import { expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ inbox: vi.fn(), watches: vi.fn(), follows: vi.fn() }));
 vi.mock("server-only", () => ({}));
-vi.mock("../apps/web/node_modules/server-only/index.js", () => ({}));
+vi.mock("../site/node_modules/server-only/index.js", () => ({}));
 vi.mock("@nexus/db", () => ({
   notificationRepository: { pageInbox: state.inbox },
   resourceReleaseWatchesRepository: { page: state.watches },
 }));
-vi.mock("../apps/web/src/lib/services/follow-workspace-service", () => ({
+vi.mock("../site/src/lib/services/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.follows },
 }));
 
-import { loadPersonalChangesSummary } from "../apps/web/src/lib/home-personal-changes";
+import { loadPersonalChangesSummary } from "../site/src/lib/home-personal-changes";
 
 it("reads one inbox snapshot to classify localized personal changes", async () => {
   state.inbox.mockResolvedValueOnce({

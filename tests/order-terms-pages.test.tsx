@@ -22,19 +22,19 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/order-terms-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/order-terms-service", () => ({
   orderTermsService: { report: state.report },
 }));
 
-import TermsLoading from "../apps/web/src/app/admin/commerce/reconciliation/[id]/terms/loading";
-import Admin from "../apps/web/src/app/admin/commerce/reconciliation/[id]/terms/page";
-import BuyerTermsLoading from "../apps/web/src/app/workspace/purchases/[id]/terms/loading";
-import Buyer, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/terms/page";
-import { orderTermsCopy } from "../apps/web/src/lib/order-terms-i18n";
+import TermsLoading from "../site/src/app/admin/commerce/reconciliation/[id]/terms/loading";
+import Admin from "../site/src/app/admin/commerce/reconciliation/[id]/terms/page";
+import BuyerTermsLoading from "../site/src/app/workspace/purchases/[id]/terms/loading";
+import Buyer, { metadata } from "../site/src/app/workspace/purchases/[id]/terms/page";
+import { orderTermsCopy } from "../site/src/lib/order-terms-i18n";
 
 const input = {
     params: Promise.resolve({ id: "ord_a" }),

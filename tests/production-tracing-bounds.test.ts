@@ -6,22 +6,22 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("production tracing and standalone runtime bounds", () => {
   it("excludes non-runtime checkout trees from standalone NFT output", () => {
-    const config = read("apps/web/next.config.mjs");
+    const config = read("site/next.config.mjs");
 
     expect(config).toContain('output: "standalone"');
     expect(config).toContain("outputFileTracingRoot: repositoryRoot");
     expect(config).toContain("outputFileTracingExcludes");
     for (const pattern of [
-      "../../tests/**/*",
-      "../../scripts/**/*",
-      "../../docs/**/*",
-      "../../.git/**/*",
-      "../../.env*",
-      "../../packages/db/migrations/**/*",
-      "../../packages/db/scripts/**/*",
-      "../../uploads/**/*",
-      "../../.github/**/*",
-      "../../deploy/**/*",
+      "../tests/**/*",
+      "../scripts/**/*",
+      "../docs/**/*",
+      "../.git/**/*",
+      "../.env*",
+      "../packages/db/migrations/**/*",
+      "../packages/db/scripts/**/*",
+      "../uploads/**/*",
+      "../.github/**/*",
+      "../deploy/**/*",
     ]) {
       expect(config).toContain(pattern);
     }
@@ -40,12 +40,12 @@ describe("production tracing and standalone runtime bounds", () => {
     expect(mail).toContain("O_NOFOLLOW");
     expect(dockerfile).toMatch(/USER node[\s\S]*CMD \["sh", "scripts\/start-production\.sh"\]/u);
     expect(dockerfile).toContain("chown -R node:node /data/uploads");
-    expect(dockerfile).toContain("COPY --from=build /app/apps/web/.next/standalone/ /app/");
+    expect(dockerfile).toContain("COPY --from=build /app/site/.next/standalone/ /app/");
     expect(dockerfile).toContain("pnpm --filter @nexus/db --prod deploy /runtime/db");
   });
 
   it("documents build-only placeholders and refuses baking secrets via next.config env", () => {
-    const config = read("apps/web/next.config.mjs");
+    const config = read("site/next.config.mjs");
     const dockerfile = read("Dockerfile");
 
     expect(config).toMatch(/deliberately omit next\.config `env`|omit next\.config `env`/u);

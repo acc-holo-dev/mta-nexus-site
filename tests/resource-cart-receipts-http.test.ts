@@ -8,20 +8,20 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/resource-cart-receipts-service", () => ({
+vi.mock("../site/src/lib/services/resource-cart-receipts-service", () => ({
   resourceCartReceiptsService: { page: state.page, detail: state.detail },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { reviewResourceCart: state.review },
 }));
-import { GET as page } from "../apps/web/src/app/api/resources/cart/receipts/route";
-import { GET as detail } from "../apps/web/src/app/api/resources/cart/receipts/[id]/route";
-import { GET as csv } from "../apps/web/src/app/api/resources/cart/receipts/export/route";
-import { GET as review } from "../apps/web/src/app/api/resources/cart/review/route";
+import { GET as page } from "../site/src/app/api/resources/cart/receipts/route";
+import { GET as detail } from "../site/src/app/api/resources/cart/receipts/[id]/route";
+import { GET as csv } from "../site/src/app/api/resources/cart/receipts/export/route";
+import { GET as review } from "../site/src/app/api/resources/cart/review/route";
 const requestId = "11111111-1111-4111-8111-111111111111",
   context = { params: Promise.resolve({ id: requestId }) };
 const request = (url: string) => new NextRequest(`https://nexus.test/api/resources/cart/${url}`);

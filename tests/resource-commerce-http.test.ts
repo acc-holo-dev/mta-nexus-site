@@ -13,10 +13,10 @@ const mocks = vi.hoisted(() => ({
   transition: vi.fn(),
   order: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => mocks.user },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: {
     getResourceCart: mocks.get,
     addResourceToCart: mocks.add,
@@ -25,14 +25,14 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
     getBuyerOrderDetails: mocks.order,
   },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { transitionResource: mocks.transition },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { GET, POST, DELETE } from "../apps/web/src/app/api/resources/cart/route";
-import { POST as acquire } from "../apps/web/src/app/api/resources/cart/acquire/route";
-import { POST as lifecycle } from "../apps/web/src/app/api/products/[id]/lifecycle/route";
-import { GET as orderDetails } from "../apps/web/src/app/api/orders/[id]/route";
+import { GET, POST, DELETE } from "../site/src/app/api/resources/cart/route";
+import { POST as acquire } from "../site/src/app/api/resources/cart/acquire/route";
+import { POST as lifecycle } from "../site/src/app/api/products/[id]/lifecycle/route";
+import { GET as orderDetails } from "../site/src/app/api/orders/[id]/route";
 
 const requestId = "607177bf-31df-4a67-a7d4-cba38c456d07";
 function request(

@@ -8,7 +8,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   publisher: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
@@ -19,10 +19,10 @@ vi.mock("@nexus/db", () => ({
     publisher: state.publisher,
   },
 }));
-import { GET as page } from "../apps/web/src/app/api/library/downloads/route";
-import { GET as detail } from "../apps/web/src/app/api/library/downloads/[id]/route";
-import { GET as csv } from "../apps/web/src/app/api/library/downloads/export/route";
-import { GET as publisher } from "../apps/web/src/app/api/products/[id]/deliveries/route";
+import { GET as page } from "../site/src/app/api/library/downloads/route";
+import { GET as detail } from "../site/src/app/api/library/downloads/[id]/route";
+import { GET as csv } from "../site/src/app/api/library/downloads/export/route";
+import { GET as publisher } from "../site/src/app/api/products/[id]/deliveries/route";
 const request = (path = "/api/library/downloads") => new NextRequest(`https://nexus.test${path}`);
 beforeEach(() => {
   vi.clearAllMocks();

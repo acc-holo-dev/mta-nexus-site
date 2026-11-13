@@ -8,7 +8,7 @@ const h = vi.hoisted(() => ({
   disable: vi.fn(),
   resume: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => "aud_a" }));
@@ -19,8 +19,8 @@ vi.mock("@nexus/db", () => ({
     resumeBatch: h.resume,
   },
 }));
-import { GET as exportPage } from "../apps/web/src/app/api/library/watches/export/route";
-import { POST as resume } from "../apps/web/src/app/api/library/watches/resume/route";
+import { GET as exportPage } from "../site/src/app/api/library/watches/export/route";
+import { POST as resume } from "../site/src/app/api/library/watches/resume/route";
 const command = { items: [{ productId: "prd_a", expectedRevision: 1 }] };
 const get = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/export${query}`);

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DOWNLOAD_IDLE_TIMEOUT_MS,
   fetchResourceDownload,
-} from "../apps/web/src/lib/resource-download-client";
+} from "../site/src/lib/resource-download-client";
 import { controller, response, sha256 } from "./helpers/resource-download-client-harness";
 
 afterEach(() => vi.useRealTimers());

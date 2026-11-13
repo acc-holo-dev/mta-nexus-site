@@ -6,9 +6,9 @@ import {
   nextThemePreference,
   parseThemePreference,
   resolveThemePreference,
-} from "../apps/web/src/lib/theme-preference";
+} from "../site/src/lib/theme-preference";
 
-const css = readFileSync(resolve(process.cwd(), "apps/web/src/app/globals.css"), "utf8");
+const css = readFileSync(resolve(process.cwd(), "site/src/app/globals.css"), "utf8");
 
 describe("theme preference", () => {
   it("treats missing and invalid stored values as system preference", () => {

@@ -15,18 +15,18 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/resources/prd_a/history",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-publisher-service", () => ({
+vi.mock("../site/src/lib/services/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: state.inventory, history: state.history },
 }));
 
-import HistoryPage from "../apps/web/src/app/workspace/resources/[id]/history/page";
-import InventoryPage from "../apps/web/src/app/workspace/resources/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
+import HistoryPage from "../site/src/app/workspace/resources/[id]/history/page";
+import InventoryPage from "../site/src/app/workspace/resources/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getResourcePublisherCopy } from "../site/src/lib/resource-publisher-i18n";
 
 const context = {
   params: Promise.resolve({ id: "prd_a" }),

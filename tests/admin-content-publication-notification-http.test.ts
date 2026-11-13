@@ -14,7 +14,7 @@ const state = vi.hoisted(() => ({
 
 const moderateContent = vi.hoisted(() => vi.fn(async () => state.moderated));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -26,7 +26,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
@@ -34,7 +34,7 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     moderateContent,
   },
@@ -68,7 +68,7 @@ vi.mock("@nexus/security", async () => {
 });
 
 import { NextRequest } from "next/server";
-import { POST } from "../apps/web/src/app/api/admin/actions/route";
+import { POST } from "../site/src/app/api/admin/actions/route";
 
 function request(action: "publish" | "archive", extra: Record<string, unknown> = {}) {
   return new NextRequest("http://nexus.test/api/admin/actions", {

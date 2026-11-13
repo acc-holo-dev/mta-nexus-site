@@ -4,11 +4,11 @@ import { libraryReleaseCommandSchema, resourceModerationCommandSchema } from "@n
 import {
   confirmedLibraryRelease,
   confirmedResourceModeration,
-} from "../apps/web/src/lib/resource-release-control-confirmation";
+} from "../site/src/lib/resource-release-control-confirmation";
 import {
   libraryReleaseQuery,
   resourceModerationQuery,
-} from "../apps/web/src/lib/resource-release-control-query";
+} from "../site/src/lib/resource-release-control-query";
 const revision = "2026-10-10T12:00:00.000Z";
 it("always releases a suspension into a draft requiring a new review", () => {
   expect(resourceModerationTarget("suspended", "release")).toBe("draft");

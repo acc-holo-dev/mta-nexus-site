@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/new-resource-form.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/new-resource-form.tsx"), "utf8");
 
 it("locks new-resource unknown intent notice to ErrorState and keeps hard error plus success status", () => {
   expect(source).toContain(

@@ -12,7 +12,7 @@ const state = vi.hoisted(() => ({
   preview: vi.fn(),
   publish: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate, generateId: () => "evt_a" }));
@@ -29,10 +29,10 @@ vi.mock("@nexus/domain", async (importOriginal) => ({
   eventBus: { publish: state.publish },
 }));
 
-import { GET as exportGET } from "../apps/web/src/app/api/products/[id]/copies/[receiptId]/export/route";
-import { GET as detailGET } from "../apps/web/src/app/api/products/[id]/copies/[receiptId]/route";
-import { GET as historyGET } from "../apps/web/src/app/api/products/[id]/copies/route";
-import { POST, GET as previewGET } from "../apps/web/src/app/api/products/[id]/copy/route";
+import { GET as exportGET } from "../site/src/app/api/products/[id]/copies/[receiptId]/export/route";
+import { GET as detailGET } from "../site/src/app/api/products/[id]/copies/[receiptId]/route";
+import { GET as historyGET } from "../site/src/app/api/products/[id]/copies/route";
+import { POST, GET as previewGET } from "../site/src/app/api/products/[id]/copy/route";
 import { command, metadata, preview, receipt, receiptId, sourceId } from "./resource-copy-fixtures";
 
 const context = { params: Promise.resolve({ id: sourceId, receiptId }) },

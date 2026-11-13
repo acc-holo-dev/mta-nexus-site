@@ -14,7 +14,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
+import { LibraryCollectionBatchForm } from "../site/src/components/library-collection-batch";
 
 const { collection, items, render, check, submit, success } =
   createLibraryCollectionsBatchInteractionHelpers(harness, LibraryCollectionBatchForm);

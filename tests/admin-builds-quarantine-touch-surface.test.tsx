@@ -1,19 +1,19 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
   }),
 }));
 
-import { AdminBuildsQuarantineSection } from "../apps/web/src/components/admin/admin-builds-quarantine-section";
+import { AdminBuildsQuarantineSection } from "../site/src/components/admin/admin-builds-quarantine-section";
 
 it.each(["en", "ru"] as const)(
   "renders admin builds quarantine actionable links with min-h-11 touch targets in %s",

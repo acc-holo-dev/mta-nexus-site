@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mock = vi.hoisted(() => ({ session: vi.fn(), history: vi.fn(), rate: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/db", () => ({ communityReportsRepository: { history: mock.history } }));
@@ -12,11 +12,11 @@ vi.mock("@nexus/security", () => ({
   can: (actor: { role: string }) => ["moderator", "admin"].includes(actor.role),
 }));
 
-import { GET as staffExport } from "../apps/web/src/app/api/admin/reports/[id]/history/export/route";
-import { GET as staff } from "../apps/web/src/app/api/admin/reports/[id]/history/route";
-import { GET as ownExport } from "../apps/web/src/app/api/workspace/reports/[id]/history/export/route";
-import { GET as own } from "../apps/web/src/app/api/workspace/reports/[id]/history/route";
-import { reportHistoryCopy } from "../apps/web/src/lib/community-report-history-copy";
+import { GET as staffExport } from "../site/src/app/api/admin/reports/[id]/history/export/route";
+import { GET as staff } from "../site/src/app/api/admin/reports/[id]/history/route";
+import { GET as ownExport } from "../site/src/app/api/workspace/reports/[id]/history/export/route";
+import { GET as own } from "../site/src/app/api/workspace/reports/[id]/history/route";
+import { reportHistoryCopy } from "../site/src/lib/community-report-history-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   actor = { id: "owner", role: "user" },

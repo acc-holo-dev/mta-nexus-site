@@ -23,10 +23,10 @@ vi.mock("next/server", async () => ({
     state.after.push(callback);
   },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     getArticleBySlug: mocks.article,
     pageDiscussion: mocks.page,
@@ -34,12 +34,12 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
     commentAuthor: mocks.parent,
   },
 }));
-vi.mock("../apps/web/src/lib/services/discussion-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/discussion-follow-notification-service", () => ({
   notifyDiscussionReplies: mocks.notify,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
-import { GET, POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
+import { GET, POST } from "../site/src/app/api/content/[slug]/comments/route";
 
 const context = { params: Promise.resolve({ slug: "article" }) };
 const INTENT = "12345678-1234-4234-8234-123456789abc";

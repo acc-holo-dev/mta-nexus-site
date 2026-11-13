@@ -8,7 +8,7 @@ vi.mock("@nexus/config", () => ({
   },
 }));
 
-import { buildScannerService } from "../apps/web/src/lib/services/build-scanner-service";
+import { buildScannerService } from "../site/src/lib/services/build-scanner-service";
 
 describe("disabled resource build scanner", () => {
   // TCP framing/verdicts, upload rejection, production configuration and

@@ -16,14 +16,14 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/downloads/dlv_a",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-deliveries-service", () => ({
+vi.mock("../site/src/lib/services/resource-deliveries-service", () => ({
   resourceDeliveriesService: { page: state.page, detail: state.detail, publisher: state.publisher },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId: string }) => (
     <button type="button" data-product={productId} data-build={buildId}>
       download
@@ -31,10 +31,10 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
   ),
 }));
 
-import Detail from "../apps/web/src/app/workspace/library/downloads/[id]/page";
-import Page from "../apps/web/src/app/workspace/library/downloads/page";
-import Publisher from "../apps/web/src/app/workspace/resources/[id]/deliveries/page";
-import { resourceDeliveriesCopy } from "../apps/web/src/lib/resource-deliveries-i18n";
+import Detail from "../site/src/app/workspace/library/downloads/[id]/page";
+import Page from "../site/src/app/workspace/library/downloads/page";
+import Publisher from "../site/src/app/workspace/resources/[id]/deliveries/page";
+import { resourceDeliveriesCopy } from "../site/src/lib/resource-deliveries-i18n";
 
 const context = { params: Promise.resolve({ id: "dlv_a" }) };
 beforeEach(() => {

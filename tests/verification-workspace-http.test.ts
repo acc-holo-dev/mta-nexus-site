@@ -17,10 +17,10 @@ vi.mock("next/server", async (original) => ({
   ...(await original<typeof import("next/server")>()),
   after: mocks.after,
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: mocks,
 }));
 vi.mock("@nexus/db", () => ({
@@ -29,10 +29,10 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
-import { GET as own, PATCH as update } from "../apps/web/src/app/api/account/developer/route";
-import { PATCH as decide } from "../apps/web/src/app/api/admin/verification/[id]/route";
-import { GET as overview, POST } from "../apps/web/src/app/api/workspace/verification/route";
-import { GET as targets } from "../apps/web/src/app/api/workspace/verification/targets/route";
+import { GET as own, PATCH as update } from "../site/src/app/api/account/developer/route";
+import { PATCH as decide } from "../site/src/app/api/admin/verification/[id]/route";
+import { GET as overview, POST } from "../site/src/app/api/workspace/verification/route";
+import { GET as targets } from "../site/src/app/api/workspace/verification/targets/route";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const actor = { id: "actor", role: "developer" },

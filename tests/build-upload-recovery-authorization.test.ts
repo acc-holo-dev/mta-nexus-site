@@ -11,7 +11,7 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: {},
 }));
 
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 
 describe("pending upload retry authorization", () => {
   beforeEach(() => vi.clearAllMocks());

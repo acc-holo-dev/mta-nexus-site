@@ -4,19 +4,19 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: {
     detail: vi.fn(),
     command: vi.fn(),
     page: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     detail: vi.fn(),
     command: vi.fn(),
@@ -25,10 +25,10 @@ vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => (
   },
 }));
 
-import { POST as selectRelease } from "../apps/web/src/app/api/library/releases/[id]/route";
-import { POST as watchCommand } from "../apps/web/src/app/api/library/watches/[id]/route";
-import { POST as disableWatches } from "../apps/web/src/app/api/library/watches/disable/route";
-import { POST as resumeWatches } from "../apps/web/src/app/api/library/watches/resume/route";
+import { POST as selectRelease } from "../site/src/app/api/library/releases/[id]/route";
+import { POST as watchCommand } from "../site/src/app/api/library/watches/[id]/route";
+import { POST as disableWatches } from "../site/src/app/api/library/watches/disable/route";
+import { POST as resumeWatches } from "../site/src/app/api/library/watches/resume/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const mutations = [

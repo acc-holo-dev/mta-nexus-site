@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ getHistory: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/server-history-service", () => ({
+vi.mock("../site/src/lib/services/server-history-service", () => ({
   serverHistoryService: { getHistory: state.getHistory },
   serverHistoryWindows: { "24h": 24, "7d": 168, "30d": 720 },
 }));
-import { GET } from "../apps/web/src/app/api/servers/[id]/history/route";
+import { GET } from "../site/src/app/api/servers/[id]/history/route";
 const params = { params: Promise.resolve({ id: "server" }) };
 beforeEach(() => {
   state.getHistory.mockReset();

@@ -15,7 +15,7 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh, push: vi.fn() }) }));
 
-import { OrderCaseReviewForm } from "../apps/web/src/components/order-case-forms";
+import { OrderCaseReviewForm } from "../site/src/components/order-case-forms";
 
 const { render, prepare, review } = createOrderCaseReviewActorInteractionHelpers(
   h,

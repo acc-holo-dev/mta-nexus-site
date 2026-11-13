@@ -2,19 +2,19 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ManagedServerCard } from "../apps/web/src/components/managed-server-card";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getManagedServerCopy } from "../apps/web/src/lib/managed-server-view";
+import { ManagedServerCard } from "../site/src/components/managed-server-card";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getManagedServerCopy } from "../site/src/lib/managed-server-view";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("localized legal and workspace shell", () => {
   it("serves legal pages from one RU/EN document system", () => {
     for (const [path, key] of [
-      ["apps/web/src/app/terms/page.tsx", "terms"],
-      ["apps/web/src/app/privacy/page.tsx", "privacy"],
-      ["apps/web/src/app/copyright/page.tsx", "copyright"],
-      ["apps/web/src/app/community-rules/page.tsx", "communityRules"],
+      ["site/src/app/terms/page.tsx", "terms"],
+      ["site/src/app/privacy/page.tsx", "privacy"],
+      ["site/src/app/copyright/page.tsx", "copyright"],
+      ["site/src/app/community-rules/page.tsx", "communityRules"],
     ] as const) {
       const page = read(path);
       expect(page).toContain("getRequestLocale");
@@ -31,8 +31,8 @@ describe("localized legal and workspace shell", () => {
   });
 
   it("uses the shared locale provider for route errors and loading", () => {
-    const error = read("apps/web/src/app/error.tsx");
-    const loading = read("apps/web/src/app/loading.tsx");
+    const error = read("site/src/app/error.tsx");
+    const loading = read("site/src/app/loading.tsx");
 
     expect(error).toContain("useNexusLocale");
     expect(error).not.toContain("document.cookie");

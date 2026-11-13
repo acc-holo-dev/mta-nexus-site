@@ -23,23 +23,23 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { membershipHistory: state.history, membershipReceipt: state.detail },
 }));
 
 import Detail, {
   generateMetadata as detailMetadata,
-} from "../apps/web/src/app/workspace/library/collections/membership-history/[id]/page";
+} from "../site/src/app/workspace/library/collections/membership-history/[id]/page";
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/collections/membership-history/page";
-import { LibraryMembershipHistoryScreen } from "../apps/web/src/components/library-membership-history-screen";
-import { libraryMembershipHistoryCopy } from "../apps/web/src/lib/library-membership-history-i18n";
+} from "../site/src/app/workspace/library/collections/membership-history/page";
+import { LibraryMembershipHistoryScreen } from "../site/src/components/library-membership-history-screen";
+import { libraryMembershipHistoryCopy } from "../site/src/lib/library-membership-history-i18n";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";

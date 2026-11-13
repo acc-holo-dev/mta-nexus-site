@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/resource-media-editor.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/resource-media-editor.tsx"), "utf8");
 
 it("locks gallery readonly notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState, Input } from "@nexus/ui"');

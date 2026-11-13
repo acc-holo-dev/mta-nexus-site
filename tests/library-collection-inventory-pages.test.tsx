@@ -22,14 +22,14 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { inventory: state.history },
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({
     productId,
     buildId,
@@ -44,14 +44,14 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+vi.mock("../site/src/components/library-release-follow-latest", () => ({
   LibraryReleaseFollowLatest: ({ productId }: { productId: string }) => (
     <button type="button" data-follow-latest={productId}>
       Use latest
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+vi.mock("../site/src/components/resource-release-watch-control", () => ({
   ResourceReleaseWatchControl: ({
     watch,
   }: {
@@ -66,8 +66,8 @@ vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/collections/resources/page";
-import { libraryCollectionInventoryCopy } from "../apps/web/src/lib/library-collection-inventory-i18n";
+} from "../site/src/app/workspace/library/collections/resources/page";
+import { libraryCollectionInventoryCopy } from "../site/src/lib/library-collection-inventory-i18n";
 
 const date = "2026-10-13T00:00:00.000Z",
   a = { id: "lcol_a", name: "Own <active>", status: "active", revision: 4, itemCount: 2 },

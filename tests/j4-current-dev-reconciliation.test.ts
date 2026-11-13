@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("current-dev build upload reconciliation", () => {
   it("keeps target authorization before request body work and infrastructure calls", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     const preflight = route.indexOf("productService.assertCanReleaseBuild(productId, user)");
     const contentLength = route.indexOf('request.headers.get("content-length")');
@@ -26,7 +26,7 @@ describe("current-dev build upload reconciliation", () => {
   });
 
   it("uses correlated JSON for scanner outages instead of an undefined NextResponse symbol", () => {
-    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
+    const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     expect(route).toContain('event: "resource.build.scanner_unavailable"');
     expect(route).toContain(
@@ -38,7 +38,7 @@ describe("current-dev build upload reconciliation", () => {
   });
 
   it("keeps releaseBuild authoritative with the same preflight helper", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');

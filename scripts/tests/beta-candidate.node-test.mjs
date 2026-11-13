@@ -155,7 +155,7 @@ test("dated env backup porcelain alone is not a dirty working tree", () => {
     isDirtyWorkingTreeBeyondEnvBackups("?? .env.backup-20251011\n?? scripts/scratch.mjs\n"),
     true,
   );
-  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M apps/web/src/lib/i18n.ts\n"), true);
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M site/src/lib/i18n.ts\n"), true);
 });
 
 test("web_push residual stays residual without inventing PASS for mere file presence", () => {

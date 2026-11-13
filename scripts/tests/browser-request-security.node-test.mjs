@@ -3,9 +3,9 @@ import { test } from "node:test";
 import {
   browserRequestDecision,
   isLicenseRuntimeRequest,
-} from "../../apps/web/src/lib/browser-request-policy.ts";
-import { sessionCookieOptions } from "../../apps/web/src/lib/session-cookie.ts";
-import { SESSION_LIFETIME_SECONDS } from "../../apps/web/src/lib/session-policy.ts";
+} from "../../site/src/lib/browser-request-policy.ts";
+import { sessionCookieOptions } from "../../site/src/lib/session-cookie.ts";
+import { SESSION_LIFETIME_SECONDS } from "../../site/src/lib/session-policy.ts";
 
 const env = { NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "https://nexus.test" };
 const decide = (headers = {}, method = "POST", overrides = {}) =>

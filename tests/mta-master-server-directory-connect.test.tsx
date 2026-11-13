@@ -1,8 +1,8 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { MtaMasterServerDirectory } from "../apps/web/src/components/mta-master-server-directory";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { MtaMasterServerDirectory } from "../site/src/components/mta-master-server-directory";
+import { getDictionary } from "../site/src/lib/i18n";
 
 describe("MTA master directory connect honesty", () => {
   it.each(["en", "ru"] as const)(

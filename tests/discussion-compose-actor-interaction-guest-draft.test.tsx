@@ -10,7 +10,7 @@ vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
 vi.mock("next/link", () => ({ default: ({ children }: { children: ReactNode }) => children }));
 
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
+import { ContentDiscussion } from "../site/src/components/content-discussion";
 
 const { render, changeText, submit } = createDiscussionComposeActorInteractionHelpers(
   h,

@@ -4,13 +4,13 @@ import { expect, it } from "vitest";
 import {
   confirmedPlanReview,
   expectedPlanReviewId,
-} from "../apps/web/src/lib/plan-review-confirmation";
-import { planReviewError, planReviewsCopy } from "../apps/web/src/lib/plan-reviews-i18n";
+} from "../site/src/lib/plan-review-confirmation";
+import { planReviewError, planReviewsCopy } from "../site/src/lib/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewNewQuery,
   planReviewsQuery,
-} from "../apps/web/src/lib/plan-reviews-query";
+} from "../site/src/lib/plan-reviews-query";
 
 const terms = {
   titleRu: "Тариф",

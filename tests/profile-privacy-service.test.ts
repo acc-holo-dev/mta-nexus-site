@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({ own: vi.fn(), visibility: vi.fn(), update: vi.
 vi.mock("@nexus/db", () => ({ profilePrivacyRepository: mocks }));
 vi.mock("@nexus/security", () => ({ generateId: () => "audit" }));
 
-import { profilePrivacyService as service } from "../apps/web/src/lib/services/profile-privacy-service";
+import { profilePrivacyService as service } from "../site/src/lib/services/profile-privacy-service";
 
 const actor = { id: "actor" } as User;
 const row = {

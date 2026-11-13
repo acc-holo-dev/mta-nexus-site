@@ -15,17 +15,17 @@ vi.mock("next/navigation", () => ({
     throw Error("NEXT_NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/server-workspace-history-service", () => ({
+vi.mock("../site/src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.page },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 
 import ServerActivityPage, {
   generateMetadata,
-} from "../apps/web/src/app/workspace/servers/[id]/activity/page";
+} from "../site/src/app/workspace/servers/[id]/activity/page";
 
 const until = "2026-10-12T00:00:00.123456Z",
   cursor = "YQ";

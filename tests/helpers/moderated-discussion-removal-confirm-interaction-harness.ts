@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { moderatedDiscussionCopy } from "../../apps/web/src/lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../../site/src/lib/moderated-discussion-copy";
 import {
   type FlatTestElement,
   findTestButton,

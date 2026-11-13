@@ -10,11 +10,11 @@ describe("J4 production upload integration candidate", () => {
     const caddy = read("deploy/Caddyfile");
     const startup = read("scripts/check-production-startup.sh");
 
-    expect(dockerfile).toContain("apps/web/.next/standalone/apps/web/server.js");
+    expect(dockerfile).toContain("site/.next/standalone/site/server.js");
     expect(dockerfile).toContain("pnpm --filter @nexus/db --prod deploy /runtime/db");
     expect(caddy).toContain("max_size 68157440");
 
-    expect(startup).toContain("test -f /app/apps/web/server.js");
+    expect(startup).toContain("test -f /app/site/server.js");
     expect(startup).toContain("test -f /app/packages/db/node_modules/tsx/package.json");
     expect(startup).toContain("production runtime unexpectedly contains pnpm");
     expect(startup).toContain("oversized-request.bin");

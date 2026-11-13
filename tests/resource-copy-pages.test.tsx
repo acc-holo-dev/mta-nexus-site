@@ -25,21 +25,21 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/resource-copy-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/resource-copy-service", () => ({
   resourceCopyService: { preview: state.preview, page: state.page, detail: state.detail },
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import Detail from "../apps/web/src/app/workspace/resources/[id]/copies/[receiptId]/page";
-import History from "../apps/web/src/app/workspace/resources/[id]/copies/page";
-import New from "../apps/web/src/app/workspace/resources/[id]/copy/page";
-import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
+import Detail from "../site/src/app/workspace/resources/[id]/copies/[receiptId]/page";
+import History from "../site/src/app/workspace/resources/[id]/copies/page";
+import New from "../site/src/app/workspace/resources/[id]/copy/page";
+import { resourceCopyCopy } from "../site/src/lib/resource-copy-i18n";
 import { date, preview, receipt, receiptId, sourceId } from "./resource-copy-fixtures";
 
 const context = {

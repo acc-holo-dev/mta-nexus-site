@@ -3,17 +3,17 @@ const state = vi.hoisted(() => ({ page: vi.fn(), read: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   serverObservationRepository: { pageObservations: state.page, readStatistics: state.read },
 }));
-import { serverStatisticsService } from "../apps/web/src/lib/services/server-statistics-service";
-import { parseServerStatisticsQuery } from "../apps/web/src/lib/server-statistics-contract";
+import { serverStatisticsService } from "../site/src/lib/services/server-statistics-service";
+import { parseServerStatisticsQuery } from "../site/src/lib/server-statistics-contract";
 import {
   parseServerObservationBrowserQuery,
   serverObservationBrowserHref,
-} from "../apps/web/src/lib/server-observation-browser-contract";
-import { serverObservationBrowserCsv } from "../apps/web/src/lib/server-statistics-export";
+} from "../site/src/lib/server-observation-browser-contract";
+import { serverObservationBrowserCsv } from "../site/src/lib/server-statistics-export";
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
-} from "../apps/web/src/lib/server-observation-browser-copy";
+} from "../site/src/lib/server-observation-browser-copy";
 const end = "2026-10-11T00:00:00.000Z",
   exact = "2026-10-10T23:59:00.123456Z",
   context = "a".repeat(64);

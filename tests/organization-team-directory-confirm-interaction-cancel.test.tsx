@@ -11,18 +11,18 @@ const harness = vi.hoisted(() => ({
   request: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({
   default: ({ children, ...props }: { children: ReactNode; href: string }) => (
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../apps/web/src/lib/organization-workspace-client", () => ({
+vi.mock("../site/src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationTeamDirectory } from "../apps/web/src/components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../site/src/components/organization-team-directory";
 
 const { render, memberEditor } = createOrganizationTeamDirectoryConfirmInteractionHelpers(
   harness,

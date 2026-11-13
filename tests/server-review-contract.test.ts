@@ -5,8 +5,8 @@ import {
   serverReviewModerationSchema,
 } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedServerReview } from "../apps/web/src/lib/server-review-confirmation";
-import { serverReviewQuery } from "../apps/web/src/lib/server-review-query";
+import { confirmedServerReview } from "../site/src/lib/server-review-confirmation";
+import { serverReviewQuery } from "../site/src/lib/server-review-query";
 
 it("requires follow evidence and blocks owner or moderated authors", () => {
   expect(serverReviewEligibility({ following: true, ownsServer: false, removed: false })).toEqual({

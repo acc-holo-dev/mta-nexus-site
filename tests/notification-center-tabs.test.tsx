@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { NotificationCenterTabs } from "../apps/web/src/components/notification-center-tabs";
+import { NotificationCenterTabs } from "../site/src/components/notification-center-tabs";
 
 describe("NotificationCenterTabs keyboard focus", () => {
   it("renders reading-state filters with a visible focus ring", () => {

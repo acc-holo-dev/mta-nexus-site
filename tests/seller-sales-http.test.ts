@@ -9,18 +9,18 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   scopes: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../apps/web/src/lib/services/seller-sales-service", () => ({
+vi.mock("../site/src/lib/services/seller-sales-service", () => ({
   sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
 }));
 
-import { GET as detail } from "../apps/web/src/app/api/sales/[id]/route";
-import { GET as csv } from "../apps/web/src/app/api/sales/export/route";
-import { GET as report } from "../apps/web/src/app/api/sales/route";
-import { GET as scopes } from "../apps/web/src/app/api/sales/scopes/route";
+import { GET as detail } from "../site/src/app/api/sales/[id]/route";
+import { GET as csv } from "../site/src/app/api/sales/export/route";
+import { GET as report } from "../site/src/app/api/sales/route";
+import { GET as scopes } from "../site/src/app/api/sales/scopes/route";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   request = (path = "") => new NextRequest(`https://nexus.test/api/sales${path}`),

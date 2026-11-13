@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   discussionReplayDatabaseIdentity as identity,
   discussionReplayOptions as options,
-} from "../apps/web/scripts/discussion-replay-options";
+} from "../site/scripts/discussion-replay-options";
 
 const from = "2026-10-12T00:00:00.000001Z",
   until = "2026-10-12T01:00:00.000002Z";

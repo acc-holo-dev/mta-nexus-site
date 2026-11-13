@@ -8,7 +8,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import { describe, expect, it } from "vitest";
-import { supportMutationFingerprint } from "../apps/web/src/lib/support-idempotency";
+import { supportMutationFingerprint } from "../site/src/lib/support-idempotency";
 import { createSupportCaseSchema } from "@nexus/validation";
 
 describe("durable support mutation idempotency", () => {

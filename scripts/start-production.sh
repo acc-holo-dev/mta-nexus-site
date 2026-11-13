@@ -29,5 +29,5 @@ test -n "$(find migrations -type f -name '*.sql' -print -quit)"
 node --import tsx --input-type=module -e "import '@nexus/config';"
 node --import tsx src/migrate.ts
 
-cd "$root/apps/web"
+cd "$root/site"
 exec node server.js

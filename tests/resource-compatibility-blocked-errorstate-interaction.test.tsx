@@ -15,12 +15,12 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 
-import { ResourceCompatibilityForm } from "../apps/web/src/components/resource-compatibility-form";
-import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
+import { ResourceCompatibilityForm } from "../site/src/components/resource-compatibility-form";
+import { getResourceManagementCopy } from "../site/src/lib/resource-management-i18n";
 
 const { render } = createResourceCompatibilityDraftInteractionHelpers(
   harness,

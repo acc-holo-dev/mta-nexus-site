@@ -13,7 +13,7 @@ import {
   buildPackageComparisonRepository as comparison,
 } from "@nexus/db";
 import fixtures from "./fixtures/build-packages.json";
-import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../site/src/lib/services/build-package-inspection";
 
 // Requires a disposable PostgreSQL database migrated through 0059; no payment or entitlement mutation.
 async function fixture() {

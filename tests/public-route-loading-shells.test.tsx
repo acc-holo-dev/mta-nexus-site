@@ -1,18 +1,18 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => "en" as const,
 }));
 
-import ContextTrustLoading from "../apps/web/src/app/organizations/[slug]/trust/loading";
-import ReportGroupsLoading from "../apps/web/src/app/admin/reports/targets/loading";
-import LibraryCollectionsLoading from "../apps/web/src/app/workspace/library/collections/loading";
-import UserTrustHistoryLoading from "../apps/web/src/app/users/[username]/trust/history/loading";
-import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
-import { reportGroupsCopy } from "../apps/web/src/lib/community-report-groups-copy";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
-import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+import ContextTrustLoading from "../site/src/app/organizations/[slug]/trust/loading";
+import ReportGroupsLoading from "../site/src/app/admin/reports/targets/loading";
+import LibraryCollectionsLoading from "../site/src/app/workspace/library/collections/loading";
+import UserTrustHistoryLoading from "../site/src/app/users/[username]/trust/history/loading";
+import { contextTrustCopy } from "../site/src/lib/public-context-trust-copy";
+import { reportGroupsCopy } from "../site/src/lib/community-report-groups-copy";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
+import { approvalCopy } from "../site/src/lib/public-verification-history-copy";
 
 it.each([
   ["context trust", ContextTrustLoading, contextTrustCopy("en"), "context-trust-loading-heading"],

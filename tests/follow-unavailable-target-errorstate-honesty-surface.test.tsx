@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/follow-workspace.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/follow-workspace.tsx"), "utf8");
 
 /** Honesty lock for follow items whose target href is unavailable. */
 it("locks follow unavailable target notice to ErrorState", () => {

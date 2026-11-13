@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { resourceReleaseWatchEnableCommandSchema } from "@nexus/validation";
-import { confirmedResourceReleaseWatchBatch } from "../apps/web/src/lib/resource-release-watch-batch-confirmation";
+import { confirmedResourceReleaseWatchBatch } from "../site/src/lib/resource-release-watch-batch-confirmation";
 const command = {
   expectedCollectionRevision: 3,
   items: [

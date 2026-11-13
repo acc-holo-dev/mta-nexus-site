@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { ContextSwitcher } from "../apps/web/src/components/context-switcher";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
+import { ContextSwitcher } from "../site/src/components/context-switcher";
+import { LocaleProvider } from "../site/src/components/locale-context";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),

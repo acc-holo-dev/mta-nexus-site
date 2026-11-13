@@ -3,7 +3,7 @@ import {
   encodeSupportMessageCursor,
   parseSupportMessageQuery,
   supportMessageHref,
-} from "../apps/web/src/lib/support-message-discovery-contract";
+} from "../site/src/lib/support-message-discovery-contract";
 
 const id = `spm_${"a".repeat(24)}`,
   stamp = "2026-10-12T00:00:00.123456Z",

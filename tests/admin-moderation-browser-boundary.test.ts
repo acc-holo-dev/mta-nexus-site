@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {
@@ -19,38 +19,38 @@ vi.mock("@nexus/db", () => ({
   reportRepository: {},
   verificationRepository: {},
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({ productService: {} }));
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: {},
 }));
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: {},
 }));
-vi.mock("../apps/web/src/lib/services/license-control-service", () => ({
+vi.mock("../site/src/lib/services/license-control-service", () => ({
   licenseControlService: {},
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: {},
 }));
 
-import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
-import { POST as communityCommand } from "../apps/web/src/app/api/admin/community/[id]/route";
-import { POST as removeDiscussion } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/route";
-import { POST as discussionPreview } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route";
-import { POST as discussionBatch } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route";
-import { POST as publicationPreview } from "../apps/web/src/app/api/admin/community/[id]/reports/batch/preview/route";
-import { POST as publicationBatch } from "../apps/web/src/app/api/admin/community/[id]/reports/batch/route";
-import { POST as licenseModerate } from "../apps/web/src/app/api/admin/licenses/[id]/route";
-import { PATCH as reportDecision } from "../apps/web/src/app/api/admin/reports/[id]/route";
-import { POST as resourceModerate } from "../apps/web/src/app/api/admin/resources/[id]/route";
-import { PATCH as verificationDecision } from "../apps/web/src/app/api/admin/verification/[id]/route";
+import { POST as adminAction } from "../site/src/app/api/admin/actions/route";
+import { POST as communityCommand } from "../site/src/app/api/admin/community/[id]/route";
+import { POST as removeDiscussion } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/route";
+import { POST as discussionPreview } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route";
+import { POST as discussionBatch } from "../site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route";
+import { POST as publicationPreview } from "../site/src/app/api/admin/community/[id]/reports/batch/preview/route";
+import { POST as publicationBatch } from "../site/src/app/api/admin/community/[id]/reports/batch/route";
+import { POST as licenseModerate } from "../site/src/app/api/admin/licenses/[id]/route";
+import { PATCH as reportDecision } from "../site/src/app/api/admin/reports/[id]/route";
+import { POST as resourceModerate } from "../site/src/app/api/admin/resources/[id]/route";
+import { PATCH as verificationDecision } from "../site/src/app/api/admin/verification/[id]/route";
 
 const context = { params: Promise.resolve({ id: "mod_1", commentId: "cmt_1" }) };
 const mutations = [

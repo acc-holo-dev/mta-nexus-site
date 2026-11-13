@@ -2,7 +2,7 @@ import { mkdtemp, readdir, readFile, rm, stat, symlink, writeFile } from "node:f
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
+import { replayDiscussionNotifications } from "../site/src/lib/services/discussion-notification-replay";
 
 const fault = vi.hoisted(() => ({ stage: "", events: [] as string[] }));
 vi.mock("node:fs/promises", async () => {
@@ -35,7 +35,7 @@ vi.mock("node:fs/promises", async () => {
   };
 });
 
-import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
+import { withDiscussionReplayCheckpoint } from "../site/scripts/discussion-replay-storage";
 
 const identity = "a".repeat(64);
 // Existing fixtures intentionally exercise operator-approved adoption of version 1.

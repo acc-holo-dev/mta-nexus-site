@@ -71,7 +71,7 @@ export function mockReactHooks(harness: CommunityTopicIntentInteractionHarness) 
 export function createCommunityTopicIntentInteractionHelpers(
   harness: CommunityTopicIntentInteractionHarness,
   CommunityTopicForm: CommunityTopicFormComponent,
-  getDictionary: typeof import("../../apps/web/src/lib/i18n").getDictionary,
+  getDictionary: typeof import("../../site/src/lib/i18n").getDictionary,
 ) {
   function render() {
     harness.cursor = 0;

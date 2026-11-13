@@ -15,8 +15,8 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { GET as downloadReviewerArtifact } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
-import { POST as moderate } from "../apps/web/src/app/api/admin/actions/route";
+import { GET as downloadReviewerArtifact } from "../site/src/app/api/admin/builds/[buildId]/download/route";
+import { POST as moderate } from "../site/src/app/api/admin/actions/route";
 
 function getRequest(token: string, buildId: string) {
   return new NextRequest(`http://nexus.test/api/admin/builds/${buildId}/download`, {

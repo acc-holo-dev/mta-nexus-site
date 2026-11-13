@@ -5,11 +5,11 @@ import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/components/server-claim-control-panel.tsx"),
+  join(root, "site/src/components/server-claim-control-panel.tsx"),
   "utf8",
 );
 const statusSource = readFileSync(
-  join(root, "apps/web/src/components/server-claim-status-panel.tsx"),
+  join(root, "site/src/components/server-claim-status-panel.tsx"),
   "utf8",
 );
 

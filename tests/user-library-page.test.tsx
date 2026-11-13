@@ -17,10 +17,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("@nexus/db", () => ({
   userLibraryRepository: { pageByUser: state.page },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/link", async () => {
@@ -37,7 +37,7 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/components/resource-download-button", async () => {
+vi.mock("../site/src/components/resource-download-button", async () => {
   const React = await import("react");
   return {
     ResourceDownloadButton: ({
@@ -62,9 +62,9 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
   };
 });
 
-import LibraryLoading from "../apps/web/src/app/workspace/library/loading";
-import LibraryPage, { metadata } from "../apps/web/src/app/workspace/library/page";
-import { getLibraryCopy } from "../apps/web/src/lib/library-view";
+import LibraryLoading from "../site/src/app/workspace/library/loading";
+import LibraryPage, { metadata } from "../site/src/app/workspace/library/page";
+import { getLibraryCopy } from "../site/src/lib/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
 const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({

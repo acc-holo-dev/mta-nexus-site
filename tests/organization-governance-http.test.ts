@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   findByEmail: vi.fn(),
   verifyPassword: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/db", () => ({
@@ -26,8 +26,8 @@ vi.mock("@nexus/security", () => ({
   freshAuthProofAccepted: () => true,
 }));
 
-import { GET } from "../apps/web/src/app/api/workspace/organizations/[id]/activity/route";
-import { POST } from "../apps/web/src/app/api/workspace/organizations/[id]/ownership/route";
+import { GET } from "../site/src/app/api/workspace/organizations/[id]/activity/route";
+import { POST } from "../site/src/app/api/workspace/organizations/[id]/ownership/route";
 
 const time = "2026-10-11T00:00:00.000Z",
   actor = { id: "owner", role: "user", email: "owner@nexus.test" },

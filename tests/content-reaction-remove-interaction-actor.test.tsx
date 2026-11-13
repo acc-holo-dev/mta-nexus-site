@@ -13,12 +13,12 @@ const harness = vi.hoisted(() => ({
   actorId: "actor",
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../site/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/guide" }));
 vi.mock("next/link", () => ({ default: "a" }));
 
-import { ContentReactions } from "../apps/web/src/components/content-reactions";
+import { ContentReactions } from "../site/src/components/content-reactions";
 
 const { render, removeButton } = createContentReactionRemoveInteractionHelpers(
   harness,

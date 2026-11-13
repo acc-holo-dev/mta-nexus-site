@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/resource-review-controls.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/resource-review-controls.tsx"), "utf8");
 
 it("locks resource review fail/unknown to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

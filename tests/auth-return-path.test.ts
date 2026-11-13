@@ -5,10 +5,10 @@ import {
   authEntryHref,
   parseAuthReturnPath,
   resolveAuthReturnPath,
-} from "../apps/web/src/components/auth-return-path";
+} from "../site/src/components/auth-return-path";
 
 const authFormSource = readFileSync(
-  resolve(process.cwd(), "apps/web/src/components/auth-form.tsx"),
+  resolve(process.cwd(), "site/src/components/auth-form.tsx"),
   "utf8",
 );
 

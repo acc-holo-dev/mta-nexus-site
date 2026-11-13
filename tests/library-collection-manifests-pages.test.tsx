@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import ReconcilePage, {
   generateMetadata as reconcileMetadata,
-} from "../apps/web/src/app/workspace/library/collections/[id]/reconcile/page";
+} from "../site/src/app/workspace/library/collections/[id]/reconcile/page";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -25,15 +25,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { exportManifest: state.history },
 }));
 
-vi.mock("../apps/web/src/components/library-collection-import", () => ({
+vi.mock("../site/src/components/library-collection-import", () => ({
   LibraryCollectionImport: ({
     collection,
     locale,
@@ -46,9 +46,9 @@ vi.mock("../apps/web/src/components/library-collection-import", () => ({
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/collections/[id]/import/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
+} from "../site/src/app/workspace/library/collections/[id]/import/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { libraryCollectionManifestsCopy } from "../site/src/lib/library-collection-manifests-i18n";
 
 const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
 const screen = async (query: Record<string, string | string[] | undefined> = {}, id = "lcol_a") =>

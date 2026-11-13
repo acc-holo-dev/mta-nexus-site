@@ -1,12 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { ContentFollowControls } from "../apps/web/src/components/content-follow-controls";
-import { FollowButton } from "../apps/web/src/components/follow-button";
-import { FollowWorkspace } from "../apps/web/src/components/follow-workspace";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import type { FollowPage } from "../apps/web/src/lib/follow-workspace-contract";
-import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { ContentFollowControls } from "../site/src/components/content-follow-controls";
+import { FollowButton } from "../site/src/components/follow-button";
+import { FollowWorkspace } from "../site/src/components/follow-workspace";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import type { FollowPage } from "../site/src/lib/follow-workspace-contract";
+import { followActionCopy, followCopy } from "../site/src/lib/follow-workspace-copy";
+import { getDictionary } from "../site/src/lib/i18n";
 import { followWorkspaceItemBase } from "./helpers/discovery-follow-surface-harness";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));

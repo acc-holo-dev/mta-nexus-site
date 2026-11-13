@@ -7,7 +7,7 @@
 5. Назначайте параллельным исполнителям непересекающиеся файлы. Основной агент отвечает за общие контракты, интеграцию, проверки и внешнюю отправку. Полные наборы проверок не запускайте отдельно для каждого исполнителя; тяжёлые unit/DB/build-прогоны на ограниченном хосте выполняйте последовательно.
 6. История выполненной работы живёт в Git и проверяемых результатах CI. Не создавайте параллельные журналы передачи или несколько вручную поддерживаемых копий backlog.
 
-Архитектура вкратце: HTTP разбирает запрос и для составных изменений вызывает service; простые read/health → `@nexus/db` допустимы только из списка в [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / `.dependency-cruiser.exceptions.cjs`. Пакеты не импортируют apps; domain независим; UI не тянет server packages. Версия приложения и toolchain pins — [OPS/OPERATIONS](docs/OPERATIONS.md); major-ok (`engines`) и exact pin (`.nvmrc` / `packageManager`) — разные проверки.
+Архитектура вкратце: HTTP разбирает запрос и для составных изменений вызывает service; простые read/health → `@nexus/db` допустимы только из списка в [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / `.dependency-cruiser.exceptions.cjs`. Пакеты не импортируют код приложения; domain независим; UI не тянет server packages. Версия приложения и toolchain pins — [OPS/OPERATIONS](docs/OPERATIONS.md); major-ok (`engines`) и exact pin (`.nvmrc` / `packageManager`) — разные проверки.
 
 Краткая навигация при необходимости: [карта проекта](docs/PROJECT-MAP.md), [текущее состояние](docs/CURRENT-STATE.md), [решения](docs/DECISIONS.md) и полный baseline ID в [реестре](docs/handbook/13-DECISION-REGISTER.md), [эксплуатация](docs/OPERATIONS.md), [проблемы](docs/PROBLEMS.md), [roadmap](docs/ROADMAP.md).
 

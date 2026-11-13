@@ -7,15 +7,15 @@ const h = vi.hoisted(() => ({
   page: vi.fn(),
   disable: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => "aud_a" }));
 vi.mock("@nexus/db", () => ({
   resourceReleaseWatchesRepository: { page: h.page, disableBatch: h.disable },
 }));
-import { GET as exportPage } from "../apps/web/src/app/api/library/watches/export/route";
-import { POST as disable } from "../apps/web/src/app/api/library/watches/disable/route";
+import { GET as exportPage } from "../site/src/app/api/library/watches/export/route";
+import { POST as disable } from "../site/src/app/api/library/watches/disable/route";
 const command = { items: [{ productId: "prd_a", expectedRevision: 1 }] };
 const get = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/export${query}`);

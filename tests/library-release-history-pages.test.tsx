@@ -13,16 +13,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/version-history",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 
-import { LibraryReleaseHistoryScreen } from "../apps/web/src/components/library-release-history-screen";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { LibraryReleaseHistoryScreen } from "../site/src/components/library-release-history-screen";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
@@ -108,7 +108,7 @@ it("rejects ambiguous scope and requires authentication before history calls", a
 it("shows an honest recovery state when version history fails to load", async () => {
   h.history.mockRejectedValueOnce(new Error("history unavailable"));
   const copy = (
-    await import("../apps/web/src/lib/library-release-history-i18n")
+    await import("../site/src/lib/library-release-history-i18n")
   ).libraryReleaseHistoryCopy("en");
   const html = await screen();
   expect(html).toContain('role="alert"');

@@ -5,7 +5,7 @@ import {
   resourceVersionsConflict,
 } from "@nexus/domain";
 import { MTA_VERSION_PATTERN } from "@nexus/validation";
-import { getMtaVersionTargetSuggestion } from "../apps/web/src/lib/mta-version-target";
+import { getMtaVersionTargetSuggestion } from "../site/src/lib/mta-version-target";
 
 describe("MTA minimum version suggestions", () => {
   it("preserves the exact shared sortable release value", () => {

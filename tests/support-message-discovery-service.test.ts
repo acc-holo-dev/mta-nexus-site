@@ -3,7 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const page = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({ supportMessageDiscoveryRepository: { page } }));
 
-import { supportMessageDiscoveryService as service } from "../apps/web/src/lib/services/support-message-discovery-service";
+import { supportMessageDiscoveryService as service } from "../site/src/lib/services/support-message-discovery-service";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

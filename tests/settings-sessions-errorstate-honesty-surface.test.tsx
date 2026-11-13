@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/settings-active-sessions.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "site/src/components/settings-active-sessions.tsx"), "utf8");
 
 it("routes unavailable sessions through ErrorState with reload and keeps empty EmptyState", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');

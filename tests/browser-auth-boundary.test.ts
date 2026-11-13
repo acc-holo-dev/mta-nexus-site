@@ -17,26 +17,26 @@ const authService = vi.hoisted(() => ({
   confirmPasswordReset: vi.fn(),
 }));
 const consumeRateLimit = vi.hoisted(() => vi.fn(async () => ({ success: true })));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
 vi.mock("@nexus/db", () => ({ organizationRepository: {} }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 
-import { POST as login } from "../apps/web/src/app/api/auth/login/route";
-import { POST as register } from "../apps/web/src/app/api/auth/register/route";
-import { DELETE as logout } from "../apps/web/src/app/api/auth/session/route";
-import { DELETE as revoke } from "../apps/web/src/app/api/auth/sessions/route";
-import { POST as password } from "../apps/web/src/app/api/auth/password/route";
-import { POST as context } from "../apps/web/src/app/api/auth/context/route";
+import { POST as login } from "../site/src/app/api/auth/login/route";
+import { POST as register } from "../site/src/app/api/auth/register/route";
+import { DELETE as logout } from "../site/src/app/api/auth/session/route";
+import { DELETE as revoke } from "../site/src/app/api/auth/sessions/route";
+import { POST as password } from "../site/src/app/api/auth/password/route";
+import { POST as context } from "../site/src/app/api/auth/context/route";
 import {
   POST as emailRequest,
   PATCH as emailConfirm,
-} from "../apps/web/src/app/api/auth/email-verification/route";
+} from "../site/src/app/api/auth/email-verification/route";
 import {
   POST as resetRequest,
   PATCH as resetConfirm,
-} from "../apps/web/src/app/api/auth/password-reset/route";
-import { proxy } from "../apps/web/src/proxy";
+} from "../site/src/app/api/auth/password-reset/route";
+import { proxy } from "../site/src/proxy";
 
 const mutations = [
   ["login", "POST", login],

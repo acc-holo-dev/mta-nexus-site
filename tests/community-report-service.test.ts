@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@nexus/db", () => ({ communityReportsRepository: mocks }));
 
-import { communityReportService as service } from "../apps/web/src/lib/services/community-report-service";
+import { communityReportService as service } from "../site/src/lib/services/community-report-service";
 
 const actor = { id: "actor", role: "user" } as User,
   moderator = { ...actor, role: "moderator" } as User;

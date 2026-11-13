@@ -22,14 +22,14 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { comparison: state.comparison },
 }));
-vi.mock("../apps/web/src/components/library-collection-item-copy", () => ({
+vi.mock("../site/src/components/library-collection-item-copy", () => ({
   LibraryCollectionItemCopyForm: ({
     source,
     items,
@@ -60,9 +60,9 @@ vi.mock("../apps/web/src/components/library-collection-item-copy", () => ({
 import Page, {
   dynamic,
   generateMetadata,
-} from "../apps/web/src/app/workspace/library/collections/[id]/compare/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { libraryCollectionComparisonCopy } from "../apps/web/src/lib/library-collection-comparison-i18n";
+} from "../site/src/app/workspace/library/collections/[id]/compare/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { libraryCollectionComparisonCopy } from "../site/src/lib/library-collection-comparison-i18n";
 
 const source = {
     id: "lcol_a",

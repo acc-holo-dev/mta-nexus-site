@@ -3,8 +3,8 @@ import { expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
-import { FooterContribute } from "../apps/web/src/components/footer-contribute";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { FooterContribute } from "../site/src/components/footer-contribute";
+import { getDictionary } from "../site/src/lib/i18n";
 
 it.each(["en", "ru"] as const)(
   "hides workspace contribute links until the session is known in %s",

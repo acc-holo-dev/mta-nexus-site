@@ -17,7 +17,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   cancel: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -36,15 +36,12 @@ vi.mock("@nexus/security", async (importOriginal) => ({
 }));
 
 import { consumeRateLimit } from "@nexus/security";
-import { POST as edit } from "../apps/web/src/app/api/admin/commerce/plans/[id]/route";
-import {
-  GET as adminPage,
-  POST as create,
-} from "../apps/web/src/app/api/admin/commerce/plans/route";
-import { GET as estimate } from "../apps/web/src/app/api/commerce/estimate/route";
-import { GET as catalog } from "../apps/web/src/app/api/commerce/plans/route";
-import { POST as cancel } from "../apps/web/src/app/api/orders/[id]/cancel/route";
-import { GET as detail } from "../apps/web/src/app/api/orders/[id]/operations/route";
+import { POST as edit } from "../site/src/app/api/admin/commerce/plans/[id]/route";
+import { GET as adminPage, POST as create } from "../site/src/app/api/admin/commerce/plans/route";
+import { GET as estimate } from "../site/src/app/api/commerce/estimate/route";
+import { GET as catalog } from "../site/src/app/api/commerce/plans/route";
+import { POST as cancel } from "../site/src/app/api/orders/[id]/cancel/route";
+import { GET as detail } from "../site/src/app/api/orders/[id]/operations/route";
 
 const ctx = { params: Promise.resolve({ id: "ord_a" }) },
   planCtx = { params: Promise.resolve({ id: "cplan_a" }) };

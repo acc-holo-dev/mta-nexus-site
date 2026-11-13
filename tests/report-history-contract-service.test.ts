@@ -16,22 +16,22 @@ vi.mock("@nexus/db", () => ({
   serverContentRepository: {},
   communityReportsRepository: state,
 }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../site/src/lib/services/content-service", () => ({ contentService: {} }));
 
 import {
   discussionReportsHref,
   discussionReportsPageSchema,
   parseDiscussionReportsQuery,
-} from "../apps/web/src/lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../apps/web/src/lib/discussion-reports-copy";
+} from "../site/src/lib/discussion-reports-contract";
+import { discussionReportsCopy } from "../site/src/lib/discussion-reports-copy";
 import {
   confirmedOrganizationPublicationRestore,
   organizationPublicationHistorySchema,
-} from "../apps/web/src/lib/organization-publication-history-contract";
-import { organizationPublicationHistoryCopy } from "../apps/web/src/lib/organization-publication-history-copy";
-import { communityModerationService as moderation } from "../apps/web/src/lib/services/community-moderation-service";
-import { communityReportService as reports } from "../apps/web/src/lib/services/community-report-service";
-import { organizationContentService as organizations } from "../apps/web/src/lib/services/organization-content-service";
+} from "../site/src/lib/organization-publication-history-contract";
+import { organizationPublicationHistoryCopy } from "../site/src/lib/organization-publication-history-copy";
+import { communityModerationService as moderation } from "../site/src/lib/services/community-moderation-service";
+import { communityReportService as reports } from "../site/src/lib/services/community-report-service";
+import { organizationContentService as organizations } from "../site/src/lib/services/organization-content-service";
 
 const time = "2026-10-11T00:00:00.123456Z",
   next = "2026-10-11T00:00:00.123457Z",

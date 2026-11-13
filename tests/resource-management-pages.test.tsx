@@ -33,35 +33,35 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...rest }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: { getManagedProduct: state.product, getDependencyResolution: state.resolution },
 }));
-vi.mock("../apps/web/src/lib/services/resource-management-service", () => ({
+vi.mock("../site/src/lib/services/resource-management-service", () => ({
   resourceManagementService: {
     managedVariants: state.managed,
     variantCandidates: state.candidates,
   },
 }));
-vi.mock("../apps/web/src/components/resource-variants-form", () => ({
+vi.mock("../site/src/components/resource-variants-form", () => ({
   ResourceVariantsForm: (props: unknown) => {
     state.variantForm(props);
     return null;
   },
 }));
-vi.mock("../apps/web/src/components/resource-compatibility-form", () => ({
+vi.mock("../site/src/components/resource-compatibility-form", () => ({
   ResourceCompatibilityForm: (props: unknown) => {
     state.compatibilityForm(props);
     return null;
   },
 }));
 
-import CompatibilityPage from "../apps/web/src/app/workspace/resources/[id]/compatibility/page";
-import VariantsPage, { metadata } from "../apps/web/src/app/workspace/resources/[id]/variants/page";
-import { ResourceVariantChoices } from "../apps/web/src/components/resource-variant-choices";
+import CompatibilityPage from "../site/src/app/workspace/resources/[id]/compatibility/page";
+import VariantsPage, { metadata } from "../site/src/app/workspace/resources/[id]/variants/page";
+import { ResourceVariantChoices } from "../site/src/components/resource-variant-choices";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   revision = "2026-10-10T00:00:00.000Z";
@@ -132,9 +132,7 @@ it.each(["en", "ru"] as const)(
 );
 it("shows an honest recovery state when variant management fails", async () => {
   state.managed.mockRejectedValue(new Error("variants unavailable"));
-  const { getResourceManagementCopy } = await import(
-    "../apps/web/src/lib/resource-management-i18n"
-  );
+  const { getResourceManagementCopy } = await import("../site/src/lib/resource-management-i18n");
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await VariantsPage(context));
   expect(html).toContain('role="alert"');
@@ -143,9 +141,7 @@ it("shows an honest recovery state when variant management fails", async () => {
 });
 it("shows an honest recovery state when compatibility resolution fails", async () => {
   state.resolution.mockRejectedValue(new Error("compatibility unavailable"));
-  const { getResourceManagementCopy } = await import(
-    "../apps/web/src/lib/resource-management-i18n"
-  );
+  const { getResourceManagementCopy } = await import("../site/src/lib/resource-management-i18n");
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await CompatibilityPage(context));
   expect(html).toContain('role="alert"');

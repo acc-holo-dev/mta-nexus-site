@@ -17,28 +17,28 @@ const verificationWorkspaceService = vi.hoisted(() => ({
   updateProfile: vi.fn(async () => ({ id: "usr_owner", specialties: ["Lua"] })),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
-vi.mock("../apps/web/src/lib/services/public-profile-service", () => ({
+vi.mock("../site/src/lib/services/public-profile-service", () => ({
   publicProfileService,
   editableProfile: (user: { id: string }) => ({ id: user.id }),
 }));
-vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
+vi.mock("../site/src/lib/services/profile-privacy-service", () => ({
   profilePrivacyService,
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService,
 }));
 
 import {
   GET as profileGet,
   PATCH as profilePatch,
-} from "../apps/web/src/app/api/account/profile/route";
+} from "../site/src/app/api/account/profile/route";
 import {
   GET as privacyGet,
   PATCH as privacyPatch,
-} from "../apps/web/src/app/api/account/privacy/route";
-import { PATCH as developerPatch } from "../apps/web/src/app/api/account/developer/route";
+} from "../site/src/app/api/account/privacy/route";
+import { PATCH as developerPatch } from "../site/src/app/api/account/developer/route";
 
 const profileBody = {
   displayName: "Owner",

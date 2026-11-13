@@ -1,7 +1,7 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -24,15 +24,15 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => state.locale),
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { listServers: state.listings },
 }));
 
-vi.mock("../apps/web/src/components/mta-master-server-directory", async () => {
+vi.mock("../site/src/components/mta-master-server-directory", async () => {
   const ReactModule = await import("react");
   return {
     MtaMasterServerDirectory: ({
@@ -52,8 +52,8 @@ vi.mock("../apps/web/src/components/mta-master-server-directory", async () => {
   };
 });
 
-import ServersLoading from "../apps/web/src/app/servers/loading";
-import ServersPage from "../apps/web/src/app/servers/page";
+import ServersLoading from "../site/src/app/servers/loading";
+import ServersPage from "../site/src/app/servers/page";
 
 describe("public MTA directory page behavior", () => {
   beforeEach(() => {

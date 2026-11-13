@@ -45,22 +45,22 @@ vi.mock("next/link", async () => {
 vi.mock("@nexus/db", () => ({
   buildRepository: { pagePublishedReleases: state.history },
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     getProductBySlug: state.getProduct,
     canManageProduct: state.canManage,
   },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: { checkEntitlement: state.checkRight },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../apps/web/src/components/resource-download-button", async () => {
+vi.mock("../site/src/components/resource-download-button", async () => {
   const React = await import("react");
   return {
     ResourceDownloadButton: ({
@@ -84,9 +84,9 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
   };
 });
 
-import ReleasePage, { metadata } from "../apps/web/src/app/market/[slug]/versions/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { getReleaseHistoryCopy } from "../apps/web/src/lib/public-release-history";
+import ReleasePage, { metadata } from "../site/src/app/market/[slug]/versions/page";
+import { getDictionary } from "../site/src/lib/i18n";
+import { getReleaseHistoryCopy } from "../site/src/lib/public-release-history";
 
 const release = {
   id: "bld_clean_1",
@@ -277,7 +277,7 @@ describe("public safely published version archive", () => {
 
   it("clips the public versions loading shell", async () => {
     const { default: VersionsLoading } = await import(
-      "../apps/web/src/app/market/[slug]/versions/loading"
+      "../site/src/app/market/[slug]/versions/loading"
     );
     const html = renderToStaticMarkup(await VersionsLoading());
     expect(html).toContain("min-w-0");

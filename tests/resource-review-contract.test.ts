@@ -8,12 +8,12 @@ import {
 import {
   resourceReviewQuery,
   resourceReviewPageQuery,
-} from "../apps/web/src/lib/resource-review-query";
+} from "../site/src/lib/resource-review-query";
 import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
-} from "../apps/web/src/lib/resource-review-confirmation";
+} from "../site/src/lib/resource-review-confirmation";
 it.each([0, 6, 1.5, NaN, "5"])("rejects invalid rating %s", (rating) => {
   expect(resourceReviewCreateSchema.safeParse({ text: "Useful map", rating }).success).toBe(false);
 });

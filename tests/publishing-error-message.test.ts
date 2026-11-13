@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getResourceSubmissionErrorMessage } from "../apps/web/src/lib/publishing-error-message";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getResourceSubmissionErrorMessage } from "../site/src/lib/publishing-error-message";
+import { getDictionary } from "../site/src/lib/i18n";
 
 describe("localized resource submission failures", () => {
   it.each([

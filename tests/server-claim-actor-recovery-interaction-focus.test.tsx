@@ -19,12 +19,12 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 vi.mock("next/link", () => ({ default: ({ children }: { children: ReactNode }) => children }));
-vi.mock("../apps/web/src/components/locale-context", async () => {
-  const { getDictionary } = await import("../apps/web/src/lib/i18n");
+vi.mock("../site/src/components/locale-context", async () => {
+  const { getDictionary } = await import("../site/src/lib/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { ServerClaimControlPanel } from "../apps/web/src/components/server-claim-control-panel";
+import { ServerClaimControlPanel } from "../site/src/components/server-claim-control-panel";
 
 const { render, mount, click, waitUntilReady, hasCopy, attachWindowEvents } =
   createServerClaimActorRecoveryInteractionHelpers(h, ServerClaimControlPanel);

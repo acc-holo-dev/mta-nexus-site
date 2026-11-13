@@ -13,23 +13,23 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/versions",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { detail: state.detail },
 }));
-vi.mock("../apps/web/src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../site/src/lib/services/library-selection-batches-service", () => ({
   librarySelectionBatchesService: { history: state.history },
 }));
-vi.mock("../apps/web/src/components/library-selection-batch-controls", () => ({
+vi.mock("../site/src/components/library-selection-batch-controls", () => ({
   LibrarySelectionBatchControls: ({ items }: { items: { productId: string }[] }) => (
     <p data-batch={items.map((i) => i.productId).join(",")}>Batch controls</p>
   ),
 }));
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { LibrarySelectionBatchScreen as screen } from "../apps/web/src/components/library-selection-batch-screen";
+import { getDictionary } from "../site/src/lib/i18n";
+import { LibrarySelectionBatchScreen as screen } from "../site/src/components/library-selection-batch-screen";
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
 beforeEach(() => {
@@ -122,7 +122,7 @@ it("rejects duplicate pagination before fetching private metadata", async () => 
 it("shows an honest recovery state when batch metadata fails to load", async () => {
   state.detail.mockRejectedValueOnce(new Error("batch detail unavailable"));
   const { librarySelectionBatchesCopy } = await import(
-    "../apps/web/src/lib/library-selection-batches-i18n"
+    "../site/src/lib/library-selection-batches-i18n"
   );
   const copy = librarySelectionBatchesCopy("en");
   const html = renderToStaticMarkup(await screen(props));

@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   profile: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -32,14 +32,14 @@ vi.mock("@nexus/security", () => ({
 import {
   GET as profileGet,
   PATCH as profilePatch,
-} from "../apps/web/src/app/api/account/profile/route";
+} from "../site/src/app/api/account/profile/route";
 import {
   DELETE as archive,
   GET as get,
   PATCH as update,
-} from "../apps/web/src/app/api/workspace/content/[id]/route";
-import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/content/route";
-import { userPlatformError } from "../apps/web/src/lib/user-platform-copy";
+} from "../site/src/app/api/workspace/content/[id]/route";
+import { POST as create, GET as list } from "../site/src/app/api/workspace/content/route";
+import { userPlatformError } from "../site/src/lib/user-platform-copy";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const context = { params: Promise.resolve({ id: "cnt_author" }) };

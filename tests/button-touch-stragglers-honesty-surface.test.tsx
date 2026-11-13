@@ -7,11 +7,11 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "apps/web/src/components/seller-sales-report.tsx",
-  "apps/web/src/components/resource-review-controls.tsx",
-  "apps/web/src/components/support-center.tsx",
-  "apps/web/src/components/order-case-page.tsx",
-  "apps/web/src/components/mta-master-server-directory.tsx",
+  "site/src/components/seller-sales-report.tsx",
+  "site/src/components/resource-review-controls.tsx",
+  "site/src/components/support-center.tsx",
+  "site/src/components/order-case-page.tsx",
+  "site/src/components/mta-master-server-directory.tsx",
 ] as const;
 
 it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-10", () => {
@@ -24,31 +24,31 @@ it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-
 });
 
 it("locks resource-review primary submit CTAs to size=touch", () => {
-  const source = read("apps/web/src/components/resource-review-controls.tsx");
+  const source = read("site/src/components/resource-review-controls.tsx");
   const touchSubmits = source.match(/<Button\s+type="submit"\s+size="touch"/gu) ?? [];
   expect(touchSubmits.length).toBeGreaterThanOrEqual(3);
 });
 
 it("locks order-case filter selects to min-h-11 field chrome", () => {
-  const source = read("apps/web/src/components/order-case-page.tsx");
+  const source = read("site/src/components/order-case-page.tsx");
   expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
   expect(source).toContain('size="touch"');
 });
 
 it("locks seller-sales apply and support create-case submit to size=touch", () => {
-  expect(read("apps/web/src/components/seller-sales-report.tsx")).toMatch(
+  expect(read("site/src/components/seller-sales-report.tsx")).toMatch(
     /type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u,
   );
-  expect(read("apps/web/src/components/support-center.tsx")).toMatch(
+  expect(read("site/src/components/support-center.tsx")).toMatch(
     /variant="primary"[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?variant="primary"/u,
   );
-  expect(read("apps/web/src/components/mta-master-server-directory.tsx")).toMatch(
+  expect(read("site/src/components/mta-master-server-directory.tsx")).toMatch(
     /onClick=\{resetFilters\}[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}/u,
   );
 });
 
 it("locks MTA directory empty chrome to EmptyState without size=sm stragglers", () => {
-  const source = read("apps/web/src/components/mta-master-server-directory.tsx");
+  const source = read("site/src/components/mta-master-server-directory.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("noMatchDescription");
   expect(source).toContain("noneDescription");

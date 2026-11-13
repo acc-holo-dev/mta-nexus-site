@@ -10,8 +10,8 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { authService } from "../apps/web/src/lib/services/auth-service";
-import { GET as getContexts } from "../apps/web/src/app/api/auth/context/route";
+import { authService } from "../site/src/lib/services/auth-service";
+import { GET as getContexts } from "../site/src/app/api/auth/context/route";
 
 describe("organization owner context switching integration", () => {
   it("shows and accepts a directly owned organization without requiring a membership row", async () => {

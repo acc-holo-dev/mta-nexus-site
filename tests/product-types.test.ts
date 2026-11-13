@@ -4,12 +4,12 @@ import { PRODUCT_TYPES, isProductType } from "@nexus/domain";
 import { createProductSchema } from "@nexus/validation";
 import { getTableConfig, PgDialect } from "drizzle-orm/pg-core";
 import { products } from "../packages/db/src/schema";
-import { parseMarketQuery } from "../apps/web/src/lib/market-query";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { parseMarketQuery } from "../site/src/lib/market-query";
+import { getDictionary } from "../site/src/lib/i18n";
 import {
   PRODUCT_CATEGORY_KEYS,
   PRODUCT_PUBLISHING_KEYS,
-} from "../apps/web/src/lib/product-type-labels";
+} from "../site/src/lib/product-type-labels";
 
 it.each(PRODUCT_TYPES)(
   "supports %s consistently across validation, catalog and translations",

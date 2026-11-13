@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { followCopy } from "../../apps/web/src/lib/follow-workspace-copy";
+import { followCopy } from "../../site/src/lib/follow-workspace-copy";
 import { type FlatTestElement, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type ContentFollowControlsInteractionHarness = {

@@ -2,12 +2,12 @@ import { buildResourcePublicationReadiness } from "@nexus/domain";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { ResourcePublicationReadinessPanel } from "../apps/web/src/components/resource-publication-readiness-panel";
+import { ResourcePublicationReadinessPanel } from "../site/src/components/resource-publication-readiness-panel";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
-} from "../apps/web/src/lib/resource-publication-readiness-i18n";
-import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
+} from "../site/src/lib/resource-publication-readiness-i18n";
+import { getResourcePublisherCopy } from "../site/src/lib/resource-publisher-i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");

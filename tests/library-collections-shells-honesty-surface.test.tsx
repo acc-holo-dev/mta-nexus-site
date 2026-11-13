@@ -10,52 +10,52 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
-import DiscussionsDetailLoading from "../apps/web/src/app/workspace/discussions/[id]/loading";
-import FeedLoading from "../apps/web/src/app/workspace/feed/loading";
-import CollectionAddLoading from "../apps/web/src/app/workspace/library/collections/[id]/add/loading";
-import CollectionCompareLoading from "../apps/web/src/app/workspace/library/collections/[id]/compare/loading";
-import CollectionCopyLoading from "../apps/web/src/app/workspace/library/collections/[id]/copy/loading";
-import CollectionCopyItemsLoading from "../apps/web/src/app/workspace/library/collections/[id]/copy-items/loading";
-import CollectionHistoryLoading from "../apps/web/src/app/workspace/library/collections/[id]/history/loading";
-import CollectionDetailLoading from "../apps/web/src/app/workspace/library/collections/[id]/loading";
-import CollectionMoveItemsLoading from "../apps/web/src/app/workspace/library/collections/[id]/move-items/loading";
-import CollectionVersionsHistoryLoading from "../apps/web/src/app/workspace/library/collections/[id]/versions/history/loading";
-import MembershipHistoryDetailLoading from "../apps/web/src/app/workspace/library/collections/membership-history/[id]/loading";
-import { libraryCollectionComparisonCopy } from "../apps/web/src/lib/library-collection-comparison-i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+import DiscussionsDetailLoading from "../site/src/app/workspace/discussions/[id]/loading";
+import FeedLoading from "../site/src/app/workspace/feed/loading";
+import CollectionAddLoading from "../site/src/app/workspace/library/collections/[id]/add/loading";
+import CollectionCompareLoading from "../site/src/app/workspace/library/collections/[id]/compare/loading";
+import CollectionCopyLoading from "../site/src/app/workspace/library/collections/[id]/copy/loading";
+import CollectionCopyItemsLoading from "../site/src/app/workspace/library/collections/[id]/copy-items/loading";
+import CollectionHistoryLoading from "../site/src/app/workspace/library/collections/[id]/history/loading";
+import CollectionDetailLoading from "../site/src/app/workspace/library/collections/[id]/loading";
+import CollectionMoveItemsLoading from "../site/src/app/workspace/library/collections/[id]/move-items/loading";
+import CollectionVersionsHistoryLoading from "../site/src/app/workspace/library/collections/[id]/versions/history/loading";
+import MembershipHistoryDetailLoading from "../site/src/app/workspace/library/collections/membership-history/[id]/loading";
+import { libraryCollectionComparisonCopy } from "../site/src/lib/library-collection-comparison-i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedPages = [
-  "apps/web/src/app/workspace/library/collections/page.tsx",
-  "apps/web/src/app/workspace/library/collections/membership-history/page.tsx",
-  "apps/web/src/app/workspace/library/collections/membership-history/[id]/page.tsx",
-  "apps/web/src/app/market/[slug]/page.tsx",
-  "apps/web/src/app/articles/page.tsx",
+  "site/src/app/workspace/library/collections/page.tsx",
+  "site/src/app/workspace/library/collections/membership-history/page.tsx",
+  "site/src/app/workspace/library/collections/membership-history/[id]/page.tsx",
+  "site/src/app/market/[slug]/page.tsx",
+  "site/src/app/articles/page.tsx",
 ] as const;
 
 const clippedLoadings = [
-  "apps/web/src/app/workspace/library/collections/[id]/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/membership-history/[id]/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/add/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/copy/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/copy-items/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/move-items/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/compare/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/history/loading.tsx",
-  "apps/web/src/app/workspace/library/collections/[id]/versions/history/loading.tsx",
-  "apps/web/src/app/workspace/discussions/[id]/loading.tsx",
-  "apps/web/src/app/workspace/feed/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/loading.tsx",
+  "site/src/app/workspace/library/collections/membership-history/[id]/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/add/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/copy/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/copy-items/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/move-items/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/compare/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/history/loading.tsx",
+  "site/src/app/workspace/library/collections/[id]/versions/history/loading.tsx",
+  "site/src/app/workspace/discussions/[id]/loading.tsx",
+  "site/src/app/workspace/feed/loading.tsx",
 ] as const;
 
 it("locks library collections shells and exclusive market/articles pages to clipped frames", () => {
@@ -72,7 +72,7 @@ it("locks library collections shells and exclusive market/articles pages to clip
 });
 
 it("locks market detail and articles shells to ErrorState/EmptyState honesty chrome", () => {
-  const market = read("apps/web/src/app/market/[slug]/page.tsx");
+  const market = read("site/src/app/market/[slug]/page.tsx");
   expect(market).toContain("ErrorState");
   expect(market).toContain("EmptyState");
   expect(market).toContain("pageShellClass");
@@ -80,16 +80,16 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   expect(market).not.toContain('role="alert"');
   expect(market).not.toContain("throw error");
 
-  const articles = read("apps/web/src/app/articles/page.tsx");
+  const articles = read("site/src/app/articles/page.tsx");
   expect(articles).toContain("ErrorState");
   expect(articles).toContain("EmptyState");
   expect(articles).toContain("overflow-x-clip");
   expect(articles).toContain("min-w-0");
   expect(articles).toMatch(/min-h-11|size="touch"/u);
 
-  expect(read("apps/web/src/lib/i18n/en/product.ts")).toContain("detailUnavailableDescription");
-  expect(read("apps/web/src/lib/i18n/ru/product.ts")).toContain("noBuildsHint");
-  expect(read("apps/web/src/lib/i18n/en/product.ts")).toContain("noReviewsHint");
+  expect(read("site/src/lib/i18n/en/product.ts")).toContain("detailUnavailableDescription");
+  expect(read("site/src/lib/i18n/ru/product.ts")).toContain("noBuildsHint");
+  expect(read("site/src/lib/i18n/en/product.ts")).toContain("noReviewsHint");
 });
 
 it.each([

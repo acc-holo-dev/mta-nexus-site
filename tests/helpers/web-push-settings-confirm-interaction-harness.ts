@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { getDictionary } from "../../apps/web/src/lib/i18n";
+import { getDictionary } from "../../site/src/lib/i18n";
 
 export type WebPushSettingsConfirmHarness = {
   slots: unknown[];

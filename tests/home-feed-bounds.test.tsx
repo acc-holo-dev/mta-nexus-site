@@ -40,46 +40,46 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   };
 });
 
-vi.mock("../apps/web/src/components/article-card", () => ({
+vi.mock("../site/src/components/article-card", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
 
-vi.mock("../apps/web/src/components/product-card", () => ({
+vi.mock("../site/src/components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: mocks.directory,
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     listProducts: mocks.products,
     getPublicAttributions: async () => new Map(),
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: {
     listArticles: mocks.articles,
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
+vi.mock("../site/src/lib/services/server-service", () => ({
   serverService: { listServers: mocks.listServers },
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../apps/web/src/lib/home-personal-changes", () => ({
+vi.mock("../site/src/lib/home-personal-changes", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 
@@ -93,8 +93,8 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 
-import HomePage from "../apps/web/src/app/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import HomePage from "../site/src/app/page";
+import { getDictionary } from "../site/src/lib/i18n";
 
 describe("bounded home feed reads", () => {
   beforeEach(() => {

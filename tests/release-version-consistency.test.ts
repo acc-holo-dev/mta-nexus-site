@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 const packagePaths = [
   "package.json",
-  "apps/web/package.json",
+  "site/package.json",
   "packages/config/package.json",
   "packages/db/package.json",
   "packages/domain/package.json",

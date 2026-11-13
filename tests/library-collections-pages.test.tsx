@@ -29,11 +29,11 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: {
     page: state.page,
     detail: state.detail,
@@ -42,7 +42,7 @@ vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
     copyItemsPage: state.copyItemsPage,
   },
 }));
-vi.mock("../apps/web/src/components/library-collection-command", () => ({
+vi.mock("../site/src/components/library-collection-command", () => ({
   LibraryCollectionCommandForm: ({
     action = "create",
     productId,
@@ -55,7 +55,7 @@ vi.mock("../apps/web/src/components/library-collection-command", () => ({
     </button>
   ),
 }));
-vi.mock("../apps/web/src/components/resource-download-button", () => ({
+vi.mock("../site/src/components/resource-download-button", () => ({
   ResourceDownloadButton: ({ productId, buildId }: { productId: string; buildId?: string }) => (
     <button type="button" data-download={productId} data-build={buildId}>
       Download
@@ -63,9 +63,9 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
   ),
 }));
 
-import { LibraryCollectionsScreen } from "../apps/web/src/components/library-collections-screen";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+import { LibraryCollectionsScreen } from "../site/src/components/library-collections-screen";
+import { getDictionary } from "../site/src/lib/i18n";
+import { libraryCollectionsCopy } from "../site/src/lib/library-collections-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {

@@ -6,23 +6,23 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("server ownership hardening surface", () => {
   it("hardens registration ownership and validates organization identifiers", () => {
-    const service = read("apps/web/src/lib/services/server-service.ts");
-    const route = read("apps/web/src/app/api/servers/route.ts");
+    const service = read("site/src/lib/services/server-service.ts");
+    const route = read("site/src/app/api/servers/route.ts");
     expect(service).toContain("ownerId: input.organizationId ? undefined : actor.id");
     expect(route).toContain("serverRegistrationSchema.safeParse");
     expect(route).toContain("createServerSchema.strict()");
   });
 
   it("uses trusted request IP for server registration", () => {
-    const route = read("apps/web/src/app/api/servers/route.ts");
+    const route = read("site/src/app/api/servers/route.ts");
     expect(route).toContain('import { getTrustedRequestIp } from "../../../lib/request-client-ip"');
     expect(route).toContain("getTrustedRequestIp(request)");
     expect(route).not.toContain("getClientIp(request.headers)");
   });
 
   it("uses one server management contract in service and workspace page", () => {
-    const service = read("apps/web/src/lib/services/server-service.ts");
-    const page = read("apps/web/src/app/workspace/servers/[id]/page.tsx");
+    const service = read("site/src/lib/services/server-service.ts");
+    const page = read("site/src/app/workspace/servers/[id]/page.tsx");
 
     expect(service).toContain("async canManageServer(");
     expect(service).toContain("if (!organization) return false");
@@ -46,7 +46,7 @@ describe("server ownership hardening surface", () => {
 
   it("serializes server claims in the repository and checks pending claims across requesters", () => {
     const repository = read("packages/db/src/repositories/verification.ts");
-    const route = read("apps/web/src/app/api/verification/route.ts");
+    const route = read("site/src/app/api/verification/route.ts");
 
     expect(repository).toContain("pg_advisory_xact_lock");
     expect(repository).toContain("pg_advisory_xact_lock");
@@ -69,7 +69,7 @@ describe("server ownership hardening surface", () => {
   });
 
   it("preserves private cache semantics on the authenticated verification GET", () => {
-    const route = read("apps/web/src/app/api/verification/route.ts");
+    const route = read("site/src/app/api/verification/route.ts");
 
     // Every authenticated response (including 401 and rate limits) goes through
     // the json() helper, so the private no-store headers always apply.
@@ -81,7 +81,7 @@ describe("server ownership hardening surface", () => {
   });
 
   it("does not claim automatic proof or live-ownership acceptance", () => {
-    const route = read("apps/web/src/app/api/verification/route.ts");
+    const route = read("site/src/app/api/verification/route.ts");
 
     expect(route).toContain("proofUrl");
     expect(route).not.toContain("ownershipVerified: true");

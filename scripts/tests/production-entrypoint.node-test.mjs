@@ -10,7 +10,7 @@ function exercise(migrationExit, serverExit = 0, { withMigrations = true, config
   try {
     mkdirSync(join(root, "scripts"));
     mkdirSync(join(root, "bin"));
-    mkdirSync(join(root, "apps/web"), { recursive: true });
+    mkdirSync(join(root, "site"), { recursive: true });
     mkdirSync(join(root, "packages/db"), { recursive: true });
     if (withMigrations) {
       mkdirSync(join(root, "packages/db/migrations"), { recursive: true });
@@ -57,7 +57,7 @@ test("runs migrations before the standalone server from isolated runtime directo
   assert.deepEqual(result.calls, [
     `${result.root}/packages/db|--import tsx --input-type=module -e import '@nexus/config';`,
     `${result.root}/packages/db|--import tsx src/migrate.ts`,
-    `${result.root}/apps/web|server.js`,
+    `${result.root}/site|server.js`,
   ]);
 });
 

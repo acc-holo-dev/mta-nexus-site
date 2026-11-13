@@ -4,7 +4,7 @@ import {
   marketHref,
   parseMarketPage,
   parseMarketQuery,
-} from "../apps/web/src/lib/market-query";
+} from "../site/src/lib/market-query";
 
 describe("free resource catalog navigation", () => {
   it("accepts every visible category, including API resources", () => {

@@ -6,7 +6,7 @@ import {
   createStructuredLogEntry,
   errorLogMetadata,
   jsonWithRequestId,
-} from "../apps/web/src/lib/observability";
+} from "../site/src/lib/observability";
 
 function fakeRequest(path = "/api/example") {
   return {

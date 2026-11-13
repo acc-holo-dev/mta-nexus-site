@@ -14,7 +14,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
+import { LibraryCollectionBatchForm } from "../site/src/components/library-collection-batch";
 
 const { render, check, submit, success } = createLibraryCollectionsBatchInteractionHelpers(
   harness,
@@ -86,7 +86,7 @@ it("ignores stale handlers after a confirmed batch", async () => {
 });
 
 it("lists per-item batch outcomes after a confirmed remove-many", async () => {
-  const { libraryCollectionsCopy } = await import("../apps/web/src/lib/library-collections-i18n");
+  const { libraryCollectionsCopy } = await import("../site/src/lib/library-collections-i18n");
   check(1);
   check(2);
   harness.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>

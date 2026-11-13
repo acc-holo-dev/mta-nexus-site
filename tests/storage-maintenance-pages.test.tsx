@@ -16,20 +16,20 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/admin/storage",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/services/storage-maintenance-service", () => ({
+vi.mock("../site/src/lib/services/storage-maintenance-service", () => ({
   storageMaintenanceService: { list: state.list, detail: state.detail },
 }));
 
-import ListLoading from "../apps/web/src/app/admin/storage/loading";
-import DetailLoading from "../apps/web/src/app/admin/storage/objects/[id]/loading";
-import Detail from "../apps/web/src/app/admin/storage/objects/[id]/page";
-import Page from "../apps/web/src/app/admin/storage/page";
-import { StorageCleanupControls } from "../apps/web/src/components/storage-maintenance-controls";
-import { storageMaintenanceCopy } from "../apps/web/src/lib/storage-maintenance-i18n";
+import ListLoading from "../site/src/app/admin/storage/loading";
+import DetailLoading from "../site/src/app/admin/storage/objects/[id]/loading";
+import Detail from "../site/src/app/admin/storage/objects/[id]/page";
+import Page from "../site/src/app/admin/storage/page";
+import { StorageCleanupControls } from "../site/src/components/storage-maintenance-controls";
+import { storageMaintenanceCopy } from "../site/src/lib/storage-maintenance-i18n";
 
 const stamp = new Date("2026-10-01T00:00:00Z"),
   item = {

@@ -26,7 +26,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-import { ContentService } from "../apps/web/src/lib/services/content-service";
+import { ContentService } from "../site/src/lib/services/content-service";
 
 const moderator = {
   id: "usr_mod",

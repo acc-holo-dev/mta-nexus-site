@@ -1,8 +1,8 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { BuildProvenanceDetails } from "../apps/web/src/components/build-provenance-details";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { BuildProvenanceDetails } from "../site/src/components/build-provenance-details";
+import { getDictionary } from "../site/src/lib/i18n";
 
 function renderBuild(build: React.ComponentProps<typeof BuildProvenanceDetails>["build"]) {
   return renderToStaticMarkup(React.createElement(BuildProvenanceDetails, { build }));

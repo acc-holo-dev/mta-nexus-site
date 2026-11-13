@@ -20,42 +20,38 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/account-controls", async () => {
+vi.mock("../site/src/components/account-controls", async () => {
   const ReactModule = await import("react");
   return {
     AccountControls: () => ReactModule.createElement("span", { "data-mock": "AccountControls" }),
   };
 });
 
-vi.mock("../apps/web/src/components/locale-switcher", async () => {
+vi.mock("../site/src/components/locale-switcher", async () => {
   const ReactModule = await import("react");
   return {
     LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "LocaleSwitcher" }),
   };
 });
 
-vi.mock("../apps/web/src/components/notification-bell", async () => {
+vi.mock("../site/src/components/notification-bell", async () => {
   const ReactModule = await import("react");
   return {
     NotificationBell: () => ReactModule.createElement("span", { "data-mock": "NotificationBell" }),
   };
 });
 
-vi.mock("../apps/web/src/components/theme-toggle", async () => {
+vi.mock("../site/src/components/theme-toggle", async () => {
   const ReactModule = await import("react");
   return {
     ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
   };
 });
 
-import { Sidebar } from "../apps/web/src/components/sidebar";
-import { Navbar } from "../apps/web/src/components/navbar";
-import ExplorePage from "../apps/web/src/app/explore/page";
-import {
-  DISCOVER_TYPES,
-  discoverHref,
-  parseDiscoverQuery,
-} from "../apps/web/src/lib/discover-query";
+import { Sidebar } from "../site/src/components/sidebar";
+import { Navbar } from "../site/src/components/navbar";
+import ExplorePage from "../site/src/app/explore/page";
+import { DISCOVER_TYPES, discoverHref, parseDiscoverQuery } from "../site/src/lib/discover-query";
 
 describe("discover surface behavior", () => {
   beforeEach(() => {

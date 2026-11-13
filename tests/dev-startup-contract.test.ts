@@ -85,7 +85,7 @@ describe("beta version consistency", () => {
   it("pins the complete workspace to 1.2.0-beta.3", () => {
     const manifests = [
       "package.json",
-      "apps/web/package.json",
+      "site/package.json",
       "packages/config/package.json",
       "packages/db/package.json",
       "packages/domain/package.json",

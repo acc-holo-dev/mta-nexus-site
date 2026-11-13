@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/components/community-topic-form.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/components/community-topic-form.tsx"), "utf8");
 
 it("routes community-topic pending/unknown recovery through ErrorState and keeps busy status", () => {
   expect(source).toContain('import { Button, ErrorState, Field } from "@nexus/ui"');

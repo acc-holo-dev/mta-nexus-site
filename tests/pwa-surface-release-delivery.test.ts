@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import manifest from "../apps/web/src/app/manifest";
-import { GET as getServiceWorker } from "../apps/web/src/app/sw.js/route";
+import manifest from "../site/src/app/manifest";
+import { GET as getServiceWorker } from "../site/src/app/sw.js/route";
 
 describe("PWA release delivery", () => {
   it("publishes an installable standalone manifest", () => {

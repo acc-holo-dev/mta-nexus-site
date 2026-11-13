@@ -10,37 +10,37 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
-import OrganizationActivityLoading from "../apps/web/src/app/organizations/[slug]/activity/loading";
-import ServerUpdatesLoading from "../apps/web/src/app/servers/[slug]/updates/loading";
-import UserActivityLoading from "../apps/web/src/app/users/[username]/activity/loading";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+import OrganizationActivityLoading from "../site/src/app/organizations/[slug]/activity/loading";
+import ServerUpdatesLoading from "../site/src/app/servers/[slug]/updates/loading";
+import UserActivityLoading from "../site/src/app/users/[username]/activity/loading";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedPages = [
-  "apps/web/src/app/support/page.tsx",
-  "apps/web/src/app/support/[id]/page.tsx",
-  "apps/web/src/app/support/[id]/messages/page.tsx",
-  "apps/web/src/app/organizations/[slug]/activity/page.tsx",
-  "apps/web/src/app/organizations/[slug]/trust/page.tsx",
-  "apps/web/src/app/users/[username]/activity/page.tsx",
-  "apps/web/src/app/servers/[slug]/updates/page.tsx",
-  "apps/web/src/app/servers/[slug]/statistics/page.tsx",
-  "apps/web/src/app/servers/[slug]/observations/page.tsx",
+  "site/src/app/support/page.tsx",
+  "site/src/app/support/[id]/page.tsx",
+  "site/src/app/support/[id]/messages/page.tsx",
+  "site/src/app/organizations/[slug]/activity/page.tsx",
+  "site/src/app/organizations/[slug]/trust/page.tsx",
+  "site/src/app/users/[username]/activity/page.tsx",
+  "site/src/app/servers/[slug]/updates/page.tsx",
+  "site/src/app/servers/[slug]/statistics/page.tsx",
+  "site/src/app/servers/[slug]/observations/page.tsx",
 ] as const;
 
 const clippedLoadings = [
-  "apps/web/src/app/organizations/[slug]/activity/loading.tsx",
-  "apps/web/src/app/users/[username]/activity/loading.tsx",
-  "apps/web/src/app/servers/[slug]/updates/loading.tsx",
-  "apps/web/src/app/servers/[slug]/statistics/loading.tsx",
-  "apps/web/src/app/servers/[slug]/observations/loading.tsx",
+  "site/src/app/organizations/[slug]/activity/loading.tsx",
+  "site/src/app/users/[username]/activity/loading.tsx",
+  "site/src/app/servers/[slug]/updates/loading.tsx",
+  "site/src/app/servers/[slug]/statistics/loading.tsx",
+  "site/src/app/servers/[slug]/observations/loading.tsx",
 ] as const;
 
 it("locks support and activity page shells to clipped min-w-0 frames", () => {
@@ -62,7 +62,7 @@ it("locks activity and server panel loading shells to clipped frames", () => {
 });
 
 it("keeps legacy checkout as a compatibility redirect without payment chrome", () => {
-  const source = read("apps/web/src/app/checkout/page.tsx");
+  const source = read("site/src/app/checkout/page.tsx");
   expect(source).toContain("redirect");
   expect(source).toContain("/acquire");
   expect(source).not.toContain("ErrorState");
@@ -92,8 +92,8 @@ it.each([
 );
 
 it("locks server statistics and observations loading shells to honest busy copy", () => {
-  const statistics = read("apps/web/src/components/server-statistics-page.tsx");
-  const observations = read("apps/web/src/components/server-observation-browser-page.tsx");
+  const statistics = read("site/src/components/server-statistics-page.tsx");
+  const observations = read("site/src/components/server-observation-browser-page.tsx");
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
   expect(statistics).toContain("aria-busy");
@@ -102,24 +102,20 @@ it("locks server statistics and observations loading shells to honest busy copy"
   expect(observations).toContain("copy.loading");
   expect(observations).toContain("aria-busy");
   expect(observations).toContain("overflow-x-clip");
-  expect(read("apps/web/src/app/servers/[slug]/statistics/loading.tsx")).toContain(
-    "overflow-x-clip",
-  );
-  expect(read("apps/web/src/app/servers/[slug]/observations/loading.tsx")).toContain(
-    "overflow-x-clip",
-  );
+  expect(read("site/src/app/servers/[slug]/statistics/loading.tsx")).toContain("overflow-x-clip");
+  expect(read("site/src/app/servers/[slug]/observations/loading.tsx")).toContain("overflow-x-clip");
 });
 
 it("locks nested support and activity surfaces to ErrorState/EmptyState honesty chrome", () => {
   const surfaces = [
-    "apps/web/src/components/support-page.tsx",
-    "apps/web/src/components/support-message-page.tsx",
-    "apps/web/src/components/support-center.tsx",
-    "apps/web/src/components/public-profile-activity.tsx",
-    "apps/web/src/components/public-context-trust-page.tsx",
-    "apps/web/src/components/server-statistics-page.tsx",
-    "apps/web/src/components/server-observation-browser-page.tsx",
-    "apps/web/src/components/publication-feed.tsx",
+    "site/src/components/support-page.tsx",
+    "site/src/components/support-message-page.tsx",
+    "site/src/components/support-center.tsx",
+    "site/src/components/public-profile-activity.tsx",
+    "site/src/components/public-context-trust-page.tsx",
+    "site/src/components/server-statistics-page.tsx",
+    "site/src/components/server-observation-browser-page.tsx",
+    "site/src/components/publication-feed.tsx",
   ];
   for (const surface of surfaces) {
     const source = read(surface);
@@ -128,20 +124,18 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     expect(source).toContain("min-w-0");
     expect(source).toContain("min-h-11");
   }
-  expect(read("apps/web/src/components/support-center.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
-  expect(read("apps/web/src/components/server-observation-browser-page.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("apps/web/src/components/publication-feed.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/support-center.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/server-observation-browser-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/components/publication-feed.tsx")).toContain("EmptyState");
 });
 
 it("locks support case/filter/message controls to touch targets without min-h-10", () => {
   const touchSurfaces = [
-    "apps/web/src/components/support-case-actions.tsx",
-    "apps/web/src/components/support-center.tsx",
-    "apps/web/src/components/support-message-browser.tsx",
-    "apps/web/src/components/support-case-thread.tsx",
+    "site/src/components/support-case-actions.tsx",
+    "site/src/components/support-center.tsx",
+    "site/src/components/support-message-browser.tsx",
+    "site/src/components/support-case-thread.tsx",
   ] as const;
   for (const path of touchSurfaces) {
     const source = read(path);
@@ -149,26 +143,26 @@ it("locks support case/filter/message controls to touch targets without min-h-10
     expect(source, path).not.toContain("min-h-10");
     expect(source, path).not.toContain("min-h-9");
   }
-  expect(read("apps/web/src/components/support-case-actions.tsx")).toContain('size="touch"');
-  expect(read("apps/web/src/components/support-center.tsx")).toContain('size="touch"');
-  expect(read("apps/web/src/components/support-center.tsx")).toContain(
+  expect(read("site/src/components/support-case-actions.tsx")).toContain('size="touch"');
+  expect(read("site/src/components/support-center.tsx")).toContain('size="touch"');
+  expect(read("site/src/components/support-center.tsx")).toContain(
     "inline-flex min-h-11 items-center",
   );
-  expect(read("apps/web/src/components/support-message-browser.tsx")).toContain('size="touch"');
+  expect(read("site/src/components/support-message-browser.tsx")).toContain('size="touch"');
 });
 
 it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
-  const feed = read("apps/web/src/components/publication-feed.tsx");
+  const feed = read("site/src/components/publication-feed.tsx");
   expect(feed).toContain("inline-flex min-h-11 items-center break-all");
   expect(feed).not.toContain("min-h-8");
-  expect(read("apps/web/src/components/copyable-plain-code-block.tsx")).toContain(
+  expect(read("site/src/components/copyable-plain-code-block.tsx")).toContain(
     'className="min-h-11"',
   );
-  expect(read("apps/web/src/components/community-report-form.tsx")).not.toContain("min-h-9");
+  expect(read("site/src/components/community-report-form.tsx")).not.toContain("min-h-9");
 });
 
 it("locks support-center create-case primary submit to size=touch", () => {
-  const source = read("apps/web/src/components/support-center.tsx");
+  const source = read("site/src/components/support-center.tsx");
   expect(source).toMatch(
     /type="submit"[\s\S]{0,120}?size="touch"[\s\S]{0,80}?variant="primary"|variant="primary"[\s\S]{0,80}?size="touch"/u,
   );

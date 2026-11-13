@@ -9,11 +9,11 @@ const state = vi.hoisted(() => ({
 vi.mock("@nexus/db", () => ({
   organizationRepository: { listServerManageableByUser: state.list },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 
-import { GET } from "../apps/web/src/app/api/workspace/server-organizations/route";
+import { GET } from "../site/src/app/api/workspace/server-organizations/route";
 
 const request = () =>
   new NextRequest("https://nexus.test/api/workspace/server-organizations", {

@@ -11,10 +11,10 @@ const mocks = vi.hoisted(() => ({
   trust: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+vi.mock("../site/src/lib/services/content-reaction-service", () => ({
   contentReactionService: {
     state: mocks.state,
     set: mocks.set,
@@ -22,17 +22,17 @@ vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
     remove: mocks.remove,
   },
 }));
-vi.mock("../apps/web/src/lib/services/public-user-trust-service", () => ({
+vi.mock("../site/src/lib/services/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as state, PUT } from "../apps/web/src/app/api/content/[slug]/reactions/route";
-import { GET as page } from "../apps/web/src/app/api/workspace/reactions/route";
-import { DELETE } from "../apps/web/src/app/api/workspace/reactions/[id]/route";
-import { GET as trust } from "../apps/web/src/app/api/users/[username]/trust/route";
+import { GET as state, PUT } from "../site/src/app/api/content/[slug]/reactions/route";
+import { GET as page } from "../site/src/app/api/workspace/reactions/route";
+import { DELETE } from "../site/src/app/api/workspace/reactions/[id]/route";
+import { GET as trust } from "../site/src/app/api/users/[username]/trust/route";
 const actor = { id: "actor", role: "user" },
   publication = { params: Promise.resolve({ slug: "guide" }) },
   cleanup = { params: Promise.resolve({ id: "content" }) },

@@ -1,11 +1,11 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { OrganizationTeamDirectory } from "../apps/web/src/components/organization-team-directory";
-import { organizationTeamCopy } from "../apps/web/src/lib/organization-team-copy";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
-import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
-import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+import { OrganizationTeamDirectory } from "../site/src/components/organization-team-directory";
+import { organizationTeamCopy } from "../site/src/lib/organization-team-copy";
+import { getOrganizationCopy } from "../site/src/lib/organization-workspace-copy";
+import { contextTrustCopy } from "../site/src/lib/public-context-trust-copy";
+import { approvalCopy } from "../site/src/lib/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -20,24 +20,22 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/organizations/org/team",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/public-context-trust-service", () => ({
+vi.mock("../site/src/lib/services/public-context-trust-service", () => ({
   publicContextTrustService: { page: mocks.trust },
 }));
-vi.mock("../apps/web/src/lib/services/organization-team-service", () => ({
+vi.mock("../site/src/lib/services/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
 
-import TeamPage, {
-  generateMetadata,
-} from "../apps/web/src/app/workspace/organizations/[id]/team/page";
+import TeamPage, { generateMetadata } from "../site/src/app/workspace/organizations/[id]/team/page";
 import {
   contextTrustMetadata,
   PublicContextTrustPage,
-} from "../apps/web/src/components/public-context-trust-page";
+} from "../site/src/components/public-context-trust-page";
 
 const time = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ slug: "team" }) },

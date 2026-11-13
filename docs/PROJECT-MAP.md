@@ -7,7 +7,7 @@
 | Слой      | Версия / выбор                                                                        |
 | --------- | ------------------------------------------------------------------------------------- |
 | Runtime   | Node.js 26.10.0 (`.nvmrc`), pnpm 12.4.2                                               |
-| App       | Next.js 16.4 + React 19.3 в `apps/web` (Turbopack default; `build:webpack` запасной)  |
+| App       | Next.js 16.4 + React 19.3 в `site` (Turbopack default; `build:webpack` запасной)      |
 | UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                              |
 | Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                               |
 | Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser |
@@ -19,7 +19,7 @@
 ## Пакеты и приложение
 
 ```
-apps/web          → страницы App Router, HTTP API, UI, lib/services (~75 сервисов)
+site          → страницы App Router, HTTP API, UI, lib/services (~75 сервисов)
 packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
 packages/validation → Zod/схемы входа
 packages/security → сессии, authz, идентификаторы, лимиты
@@ -31,7 +31,7 @@ tests/            → HTTP/UI/поведенческие Vitest-сюиты (~6MB
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
 
-Граница: HTTP → services → domain/validation → repositories. Пакеты не импортируют `apps/web`.
+Граница: HTTP → services → domain/validation → repositories. Пакеты не импортируют код приложения.
 
 ## Основные продуктовые поверхности
 
@@ -84,6 +84,13 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 - Нет корневого Turbo/`turbo.json`: оркестрация — pnpm scripts + Compose + CI policy.
 - Database Vitest: `maxWorkers: 1`, `isolate: true` — намеренно из‑за Proxy-моков клиента БД; ускорять только после замеров ([PROBLEMS](PROBLEMS.md)).
 - Платежи/payout/DRM: утверждённая цель, не runtime open free beta.
+
+## Подготовка изменения структуры
+
+[План архитектурного рефакторинга](STRUCTURE-REFACTORING.md) фиксирует Phase 0,
+инвентарь ссылок на конкретном SHA, целевую структуру и приёмку будущих переносов.
+Приложение локально перенесено в `site/` (Phase 1); пакеты, тесты и Docker
+остаются на прежних местах до следующих этапов. Результаты приёмки — в плане.
 
 ## Документы по роли
 

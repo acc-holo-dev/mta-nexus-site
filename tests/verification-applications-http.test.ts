@@ -10,10 +10,10 @@ const state = vi.hoisted(() => ({
   amend: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: state,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
@@ -21,8 +21,8 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 import {
   PATCH as amend,
   GET as detail,
-} from "../apps/web/src/app/api/workspace/verification/[id]/route";
-import { GET as history } from "../apps/web/src/app/api/workspace/verification/history/route";
+} from "../site/src/app/api/workspace/verification/[id]/route";
+import { GET as history } from "../site/src/app/api/workspace/verification/history/route";
 
 const context = { params: Promise.resolve({ id: "request" }) },
   revision = "a".repeat(64),

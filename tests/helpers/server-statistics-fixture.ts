@@ -1,4 +1,4 @@
-import type { ServerStatisticsResult } from "../../apps/web/src/lib/services/server-statistics-service";
+import type { ServerStatisticsResult } from "../../site/src/lib/services/server-statistics-service";
 export function statisticsFixture(): ServerStatisticsResult {
   const summary = {
     observationCount: 100,

@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 /** Honesty lock: admin quarantined build reason soft danger caption → ErrorState. */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/components/admin/admin-builds-quarantine-section.tsx"),
+  join(root, "site/src/components/admin/admin-builds-quarantine-section.tsx"),
   "utf8",
 );
 

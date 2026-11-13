@@ -1,12 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-import Loading from "../apps/web/src/app/settings/loading";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import Loading from "../site/src/app/settings/loading";
+import { getDictionary } from "../site/src/lib/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { PublicationFeed } from "../apps/web/src/components/publication-feed";
+import { PublicationFeed } from "../site/src/components/publication-feed";
 import {
   type PublicationPage,
   publicationPageQuery,
-} from "../apps/web/src/lib/publication-feed-contract";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+} from "../site/src/lib/publication-feed-contract";
+import { publicationCopy } from "../site/src/lib/publication-feed-copy";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -13,16 +13,16 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "ru" | "en",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
+vi.mock("../site/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page },
 }));
 
-import Loading from "../apps/web/src/app/workspace/feed/loading";
-import FollowingPage, { generateMetadata } from "../apps/web/src/app/workspace/feed/page";
+import Loading from "../site/src/app/workspace/feed/loading";
+import FollowingPage, { generateMetadata } from "../site/src/app/workspace/feed/page";
 
 const initial: PublicationPage = {
   items: [

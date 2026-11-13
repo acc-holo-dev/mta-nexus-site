@@ -2,7 +2,7 @@ import { canModerateLicense, LICENSE_RUNTIME_TOKEN_DAYS } from "@nexus/domain";
 import { createLicenseRuntimeToken, digestLicenseRuntimeToken } from "@nexus/security";
 import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexus/validation";
 import { beforeEach, expect, it, vi } from "vitest";
-import { confirmedLicenseControl } from "../apps/web/src/lib/license-control-confirmation";
+import { confirmedLicenseControl } from "../site/src/lib/license-control-confirmation";
 
 vi.mock("../packages/db/src/client", async () => {
   const { createLicenseControlsDbMock } = await import("./helpers/license-controls-harness");

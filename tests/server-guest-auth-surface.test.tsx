@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { GuestAuthLinks } from "../apps/web/src/components/guest-auth-links";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { GuestAuthLinks } from "../site/src/components/guest-auth-links";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -38,14 +38,14 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo-server",
 }));
 
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({
     locale: "en" as const,
     dictionary: getDictionary("en"),
   }),
 }));
 
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 
@@ -89,8 +89,8 @@ vi.mock("@nexus/ui", async () => {
 
 vi.stubGlobal("fetch", harness.fetch);
 
-import { ServerClaimControlPanel } from "../apps/web/src/components/server-claim-control-panel";
-import { ServerReviewPanel } from "../apps/web/src/components/server-review-panel";
+import { ServerClaimControlPanel } from "../site/src/components/server-claim-control-panel";
+import { ServerReviewPanel } from "../site/src/components/server-review-panel";
 
 type Element = ReactElement<Record<string, unknown>>;
 

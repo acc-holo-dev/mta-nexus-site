@@ -11,20 +11,20 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
   ip: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+vi.mock("../site/src/lib/services/discovery-service", () => ({
   discoveryService: { stream: mocks.stream },
 }));
-vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
+vi.mock("../site/src/lib/services/community-moderation-service", () => ({
   communityModerationService: { page: mocks.page, detail: mocks.detail, command: mocks.command },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
-import { GET as stream } from "../apps/web/src/app/api/discover/stream/route";
-import { GET as page } from "../apps/web/src/app/api/admin/community/route";
-import { GET as detail, POST as command } from "../apps/web/src/app/api/admin/community/[id]/route";
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
+import { GET as stream } from "../site/src/app/api/discover/stream/route";
+import { GET as page } from "../site/src/app/api/admin/community/route";
+import { GET as detail, POST as command } from "../site/src/app/api/admin/community/[id]/route";
 const actor = { id: "actor", role: "moderator" },
   context = { params: Promise.resolve({ id: "item" }) };
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {

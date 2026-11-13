@@ -3,15 +3,15 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mock = vi.hoisted(() => ({ session: vi.fn(), rate: vi.fn(), page: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 vi.mock("@nexus/db", () => ({ supportMessageDiscoveryRepository: { page: mock.page } }));
 
-import { GET as download } from "../apps/web/src/app/api/support/[id]/messages/export/route";
-import { GET } from "../apps/web/src/app/api/support/[id]/messages/route";
-import { supportMessageCopy } from "../apps/web/src/lib/support-message-discovery-copy";
+import { GET as download } from "../site/src/app/api/support/[id]/messages/export/route";
+import { GET } from "../site/src/app/api/support/[id]/messages/route";
+import { supportMessageCopy } from "../site/src/lib/support-message-discovery-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

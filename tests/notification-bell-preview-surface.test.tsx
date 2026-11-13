@@ -25,8 +25,8 @@ vi.mock("react", async (importOriginal) => {
 });
 vi.mock("next/link", () => ({ default: "a" }));
 
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { NotificationBell } from "../apps/web/src/components/notification-bell";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { NotificationBell } from "../site/src/components/notification-bell";
 
 beforeEach(() => {
   harness.slots = [];

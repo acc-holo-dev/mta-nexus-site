@@ -3,7 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import {
   confirmedCompatibility,
   confirmedVariantCommand,
-} from "../apps/web/src/lib/resource-management-confirmation";
+} from "../site/src/lib/resource-management-confirmation";
 
 vi.mock("../packages/db/src/client", async () => {
   const { createResourceManagementDbMock } = await import("./helpers/resource-management-harness");

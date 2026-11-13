@@ -221,29 +221,29 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(@types/node@26.6.6)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
-  apps/web:
+  site:
     dependencies:
       '@nexus/config':
         specifier: workspace:*
-        version: link:../../packages/config
+        version: link:../packages/config
       '@nexus/db':
         specifier: workspace:*
-        version: link:../../packages/db
+        version: link:../packages/db
       '@nexus/domain':
         specifier: workspace:*
-        version: link:../../packages/domain
+        version: link:../packages/domain
       '@nexus/security':
         specifier: workspace:*
-        version: link:../../packages/security
+        version: link:../packages/security
       '@nexus/storage':
         specifier: workspace:*
-        version: link:../../packages/storage
+        version: link:../packages/storage
       '@nexus/ui':
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../packages/ui
       '@nexus/validation':
         specifier: workspace:*
-        version: link:../../packages/validation
+        version: link:../packages/validation
       lucide-react:
         specifier: ^1.67.0
         version: 1.67.0(@types/react@19.3.0)(react@19.3.1)

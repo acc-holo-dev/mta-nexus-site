@@ -23,15 +23,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/i18n-server", async () => {
+vi.mock("../site/src/lib/i18n-server", async () => {
   const { state: harnessState } = await import("./helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { state: harnessState } = await import("./helpers/resource-review-pages-harness");
   return { authService: { getSession: async () => harnessState.actor } };
 });
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     getProductBySlug: async () => ({
       id: "prd_a",
@@ -56,10 +56,10 @@ vi.mock("@nexus/db", async () => {
 
 setupResourceReviewPages();
 
-import Editor from "../apps/web/src/app/workspace/library/review/[id]/page";
-import Own from "../apps/web/src/app/workspace/library/reviews/page";
-import { ResourceReviewEditor } from "../apps/web/src/components/resource-review-controls";
-import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
+import Editor from "../site/src/app/workspace/library/review/[id]/page";
+import Own from "../site/src/app/workspace/library/reviews/page";
+import { ResourceReviewEditor } from "../site/src/components/resource-review-controls";
+import { resourceReviewCopy } from "../site/src/lib/resource-review-i18n";
 
 it.each(["en", "ru"] as const)(
   "renders own unavailable reviews and history navigation in %s",
@@ -107,10 +107,10 @@ it("shows an honest recovery state when own review detail fails to load", async 
 });
 it("clips honest own-review loading shells on narrow layouts", async () => {
   const { default: OwnReviewsLoading } = await import(
-    "../apps/web/src/app/workspace/library/reviews/loading"
+    "../site/src/app/workspace/library/reviews/loading"
   );
   const { default: OwnReviewDetailLoading } = await import(
-    "../apps/web/src/app/workspace/library/review/[id]/loading"
+    "../site/src/app/workspace/library/review/[id]/loading"
   );
   const copy = resourceReviewCopy("en");
   for (const Loading of [OwnReviewsLoading, OwnReviewDetailLoading]) {

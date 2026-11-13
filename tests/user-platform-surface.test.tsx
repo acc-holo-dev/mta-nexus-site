@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDictionary, type Locale } from "../apps/web/src/lib/i18n";
-import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+import { getDictionary, type Locale } from "../site/src/lib/i18n";
+import { getUserPlatformCopy } from "../site/src/lib/user-platform-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -13,16 +13,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
 }));
 
-import ArticlesPage from "../apps/web/src/app/articles/page";
-import CommunityPage from "../apps/web/src/app/community/page";
-import { AuthorContentForm } from "../apps/web/src/components/author-content-form";
-import { ContentPageNavigation } from "../apps/web/src/components/content-catalog-controls";
-import { PlatformSignIn } from "../apps/web/src/components/platform-sign-in";
+import ArticlesPage from "../site/src/app/articles/page";
+import CommunityPage from "../site/src/app/community/page";
+import { AuthorContentForm } from "../site/src/components/author-content-form";
+import { ContentPageNavigation } from "../site/src/components/content-catalog-controls";
+import { PlatformSignIn } from "../site/src/components/platform-sign-in";
 
 beforeEach(() => {
   vi.clearAllMocks();

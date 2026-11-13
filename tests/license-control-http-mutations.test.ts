@@ -11,16 +11,16 @@ vi.mock("@nexus/security", async (importOriginal) => {
     consumeRateLimit: vi.fn(async () => ({ success: licenseControlHttpState.allowed })),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { licenseControlHttpState } = await import("./helpers/license-control-http-harness");
   return {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 
-import { POST as moderationAction } from "../apps/web/src/app/api/admin/licenses/[id]/route";
-import { POST as ownerAction } from "../apps/web/src/app/api/licenses/[id]/actions/route";
+import { POST as moderationAction } from "../site/src/app/api/admin/licenses/[id]/route";
+import { POST as ownerAction } from "../site/src/app/api/licenses/[id]/actions/route";
 import {
   licenseControlHttpContext as context,
   installLicenseControlHttpLifecycle,

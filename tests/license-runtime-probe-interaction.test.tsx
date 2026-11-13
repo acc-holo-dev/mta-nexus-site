@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
+import { getLicenseControlCopy } from "../site/src/lib/license-control-i18n";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -31,7 +31,7 @@ vi.mock("react", async (original) => ({
   },
 }));
 
-import { LicenseRuntimeProbe } from "../apps/web/src/components/license-runtime-probe";
+import { LicenseRuntimeProbe } from "../site/src/components/license-runtime-probe";
 
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {

@@ -4,7 +4,7 @@ import {
   PENDING_RESOURCE_DRAFT_TTL_MS,
   parsePendingResourceDraft,
   pendingResourceDraftKey,
-} from "../apps/web/src/lib/pending-resource-draft";
+} from "../site/src/lib/pending-resource-draft";
 
 const now = Date.UTC(2026, 9, 5);
 const draft = { id: "prd_saved_draft_1", slug: "saved-resource", mtaVersionTarget: "1.6.0" };

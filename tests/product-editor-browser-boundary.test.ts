@@ -4,35 +4,35 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
 }));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
+vi.mock("../site/src/lib/services/product-service", () => ({
   productService: {
     createProduct: vi.fn(),
     updateProductDetails: vi.fn(),
     getManagedProduct: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/resource-management-service", () => ({
+vi.mock("../site/src/lib/services/resource-management-service", () => ({
   resourceManagementService: {
     updateCompatibility: vi.fn(),
     saveVariants: vi.fn(),
     managedVariants: vi.fn(),
   },
 }));
-vi.mock("../apps/web/src/lib/services/resource-copy-service", () => ({
+vi.mock("../site/src/lib/services/resource-copy-service", () => ({
   resourceCopyService: { create: vi.fn(), preview: vi.fn() },
 }));
 
-import { POST as createResource } from "../apps/web/src/app/api/products/route";
-import { PATCH as editResource } from "../apps/web/src/app/api/products/[id]/route";
-import { POST as compatibility } from "../apps/web/src/app/api/products/[id]/compatibility/route";
-import { POST as variants } from "../apps/web/src/app/api/products/[id]/variants/route";
-import { POST as copyResource } from "../apps/web/src/app/api/products/[id]/copy/route";
+import { POST as createResource } from "../site/src/app/api/products/route";
+import { PATCH as editResource } from "../site/src/app/api/products/[id]/route";
+import { POST as compatibility } from "../site/src/app/api/products/[id]/compatibility/route";
+import { POST as variants } from "../site/src/app/api/products/[id]/variants/route";
+import { POST as copyResource } from "../site/src/app/api/products/[id]/copy/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const mutations = [

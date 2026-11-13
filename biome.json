@@ -31,13 +31,23 @@
   },
   "overrides": [
     {
-      "includes": ["apps/web/src/app/api/**"],
+      "includes": ["site/src/app/api/**"],
       "linter": {
         "rules": {
           "suspicious": {
             "noConsole": "error"
           }
         }
+      }
+    },
+    {
+      "includes": [
+        "planning/import-baseline/tasks.json",
+        "planning/import-baseline/task-schema.json",
+        "planning/import-baseline/source-register.json"
+      ],
+      "formatter": {
+        "enabled": false
       }
     }
   ]

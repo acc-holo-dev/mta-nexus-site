@@ -18,12 +18,12 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",
   useRouter: () => ({ refresh: vi.fn() }),
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ServerReviewPanel } from "../apps/web/src/components/server-review-panel";
-import { serverReviewCopy } from "../apps/web/src/lib/server-review-i18n";
+import { ServerReviewPanel } from "../site/src/components/server-review-panel";
+import { serverReviewCopy } from "../site/src/lib/server-review-i18n";
 
 const { render } = createServerReviewDraftRefreshInteractionHelpers(harness, ServerReviewPanel);
 

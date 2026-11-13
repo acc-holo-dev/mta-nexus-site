@@ -14,14 +14,14 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/watches",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+vi.mock("../site/src/components/resource-release-watch-control", () => ({
   ResourceReleaseWatchControl: ({ watch }: { watch: { productId: string; enabled: boolean } }) => (
     <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
       Watch
@@ -29,10 +29,8 @@ vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
   ),
 }));
 
-import Page, {
-  metadata,
-} from "../apps/web/src/app/workspace/library/collections/[id]/watches/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import Page, { metadata } from "../site/src/app/workspace/library/collections/[id]/watches/page";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const screen = async () =>
   renderToStaticMarkup(

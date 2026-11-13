@@ -17,16 +17,16 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../apps/web/src/lib/user-platform-client", async (original) => {
-  const actual = await original<typeof import("../apps/web/src/lib/user-platform-client")>();
+vi.mock("../site/src/lib/user-platform-client", async (original) => {
+  const actual = await original<typeof import("../site/src/lib/user-platform-client")>();
   return {
     ...actual,
     platformRequest: harness.request,
   };
 });
 
-import { CommunityReportDetailView } from "../apps/web/src/components/community-report-detail";
-import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
+import { CommunityReportDetailView } from "../site/src/components/community-report-detail";
+import { communityReportCopy } from "../site/src/lib/community-report-copy";
 
 const { render, clickCancel } = createCommunityReportDetailConfirmInteractionHelpers(
   harness,

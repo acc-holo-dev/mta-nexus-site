@@ -18,12 +18,12 @@ vi.mock("@nexus/security", async (original) => ({
   verifyPassword: mocks.verifyPassword,
   consumeRateLimit: mocks.consumeRateLimit,
 }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({
+vi.mock("../site/src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "127.0.0.1",
 }));
 
-import { POST } from "../apps/web/src/app/api/auth/login/route";
-import { authService } from "../apps/web/src/lib/services/auth-service";
+import { POST } from "../site/src/app/api/auth/login/route";
+import { authService } from "../site/src/lib/services/auth-service";
 
 beforeEach(() => vi.resetAllMocks());
 afterEach(() => vi.unstubAllEnvs());

@@ -4,22 +4,22 @@ import { NextRequest } from "next/server";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../site/src/lib/services/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 vi.mock("@nexus/db", () => ({ resourceMediaRepository: {} }));
 vi.mock("@nexus/storage", () => ({ storageService: {} }));
-vi.mock("../apps/web/src/lib/services/resource-media-service", () => ({
+vi.mock("../site/src/lib/services/resource-media-service", () => ({
   resourceMediaService: {},
 }));
 
 import {
   PATCH as mediaPatch,
   POST as mediaUpload,
-} from "../apps/web/src/app/api/products/[id]/media/route";
-import { POST as inspectMeta } from "../apps/web/src/app/api/resources/inspect-meta/route";
+} from "../site/src/app/api/products/[id]/media/route";
+import { POST as inspectMeta } from "../site/src/app/api/resources/inspect-meta/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const mutations = [

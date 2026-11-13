@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { ServerHistoryPanel } from "../apps/web/src/components/server-history-panel";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { ServerHistoryPanel } from "../site/src/components/server-history-panel";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const history = {
   server: { id: "server", name: "Server", slug: "server" },

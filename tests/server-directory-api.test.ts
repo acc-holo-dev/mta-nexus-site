@@ -6,10 +6,10 @@ const { getDirectory, logEvent } = vi.hoisted(() => ({
   logEvent: vi.fn(),
 }));
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../site/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory },
 }));
-vi.mock("../apps/web/src/lib/observability", () => ({
+vi.mock("../site/src/lib/observability", () => ({
   createRequestLogContext: () => ({ requestId: "test-request" }),
   jsonWithRequestId: (context: { requestId: string }, body: unknown, init: ResponseInit) => {
     const headers = new Headers(init.headers);
@@ -19,7 +19,7 @@ vi.mock("../apps/web/src/lib/observability", () => ({
   logRequestEvent: logEvent,
 }));
 
-import { GET } from "../apps/web/src/app/api/servers/directory/route";
+import { GET } from "../site/src/app/api/servers/directory/route";
 
 beforeEach(() => {
   getDirectory.mockReset();

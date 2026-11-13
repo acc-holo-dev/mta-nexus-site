@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Build } from "@nexus/domain";
-import { decideResourceDownloadAccess } from "../apps/web/src/lib/resource-download-policy";
+import { decideResourceDownloadAccess } from "../site/src/lib/resource-download-policy";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],

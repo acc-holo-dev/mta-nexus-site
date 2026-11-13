@@ -69,6 +69,7 @@ describe("mainline repository policy", () => {
       "ROADMAP.md",
       "SERVER-PACK-SPEC.md",
       "SERVERS-ORGS.md",
+      "STRUCTURE-REFACTORING.md",
       "TASKS.md",
       "TRACEABILITY.md",
       "TRUST-STAFF.md",
@@ -108,10 +109,10 @@ describe("mainline repository policy", () => {
     expect(ai007[0].toLowerCase()).not.toContain("push directly to");
   });
 
-  it("keeps Docker DEV source mounts and polling enabled", () => {
+  it("keeps Docker DEV source mounts and the polling flag", () => {
     const compose = read("compose.yaml");
     expect(compose).toContain('WATCHPACK_POLLING: "true"');
-    expect(compose).toContain("./apps/web/src:/app/apps/web/src:ro");
+    expect(compose).toContain("./site/src:/app/site/src:ro");
     expect(compose).toContain("./packages/db/src:/app/packages/db/src:ro");
     expect(compose).toContain("./packages/ui/src:/app/packages/ui/src:ro");
   });

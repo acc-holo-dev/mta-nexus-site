@@ -6,10 +6,8 @@ import { expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const importSource = read("apps/web/src/app/workspace/library/collections/[id]/import/page.tsx");
-const reconcileSource = read(
-  "apps/web/src/app/workspace/library/collections/[id]/reconcile/page.tsx",
-);
+const importSource = read("site/src/app/workspace/library/collections/[id]/import/page.tsx");
+const reconcileSource = read("site/src/app/workspace/library/collections/[id]/reconcile/page.tsx");
 
 /** Honesty lock: import/reconcile max-revision muted notes → ErrorState. */
 it("locks collection import revisionLocked to ErrorState", () => {

@@ -10,7 +10,7 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   })),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_claim_ip",
@@ -19,7 +19,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+vi.mock("../site/src/lib/services/commerce-service", () => ({
   commerceService: {
     claimFreeResource: vi.fn(async () => ({
       entitlement: {
@@ -35,7 +35,7 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
   },
 }));
 
-import { POST } from "../apps/web/src/app/api/resources/claim/route";
+import { POST } from "../site/src/app/api/resources/claim/route";
 
 const secret = "trusted-claim-proxy-secret-0123456789abcdef";
 

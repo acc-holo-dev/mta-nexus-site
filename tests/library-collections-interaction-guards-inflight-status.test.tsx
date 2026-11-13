@@ -13,7 +13,7 @@ const harness = vi.hoisted(() => ({
   cleanup: null as (() => void) | null,
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
@@ -21,7 +21,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh, push: harness.push }),
 }));
 
-import { LibraryCollectionCommandForm } from "../apps/web/src/components/library-collection-command";
+import { LibraryCollectionCommandForm } from "../site/src/components/library-collection-command";
 
 const { collection, render, submit, success } = createLibraryCollectionsInteractionHelpers(
   harness,

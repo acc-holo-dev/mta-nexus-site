@@ -7,8 +7,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "apps/web/src/components/server-connect-controls.tsx",
-  "apps/web/src/app/error.tsx",
+  "site/src/components/server-connect-controls.tsx",
+  "site/src/app/error.tsx",
 ] as const;
 
 it("locks connect copy and root error CTAs to size=touch / min-h-11 without size=sm", () => {
@@ -22,13 +22,13 @@ it("locks connect copy and root error CTAs to size=touch / min-h-11 without size
 });
 
 it("locks root error home link and both Buttons to touch chrome", () => {
-  const source = read("apps/web/src/app/error.tsx");
+  const source = read("site/src/app/error.tsx");
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
   expect(source).toContain("min-h-11 items-center");
 });
 
 it("locks server connect copy Button to size=touch with min-h-11 class", () => {
-  const source = read("apps/web/src/components/server-connect-controls.tsx");
+  const source = read("site/src/components/server-connect-controls.tsx");
   expect(source).toMatch(
     /size="touch"[\s\S]{0,240}?className="min-h-11 gap-1\.5"|className="min-h-11 gap-1\.5"[\s\S]{0,240}?size="touch"/u,
   );

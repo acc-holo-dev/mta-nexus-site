@@ -1,8 +1,8 @@
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
+import { getLicenseControlCopy } from "../site/src/lib/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../site/src/lib/license-maintenance-i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined, push: () => undefined }),
@@ -14,12 +14,12 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href }, children),
   };
 });
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { LicenseArchiveFilters } from "../apps/web/src/components/license-archive-filters";
-import { LicenseControlPanel } from "../apps/web/src/components/license-control-panel";
+import { LicenseArchiveFilters } from "../site/src/components/license-archive-filters";
+import { LicenseControlPanel } from "../site/src/components/license-control-panel";
 
 describe("license chrome surface", () => {
   it.each(["en", "ru"] as const)(

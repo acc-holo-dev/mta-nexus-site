@@ -15,7 +15,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "./helpers/library-collections-http-harness"
   );
@@ -24,10 +24,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", async () => {
   };
 });
 
-import { GET as receiptExport } from "../apps/web/src/app/api/library/collections/receipts/[id]/export/route";
-import { GET as receiptDetail } from "../apps/web/src/app/api/library/collections/receipts/[id]/route";
-import { GET as inventoryExport } from "../apps/web/src/app/api/library/collections/resources/export/route";
-import { GET as inventory } from "../apps/web/src/app/api/library/collections/resources/route";
+import { GET as receiptExport } from "../site/src/app/api/library/collections/receipts/[id]/export/route";
+import { GET as receiptDetail } from "../site/src/app/api/library/collections/receipts/[id]/route";
+import { GET as inventoryExport } from "../site/src/app/api/library/collections/resources/export/route";
+import { GET as inventory } from "../site/src/app/api/library/collections/resources/route";
 import {
   libraryCollectionsHttpBase as base,
   installLibraryCollectionsHttpLifecycle,

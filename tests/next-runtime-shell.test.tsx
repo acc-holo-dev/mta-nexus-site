@@ -31,11 +31,11 @@ vi.mock("next/script", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => runtime.locale,
 }));
 
-vi.mock("../apps/web/src/components/nexus-shell", async () => {
+vi.mock("../site/src/components/nexus-shell", async () => {
   const ReactModule = await import("react");
   return {
     NexusShell: ({ children, locale }: { children?: React.ReactNode; locale: string }) =>
@@ -43,7 +43,7 @@ vi.mock("../apps/web/src/components/nexus-shell", async () => {
   };
 });
 
-vi.mock("../apps/web/src/components/pwa-service-worker", async () => {
+vi.mock("../site/src/components/pwa-service-worker", async () => {
   const ReactModule = await import("react");
   return {
     PwaServiceWorker: () => ReactModule.createElement("span", { "data-pwa": "registered" }),
@@ -65,12 +65,12 @@ vi.mock("next/link", async () => {
   };
 });
 
-import ErrorPage from "../apps/web/src/app/error";
-import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
-import RootLayout from "../apps/web/src/app/layout";
-import NotFound from "../apps/web/src/app/not-found";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import ErrorPage from "../site/src/app/error";
+import GlobalError, { detectGlobalErrorLocale } from "../site/src/app/global-error";
+import RootLayout from "../site/src/app/layout";
+import NotFound from "../site/src/app/not-found";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { getDictionary } from "../site/src/lib/i18n";
 
 function executeThemeScript(
   source: string,
@@ -181,7 +181,7 @@ describe("Next.js root runtime shell behavior", () => {
   );
 
   it("locks root error CTAs to size=touch / min-h-11 without size=sm", () => {
-    const source = readSource("apps/web/src/app/error.tsx");
+    const source = readSource("site/src/app/error.tsx");
     expect(source).toContain('size="touch"');
     expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
     expect(source).toContain("min-h-11 items-center");

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildReverseDependencySummary,
   reverseDependencyLimits,
-} from "../apps/web/src/lib/reverse-dependency-summary";
+} from "../site/src/lib/reverse-dependency-summary";
 
 describe("reverse dependency summary", () => {
   it("removes self references, de-duplicates slugs and bounds visible results", () => {

@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(
-  join(root, "apps/web/src/components/build-moderation-controls.tsx"),
+  join(root, "site/src/components/build-moderation-controls.tsx"),
   "utf8",
 );
 

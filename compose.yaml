@@ -63,7 +63,7 @@ services:
       - uploads:/data/uploads
       # Keep dependency installation inside the image, but hot-reload application
       # and workspace source files from the host.
-      - ./apps/web/src:/app/apps/web/src:ro
+      - ./site/src:/app/site/src:ro
       - ./packages/config/src:/app/packages/config/src:ro
       - ./packages/db/src:/app/packages/db/src:ro
       - ./packages/db/migrations:/app/packages/db/migrations:ro

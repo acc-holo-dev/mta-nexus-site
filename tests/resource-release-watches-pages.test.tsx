@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { ResourceReleaseWatchControl } from "../apps/web/src/components/resource-release-watch-control";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { ResourceReleaseWatchControl } from "../site/src/components/resource-release-watch-control";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -13,16 +13,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh() {} }),
   usePathname: () => "/workspace/library/watches",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { page: state.page },
 }));
 
-import Page, { generateMetadata } from "../apps/web/src/app/workspace/library/watches/page";
-import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
+import Page, { generateMetadata } from "../site/src/app/workspace/library/watches/page";
+import { resourceReleaseWatchesCopy } from "../site/src/lib/resource-release-watches-i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -156,7 +156,7 @@ test("rejects public or implicit ACME issuers before Caddy starts", () => {
 test("pins the production proxy body limit to the application build envelope", () => {
   const caddy = readFileSync("deploy/Caddyfile", "utf8");
   const storage = readFileSync("packages/storage/src/storage-service.ts", "utf8");
-  const uploadRoute = readFileSync("apps/web/src/app/api/products/[id]/builds/route.ts", "utf8");
+  const uploadRoute = readFileSync("site/src/app/api/products/[id]/builds/route.ts", "utf8");
   assert.equal(PRODUCTION_UPLOAD_ENVELOPE_BYTES, 65 * 1024 * 1024);
   assert.doesNotThrow(() => assertProductionUploadBodyLimit(caddy));
   assert.match(storage, /MAX_FILE_SIZE_BYTES\s*=\s*MAX_UPLOAD_FILE_SIZE_BYTES/u);

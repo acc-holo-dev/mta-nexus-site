@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
-import { SUPPORT_JSON_MAX_BYTES } from "../apps/web/src/lib/bounded-json";
+import { SUPPORT_JSON_MAX_BYTES } from "../site/src/lib/bounded-json";
 
 vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>("next/server");
@@ -9,7 +9,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: supportRouteAfterMock };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+vi.mock("../site/src/lib/services/auth-service", async () => {
   const { supportRouteMocks } = await import("./helpers/support-route-harness");
   return { authService: { getSession: supportRouteMocks.session } };
 });
@@ -24,7 +24,7 @@ vi.mock("@nexus/db", async () => {
   return createSupportRouteDbMock();
 });
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", async () => {
+vi.mock("../site/src/lib/services/notification-dispatch-service", async () => {
   const { supportRouteMocks } = await import("./helpers/support-route-harness");
   return { dispatchNotificationsBestEffort: supportRouteMocks.dispatch };
 });
@@ -33,8 +33,8 @@ import {
   POST as addMessage,
   GET as getCase,
   PATCH as updateCase,
-} from "../apps/web/src/app/api/support/[id]/route";
-import { POST as createCase, GET as listCases } from "../apps/web/src/app/api/support/route";
+} from "../site/src/app/api/support/[id]/route";
+import { POST as createCase, GET as listCases } from "../site/src/app/api/support/route";
 import {
   expectSupportPrivate,
   installSupportRouteLifecycle,

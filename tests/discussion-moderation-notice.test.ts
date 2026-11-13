@@ -33,7 +33,7 @@ vi.mock("../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { formatNotification } from "../site/src/lib/notification-copy";
 import { db } from "../packages/db/src/client";
 import { discussionModerationNotice } from "../packages/db/src/repositories/discussion-moderation-notice";
 

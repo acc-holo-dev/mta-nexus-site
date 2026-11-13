@@ -6,11 +6,11 @@ import {
   memberAddSchema,
   memberUpdateSchema,
   parseOrganizationPage,
-} from "../apps/web/src/lib/organization-workspace-contract";
+} from "../site/src/lib/organization-workspace-contract";
 import {
   getOrganizationCopy,
   organizationError,
-} from "../apps/web/src/lib/organization-workspace-copy";
+} from "../site/src/lib/organization-workspace-copy";
 const fields = { name: "Team", description: "", logoUrl: "", websiteUrl: "" };
 it.each(["owner", "admin", "developer", "member"])("protects ownership for actor %s", (actor) => {
   expect(canChangeOrganizationMember(actor, "owner", null, false, true)).toBe(false);

@@ -95,7 +95,7 @@ describe("fresh-auth requirements", () => {
   });
 
   it("keeps admin/actions HTTP enforcement on the staff_action proof path", () => {
-    const route = readFileSync("apps/web/src/app/api/admin/actions/route.ts", "utf8");
+    const route = readFileSync("site/src/app/api/admin/actions/route.ts", "utf8");
     expect(route).toContain("criticalStaffAdminFreshAuthAction");
     expect(route).toContain("confirmStaffActionPassword");
     expect(route).toContain("currentPassword");

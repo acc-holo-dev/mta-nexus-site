@@ -13,23 +13,23 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/workspace/verification/history",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
+vi.mock("../site/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: state,
 }));
 
 import Detail, {
   generateMetadata as detailMetadata,
-} from "../apps/web/src/app/workspace/verification/[id]/page";
-import Loading from "../apps/web/src/app/workspace/verification/history/loading";
+} from "../site/src/app/workspace/verification/[id]/page";
+import Loading from "../site/src/app/workspace/verification/history/loading";
 import History, {
   generateMetadata as historyMetadata,
-} from "../apps/web/src/app/workspace/verification/history/page";
-import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
-import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+} from "../site/src/app/workspace/verification/history/page";
+import { verificationApplicationsCopy } from "../site/src/lib/verification-applications-copy";
+import { verificationCopy } from "../site/src/lib/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   params = { params: Promise.resolve({ id: "request" }) },
@@ -237,10 +237,10 @@ it.each(["en", "ru"] as const)(
 );
 it("clips honest verification application loading shells on narrow layouts", async () => {
   const { default: HistoryLoading } = await import(
-    "../apps/web/src/app/workspace/verification/history/loading"
+    "../site/src/app/workspace/verification/history/loading"
   );
   const { default: DetailLoading } = await import(
-    "../apps/web/src/app/workspace/verification/[id]/loading"
+    "../site/src/app/workspace/verification/[id]/loading"
   );
   for (const LoadingShell of [HistoryLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await LoadingShell());

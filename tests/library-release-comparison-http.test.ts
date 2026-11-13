@@ -5,15 +5,15 @@ const h = vi.hoisted(() => ({
   rate: vi.fn(),
   compare: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+vi.mock("../site/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
-import { GET } from "../apps/web/src/app/api/library/releases/[id]/compare/route";
-import { GET as download } from "../apps/web/src/app/api/library/releases/[id]/compare/export/route";
+import { GET } from "../site/src/app/api/library/releases/[id]/compare/route";
+import { GET as download } from "../site/src/app/api/library/releases/[id]/compare/export/route";
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   request = (suffix = "?from=bld_a&to=bld_b&returnPage=2") =>
     new NextRequest(`https://nexus.test/api/library/releases/prd_a/compare${suffix}`);

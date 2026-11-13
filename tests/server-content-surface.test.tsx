@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { serverContentCopy } from "../apps/web/src/lib/server-content-copy";
-import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+import { serverContentCopy } from "../site/src/lib/server-content-copy";
+import { getUserPlatformCopy } from "../site/src/lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -17,16 +17,16 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/servers/srv/content",
 }));
 
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
+vi.mock("../site/src/lib/services/server-content-service", () => ({
   serverContentService: mocks,
 }));
 
-import Page, { generateMetadata } from "../apps/web/src/app/workspace/servers/[id]/content/page";
-import { ServerContentEditorPage } from "../apps/web/src/components/server-content-editor-page";
+import Page, { generateMetadata } from "../site/src/app/workspace/servers/[id]/content/page";
+import { ServerContentEditorPage } from "../site/src/components/server-content-editor-page";
 
 const server = { id: "srv", name: "Team", slug: "team" };
 const content = {

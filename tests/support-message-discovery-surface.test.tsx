@@ -10,21 +10,21 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mock.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../apps/web/src/lib/services/support-message-discovery-service", () => ({
+vi.mock("../site/src/lib/services/support-message-discovery-service", () => ({
   supportMessageDiscoveryService: { page: mock.page },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { SupportMessageBrowser } from "../apps/web/src/components/support-message-browser";
+import { SupportMessageBrowser } from "../site/src/components/support-message-browser";
 import {
   SupportMessagePage,
   supportMessageMetadata,
-} from "../apps/web/src/components/support-message-page";
-import { supportMessageCopy } from "../apps/web/src/lib/support-message-discovery-copy";
+} from "../site/src/components/support-message-page";
+import { supportMessageCopy } from "../site/src/lib/support-message-discovery-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

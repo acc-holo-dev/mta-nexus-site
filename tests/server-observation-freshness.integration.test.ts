@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-matching";
+import { buildMasterObservationCandidates } from "../site/src/lib/services/server-observation-matching";
 import {
   db,
   servers,

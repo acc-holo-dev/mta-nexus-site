@@ -3,7 +3,7 @@ import {
   readBoundedJson,
   requireServerJsonContentType,
   SERVER_MUTATION_MAX_BODY_BYTES,
-} from "../apps/web/src/lib/bounded-json";
+} from "../site/src/lib/bounded-json";
 
 const url = "https://nexus.test/api/servers";
 const request = (body: BodyInit, headers: HeadersInit = {}) =>

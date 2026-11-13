@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { User } from "@nexus/domain";
 import { auditEvents, products, users } from "../packages/db/src/schema";
 import { productRepository } from "../packages/db/src/repositories/products";
-import { ProductService } from "../apps/web/src/lib/services/product-service";
+import { ProductService } from "../site/src/lib/services/product-service";
 import { expect, it } from "vitest";
 import { db } from "../packages/db/src/client";
 import { managedProductCondition } from "../packages/db/src/repositories/products";

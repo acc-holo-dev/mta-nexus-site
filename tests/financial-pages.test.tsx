@@ -24,23 +24,23 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("@nexus/db", () => ({
   financialStatementsRepository: { statement: state.statement, scopes: state.scopes },
   financialReviewRepository: { page: state.page, detail: state.detail },
 }));
 
 import { AppError } from "@nexus/domain";
-import DetailLoading from "../apps/web/src/app/admin/commerce/reconciliation/[id]/loading";
-import Detail from "../apps/web/src/app/admin/commerce/reconciliation/[id]/page";
-import ReviewLoading from "../apps/web/src/app/admin/commerce/reconciliation/loading";
-import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
-import FinanceLoading from "../apps/web/src/app/workspace/finance/loading";
-import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
-import { getFinancialCopy } from "../apps/web/src/lib/financial-i18n";
+import DetailLoading from "../site/src/app/admin/commerce/reconciliation/[id]/loading";
+import Detail from "../site/src/app/admin/commerce/reconciliation/[id]/page";
+import ReviewLoading from "../site/src/app/admin/commerce/reconciliation/loading";
+import Review from "../site/src/app/admin/commerce/reconciliation/page";
+import FinanceLoading from "../site/src/app/workspace/finance/loading";
+import Statement, { metadata } from "../site/src/app/workspace/finance/page";
+import { getFinancialCopy } from "../site/src/lib/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };

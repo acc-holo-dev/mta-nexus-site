@@ -10,28 +10,28 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/settings",
 }));
 
-import LoginPage from "../apps/web/src/app/auth/login/page";
-import RegisterPage from "../apps/web/src/app/auth/register/page";
-import SettingsPage from "../apps/web/src/app/settings/page";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import LoginPage from "../site/src/app/auth/login/page";
+import RegisterPage from "../site/src/app/auth/register/page";
+import SettingsPage from "../site/src/app/settings/page";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { getDictionary } from "../site/src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "apps/web/src/app/settings/page.tsx",
-  "apps/web/src/app/settings/history/page.tsx",
-  "apps/web/src/app/auth/login/page.tsx",
-  "apps/web/src/app/auth/register/page.tsx",
+  "site/src/app/settings/page.tsx",
+  "site/src/app/settings/history/page.tsx",
+  "site/src/app/auth/login/page.tsx",
+  "site/src/app/auth/register/page.tsx",
 ] as const;
 
 it("locks residual settings and auth route shells to clipped min-w-0 frames", () => {
@@ -44,21 +44,21 @@ it("locks residual settings and auth route shells to clipped min-w-0 frames", ()
 });
 
 it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipped shells", () => {
-  const settingsClient = read("apps/web/src/components/settings-page-client.tsx");
+  const settingsClient = read("site/src/components/settings-page-client.tsx");
   expect(settingsClient).toContain("ErrorState");
   expect(settingsClient).toContain("overflow-x-clip");
   expect(settingsClient).toContain("min-w-0");
   expect(settingsClient).toMatch(/min-h-11|size="touch"/u);
   expect(settingsClient).not.toContain('role="alert"');
 
-  const authForm = read("apps/web/src/components/auth-form.tsx");
+  const authForm = read("site/src/components/auth-form.tsx");
   expect(authForm).toContain("ErrorState");
   expect(authForm).toContain("overflow-x-clip");
   expect(authForm).toContain("min-w-0");
   expect(authForm).toMatch(/min-h-11|size="touch"/u);
   expect(authForm).not.toContain('role="alert"');
 
-  const history = read("apps/web/src/components/profile-change-history.tsx");
+  const history = read("site/src/components/profile-change-history.tsx");
   expect(history).toContain("ErrorState");
   expect(history).toContain("EmptyState");
   expect(history).toContain("overflow-x-clip");
@@ -69,8 +69,8 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
 
 it("locks settings password and recovery native controls to fieldControlClass without h-10 chrome", () => {
   for (const path of [
-    "apps/web/src/components/settings-password-form.tsx",
-    "apps/web/src/components/settings-recovery-email-section.tsx",
+    "site/src/components/settings-password-form.tsx",
+    "site/src/components/settings-recovery-email-section.tsx",
   ] as const) {
     const source = read(path);
     expect(source, path).toContain("fieldControlClass");
@@ -82,7 +82,7 @@ it("locks settings password and recovery native controls to fieldControlClass wi
 });
 
 it("locks active sessions empty list to EmptyState and revoke/reload ghosts to size=touch", () => {
-  const source = read("apps/web/src/components/settings-active-sessions.tsx");
+  const source = read("site/src/components/settings-active-sessions.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("noSessions");
   expect(source).toContain("sessionsDescription");
@@ -93,7 +93,7 @@ it("locks active sessions empty list to EmptyState and revoke/reload ghosts to s
 });
 
 it("wraps settings history guest and authenticated returns in the clipped page shell", () => {
-  const source = read("apps/web/src/app/settings/history/page.tsx");
+  const source = read("site/src/app/settings/history/page.tsx");
   expect(source).toContain("PlatformSignIn");
   expect(source).toContain("ProfileChangeHistoryView");
   expect(source).toContain("pageShellClass");

@@ -15,20 +15,20 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
+vi.mock("../site/src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
 }));
 
-import { CommunityReportDetailView } from "../apps/web/src/components/community-report-detail";
-import { CommunityReportForm } from "../apps/web/src/components/community-report-form";
-import { CommunityReportList } from "../apps/web/src/components/community-report-list";
-import { CommunityReportScreen } from "../apps/web/src/components/community-report-screen";
-import type { CommunityReportDetail } from "../apps/web/src/lib/community-report-contract";
-import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
+import { CommunityReportDetailView } from "../site/src/components/community-report-detail";
+import { CommunityReportForm } from "../site/src/components/community-report-form";
+import { CommunityReportList } from "../site/src/components/community-report-list";
+import { CommunityReportScreen } from "../site/src/components/community-report-screen";
+import type { CommunityReportDetail } from "../site/src/lib/community-report-contract";
+import { communityReportCopy } from "../site/src/lib/community-report-copy";
 
 const row: CommunityReportDetail = {
   id: "report",

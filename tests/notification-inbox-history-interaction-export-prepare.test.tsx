@@ -17,18 +17,18 @@ const harness = vi.hoisted(() => ({
   announce: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
+vi.mock("../site/src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("../site/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
-vi.mock("../apps/web/src/lib/notification-inbox-events", () => ({
+vi.mock("../site/src/lib/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
 }));
 
-import { NotificationInbox } from "../apps/web/src/components/notification-inbox";
+import { NotificationInbox } from "../site/src/components/notification-inbox";
 
 const { render, button, acknowledgeSelection, exportClick } =
   createNotificationInboxInteractionHelpers(harness, NotificationInbox);

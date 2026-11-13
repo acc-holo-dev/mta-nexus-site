@@ -16,10 +16,10 @@ const state = vi.hoisted(() => ({
   decide: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
+vi.mock("../site/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => state.ip }));
 vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_generated`,
   consumeRateLimit: async (...args: unknown[]) => {
@@ -39,20 +39,17 @@ vi.mock("@nexus/db", () => ({
     decide: state.decide,
   },
 }));
-import {
-  GET as publicPage,
-  POST as create,
-} from "../apps/web/src/app/api/products/[id]/reviews/route";
-import { GET as ownPage } from "../apps/web/src/app/api/library/reviews/route";
-import { GET as ownDetail, POST as edit } from "../apps/web/src/app/api/library/review/[id]/route";
-import { POST as report } from "../apps/web/src/app/api/products/[id]/reviews/[reviewId]/report/route";
-import { GET as reportsPage } from "../apps/web/src/app/api/review-reports/route";
-import { GET as reportDetail } from "../apps/web/src/app/api/review-reports/[id]/route";
-import { GET as queue } from "../apps/web/src/app/api/admin/commerce/reviews/route";
+import { GET as publicPage, POST as create } from "../site/src/app/api/products/[id]/reviews/route";
+import { GET as ownPage } from "../site/src/app/api/library/reviews/route";
+import { GET as ownDetail, POST as edit } from "../site/src/app/api/library/review/[id]/route";
+import { POST as report } from "../site/src/app/api/products/[id]/reviews/[reviewId]/report/route";
+import { GET as reportsPage } from "../site/src/app/api/review-reports/route";
+import { GET as reportDetail } from "../site/src/app/api/review-reports/[id]/route";
+import { GET as queue } from "../site/src/app/api/admin/commerce/reviews/route";
 import {
   GET as caseDetail,
   POST as decide,
-} from "../apps/web/src/app/api/admin/commerce/reviews/[id]/route";
+} from "../site/src/app/api/admin/commerce/reviews/[id]/route";
 const context = { params: Promise.resolve({ id: "prd_a", reviewId: "cmt_a" }) };
 const request = (url: string, body?: unknown, headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test${url}`, {

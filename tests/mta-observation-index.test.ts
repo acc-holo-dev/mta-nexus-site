@@ -3,7 +3,7 @@ import fc from "fast-check";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
-} from "../apps/web/src/lib/services/mta-master-directory-service";
+} from "../site/src/lib/services/mta-master-directory-service";
 
 describe("incremental MTA observation index", () => {
   it("defers traversal and reuses the scanned prefix for out-of-order and repeated lookups", () => {

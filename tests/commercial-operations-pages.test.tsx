@@ -33,11 +33,11 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...rest }, children),
   };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../site/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../apps/web/src/lib/services/commercial-plan-service", () => ({
+vi.mock("../site/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../site/src/lib/services/commercial-plan-service", () => ({
   commercialPlanService: {
     catalog: state.catalog,
     adminPage: state.adminPage,
@@ -46,18 +46,18 @@ vi.mock("../apps/web/src/lib/services/commercial-plan-service", () => ({
   orderOperationsService: { detail: state.detail },
 }));
 
-import PlanDetailLoading from "../apps/web/src/app/admin/commerce/plans/[id]/loading";
-import Admin from "../apps/web/src/app/admin/commerce/plans/[id]/page";
-import PlansLoading from "../apps/web/src/app/admin/commerce/plans/loading";
-import PlanNewLoading from "../apps/web/src/app/admin/commerce/plans/new/loading";
-import Plans from "../apps/web/src/app/admin/commerce/plans/page";
-import CatalogLoading from "../apps/web/src/app/subscriptions/loading";
-import Catalog from "../apps/web/src/app/subscriptions/page";
-import OperationsLoading from "../apps/web/src/app/workspace/purchases/[id]/operations/loading";
-import Operations, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/operations/page";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { getCommercialCopy } from "../apps/web/src/lib/commercial-i18n";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import PlanDetailLoading from "../site/src/app/admin/commerce/plans/[id]/loading";
+import Admin from "../site/src/app/admin/commerce/plans/[id]/page";
+import PlansLoading from "../site/src/app/admin/commerce/plans/loading";
+import PlanNewLoading from "../site/src/app/admin/commerce/plans/new/loading";
+import Plans from "../site/src/app/admin/commerce/plans/page";
+import CatalogLoading from "../site/src/app/subscriptions/loading";
+import Catalog from "../site/src/app/subscriptions/page";
+import OperationsLoading from "../site/src/app/workspace/purchases/[id]/operations/loading";
+import Operations, { metadata } from "../site/src/app/workspace/purchases/[id]/operations/page";
+import { LocaleProvider } from "../site/src/components/locale-context";
+import { getCommercialCopy } from "../site/src/lib/commercial-i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
 const now = new Date("2026-10-10T12:00:00Z"),
   input = {

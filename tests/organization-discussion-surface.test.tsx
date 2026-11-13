@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
-import { OrganizationProfileForm } from "../apps/web/src/components/organization-profile-form";
-import { OrganizationWorkspacePanel } from "../apps/web/src/components/organization-workspace";
-import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
-import type { OrganizationWorkspace } from "../apps/web/src/lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
+import { ContentDiscussion } from "../site/src/components/content-discussion";
+import { OrganizationProfileForm } from "../site/src/components/organization-profile-form";
+import { OrganizationWorkspacePanel } from "../site/src/components/organization-workspace";
+import { getDiscussionCopy } from "../site/src/lib/content-discussion-copy";
+import type { OrganizationWorkspace } from "../site/src/lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../site/src/lib/organization-workspace-copy";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),

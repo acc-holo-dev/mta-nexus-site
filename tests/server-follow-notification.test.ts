@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildServerPublicationNotification } from "../apps/web/src/lib/server-follow-notifications";
+import { buildServerPublicationNotification } from "../site/src/lib/server-follow-notifications";
 
 describe("server publication notification", () => {
   it("links a server follower to the published content without claiming live alerts", () => {

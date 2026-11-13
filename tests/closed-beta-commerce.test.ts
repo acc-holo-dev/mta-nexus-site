@@ -19,8 +19,8 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => "ent_test"),
 }));
 
-import { POST as disabledCheckout } from "../apps/web/src/app/api/checkout/route";
-import { CommerceService } from "../apps/web/src/lib/services/commerce-service";
+import { POST as disabledCheckout } from "../site/src/app/api/checkout/route";
+import { CommerceService } from "../site/src/lib/services/commerce-service";
 
 describe("open free-beta commerce behavior", () => {
   beforeEach(() => {

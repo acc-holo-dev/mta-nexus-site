@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confirmsFollowMutation } from "../apps/web/src/lib/follow-confirmation";
+import { confirmsFollowMutation } from "../site/src/lib/follow-confirmation";
 
 describe("follow read-your-write confirmation", () => {
   const target = { targetType: "server", targetId: "srv_123" };

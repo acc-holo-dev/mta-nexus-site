@@ -8,7 +8,7 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { POST } from "../apps/web/src/app/api/resources/claim/route";
+import { POST } from "../site/src/app/api/resources/claim/route";
 
 function claimRequest(productId: string, token?: string, requestId = "default") {
   return new NextRequest("http://nexus.test/api/resources/claim", {

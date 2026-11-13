@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../site/src/lib/i18n";
 
-vi.mock("../apps/web/src/components/article-card", () => ({
+vi.mock("../site/src/components/article-card", () => ({
   ArticleCard: ({
     article,
     locale,
@@ -16,7 +16,7 @@ vi.mock("../apps/web/src/components/article-card", () => ({
   ),
 }));
 
-import { ServerUpdatesPanel } from "../apps/web/src/components/server-updates-panel";
+import { ServerUpdatesPanel } from "../site/src/components/server-updates-panel";
 
 describe("server updates panel behavior", () => {
   it("links even an empty server preview to the full archive", () => {
