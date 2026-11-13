@@ -41,7 +41,7 @@ vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
 vi.mock("../../src/lib/services/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
-vi.mock("../../src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
 

@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { ArticleCard } from "../../../components/article-card";
 import { FollowButton } from "../../../components/follow-button";
-import { ProductCard } from "../../../components/product-card";
+import { ProductCard } from "../../../features/resources/view";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";

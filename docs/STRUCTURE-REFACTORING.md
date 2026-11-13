@@ -5,7 +5,8 @@
 Phase 2.1 проверена: `packages` → `site/packages`.
 Phase 2.2 проверена: `tests` → `site/tests`.
 Phase 3 проверена: `deploy/configs` → `docker/config`.
-Выполняется Phase 4.1: read-only Servers pilot. Владелец явно
+Phase 4.1 проверена: read-only Servers pilot.
+Выполняется Phase 4.2: read-only Resources catalog. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -349,3 +350,26 @@ client→server/services/infra, model→UI/app и Node core imports. Negative fi
 model и directory UI suites. Полный состав unit/database до/после сохраняется после
 единственного rename `server-card.test.tsx`. Критерии — behavior/API/cache/error/zero/
 stale/RU/EN и browser keyboard/mobile, без redesign или новых business rules.
+
+### Phase 4.2: Resources read-only catalog
+
+Servers pilot прошёл полный [CI #4636](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43394838095)
+на `517f0a5f`: все 15 gates, 8 271 unit, 530 tooling и 1 155 DB tests,
+все 11 directory browser scenarios и production/upgrade/persistence/HMR acceptance.
+
+Каталог `/market`, карточка ресурса и чистый query/pagination module выделены в
+`site/src/features/resources`; [локальный контракт](../site/src/features/resources/README.md)
+описывает `view`, `server` и `model`. Общий view entry сохраняет совместимость с RSC
+и Discovery без нового client directive. App Router сохраняет dynamic
+config и делегирует server-only composition; products API использует pure model.
+
+Services, repositories, visibility/scan/access policy и SQL остаются прежними.
+Detail/editor/builds/download/Q&A/reviews не переносятся. Home, Discovery и страницы
+автора/организации используют общий публичный view; fallback preview остаётся общим
+компонентом. Тела карточки, query и страницы сохраняются, меняются imports/exports.
+
+Новые error rules и negative fixtures закрывают private imports, feature→routing,
+view/model→server/services/infra и impure model edges; реальное transitive closure
+проверяется отдельно. Feature paths требуют full acceptance. Состав unit/database
+сохраняется после rename colocated card test. Критерии — каталог/SQL/HTTP/pagination,
+preview/card/consumers, RU/EN, empty/error и полный browser publishing/download flow.

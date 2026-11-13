@@ -74,6 +74,50 @@ module.exports = {
       to: { dependencyTypes: ["core"] },
     },
     {
+      name: "resources-feature-public-api",
+      severity: "error",
+      comment:
+        "Other application modules consume the Resources catalog through view, server or model entrypoints.",
+      from: { path: "^site/src/(?!features/resources/)" },
+      to: { path: "^site/src/features/resources/(?!(?:view|server|model)\\.ts$)" },
+    },
+    {
+      name: "resources-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/resources/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "resources-view-isolation",
+      severity: "error",
+      comment:
+        "Shared views and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
+      from: { path: "^site/src/features/resources/(?:view\\.ts$|components/|model(?:\\.ts$|/))" },
+      to: {
+        path: "^(?:site/src/(?:features/resources/server(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "resources-model-is-pure",
+      severity: "error",
+      from: { path: "^site/src/features/resources/model(?:\\.ts$|/)" },
+      to: {
+        path: "^(?:site/src/(?!features/resources/model(?:\\.ts$|/))|site/packages/(?!domain/))",
+      },
+    },
+    {
+      name: "resources-model-has-no-framework",
+      severity: "error",
+      from: { path: "^site/src/features/resources/model(?:\\.ts$|/)" },
+      to: { path: "(?:^|/)node_modules/(?:react|react-dom|next)(?:/|$)" },
+    },
+    {
+      name: "resources-view-has-no-node-builtins",
+      severity: "error",
+      from: { path: "^site/src/features/resources/(?:view\\.ts$|components/|model(?:\\.ts$|/))" },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "http-handlers-use-services-for-db",
       severity: "error",
       comment:

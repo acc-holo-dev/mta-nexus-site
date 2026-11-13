@@ -65,7 +65,7 @@ vi.mock("../../../lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: state.directory },
   indexMtaObservations: () => () => undefined,
 }));
-vi.mock("../../../components/product-card", () => ({
+vi.mock("../../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string; slug?: string } }) => (
     <article>
       <a href={`/market/${product.slug ?? "resource"}`}>{product.title}</a>

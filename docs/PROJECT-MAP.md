@@ -31,6 +31,10 @@ site/tests/       → HTTP/UI/поведенческие Vitest-сюиты (~6MB
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
 
+Resources catalog живёт в [`site/src/features/resources`](../site/src/features/resources/README.md):
+`view` — общая карточка, `server` — `/market` composition, `model` — query/pagination.
+Services, SQL visibility и download authority сохраняют прежние места.
+
 Servers read-only pilot живёт в [`site/src/features/servers`](../site/src/features/servers/README.md);
 claim/management/collectors остаются в прежних модулях.
 

@@ -44,7 +44,7 @@ vi.mock("../../src/components/article-card", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
 
-vi.mock("../../src/components/product-card", () => ({
+vi.mock("../../src/features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 

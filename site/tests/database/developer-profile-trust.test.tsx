@@ -107,7 +107,7 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-vi.mock("../../src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
 

@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 import type { z } from "zod";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { parseMarketQuery } from "../../../lib/market-query";
+import { parseMarketQuery } from "../../../features/resources/model";
 import {
   createRequestLogContext,
   jsonWithRequestId,

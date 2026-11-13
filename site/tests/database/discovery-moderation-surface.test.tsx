@@ -58,7 +58,7 @@ vi.mock("../../src/components/locale-context", async () => {
     useNexusLocale: () => ({ locale: mocks.locale, dictionary: getDictionary(mocks.locale) }),
   };
 });
-vi.mock("../../src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));
 vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
 vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null }));
 

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
-import { getDictionary, type Locale } from "../lib/i18n";
-import type { PublicResourceAttribution } from "../lib/public-resource-attribution";
-import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
-import { ResourcePreview } from "./resource-preview";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
+import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { ResourcePreview } from "../../../components/resource-preview";
 
 const cardFocus =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

@@ -4,7 +4,7 @@ import { PRODUCT_TYPES, isProductType } from "@nexus/domain";
 import { createProductSchema } from "@nexus/validation";
 import { getTableConfig, PgDialect } from "drizzle-orm/pg-core";
 import { products } from "../../packages/db/src/schema";
-import { parseMarketQuery } from "../../src/lib/market-query";
+import { parseMarketQuery } from "../../src/features/resources/model";
 import { getDictionary } from "../../src/lib/i18n";
 import { PRODUCT_CATEGORY_KEYS, PRODUCT_PUBLISHING_KEYS } from "../../src/lib/product-type-labels";
 

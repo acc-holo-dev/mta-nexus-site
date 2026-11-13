@@ -54,7 +54,7 @@ vi.mock("../../../lib/services/auth-service", () => ({
     getSession: () => state.session(),
   },
 }));
-vi.mock("../../../components/product-card", () => ({
+vi.mock("../../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 vi.mock("../../../components/article-card", () => ({

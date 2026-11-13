@@ -1,0 +1,165 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import test from "node:test";
+
+const root = resolve(import.meta.dirname, "../..");
+const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
+const config = resolve(root, ".dependency-cruiser.cjs");
+function cruise(cwd, entries, output = "json") {
+  return spawnSync(
+    process.execPath,
+    [cruiser, "--config", config, "--output-type", output, ...entries],
+    {
+      cwd,
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+    },
+  );
+}
+
+test("Resources catalog rejects private imports, server leaks and impure model edges", (t) => {
+  const fixture = mkdtempSync(join(tmpdir(), "nexus-resources-boundary-"));
+  t.after(() => rmSync(fixture, { recursive: true, force: true }));
+  function write(name, content) {
+    const file = join(fixture, name);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, content);
+  }
+  write(
+    "tsconfig.json",
+    JSON.stringify({
+      compilerOptions: {
+        module: "esnext",
+        moduleResolution: "bundler",
+        paths: {
+          "@nexus/domain": ["./site/packages/domain/src/index.ts"],
+          "@nexus/db": ["./site/packages/db/src/index.ts"],
+          "@nexus/ui": ["./site/packages/ui/src/index.ts"],
+        },
+      },
+    }),
+  );
+  write("node_modules/server-only/package.json", '{"name":"server-only","main":"index.js"}');
+  write("node_modules/server-only/index.js", "export {};");
+  write("node_modules/react/package.json", '{"name":"react","main":"index.js"}');
+  write("node_modules/react/index.js", "export const useState = 1;");
+  write("site/packages/domain/src/index.ts", "export const domain = 1;");
+  write("site/packages/db/src/index.ts", "export const db = 1; export type Row = string;");
+  write("site/packages/ui/src/index.ts", "export type View = string;");
+  write(
+    "site/src/lib/services/session.ts",
+    'export { db } from "@nexus/db"; export type Session = string;',
+  );
+  write("site/src/features/resources/components/card.ts", "export const card = 1;");
+  write(
+    "site/src/features/resources/model/query.ts",
+    'export { domain } from "@nexus/domain";',
+  );
+  write("site/src/features/resources/model.ts", 'export { domain } from "./model/query";');
+  write("site/src/features/resources/view.ts", 'export { card } from "./components/card";');
+  write(
+    "site/src/features/resources/server.ts",
+    'import "server-only"; export { page } from "./server/page";',
+  );
+  write(
+    "site/src/features/resources/server/page.ts",
+    'import { db } from "../../../lib/services/session"; export const page = db;',
+  );
+  write("site/src/app/page.ts", 'export { page } from "../features/resources/server";');
+  write("site/src/app/view.ts", 'export { card } from "../features/resources/view";');
+  write("site/src/lib/consumer.ts", 'export { domain } from "../features/resources/model";');
+  write("site/src/app/deep.ts", 'export { card } from "../features/resources/components/card";');
+  write(
+    "site/src/features/other/deep.ts",
+    'export { domain } from "../resources/model/observation";',
+  );
+  write(
+    "site/src/features/resources/components/server-leak.ts",
+    'export { page } from "../server";',
+  );
+  write(
+    "site/src/features/resources/components/service-leak.ts",
+    'export type { Session } from "../../../lib/services/session";',
+  );
+  write(
+    "site/src/features/resources/components/db-leak.ts",
+    'export type { Row } from "@nexus/db";',
+  );
+  write("site/src/features/resources/model/ui-leak.ts", 'export type { View } from "@nexus/ui";');
+  write("site/src/features/resources/model/framework-leak.ts", 'export { useState } from "react";');
+  write(
+    "site/src/features/resources/model/node-leak.ts",
+    'export { readFileSync } from "node:fs";',
+  );
+  write(
+    "site/src/features/resources/server/routing-leak.ts",
+    'export { page } from "../../../app/page";',
+  );
+
+  const result = cruise(fixture, ["site/src", "site/packages"]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  const rules = (name) => {
+    const module = graph.modules.find((item) => item.source === name);
+    assert(module, name);
+    return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
+  };
+  for (const [name, rule] of [
+    ["app/deep.ts", "resources-feature-public-api"],
+    ["features/other/deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/server-leak.ts", "resources-view-isolation"],
+    ["features/resources/components/service-leak.ts", "resources-view-isolation"],
+    ["features/resources/components/db-leak.ts", "resources-view-isolation"],
+    ["features/resources/model/ui-leak.ts", "resources-model-is-pure"],
+    ["features/resources/model/framework-leak.ts", "resources-model-has-no-framework"],
+    ["features/resources/model/node-leak.ts", "resources-view-has-no-node-builtins"],
+    ["features/resources/server/routing-leak.ts", "resources-feature-does-not-import-routing"],
+  ])
+    assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
+  for (const name of [
+    "app/page.ts",
+    "app/view.ts",
+    "lib/consumer.ts",
+    "features/resources/server/page.ts",
+    "features/resources/model/query.ts",
+  ])
+    assert.deepEqual(rules(`site/src/${name}`), [], name);
+  const gate = cruise(fixture, ["site/src", "site/packages"], "err");
+  assert.notEqual(gate.status, 0, "Forbidden imports must fail the architecture gate");
+  assert.match(`${gate.stdout}${gate.stderr}`, /resources-feature-public-api/u);
+});
+
+test("real view and model entrypoints have no transitive server dependencies", () => {
+  const result = cruise(root, [
+    "site/src/features/resources/view.ts",
+    "site/src/features/resources/model.ts",
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  const modules = new Map(graph.modules.map((module) => [module.source, module]));
+  const visited = new Set();
+  function visit(name) {
+    if (visited.has(name)) return;
+    visited.add(name);
+    assert(
+      !/^site\/src\/(?:app\/|features\/resources\/server(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+        name,
+      ),
+      name,
+    );
+    assert(!/^site\/packages\/(?:db|storage|security|config)\//u.test(name), name);
+    for (const dependency of modules.get(name)?.dependencies || []) {
+      assert(!dependency.couldNotResolve, `${name} → ${dependency.module}`);
+      assert(!dependency.dependencyTypes?.includes("core"), `${name} → ${dependency.resolved}`);
+      assert(!/server-only|next\/headers/u.test(dependency.resolved), dependency.resolved);
+      visit(dependency.resolved);
+    }
+  }
+  visit("site/src/features/resources/view.ts");
+  visit("site/src/features/resources/model.ts");
+  assert(visited.has("site/src/features/resources/components/product-card.tsx"));
+  assert(visited.has("site/src/features/resources/model/market-query.ts"));
+});

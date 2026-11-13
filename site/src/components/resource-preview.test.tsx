@@ -5,7 +5,7 @@ import { PRODUCT_TYPES, type Product } from "@nexus/domain";
 import { getDictionary } from "../lib/i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { ResourcePreview } from "./resource-preview";
-import { ProductCard } from "./product-card";
+import { ProductCard } from "../features/resources/view";
 
 it.each([
   undefined,

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,7 +17,7 @@ vi.mock("../../lib/services/product-service", () => ({
     getPublicAttributions: async () => new Map(),
   },
 }));
-vi.mock("../../components/product-card", () => ({
+vi.mock("../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 

@@ -60,7 +60,7 @@ vi.mock("../../../lib/services/profile-privacy-service", () => ({
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
   },
 }));
-vi.mock("../../../components/product-card", () => ({
+vi.mock("../../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 vi.mock("next/navigation", () => ({

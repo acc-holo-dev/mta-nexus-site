@@ -1,7 +1,7 @@
 import type { Product } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { ProductCard } from "./product-card";
 
 vi.mock("next/link", async () => {
@@ -19,7 +19,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("./resource-preview", () => ({
+vi.mock("../../../components/resource-preview", () => ({
   ResourcePreview: ({ title }: { title: string }) => <div data-testid="preview">{title}</div>,
 }));
 
