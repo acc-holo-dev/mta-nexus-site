@@ -25,7 +25,7 @@ import {
   resourceIntentKey,
 } from "../../../lib/resource-submission-intent";
 import { useNexusLocale } from "../../../components/locale-context";
-import { MtaMetaInspectorPanel } from "../../../components/mta-meta-inspector-panel";
+import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 
 const nativeLabelClass = "block font-label uppercase text-secondary";

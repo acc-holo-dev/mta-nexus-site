@@ -116,7 +116,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../../../components/server-follow-button", async () => {
+vi.mock("../../../features/servers/follow", async () => {
   const React = await import("react");
   return {
     ServerFollowButton: ({ initial }: { initial?: unknown }) =>
@@ -170,7 +170,7 @@ vi.mock("../../../features/servers/connect", async () => {
   };
 });
 
-vi.mock("../../../components/server-review-panel", async () => {
+vi.mock("../../../features/servers/review-controls", async () => {
   const React = await import("react");
   return {
     ServerReviewPanel: (props: Record<string, unknown>) => {

@@ -3,18 +3,18 @@
 import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
-import { getDictionary } from "../lib/i18n";
-import { confirmedServerReview } from "../lib/server-review-confirmation";
+import { getDictionary } from "../../../lib/i18n";
+import { confirmedServerReview } from "../../../lib/server-review-confirmation";
 import {
   serverReviewCopy,
   serverReviewError,
   serverReviewLoadCopy,
   serverReviewState,
-} from "../lib/server-review-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/server-review-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { useNexusLocale } from "../../../components/locale-context";
 
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

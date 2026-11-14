@@ -26,6 +26,9 @@ repositories и collectors остаются в прежних модулях и 
 | `publication-history-server.ts` | `ServerPublicationHistoryScreen`; server-only история публикаций                                  |
 | `updates-server.ts`             | `ServerUpdatesPanel`; server-only обновления                                                      |
 | `workspace-navigation.ts`       | `ServerWorkspaceNav`; client навигация workspace                                                  |
+| `review-controls.ts`            | `ServerReviewPanel`; client отзывы                                                                |
+| `follow.ts`                     | `ServerFollowButton`; client подписка                                                             |
+| `visibility-batch.ts`           | `ManagedServerVisibilityBatch`; client пакетная видимость                                         |
 | `client.ts`                     | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
 | `server.ts`                     | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
 | `model.ts`                      | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
@@ -72,3 +75,7 @@ Servers. Actor/draft/revision и challenge сохраняются, права и
 Редактор, история публикаций, активность, навигация и панель обновлений
 принадлежат Servers. Session/manager authorization, recovery, pagination
 и public visibility сохраняются в существующих сервисах и routing.
+
+Отзывы, подписка и пакетная видимость принадлежат Servers. Review eligibility,
+actor/revision, подтверждения, отмена запросов и серверные права сохраняются;
+общий follow UI и сервисы не дублируются.

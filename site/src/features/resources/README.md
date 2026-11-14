@@ -162,3 +162,6 @@ shared request helpers, services и repositories не дублируются.
 Controls корзины и review evidence принадлежат Resources; квитанция выдачи
 доступна через server-only port. Прежние commerce flags, guest intent,
 подтверждения и авторитетные проверки выдачи сохраняются.
+
+MTA meta inspector остаётся private client component формы создания Resources;
+валидация, сообщения и подсказка версии сохранены.

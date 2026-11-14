@@ -35,7 +35,8 @@ composition страницы), `model.ts` (чистые types/projections/pagina
 `history-server.ts` для статистики, наблюдений и истории. Registration, claim
 и details forms используют client ports; claim status и managed card — отдельные
 server-only ports. Server content, activity, publication history и updates
-используют независимые server-only ports; workspace navigation остаётся client.
+используют независимые server-only ports; workspace navigation, reviews, follow
+и batch visibility используют отдельные client ports.
 [Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
 
 App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует

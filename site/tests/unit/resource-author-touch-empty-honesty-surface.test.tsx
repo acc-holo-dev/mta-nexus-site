@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "site/src/components/mta-meta-inspector-panel.tsx",
+  "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
   "site/src/features/resources/components/resource-variants-form.tsx",
   "site/src/features/resources/components/new-resource-form.tsx",
 ] as const;
@@ -27,7 +27,7 @@ it("locks resource author touch/empty surfaces to size=touch and EmptyState hone
   expect(variants).not.toContain('size="sm"');
   expect(variants.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(3);
 
-  const meta = read("site/src/components/mta-meta-inspector-panel.tsx");
+  const meta = read("site/src/features/resources/components/mta-meta-inspector-panel.tsx");
   expect(meta).toMatch(
     /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
   );

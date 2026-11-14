@@ -3,9 +3,9 @@
 import { Button, ErrorState, withOccurrenceKeys } from "@nexus/ui";
 import { FileSearch } from "lucide-react";
 import { useState } from "react";
-import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
-import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
-import { useNexusLocale } from "./locale-context";
+import { getMtaMetaInspectorIssueMessage } from "../../../lib/mta-meta-inspector-messages";
+import { getMtaVersionTargetSuggestion } from "../../../lib/mta-version-target";
+import { useNexusLocale } from "../../../components/locale-context";
 
 export type InspectionResponse = {
   inspection?: {

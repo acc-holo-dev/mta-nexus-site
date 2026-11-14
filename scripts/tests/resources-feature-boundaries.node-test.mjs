@@ -324,6 +324,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
 
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
     "site/src/features/resources/cart-controls.ts",
     "site/src/features/resources/cart-view.ts",
     "site/src/features/resources/qa-report-actions.ts",
@@ -436,6 +437,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     readFileSync(resolve(root, "site/src/features/resources/cart-view.ts"), "utf8"),
     /^"use client";/u,
   );
+  visit("site/src/features/resources/components/mta-meta-inspector-panel.tsx");
   visit("site/src/features/resources/release-watch.ts");
   visit("site/src/features/resources/compatibility-controls.ts");
   visit("site/src/features/resources/variant-controls.ts");

@@ -90,7 +90,7 @@ vi.mock("@nexus/ui", async () => {
 vi.stubGlobal("fetch", harness.fetch);
 
 import { ServerClaimControlPanel } from "../../src/features/servers/components/server-claim-control-panel";
-import { ServerReviewPanel } from "../../src/components/server-review-panel";
+import { ServerReviewPanel } from "../../src/features/servers/components/server-review-panel";
 
 type Element = ReactElement<Record<string, unknown>>;
 

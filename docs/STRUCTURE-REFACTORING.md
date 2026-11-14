@@ -28,7 +28,8 @@ Phase 4.20 проверена: Resources cart и delivery presentation.
 Phase 4.21 проверена: Servers connect и statistics controls.
 Phase 4.22 проверена: Servers statistics, observations и history.
 Phase 4.23 проверена: Servers registration, claim и management UI.
-Выполняется Phase 4.24: Servers content, activity и navigation UI. Владелец явно
+Phase 4.24 проверена: Servers content, activity и navigation UI.
+Выполняется Phase 4.25: Servers interactions и Resources meta inspector. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -545,3 +546,7 @@ Statistics, observations и history прошли полный [CI #4661](https:/
 ### Phase 4.24: Servers content, activity и navigation UI
 
 Registration, claim и management UI прошли полный [CI #4662](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43574715061) на `fabe6457`. Редактор публикаций, история публикаций, история активности, workspace navigation и панель обновлений объединены в Servers. Server-only ports и client navigation разделены; тела компонентов сохранены после адаптации imports. Session/manager authorization, publication recovery, pagination и public visibility остаются прежними. Boundary fixtures и реальные графы проверяют границы.
+
+### Phase 4.25: Servers interactions и Resources meta inspector
+
+Content, activity и navigation UI прошли полный [CI #4663](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43576455204) на `37496dce`. Reviews, follow, batch visibility и MTA meta inspector объединены с соответствующими features. Тела компонентов сохранены после адаптации imports; actor/revision, review eligibility, confirmation, abort/retry, наблюдения и серверные проверки прав остаются прежними. Shared follow UI и services не дублируются. Boundary fixtures, реальные client graphs и project membership проверяются.

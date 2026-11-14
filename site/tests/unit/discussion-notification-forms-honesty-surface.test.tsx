@@ -19,7 +19,7 @@ const formComponents = [
   "site/src/components/discussion-comment-actions.tsx",
   "site/src/components/discussion-report-batch.tsx",
   "site/src/components/moderated-discussion-removal.tsx",
-  "site/src/components/mta-meta-inspector-panel.tsx",
+  "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
   "site/src/components/publication-reports-page.tsx",
   "site/src/features/servers/components/server-statistics-export-button.tsx",
 ] as const;
@@ -46,7 +46,7 @@ it("locks notification bell empty preview to EmptyState with emptyHint copy", ()
 });
 
 it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
-  const source = read("site/src/components/mta-meta-inspector-panel.tsx");
+  const source = read("site/src/features/resources/components/mta-meta-inspector-panel.tsx");
   expect(source).toMatch(
     /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
   );

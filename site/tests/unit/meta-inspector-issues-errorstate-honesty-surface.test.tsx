@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/mta-meta-inspector-panel.tsx";
+const surface = "site/src/features/resources/components/mta-meta-inspector-panel.tsx";
 
 it("locks meta-inspector http export and structural issue notices to ErrorState", () => {
   const source = read(surface);

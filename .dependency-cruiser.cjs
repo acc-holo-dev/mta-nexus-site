@@ -36,7 +36,7 @@ module.exports = {
         "Other application modules consume Servers only through explicit public entrypoints.",
       from: { path: "^site/src/(?!features/servers/)" },
       to: {
-        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|workspace-navigation|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server|workspace-navigation)\\.ts$)",
+        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server)\\.ts$)",
       },
     },
     {
@@ -51,10 +51,10 @@ module.exports = {
       comment:
         "Client components and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|workspace-navigation)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-organization-options|server-workspace-nav-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-organization-options|server-workspace-nav-i18n|managed-server-copy|server-workspace-contract|server-workspace-copy|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|content-discussion-contract|server-review-confirmation|server-review-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -75,7 +75,7 @@ module.exports = {
       name: "servers-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|workspace-navigation)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -104,7 +104,7 @@ module.exports = {
         path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|resource-management-confirmation|resource-publisher-i18n|resource-publisher-query|resource-requirements-i18n|resource-publisher-nav-i18n|resource-publication-readiness-i18n|resource-copy-confirmation|resource-copy-i18n|author-resource-response|author-resource-draft|author-resource-requests|resource-commerce-i18n|resource-release-control-confirmation|resource-release-control-i18n|build-file-validation|new-resource-response|pending-resource-draft|publishing-error-message|resource-submission-intent|user-platform-client|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-release-watch-batch-confirmation|community-report-copy|resource-cart-receipts-i18n|resource-cart-receipts-query|resource-cart-review-confirmation|resource-commerce-confirmation|resource-build-workspace-i18n|resource-build-workspace-response|admin-action-confirmation|build-moderation-ui|verification-workspace-copy|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|resource-management-confirmation|resource-publisher-i18n|resource-publisher-query|resource-requirements-i18n|resource-publisher-nav-i18n|resource-publication-readiness-i18n|resource-copy-confirmation|resource-copy-i18n|author-resource-response|author-resource-draft|author-resource-requests|resource-commerce-i18n|resource-release-control-confirmation|resource-release-control-i18n|build-file-validation|new-resource-response|pending-resource-draft|publishing-error-message|resource-submission-intent|user-platform-client|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-release-watch-batch-confirmation|community-report-copy|resource-cart-receipts-i18n|resource-cart-receipts-query|resource-cart-review-confirmation|resource-commerce-confirmation|resource-build-workspace-i18n|resource-build-workspace-response|admin-action-confirmation|build-moderation-ui|verification-workspace-copy|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages|mta-version-target)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

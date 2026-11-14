@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
 }));
 
-import { ManagedServerVisibilityBatch } from "../../src/components/managed-server-visibility-batch";
+import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
 import { MtaMasterServerDirectory } from "../../src/features/servers/client";
 import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
 

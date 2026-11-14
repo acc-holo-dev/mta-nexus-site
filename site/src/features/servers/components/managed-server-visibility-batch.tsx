@@ -3,18 +3,21 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { getManagedServerCopy } from "../lib/managed-server-view";
+import type { Locale } from "../../../lib/i18n";
+import { getManagedServerCopy } from "../../../lib/managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
   confirmsServerVisibilityPreview,
   type ServerVisibilityPreview,
-} from "../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../lib/server-workspace-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/server-workspace-contract";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../../../lib/server-workspace-copy";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
 export function ManagedServerVisibilityBatch({
   items,
   locale,

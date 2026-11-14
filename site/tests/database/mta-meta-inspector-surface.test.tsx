@@ -18,7 +18,7 @@ import {
   metaInspectorClientPolicy,
   metaInspectorPreview,
   requestMtaMetaInspection,
-} from "../../src/components/mta-meta-inspector-panel";
+} from "../../src/features/resources/components/mta-meta-inspector-panel";
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 
 describe("author-facing MTA meta inspector", () => {

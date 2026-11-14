@@ -92,7 +92,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
 
-vi.mock("../../src/components/server-follow-button", async () => {
+vi.mock("../../src/features/servers/follow", async () => {
   const React = await import("react");
   return {
     ServerFollowButton: ({ serverId, serverName }: { serverId: string; serverName: string }) =>
@@ -165,7 +165,7 @@ vi.mock("../../src/features/servers/connect", async () => {
   };
 });
 
-vi.mock("../../src/components/server-review-panel", async () => {
+vi.mock("../../src/features/servers/review-controls", async () => {
   const React = await import("react");
   return {
     ServerReviewPanel: ({ serverId }: { serverId: string }) =>

@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/server-review-panel.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/servers/components/server-review-panel.tsx"),
+  "utf8",
+);
 
 it("locks server-review eligibility notices to ErrorState and keeps success as status", () => {
   expect(source).toContain(

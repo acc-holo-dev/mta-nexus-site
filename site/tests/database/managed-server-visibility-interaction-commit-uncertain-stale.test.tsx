@@ -22,7 +22,7 @@ vi.mock("../../src/components/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 
-import { ManagedServerVisibilityBatch } from "../../src/components/managed-server-visibility-batch";
+import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
 import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
 
 const { render, hasCopy, button, click, acknowledgeBatchCommit, commitBatch, review } =

@@ -22,7 +22,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ServerReviewPanel } from "../../src/components/server-review-panel";
+import { ServerReviewPanel } from "../../src/features/servers/components/server-review-panel";
 
 const { render } = createServerReviewDraftRefreshInteractionHelpers(harness, ServerReviewPanel);
 
