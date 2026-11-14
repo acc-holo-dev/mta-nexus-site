@@ -61,7 +61,7 @@ setupResourceReviewPages();
 import ReviewDetailLoading from "../../src/app/admin/commerce/reviews/[id]/loading";
 import ReviewsLoading from "../../src/app/admin/commerce/reviews/loading";
 import Public from "../../src/app/market/[slug]/reviews/page";
-import { ResourceReviewReportScreen } from "../../src/components/resource-review-report-screen";
+import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
 import { getDictionary } from "../../src/lib/i18n";
 import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 

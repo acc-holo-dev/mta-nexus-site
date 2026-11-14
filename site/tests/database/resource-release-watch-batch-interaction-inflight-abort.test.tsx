@@ -18,7 +18,7 @@ vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
 
-import { ResourceReleaseWatchBatchControls } from "../../src/components/resource-release-watch-batch-controls";
+import { ResourceReleaseWatchBatchControls } from "../../src/features/resources/components/resource-release-watch-batch-controls";
 
 const { button, ack, reviewed } = createResourceReleaseWatchBatchInteractionHelpers(
   h,

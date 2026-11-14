@@ -19,7 +19,7 @@ vi.mock("../../src/components/report-moderation-controls", () => ({
   ),
 }));
 
-vi.mock("../../src/components/admin/admin-resource-qa-report-actions", () => ({
+vi.mock("../../src/features/resources/qa-report-actions", () => ({
   AdminResourceQaReportActions: ({
     reportId,
     productId,

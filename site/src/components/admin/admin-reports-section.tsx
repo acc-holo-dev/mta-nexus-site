@@ -9,7 +9,7 @@ import { resourceReviewCopy } from "../../lib/resource-review-i18n";
 import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
 import { ReportEvidenceLinks } from "../report-evidence-links";
 import { ReportModerationControls } from "../report-moderation-controls";
-import { AdminResourceQaReportActions } from "./admin-resource-qa-report-actions";
+import { AdminResourceQaReportActions } from "../../features/resources/qa-report-actions";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 

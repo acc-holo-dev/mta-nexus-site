@@ -4,16 +4,16 @@ import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Locale } from "../lib/i18n";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../lib/resource-review-query";
-import { authService } from "../lib/services/auth-service";
-import { resourceReviewService } from "../lib/services/resource-review-service";
-import { PlatformSignIn } from "./platform-sign-in";
-import { ResourceReviewDecisionForm } from "../features/resources/review-controls";
-import { ResourceReviewPager } from "../features/resources/reviews-view";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { resourceReviewCopy, resourceReviewState } from "../../../lib/resource-review-i18n";
+import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
+import { authService } from "../../../lib/services/auth-service";
+import { resourceReviewService } from "../../../lib/services/resource-review-service";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { ResourceReviewDecisionForm } from "../review-controls";
+import { ResourceReviewPager } from "../reviews-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
 const navLinkClass =

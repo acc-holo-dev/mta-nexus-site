@@ -4,12 +4,12 @@ import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { confirmsAdminAction } from "../../lib/admin-action-confirmation";
-import { communityReportCopy } from "../../lib/community-report-copy";
-import { privateApiRequest } from "../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../lib/resource-qa-i18n";
-import { confirmAction } from "../confirm-action";
-import { useNexusLocale } from "../locale-context";
+import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
+import { communityReportCopy } from "../../../lib/community-report-copy";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 /**
  * Staff bridge: remove the reported Q&A thread, then resolve the report record.

@@ -56,8 +56,9 @@ publishing и download handlers не переносятся. Отдельный 
 сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
 `versions-server` и `reviews-server` отвечают за публичные подстраницы,
 `media-server` и `build-server` — за author/staff media и build composition;
-`package-server` и `requirements-server` — за состав сборки и требования. Metadata
-и dynamic config остаются в routing. Все восемь server entries изолированы
+`package-server` и `requirements-server` — за состав сборки и требования,
+`review-report-server` — за жалобы на отзывы. Metadata и dynamic config остаются
+в routing. Все девять server entries изолированы
 друг от друга и защищены `server-only`. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
 Public `client` содержит gallery/Q&A, preview остаётся private; нейтральный `evidence` — provenance/package

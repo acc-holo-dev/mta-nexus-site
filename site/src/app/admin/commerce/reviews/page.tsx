@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ResourceReviewReportScreen } from "../../../../components/resource-review-report-screen";
+import { ResourceReviewReportScreen } from "../../../../features/resources/review-report-server";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
 

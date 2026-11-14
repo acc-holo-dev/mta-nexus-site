@@ -80,7 +80,7 @@ module.exports = {
         "Other application modules consume the Resources feature through view, server or model entrypoints.",
       from: { path: "^site/src/(?!features/resources/)" },
       to: {
-        path: "^site/src/features/resources/(?!(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|download|release-watch|client|evidence|server|(?:detail|versions|reviews|media|build|package|requirements)-server|model)\\.ts$)",
+        path: "^site/src/features/resources/(?!(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|download|release-watch|client|evidence|server|(?:detail|versions|reviews|media|build|package|requirements|review-report)-server|model)\\.ts$)",
       },
     },
     {
@@ -95,10 +95,10 @@ module.exports = {
       comment:
         "Shared views and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|resource-management-confirmation|resource-publisher-i18n|resource-publisher-query|resource-requirements-i18n|resource-publisher-nav-i18n|resource-publication-readiness-i18n|resource-copy-confirmation|resource-copy-i18n|author-resource-response|author-resource-draft|author-resource-requests|resource-commerce-i18n|resource-release-control-confirmation|resource-release-control-i18n|build-file-validation|new-resource-response|pending-resource-draft|publishing-error-message|resource-submission-intent|user-platform-client|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-build-workspace-i18n|resource-build-workspace-response|admin-action-confirmation|build-moderation-ui|verification-workspace-copy|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|resource-management-confirmation|resource-publisher-i18n|resource-publisher-query|resource-requirements-i18n|resource-publisher-nav-i18n|resource-publication-readiness-i18n|resource-copy-confirmation|resource-copy-i18n|author-resource-response|author-resource-draft|author-resource-requests|resource-commerce-i18n|resource-release-control-confirmation|resource-release-control-i18n|build-file-validation|new-resource-response|pending-resource-draft|publishing-error-message|resource-submission-intent|user-platform-client|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-release-watch-batch-confirmation|community-report-copy|resource-build-workspace-i18n|resource-build-workspace-response|admin-action-confirmation|build-moderation-ui|verification-workspace-copy|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -119,7 +119,7 @@ module.exports = {
       name: "resources-view-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },

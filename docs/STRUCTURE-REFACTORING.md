@@ -22,7 +22,8 @@ Phase 4.14 проверена: Resources author management UI.
 Phase 4.15 проверена: Resources publisher workspace views.
 Phase 4.16 проверена: Resources creation и copying UI.
 Phase 4.17 проверена: Resources lifecycle и moderation UI.
-Выполняется Phase 4.18: Resources package, requirements и quarantine UI. Владелец явно
+Phase 4.18 проверена: Resources package, requirements и quarantine UI.
+Выполняется Phase 4.19: Resources reports и batch watches. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -515,3 +516,7 @@ Creation и copying UI прошли полный [CI #4654](https://github.com/a
 ### Phase 4.18: Resources package, requirements и quarantine UI
 
 Lifecycle и moderation UI прошли полный [CI #4655](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43550607960) на `6e2b8a43`. Экраны состава сборки и требований, представление отчёта и quarantine controls объединены в Resources. Изолированные server-only ports отделены от view и client port; тела сохранены после адаптации imports. Session/role/access, scan, opt-in уведомлений и server authority не меняются. Boundary fixtures и реальные графы проверяют новые границы.
+
+### Phase 4.19: Resources reports и batch watches
+
+Package, requirements и quarantine UI прошли полный [CI #4656](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43552563068) на `b6596b36`. Экран жалоб на отзывы, staff Q&A report actions и batch release watches объединены в Resources; server-only и client ports разделены. Тела компонентов сохранены после адаптации imports. Session/role, confirmation, revision, quota, abort/retry и server authority остаются прежними. Boundary fixtures и реальные графы проверяют новые границы.

@@ -162,7 +162,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/lib/resource-review-i18n.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/components/order-case-page.tsx")).toContain("loadUnavailableHint");
-  expect(read("site/src/components/resource-review-report-screen.tsx")).toContain(
+  expect(read("site/src/features/resources/server/resource-review-report-screen.tsx")).toContain(
     "loadUnavailableHint",
   );
 });
