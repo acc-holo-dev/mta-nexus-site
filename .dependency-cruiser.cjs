@@ -98,7 +98,7 @@ module.exports = {
         path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|download|release-watch|client|evidence)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-build-workspace-i18n|resource-build-workspace-response|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-type-labels|resource-image-url|resource-media-i18n|resource-review-i18n|resource-review-confirmation|product-dependency-resolution|reverse-dependency-summary|resource-management-i18n|license-model-i18n|resource-qa-i18n|resource-release-watches-i18n|resource-build-workspace-i18n|resource-build-workspace-response|admin-action-confirmation|build-moderation-ui|verification-workspace-copy|private-request|resource-deliveries-i18n|resource-download-client|private-api-request|build-package-i18n|mta-meta-inspector-messages)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

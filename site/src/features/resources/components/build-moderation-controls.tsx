@@ -4,12 +4,12 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { confirmsAdminAction } from "../lib/admin-action-confirmation";
-import { buildModerationUiState } from "../lib/build-moderation-ui";
-import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
-import { verificationCopy } from "../lib/verification-workspace-copy";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
+import { buildModerationUiState } from "../../../lib/build-moderation-ui";
+import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 export function BuildModerationControls({
   buildId,

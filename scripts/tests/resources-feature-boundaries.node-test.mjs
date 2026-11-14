@@ -250,6 +250,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
     "site/src/features/resources/release-watch.ts",
+    "site/src/features/resources/components/build-moderation-controls.tsx",
     "site/src/features/resources/components/resource-build-controls.tsx",
     "site/src/features/resources/components/resource-media-editor.tsx",
     "site/src/features/resources/download.ts",
@@ -298,6 +299,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     /"use client"/u,
   );
   visit("site/src/features/resources/release-watch.ts");
+  visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");
   visit("site/src/features/resources/download.ts");

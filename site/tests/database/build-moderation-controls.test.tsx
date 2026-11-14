@@ -14,7 +14,7 @@ vi.mock("../../src/components/locale-context", () => ({
   }),
 }));
 
-import { BuildModerationControls } from "../../src/components/build-moderation-controls";
+import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
 
 describe("build moderation control behavior", () => {
   it("requires review notes and trusted clean provenance before approval", () => {

@@ -16,7 +16,8 @@ Phase 4.8 проверена: Resources dependency и version-help UI.
 Phase 4.9 проверена: Resources download UI.
 Phase 4.10 проверена: Resources release-watch UI.
 Phase 4.11 проверена: Resources media editor и server composition.
-Выполняется Phase 4.12: Resources build screen и controls. Владелец явно
+Phase 4.12 проверена: Resources build screen и controls.
+Выполняется Phase 4.13: Resources build moderation controls. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -485,3 +486,7 @@ Release-watch UI прошёл полный [CI #4647](https://github.com/acc-hol
 ### Phase 4.12: Resources build screen и controls
 
 Media editor прошёл полный [CI #4649](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43535148309) на `dffbd868`. Build screen и client controls объединены в Resources; workspace и admin routes используют server-only `build-server`, сохраняя metadata и оболочки. Тела screen/controls сохранены после адаптации imports. Session/role/ownership, scan provenance, revision, confirm и server mutation authority остаются прежними. Services, repositories и moderation controls не переносятся. Negative fixtures и реальные client/server graphs проверяют новый порт.
+
+### Phase 4.13: Resources build moderation controls
+
+Build screen прошёл полный [CI #4650](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43537128520) на `0e22dde2`. Moderation controls перенесены внутрь Resources как private client component; тело сохранено после адаптации imports. Подтверждение, revision и проверка trusted-clean scan сохраняются; shared helpers, HTTP handlers, service и repository остаются прежними. Реальный client graph и boundary fixtures проверяют изоляцию.

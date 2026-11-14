@@ -112,6 +112,6 @@ client component. Session/role/ownership, scan и mutation authority остаю�
 сохраняются; server entry не загружает composition других страниц.
 
 Build screen и client controls принадлежат Resources. Workspace и staff routes
-используют `build-server`, сохраняя metadata; moderation controls, service и
-repository остаются общими. Session/role/ownership, scan provenance, revision,
+используют `build-server`, сохраняя metadata; moderation controls остаются private
+client component. Shared helpers, service и repository сохраняются. Session/role/ownership, scan provenance, revision,
 confirm и server mutation authority сохраняются.

@@ -13,7 +13,7 @@ import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceBuildWorkspaceService } from "../../../lib/services/resource-build-workspace-service";
-import { BuildModerationControls } from "../../../components/build-moderation-controls";
+import { BuildModerationControls } from "../components/build-moderation-controls";
 import { BuildPackageEvidencePanel } from "../evidence";
 import { BuildProvenanceDetails } from "../evidence";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
