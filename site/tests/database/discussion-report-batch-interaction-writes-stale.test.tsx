@@ -21,7 +21,7 @@ vi.mock("../../src/components/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 
-import { DiscussionReportBatch } from "../../src/components/discussion-report-batch";
+import { DiscussionReportBatch } from "../../src/features/community/components/discussion-report-batch";
 import { reportBatchCopy } from "../../src/lib/report-batch-copy";
 
 const { render, commitBatch, review } = createDiscussionReportBatchInteractionHelpers(

@@ -2,10 +2,10 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
-import type { OwnDiscussion } from "../lib/discussion-workspace-contract";
-import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
-import type { Locale } from "../lib/i18n";
-import { DiscussionCommentActions } from "../features/community/comment-actions";
+import type { OwnDiscussion } from "../../../lib/discussion-workspace-contract";
+import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
+import type { Locale } from "../../../lib/i18n";
+import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

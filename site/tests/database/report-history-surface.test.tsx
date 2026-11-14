@@ -41,7 +41,7 @@ vi.mock("../../src/components/author-publication-restore", () => ({
   }) => <div data-restore={organizationId ?? serverId} />,
 }));
 
-import { DiscussionReportsScreen as Reports } from "../../src/components/discussion-reports-screen";
+import { DiscussionReportsScreen as Reports } from "../../src/features/community/server/discussion-reports-screen";
 import { OrganizationPublicationHistoryScreen as History } from "../../src/components/organization-publication-history-screen";
 import { discussionReportsCopy } from "../../src/lib/discussion-reports-copy";
 import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";

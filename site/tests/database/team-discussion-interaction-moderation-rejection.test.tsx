@@ -24,7 +24,7 @@ vi.mock("../../src/components/confirm-action", () => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { ModeratedDiscussionRemoval } from "../../src/components/moderated-discussion-removal";
+import { ModeratedDiscussionRemoval } from "../../src/features/community/components/moderated-discussion-removal";
 
 const { render, button, click, prepareComment } = createModerationRemovalInteractionHelpers(
   harness,

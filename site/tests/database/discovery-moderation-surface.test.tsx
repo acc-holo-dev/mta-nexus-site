@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -65,7 +67,7 @@ vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null 
 import { generateMetadata as moderationMetadata } from "../../src/app/admin/community/page";
 import StreamLoading from "../../src/app/discover/stream/loading";
 import StreamPage, { generateMetadata as streamMetadata } from "../../src/app/discover/stream/page";
-import { CommunityModerationScreen } from "../../src/components/community-moderation-screen";
+import { CommunityModerationScreen } from "../../src/features/community/server/community-moderation-screen";
 import { ContentModerationControls } from "../../src/components/content-moderation-controls";
 import { moderationCopy } from "../../src/lib/community-moderation-copy";
 import { discoveryStreamCopy } from "../../src/lib/discovery-stream-copy";

@@ -34,7 +34,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/community/)" },
       to: {
-        path: "^site/src/features/community/(?!(?:discussion|topic-form|report-form|comment-actions|reports-server|report-history-server|report-groups-server)\\.ts$)",
+        path: "^site/src/features/community/(?!(?:discussion|topic-form|report-form|own-discussion|reports-server|report-history-server|report-groups-server|moderation-server|moderated-discussion-server|discussion-reports-server|publication-reports-server)\\.ts$)",
       },
     },
     {
@@ -47,17 +47,17 @@ module.exports = {
       name: "community-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|comment-actions)\\.ts$|components/)",
+        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|own-discussion)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/community/(?:server(?:\\.ts$|/)|(?:reports|report-history|report-groups)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/community/(?:server(?:\\.ts$|/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "community-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|comment-actions)\\.ts$|components/)",
+        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|own-discussion)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

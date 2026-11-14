@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OwnDiscussionDetail } from "../../../../components/own-discussion-detail";
+import { OwnDiscussionDetail } from "../../../../features/community/own-discussion";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ownDiscussionCopy } from "../../../../lib/discussion-workspace-copy";
 import { getDictionary } from "../../../../lib/i18n";

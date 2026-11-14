@@ -8,9 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const ports = ["discussion", "topic-form", "report-form", "comment-actions"];
+const ports = ["discussion", "topic-form", "report-form", "own-discussion"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -69,7 +69,15 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "site/src/features/community/components/route.ts",
     'export { value } from "../../../app/deep";',
   );
-  for (const port of ["reports", "report-history", "report-groups"]) {
+  for (const port of [
+    "reports",
+    "report-history",
+    "report-groups",
+    "moderation",
+    "moderated-discussion",
+    "discussion-reports",
+    "publication-reports",
+  ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
       `site/src/app/${port}-server.ts`,
@@ -92,7 +100,15 @@ test("Community rejects private imports, routing, server and infrastructure edge
     assert(rules(`features/community/${port}.ts`).includes("community-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }
-  for (const port of ["reports", "report-history", "report-groups"]) {
+  for (const port of [
+    "reports",
+    "report-history",
+    "report-groups",
+    "moderation",
+    "moderated-discussion",
+    "discussion-reports",
+    "publication-reports",
+  ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
       rules(`features/community/components/${port}-leak.ts`).includes("community-client-isolation"),
@@ -116,6 +132,8 @@ test("real Community client graphs have no transitive server dependencies", () =
     "community-report-list",
     "community-report-history",
     "community-report-groups",
+    "moderated-discussion-removal",
+    "discussion-report-batch",
   ].map((name) => `site/src/features/community/components/${name}.tsx`);
   const result = cruise(root, [...entries, ...componentEntries]);
   assert.equal(result.status, 0, result.stderr);
@@ -126,7 +144,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -146,7 +164,12 @@ test("real Community client graphs have no transitive server dependencies", () =
     visit(entry);
   }
   for (const entry of componentEntries) visit(entry);
-  for (const name of ["community-report-detail", "community-report-list"])
+  for (const name of [
+    "community-report-detail",
+    "community-report-list",
+    "moderated-discussion-removal",
+    "discussion-report-batch",
+  ])
     assert.match(
       readFileSync(resolve(root, `site/src/features/community/components/${name}.tsx`), "utf8"),
       /^"use client";/u,
@@ -161,6 +184,10 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["reports-server.ts", "community-report-screen.tsx"],
     ["report-history-server.ts", "community-report-history-page.tsx"],
     ["report-groups-server.ts", "community-report-groups-page.tsx"],
+    ["moderation-server.ts", "community-moderation-screen.tsx"],
+    ["moderated-discussion-server.ts", "moderated-discussion-screen.tsx"],
+    ["discussion-reports-server.ts", "discussion-reports-screen.tsx"],
+    ["publication-reports-server.ts", "publication-reports-page.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;

@@ -17,10 +17,10 @@ const formComponents = [
   "site/src/components/content-comment-form.tsx",
   "site/src/features/community/components/content-discussion-compose-feedback.tsx",
   "site/src/features/community/components/discussion-comment-actions.tsx",
-  "site/src/components/discussion-report-batch.tsx",
-  "site/src/components/moderated-discussion-removal.tsx",
+  "site/src/features/community/components/discussion-report-batch.tsx",
+  "site/src/features/community/components/moderated-discussion-removal.tsx",
   "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
-  "site/src/components/publication-reports-page.tsx",
+  "site/src/features/community/server/publication-reports-page.tsx",
   "site/src/features/servers/components/server-statistics-export-button.tsx",
 ] as const;
 

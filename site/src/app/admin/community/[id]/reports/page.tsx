@@ -1,7 +1,7 @@
 import {
   PublicationReportsPage,
   publicationReportsMetadata,
-} from "../../../../../components/publication-reports-page";
+} from "../../../../../features/community/publication-reports-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

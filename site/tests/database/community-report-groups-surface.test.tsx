@@ -38,7 +38,7 @@ import {
 import {
   PublicationReportsPage,
   publicationReportsMetadata,
-} from "../../src/components/publication-reports-page";
+} from "../../src/features/community/server/publication-reports-page";
 import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
 import { reportGroupsCopy } from "../../src/lib/community-report-groups-copy";
 import { reportBatchCopy } from "../../src/lib/report-batch-copy";

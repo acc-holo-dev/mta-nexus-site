@@ -1,4 +1,4 @@
-import { CommunityModerationScreen } from "../../../components/community-moderation-screen";
+import { CommunityModerationScreen } from "../../../features/community/moderation-server";
 import { moderationCopy } from "../../../lib/community-moderation-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 

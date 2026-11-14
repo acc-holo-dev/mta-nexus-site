@@ -24,13 +24,13 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 vi.mock("../../src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../../src/components/moderated-discussion-removal", () => ({
+vi.mock("../../src/features/community/components/moderated-discussion-removal", () => ({
   ModeratedDiscussionRemoval: () => <div data-removal="available" />,
 }));
 
 import DiscussionReportsLoading from "../../src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
 import DiscussionLoading from "../../src/app/admin/community/[id]/discussion/loading";
-import { ModeratedDiscussionScreen } from "../../src/components/moderated-discussion-screen";
+import { ModeratedDiscussionScreen } from "../../src/features/community/server/moderated-discussion-screen";
 import { moderationCopy } from "../../src/lib/community-moderation-copy";
 import { moderatedDiscussionCopy } from "../../src/lib/moderated-discussion-copy";
 

@@ -4,22 +4,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
-import { communityReportCopy } from "../lib/community-report-copy";
-import { reportGroupsCopy } from "../lib/community-report-groups-copy";
-import type { discussionReportsPageSchema } from "../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../lib/discussion-reports-copy";
-import type { Locale } from "../lib/i18n";
+import { communityReportCopy } from "../../../lib/community-report-copy";
+import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
+import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
+import type { Locale } from "../../../lib/i18n";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
   type ReportBatchPreview,
   reportBatchPreviewInput,
-} from "../lib/report-batch-contract";
-import { reportBatchCopy, reportBatchError } from "../lib/report-batch-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/report-batch-contract";
+import { reportBatchCopy, reportBatchError } from "../../../lib/report-batch-copy";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({

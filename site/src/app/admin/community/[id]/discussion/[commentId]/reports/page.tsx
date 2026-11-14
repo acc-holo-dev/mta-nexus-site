@@ -1,4 +1,4 @@
-import { DiscussionReportsScreen } from "../../../../../../../components/discussion-reports-screen";
+import { DiscussionReportsScreen } from "../../../../../../../features/community/discussion-reports-server";
 import { discussionReportsCopy } from "../../../../../../../lib/discussion-reports-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 

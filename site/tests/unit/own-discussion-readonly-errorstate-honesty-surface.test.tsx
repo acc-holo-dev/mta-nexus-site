@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/own-discussion-detail.tsx";
+const surface = "site/src/features/community/components/own-discussion-detail.tsx";
 
 it("locks own-discussion readonly notice to ErrorState without soft muted caption", () => {
   const source = read(surface);

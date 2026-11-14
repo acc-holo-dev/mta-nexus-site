@@ -1,4 +1,4 @@
-import { ModeratedDiscussionScreen } from "../../../../../components/moderated-discussion-screen";
+import { ModeratedDiscussionScreen } from "../../../../../features/community/moderated-discussion-server";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { moderatedDiscussionCopy } from "../../../../../lib/moderated-discussion-copy";
 

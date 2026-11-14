@@ -31,7 +31,8 @@ Phase 4.23 проверена: Servers registration, claim и management UI.
 Phase 4.24 проверена: Servers content, activity и navigation UI.
 Phase 4.25 проверена: Servers interactions и Resources meta inspector.
 Phase 4.26 проверена: Community discussion, reports и topics.
-Выполняется Phase 4.27: Community report screens и history. Владелец явно
+Phase 4.27 проверена: Community report screens и history.
+Выполняется Phase 4.28: Community moderation и discussion controls. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -560,3 +561,7 @@ Servers interactions и Resources meta inspector прошли полный [CI #
 ### Phase 4.27: Community report screens и history
 
 Community discussion, reports и topics прошли полный [CI #4665](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43582652970) на `b2cbf895`. Экран жалоб и его список/детали, история и группировка жалоб с представлениями объединены в Community. Независимые server-only ports отделены от внутренних client/RSC компонентов; тела сохранены после адаптации imports. Session/role, private evidence, filters, pagination и server authority не меняются. Negative fixtures, client graphs и независимость серверных графов проверяются.
+
+### Phase 4.28: Community moderation и discussion controls
+
+Report screens и history прошли полный [CI #4666](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43587683429) на `398ec26d`. Модерация публикаций и обсуждений, удаление комментариев, страницы и пакетные действия по жалобам и пользовательская деталь обсуждения объединены в Community. Независимые server-only ports отделены от client controls; тела сохранены после адаптации imports. Staff/session authorization, revision, confirmation, batch recovery и серверные транзакции не меняются. Boundary fixtures и реальные графы проверяют изоляцию.

@@ -12,17 +12,17 @@ import {
   moderationPageSchema,
   parseModerationDetailQuery,
   parseModerationQuery,
-} from "../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
-import { discoveryCopy } from "../lib/discovery-copy";
-import { getRequestLocale } from "../lib/i18n-server";
-import { moderatedDiscussionCopy } from "../lib/moderated-discussion-copy";
-import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
-import { authService } from "../lib/services/auth-service";
-import { communityModerationService } from "../lib/services/community-moderation-service";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { ContentModerationControls } from "./content-moderation-controls";
-import { PlatformSignIn } from "./platform-sign-in";
+} from "../../../lib/community-moderation-contract";
+import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
+import { discoveryCopy } from "../../../lib/discovery-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";
+import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
+import { authService } from "../../../lib/services/auth-service";
+import { communityModerationService } from "../../../lib/services/community-moderation-service";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { ContentModerationControls } from "../../../components/content-moderation-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

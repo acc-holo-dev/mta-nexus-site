@@ -4,24 +4,24 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { moderationCopy } from "../lib/community-moderation-copy";
-import { REPORT_TYPES } from "../lib/community-report-contract";
-import { communityReportCopy } from "../lib/community-report-copy";
+import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { REPORT_TYPES } from "../../../lib/community-report-contract";
+import { communityReportCopy } from "../../../lib/community-report-copy";
 import {
   discussionReportsHref,
   discussionReportsPageSchema,
   parseDiscussionReportsQuery,
-} from "../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../lib/discussion-reports-copy";
-import type { Locale } from "../lib/i18n";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { moderatedDiscussionHref } from "../lib/moderated-discussion-contract";
-import { authService } from "../lib/services/auth-service";
-import { communityModerationService } from "../lib/services/community-moderation-service";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { DiscussionReportBatch } from "./discussion-report-batch";
-import { PlatformSignIn } from "./platform-sign-in";
+} from "../../../lib/discussion-reports-contract";
+import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { moderatedDiscussionHref } from "../../../lib/moderated-discussion-contract";
+import { authService } from "../../../lib/services/auth-service";
+import { communityModerationService } from "../../../lib/services/community-moderation-service";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { DiscussionReportBatch } from "../components/discussion-report-batch";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =

@@ -56,7 +56,8 @@ HTTP ограничения сохраняются. Новые Servers feature p
 
 `site/src/features/community` объединяет UI обсуждения, жалоб и создания тем.
 Явные client entries и независимые server-only `reports-server`,
-`report-history-server`, `report-groups-server` защищают private implementations;
+`report-history-server`, `report-groups-server` и moderation server entries
+защищают private implementations;
 routing, services, server и infrastructure не входят в client graph. Actor/draft/intent, confirmation, revision и server authority
 остаются прежними. [Контракт feature](../site/src/features/community/README.md)
 и boundary suite проверяют прямые и транзитивные зависимости; изменения требуют полного CI.
