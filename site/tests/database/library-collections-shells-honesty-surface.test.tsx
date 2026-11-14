@@ -44,7 +44,7 @@ const clippedPages = [
   "site/src/app/workspace/library/collections/membership-history/page.tsx",
   "site/src/app/workspace/library/collections/membership-history/[id]/page.tsx",
   "site/src/features/resources/server/detail-page.tsx",
-  "site/src/app/articles/page.tsx",
+  "site/src/features/community/server/articles-page.tsx",
 ] as const;
 
 const clippedLoadings = [
@@ -83,7 +83,7 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   expect(market).not.toContain('role="alert"');
   expect(market).not.toContain("throw error");
 
-  const articles = read("site/src/app/articles/page.tsx");
+  const articles = read("site/src/features/community/server/articles-page.tsx");
   expect(articles).toContain("ErrorState");
   expect(articles).toContain("EmptyState");
   expect(articles).toContain("overflow-x-clip");

@@ -6,6 +6,13 @@ Feature объединяет клиентское обсуждение публ�
 
 | Entry                                | Контракт                                                                      |
 | ------------------------------------ | ----------------------------------------------------------------------------- |
+| `community-page-server.ts`           | Каталог обсуждений                                                            |
+| `new-topic-page-server.ts`           | Создание темы                                                                 |
+| `articles-page-server.ts`            | Каталог статей                                                                |
+| `article-page-server.ts`             | Страница публикации и обсуждения                                              |
+| `own-discussions-page-server.ts`     | Свои обсуждения                                                               |
+| `own-discussion-page-server.ts`      | Деталь своего обсуждения                                                      |
+| `author-desk-page-server.ts`         | Авторский кабинет публикаций                                                  |
 | `reports-server.ts`                  | `CommunityReportScreen`; server-only жалобы заявителя и staff                 |
 | `report-history-server.ts`           | `CommunityReportHistoryPage`, metadata; server-only история                   |
 | `report-groups-server.ts`            | `CommunityReportGroupsPage`, metadata; server-only группировка                |
@@ -48,3 +55,5 @@ confirmation и серверные транзакции сохраняются.
 Карточка, лента, загрузка, подписка и авторские действия принадлежат Community. Подписка остаётся внутренним компонентом обсуждения; authority и существующие HTTP adapters сохранены.
 
 Фильтры каталога, реакции, модерация и форма комментария входят в Community. Общая история публикаций имеет server-only вход и использует прежние сервисы организаций и серверов.
+
+Каталоги, деталь публикации, создание темы, собственные обсуждения и авторский кабинет используют независимые server-only композиции. Динамический режим и metadata маршрутов сохраняются.

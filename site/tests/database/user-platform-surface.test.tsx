@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { getDictionary, type Locale } from "../../src/lib/i18n";

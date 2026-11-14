@@ -91,6 +91,13 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "publication-reports",
     "publication-feed-loading",
     "context-history",
+    "community-page",
+    "new-topic-page",
+    "articles-page",
+    "article-page",
+    "own-discussions-page",
+    "own-discussion-page",
+    "author-desk-page",
   ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
@@ -124,6 +131,13 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "publication-reports",
     "publication-feed-loading",
     "context-history",
+    "community-page",
+    "new-topic-page",
+    "articles-page",
+    "article-page",
+    "own-discussions-page",
+    "own-discussion-page",
+    "author-desk-page",
   ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
@@ -161,7 +175,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -208,6 +222,13 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["publication-reports-server.ts", "publication-reports-page.tsx"],
     ["publication-feed-loading-server.ts", "publication-feed-loading.tsx"],
     ["context-history-server.ts", "context-publication-history-screen.tsx"],
+    ["community-page-server.ts", "community-page.tsx"],
+    ["new-topic-page-server.ts", "new-topic-page.tsx"],
+    ["articles-page-server.ts", "articles-page.tsx"],
+    ["article-page-server.ts", "article-page.tsx"],
+    ["own-discussions-page-server.ts", "own-discussions-page.tsx"],
+    ["own-discussion-page-server.ts", "own-discussion-page.tsx"],
+    ["author-desk-page-server.ts", "author-desk-page.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;
@@ -222,5 +243,22 @@ test("Community report server entrypoints have isolated composition graphs", () 
       if (otherEntry !== entry)
         assert(!modules.has(`site/src/features/community/server/${otherPage}`), otherPage);
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+});
+
+test("Community routes retain dynamic rendering and metadata contracts", () => {
+  for (const [route, port, dynamic, metadata] of [
+    ["community", "community-page", true, true],
+    ["community/new", "new-topic-page", false, false],
+    ["articles", "articles-page", true, true],
+    ["articles/[slug]", "article-page", true, true],
+    ["workspace/discussions", "own-discussions-page", true, true],
+    ["workspace/discussions/[id]", "own-discussion-page", true, true],
+    ["workspace/content", "author-desk-page", true, true],
+  ]) {
+    const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
+    assert.equal(source.includes('export const dynamic = "force-dynamic";'), dynamic);
+    assert.equal(source.includes("generateMetadata"), metadata);
+    assert(source.includes(`/${port}-server";`));
   }
 });
