@@ -57,7 +57,7 @@ const delegatedHonestyScreens = [
   "site/src/components/collection-releases-screen.tsx",
   "site/src/components/collection-requirements-screen.tsx",
   "site/src/components/library-selection-batch-screen.tsx",
-  "site/src/components/resource-requirements-screen.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
   "site/src/components/library-release-comparison-screen.tsx",
 ] as const;
 

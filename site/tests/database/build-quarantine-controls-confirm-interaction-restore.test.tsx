@@ -26,7 +26,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { BuildQuarantineControls } from "../../src/components/build-quarantine-controls";
+import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
 import { getDictionary } from "../../src/lib/i18n";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 

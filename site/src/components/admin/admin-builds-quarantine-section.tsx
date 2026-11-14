@@ -3,7 +3,7 @@ import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels";
 import type { getDictionary, Locale } from "../../lib/i18n";
-import { BuildQuarantineControls } from "../build-quarantine-controls";
+import { BuildQuarantineControls } from "../../features/resources/quarantine-controls";
 
 const touchLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

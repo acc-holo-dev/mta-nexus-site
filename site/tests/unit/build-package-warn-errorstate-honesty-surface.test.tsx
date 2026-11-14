@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/build-package-screen.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/server/build-package-screen.tsx"),
+  "utf8",
+);
 
 it("locks legacy/no-baseline package notices to ErrorState without fake retry", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

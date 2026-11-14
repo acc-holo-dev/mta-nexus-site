@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BuildPackageScreen } from "../../../../../../../components/build-package-screen";
+import { BuildPackageScreen } from "../../../../../../../features/resources/package-server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Package files | MTA NEXUS",

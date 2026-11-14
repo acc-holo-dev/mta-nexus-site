@@ -32,7 +32,7 @@ import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
 } from "../../src/features/resources/evidence";
-import { BuildPackageScreen } from "../../src/components/build-package-screen";
+import { BuildPackageScreen } from "../../src/features/resources/server/build-package-screen";
 import { buildPackageCopy } from "../../src/lib/build-package-i18n";
 
 const detail = {

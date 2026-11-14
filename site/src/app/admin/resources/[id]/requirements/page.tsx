@@ -1,4 +1,4 @@
-import { ResourceRequirementsScreen } from "../../../../../components/resource-requirements-screen";
+import { ResourceRequirementsScreen } from "../../../../../features/resources/requirements-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

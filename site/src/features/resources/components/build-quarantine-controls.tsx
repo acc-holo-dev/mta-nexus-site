@@ -4,11 +4,11 @@ import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { confirmsAdminAction } from "../lib/admin-action-confirmation";
-import { verificationCopy } from "../lib/verification-workspace-copy";
-import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 export function BuildQuarantineControls({
   buildId,

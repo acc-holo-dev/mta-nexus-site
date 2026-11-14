@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BuildPackageScreen } from "../../../../../../../components/build-package-screen";
+import { BuildPackageScreen } from "../../../../../../../features/resources/package-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

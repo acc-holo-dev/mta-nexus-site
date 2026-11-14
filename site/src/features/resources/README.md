@@ -21,6 +21,10 @@ Services и repositories не дублируются и не переносят�
 | `author-controls.ts`        | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
 | `lifecycle-controls.ts`     | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
 | `moderation-controls.ts`    | `ResourceModerationControls`; staff moderation UI                                                           |
+| `requirements-view.ts`      | `ResourceRequirementsReportBody`; общее представление отчёта                                                |
+| `quarantine-controls.ts`    | `BuildQuarantineControls`; client UI карантина                                                              |
+| `package-server.ts`         | `BuildPackageScreen`; server-only экран состава сборки                                                      |
+| `requirements-server.ts`    | `ResourceRequirementsScreen`; server-only экран требований                                                  |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
@@ -49,7 +53,7 @@ fixtures проверяют value/type edges; реальные графы public
 `server.ts` отвечает только за каталог; `detail-server.ts` — только за детальную
 страницу. Они не реэкспортируют друг друга: SSR hydration сессии, entitlement,
 reviews/Q&A и follow/mute не добавляется к графу каталога. `versions-server.ts` и
-`reviews-server.ts` также изолированы: ни один из шести server entrypoints не
+`reviews-server.ts` также изолированы: ни один из восьми server entrypoints не
 загружает composition остальных страниц. Boundary suite проверяет эту независимость,
 защиту `server-only` и запрет value/type server leaks в view.
 
@@ -141,3 +145,7 @@ draft, revision, подтверждения и серверные огранич
 Авторские формы, lifecycle и staff moderation controls принадлежат Resources.
 Подтверждения, revision, draft, проверки scan и права на сервере сохраняются;
 shared request helpers, services и repositories не дублируются.
+
+Экраны состава сборки и требований используют отдельные server-only ports;
+отчёт требований и quarantine controls имеют независимые view/client ports.
+Проверки доступа, scan и opt-in уведомлений остаются на прежних границах.

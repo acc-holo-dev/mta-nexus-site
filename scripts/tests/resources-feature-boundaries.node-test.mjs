@@ -113,6 +113,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
   for (const port of [
     "compatibility-controls",
     "variant-controls",
+    "quarantine-controls",
+    "requirements-view",
     "author-controls",
     "lifecycle-controls",
     "moderation-controls",
@@ -156,7 +158,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/app/detail-deep.ts",
     'export { detail } from "../features/resources/server/detail";',
   );
-  for (const scenario of ["versions", "reviews"]) {
+  for (const scenario of ["versions", "reviews", "package", "requirements"]) {
     write(
       `site/src/features/resources/${scenario}-server.ts`,
       `import "server-only"; export { value } from "./server/${scenario}"; export type Scope = string;`,
@@ -220,6 +222,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/review-controls.ts", "resources-view-isolation"],
     ["features/resources/compatibility-controls.ts", "resources-view-isolation"],
     ["features/resources/variant-controls.ts", "resources-view-isolation"],
+    ["features/resources/quarantine-controls.ts", "resources-view-isolation"],
+    ["features/resources/requirements-view.ts", "resources-view-isolation"],
     ["features/resources/author-controls.ts", "resources-view-isolation"],
     ["features/resources/lifecycle-controls.ts", "resources-view-isolation"],
     ["features/resources/moderation-controls.ts", "resources-view-isolation"],
@@ -235,6 +239,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/evidence.ts", "resources-view-isolation"],
     ["app/versions-deep.ts", "resources-feature-public-api"],
     ["app/reviews-deep.ts", "resources-feature-public-api"],
+    ["app/package-deep.ts", "resources-feature-public-api"],
+    ["app/requirements-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/package-leak.ts", "resources-view-isolation"],
+    ["features/resources/components/requirements-leak.ts", "resources-view-isolation"],
     ["features/resources/components/versions-leak.ts", "resources-view-isolation"],
     ["features/resources/components/reviews-leak.ts", "resources-view-isolation"],
     ["app/detail-deep.ts", "resources-feature-public-api"],
@@ -255,6 +263,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/review-controls.ts",
     "app/compatibility-controls.ts",
     "app/variant-controls.ts",
+    "app/quarantine-controls.ts",
+    "app/requirements-view.ts",
     "app/author-controls.ts",
     "app/lifecycle-controls.ts",
     "app/moderation-controls.ts",
@@ -270,6 +280,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/release-watch.ts",
     "app/download.ts",
     "app/evidence.ts",
+    "app/package.ts",
+    "app/requirements.ts",
     "app/versions.ts",
     "app/reviews.ts",
     "app/detail.ts",
@@ -287,6 +299,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
 
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/resources/quarantine-controls.ts",
+    "site/src/features/resources/requirements-view.ts",
     "site/src/features/resources/author-controls.ts",
     "site/src/features/resources/lifecycle-controls.ts",
     "site/src/features/resources/moderation-controls.ts",
@@ -321,7 +335,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -360,6 +374,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "author-controls",
     "lifecycle-controls",
     "moderation-controls",
+    "quarantine-controls",
   ]) {
     assert.match(
       readFileSync(resolve(root, `site/src/features/resources/${port}.ts`), "utf8"),
@@ -370,9 +385,19 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     readFileSync(resolve(root, "site/src/features/resources/copy-view.ts"), "utf8"),
     /^"use client";/u,
   );
+  assert.match(
+    readFileSync(resolve(root, "site/src/features/resources/quarantine-controls.ts"), "utf8"),
+    /^"use client";/u,
+  );
+  assert.doesNotMatch(
+    readFileSync(resolve(root, "site/src/features/resources/requirements-view.ts"), "utf8"),
+    /^"use client";/u,
+  );
   visit("site/src/features/resources/release-watch.ts");
   visit("site/src/features/resources/compatibility-controls.ts");
   visit("site/src/features/resources/variant-controls.ts");
+  visit("site/src/features/resources/quarantine-controls.ts");
+  visit("site/src/features/resources/requirements-view.ts");
   visit("site/src/features/resources/author-controls.ts");
   visit("site/src/features/resources/lifecycle-controls.ts");
   visit("site/src/features/resources/moderation-controls.ts");
@@ -422,6 +447,8 @@ test("Resources server entrypoints keep independent composition graphs", () => {
     ["reviews-server.ts", "reviews-page.tsx"],
     ["media-server.ts", "media-screen.tsx"],
     ["build-server.ts", "build-screen.tsx"],
+    ["package-server.ts", "build-package-screen.tsx"],
+    ["requirements-server.ts", "resource-requirements-screen.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/resources/${entry}`;

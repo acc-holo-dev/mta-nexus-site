@@ -8,9 +8,9 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "site/src/components/resource-requirements-screen.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
   "site/src/components/collection-releases-screen.tsx",
-  "site/src/components/build-package-screen.tsx",
+  "site/src/features/resources/server/build-package-screen.tsx",
   "site/src/components/library-release-history-screen.tsx",
 ] as const;
 

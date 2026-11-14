@@ -3,13 +3,13 @@ import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPackageCopy } from "../lib/build-package-i18n";
-import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-package-query";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { authService } from "../lib/services/auth-service";
-import { buildPackageService } from "../lib/services/build-package-service";
-import { PlatformSignIn } from "./platform-sign-in";
+import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { buildPackageQueryHref, parseBuildPackageQuery } from "../../../lib/build-package-query";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { buildPackageService } from "../../../lib/services/build-package-service";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
