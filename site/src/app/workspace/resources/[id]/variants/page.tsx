@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
-import { ResourceVariantsForm } from "../../../../../components/resource-variants-form";
+import { ResourceVariantsForm } from "../../../../../features/resources/variant-controls";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";

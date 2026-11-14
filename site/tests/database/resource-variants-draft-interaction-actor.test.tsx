@@ -19,7 +19,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 
-import { ResourceVariantsForm } from "../../src/components/resource-variants-form";
+import { ResourceVariantsForm } from "../../src/features/resources/components/resource-variants-form";
 import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
 
 const { render, edit, submit } = createResourceVariantsDraftInteractionHelpers(

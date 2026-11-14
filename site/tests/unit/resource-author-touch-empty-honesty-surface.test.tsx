@@ -9,7 +9,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
   "site/src/components/mta-meta-inspector-panel.tsx",
-  "site/src/components/resource-variants-form.tsx",
+  "site/src/features/resources/components/resource-variants-form.tsx",
   "site/src/components/new-resource-form.tsx",
 ] as const;
 
@@ -21,7 +21,7 @@ it("locks resource author touch/empty surfaces to size=touch and EmptyState hone
     expect(source, path).not.toContain("min-h-8");
   }
 
-  const variants = read("site/src/components/resource-variants-form.tsx");
+  const variants = read("site/src/features/resources/components/resource-variants-form.tsx");
   expect(variants).toContain("EmptyState");
   expect(variants).toContain("copy.noCandidatesHint");
   expect(variants).not.toContain('size="sm"');

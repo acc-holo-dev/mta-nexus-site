@@ -110,6 +110,13 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/app/review-controls.ts",
     'export { page } from "../features/resources/review-controls";',
   );
+  for (const port of ["compatibility-controls", "variant-controls"]) {
+    write(
+      `site/src/features/resources/${port}.ts`,
+      '"use client"; export { page } from "./server";',
+    );
+    write(`site/src/app/${port}.ts`, `export { page } from "../features/resources/${port}";`);
+  }
   write("site/src/features/resources/reviews-view.ts", 'export { page } from "./server";');
   write(
     "site/src/app/reviews-view.ts",
@@ -200,6 +207,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/components/media-server-leak.ts", "resources-view-isolation"],
     ["features/resources/detail-view.ts", "resources-view-isolation"],
     ["features/resources/review-controls.ts", "resources-view-isolation"],
+    ["features/resources/compatibility-controls.ts", "resources-view-isolation"],
+    ["features/resources/variant-controls.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/release-watch.ts", "resources-view-isolation"],
@@ -225,6 +234,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
   for (const name of [
     "app/detail-view.ts",
     "app/review-controls.ts",
+    "app/compatibility-controls.ts",
+    "app/variant-controls.ts",
     "app/reviews-view.ts",
     "app/build-route.ts",
     "app/media-route.ts",
@@ -250,6 +261,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
     "site/src/features/resources/release-watch.ts",
+    "site/src/features/resources/compatibility-controls.ts",
+    "site/src/features/resources/variant-controls.ts",
     "site/src/features/resources/components/build-moderation-controls.tsx",
     "site/src/features/resources/components/resource-build-controls.tsx",
     "site/src/features/resources/components/resource-media-editor.tsx",
@@ -299,6 +312,8 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     /"use client"/u,
   );
   visit("site/src/features/resources/release-watch.ts");
+  visit("site/src/features/resources/compatibility-controls.ts");
+  visit("site/src/features/resources/variant-controls.ts");
   visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");

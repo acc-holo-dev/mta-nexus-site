@@ -48,13 +48,13 @@ vi.mock("../../src/lib/services/resource-management-service", () => ({
     variantCandidates: state.candidates,
   },
 }));
-vi.mock("../../src/components/resource-variants-form", () => ({
+vi.mock("../../src/features/resources/variant-controls", () => ({
   ResourceVariantsForm: (props: unknown) => {
     state.variantForm(props);
     return null;
   },
 }));
-vi.mock("../../src/components/resource-compatibility-form", () => ({
+vi.mock("../../src/features/resources/compatibility-controls", () => ({
   ResourceCompatibilityForm: (props: unknown) => {
     state.compatibilityForm(props);
     return null;

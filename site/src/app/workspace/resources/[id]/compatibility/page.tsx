@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ProductDependencyList } from "../../../../../features/resources/detail-view";
-import { ResourceCompatibilityForm } from "../../../../../components/resource-compatibility-form";
+import { ResourceCompatibilityForm } from "../../../../../features/resources/compatibility-controls";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";

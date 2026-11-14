@@ -4,15 +4,15 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmedCompatibility } from "../lib/resource-management-confirmation";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmedCompatibility } from "../../../lib/resource-management-confirmation";
 import {
   getResourceManagementCopy,
   resourceManagementError,
-} from "../lib/resource-management-i18n";
-import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
-import { parseEditableProfile } from "../lib/user-platform-client";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/resource-management-i18n";
+import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { parseEditableProfile } from "../../../lib/user-platform-client";
+import { useNexusLocale } from "../../../components/locale-context";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 font-mono text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

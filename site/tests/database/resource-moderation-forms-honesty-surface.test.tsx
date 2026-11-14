@@ -29,8 +29,8 @@ const exclusive = [
   "site/src/components/new-resource-form.tsx",
   "site/src/components/author-resource-forms.tsx",
   "site/src/features/resources/components/resource-media-editor.tsx",
-  "site/src/components/resource-compatibility-form.tsx",
-  "site/src/components/resource-variants-form.tsx",
+  "site/src/features/resources/components/resource-compatibility-form.tsx",
+  "site/src/features/resources/components/resource-variants-form.tsx",
   "site/src/components/resource-copy-form.tsx",
   "site/src/components/resource-lifecycle-controls.tsx",
   "site/src/components/resource-moderation-controls.tsx",
@@ -61,7 +61,7 @@ it("locks resource media editor reorder/remove CTAs to size=touch", () => {
 });
 
 it("locks resource variants reorder/remove to size=touch and noCandidates to EmptyState", () => {
-  const source = read("site/src/components/resource-variants-form.tsx");
+  const source = read("site/src/features/resources/components/resource-variants-form.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("copy.noCandidates");
   expect(source).toContain("copy.noCandidatesHint");
