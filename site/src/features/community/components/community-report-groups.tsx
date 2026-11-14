@@ -2,14 +2,17 @@ import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
-import { REPORT_TYPES } from "../lib/community-report-contract";
-import { communityReportCopy } from "../lib/community-report-copy";
-import { type ReportGroupsPage, reportGroupsHref } from "../lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../lib/community-report-groups-copy";
-import type { Locale } from "../lib/i18n";
-import { privateChangeHistoryCopy } from "../lib/private-change-history-copy";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { PrivateChangeHistoryCutoff } from "./private-change-history-controls";
+import { REPORT_TYPES } from "../../../lib/community-report-contract";
+import { communityReportCopy } from "../../../lib/community-report-copy";
+import {
+  type ReportGroupsPage,
+  reportGroupsHref,
+} from "../../../lib/community-report-groups-contract";
+import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import type { Locale } from "../../../lib/i18n";
+import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { PrivateChangeHistoryCutoff } from "../../../components/private-change-history-controls";
 export function CommunityReportGroups({
   page,
   filters,

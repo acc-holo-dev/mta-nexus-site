@@ -30,11 +30,11 @@ vi.mock("../../src/lib/services/community-report-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { CommunityReportGroups } from "../../src/components/community-report-groups";
+import { CommunityReportGroups } from "../../src/features/community/components/community-report-groups";
 import {
   CommunityReportGroupsPage,
   reportGroupsMetadata,
-} from "../../src/components/community-report-groups-page";
+} from "../../src/features/community/server/community-report-groups-page";
 import {
   PublicationReportsPage,
   publicationReportsMetadata,

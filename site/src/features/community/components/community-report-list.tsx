@@ -8,10 +8,10 @@ import {
   type CommunityReportQuery,
   communityReportPageSchema,
   REPORT_TYPES,
-} from "../lib/community-report-contract";
-import { communityReportCopy, communityReportError } from "../lib/community-report-copy";
-import type { Locale } from "../lib/i18n";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+} from "../../../lib/community-report-contract";
+import { communityReportCopy, communityReportError } from "../../../lib/community-report-copy";
+import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -25,10 +25,10 @@ vi.mock("../../src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
 }));
 
-import { CommunityReportDetailView } from "../../src/components/community-report-detail";
+import { CommunityReportDetailView } from "../../src/features/community/components/community-report-detail";
 import { CommunityReportForm } from "../../src/features/community/components/community-report-form";
-import { CommunityReportList } from "../../src/components/community-report-list";
-import { CommunityReportScreen } from "../../src/components/community-report-screen";
+import { CommunityReportList } from "../../src/features/community/components/community-report-list";
+import { CommunityReportScreen } from "../../src/features/community/server/community-report-screen";
 import type { CommunityReportDetail } from "../../src/lib/community-report-contract";
 import { communityReportCopy } from "../../src/lib/community-report-copy";
 

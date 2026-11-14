@@ -7,14 +7,14 @@ import {
 import { Button, EmptyState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import Link from "next/link";
-import { communityReportCopy } from "../lib/community-report-copy";
-import type { ReportHistoryPage } from "../lib/community-report-history-contract";
-import { reportHistoryCopy } from "../lib/community-report-history-copy";
-import type { Locale } from "../lib/i18n";
-import { privateChangeHistoryCopy } from "../lib/private-change-history-copy";
-import { changeHistoryHref } from "../lib/private-change-history-query";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { PrivateChangeHistoryCutoff } from "./private-change-history-controls";
+import { communityReportCopy } from "../../../lib/community-report-copy";
+import type { ReportHistoryPage } from "../../../lib/community-report-history-contract";
+import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
+import type { Locale } from "../../../lib/i18n";
+import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
+import { changeHistoryHref } from "../../../lib/private-change-history-query";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { PrivateChangeHistoryCutoff } from "../../../components/private-change-history-controls";
 export function CommunityReportHistory({
   page,
   filters,

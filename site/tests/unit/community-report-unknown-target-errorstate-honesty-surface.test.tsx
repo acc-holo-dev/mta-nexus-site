@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/community-report-groups.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/community/components/community-report-groups.tsx"),
+  "utf8",
+);
 
 /** Honesty lock for community report unknown target notice. */
 it("locks community report unknown target to ErrorState", () => {

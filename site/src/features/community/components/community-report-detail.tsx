@@ -8,18 +8,18 @@ import {
   type communityReportDecisionSchema,
   communityReportDetailSchema,
   confirmsReportDecision,
-} from "../lib/community-report-contract";
+} from "../../../lib/community-report-contract";
 import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
-} from "../lib/community-report-copy";
-import { reportGroupsCopy } from "../lib/community-report-groups-copy";
-import { reportHistoryCopy } from "../lib/community-report-history-copy";
-import { discussionReportsCopy } from "../lib/discussion-reports-copy";
-import type { Locale } from "../lib/i18n";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
-import { ReportEvidenceLinks } from "./report-evidence-links";
+} from "../../../lib/community-report-copy";
+import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
+import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
+import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { ReportEvidenceLinks } from "../../../components/report-evidence-links";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({

@@ -1,7 +1,7 @@
 import {
   CommunityReportHistoryPage,
   reportHistoryMetadata,
-} from "../../../../../components/community-report-history-page";
+} from "../../../../../features/community/report-history-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

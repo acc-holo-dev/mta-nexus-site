@@ -8,16 +8,16 @@ import {
   communityReportDetailSchema,
   communityReportPageQuery,
   communityReportPageSchema,
-} from "../lib/community-report-contract";
-import { communityReportCopy } from "../lib/community-report-copy";
-import { reportGroupsCopy } from "../lib/community-report-groups-copy";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { authService } from "../lib/services/auth-service";
-import { communityReportService } from "../lib/services/community-report-service";
-import { CommunityReportDetailView } from "./community-report-detail";
-import { CommunityReportList } from "./community-report-list";
-import { PlatformSignIn } from "./platform-sign-in";
+} from "../../../lib/community-report-contract";
+import { communityReportCopy } from "../../../lib/community-report-copy";
+import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { communityReportService } from "../../../lib/services/community-report-service";
+import { CommunityReportDetailView } from "../components/community-report-detail";
+import { CommunityReportList } from "../components/community-report-list";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 export async function CommunityReportScreen({
   staff = false,
   id,

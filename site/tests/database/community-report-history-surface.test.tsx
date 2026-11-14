@@ -21,11 +21,11 @@ vi.mock("../../src/lib/services/community-report-history-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { CommunityReportHistory } from "../../src/components/community-report-history";
+import { CommunityReportHistory } from "../../src/features/community/components/community-report-history";
 import {
   CommunityReportHistoryPage,
   reportHistoryMetadata,
-} from "../../src/components/community-report-history-page";
+} from "../../src/features/community/server/community-report-history-page";
 import type { ReportHistoryPage } from "../../src/lib/community-report-history-contract";
 import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
 

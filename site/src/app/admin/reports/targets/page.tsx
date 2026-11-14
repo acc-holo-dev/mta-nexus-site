@@ -1,7 +1,7 @@
 import {
   CommunityReportGroupsPage,
   reportGroupsMetadata,
-} from "../../../../components/community-report-groups-page";
+} from "../../../../features/community/report-groups-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

@@ -48,8 +48,12 @@ it("keeps residual report and version-history routes as thin clipped shells arou
   expect(read("site/src/app/workspace/library/version-history/page.tsx")).toContain(
     "LibraryReleaseHistoryScreen",
   );
-  expect(read("site/src/components/community-report-screen.tsx")).toContain("ErrorState");
-  expect(read("site/src/components/community-report-history-page.tsx")).toContain("ErrorState");
+  expect(read("site/src/features/community/server/community-report-screen.tsx")).toContain(
+    "ErrorState",
+  );
+  expect(read("site/src/features/community/server/community-report-history-page.tsx")).toContain(
+    "ErrorState",
+  );
   expect(read("site/src/components/library-release-history-screen.tsx")).toContain("ErrorState");
 });
 

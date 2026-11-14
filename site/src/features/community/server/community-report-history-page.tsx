@@ -2,14 +2,14 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { reportId, reportRateLimit } from "../lib/community-report-api";
-import { parseReportHistoryQuery } from "../lib/community-report-history-contract";
-import { reportHistoryCopy, reportHistoryError } from "../lib/community-report-history-copy";
-import { getRequestLocale } from "../lib/i18n-server";
-import { authService } from "../lib/services/auth-service";
-import { communityReportHistoryService } from "../lib/services/community-report-history-service";
-import { CommunityReportHistory } from "./community-report-history";
-import { PlatformSignIn } from "./platform-sign-in";
+import { reportId, reportRateLimit } from "../../../lib/community-report-api";
+import { parseReportHistoryQuery } from "../../../lib/community-report-history-contract";
+import { reportHistoryCopy, reportHistoryError } from "../../../lib/community-report-history-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
+import { CommunityReportHistory } from "../components/community-report-history";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,

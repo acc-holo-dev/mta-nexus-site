@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CommunityReportScreen } from "../../../components/community-report-screen";
+import { CommunityReportScreen } from "../../../features/community/reports-server";
 import { communityReportCopy } from "../../../lib/community-report-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 

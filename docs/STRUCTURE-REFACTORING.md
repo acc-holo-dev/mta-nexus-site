@@ -30,7 +30,8 @@ Phase 4.22 проверена: Servers statistics, observations и history.
 Phase 4.23 проверена: Servers registration, claim и management UI.
 Phase 4.24 проверена: Servers content, activity и navigation UI.
 Phase 4.25 проверена: Servers interactions и Resources meta inspector.
-Выполняется Phase 4.26: Community discussion, reports и topics. Владелец явно
+Phase 4.26 проверена: Community discussion, reports и topics.
+Выполняется Phase 4.27: Community report screens и history. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -555,3 +556,7 @@ Content, activity и navigation UI прошли полный [CI #4663](https://
 ### Phase 4.26: Community discussion, reports и topics
 
 Servers interactions и Resources meta inspector прошли полный [CI #4664](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43580499675) на `63ac937f`. Обсуждение публикации, обратная связь при отправке, действия с комментариями, форма жалобы и создание темы объединены в Community через отдельные client ports. Тела компонентов сохранены после адаптации imports; actor/draft/intent, подтверждения, revision, восстановление неопределённого результата и серверные проверки прав остаются прежними. Negative fixtures и транзитивные client graphs защищают границы; изменения Community требуют полного CI.
+
+### Phase 4.27: Community report screens и history
+
+Community discussion, reports и topics прошли полный [CI #4665](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43582652970) на `b2cbf895`. Экран жалоб и его список/детали, история и группировка жалоб с представлениями объединены в Community. Независимые server-only ports отделены от внутренних client/RSC компонентов; тела сохранены после адаптации imports. Session/role, private evidence, filters, pagination и server authority не меняются. Negative fixtures, client graphs и независимость серверных графов проверяются.
