@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const source = readFileSync(
-  join(root, "site/src/components/organization-profile-form.tsx"),
+  join(root, "site/src/features/organizations/components/organization-profile-form.tsx"),
   "utf8",
 );
 

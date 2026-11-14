@@ -22,7 +22,7 @@ vi.mock("../../src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationProfileForm } from "../../src/components/organization-profile-form";
+import { OrganizationProfileForm } from "../../src/features/organizations/profile";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 const { render, edit } = createOrganizationProfileDraftInteractionHelpers(

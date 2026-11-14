@@ -9,21 +9,21 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { organizationContentCopy } from "../lib/organization-content-copy";
-import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
-import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
-import { organizationTeamCopy } from "../lib/organization-team-copy";
-import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
+import type { Locale } from "../../../lib/i18n";
+import { organizationContentCopy } from "../../../lib/organization-content-copy";
+import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
+import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
+import { organizationTeamCopy } from "../../../lib/organization-team-copy";
+import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
 import {
   editableOrganizationSchema,
   memberAddSchema,
   type OrganizationWorkspace,
   organizationWorkspaceSchema,
-} from "../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { confirmAction } from "../../../components/confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";

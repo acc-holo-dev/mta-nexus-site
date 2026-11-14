@@ -1,4 +1,4 @@
-import { OrganizationContentEditorPage } from "../../../../../../components/organization-content-editor-page";
+import { OrganizationContentEditorPage } from "../../../../../../features/organizations/content-editor-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 

@@ -1,4 +1,4 @@
-import { OrganizationPublicationHistoryScreen } from "../../../../../../../components/organization-publication-history-screen";
+import { OrganizationPublicationHistoryScreen } from "../../../../../../../features/organizations/publication-history-server";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 import { organizationPublicationHistoryCopy } from "../../../../../../../lib/organization-publication-history-copy";
 

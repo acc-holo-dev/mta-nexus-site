@@ -1,5 +1,5 @@
-import { organizationContentService } from "../lib/services/organization-content-service";
-import { ContextPublicationHistoryScreen } from "../features/community/context-history-server";
+import { organizationContentService } from "../../../lib/services/organization-content-service";
+import { ContextPublicationHistoryScreen } from "../../community/context-history-server";
 export function OrganizationPublicationHistoryScreen(props: {
   id: string;
   contentId: string;

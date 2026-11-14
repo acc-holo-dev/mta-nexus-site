@@ -6,19 +6,22 @@ import {
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
   type OrganizationBatchPreview,
-} from "../lib/organization-batch-contract";
-import { organizationBatchCopy } from "../lib/organization-batch-copy";
-import type { OrganizationTeamPage } from "../lib/organization-team-contract";
-import { organizationRequest } from "../lib/organization-workspace-client";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/organization-batch-contract";
+import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
+import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
+import { organizationRequest } from "../../../lib/organization-workspace-client";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
 export function OrganizationTeamBatch({
   data,
   actorId,

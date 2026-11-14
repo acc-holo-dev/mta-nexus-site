@@ -20,7 +20,7 @@ vi.mock("../../src/lib/organization-workspace-client", () => ({
   organizationRequest: h.request,
 }));
 
-import { OrganizationProfileForm } from "../../src/components/organization-profile-form";
+import { OrganizationProfileForm } from "../../src/features/organizations/profile";
 
 const { render, mount } = createOrganizationCreateRecoveryInteractionHelpers(
   h,

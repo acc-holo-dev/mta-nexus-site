@@ -25,9 +25,9 @@ vi.mock("../../src/lib/services/organization-governance-service", () => ({
 import HistoryPage, {
   generateMetadata,
 } from "../../src/app/workspace/organizations/[id]/activity/page";
-import { OrganizationHistoryView } from "../../src/components/organization-history";
-import { OrganizationOwnershipTransfer } from "../../src/components/organization-ownership-transfer";
-import { OrganizationWorkspacePanel } from "../../src/components/organization-workspace";
+import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
+import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 import {
   confirmOwnershipTransfer,
   type OrganizationHistory,

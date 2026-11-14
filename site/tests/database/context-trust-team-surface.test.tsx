@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { OrganizationTeamDirectory } from "../../src/components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
 import { organizationTeamCopy } from "../../src/lib/organization-team-copy";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { OrganizationWorkspacePanel } from "../../src/components/organization-workspace";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
@@ -21,7 +21,10 @@ vi.mock("next/navigation", () => ({
 /** Honesty lock: organization workspace soft muted readonly → ErrorState alert. */
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/organization-workspace.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/organizations/components/organization-workspace.tsx"),
+  "utf8",
+);
 
 const workspace: OrganizationWorkspace = {
   organization: {

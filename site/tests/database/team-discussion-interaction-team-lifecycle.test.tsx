@@ -24,7 +24,7 @@ vi.mock("../../src/components/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 
-import { OrganizationTeamBatch } from "../../src/components/organization-team-batch";
+import { OrganizationTeamBatch } from "../../src/features/organizations/components/organization-team-batch";
 
 const { render, button, prepareTeam } = createTeamBatchInteractionHelpers(
   harness,

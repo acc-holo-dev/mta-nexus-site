@@ -30,6 +30,38 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "organizations-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/organizations/)" },
+      to: {
+        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|content-editor-server|publication-history-server)\\.ts$)",
+      },
+    },
+    {
+      name: "organizations-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/organizations/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "organizations-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!organizations/)|features/organizations/(?:server/|(?:content-editor|publication-history)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "organizations-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "community-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/community/)" },

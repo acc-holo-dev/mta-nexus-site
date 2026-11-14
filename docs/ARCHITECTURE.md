@@ -52,6 +52,10 @@ infrastructure packages. Model не зависит от UI и Node builtins. Э�
 проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
 HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
 
+### Organizations feature
+
+`site/src/features/organizations` объединяет workspace, команду, профиль, историю и серверные экраны публикаций организаций. Явные клиентские и server-only входы защищены проверками границ и транзитивных зависимостей; авторизация и сервисы сохраняют существующую ответственность. [Контракт feature](../site/src/features/organizations/README.md). Изменения требуют полного CI.
+
 ### Community feature
 
 `site/src/features/community` объединяет UI публикаций, каталога, реакций, ленты, авторских действий, обсуждения, жалоб и создания тем; общий серверный экран истории публикаций.

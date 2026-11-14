@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../../../../../features/organizations/team";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {

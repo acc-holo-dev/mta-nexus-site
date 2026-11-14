@@ -22,7 +22,7 @@ vi.mock("../../src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationTeamDirectory } from "../../src/components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
 
 const { render, memberEditor } = createOrganizationTeamDirectoryConfirmInteractionHelpers(
   harness,

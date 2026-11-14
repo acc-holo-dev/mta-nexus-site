@@ -2,20 +2,20 @@
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   confirmOwnershipTransfer,
   type ownershipTransferResultSchema,
   ownershipTransferSchema,
-} from "../lib/organization-governance-contract";
+} from "../../../lib/organization-governance-contract";
 import {
   organizationGovernanceCopy,
   organizationGovernanceMutationError,
-} from "../lib/organization-governance-copy";
-import type { OrganizationWorkspace } from "../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/organization-governance-copy";
+import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { confirmAction } from "../../../components/confirm-action";
 export function OrganizationOwnershipTransfer({
   data,
   target,

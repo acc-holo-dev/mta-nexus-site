@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -27,7 +29,7 @@ vi.mock("../../src/lib/services/organization-content-service", () => ({
 }));
 
 import Page, { generateMetadata } from "../../src/app/workspace/organizations/[id]/content/page";
-import { OrganizationContentEditorPage } from "../../src/components/organization-content-editor-page";
+import { OrganizationContentEditorPage } from "../../src/features/organizations/content-editor-server";
 
 const organization = { id: "org", name: "Team", slug: "team" };
 const content = {

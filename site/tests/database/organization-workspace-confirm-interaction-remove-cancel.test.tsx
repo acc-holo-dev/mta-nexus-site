@@ -27,7 +27,7 @@ vi.mock("../../src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationWorkspacePanel } from "../../src/components/organization-workspace";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 
 const { render, memberEditor } = createOrganizationWorkspaceConfirmInteractionHelpers(
   harness,

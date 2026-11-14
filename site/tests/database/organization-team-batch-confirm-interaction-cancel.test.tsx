@@ -19,7 +19,7 @@ const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { OrganizationTeamBatch } from "../../src/components/organization-team-batch";
+import { OrganizationTeamBatch } from "../../src/features/organizations/components/organization-team-batch";
 import { organizationBatchCopy } from "../../src/lib/organization-batch-copy";
 
 const { click, prepareRemoveReview } = createOrganizationTeamBatchConfirmInteractionHelpers(

@@ -7,19 +7,19 @@ import {
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { organizationBatchCopy } from "../lib/organization-batch-copy";
-import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
+import type { Locale } from "../../../lib/i18n";
+import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
+import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
 import {
   type OrganizationTeamPage,
   type OrganizationTeamQuery,
   organizationTeamHref,
   organizationTeamPageSchema,
-} from "../lib/organization-team-contract";
-import { organizationTeamCopy } from "../lib/organization-team-copy";
-import { organizationRequest } from "../lib/organization-workspace-client";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/organization-team-contract";
+import { organizationTeamCopy } from "../../../lib/organization-team-copy";
+import { organizationRequest } from "../../../lib/organization-workspace-client";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
+import { confirmAction } from "../../../components/confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
 

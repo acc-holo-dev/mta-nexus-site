@@ -2,16 +2,16 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../lib/i18n-server";
-import { organizationContentId } from "../lib/organization-content-api";
-import { organizationContentCopy } from "../lib/organization-content-copy";
-import { organizationPublicationHistoryCopy } from "../lib/organization-publication-history-copy";
-import { authService } from "../lib/services/auth-service";
-import { organizationContentService } from "../lib/services/organization-content-service";
-import { parseEditableContent } from "../lib/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { AuthorContentForm } from "../features/community/author-content-form";
-import { PlatformSignIn } from "./platform-sign-in";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { organizationContentId } from "../../../lib/organization-content-api";
+import { organizationContentCopy } from "../../../lib/organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../../../lib/organization-publication-history-copy";
+import { authService } from "../../../lib/services/auth-service";
+import { organizationContentService } from "../../../lib/services/organization-content-service";
+import { parseEditableContent } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import { AuthorContentForm } from "../../community/author-content-form";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

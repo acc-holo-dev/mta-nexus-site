@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { OrganizationWorkspacePanel } from "../../../../components/organization-workspace";
+import { OrganizationWorkspacePanel } from "../../../../features/organizations/workspace";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import {

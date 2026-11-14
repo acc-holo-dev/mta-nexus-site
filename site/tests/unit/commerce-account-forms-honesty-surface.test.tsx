@@ -20,7 +20,7 @@ const formComponents = [
   "site/src/features/resources/components/resource-download-button.tsx",
   "site/src/components/license-control-panel.tsx",
   "site/src/components/license-runtime-probe.tsx",
-  "site/src/components/organization-ownership-transfer.tsx",
+  "site/src/features/organizations/components/organization-ownership-transfer.tsx",
   "site/src/features/servers/components/register-server-form.tsx",
   "site/src/components/storage-maintenance-controls.tsx",
 ] as const;

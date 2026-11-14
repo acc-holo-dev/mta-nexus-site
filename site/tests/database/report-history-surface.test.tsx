@@ -44,7 +44,7 @@ vi.mock("../../src/features/community/author-publication-restore", () => ({
 }));
 
 import { DiscussionReportsScreen as Reports } from "../../src/features/community/server/discussion-reports-screen";
-import { OrganizationPublicationHistoryScreen as History } from "../../src/components/organization-publication-history-screen";
+import { OrganizationPublicationHistoryScreen as History } from "../../src/features/organizations/publication-history-server";
 import { discussionReportsCopy } from "../../src/lib/discussion-reports-copy";
 import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
 

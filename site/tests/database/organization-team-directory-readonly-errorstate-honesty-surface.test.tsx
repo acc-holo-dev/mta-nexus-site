@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { OrganizationTeamDirectory } from "../../src/components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
 import type { OrganizationTeamPage } from "../../src/lib/organization-team-contract";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
@@ -18,7 +18,7 @@ vi.mock("next/link", () => ({
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const source = readFileSync(
-  join(root, "site/src/components/organization-team-directory.tsx"),
+  join(root, "site/src/features/organizations/components/organization-team-directory.tsx"),
   "utf8",
 );
 

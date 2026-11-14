@@ -27,7 +27,7 @@ vi.mock("../../src/lib/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
-import { OrganizationTeamDirectory } from "../../src/components/organization-team-directory";
+import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
 import { organizationBatchCopy } from "../../src/lib/organization-batch-copy";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
