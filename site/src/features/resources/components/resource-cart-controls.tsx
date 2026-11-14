@@ -4,20 +4,23 @@ import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { getDictionary } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { resourceCartReceiptsCopy } from "../lib/resource-cart-receipts-i18n";
-import { resourceCartReceiptUrl } from "../lib/resource-cart-receipts-query";
-import { confirmedResourceCartReview } from "../lib/resource-cart-review-confirmation";
+import { getDictionary } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptUrl } from "../../../lib/resource-cart-receipts-query";
+import { confirmedResourceCartReview } from "../../../lib/resource-cart-review-confirmation";
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,
-} from "../lib/resource-commerce-confirmation";
-import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/resource-commerce-confirmation";
+import {
+  getResourceCommerceCopy,
+  resourceCommerceError,
+} from "../../../lib/resource-commerce-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { useNexusLocale } from "../../../components/locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =

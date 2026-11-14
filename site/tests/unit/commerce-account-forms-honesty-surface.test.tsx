@@ -16,7 +16,7 @@ const formComponents = [
   "site/src/components/plan-review-form.tsx",
   "site/src/components/order-case-forms.tsx",
   "site/src/components/order-cancellation-form.tsx",
-  "site/src/components/resource-cart-controls.tsx",
+  "site/src/features/resources/components/resource-cart-controls.tsx",
   "site/src/features/resources/components/resource-download-button.tsx",
   "site/src/components/license-control-panel.tsx",
   "site/src/components/license-runtime-probe.tsx",

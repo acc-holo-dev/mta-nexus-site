@@ -14,7 +14,7 @@ import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { FollowButton } from "../../../components/follow-button";
 import { ObjectReportForm } from "../../../components/object-report-form";
 import { ProductDependencyList } from "../components/product-dependency-list";
-import { AddResourceToCart } from "../../../components/resource-cart-controls";
+import { AddResourceToCart } from "../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../components/resource-download-button";
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourcePreview } from "../components/resource-preview";

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ResourceCartControls } from "../../../components/resource-cart-controls";
+import { ResourceCartControls } from "../../../features/resources/cart-controls";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";

@@ -28,6 +28,9 @@ Services и repositories не дублируются и не переносят�
 | `review-report-server.ts`   | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
 | `qa-report-actions.ts`      | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
 | `release-watch-batch.ts`    | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
+| `cart-controls.ts`          | `AddResourceToCart`, `ResourceCartControls`; client UI корзины                                              |
+| `cart-view.ts`              | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
+| `delivery-server.ts`        | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
@@ -56,7 +59,7 @@ fixtures проверяют value/type edges; реальные графы public
 `server.ts` отвечает только за каталог; `detail-server.ts` — только за детальную
 страницу. Они не реэкспортируют друг друга: SSR hydration сессии, entitlement,
 reviews/Q&A и follow/mute не добавляется к графу каталога. `versions-server.ts` и
-`reviews-server.ts` также изолированы: ни один из девяти server entrypoints не
+`reviews-server.ts` также изолированы: ни один из десяти server entrypoints не
 загружает composition остальных страниц. Boundary suite проверяет эту независимость,
 защиту `server-only` и запрет value/type server leaks в view.
 
@@ -155,3 +158,7 @@ shared request helpers, services и repositories не дублируются.
 
 Экран жалоб на отзывы, staff-действия Q&A и пакетное управление подписками
 принадлежат Resources. Confirmation, revision, quota и server authority сохраняются.
+
+Controls корзины и review evidence принадлежат Resources; квитанция выдачи
+доступна через server-only port. Прежние commerce flags, guest intent,
+подтверждения и авторитетные проверки выдачи сохраняются.

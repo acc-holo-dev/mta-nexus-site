@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../../src/components/locale-context";
-import { ResourceCartControls } from "../../src/components/resource-cart-controls";
+import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,

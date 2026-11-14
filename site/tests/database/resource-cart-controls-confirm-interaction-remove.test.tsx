@@ -25,7 +25,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ResourceCartControls } from "../../src/components/resource-cart-controls";
+import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
 import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
 
 const { render, removeButton } = createResourceCartControlsConfirmInteractionHelpers(

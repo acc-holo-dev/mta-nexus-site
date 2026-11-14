@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import { ResourceDeliveryEvidence } from "../../../../components/resource-delivery-evidence";
+import { ResourceDeliveryEvidence } from "../../../../features/resources/delivery-server";
 import { ResourceDownloadButton } from "../../../../features/resources/download";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";

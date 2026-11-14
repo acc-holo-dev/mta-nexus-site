@@ -30,7 +30,7 @@ vi.mock("../../src/features/resources/download", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/resource-cart-controls", () => ({
+vi.mock("../../src/features/resources/components/resource-cart-controls", () => ({
   AddResourceToCart: ({ productId }: { productId: string }) => (
     <button type="button" data-cart={productId}>
       Add to cart

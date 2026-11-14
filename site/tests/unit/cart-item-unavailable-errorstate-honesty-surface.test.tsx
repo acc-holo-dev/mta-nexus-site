@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/resource-cart-controls.tsx";
+const surface = "site/src/features/resources/components/resource-cart-controls.tsx";
 
 it("locks cart item unavailable title to ErrorState", () => {
   const source = read(surface);

@@ -22,7 +22,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ResourceCartControls } from "../../src/components/resource-cart-controls";
+import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
 
 const { render, removeButton } = createResourceCartControlsConfirmInteractionHelpers(
   harness,
