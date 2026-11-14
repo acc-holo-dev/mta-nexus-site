@@ -15,7 +15,7 @@ Services и repositories не дублируются и не переносят�
 | `reviews-view.ts`    | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`   | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
 | `download.ts`        | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
-| `client.ts`          | `ResourcePreview`, `ResourceGallery`, `ResourceQaPanel`; client components                                  |
+| `client.ts`          | `ResourceGallery`, `ResourceQaPanel`; client components                                                     |
 | `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
 | `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                                |
 | `server.ts`          | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
@@ -26,7 +26,7 @@ Services и repositories не дублируются и не переносят�
 | `model.ts`           | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
-совместимость. `client` экспортирует preview/gallery с прежними client directives;
+совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
 lightbox остаётся приватным. Общие locale, безопасные preview URLs и public attribution
 остаются в lib, общий native-dialog hook — в components. Внутри feature используются
 прямые implementation imports; workspace/media/build/library используют public ports.

@@ -36,7 +36,7 @@ Resources catalog живёт в [`site/src/features/resources`](../site/src/feat
 `detail-server` — изолированная `/market/[slug]` composition; metadata остаётся в routing.
 `versions-server` и `reviews-server` — отдельные публичные подстраницы; safe-build/review
 правила и SQL остаются в существующих service/repository.
-`client` — preview/gallery; `evidence` — build provenance/package UI. Общий modal
+`client` — gallery/Q&A; preview используется внутри feature; `evidence` — build provenance/package UI. Общий modal
 hook остаётся в components; pure gallery/provenance helpers — в feature model.
 Services, SQL visibility и download authority сохраняют прежние места.
 
