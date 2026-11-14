@@ -10,7 +10,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const exclusive = [
   "site/src/components/mta-meta-inspector-panel.tsx",
   "site/src/features/resources/components/resource-variants-form.tsx",
-  "site/src/components/new-resource-form.tsx",
+  "site/src/features/resources/components/new-resource-form.tsx",
 ] as const;
 
 it("locks resource author touch/empty surfaces to size=touch and EmptyState honesty", () => {
@@ -32,7 +32,7 @@ it("locks resource author touch/empty surfaces to size=touch and EmptyState hone
     /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
   );
 
-  const create = read("site/src/components/new-resource-form.tsx");
+  const create = read("site/src/features/resources/components/new-resource-form.tsx");
   expect(create).toMatch(
     /onClick=\{startNewSubmission\}[\s\S]{0,80}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{startNewSubmission\}/u,
   );

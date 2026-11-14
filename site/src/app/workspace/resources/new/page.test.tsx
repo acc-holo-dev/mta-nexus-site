@@ -15,7 +15,7 @@ vi.mock("../../../../lib/services/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../../../../components/new-resource-form", () => ({
+vi.mock("../../../../features/resources/create-controls", () => ({
   NewResourceForm: (props: unknown) => {
     mocks.forms(props);
     return null;

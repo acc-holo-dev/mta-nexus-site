@@ -124,10 +124,10 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { NewResourceForm } from "../../src/components/new-resource-form";
+import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 import { PublicProfileForm } from "../../src/components/public-profile-form";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
-import { ResourceCopyForm } from "../../src/components/resource-copy-form";
+import { ResourceCopyForm } from "../../src/features/resources/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../../src/components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
 import { ResourcePublisherFilters } from "../../src/features/resources/components/resource-publisher-filters";

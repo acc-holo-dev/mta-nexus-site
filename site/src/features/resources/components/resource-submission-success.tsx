@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { platformSignInFocusClass } from "./guest-auth-links";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 
 export function ResourceSubmissionSuccess({
   resultId,

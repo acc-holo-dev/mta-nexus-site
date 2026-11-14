@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/new-resource-form.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/new-resource-form.tsx"),
+  "utf8",
+);
 
 it("locks new-resource unknown intent notice to ErrorState and keeps hard error plus success status", () => {
   expect(source).toContain(

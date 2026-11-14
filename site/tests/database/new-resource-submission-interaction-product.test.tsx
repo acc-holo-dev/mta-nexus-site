@@ -19,7 +19,7 @@ vi.mock("../../src/components/locale-context", async () => {
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { NewResourceForm } from "../../src/components/new-resource-form";
+import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 
 const { render, mount, submit } = createNewResourceSubmissionInteractionHelpers(h, NewResourceForm);
 

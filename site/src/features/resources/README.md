@@ -15,6 +15,9 @@ Services и repositories не дублируются и не переносят�
 | `variant-controls.ts`       | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
 | `publisher-view.ts`         | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
 | `publisher-navigation.ts`   | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
+| `create-controls.ts`        | `NewResourceForm`; клиентская форма создания                                                                |
+| `copy-controls.ts`          | `ResourceCopyForm`; клиентская форма копирования                                                            |
+| `copy-view.ts`              | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
@@ -127,3 +130,7 @@ draft, revision, подтверждения и серверные огранич
 Фильтры, готовность публикации и навигация авторского workspace принадлежат Resources.
 Представления используют RSC-compatible port, навигация — отдельный client port;
 фильтрация и авторитетная проверка готовности сохраняются на сервере.
+
+Создание и копирование ресурса принадлежат Resources; клиентские формы и
+представление метаданных экспортируются раздельно. Draft/intent, подтверждения,
+валидация файла и серверная проверка прав сохраняются.

@@ -3,29 +3,29 @@
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedAuthorBuild } from "../lib/author-resource-response";
+import { confirmedAuthorBuild } from "../../../lib/author-resource-response";
 import {
   MAX_BUILD_FILE_SIZE_BYTES,
   validateBuildFileSelection,
-} from "../lib/build-file-validation";
-import { buildPackageCopy } from "../lib/build-package-i18n";
-import { confirmedCreatedResource } from "../lib/new-resource-response";
+} from "../../../lib/build-file-validation";
+import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { confirmedCreatedResource } from "../../../lib/new-resource-response";
 import {
   createPendingResourceDraft,
   PENDING_RESOURCE_DRAFT_KEY,
   parsePendingResourceDraft,
   pendingResourceDraftKey,
-} from "../lib/pending-resource-draft";
-import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
-import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+} from "../../../lib/pending-resource-draft";
+import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
 import {
   parseResourceIntent,
   type ResourceSubmissionIntent,
   resourceFileHash,
   resourceIntentKey,
-} from "../lib/resource-submission-intent";
-import { useNexusLocale } from "./locale-context";
-import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
+} from "../../../lib/resource-submission-intent";
+import { useNexusLocale } from "../../../components/locale-context";
+import { MtaMetaInspectorPanel } from "../../../components/mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 
 const nativeLabelClass = "block font-label uppercase text-secondary";

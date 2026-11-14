@@ -22,16 +22,16 @@ vi.mock("../../src/components/locale-context", () => ({
 
 import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
 import { BuildQuarantineControls } from "../../src/components/build-quarantine-controls";
-import { NewResourceForm } from "../../src/components/new-resource-form";
+import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 import { ReportModerationControls } from "../../src/components/report-moderation-controls";
 
 const exclusive = [
-  "site/src/components/new-resource-form.tsx",
+  "site/src/features/resources/components/new-resource-form.tsx",
   "site/src/components/author-resource-forms.tsx",
   "site/src/features/resources/components/resource-media-editor.tsx",
   "site/src/features/resources/components/resource-compatibility-form.tsx",
   "site/src/features/resources/components/resource-variants-form.tsx",
-  "site/src/components/resource-copy-form.tsx",
+  "site/src/features/resources/components/resource-copy-form.tsx",
   "site/src/components/resource-lifecycle-controls.tsx",
   "site/src/components/resource-moderation-controls.tsx",
   "site/src/features/resources/components/build-moderation-controls.tsx",
@@ -77,7 +77,7 @@ it("locks resource variants reorder/remove to size=touch and noCandidates to Emp
 });
 
 it("locks new resource post-create CTA to size=touch", () => {
-  const source = read("site/src/components/new-resource-form.tsx");
+  const source = read("site/src/features/resources/components/new-resource-form.tsx");
   expect(source).toMatch(
     /onClick=\{startNewSubmission\}[\s\S]{0,80}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{startNewSubmission\}/u,
   );
@@ -87,7 +87,7 @@ it("locks new resource post-create CTA to size=touch", () => {
 });
 
 it("locks new resource native controls to fieldControlClass without h-10 chrome", () => {
-  const source = read("site/src/components/new-resource-form.tsx");
+  const source = read("site/src/features/resources/components/new-resource-form.tsx");
   expect(source).toContain("fieldControlClass");
   expect(source).toContain('className: "min-h-11"');
   expect(source).not.toContain("h-10");

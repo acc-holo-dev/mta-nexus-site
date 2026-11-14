@@ -19,7 +19,8 @@ Phase 4.11 проверена: Resources media editor и server composition.
 Phase 4.12 проверена: Resources build screen и controls.
 Phase 4.13 проверена: Resources build moderation controls.
 Phase 4.14 проверена: Resources author management UI.
-Выполняется Phase 4.15: Resources publisher workspace views. Владелец явно
+Phase 4.15 проверена: Resources publisher workspace views.
+Выполняется Phase 4.16: Resources creation и copying UI. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -500,3 +501,7 @@ Build moderation controls прошли полный [CI #4651](https://github.co
 ### Phase 4.15: Resources publisher workspace views
 
 Author management UI прошёл полный [CI #4652](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43542338801) на `4eb502ac`. Фильтры авторского списка, панель готовности и навигация ресурса объединены в Resources. Серверные представления используют `publisher-view`, клиентская навигация — отдельный `publisher-navigation`. Тела компонентов сохранены после адаптации imports; локализация, ссылки, состояния готовности и server authority остаются прежними. Negative fixtures и реальные графы проверяют новые границы.
+
+### Phase 4.16: Resources creation и copying UI
+
+Publisher workspace views прошли полный [CI #4653](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43546546740) на `ad322b5a`. Форма создания, экран успеха, форма копирования и представление метаданных объединены в Resources. Client ports отделены от RSC-compatible copy view. Тела компонентов сохранены после адаптации imports; actor/draft/intent, file validation, confirmation, HTTP/service authority и обработка неопределённого результата остаются прежними. Colocated test и команды следуют переносу; границы и project membership проверяются.

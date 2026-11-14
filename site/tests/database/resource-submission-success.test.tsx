@@ -17,7 +17,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourceSubmissionSuccess } from "../../src/components/resource-submission-success";
+import { ResourceSubmissionSuccess } from "../../src/features/resources/components/resource-submission-success";
 
 describe("resource submission success state", () => {
   it.each(["en", "ru"] as const)(
