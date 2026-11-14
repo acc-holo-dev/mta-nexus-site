@@ -72,6 +72,20 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "site/src/features/servers/server/page.ts",
     'import { db } from "../../../lib/services/session"; export const page = db;',
   );
+  for (const port of ["statistics", "observations", "history"]) {
+    write(
+      `site/src/features/servers/${port}-server.ts`,
+      'import "server-only"; export { page } from "./server/page";',
+    );
+    write(
+      `site/src/app/${port}-server.ts`,
+      `export { page } from "../features/servers/${port}-server";`,
+    );
+    write(
+      `site/src/features/servers/components/${port}-leak.ts`,
+      `export { page } from "../${port}-server";`,
+    );
+  }
   write("site/src/app/page.ts", 'export { page } from "../features/servers/server";');
   write("site/src/app/client.ts", 'export { card } from "../features/servers/client";');
   write("site/src/lib/consumer.ts", 'export { domain } from "../features/servers/model";');
@@ -106,6 +120,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/connect.ts", "servers-client-isolation"],
     ["features/servers/statistics-export.ts", "servers-client-isolation"],
     ["features/servers/statistics-view.ts", "servers-client-isolation"],
+    ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/observations-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/history-leak.ts", "servers-client-isolation"],
     ["app/deep.ts", "servers-feature-public-api"],
     ["features/other/deep.ts", "servers-feature-public-api"],
     ["features/servers/components/server-leak.ts", "servers-client-isolation"],
@@ -118,6 +135,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/statistics-server.ts",
+    "app/observations-server.ts",
+    "app/history-server.ts",
     "app/page.ts",
     "app/connect.ts",
     "app/statistics-export.ts",
@@ -149,7 +169,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/server(?:\.ts$|\/)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -179,4 +199,27 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/model.ts");
   assert(visited.has("site/src/features/servers/components/server-card.tsx"));
   assert(visited.has("site/src/features/servers/model/mta-directory-page.ts"));
+});
+
+test("Servers server entrypoints keep independent composition graphs", () => {
+  const entries = [
+    ["server.ts", "servers-page.tsx"],
+    ["statistics-server.ts", "server-statistics-page.tsx"],
+    ["observations-server.ts", "server-observation-browser-page.tsx"],
+    ["history-server.ts", "server-history-panel.tsx"],
+  ];
+  for (const [entry, ownPage] of entries) {
+    const source = `site/src/features/servers/${entry}`;
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has(`site/src/features/servers/server/${ownPage}`), ownPage);
+    for (const [otherEntry, otherPage] of entries)
+      if (otherEntry !== entry)
+        assert(!modules.has(`site/src/features/servers/server/${otherPage}`), otherPage);
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
 });

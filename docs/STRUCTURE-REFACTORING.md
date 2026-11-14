@@ -25,7 +25,8 @@ Phase 4.17 проверена: Resources lifecycle и moderation UI.
 Phase 4.18 проверена: Resources package, requirements и quarantine UI.
 Phase 4.19 проверена: Resources reports и batch watches.
 Phase 4.20 проверена: Resources cart и delivery presentation.
-Выполняется Phase 4.21: Servers connect и statistics controls. Владелец явно
+Phase 4.21 проверена: Servers connect и statistics controls.
+Выполняется Phase 4.22: Servers statistics, observations и history. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -530,3 +531,7 @@ Reports и batch watches прошли полный [CI #4657](https://github.com
 ### Phase 4.21: Servers connect и statistics controls
 
 Resources cart и delivery presentation прошли полный [CI #4659](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43562649285) на `b74fd1e3`. Connect/copy, экспорт статистики и выбор периода наблюдений объединены в Servers. Client и RSC-compatible ports разделены, тела компонентов сохранены; общий field alias заменён на тот же UI primitive. Clipboard fallback, границы периода, timeout/abort и существующие HTTP/access checks не меняются. Boundary fixtures, реальные client graphs и состав тестовых проектов проверяются.
+
+### Phase 4.22: Servers statistics, observations и history
+
+Connect и statistics controls прошли полный [CI #4660](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43564712037) на `12ffdb40`. Экраны статистики и наблюдений, statistics panel и history panel объединены в Servers с независимыми server-only ports. Тела компонентов сохранены после адаптации imports; metadata/noindex, loading, session/manager authority, диапазоны и различие observations/managed profile остаются прежними. Negative fixtures и реальные графы проверяют изоляцию.

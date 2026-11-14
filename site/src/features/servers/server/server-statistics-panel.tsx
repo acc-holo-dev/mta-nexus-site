@@ -1,15 +1,15 @@
 import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { Locale } from "../lib/i18n";
-import { serverHistoryBarPercent } from "../lib/server-history-presentation";
-import { serverObservationBrowserCopy } from "../lib/server-observation-browser-copy";
-import { serverStatisticsHref } from "../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../lib/server-statistics-copy";
-import { serverStatisticsIntervals } from "../lib/server-statistics-export";
-import type { ServerStatisticsResult } from "../lib/services/server-statistics-service";
-import { ServerObservationPeriodControls } from "../features/servers/statistics-view";
-import { ServerStatisticsExportButton } from "../features/servers/statistics-export";
+import type { Locale } from "../../../lib/i18n";
+import { serverHistoryBarPercent } from "../../../lib/server-history-presentation";
+import { serverObservationBrowserCopy } from "../../../lib/server-observation-browser-copy";
+import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
+import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { serverStatisticsIntervals } from "../../../lib/server-statistics-export";
+import type { ServerStatisticsResult } from "../../../lib/services/server-statistics-service";
+import { ServerObservationPeriodControls } from "../statistics-view";
+import { ServerStatisticsExportButton } from "../statistics-export";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

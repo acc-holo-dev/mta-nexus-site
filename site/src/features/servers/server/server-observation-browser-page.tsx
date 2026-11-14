@@ -4,28 +4,28 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Locale } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
+import type { Locale } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   parseServerObservationBrowserQuery,
   type ServerObservationBrowserQuery,
   serverObservationBrowserHref,
-} from "../lib/server-observation-browser-contract";
+} from "../../../lib/server-observation-browser-contract";
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
-} from "../lib/server-observation-browser-copy";
-import { serverStatisticsHref } from "../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../lib/server-statistics-copy";
-import { authService } from "../lib/services/auth-service";
+} from "../../../lib/server-observation-browser-copy";
+import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
+import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerObservationBrowserResult,
   serverStatisticsService,
-} from "../lib/services/server-statistics-service";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./platform-sign-in";
-import { ServerObservationPeriodControls } from "../features/servers/statistics-view";
-import { ServerStatisticsExportButton } from "../features/servers/statistics-export";
+} from "../../../lib/services/server-statistics-service";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { ServerObservationPeriodControls } from "../statistics-view";
+import { ServerStatisticsExportButton } from "../statistics-export";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

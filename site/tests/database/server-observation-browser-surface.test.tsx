@@ -32,7 +32,7 @@ import {
   ServerObservationBrowserLoading,
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
-} from "../../src/components/server-observation-browser-page";
+} from "../../src/features/servers/server/server-observation-browser-page";
 import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import { getDictionary } from "../../src/lib/i18n";
 

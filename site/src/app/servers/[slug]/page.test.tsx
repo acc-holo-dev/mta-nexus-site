@@ -127,7 +127,7 @@ vi.mock("../../../components/server-follow-button", async () => {
   };
 });
 
-vi.mock("../../../components/server-history-panel", async () => {
+vi.mock("../../../features/servers/history-server", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: () => React.createElement("div", { "data-testid": "server-history" }),

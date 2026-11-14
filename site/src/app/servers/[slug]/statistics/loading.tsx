@@ -1,4 +1,4 @@
-import { ServerStatisticsLoading } from "../../../../components/server-statistics-page";
+import { ServerStatisticsLoading } from "../../../../features/servers/statistics-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

@@ -107,7 +107,7 @@ vi.mock("../../src/components/server-follow-button", async () => {
   };
 });
 
-vi.mock("../../src/components/server-history-panel", async () => {
+vi.mock("../../src/features/servers/history-server", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: ({ history, locale }: { history: unknown; locale: string }) =>

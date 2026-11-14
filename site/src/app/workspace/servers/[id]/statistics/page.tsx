@@ -1,7 +1,7 @@
 import {
   ServerStatisticsPage,
   serverStatisticsMetadata,
-} from "../../../../../components/server-statistics-page";
+} from "../../../../../features/servers/statistics-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

@@ -11,7 +11,7 @@ import { ObjectReportForm } from "../../../components/object-report-form";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../components/server-follow-button";
-import { ServerHistoryPanel } from "../../../components/server-history-panel";
+import { ServerHistoryPanel } from "../../../features/servers/history-server";
 import { ServerReviewPanel } from "../../../components/server-review-panel";
 import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";

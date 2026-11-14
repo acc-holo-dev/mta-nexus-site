@@ -8,14 +8,17 @@ Claim, ownership, management, reviews, history и collectors пока наход
 
 ## Публичные entrypoints
 
-| Entry                  | Контракт                                                                                          |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| `connect.ts`           | `ServerConnectControls`; client connect/copy UI                                                   |
-| `statistics-export.ts` | `ServerStatisticsExportButton`; client экспорт                                                    |
-| `statistics-view.ts`   | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
-| `client.ts`            | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
-| `server.ts`            | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
-| `model.ts`             | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
+| Entry                    | Контракт                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| `connect.ts`             | `ServerConnectControls`; client connect/copy UI                                                   |
+| `statistics-export.ts`   | `ServerStatisticsExportButton`; client экспорт                                                    |
+| `statistics-view.ts`     | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
+| `statistics-server.ts`   | Statistics page, metadata и loading; server-only                                                  |
+| `observations-server.ts` | Observation browser, metadata и loading; server-only                                              |
+| `history-server.ts`      | `ServerHistoryPanel`; server-only                                                                 |
+| `client.ts`              | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
+| `server.ts`              | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
+| `model.ts`               | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
@@ -47,3 +50,7 @@ transitive closure реальных client/model entrypoints. Все измен�
 Connect/copy, экспорт статистики и выбор периода принадлежат Servers.
 Clipboard fallback, ограничения периода, timeout/abort и серверные проверки доступа
 сохраняются; UI не доказывает факт игры и не меняет наблюдения.
+
+Экраны статистики и наблюдений, statistics panel и history panel принадлежат
+Servers и используют отдельные server-only ports. Metadata, loading, session и
+права менеджера сохраняются; observations не заменяют managed profile.

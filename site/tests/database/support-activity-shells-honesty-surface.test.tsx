@@ -93,8 +93,8 @@ it.each([
 );
 
 it("locks server statistics and observations loading shells to honest busy copy", () => {
-  const statistics = read("site/src/components/server-statistics-page.tsx");
-  const observations = read("site/src/components/server-observation-browser-page.tsx");
+  const statistics = read("site/src/features/servers/server/server-statistics-page.tsx");
+  const observations = read("site/src/features/servers/server/server-observation-browser-page.tsx");
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
   expect(statistics).toContain("aria-busy");
@@ -114,8 +114,8 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     "site/src/components/support-center.tsx",
     "site/src/components/public-profile-activity.tsx",
     "site/src/components/public-context-trust-page.tsx",
-    "site/src/components/server-statistics-page.tsx",
-    "site/src/components/server-observation-browser-page.tsx",
+    "site/src/features/servers/server/server-statistics-page.tsx",
+    "site/src/features/servers/server/server-observation-browser-page.tsx",
     "site/src/components/publication-feed.tsx",
   ];
   for (const surface of surfaces) {
@@ -127,7 +127,9 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
   }
   expect(read("site/src/components/support-center.tsx")).toContain("EmptyState");
   expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
-  expect(read("site/src/components/server-observation-browser-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
+    "EmptyState",
+  );
   expect(read("site/src/components/publication-feed.tsx")).toContain("EmptyState");
 });
 

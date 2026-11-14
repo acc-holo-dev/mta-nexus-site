@@ -5,18 +5,18 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRequestLocale } from "../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
-} from "../lib/server-statistics-contract";
-import { serverStatisticsCopy, serverStatisticsError } from "../lib/server-statistics-copy";
-import { authService } from "../lib/services/auth-service";
+} from "../../../lib/server-statistics-contract";
+import { serverStatisticsCopy, serverStatisticsError } from "../../../lib/server-statistics-copy";
+import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerStatisticsResult,
   serverStatisticsService,
-} from "../lib/services/server-statistics-service";
-import { PlatformSignIn } from "./platform-sign-in";
+} from "../../../lib/services/server-statistics-service";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";

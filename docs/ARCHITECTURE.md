@@ -30,7 +30,9 @@
 `site/src/features/servers` объединяет публичный каталог и карточки. Публичный
 контракт включает `client.ts` (клиентский UI), `server.ts` (server-only
 composition страницы), `model.ts` (чистые types/projections/pagination/cache helpers),
-`connect.ts`, `statistics-export.ts` и `statistics-view.ts` для detail controls.
+`connect.ts`, `statistics-export.ts` и `statistics-view.ts` для detail controls,
+а также server-only `statistics-server.ts`, `observations-server.ts` и
+`history-server.ts` для статистики, наблюдений и истории.
 [Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
 
 App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует

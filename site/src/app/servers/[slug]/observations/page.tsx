@@ -1,7 +1,7 @@
 import {
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
-} from "../../../../components/server-observation-browser-page";
+} from "../../../../features/servers/observations-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

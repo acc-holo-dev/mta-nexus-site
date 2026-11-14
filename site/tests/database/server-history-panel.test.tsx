@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { ServerHistoryPanel } from "../../src/components/server-history-panel";
+import { ServerHistoryPanel } from "../../src/features/servers/server/server-history-panel";
 import { getDictionary } from "../../src/lib/i18n";
 
 const history = {

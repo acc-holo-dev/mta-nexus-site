@@ -1,4 +1,4 @@
-import { ServerObservationBrowserLoading } from "../../../../../components/server-observation-browser-page";
+import { ServerObservationBrowserLoading } from "../../../../../features/servers/observations-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

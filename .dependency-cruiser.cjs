@@ -36,7 +36,7 @@ module.exports = {
         "Other application modules consume Servers only through explicit public entrypoints.",
       from: { path: "^site/src/(?!features/servers/)" },
       to: {
-        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view)\\.ts$)",
+        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|statistics-server|observations-server|history-server)\\.ts$)",
       },
     },
     {
@@ -54,7 +54,7 @@ module.exports = {
         path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/servers/server(?:\\.ts$|/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
