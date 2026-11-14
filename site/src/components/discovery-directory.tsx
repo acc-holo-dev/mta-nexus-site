@@ -19,7 +19,7 @@ import {
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
 import { productService } from "../lib/services/product-service";
-import { ArticleCard } from "./article-card";
+import { ArticleCard } from "../features/community/article-view";
 import { FollowButton } from "./follow-button";
 import { ProductCard } from "../features/resources/view";
 import { ServerCard } from "../features/servers/client";

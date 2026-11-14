@@ -57,7 +57,7 @@ vi.mock("../../../lib/services/auth-service", () => ({
 vi.mock("../../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
-vi.mock("../../../components/article-card", () => ({
+vi.mock("../../../features/community/article-view", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
 vi.mock("@nexus/ui", () => ({

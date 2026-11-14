@@ -69,7 +69,7 @@ vi.mock("../../../lib/services/content-reaction-service", () => ({
   },
 }));
 
-import { ArticleCard } from "../../../components/article-card";
+import { ArticleCard } from "../../../features/community/article-view";
 import Page, { generateMetadata } from "./page";
 
 const input = () => ({ params: Promise.resolve({ slug: "guide" }) });

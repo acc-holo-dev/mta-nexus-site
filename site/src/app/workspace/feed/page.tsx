@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PublicationFeed } from "../../../components/publication-feed";
+import { PublicationFeed } from "../../../features/community/publication-feed";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { publicationFeedView } from "../../../lib/publication-feed-view";

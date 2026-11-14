@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { ArticleCard } from "../../../components/article-card";
+import { ArticleCard } from "../../../features/community/article-view";
 import { FollowButton } from "../../../components/follow-button";
 import { ProductCard } from "../../../features/resources/view";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";

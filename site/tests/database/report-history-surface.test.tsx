@@ -31,7 +31,7 @@ vi.mock("../../src/lib/services/server-content-service", () => ({
 vi.mock("../../src/lib/services/organization-content-service", () => ({
   organizationContentService: state,
 }));
-vi.mock("../../src/components/author-publication-restore", () => ({
+vi.mock("../../src/features/community/author-publication-restore", () => ({
   AuthorPublicationRestore: ({
     organizationId,
     serverId,

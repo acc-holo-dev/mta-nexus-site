@@ -33,7 +33,7 @@ import { platformFieldClass } from "../../../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
-import { ContentFollowControls } from "../../../components/content-follow-controls";
+import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 

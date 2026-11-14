@@ -2,8 +2,8 @@ import type { Content } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import Link from "next/link";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 
 export function ArticleCard({ article, locale = "en" }: { article: Content; locale?: Locale }) {
   const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);

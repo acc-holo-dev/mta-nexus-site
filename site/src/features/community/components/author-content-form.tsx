@@ -3,23 +3,27 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authorPublicationDeskCopy } from "../lib/author-publication-desk-copy";
-import type { Locale } from "../lib/i18n";
+import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
+import type { Locale } from "../../../lib/i18n";
 import {
   organizationContentCopy,
   organizationContentMutationError,
-} from "../lib/organization-content-copy";
-import { serverContentCopy, serverContentMutationError } from "../lib/server-content-copy";
-import { publicationSupportHref } from "../lib/support-workspace-contract";
+} from "../../../lib/organization-content-copy";
+import { serverContentCopy, serverContentMutationError } from "../../../lib/server-content-copy";
+import { publicationSupportHref } from "../../../lib/support-workspace-contract";
 import {
   type EditableContent,
   parseEditableContent,
   platformFieldClass,
   platformRequest,
-} from "../lib/user-platform-client";
-import { contentFieldsSchema, editorialTypes, writerTypes } from "../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/user-platform-client";
+import {
+  contentFieldsSchema,
+  editorialTypes,
+  writerTypes,
+} from "../../../lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import { confirmAction } from "../../../components/confirm-action";
 
 export function AuthorContentForm({
   locale,

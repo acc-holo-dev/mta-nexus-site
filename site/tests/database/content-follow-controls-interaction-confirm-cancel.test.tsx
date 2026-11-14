@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/articles/article",
 }));
 
-import { ContentFollowControls } from "../../src/components/content-follow-controls";
+import { ContentFollowControls } from "../../src/features/community/components/content-follow-controls";
 import { followCopy } from "../../src/lib/follow-workspace-copy";
 
 const { render, saveToggle } = createContentFollowControlsInteractionHelpers(

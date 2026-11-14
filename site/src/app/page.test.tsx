@@ -125,7 +125,7 @@ vi.mock("../features/resources/view", () => ({
     createElement("article", null, product.title),
 }));
 
-vi.mock("../components/article-card", () => ({
+vi.mock("../features/community/article-view", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) =>
     createElement("article", null, article.title),
 }));

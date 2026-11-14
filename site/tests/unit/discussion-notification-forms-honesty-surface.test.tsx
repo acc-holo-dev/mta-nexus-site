@@ -11,7 +11,7 @@ const formComponents = [
   "site/src/components/notification-bell.tsx",
   "site/src/components/notification-inbox.tsx",
   "site/src/components/follow-button.tsx",
-  "site/src/components/content-follow-controls.tsx",
+  "site/src/features/community/components/content-follow-controls.tsx",
   "site/src/components/context-switcher.tsx",
   "site/src/features/community/components/community-report-form.tsx",
   "site/src/components/content-comment-form.tsx",

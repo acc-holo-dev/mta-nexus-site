@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { serverContentService } from "../../../lib/services/server-content-service";
 import { parseEditableContent } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-import { AuthorContentForm } from "../../../components/author-content-form";
+import { AuthorContentForm } from "../../community/author-content-form";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";

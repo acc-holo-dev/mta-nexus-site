@@ -61,7 +61,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));
-vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
+vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null }));
 
 import { generateMetadata as moderationMetadata } from "../../src/app/admin/community/page";

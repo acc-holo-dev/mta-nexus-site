@@ -1,6 +1,6 @@
 import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -8,10 +8,10 @@ import {
   type PublicationQuery,
   publicationHref,
   SERVER_PUBLICATION_TYPES,
-} from "../lib/publication-feed-contract";
-import { publicationCopy, publicationError } from "../lib/publication-feed-copy";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
+} from "../../../lib/publication-feed-contract";
+import { publicationCopy, publicationError } from "../../../lib/publication-feed-copy";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -22,7 +22,7 @@ vi.mock("../../src/lib/services/content-service", () => ({
 
 import ArticlesPage from "../../src/app/articles/page";
 import CommunityPage from "../../src/app/community/page";
-import { AuthorContentForm } from "../../src/components/author-content-form";
+import { AuthorContentForm } from "../../src/features/community/author-content-form";
 import { ContentPageNavigation } from "../../src/components/content-catalog-controls";
 import { PlatformSignIn } from "../../src/components/platform-sign-in";
 

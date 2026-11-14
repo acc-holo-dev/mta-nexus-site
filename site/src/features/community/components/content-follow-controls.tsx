@@ -3,15 +3,15 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Bell, BellOff, Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmsFollowMutation } from "../lib/follow-confirmation";
-import type { ObjectMuteDuration } from "../lib/follow-workspace-contract";
-import { followCopy, followError } from "../lib/follow-workspace-copy";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { LocaleProvider, useNexusLocale } from "./locale-context";
+import { confirmsFollowMutation } from "../../../lib/follow-confirmation";
+import type { ObjectMuteDuration } from "../../../lib/follow-workspace-contract";
+import { followCopy, followError } from "../../../lib/follow-workspace-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { LocaleProvider, useNexusLocale } from "../../../components/locale-context";
 
 type ContentFollowState = {
   authenticated: boolean;

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { AuthorContentForm } from "../../../../components/author-content-form";
+import { AuthorContentForm } from "../../../../features/community/author-content-form";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";

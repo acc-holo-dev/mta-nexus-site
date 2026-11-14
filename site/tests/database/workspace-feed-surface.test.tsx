@@ -1,6 +1,8 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { PublicationFeed } from "../../src/components/publication-feed";
+import { PublicationFeed } from "../../src/features/community/publication-feed";
 import {
   type PublicationPage,
   publicationPageQuery,

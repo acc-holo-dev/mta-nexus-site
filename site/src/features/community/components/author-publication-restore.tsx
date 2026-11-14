@@ -3,25 +3,25 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmedAuthorPublicationRestore } from "../lib/author-publication-desk-contract";
+import { confirmedAuthorPublicationRestore } from "../../../lib/author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
-} from "../lib/author-publication-desk-copy";
-import type { Locale } from "../lib/i18n";
-import { confirmedOrganizationPublicationRestore } from "../lib/organization-publication-history-contract";
+} from "../../../lib/author-publication-desk-copy";
+import type { Locale } from "../../../lib/i18n";
+import { confirmedOrganizationPublicationRestore } from "../../../lib/organization-publication-history-contract";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
-} from "../lib/organization-publication-history-copy";
-import { confirmedServerPublicationRestore } from "../lib/server-publication-history-contract";
+} from "../../../lib/organization-publication-history-copy";
+import { confirmedServerPublicationRestore } from "../../../lib/server-publication-history-contract";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,
-} from "../lib/server-publication-history-copy";
-import { platformRequest } from "../lib/user-platform-client";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { confirmAction } from "./confirm-action";
+} from "../../../lib/server-publication-history-copy";
+import { platformRequest } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { confirmAction } from "../../../components/confirm-action";
 export function AuthorPublicationRestore({
   id,
   revision,

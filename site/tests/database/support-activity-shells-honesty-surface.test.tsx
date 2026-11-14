@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -116,7 +118,7 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     "site/src/components/public-context-trust-page.tsx",
     "site/src/features/servers/server/server-statistics-page.tsx",
     "site/src/features/servers/server/server-observation-browser-page.tsx",
-    "site/src/components/publication-feed.tsx",
+    "site/src/features/community/components/publication-feed.tsx",
   ];
   for (const surface of surfaces) {
     const source = read(surface);
@@ -130,7 +132,9 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
   expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/components/publication-feed.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/community/components/publication-feed.tsx")).toContain(
+    "EmptyState",
+  );
 });
 
 it("locks support case/filter/message controls to touch targets without min-h-10", () => {
@@ -155,7 +159,7 @@ it("locks support case/filter/message controls to touch targets without min-h-10
 });
 
 it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
-  const feed = read("site/src/components/publication-feed.tsx");
+  const feed = read("site/src/features/community/components/publication-feed.tsx");
   expect(feed).toContain("inline-flex min-h-11 items-center break-all");
   expect(feed).not.toContain("min-h-8");
   expect(read("site/src/components/copyable-plain-code-block.tsx")).toContain(

@@ -43,7 +43,7 @@ vi.mock("../../src/lib/services/product-service", () => ({
 }));
 vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
-vi.mock("../../src/components/article-card", () => ({ ArticleCard: () => null }));
+vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 
 import { DirectoryFilters, DirectoryResults } from "../../src/components/discovery-directory";
 import { LocaleProvider } from "../../src/components/locale-context";
@@ -202,9 +202,9 @@ it.each([
   ["update", "en", "Update"],
   ["update", "ru", "Обновление"],
 ] as const)("localizes %s cards in %s", async (type, locale, label) => {
-  const { ArticleCard } = await vi.importActual<typeof import("../../src/components/article-card")>(
-    "../../src/components/article-card",
-  );
+  const { ArticleCard } = await vi.importActual<
+    typeof import("../../src/features/community/article-view")
+  >("../../src/features/community/article-view");
   const article: Content = {
     id: "content",
     slug: "entry",

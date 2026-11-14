@@ -1,7 +1,9 @@
+vi.mock("server-only", () => ({}));
+
 import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
-import { PublicationFeed } from "../../src/components/publication-feed";
+import { PublicationFeed } from "../../src/features/community/publication-feed";
 import { publicationCopy } from "../../src/lib/publication-feed-copy";
 import {
   publicationPageQuery,

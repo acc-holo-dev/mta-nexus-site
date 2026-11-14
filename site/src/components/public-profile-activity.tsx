@@ -7,7 +7,7 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { publicationFeedView } from "../lib/publication-feed-view";
 import { publicationFeedService } from "../lib/services/publication-feed-service";
-import { PublicationFeed } from "./publication-feed";
+import { PublicationFeed } from "../features/community/publication-feed";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

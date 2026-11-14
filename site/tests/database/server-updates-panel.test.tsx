@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
 
-vi.mock("../../src/components/article-card", () => ({
+vi.mock("../../src/features/community/article-view", () => ({
   ArticleCard: ({
     article,
     locale,

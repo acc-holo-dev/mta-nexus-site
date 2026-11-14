@@ -1,7 +1,7 @@
 import { EmptyState, ErrorState, PageHeader } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
-import { ArticleCard } from "../../components/article-card";
+import { ArticleCard } from "../../features/community/article-view";
 import {
   ContentCatalogControls,
   ContentPageNavigation,

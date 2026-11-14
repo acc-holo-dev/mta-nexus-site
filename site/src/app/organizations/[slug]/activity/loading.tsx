@@ -1,4 +1,4 @@
-import { PublicationFeedLoading } from "../../../../components/publication-feed-loading";
+import { PublicationFeedLoading } from "../../../../features/community/publication-feed-loading-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

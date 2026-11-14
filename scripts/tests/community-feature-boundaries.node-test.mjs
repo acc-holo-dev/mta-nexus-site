@@ -8,9 +8,18 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const ports = ["discussion", "topic-form", "report-form", "own-discussion"];
+const ports = [
+  "discussion",
+  "topic-form",
+  "report-form",
+  "own-discussion",
+  "article-view",
+  "publication-feed",
+  "author-content-form",
+  "author-publication-restore",
+];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-contract|organization-publication-history-copy|server-publication-history-contract|server-publication-history-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -77,6 +86,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "moderated-discussion",
     "discussion-reports",
     "publication-reports",
+    "publication-feed-loading",
   ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
@@ -108,6 +118,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "moderated-discussion",
     "discussion-reports",
     "publication-reports",
+    "publication-feed-loading",
   ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
@@ -144,7 +155,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -160,7 +171,8 @@ test("real Community client graphs have no transitive server dependencies", () =
     }
   }
   for (const entry of entries) {
-    assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    if (!["article-view", "publication-feed"].some((port) => entry.endsWith(`/${port}.ts`)))
+      assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
     visit(entry);
   }
   for (const entry of componentEntries) visit(entry);
@@ -188,6 +200,7 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["moderated-discussion-server.ts", "moderated-discussion-screen.tsx"],
     ["discussion-reports-server.ts", "discussion-reports-screen.tsx"],
     ["publication-reports-server.ts", "publication-reports-page.tsx"],
+    ["publication-feed-loading-server.ts", "publication-feed-loading.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;

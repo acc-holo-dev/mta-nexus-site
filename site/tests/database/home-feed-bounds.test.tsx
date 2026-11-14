@@ -40,7 +40,7 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/components/article-card", () => ({
+vi.mock("../../src/features/community/article-view", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
 

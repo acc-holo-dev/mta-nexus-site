@@ -35,7 +35,7 @@ import Loading from "../../src/app/workspace/content/loading";
 import Desk, { generateMetadata as deskMetadata } from "../../src/app/workspace/content/page";
 import Following from "../../src/app/workspace/feed/page";
 import { FollowWorkspace } from "../../src/components/follow-workspace";
-import { PublicationFeed } from "../../src/components/publication-feed";
+import { PublicationFeed } from "../../src/features/community/publication-feed";
 import { authorPublicationDeskCopy } from "../../src/lib/author-publication-desk-copy";
 import { publicationCopy } from "../../src/lib/publication-feed-copy";
 

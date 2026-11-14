@@ -54,7 +54,7 @@ HTTP ограничения сохраняются. Новые Servers feature p
 
 ### Community feature
 
-`site/src/features/community` объединяет UI обсуждения, жалоб и создания тем.
+`site/src/features/community` объединяет UI публикаций, ленты, авторских действий, обсуждения, жалоб и создания тем.
 Явные client entries и независимые server-only `reports-server`,
 `report-history-server`, `report-groups-server` и moderation server entries
 защищают private implementations;

@@ -2,7 +2,7 @@ import { buttonClassName, ErrorState, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { ArticleCard } from "../components/article-card";
+import { ArticleCard } from "../features/community/article-view";
 import { HomePersonalChangesPanel } from "../components/home-personal-changes-panel";
 import { ProductCard } from "../features/resources/view";
 import { HomeNetworkServerCard } from "../features/servers/client";
