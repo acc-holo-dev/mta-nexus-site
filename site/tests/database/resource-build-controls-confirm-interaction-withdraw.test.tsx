@@ -22,7 +22,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 
-import { ResourceBuildControls } from "../../src/components/resource-build-controls";
+import { ResourceBuildControls } from "../../src/features/resources/components/resource-build-controls";
 import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
 
 const { render, control, reason } = createResourceBuildControlsConfirmInteractionHelpers(

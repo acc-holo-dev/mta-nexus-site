@@ -3,11 +3,11 @@ import type { ResourceBuildCommand, ResourceBuildView } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateRequest } from "../lib/private-request";
-import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
-import { confirmedBuildCommand } from "../lib/resource-build-workspace-response";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+import { privateRequest } from "../../../lib/private-request";
+import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
+import { confirmedBuildCommand } from "../../../lib/resource-build-workspace-response";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

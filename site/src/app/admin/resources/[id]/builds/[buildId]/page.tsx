@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ResourceBuildScreen } from "../../../../../../components/resource-build-screen";
+import { ResourceBuildScreen } from "../../../../../../features/resources/build-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../../../lib/resource-build-workspace-i18n";
 

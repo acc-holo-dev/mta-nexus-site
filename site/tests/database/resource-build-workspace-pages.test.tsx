@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -31,7 +33,7 @@ vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
 
 import AdminResourceBuildLoading from "../../src/app/admin/resources/[id]/builds/[buildId]/loading";
 import { generateMetadata } from "../../src/app/workspace/resources/[id]/builds/[buildId]/page";
-import { ResourceBuildScreen } from "../../src/components/resource-build-screen";
+import { ResourceBuildScreen } from "../../src/features/resources/build-server";
 import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
 
 const detail = {

@@ -2,7 +2,7 @@
 
 Resources feature объединяет composition каталога, detail, публичной истории версий и
 отзывов, карточку, preview/gallery, build provenance/package evidence и чистые
-query/gallery/provenance helpers. Остальной detail/review UI, другие editors, builds,
+query/gallery/provenance helpers. Остальной detail/review UI, другие editors, build handlers,
 download handlers и Q&A остаются в существующих модулях.
 Services и repositories не дублируются и не переносятся.
 
@@ -19,6 +19,7 @@ Services и repositories не дублируются и не переносят�
 | `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
 | `view.ts`            | `ProductCard`, совместимая с RSC и Discovery                                                                |
 | `server.ts`          | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
+| `build-server.ts`    | `ResourceBuildScreen`; server-only composition авторской и staff страниц сборки                             |
 | `media-server.ts`    | `ResourceMediaScreen`; server-only composition авторской и staff страниц медиа                              |
 | `detail-server.ts`   | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
 | `versions-server.ts` | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
@@ -38,7 +39,7 @@ fixtures проверяют value/type edges; реальные графы public
 `server.ts` отвечает только за каталог; `detail-server.ts` — только за детальную
 страницу. Они не реэкспортируют друг друга: SSR hydration сессии, entitlement,
 reviews/Q&A и follow/mute не добавляется к графу каталога. `versions-server.ts` и
-`reviews-server.ts` также изолированы: ни один из пяти server entrypoints не
+`reviews-server.ts` также изолированы: ни один из шести server entrypoints не
 загружает composition остальных страниц. Boundary suite проверяет эту независимость,
 защиту `server-only` и запрет value/type server leaks в view.
 
@@ -109,3 +110,8 @@ Media editor и его server screen принадлежат Resources. Workspace
 client component. Session/role/ownership, scan и mutation authority остаются в
 существующих service/repository и HTTP handlers. Подтверждения, abort и retry
 сохраняются; server entry не загружает composition других страниц.
+
+Build screen и client controls принадлежат Resources. Workspace и staff routes
+используют `build-server`, сохраняя metadata; moderation controls, service и
+repository остаются общими. Session/role/ownership, scan provenance, revision,
+confirm и server mutation authority сохраняются.

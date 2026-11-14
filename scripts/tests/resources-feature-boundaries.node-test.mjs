@@ -85,6 +85,18 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/features/resources/components/media-server-leak.ts",
     'export { page } from "../media-server";',
   );
+  write(
+    "site/src/features/resources/build-server.ts",
+    'import "server-only"; export { page } from "./server";',
+  );
+  write(
+    "site/src/app/build-route.ts",
+    'export { page } from "../features/resources/build-server";',
+  );
+  write(
+    "site/src/features/resources/components/build-server-leak.ts",
+    'export { page } from "../build-server";',
+  );
   write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
   write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
   write("site/src/app/evidence.ts", 'export { page } from "../features/resources/evidence";');
@@ -184,6 +196,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/resources/components/build-server-leak.ts", "resources-view-isolation"],
     ["features/resources/components/media-server-leak.ts", "resources-view-isolation"],
     ["features/resources/detail-view.ts", "resources-view-isolation"],
     ["features/resources/review-controls.ts", "resources-view-isolation"],
@@ -213,6 +226,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/detail-view.ts",
     "app/review-controls.ts",
     "app/reviews-view.ts",
+    "app/build-route.ts",
     "app/media-route.ts",
     "app/media.ts",
     "app/release-watch.ts",
@@ -236,6 +250,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
     "site/src/features/resources/release-watch.ts",
+    "site/src/features/resources/components/resource-build-controls.tsx",
     "site/src/features/resources/components/resource-media-editor.tsx",
     "site/src/features/resources/download.ts",
     "site/src/features/resources/client.ts",
@@ -257,7 +272,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -283,6 +298,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     /"use client"/u,
   );
   visit("site/src/features/resources/release-watch.ts");
+  visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");
   visit("site/src/features/resources/download.ts");
   visit("site/src/features/resources/client.ts");
@@ -321,6 +337,7 @@ test("Resources server entrypoints keep independent composition graphs", () => {
     ["versions-server.ts", "versions-page.tsx"],
     ["reviews-server.ts", "reviews-page.tsx"],
     ["media-server.ts", "media-screen.tsx"],
+    ["build-server.ts", "build-screen.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/resources/${entry}`;

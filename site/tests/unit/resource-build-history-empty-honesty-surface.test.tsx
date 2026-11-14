@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks resource build history empty chrome to EmptyState", () => {
-  const source = read("site/src/components/resource-build-screen.tsx");
+  const source = read("site/src/features/resources/server/build-screen.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("copy.noHistory");
   expect(source).toContain("copy.history");

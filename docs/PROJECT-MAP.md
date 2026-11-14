@@ -38,6 +38,7 @@ Resources catalog живёт в [`site/src/features/resources`](../site/src/feat
 правила и SQL остаются в существующих service/repository.
 `client` — gallery/Q&A; preview используется внутри feature; `evidence` — build provenance/package UI. Общий modal
 hook остаётся в components; pure gallery/provenance helpers — в feature model.
+`media-server` и `build-server` изолируют author/staff composition; metadata остаётся в routing.
 Services, SQL visibility и download authority сохраняют прежние места.
 
 Servers read-only pilot живёт в [`site/src/features/servers`](../site/src/features/servers/README.md);

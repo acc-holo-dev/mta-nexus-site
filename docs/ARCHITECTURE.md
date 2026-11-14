@@ -55,8 +55,8 @@ Services/repositories и visibility/scan/access policy остаются преж
 publishing и download handlers не переносятся. Отдельный `detail-server` entry
 сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
 `versions-server` и `reviews-server` отвечают за публичные подстраницы,
-`media-server` — за author/staff media composition; их metadata
-и dynamic config также остаются в routing. Все пять server entries изолированы
+`media-server` и `build-server` — за author/staff media и build composition; их metadata
+и dynamic config также остаются в routing. Все шесть server entries изолированы
 друг от друга и защищены `server-only`. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
 Public `client` содержит gallery/Q&A, preview остаётся private; нейтральный `evidence` — provenance/package
