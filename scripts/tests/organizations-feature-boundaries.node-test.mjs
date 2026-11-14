@@ -9,7 +9,15 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const clientPorts = ["workspace", "team", "profile", "history-view"];
-const serverPorts = ["content-editor", "publication-history"];
+const serverPorts = [
+  "content-editor",
+  "publication-history",
+  "directory-page",
+  "workspace-page",
+  "team-page",
+  "activity-page",
+  "content-page",
+];
 const safeLib =
   /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
@@ -126,7 +134,7 @@ test("Organizations client graphs exclude server dependencies transitively", () 
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -158,6 +166,11 @@ test("Organizations server entries stay server-only and separately composed", ()
   const entries = [
     ["content-editor", "organization-content-editor-page.tsx"],
     ["publication-history", "organization-publication-history-screen.tsx"],
+    ["directory-page", "directory-page.tsx"],
+    ["workspace-page", "workspace-page.tsx"],
+    ["team-page", "team-page.tsx"],
+    ["activity-page", "activity-page.tsx"],
+    ["content-page", "content-page.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/organizations/${port}-server.ts`;
@@ -172,5 +185,20 @@ test("Organizations server entries stay server-only and separately composed", ()
       if (otherPort !== port)
         assert(!modules.has(`site/src/features/organizations/server/${otherPage}`));
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+});
+
+test("Organizations route entries retain dynamic rendering and metadata", () => {
+  for (const [route, port] of [
+    ["workspace/organizations", "directory-page"],
+    ["workspace/organizations/[id]", "workspace-page"],
+    ["workspace/organizations/[id]/team", "team-page"],
+    ["workspace/organizations/[id]/activity", "activity-page"],
+    ["workspace/organizations/[id]/content", "content-page"],
+  ]) {
+    const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
+    assert.match(source, /export const dynamic = "force-dynamic";/u);
+    assert.match(source, /export\s*\{\s*default,\s*generateMetadata,?\s*\}\s*from/u);
+    assert(source.includes(`/${port}-server";`));
   }
 });

@@ -34,7 +34,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/organizations/)" },
       to: {
-        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|content-editor-server|publication-history-server)\\.ts$)",
+        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|content-editor-server|publication-history-server|directory-page-server|workspace-page-server|team-page-server|activity-page-server|content-page-server)\\.ts$)",
       },
     },
     {
@@ -50,7 +50,7 @@ module.exports = {
         path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!organizations/)|features/organizations/(?:server/|(?:content-editor|publication-history)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!organizations/)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

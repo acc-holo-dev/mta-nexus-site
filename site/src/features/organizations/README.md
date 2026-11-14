@@ -10,6 +10,11 @@ Feature объединяет существующие экраны управл�
 | `team.ts`                       | `OrganizationTeamDirectory`; клиентский каталог команды                |
 | `profile.ts`                    | `OrganizationProfileForm`; клиентский профиль                          |
 | `history-view.ts`               | `OrganizationHistoryView`; представление истории                       |
+| `directory-page-server.ts`      | Серверная композиция списка организаций                                |
+| `workspace-page-server.ts`      | Серверная композиция workspace организации                             |
+| `team-page-server.ts`           | Серверная композиция команды                                           |
+| `activity-page-server.ts`       | Серверная композиция истории активности                                |
+| `content-page-server.ts`        | Серверная композиция публикаций организации                            |
 | `content-editor-server.ts`      | `OrganizationContentEditorPage`; server-only редактор публикации       |
 | `publication-history-server.ts` | `OrganizationPublicationHistoryScreen`; server-only история публикации |
 
@@ -19,3 +24,5 @@ Feature объединяет существующие экраны управл�
 модулей, инфраструктуры и Node builtins. История публикации использует общий
 server-only вход Community. Actor, revision, confirmation, recovery и серверная
 проверка прав сохраняют существующее поведение.
+
+Маршруты workspace сохраняют dynamic rendering и metadata; независимые server-only композиции сохраняют фильтры, session и права.

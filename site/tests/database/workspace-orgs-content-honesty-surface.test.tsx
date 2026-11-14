@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 
 const clippedOrgPages = [
-  "site/src/app/workspace/organizations/[id]/activity/page.tsx",
+  "site/src/features/organizations/server/activity-page.tsx",
   "site/src/app/workspace/organizations/[id]/content/new/page.tsx",
   "site/src/app/workspace/organizations/[id]/content/[contentId]/page.tsx",
   "site/src/app/workspace/organizations/[id]/content/[contentId]/history/page.tsx",
@@ -54,7 +54,7 @@ it("locks workspace org activity and content page shells to clipped min-w-0 fram
 });
 
 it("exposes a search landmark on the workspace organizations directory filter", () => {
-  expect(read("site/src/app/workspace/organizations/page.tsx")).toContain(
+  expect(read("site/src/features/organizations/server/directory-page.tsx")).toContain(
     "<search aria-label={copy.search}>",
   );
 });
