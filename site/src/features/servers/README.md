@@ -8,11 +8,14 @@ Claim, ownership, management, reviews, history и collectors пока наход
 
 ## Публичные entrypoints
 
-| Entry       | Контракт                                                                                          |
-| ----------- | ------------------------------------------------------------------------------------------------- |
-| `client.ts` | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
-| `server.ts` | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
-| `model.ts`  | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
+| Entry                  | Контракт                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `connect.ts`           | `ServerConnectControls`; client connect/copy UI                                                   |
+| `statistics-export.ts` | `ServerStatisticsExportButton`; client экспорт                                                    |
+| `statistics-view.ts`   | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
+| `client.ts`            | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
+| `server.ts`            | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
+| `model.ts`             | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
@@ -40,3 +43,7 @@ tests, `pnpm analyze:architecture` и negative fixtures в
 `scripts/tests/servers-feature-boundaries.node-test.mjs`. Этот suite проверяет и
 transitive closure реальных client/model entrypoints. Все изменения Servers pilot
 требуют полного CI, включая directory browser.
+
+Connect/copy, экспорт статистики и выбор периода принадлежат Servers.
+Clipboard fallback, ограничения периода, timeout/abort и серверные проверки доступа
+сохраняются; UI не доказывает факт игры и не меняет наблюдения.

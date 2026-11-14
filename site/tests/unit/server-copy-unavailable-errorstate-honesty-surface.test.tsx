@@ -9,7 +9,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
-  "site/src/components/server-connect-controls.tsx",
+  "site/src/features/servers/components/server-connect-controls.tsx",
   "site/src/features/servers/components/server-card.tsx",
   "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;

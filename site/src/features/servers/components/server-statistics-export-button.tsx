@@ -1,9 +1,9 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { serverStatisticsCopy, serverStatisticsError } from "../lib/server-statistics-copy";
-import { fetchServerStatisticsCsv } from "../lib/server-statistics-download";
+import type { Locale } from "../../../lib/i18n";
+import { serverStatisticsCopy, serverStatisticsError } from "../../../lib/server-statistics-copy";
+import { fetchServerStatisticsCsv } from "../../../lib/server-statistics-download";
 
 export function ServerStatisticsExportButton({
   url,

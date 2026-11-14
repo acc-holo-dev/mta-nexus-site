@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { getDictionary } from "../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { ServerConnectControls } from "./server-connect-controls";
 
 describe("ServerConnectControls", () => {

@@ -8,8 +8,8 @@ import { serverStatisticsHref } from "../lib/server-statistics-contract";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 import { serverStatisticsIntervals } from "../lib/server-statistics-export";
 import type { ServerStatisticsResult } from "../lib/services/server-statistics-service";
-import { ServerObservationPeriodControls } from "./server-observation-period-controls";
-import { ServerStatisticsExportButton } from "./server-statistics-export-button";
+import { ServerObservationPeriodControls } from "../features/servers/statistics-view";
+import { ServerStatisticsExportButton } from "../features/servers/statistics-export";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

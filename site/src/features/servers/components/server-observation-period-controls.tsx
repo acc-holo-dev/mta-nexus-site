@@ -1,10 +1,9 @@
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../lib/i18n";
-import { type ServerHistoryWindow, serverHistoryWindows } from "../lib/server-history-window";
-import { serverStatisticsHref } from "../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../lib/server-statistics-copy";
-import { platformFieldClass } from "../lib/user-platform-client";
+import type { Locale } from "../../../lib/i18n";
+import { type ServerHistoryWindow, serverHistoryWindows } from "../../../lib/server-history-window";
+import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
+import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

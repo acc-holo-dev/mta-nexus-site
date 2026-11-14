@@ -9,7 +9,7 @@ import { cache } from "react";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { ObjectReportForm } from "../../../components/object-report-form";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
-import { ServerConnectControls } from "../../../components/server-connect-controls";
+import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../components/server-follow-button";
 import { ServerHistoryPanel } from "../../../components/server-history-panel";
 import { ServerReviewPanel } from "../../../components/server-review-panel";

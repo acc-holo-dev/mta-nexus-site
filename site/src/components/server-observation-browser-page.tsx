@@ -24,8 +24,8 @@ import {
 } from "../lib/services/server-statistics-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { PlatformSignIn } from "./platform-sign-in";
-import { ServerObservationPeriodControls } from "./server-observation-period-controls";
-import { ServerStatisticsExportButton } from "./server-statistics-export-button";
+import { ServerObservationPeriodControls } from "../features/servers/statistics-view";
+import { ServerStatisticsExportButton } from "../features/servers/statistics-export";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

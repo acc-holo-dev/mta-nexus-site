@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "site/src/components/server-connect-controls.tsx",
+  "site/src/features/servers/components/server-connect-controls.tsx",
   "site/src/app/error.tsx",
 ] as const;
 
@@ -29,7 +29,7 @@ it("locks root error home link and both Buttons to touch chrome", () => {
 });
 
 it("locks server connect copy Button to size=touch with min-h-11 class", () => {
-  const source = read("site/src/components/server-connect-controls.tsx");
+  const source = read("site/src/features/servers/components/server-connect-controls.tsx");
   expect(source).toMatch(
     /size="touch"[\s\S]{0,240}?className="min-h-11 gap-1\.5"|className="min-h-11 gap-1\.5"[\s\S]{0,240}?size="touch"/u,
   );

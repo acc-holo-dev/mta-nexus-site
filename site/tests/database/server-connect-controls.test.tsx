@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ServerConnectControls } from "../../src/components/server-connect-controls";
+import { ServerConnectControls } from "../../src/features/servers/components/server-connect-controls";
 
 describe("ServerConnectControls accessibility", () => {
   it("exposes a focusable connect action without an aria-hidden clipboard input", () => {

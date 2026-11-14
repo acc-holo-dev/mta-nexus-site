@@ -33,7 +33,7 @@ import {
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
 } from "../../src/components/server-observation-browser-page";
-import { ServerObservationPeriodControls } from "../../src/components/server-observation-period-controls";
+import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {

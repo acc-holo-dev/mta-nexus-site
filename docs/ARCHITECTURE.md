@@ -28,8 +28,9 @@
 ### Servers feature pilot
 
 `site/src/features/servers` объединяет публичный каталог и карточки. Публичный
-контракт — три entrypoints: `client.ts` (клиентский UI), `server.ts` (server-only
-composition страницы) и `model.ts` (чистые types/projections/pagination/cache helpers).
+контракт включает `client.ts` (клиентский UI), `server.ts` (server-only
+composition страницы), `model.ts` (чистые types/projections/pagination/cache helpers),
+`connect.ts`, `statistics-export.ts` и `statistics-view.ts` для detail controls.
 [Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
 
 App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует
@@ -38,7 +39,7 @@ feature server composition. Directory API использует чистую mode
 `mtaMasterDirectoryService` остаются единственными реализациями сценариев и cache.
 Claim/ownership/management/collectors не входят в пилот.
 
-Внешний production-код обращается только к трём entrypoints. Feature не импортирует
+Внешний production-код обращается только к публичным entrypoints. Feature не импортирует
 routing; client/model не импортируют services, request locale, server entry или
 infrastructure packages. Model не зависит от UI и Node builtins. Эти правила
 проверяются dependency-cruiser, включая type edges; отдельный tooling suite

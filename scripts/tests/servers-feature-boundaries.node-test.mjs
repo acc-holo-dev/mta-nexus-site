@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -59,6 +59,10 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     'export { domain } from "@nexus/domain";',
   );
   write("site/src/features/servers/model.ts", 'export { domain } from "./model/observation";');
+  for (const port of ["connect", "statistics-export", "statistics-view"]) {
+    write(`site/src/features/servers/${port}.ts`, 'export { page } from "./server";');
+    write(`site/src/app/${port}.ts`, `export { page } from "../features/servers/${port}";`);
+  }
   write("site/src/features/servers/client.ts", 'export { card } from "./components/card";');
   write(
     "site/src/features/servers/server.ts",
@@ -99,6 +103,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/servers/connect.ts", "servers-client-isolation"],
+    ["features/servers/statistics-export.ts", "servers-client-isolation"],
+    ["features/servers/statistics-view.ts", "servers-client-isolation"],
     ["app/deep.ts", "servers-feature-public-api"],
     ["features/other/deep.ts", "servers-feature-public-api"],
     ["features/servers/components/server-leak.ts", "servers-client-isolation"],
@@ -112,6 +119,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
     "app/page.ts",
+    "app/connect.ts",
+    "app/statistics-export.ts",
+    "app/statistics-view.ts",
     "app/client.ts",
     "lib/consumer.ts",
     "features/servers/server/page.ts",
@@ -125,6 +135,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
 
 test("real client and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/servers/connect.ts",
+    "site/src/features/servers/statistics-export.ts",
+    "site/src/features/servers/statistics-view.ts",
     "site/src/features/servers/client.ts",
     "site/src/features/servers/model.ts",
   ]);
@@ -136,7 +149,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/server(?:\.ts$|\/)|lib\/(?!i18n(?:\.ts$|\/)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/server(?:\.ts$|\/)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -149,6 +162,19 @@ test("real client and model entrypoints have no transitive server dependencies",
       visit(dependency.resolved);
     }
   }
+  for (const port of ["connect", "statistics-export"]) {
+    assert.match(
+      readFileSync(resolve(root, `site/src/features/servers/${port}.ts`), "utf8"),
+      /^"use client";/u,
+    );
+  }
+  assert.doesNotMatch(
+    readFileSync(resolve(root, "site/src/features/servers/statistics-view.ts"), "utf8"),
+    /^"use client";/u,
+  );
+  visit("site/src/features/servers/connect.ts");
+  visit("site/src/features/servers/statistics-export.ts");
+  visit("site/src/features/servers/statistics-view.ts");
   visit("site/src/features/servers/client.ts");
   visit("site/src/features/servers/model.ts");
   assert(visited.has("site/src/features/servers/components/server-card.tsx"));

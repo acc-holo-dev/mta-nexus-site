@@ -3,7 +3,7 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { Copy } from "lucide-react";
 import { useId, useRef, useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 
 /**
  * Honest MTA connect intent: protocol link may open the client, but never proves

@@ -21,7 +21,7 @@ const formComponents = [
   "site/src/components/moderated-discussion-removal.tsx",
   "site/src/components/mta-meta-inspector-panel.tsx",
   "site/src/components/publication-reports-page.tsx",
-  "site/src/components/server-statistics-export-button.tsx",
+  "site/src/features/servers/components/server-statistics-export-button.tsx",
 ] as const;
 
 it("locks discussion and notification form failures to ErrorState with touch CTAs", () => {
