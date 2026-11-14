@@ -17,6 +17,10 @@ const serverPorts = [
   "team-page",
   "activity-page",
   "content-page",
+  "public-directory",
+  "public-profile",
+  "public-activity",
+  "public-trust",
 ];
 const safeLib =
   /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\.ts$)/u;
@@ -134,7 +138,7 @@ test("Organizations client graphs exclude server dependencies transitively", () 
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -171,6 +175,10 @@ test("Organizations server entries stay server-only and separately composed", ()
     ["team-page", "team-page.tsx"],
     ["activity-page", "activity-page.tsx"],
     ["content-page", "content-page.tsx"],
+    ["public-directory", "public-directory.tsx"],
+    ["public-profile", "public-profile.tsx"],
+    ["public-activity", "public-activity.tsx"],
+    ["public-trust", "public-trust.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/organizations/${port}-server.ts`;
@@ -195,6 +203,10 @@ test("Organizations route entries retain dynamic rendering and metadata", () => 
     ["workspace/organizations/[id]/team", "team-page"],
     ["workspace/organizations/[id]/activity", "activity-page"],
     ["workspace/organizations/[id]/content", "content-page"],
+    ["organizations", "public-directory"],
+    ["organizations/[slug]", "public-profile"],
+    ["organizations/[slug]/activity", "public-activity"],
+    ["organizations/[slug]/trust", "public-trust"],
   ]) {
     const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
     assert.match(source, /export const dynamic = "force-dynamic";/u);

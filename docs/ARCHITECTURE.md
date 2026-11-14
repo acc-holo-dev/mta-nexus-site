@@ -54,7 +54,7 @@ HTTP ограничения сохраняются. Новые Servers feature p
 
 ### Organizations feature
 
-`site/src/features/organizations` объединяет workspace, команду, профиль, историю и серверные композиции workspace и публикаций организаций. Явные клиентские и server-only входы защищены проверками границ и транзитивных зависимостей; авторизация и сервисы сохраняют существующую ответственность. [Контракт feature](../site/src/features/organizations/README.md). Изменения требуют полного CI.
+`site/src/features/organizations` объединяет workspace, команду, профиль, историю и серверные композиции workspace, публикаций и публичных страниц организаций. Явные клиентские и server-only входы защищены проверками границ и транзитивных зависимостей; авторизация и сервисы сохраняют существующую ответственность. [Контракт feature](../site/src/features/organizations/README.md). Изменения требуют полного CI.
 
 ### Community feature
 

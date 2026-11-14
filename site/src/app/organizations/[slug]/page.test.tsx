@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 vi.mock("../../../components/follow-button", () => ({
   FollowButton: (props: { initial?: unknown }) => (
     <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>

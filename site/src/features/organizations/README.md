@@ -10,6 +10,10 @@ Feature объединяет существующие экраны управл�
 | `team.ts`                       | `OrganizationTeamDirectory`; клиентский каталог команды                |
 | `profile.ts`                    | `OrganizationProfileForm`; клиентский профиль                          |
 | `history-view.ts`               | `OrganizationHistoryView`; представление истории                       |
+| `public-directory-server.ts`    | Публичный каталог организаций                                          |
+| `public-profile-server.ts`      | Публичный профиль организации и metadata                               |
+| `public-activity-server.ts`     | Публичная активность организации                                       |
+| `public-trust-server.ts`        | Публичная страница доверия организации                                 |
 | `directory-page-server.ts`      | Серверная композиция списка организаций                                |
 | `workspace-page-server.ts`      | Серверная композиция workspace организации                             |
 | `team-page-server.ts`           | Серверная композиция команды                                           |
@@ -26,3 +30,5 @@ server-only вход Community. Actor, revision, confirmation, recovery и се�
 проверка прав сохраняют существующее поведение.
 
 Маршруты workspace сохраняют dynamic rendering и metadata; независимые server-only композиции сохраняют фильтры, session и права.
+
+Публичные каталог, профиль, активность и доверие имеют независимые server-only входы. Metadata и профиль разделяют request-scoped чтение.

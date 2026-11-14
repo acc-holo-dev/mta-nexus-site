@@ -29,6 +29,8 @@ function collectTsFiles(directory) {
 }
 const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
+  resolve(sourceRoot, "features/organizations/public-profile-server.ts"),
+  resolve(sourceRoot, "features/organizations/server/public-profile.tsx"),
   ...[
     "i18n.ts",
     "i18n-server.ts",
