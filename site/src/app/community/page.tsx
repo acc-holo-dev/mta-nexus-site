@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
-} from "../../components/content-catalog-controls";
+} from "../../features/community/catalog-controls";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { publicationCopy } from "../../lib/publication-feed-copy";

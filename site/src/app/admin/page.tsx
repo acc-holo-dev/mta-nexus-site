@@ -23,7 +23,7 @@ import { AdminBuildsQuarantineSection } from "../../components/admin/admin-build
 import { AdminHealthStats } from "../../components/admin/admin-health-stats";
 import { AdminReportsSection } from "../../components/admin/admin-reports-section";
 import { AdminVerificationQueueSection } from "../../components/admin/admin-verification-queue-section";
-import { ContentModerationControls } from "../../components/content-moderation-controls";
+import { ContentModerationControls } from "../../features/community/content-moderation";
 import { PlatformSignIn } from "../../components/platform-sign-in";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";

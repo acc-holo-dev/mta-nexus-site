@@ -14,7 +14,7 @@ const formComponents = [
   "site/src/features/community/components/content-follow-controls.tsx",
   "site/src/components/context-switcher.tsx",
   "site/src/features/community/components/community-report-form.tsx",
-  "site/src/components/content-comment-form.tsx",
+  "site/src/features/community/components/content-comment-form.tsx",
   "site/src/features/community/components/content-discussion-compose-feedback.tsx",
   "site/src/features/community/components/discussion-comment-actions.tsx",
   "site/src/features/community/components/discussion-report-batch.tsx",

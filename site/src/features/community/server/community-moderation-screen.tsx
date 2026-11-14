@@ -21,7 +21,7 @@ import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { ContentModerationControls } from "../../../components/content-moderation-controls";
+import { ContentModerationControls } from "../content-moderation";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 const focusLink =

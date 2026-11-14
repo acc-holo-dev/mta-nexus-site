@@ -26,7 +26,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { ContentModerationControls } from "../../src/components/content-moderation-controls";
+import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { moderationCopy } from "../../src/lib/community-moderation-copy";
 import { getDictionary } from "../../src/lib/i18n";
 

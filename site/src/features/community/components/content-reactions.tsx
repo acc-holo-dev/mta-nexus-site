@@ -8,13 +8,13 @@ import {
   confirmedReactionMutation,
   type ReactionState,
   reactionStateSchema,
-} from "../lib/content-reaction-contract";
-import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
+} from "../../../lib/content-reaction-contract";
+import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
 export function ContentReactions({
   slug,
   contentId,

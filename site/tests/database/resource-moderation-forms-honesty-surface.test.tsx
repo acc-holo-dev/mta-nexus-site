@@ -36,7 +36,7 @@ const exclusive = [
   "site/src/features/resources/components/resource-moderation-controls.tsx",
   "site/src/features/resources/components/build-moderation-controls.tsx",
   "site/src/features/resources/components/build-quarantine-controls.tsx",
-  "site/src/components/content-moderation-controls.tsx",
+  "site/src/features/community/components/content-moderation-controls.tsx",
   "site/src/components/report-moderation-controls.tsx",
   "site/src/components/verification-moderation-controls.tsx",
   "site/src/features/resources/components/resource-release-watch-control.tsx",

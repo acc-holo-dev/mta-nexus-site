@@ -68,7 +68,7 @@ import { generateMetadata as moderationMetadata } from "../../src/app/admin/comm
 import StreamLoading from "../../src/app/discover/stream/loading";
 import StreamPage, { generateMetadata as streamMetadata } from "../../src/app/discover/stream/page";
 import { CommunityModerationScreen } from "../../src/features/community/server/community-moderation-screen";
-import { ContentModerationControls } from "../../src/components/content-moderation-controls";
+import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { moderationCopy } from "../../src/lib/community-moderation-copy";
 import { discoveryStreamCopy } from "../../src/lib/discovery-stream-copy";
 import { getDictionary } from "../../src/lib/i18n";

@@ -5,7 +5,7 @@ import { ArticleCard } from "../../features/community/article-view";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
-} from "../../components/content-catalog-controls";
+} from "../../features/community/catalog-controls";
 import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";

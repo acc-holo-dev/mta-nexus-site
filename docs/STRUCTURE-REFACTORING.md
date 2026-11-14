@@ -33,7 +33,8 @@ Phase 4.25 проверена: Servers interactions и Resources meta inspector.
 Phase 4.26 проверена: Community discussion, reports и topics.
 Phase 4.27 проверена: Community report screens и history.
 Phase 4.28 проверена: Community moderation и discussion controls.
-Выполняется Phase 4.29: Community publications и author controls. Владелец явно
+Phase 4.29 проверена: Community publications и author controls.
+Выполняется Phase 4.30: Community catalog, reactions и publication history. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -570,3 +571,7 @@ Report screens и history прошли полный [CI #4666](https://github.co
 ### Phase 4.29: Community publications и author controls
 
 Модерация Community прошла полный [CI #4667](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43590083297) на `f41f7155`. Карточка публикации, лента и её загрузка, подписка, редактор автора и восстановление публикации объединены в Community. Public entries отделяют клиентские и server-only зависимости; существующие подтверждения и серверные проверки сохранены.
+
+### Phase 4.30: Community catalog, reactions и publication history
+
+Публикации и авторские действия прошли полный [CI #4668](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43625928083) на `760f9d43`. Фильтры каталога, реакции, управление модерацией, форма комментария и общий экран истории публикаций объединены в Community. Server-only вход истории сохраняет общий экран для организаций и серверов; проверки полномочий, подтверждения и существующие сервисы остаются прежними.

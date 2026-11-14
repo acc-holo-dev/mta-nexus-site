@@ -17,9 +17,12 @@ const ports = [
   "publication-feed",
   "author-content-form",
   "author-publication-restore",
+  "catalog-controls",
+  "reactions",
+  "content-moderation",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-contract|organization-publication-history-copy|server-publication-history-contract|server-publication-history-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-contract|organization-publication-history-copy|server-publication-history-contract|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -87,6 +90,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "discussion-reports",
     "publication-reports",
     "publication-feed-loading",
+    "context-history",
   ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
@@ -119,6 +123,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "discussion-reports",
     "publication-reports",
     "publication-feed-loading",
+    "context-history",
   ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
@@ -145,6 +150,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     "community-report-groups",
     "moderated-discussion-removal",
     "discussion-report-batch",
+    "content-comment-form",
   ].map((name) => `site/src/features/community/components/${name}.tsx`);
   const result = cruise(root, [...entries, ...componentEntries]);
   assert.equal(result.status, 0, result.stderr);
@@ -155,7 +161,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -201,6 +207,7 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["discussion-reports-server.ts", "discussion-reports-screen.tsx"],
     ["publication-reports-server.ts", "publication-reports-page.tsx"],
     ["publication-feed-loading-server.ts", "publication-feed-loading.tsx"],
+    ["context-history-server.ts", "context-publication-history-screen.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;

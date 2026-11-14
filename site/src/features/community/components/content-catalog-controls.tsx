@@ -2,13 +2,13 @@
 
 import { Button, FilterBar, fieldClass, SearchField } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   contentPageHref,
   type parseContentPage,
   type writerTypes,
-} from "../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
+} from "../../../lib/user-platform-contract";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 
 type Filters = ReturnType<typeof parseContentPage>;
 

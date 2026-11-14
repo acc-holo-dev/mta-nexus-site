@@ -10,7 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommunityReportForm } from "../../../features/community/report-form";
 import { ContentDiscussion } from "../../../features/community/discussion";
-import { ContentReactions } from "../../../components/content-reactions";
+import { ContentReactions } from "../../../features/community/reactions";
 import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../../../lib/content-discussion-copy";
 import { getDictionary } from "../../../lib/i18n";

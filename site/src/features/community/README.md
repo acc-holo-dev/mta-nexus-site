@@ -4,24 +4,28 @@ Feature объединяет клиентское обсуждение публ�
 комментарием, обратную связь при отправке и создание темы. Сервисы, репозитории,
 авторизация и транзакции доставки остаются единственными существующими реализациями.
 
-| Entry                                | Контракт                                                             |
-| ------------------------------------ | -------------------------------------------------------------------- |
-| `reports-server.ts`                  | `CommunityReportScreen`; server-only жалобы заявителя и staff        |
-| `report-history-server.ts`           | `CommunityReportHistoryPage`, metadata; server-only история          |
-| `report-groups-server.ts`            | `CommunityReportGroupsPage`, metadata; server-only группировка       |
-| `moderation-server.ts`               | `CommunityModerationScreen`; server-only модерация публикаций        |
-| `moderated-discussion-server.ts`     | `ModeratedDiscussionScreen`; server-only модерация обсуждений        |
-| `discussion-reports-server.ts`       | `DiscussionReportsScreen`; server-only жалобы на обсуждение          |
-| `publication-reports-server.ts`      | `PublicationReportsPage`, metadata; server-only жалобы на публикацию |
-| `article-view.ts`                    | `ArticleCard`; карточка публикации                                   |
-| `publication-feed.ts`                | `PublicationFeed`; лента публикаций                                  |
-| `publication-feed-loading-server.ts` | `PublicationFeedLoading`; server-only состояние загрузки             |
-| `author-content-form.ts`             | `AuthorContentForm`; редактор автора                                 |
-| `author-publication-restore.ts`      | `AuthorPublicationRestore`; восстановление публикации                |
-| `own-discussion.ts`                  | `OwnDiscussionDetail`; клиентская деталь обсуждения                  |
-| `discussion.ts`                      | `ContentDiscussion`; обсуждение публикации                           |
-| `topic-form.ts`                      | `CommunityTopicForm`; создание темы                                  |
-| `report-form.ts`                     | `CommunityReportForm`; жалоба на публикацию или комментарий          |
+| Entry                                | Контракт                                                                      |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| `reports-server.ts`                  | `CommunityReportScreen`; server-only жалобы заявителя и staff                 |
+| `report-history-server.ts`           | `CommunityReportHistoryPage`, metadata; server-only история                   |
+| `report-groups-server.ts`            | `CommunityReportGroupsPage`, metadata; server-only группировка                |
+| `moderation-server.ts`               | `CommunityModerationScreen`; server-only модерация публикаций                 |
+| `moderated-discussion-server.ts`     | `ModeratedDiscussionScreen`; server-only модерация обсуждений                 |
+| `discussion-reports-server.ts`       | `DiscussionReportsScreen`; server-only жалобы на обсуждение                   |
+| `publication-reports-server.ts`      | `PublicationReportsPage`, metadata; server-only жалобы на публикацию          |
+| `catalog-controls.ts`                | Фильтры и навигация каталога публикаций                                       |
+| `reactions.ts`                       | `ContentReactions`; реакции на публикацию                                     |
+| `content-moderation.ts`              | `ContentModerationControls`; действия модерации                               |
+| `context-history-server.ts`          | `ContextPublicationHistoryScreen`; server-only история организаций и серверов |
+| `article-view.ts`                    | `ArticleCard`; карточка публикации                                            |
+| `publication-feed.ts`                | `PublicationFeed`; лента публикаций                                           |
+| `publication-feed-loading-server.ts` | `PublicationFeedLoading`; server-only состояние загрузки                      |
+| `author-content-form.ts`             | `AuthorContentForm`; редактор автора                                          |
+| `author-publication-restore.ts`      | `AuthorPublicationRestore`; восстановление публикации                         |
+| `own-discussion.ts`                  | `OwnDiscussionDetail`; клиентская деталь обсуждения                           |
+| `discussion.ts`                      | `ContentDiscussion`; обсуждение публикации                                    |
+| `topic-form.ts`                      | `CommunityTopicForm`; создание темы                                           |
+| `report-form.ts`                     | `CommunityReportForm`; жалоба на публикацию или комментарий                   |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую
@@ -42,3 +46,5 @@ Session/role, private evidence, filters, pagination и server authority сохр
 confirmation и серверные транзакции сохраняются.
 
 Карточка, лента, загрузка, подписка и авторские действия принадлежат Community. Подписка остаётся внутренним компонентом обсуждения; authority и существующие HTTP adapters сохранены.
+
+Фильтры каталога, реакции, модерация и форма комментария входят в Community. Общая история публикаций имеет server-only вход и использует прежние сервисы организаций и серверов.

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
-} from "../../../../../components/content-catalog-controls";
+} from "../../../../../features/community/catalog-controls";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { organizationContentId } from "../../../../../lib/organization-content-api";

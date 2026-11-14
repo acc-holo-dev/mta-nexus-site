@@ -25,7 +25,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { ContentModerationControls } from "../../src/components/content-moderation-controls";
+import { ContentModerationControls } from "../../src/features/community/content-moderation";
 
 const { click, ready } = createCommunityModerationInteractionHelpers(
   harness,

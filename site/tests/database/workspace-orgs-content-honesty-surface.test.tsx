@@ -107,15 +107,15 @@ it("locks organization content honesty chrome through shared surfaces and additi
   expect(read("site/src/components/organization-history.tsx")).toContain("ErrorState");
   expect(read("site/src/components/organization-history.tsx")).toContain("EmptyState");
   expect(read("site/src/components/organization-content-editor-page.tsx")).toContain("ErrorState");
-  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
-    "ErrorState",
-  );
-  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
-    "EmptyState",
-  );
-  expect(read("site/src/components/context-publication-history-screen.tsx")).toContain(
-    "historyEmptyHint",
-  );
+  expect(
+    read("site/src/features/community/server/context-publication-history-screen.tsx"),
+  ).toContain("ErrorState");
+  expect(
+    read("site/src/features/community/server/context-publication-history-screen.tsx"),
+  ).toContain("EmptyState");
+  expect(
+    read("site/src/features/community/server/context-publication-history-screen.tsx"),
+  ).toContain("historyEmptyHint");
   expect(read("site/src/lib/organization-publication-history-copy.ts")).toContain(
     "historyEmptyHint",
   );
