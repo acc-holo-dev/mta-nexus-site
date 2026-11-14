@@ -71,8 +71,8 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { RegisterServerForm } from "../../src/components/register-server-form";
-import { ServerDetailsForm } from "../../src/components/server-details-form";
+import { RegisterServerForm } from "../../src/features/servers/components/register-server-form";
+import { ServerDetailsForm } from "../../src/features/servers/components/server-details-form";
 
 describe("server forms use the same editable MTA metadata", () => {
   it("renders persisted HTTP port and map in the owner editor", () => {

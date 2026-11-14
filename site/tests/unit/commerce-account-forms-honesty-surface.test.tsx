@@ -21,7 +21,7 @@ const formComponents = [
   "site/src/components/license-control-panel.tsx",
   "site/src/components/license-runtime-probe.tsx",
   "site/src/components/organization-ownership-transfer.tsx",
-  "site/src/components/register-server-form.tsx",
+  "site/src/features/servers/components/register-server-form.tsx",
   "site/src/components/storage-maintenance-controls.tsx",
 ] as const;
 
@@ -35,7 +35,7 @@ it("locks commerce and account form failures to ErrorState with touch CTAs", () 
 });
 
 it("locks register server native controls to fieldControlClass without h-10 chrome", () => {
-  const source = read("site/src/components/register-server-form.tsx");
+  const source = read("site/src/features/servers/components/register-server-form.tsx");
   expect(source).toContain("fieldControlClass");
   expect(source).toContain('className: "min-h-11"');
   expect(source).not.toContain("h-10");

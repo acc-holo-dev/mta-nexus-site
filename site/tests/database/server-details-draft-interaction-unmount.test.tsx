@@ -23,7 +23,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { ServerDetailsForm } from "../../src/components/server-details-form";
+import { ServerDetailsForm } from "../../src/features/servers/components/server-details-form";
 
 const { render, submit } = createServerDetailsDraftInteractionHelpers(harness, ServerDetailsForm);
 

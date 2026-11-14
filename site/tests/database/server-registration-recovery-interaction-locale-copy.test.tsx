@@ -19,7 +19,7 @@ vi.mock("../../src/components/locale-context", async () => {
   return { useNexusLocale: () => ({ locale: h.locale, dictionary: getDictionary(h.locale) }) };
 });
 
-import { RegisterServerForm } from "../../src/components/register-server-form";
+import { RegisterServerForm } from "../../src/features/servers/components/register-server-form";
 
 const { render, mount, submit } = createServerRegistrationRecoveryInteractionHelpers(
   h,

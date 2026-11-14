@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ManagedServerCard } from "../../src/components/managed-server-card";
+import { ManagedServerCard } from "../../src/features/servers/server/managed-server-card";
 import { getDictionary } from "../../src/lib/i18n";
 import { getManagedServerCopy } from "../../src/lib/managed-server-view";
 

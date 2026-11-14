@@ -36,7 +36,7 @@ module.exports = {
         "Other application modules consume Servers only through explicit public entrypoints.",
       from: { path: "^site/src/(?!features/servers/)" },
       to: {
-        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|statistics-server|observations-server|history-server)\\.ts$)",
+        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|statistics-server|observations-server|history-server|claim-status-server|managed-card-server)\\.ts$)",
       },
     },
     {
@@ -51,10 +51,10 @@ module.exports = {
       comment:
         "Client components and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-organization-options)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -75,7 +75,7 @@ module.exports = {
       name: "servers-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },

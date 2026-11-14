@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { platformSignInFocusClass } from "../../components/guest-auth-links";
-import { ManagedServerCard } from "../../components/managed-server-card";
+import { ManagedServerCard } from "../../features/servers/managed-card-server";
 import { PlatformSignIn } from "../../components/platform-sign-in";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";

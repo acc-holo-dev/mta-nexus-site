@@ -24,7 +24,7 @@ vi.mock("../../src/components/locale-context", async () => {
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { ServerClaimControlPanel } from "../../src/components/server-claim-control-panel";
+import { ServerClaimControlPanel } from "../../src/features/servers/components/server-claim-control-panel";
 
 const { render, mount, click, waitUntilReady, hasCopy, attachWindowEvents } =
   createServerClaimActorRecoveryInteractionHelpers(h, ServerClaimControlPanel);

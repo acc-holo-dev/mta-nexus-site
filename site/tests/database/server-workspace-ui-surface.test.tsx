@@ -113,9 +113,9 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { RegisterServerForm } from "../../src/components/register-server-form";
-import { ServerClaimControlPanel } from "../../src/components/server-claim-control-panel";
-import { ServerDetailsForm } from "../../src/components/server-details-form";
+import { RegisterServerForm } from "../../src/features/servers/components/register-server-form";
+import { ServerClaimControlPanel } from "../../src/features/servers/components/server-claim-control-panel";
+import { ServerDetailsForm } from "../../src/features/servers/components/server-details-form";
 
 describe("server workspace UI surface", () => {
   it.each(["en", "ru"] as const)(

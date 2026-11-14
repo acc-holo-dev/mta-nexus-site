@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { ObjectReportForm } from "../../../components/object-report-form";
-import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
+import { ServerClaimControlPanel } from "../../../features/servers/claim-controls";
 import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../components/server-follow-button";
 import { ServerHistoryPanel } from "../../../features/servers/history-server";

@@ -5,17 +5,17 @@ import { KeyRound, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { getDictionary } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
+import { getDictionary } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
   parseIssuedServerClaimChallenge,
-} from "../lib/server-claim-confirmation";
-import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
-import { authEntryHref } from "./auth-return-path";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/server-claim-confirmation";
+import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
+import { authEntryHref } from "../../../components/auth-return-path";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { useNexusLocale } from "../../../components/locale-context";
 
 function claimMarkerKey(serverId: string, actor: string) {
   return `nexus:server-claim:v1:${encodeURIComponent(actor)}:${encodeURIComponent(serverId)}`;

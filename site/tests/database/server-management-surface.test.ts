@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -57,14 +59,14 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/components/server-details-form", async () => {
+vi.mock("../../src/features/servers/details-controls", async () => {
   const React = await import("react");
   return {
     ServerDetailsForm: () => React.createElement("div", { "data-testid": "server-details-form" }),
   };
 });
 
-vi.mock("../../src/components/server-claim-control-panel", async () => {
+vi.mock("../../src/features/servers/components/server-claim-control-panel", async () => {
   const React = await import("react");
   return {
     ServerClaimControlPanel: () =>

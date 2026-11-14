@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
-vi.mock("../../src/components/server-claim-control-panel", async () => {
+vi.mock("../../src/features/servers/components/server-claim-control-panel", async () => {
   const { createElement } = await import("react");
   return {
     ServerClaimControlPanel: () => createElement("div", { "data-testid": "claim-controls" }),
@@ -9,7 +9,7 @@ vi.mock("../../src/components/server-claim-control-panel", async () => {
 });
 
 import type { ManagedServerClaimStatus } from "@nexus/db";
-import { ServerClaimStatusPanel } from "../../src/components/server-claim-status-panel";
+import { ServerClaimStatusPanel } from "../../src/features/servers/server/server-claim-status-panel";
 import {
   getServerClaimStatusCopy,
   serverClaimErrorMessage,

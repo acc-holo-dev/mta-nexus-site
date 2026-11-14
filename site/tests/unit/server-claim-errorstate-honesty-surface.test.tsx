@@ -6,11 +6,11 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const source = readFileSync(
-  join(root, "site/src/components/server-claim-control-panel.tsx"),
+  join(root, "site/src/features/servers/components/server-claim-control-panel.tsx"),
   "utf8",
 );
 const statusSource = readFileSync(
-  join(root, "site/src/components/server-claim-status-panel.tsx"),
+  join(root, "site/src/features/servers/server/server-claim-status-panel.tsx"),
   "utf8",
 );
 

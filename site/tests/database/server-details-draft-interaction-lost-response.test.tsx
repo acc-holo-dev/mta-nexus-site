@@ -22,7 +22,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { ServerDetailsForm } from "../../src/components/server-details-form";
+import { ServerDetailsForm } from "../../src/features/servers/components/server-details-form";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render, submit } = createServerDetailsDraftInteractionHelpers(harness, ServerDetailsForm);

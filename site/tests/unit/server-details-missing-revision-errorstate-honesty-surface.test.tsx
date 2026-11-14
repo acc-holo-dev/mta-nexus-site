@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/server-details-form.tsx";
+const surface = "site/src/features/servers/components/server-details-form.tsx";
 
 it("locks missing saved revision to ErrorState alert", () => {
   const source = read(surface);

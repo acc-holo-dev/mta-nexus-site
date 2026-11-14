@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { platformSignInFocusClass } from "../../../components/guest-auth-links";
-import { ManagedServerCard } from "../../../components/managed-server-card";
+import { ManagedServerCard } from "../../../features/servers/managed-card-server";
 import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { getDictionary } from "../../../lib/i18n";

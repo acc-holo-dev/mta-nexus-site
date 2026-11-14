@@ -130,7 +130,7 @@ vi.mock("../../src/components/server-updates-panel", async () => {
   };
 });
 
-vi.mock("../../src/components/server-claim-control-panel", async () => {
+vi.mock("../../src/features/servers/claim-controls", async () => {
   const React = await import("react");
   return {
     ServerClaimControlPanel: ({ serverId }: { serverId: string }) =>

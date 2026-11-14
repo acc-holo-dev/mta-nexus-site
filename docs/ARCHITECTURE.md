@@ -32,7 +32,9 @@
 composition страницы), `model.ts` (чистые types/projections/pagination/cache helpers),
 `connect.ts`, `statistics-export.ts` и `statistics-view.ts` для detail controls,
 а также server-only `statistics-server.ts`, `observations-server.ts` и
-`history-server.ts` для статистики, наблюдений и истории.
+`history-server.ts` для статистики, наблюдений и истории. Registration, claim
+и details forms используют client ports; claim status и managed card — отдельные
+server-only ports.
 [Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
 
 App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует

@@ -145,7 +145,7 @@ vi.mock("../../../components/server-updates-panel", async () => {
   };
 });
 
-vi.mock("../../../components/server-claim-control-panel", async () => {
+vi.mock("../../../features/servers/claim-controls", async () => {
   const React = await import("react");
   return {
     ServerClaimControlPanel: () => React.createElement("div", { "data-testid": "server-claim" }),

@@ -16,6 +16,11 @@ Claim, ownership, management, reviews, history и collectors пока наход
 | `statistics-server.ts`   | Statistics page, metadata и loading; server-only                                                  |
 | `observations-server.ts` | Observation browser, metadata и loading; server-only                                              |
 | `history-server.ts`      | `ServerHistoryPanel`; server-only                                                                 |
+| `registration.ts`        | `RegisterServerForm`; client регистрация                                                          |
+| `claim-controls.ts`      | `ServerClaimControlPanel`; client подтверждение контроля                                          |
+| `details-controls.ts`    | `ServerDetailsForm`; client настройки                                                             |
+| `claim-status-server.ts` | `ServerClaimStatusPanel`; server-only статус                                                      |
+| `managed-card-server.ts` | `ManagedServerCard`; server-only карточка                                                         |
 | `client.ts`              | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
 | `server.ts`              | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
 | `model.ts`               | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
@@ -54,3 +59,7 @@ Clipboard fallback, ограничения периода, timeout/abort и се
 Экраны статистики и наблюдений, statistics panel и history panel принадлежат
 Servers и используют отдельные server-only ports. Metadata, loading, session и
 права менеджера сохраняются; observations не заменяют managed profile.
+
+Формы регистрации, claim и настроек, статус claim и managed card принадлежат
+Servers. Actor/draft/revision и challenge сохраняются, права и подтверждение
+владения по-прежнему проверяются сервером.

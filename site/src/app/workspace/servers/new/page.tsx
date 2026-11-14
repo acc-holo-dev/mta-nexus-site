@@ -2,7 +2,7 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import { RegisterServerForm } from "../../../../components/register-server-form";
+import { RegisterServerForm } from "../../../../features/servers/registration";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";

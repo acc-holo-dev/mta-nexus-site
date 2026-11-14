@@ -59,7 +59,14 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     'export { domain } from "@nexus/domain";',
   );
   write("site/src/features/servers/model.ts", 'export { domain } from "./model/observation";');
-  for (const port of ["connect", "statistics-export", "statistics-view"]) {
+  for (const port of [
+    "connect",
+    "statistics-export",
+    "statistics-view",
+    "registration",
+    "claim-controls",
+    "details-controls",
+  ]) {
     write(`site/src/features/servers/${port}.ts`, 'export { page } from "./server";');
     write(`site/src/app/${port}.ts`, `export { page } from "../features/servers/${port}";`);
   }
@@ -72,7 +79,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "site/src/features/servers/server/page.ts",
     'import { db } from "../../../lib/services/session"; export const page = db;',
   );
-  for (const port of ["statistics", "observations", "history"]) {
+  for (const port of ["statistics", "observations", "history", "claim-status", "managed-card"]) {
     write(
       `site/src/features/servers/${port}-server.ts`,
       'import "server-only"; export { page } from "./server/page";',
@@ -117,9 +124,14 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
   for (const [name, rule] of [
+    ["features/servers/registration.ts", "servers-client-isolation"],
+    ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/details-controls.ts", "servers-client-isolation"],
     ["features/servers/connect.ts", "servers-client-isolation"],
     ["features/servers/statistics-export.ts", "servers-client-isolation"],
     ["features/servers/statistics-view.ts", "servers-client-isolation"],
+    ["features/servers/components/claim-status-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/managed-card-leak.ts", "servers-client-isolation"],
     ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
     ["features/servers/components/observations-leak.ts", "servers-client-isolation"],
     ["features/servers/components/history-leak.ts", "servers-client-isolation"],
@@ -135,10 +147,15 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
   ])
     assert(rules(`site/src/${name}`).includes(rule), `${name} escaped ${rule}`);
   for (const name of [
+    "app/claim-status-server.ts",
+    "app/managed-card-server.ts",
     "app/statistics-server.ts",
     "app/observations-server.ts",
     "app/history-server.ts",
     "app/page.ts",
+    "app/registration.ts",
+    "app/claim-controls.ts",
+    "app/details-controls.ts",
     "app/connect.ts",
     "app/statistics-export.ts",
     "app/statistics-view.ts",
@@ -155,6 +172,9 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
 
 test("real client and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/servers/registration.ts",
+    "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/details-controls.ts",
     "site/src/features/servers/connect.ts",
     "site/src/features/servers/statistics-export.ts",
     "site/src/features/servers/statistics-view.ts",
@@ -169,7 +189,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-organization-options)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -182,7 +202,13 @@ test("real client and model entrypoints have no transitive server dependencies",
       visit(dependency.resolved);
     }
   }
-  for (const port of ["connect", "statistics-export"]) {
+  for (const port of [
+    "connect",
+    "statistics-export",
+    "registration",
+    "claim-controls",
+    "details-controls",
+  ]) {
     assert.match(
       readFileSync(resolve(root, `site/src/features/servers/${port}.ts`), "utf8"),
       /^"use client";/u,
@@ -192,6 +218,9 @@ test("real client and model entrypoints have no transitive server dependencies",
     readFileSync(resolve(root, "site/src/features/servers/statistics-view.ts"), "utf8"),
     /^"use client";/u,
   );
+  visit("site/src/features/servers/registration.ts");
+  visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/details-controls.ts");
   visit("site/src/features/servers/connect.ts");
   visit("site/src/features/servers/statistics-export.ts");
   visit("site/src/features/servers/statistics-view.ts");
@@ -207,6 +236,8 @@ test("Servers server entrypoints keep independent composition graphs", () => {
     ["statistics-server.ts", "server-statistics-page.tsx"],
     ["observations-server.ts", "server-observation-browser-page.tsx"],
     ["history-server.ts", "server-history-panel.tsx"],
+    ["claim-status-server.ts", "server-claim-status-panel.tsx"],
+    ["managed-card-server.ts", "managed-server-card.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/servers/${entry}`;

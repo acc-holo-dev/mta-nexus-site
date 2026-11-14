@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -35,8 +35,8 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("./locale-context", async () => {
-  const { getDictionary } = await import("../lib/i18n");
+vi.mock("../../../components/locale-context", async () => {
+  const { getDictionary } = await import("../../../lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: "en" as const,

@@ -26,7 +26,8 @@ Phase 4.18 проверена: Resources package, requirements и quarantine UI.
 Phase 4.19 проверена: Resources reports и batch watches.
 Phase 4.20 проверена: Resources cart и delivery presentation.
 Phase 4.21 проверена: Servers connect и statistics controls.
-Выполняется Phase 4.22: Servers statistics, observations и history. Владелец явно
+Phase 4.22 проверена: Servers statistics, observations и history.
+Выполняется Phase 4.23: Servers registration, claim и management UI. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -535,3 +536,7 @@ Resources cart и delivery presentation прошли полный [CI #4659](htt
 ### Phase 4.22: Servers statistics, observations и history
 
 Connect и statistics controls прошли полный [CI #4660](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43564712037) на `12ffdb40`. Экраны статистики и наблюдений, statistics panel и history panel объединены в Servers с независимыми server-only ports. Тела компонентов сохранены после адаптации imports; metadata/noindex, loading, session/manager authority, диапазоны и различие observations/managed profile остаются прежними. Negative fixtures и реальные графы проверяют изоляцию.
+
+### Phase 4.23: Servers registration, claim и management UI
+
+Statistics, observations и history прошли полный [CI #4661](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43566779033) на `6d3327d5`. Registration, claim и details forms, claim status и managed card объединены в Servers с раздельными client/server-only ports. Тела компонентов сохранены после адаптации imports; actor/draft/revision, challenge, ownership и серверная проверка прав не меняются. Boundary fixtures, реальные графы и состав тестовых проектов проверяются.
