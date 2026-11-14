@@ -49,7 +49,7 @@ test("CI runs separate test projects and reports the selected verification scope
   assert.doesNotMatch(workflow, /run: pnpm release:verify/u);
 
   const releaseEvidence = read("scripts/release-evidence.mjs");
-  const composeVerify = read("deploy/compose.verify.yaml");
+  const composeVerify = read("docker/compose.verify.yaml");
   const alignedRunner = read("scripts/run-ci-aligned-vitest.mjs");
   assert.match(releaseEvidence, /scripts\/run-ci-aligned-vitest\.mjs/u);
   assert.match(releaseEvidence, /assertDisposableTestDatabase\(\)/u);

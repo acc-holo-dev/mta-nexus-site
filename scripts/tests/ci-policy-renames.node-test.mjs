@@ -134,3 +134,17 @@ test("a move from application code to a UI component keeps the wider fast profil
     { code: "true", unit_only: "false", full: "false" },
   );
 });
+
+test("moving new sensitive paths into documentation preserves full acceptance", (t) => {
+  for (const source of [
+    "site/src/app/api/auth/login/route.ts",
+    "site/packages/db/migrations/0091.sql",
+    "docker/Caddyfile",
+  ]) {
+    assert.deepEqual(classifyRename(t, source, "docs/moved.md"), {
+      code: "true",
+      unit_only: "false",
+      full: "true",
+    });
+  }
+});

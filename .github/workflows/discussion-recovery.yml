@@ -6,18 +6,18 @@ on:
       - .github/workflows/discussion-recovery.yml
       - scripts/verify-discussion-recovery.mjs
       - scripts/tests/discussion-recovery-verification.node-test.mjs
-      - apps/web/scripts/discussion-replay-*.ts
-      - apps/web/scripts/replay-discussion-notifications.ts
-      - apps/web/src/lib/services/discussion-*.ts
-      - packages/db/src/repositories/notifications.ts
-      - packages/db/src/repositories/discussion-push-receipt.ts
-      - packages/db/src/repositories/follow-workspace.ts
-      - packages/db/src/repositories/web-push-*.ts
-      - packages/db/src/schema.ts
-      - packages/db/migrations/**
-      - tests/database/discussion-*.integration.test.ts
-      - tests/database/notification-inbox-history.integration.test.ts
-      - tests/database/web-push-*.integration.test.ts
+      - site/scripts/discussion-replay-*.ts
+      - site/scripts/replay-discussion-notifications.ts
+      - site/src/lib/services/discussion-*.ts
+      - site/packages/db/src/repositories/notifications.ts
+      - site/packages/db/src/repositories/discussion-push-receipt.ts
+      - site/packages/db/src/repositories/follow-workspace.ts
+      - site/packages/db/src/repositories/web-push-*.ts
+      - site/packages/db/src/schema.ts
+      - site/packages/db/migrations/**
+      - site/tests/database/discussion-*.integration.test.ts
+      - site/tests/database/notification-inbox-history.integration.test.ts
+      - site/tests/database/web-push-*.integration.test.ts
   workflow_dispatch:
 permissions:
   contents: read

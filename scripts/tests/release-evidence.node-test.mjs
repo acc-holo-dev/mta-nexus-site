@@ -308,7 +308,9 @@ test("release manifest requires valid unique migration names and SHA-256 hashes"
     assert.match(result.reason, /migration names and SHA-256/u);
   }
   assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: [valid] })).ok, true);
-  const actualMigrations = listMigrationEvidence(join(process.cwd(), "packages/db/migrations"));
+  const actualMigrations = listMigrationEvidence(
+    join(process.cwd(), "site/packages/db/migrations"),
+  );
   assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: actualMigrations })).ok, true);
 });
 
@@ -410,7 +412,7 @@ test("strict app image validation requires a resolved digest for the exact SHA a
 });
 
 test("strict infra validation requires the complete resolved pin inventory", () => {
-  const pins = JSON.parse(readFileSync("deploy/infra-image-pins.json", "utf8"));
+  const pins = JSON.parse(readFileSync("docker/infra-image-pins.json", "utf8"));
   const good = pins.images;
   const check = (infraImages) =>
     evaluateReleaseManifest(sampleManifest({ infraImages }), { requireResolvedInfra: true });

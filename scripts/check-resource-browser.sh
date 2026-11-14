@@ -41,7 +41,7 @@ payload_file="$work/j5-browser-resource.zip"
 node --input-type=module - "$payload_file" <<'NODE'
 import { randomBytes } from 'node:crypto';
 import { openSync, closeSync, writeFileSync } from 'node:fs';
-import { MAX_UPLOAD_FILE_SIZE_BYTES } from './packages/domain/src/upload-limits.ts';
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from './site/packages/domain/src/upload-limits.ts';
 const block = randomBytes(1024 * 1024);
 const file = openSync(process.argv[2], 'wx');
 try {
@@ -297,7 +297,7 @@ node scripts/check-download-network.mjs
 "${pc[@]}" cp scripts/tests/hash-cancellation-preload.mjs app:/tmp/nexus-hash-preload.mjs
 "${pc[@]}" cp scripts/check-download-hash-cancellation.mjs app:/tmp/nexus-hash-probe.mjs
 hash_player_count=$(sql "SELECT count(*) FROM audit_events WHERE action = 'product.download_started' AND target_id = '$product_id';")
-if "${pc[@]}" exec -T -w /app/apps/web \
+if "${pc[@]}" exec -T -w /app/site \
   -e NEXUS_HASH_PROBE=disposable-ci \
   -e NEXUS_HASH_PROBE_FILE="/data/uploads/$storage_key" \
   -e NEXUS_RESOURCE_BROWSER_PRODUCT_ID="$product_id" \

@@ -26,7 +26,7 @@ assert.equal(worker.environment?.ACCOUNT_MAIL_SMTP_PASSWORD, "nexus-ci-password"
 assert.deepEqual(worker.command, [
   "sh",
   "-c",
-  "cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready",
+  "cd /app/site/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready",
 ]);
 
 // Optional mail overlay must keep the production-base writer inventory (OPS-04/12).

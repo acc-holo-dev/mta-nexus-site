@@ -3,8 +3,8 @@
   "workspaces": {
     ".": {
       // Operational scripts and browser/Node fixtures are invoked by CI and shell.
-      "entry": ["scripts/**/*.{mjs,ts}", "tests/**/*.test.{ts,tsx}", "playwright.ci.config.mjs"],
-      "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.{ts,tsx}", "*.{mjs,cjs,ts}"],
+      "entry": ["scripts/**/*.{mjs,ts}", "playwright.ci.config.mjs"],
+      "project": ["scripts/**/*.{mjs,ts}", "*.{mjs,cjs,ts}"],
       // Browser checks install Playwright into an isolated prefix in the shell runners.
       // `postgres` is consumed by root operational scripts via the @nexus/db workspace install.
       "ignoreDependencies": ["@playwright/test", "@axe-core/playwright", "postgres"],
@@ -12,15 +12,15 @@
       // optional system runtime for the PowerShell local-verification mock test.
       "ignoreBinaries": ["openssl", "pwsh"]
     },
-    "apps/web": {
-      "entry": ["scripts/**/*.ts"],
-      "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
+    "site": {
+      "entry": ["scripts/**/*.ts", "tests/**/*.test.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts", "tests/**/*.{ts,tsx}"],
       "next": true
     },
-    "packages/*": {
+    "site/packages/*": {
       "project": ["src/**/*.{ts,tsx}"]
     },
-    "packages/db": {
+    "site/packages/db": {
       // The worker integration test starts this fixture through a computed fork path.
       "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],

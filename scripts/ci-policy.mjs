@@ -12,6 +12,7 @@ const fullAcceptancePaths = [
   /^Dockerfile$/,
   /^compose[^/]*\.ya?ml$/,
   /^deploy\//,
+  /^configs?\//,
   /^packages\/db\/(?:migrations\/|scripts\/|src\/(?:[^/]+\/)*(?:[^/]*schema|migrate)\.ts$)/,
   /^scripts\//,
   /^vitest\.config\.ts$/,
@@ -19,6 +20,7 @@ const fullAcceptancePaths = [
   /^pnpm-(?:lock|workspace)\.yaml$/,
   /^\.(?:nvmrc|node-version)$/,
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
+  /^apps\/web\/src\/features\/(?:servers|resources|community)\//,
   /^packages\/(?:config|security|storage)\//,
   /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans|order-operations|subscriptions|entitlements|resource-cart|community-reports|notifications|discussion-management|organization-governance|license-controls)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:library-collections|library-collection-(?:command|internals)|library-membership-batches|library-selection-batches)\.ts$/,
@@ -40,6 +42,24 @@ const unitOnlyPaths = [
   /^apps\/web\/src\/components\/.+\.(?:test|spec)\.[cm]?[jt]sx?$/,
 ];
 
+// Interpret both sides of each approved structural move using the current
+// sensitivity rules. Keep legacy paths covered until migration acceptance.
+function policyPath(file) {
+  if (file.startsWith("site/packages/") || file.startsWith("site/tests/"))
+    return policyPath(file.slice("site/".length));
+  if (file.startsWith("site/")) return `apps/web/${file.slice("site/".length)}`;
+  if (file === "docker/Dockerfile") return "Dockerfile";
+  if (/^docker\/compose[^/]*\.ya?ml$/u.test(file)) return file.slice("docker/".length);
+  if (file.startsWith("docker/")) return `deploy/${file.slice("docker/".length)}`;
+  if (
+    /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/u.test(
+      file,
+    )
+  )
+    return file.replace("tests/", "tests/unit/");
+  return file;
+}
+
 function isDocumentation(file) {
   return documentationPath.test(file);
 }
@@ -52,6 +72,7 @@ export function classifyChanges(
   files,
   { explicitFull = false, release = false, mainPush = false } = {},
 ) {
+  files = files.map(policyPath);
   const code = files.some((file) => !isDocumentation(file));
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),

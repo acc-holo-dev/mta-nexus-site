@@ -30,7 +30,7 @@ esac
       "bash",
       [
         "scripts/run-focused-database-test-compose.sh",
-        "tests/database/password-change-transaction.test.ts",
+        "site/tests/database/password-change-transaction.test.ts",
       ],
       {
         encoding: "utf8",
@@ -94,7 +94,7 @@ exit 0
       "bash",
       [
         "scripts/run-focused-database-test-compose.sh",
-        "tests/database/password-change-transaction.test.ts",
+        "site/tests/database/password-change-transaction.test.ts",
       ],
       {
         encoding: "utf8",
@@ -153,7 +153,7 @@ exit 0
       "bash",
       [
         "scripts/run-focused-database-test-compose.sh",
-        "tests/database/password-change-transaction.test.ts",
+        "site/tests/database/password-change-transaction.test.ts",
       ],
       {
         encoding: "utf8",

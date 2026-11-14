@@ -7,11 +7,11 @@
 | Слой      | Версия / выбор                                                                                                      |
 | --------- | ------------------------------------------------------------------------------------------------------------------- |
 | Runtime   | Node.js 26.11.1 (`.nvmrc`), pnpm 12.4.2                                                                             |
-| App       | Next.js 16.4 + React 19.3 в `apps/web` (Turbopack default; `build:webpack` запасной)                                |
+| App       | Next.js 16.4 + React 19.3 в `site` (Turbopack default; `build:webpack` запасной)                                    |
 | UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                                                            |
 | Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                                                             |
 | Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser                               |
-| Dev stack | Docker Compose [`deploy/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
+| Dev stack | Docker Compose [`docker/compose.yaml`](OPERATIONS.md#1-supported-dev-startup): app, PostgreSQL, ClamAV, push-worker |
 | CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo                                             |
 
 Модульный монолит на одной инстанции. Redis, внешние очереди и микросервисы не входят в текущую форму без измеренной необходимости.
@@ -19,33 +19,46 @@
 ## Пакеты и приложение
 
 ```
-apps/web          → страницы App Router, HTTP API, UI, lib/services (~75 сервисов)
-packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
-packages/validation → Zod/схемы входа
-packages/security → сессии, authz, идентификаторы, лимиты
-packages/db       → schema, migrations (~90 SQL), repositories (~170), workers
-packages/storage  → приватные артефакты и целостность
-packages/config   → проверка env
-packages/ui       → общие UI-примитивы без серверных импортов
-tests/            → HTTP/UI/поведенческие Vitest-сюиты (~6MB)
+site          → страницы App Router, HTTP API, UI, lib/services (~75 сервисов)
+site/packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
+site/packages/validation → Zod/схемы входа
+site/packages/security → сессии, authz, идентификаторы, лимиты
+site/packages/db       → schema, migrations (~90 SQL), repositories (~170), workers
+site/packages/storage  → приватные артефакты и целостность
+site/packages/config   → проверка env
+site/packages/ui       → общие UI-примитивы без серверных импортов
+site/tests/       → HTTP/UI/поведенческие Vitest-сюиты (~6MB)
 scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 ```
 
-Граница: HTTP → services → domain/validation → repositories. Пакеты не импортируют `apps/web`.
+Resources catalog живёт в [`site/src/features/resources`](../site/src/features/resources/README.md):
+`view` — общая карточка, `server` — `/market` composition, `model` — query/pagination.
+`detail-server` — изолированная `/market/[slug]` composition; metadata остаётся в routing.
+`versions-server` и `reviews-server` — отдельные публичные подстраницы; safe-build/review
+правила и SQL остаются в существующих service/repository.
+`client` — gallery/Q&A; preview используется внутри feature; `evidence` — build provenance/package UI. Общий modal
+hook остаётся в components; pure gallery/provenance helpers — в feature model.
+`media-server` и `build-server` изолируют author/staff composition; metadata остаётся в routing.
+Services, SQL visibility и download authority сохраняют прежние места.
+
+Servers read-only pilot живёт в [`site/src/features/servers`](../site/src/features/servers/README.md);
+claim/management/collectors остаются в прежних модулях.
+
+Граница: HTTP → services → domain/validation → repositories. Пакеты не импортируют код приложения.
 
 ## Основные продуктовые поверхности
 
-| Область                   | Где смотреть                                                         |
-| ------------------------- | -------------------------------------------------------------------- |
-| Auth / Security Center    | `auth-service`, `packages/security`, workspace settings              |
-| Servers / directory       | `mta-master-directory-service`, `server-*`, `/servers`               |
-| Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources |
-| Library / collections     | `library-*`, `/workspace/library`                                    |
-| Community / content       | `content-service`, discussions, `/community`, articles               |
-| Orgs / teams              | `organization-*`, `/workspace/organizations`                         |
-| Moderation / trust        | reports, verification, admin queues                                  |
-| Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)          |
-| Commerce shell            | cart/checkout/orders **без** реальных платежей (open free beta)      |
+| Область                   | Где смотреть                                                           |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Auth / Security Center    | `auth-service`, `site/packages/security`, workspace settings           |
+| Servers / directory       | `features/servers/{client,server,model}`, прежние services, `/servers` |
+| Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources   |
+| Library / collections     | `library-*`, `/workspace/library`                                      |
+| Community / content       | `content-service`, discussions, `/community`, articles                 |
+| Orgs / teams              | `organization-*`, `/workspace/organizations`                           |
+| Moderation / trust        | reports, verification, admin queues                                    |
+| Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)            |
+| Commerce shell            | cart/checkout/orders **без** реальных платежей (open free beta)        |
 
 ## Запуск и проверки (кратко)
 
@@ -84,6 +97,12 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 - Нет корневого Turbo/`turbo.json`: оркестрация — pnpm scripts + Compose + CI policy.
 - Database Vitest: `maxWorkers: 1`, `isolate: true` — намеренно из‑за Proxy-моков клиента БД; ускорять только после замеров ([PROBLEMS](PROBLEMS.md)).
 - Платежи/payout/DRM: утверждённая цель, не runtime open free beta.
+
+## Изменение структуры
+
+[Технический план](STRUCTURE-REFACTORING.md) описывает foundation и локальный перенос
+приложения, packages и tests в `site/`, инфраструктуры в `docker/`,
+шаблонов env в `config/env/`. Compose identity и данные сохраняются отдельно от путей.
 
 ## Документы по роли
 

@@ -57,3 +57,9 @@ pnpm-задачи на конкретном SHA.
 
 Этот файл — указатель, а не дублирующий журнал. Единственный рабочий tracker —
 [`planning/tasks.json`](../planning/tasks.json).
+
+## Planning validation
+
+Восстановленные Python entrypoints `planning/tools/check_tracker.py`,
+`test_tracker.py`, `render_backlog.py` проверяют действующие layers, Git evidence
+и производные views. Зависимости и команды — в [контракте tracker](../planning/TRACKER.md).

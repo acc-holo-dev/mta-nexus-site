@@ -190,7 +190,7 @@ export function evaluateInfraImagePins(document, { requireResolved = false } = {
 }
 
 export function readInfraImagePins(root) {
-  const path = join(root, "deploy/infra-image-pins.json");
+  const path = join(root, "docker/infra-image-pins.json");
   return JSON.parse(readFileSync(path, "utf8"));
 }
 

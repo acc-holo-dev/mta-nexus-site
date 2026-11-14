@@ -203,7 +203,7 @@ test("OPERATIONS maintenance stop inventory includes every production-base write
   assert.doesNotMatch(ops, /^dc stop caddy push-worker app$/mu);
 });
 
-test("rendered deploy/compose.production.yaml still matches the backup restore mount contract", () => {
+test("rendered docker/compose.production.yaml still matches the backup restore mount contract", () => {
   const directory = mkdtempSync(join(tmpdir(), "nexus-backup-compose-"));
   const emptyEnv = join(directory, "empty.env");
   try {
@@ -223,7 +223,7 @@ test("rendered deploy/compose.production.yaml still matches the backup restore m
           "--project-name",
           "nexus-backup-contract-surface",
           "--file",
-          resolve(process.cwd(), "deploy/compose.production.yaml"),
+          resolve(process.cwd(), "docker/compose.production.yaml"),
           "config",
           "--format",
           "json",

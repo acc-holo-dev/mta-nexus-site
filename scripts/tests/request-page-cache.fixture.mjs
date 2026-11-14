@@ -10,7 +10,7 @@ import React from "react";
 import renderer from "next/dist/compiled/react-server-dom-webpack/server.node.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const sourceRoot = resolve(root, "apps/web/src");
+const sourceRoot = resolve(root, "site/src");
 const requests = new AsyncLocalStorage();
 const routes = [
   ["developers/[username]", "username", "user"],

@@ -1,0 +1,79 @@
+# Node stages follow OPS-03 / toolchain policy: mutable major-branch tag node:26-alpine
+# (exact host/CI pin remains .nvmrc). Candidate digests are recorded in
+# docker/infra-image-pins.json via scripts/resolve-infra-image-digests.mjs — not invented here.
+# Local development image. Compose bind-mounts source directories for hot reload while keeping dependencies inside the image.
+FROM node:26-alpine AS development
+WORKDIR /app
+ENV NODE_ENV=development NEXT_TELEMETRY_DISABLED=1
+# Used by the optional local Mailpit initializer, only in the development image.
+RUN apk add --no-cache openssl
+RUN npm install --global pnpm@12.4.2
+COPY . .
+RUN pnpm install --frozen-lockfile --prod=false \
+    && mkdir -p /data/uploads \
+    && chown -R node:node /app /data/uploads
+USER node
+EXPOSE 3000
+# A migration failure stops the container before Next.js can accept requests.
+CMD ["sh", "-c", "pnpm db:migrate && exec pnpm --filter @nexus/web dev --hostname 0.0.0.0"]
+
+FROM node:26-alpine AS build
+WORKDIR /app
+RUN npm install --global pnpm@12.4.2
+# OPS-05 / ARC10: these values are compile-only placeholders for `pnpm build`.
+# They are not the promotion origin or production secrets. Runtime Compose/CI
+# supplies the real HTTPS origin (APP_URL / NEXT_PUBLIC_APP_URL) and secrets for
+# the same image digest — no per-domain rebuild. @nexus/config rejects the
+# build-placeholder AUTH_SECRET / DATABASE_URL if they reach a production process.
+ENV NODE_ENV=production \
+    NEXUS_IMAGE_COMPILE=1 \
+    NEXT_PUBLIC_APP_URL=https://nexus-mta.com \
+    DATABASE_URL=postgres://nexus:build-only@127.0.0.1:5432/mta_nexus \
+    AUTH_SECRET=build-only-secret-that-is-long-enough-for-validation \
+    STORAGE_PROVIDER=local \
+    STORAGE_LOCAL_PATH=/data/uploads \
+    EMAIL_PROVIDER=disabled \
+    BUILD_SCANNER=clamav \
+    CLAMAV_HOST=clamav \
+    CLAMAV_PORT=3310 \
+    SMTP_FROM=no-reply@nexus-mta.com
+COPY . .
+RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm build \
+    && test -f site/.next/standalone/site/server.js \
+    && test -d site/.next/static
+# Migrations and the optional mail worker intentionally remain TypeScript.
+# Deploy only their production dependency graph instead of copying the whole workspace.
+RUN pnpm --filter @nexus/db --prod deploy /runtime/db \
+    && test -f /runtime/db/src/migrate.ts \
+    && test -d /runtime/db/migrations \
+    && test -n "$(find /runtime/db/migrations -type f -name '*.sql' -print -quit)" \
+    && test -f /runtime/db/scripts/run-account-mail-dispatcher.ts \
+    && test -f /runtime/db/scripts/run-web-push-dispatcher.ts \
+    && test -f /runtime/db/scripts/run-resource-release-worker.ts \
+    && test -f /runtime/db/scripts/run-license-maintenance.ts \
+    && test -f /runtime/db/node_modules/tsx/package.json
+
+FROM node:26-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production HOSTNAME=0.0.0.0
+# The standalone tree contains the traced Next.js server and runtime dependencies.
+COPY --from=build /app/site/.next/standalone/ /app/
+COPY --from=build /app/site/.next/static /app/site/.next/static
+# Keep the database runtime independently portable for migrations and the opt-in mail worker.
+COPY --from=build /runtime/db /app/site/packages/db
+COPY --from=build /app/scripts/start-production.sh /app/scripts/start-production.sh
+COPY --from=build /app/scripts/check-local-readiness.mjs /app/scripts/check-local-readiness.mjs
+COPY --from=build /app/scripts/check-account-mail-worker-health.mjs /app/scripts/check-account-mail-worker-health.mjs
+COPY --from=build /app/scripts/web-push-worker-health-state.mjs /app/scripts/web-push-worker-health-state.mjs
+COPY --from=build /app/scripts/check-web-push-worker-health.mjs /app/scripts/check-web-push-worker-health.mjs
+COPY --from=build /app/scripts/check-web-push-worker-queue.mjs /app/scripts/check-web-push-worker-queue.mjs
+COPY --from=build /app/scripts/check-license-worker-health.mjs /app/scripts/check-license-worker-health.mjs
+COPY --from=build /app/scripts/check-resource-release-worker-health.mjs /app/scripts/check-resource-release-worker-health.mjs
+# Checkouts restored with a restrictive umask may contain mode-600 source files.
+# Runtime code stays root-owned but must be readable by the non-root process.
+RUN chmod -R a+rX /app && mkdir -p /data/uploads && chown -R node:node /data/uploads
+USER node
+EXPOSE 3000
+# Execute installed runtime tools directly; no package manager is needed in this image.
+CMD ["sh", "scripts/start-production.sh"]

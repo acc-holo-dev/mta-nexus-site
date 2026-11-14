@@ -25,8 +25,8 @@ $failure = $null
 try {
   $env:COMPOSE_DISABLE_ENV_FILE = "true"
 
-  & docker compose -p $project -f deploy/compose.verify.yaml config --quiet
-  if ($LASTEXITCODE -ne 0) { throw "deploy/compose.verify.yaml did not render successfully." }
+  & docker compose -p $project -f docker/compose.verify.yaml config --quiet
+  if ($LASTEXITCODE -ne 0) { throw "docker/compose.verify.yaml did not render successfully." }
 
   $existingContainers = & docker ps -aq --filter "label=com.docker.compose.project=$project"
   if ($LASTEXITCODE -ne 0 -or $existingContainers) {
@@ -38,7 +38,7 @@ try {
   }
 
   $owned = $true
-  & docker compose -p $project -f deploy/compose.verify.yaml up --build --abort-on-container-exit --exit-code-from verify verify
+  & docker compose -p $project -f docker/compose.verify.yaml up --build --abort-on-container-exit --exit-code-from verify verify
   if ($LASTEXITCODE -ne 0) {
     throw "Disposable Docker verification failed."
   }
@@ -49,7 +49,7 @@ catch {
 }
 finally {
   if ($owned) {
-    & docker compose -p $project -f deploy/compose.verify.yaml down --volumes --remove-orphans --timeout 15
+    & docker compose -p $project -f docker/compose.verify.yaml down --volumes --remove-orphans --timeout 15
     if ($LASTEXITCODE -ne 0) {
       if (-not $failure) { $failure = [System.Exception]::new("Disposable verification cleanup failed.") }
       else { Write-Warning "Disposable verification cleanup failed after the original error." }

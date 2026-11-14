@@ -10,11 +10,11 @@ function exercise(migrationExit, serverExit = 0, { withMigrations = true, config
   try {
     mkdirSync(join(root, "scripts"));
     mkdirSync(join(root, "bin"));
-    mkdirSync(join(root, "apps/web"), { recursive: true });
-    mkdirSync(join(root, "packages/db"), { recursive: true });
+    mkdirSync(join(root, "site"), { recursive: true });
+    mkdirSync(join(root, "site/packages/db"), { recursive: true });
     if (withMigrations) {
-      mkdirSync(join(root, "packages/db/migrations"), { recursive: true });
-      writeFileSync(join(root, "packages/db/migrations/0000_test.sql"), "select 1;\n");
+      mkdirSync(join(root, "site/packages/db/migrations"), { recursive: true });
+      writeFileSync(join(root, "site/packages/db/migrations/0000_test.sql"), "select 1;\n");
     }
     writeFileSync(join(root, "calls"), "");
     copyFileSync(
@@ -55,9 +55,9 @@ test("runs migrations before the standalone server from isolated runtime directo
   const result = exercise(0);
   assert.equal(result.status, 0);
   assert.deepEqual(result.calls, [
-    `${result.root}/packages/db|--import tsx --input-type=module -e import '@nexus/config';`,
-    `${result.root}/packages/db|--import tsx src/migrate.ts`,
-    `${result.root}/apps/web|server.js`,
+    `${result.root}/site/packages/db|--import tsx --input-type=module -e import '@nexus/config';`,
+    `${result.root}/site/packages/db|--import tsx src/migrate.ts`,
+    `${result.root}/site|server.js`,
   ]);
 });
 
@@ -107,13 +107,13 @@ test("entrypoint aligns APP_URL with NEXT_PUBLIC_APP_URL before config validatio
 
 test("same prebuilt image contract: runtime origin comes from env, not the entrypoint", () => {
   const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
-  const dockerfile = readFileSync(new URL("../../deploy/Dockerfile", import.meta.url), "utf8");
+  const dockerfile = readFileSync(new URL("../../docker/Dockerfile", import.meta.url), "utf8");
   const compose = readFileSync(
-    new URL("../../deploy/compose.production.yaml", import.meta.url),
+    new URL("../../docker/compose.production.yaml", import.meta.url),
     "utf8",
   );
   const ciOverlay = readFileSync(
-    new URL("../../deploy/compose.production-ci.yaml", import.meta.url),
+    new URL("../../docker/compose.production-ci.yaml", import.meta.url),
     "utf8",
   );
 
@@ -125,6 +125,6 @@ test("same prebuilt image contract: runtime origin comes from env, not the entry
   assert.match(ciOverlay, /NEXUS_CI_IMAGE:\?use scripts\/check-production-startup\.sh/u);
   // Two allowed HTTPS origins in the supported promotion path: DOMAIN-templated
   // production and the disposable CI origin — both consume a prebuilt runtime image.
-  assert.match(compose, /build:\s*\n\s*context:\s*\.\s*\n\s*dockerfile:\s*deploy\/Dockerfile/u);
+  assert.match(compose, /build:\s*\n\s*context:\s*\.\.\s*\n\s*dockerfile:\s*docker\/Dockerfile/u);
   assert.match(ciOverlay, /image:\s*\$\{NEXUS_CI_IMAGE/u);
 });

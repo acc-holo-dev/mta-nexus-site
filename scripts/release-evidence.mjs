@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_UPGRADE_BASELINE_TAG,
   RELEASE_UPGRADE_TARGET_TAG,
-} from "../packages/db/scripts/release-upgrade-contract.mjs";
+} from "../site/packages/db/scripts/release-upgrade-contract.mjs";
 import { assertDisposableTestDatabase } from "./disposable-test-database.mjs";
 import { evaluateInfraImagePins, readInfraImagePins } from "./infra-image-policy.mjs";
 import {
@@ -31,7 +31,7 @@ const root = resolve(here, "..");
 const outputPath = join(root, "artifacts", "release-evidence.json");
 const packageJsonPath = join(root, "package.json");
 const lockfilePath = join(root, "pnpm-lock.yaml");
-const migrationsDir = join(root, "packages", "db", "migrations");
+const migrationsDir = join(root, "site", "packages", "db", "migrations");
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
@@ -301,7 +301,7 @@ const infraPins = (() => {
 })();
 const infraPinEvaluation = infraPins
   ? evaluateInfraImagePins(infraPins, { requireResolved: false })
-  : { ok: false, reason: "deploy/infra-image-pins.json is missing." };
+  : { ok: false, reason: "docker/infra-image-pins.json is missing." };
 
 const releaseManifest = buildReleaseManifest({
   appVersion: packageJson.version,
@@ -326,10 +326,10 @@ const releaseManifest = buildReleaseManifest({
   },
   migrations: migrationFiles,
   overlays: [
-    "deploy/compose.production.yaml",
-    "deploy/compose.production-ci.yaml (CI only)",
-    "deploy/compose.recovery.yaml (optional)",
-    "deploy/compose.mail-worker.yaml (optional)",
+    "docker/compose.production.yaml",
+    "docker/compose.production-ci.yaml (CI only)",
+    "docker/compose.recovery.yaml (optional)",
+    "docker/compose.mail-worker.yaml (optional)",
   ],
   evidenceRefs: {
     coreReleaseEvidence: "artifacts/release-evidence.json",

@@ -7,7 +7,7 @@ function read(relative) {
 }
 
 test("production image contains the durable Web Push worker runtime", () => {
-  const dockerfile = read("deploy/Dockerfile");
+  const dockerfile = read("docker/Dockerfile");
 
   assert.match(dockerfile, /run-web-push-dispatcher\.ts/);
   assert.match(dockerfile, /check-web-push-worker-health\.mjs/);
@@ -15,7 +15,7 @@ test("production image contains the durable Web Push worker runtime", () => {
 });
 
 test("production compose runs Web Push as a separate healthy process", () => {
-  const compose = read("deploy/compose.production.yaml");
+  const compose = read("docker/compose.production.yaml");
 
   assert.match(compose, /\n {2}push-worker:\n/);
   assert.match(compose, /scripts\/run-web-push-dispatcher\.ts/);
@@ -30,7 +30,7 @@ test("production compose runs Web Push as a separate healthy process", () => {
 });
 
 test("OPS-15 license and resource-release workers share push-worker hardening without changing commands", () => {
-  const compose = read("deploy/compose.production.yaml");
+  const compose = read("docker/compose.production.yaml");
   for (const name of ["push-worker", "license-worker", "resource-release-worker"]) {
     const block = compose.match(
       new RegExp(`\\n {2}${name}:\\n([\\s\\S]*?)(?=\\n {2}[a-z]|\\nvolumes:)`, "u"),
@@ -50,8 +50,8 @@ test("OPS-15 license and resource-release workers share push-worker hardening wi
   }
   assert.match(compose, /run-license-maintenance\.ts", "--loop"/u);
   assert.match(compose, /run-resource-release-worker\.ts", "--loop"/u);
-  assert.match(read("packages/db/scripts/run-license-maintenance.ts"), /SIGTERM/u);
-  assert.match(read("packages/db/scripts/run-resource-release-worker.ts"), /SIGTERM/u);
+  assert.match(read("site/packages/db/scripts/run-license-maintenance.ts"), /SIGTERM/u);
+  assert.match(read("site/packages/db/scripts/run-resource-release-worker.ts"), /SIGTERM/u);
   assert.match(
     read("scripts/check-license-worker-health.mjs"),
     /\/tmp\/nexus-license-worker-health\.json/u,

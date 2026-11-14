@@ -40,7 +40,7 @@ import {
   assertProductionUploadBodyLimit,
   localCertificateConfig,
 } from './scripts/production-smoke-contract.mjs';
-const productionCaddy = readFileSync('deploy/Caddyfile', 'utf8');
+const productionCaddy = readFileSync('docker/Caddyfile', 'utf8');
 assertProductionUploadBodyLimit(productionCaddy);
 assertProductionOfflineCacheVary(productionCaddy);
 writeFileSync(
@@ -55,7 +55,7 @@ pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
   "NEXUS_CI_ACCOUNT_MAIL_KEY=$mail_key" "NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY=$abuse_key"
   "NEXUS_CI_CADDYFILE=$NEXUS_CI_CADDYFILE"
   docker compose --env-file /dev/null -p "$project"
-  -f deploy/compose.production.yaml -f deploy/compose.production-ci.yaml)
+  -f docker/compose.production.yaml -f docker/compose.production-ci.yaml)
 owned=0
 cleanup() {
   status=$?
@@ -112,13 +112,13 @@ push_worker=$("${pc[@]}" ps -q push-worker)
 [[ "$(docker inspect --format '{{json .HostConfig.CapDrop}}' "$push_worker")" == '["ALL"]' ]]
 [[ "$(docker inspect --format '{{json .HostConfig.SecurityOpt}}' "$push_worker")" == '["no-new-privileges:true"]' ]]
 "${pc[@]}" exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; assert.equal(process.env.NODE_ENV, 'production'); assert.equal(process.env.HOSTNAME, '0.0.0.0'); assert.equal(process.env.BUILD_SCANNER, 'clamav');"
-"${pc[@]}" exec -T app test -f /app/apps/web/server.js
-"${pc[@]}" exec -T app test -f /app/packages/db/src/migrate.ts
+"${pc[@]}" exec -T app test -f /app/site/server.js
+"${pc[@]}" exec -T app test -f /app/site/packages/db/src/migrate.ts
 "${pc[@]}" exec -T app test -r /app/scripts/start-production.sh
-"${pc[@]}" exec -T app test -r /app/packages/db/src/migrate.ts
-"${pc[@]}" exec -T app test -d /app/packages/db/migrations
-"${pc[@]}" exec -T app sh -c 'test -n "$(find /app/packages/db/migrations -type f -name "*.sql" -print -quit)"'
-"${pc[@]}" exec -T app test -f /app/packages/db/node_modules/tsx/package.json
+"${pc[@]}" exec -T app test -r /app/site/packages/db/src/migrate.ts
+"${pc[@]}" exec -T app test -d /app/site/packages/db/migrations
+"${pc[@]}" exec -T app sh -c 'test -n "$(find /app/site/packages/db/migrations -type f -name "*.sql" -print -quit)"'
+"${pc[@]}" exec -T app test -f /app/site/packages/db/node_modules/tsx/package.json
 "${pc[@]}" exec -T push-worker test -f /app/scripts/web-push-worker-health-state.mjs
 "${pc[@]}" exec -T push-worker test -f /app/scripts/check-web-push-worker-health.mjs
 "${pc[@]}" exec -T push-worker test -f /app/scripts/check-web-push-worker-queue.mjs

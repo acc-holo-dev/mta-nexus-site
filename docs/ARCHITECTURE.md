@@ -6,29 +6,90 @@
 
 ## Форма системы
 
-Модульный монолит: Next.js 16 и React 19 в `apps/web`, PostgreSQL 18 и Drizzle в `packages/db`. Проект рассчитан на одну инстанцию приложения. Redis, микросервисы и внешние очереди не добавляются без подтверждённой необходимости.
+Модульный монолит: Next.js 16 и React 19 в `site`, PostgreSQL 18 и Drizzle в `site/packages/db`. Проект рассчитан на одну инстанцию приложения. Redis, микросервисы и внешние очереди не добавляются без подтверждённой необходимости.
 
 ## Границы
 
 | Слой                        | Ответственность                                                                              |
 | --------------------------- | -------------------------------------------------------------------------------------------- |
-| `apps/web/src/app`          | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
-| `apps/web/src/lib/services` | Пользовательские операции, оркестрация и правила сценария.                                   |
-| `packages/db`               | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
-| `packages/domain`           | Независимые доменные типы, ошибки, правила и события.                                        |
-| `packages/validation`       | Общие схемы входных данных.                                                                  |
-| `packages/security`         | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
-| `packages/storage`          | Приватное хранение и проверка целостности файлов.                                            |
-| `packages/config`           | Проверка параметров окружения.                                                               |
-| `packages/ui`               | Общие элементы интерфейса без импортов серверных пакетов.                                    |
+| `site/src/app`              | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
+| `site/src/features/servers` | Публичный read-only Servers pilot: UI, чистые проекции и server composition.                 |
+| `site/src/lib/services`     | Пользовательские операции, оркестрация и правила сценария.                                   |
+| `site/packages/db`          | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
+| `site/packages/domain`      | Независимые доменные типы, ошибки, правила и события.                                        |
+| `site/packages/validation`  | Общие схемы входных данных.                                                                  |
+| `site/packages/security`    | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
+| `site/packages/storage`     | Приватное хранение и проверка целостности файлов.                                            |
+| `site/packages/config`      | Проверка параметров окружения.                                                               |
+| `site/packages/ui`          | Общие элементы интерфейса без импортов серверных пакетов.                                    |
 
 Пакеты не импортируют приложение; domain не зависит от остальных пакетов. `dependency-cruiser` проверяет границы и циклы: SWC разбирает исходники, а отдельный TypeScript 6 выявляет зависимости типов. Проект компилируется TypeScript 7; поддержку его новых синтаксических конструкций анализатором нужно проверять при их использовании. HTTP-обработчик не должен становиться вторым репозиторием или обходить общие проверки.
 
+### Servers feature pilot
+
+`site/src/features/servers` объединяет публичный каталог и карточки. Публичный
+контракт включает `client.ts` (клиентский UI), `server.ts` (server-only
+composition страницы), `model.ts` (чистые types/projections/pagination/cache helpers),
+`connect.ts`, `statistics-export.ts` и `statistics-view.ts` для detail controls,
+а также server-only `statistics-server.ts`, `observations-server.ts` и
+`history-server.ts` для статистики, наблюдений и истории. Registration, claim
+и details forms используют client ports; claim status и managed card — отдельные
+server-only ports. Server content, activity, publication history и updates
+используют независимые server-only ports; workspace navigation, reviews, follow
+и batch visibility используют отдельные client ports.
+[Локальный контракт feature](../site/src/features/servers/README.md) фиксирует границы.
+
+App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/servers` делегирует
+feature server composition. Directory API использует чистую model entry, поэтому
+не получает RSC или БД через server barrel. Существующие `serverService` и
+`mtaMasterDirectoryService` остаются единственными реализациями сценариев и cache.
+Claim/ownership/management/collectors не входят в пилот.
+
+Внешний production-код обращается только к публичным entrypoints. Feature не импортирует
+routing; client/model не импортируют services, request locale, server entry или
+infrastructure packages. Model не зависит от UI и Node builtins. Эти правила
+проверяются dependency-cruiser, включая type edges; отдельный tooling suite
+проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
+HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
+
+### Community feature
+
+`site/src/features/community` объединяет UI обсуждения, жалоб и создания тем.
+Явные client entries и независимые server-only `reports-server`,
+`report-history-server`, `report-groups-server` и moderation server entries
+защищают private implementations;
+routing, services, server и infrastructure не входят в client graph. Actor/draft/intent, confirmation, revision и server authority
+остаются прежними. [Контракт feature](../site/src/features/community/README.md)
+и boundary suite проверяют прямые и транзитивные зависимости; изменения требуют полного CI.
+
+### Resources feature
+
+`site/src/features/resources` выделяет read-only каталог, detail, публичные versions/reviews, карточку и query model.
+[Контракт feature](../site/src/features/resources/README.md) задаёт public `view`
+(RSC/client-compatible карточка), `server` (server-only page) и pure `model`.
+App Router сохраняет dynamic config; products API использует model и прежний service.
+Services/repositories и visibility/scan/access policy остаются прежними; detail client UI,
+publishing и download handlers не переносятся. Отдельный `detail-server` entry
+сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
+`versions-server` и `reviews-server` отвечают за публичные подстраницы,
+`media-server` и `build-server` — за author/staff media и build composition;
+`package-server` и `requirements-server` — за состав сборки и требования,
+`review-report-server` — за жалобы на отзывы, `delivery-server` — за server-only
+представление квитанции. Metadata и dynamic config остаются в routing. Все десять
+server entries изолированы
+друг от друга и защищены `server-only`. Private imports и server leaks закрыты
+анализатором и negative fixtures; реальные view/model dependencies проверяются.
+Public `client` содержит gallery/Q&A, preview остаётся private; нейтральный `evidence` — provenance/package
+UI; карточка остаётся в `view`. Pure gallery/provenance helpers входят в model.
+Сохраняются client directives и общий modal hook; UI evidence не заменяет выдачу
+по server policy. Все UI entrypoints проверяются на transitive server leaks.
+Все Resources feature paths требуют полного CI.
+
 ### HTTP → service → repository
 
-Составные изменяющие пользовательские операции идут через именованную service-команду в `apps/web/src/lib/services` (общие правила для UI, worker и API). Пустые service-обёртки вокруг одного вызова репозитория не требуются. Авторизация и browser/mutation-адаптеры остаются на границе HTTP.
+Составные изменяющие пользовательские операции идут через именованную service-команду в `site/src/lib/services` (общие правила для UI, worker и API). Пустые service-обёртки вокруг одного вызова репозитория не требуются. Авторизация и browser/mutation-адаптеры остаются на границе HTTP.
 
-`dependency-cruiser` правило `http-handlers-use-services-for-db` запрещает новым `apps/web/src/app/api/**` маршрутам импортировать `packages/db`, кроме явного списка исключений в `.dependency-cruiser.exceptions.cjs`:
+`dependency-cruiser` правило `http-handlers-use-services-for-db` запрещает новым `site/src/app/api/**` маршрутам импортировать `site/packages/db`, кроме явного списка исключений в `.dependency-cruiser.exceptions.cjs`:
 
 | Категория           | Смысл                                                                   | Примеры                                                                                                                                                                                                   |
 | ------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -50,7 +111,7 @@
 - Новое обращение поддержки или ответ заявителя сохраняет задание доставки сотрудникам вместе с сообщением и аудитом. Worker проверяет текущую роль и создаёт inbox порциями с атомарным курсором. Уведомление содержит только общий текст и ссылку на список обращений; идентификаторы и содержание обращения не раскрываются через inbox бывшему сотруднику.
 - Обычные производители inbox сохраняют намерение приёма push в той же транзакции. При `saturated`/`error` оно остаётся в `web_push_admission_recovery`; успешный приём outbox и удаление намерения атомарны. Worker повторяет приём ограниченно, проверяя прочитанность, настройки, действующие сессии устройств и исходный срок 24 часа. Уже принятый push повторно не ставится после очистки outbox. У ответов в обсуждениях сохраняется отдельный протокол receipts и адресного replay; исторический inbox без доказательства сбоя не восстанавливается автоматически.
 - Каталог серверов получает данные из внешнего MTA master list. Вход ограничен по размеру, количеству и времени; устаревшие данные помечаются и не продлеваются бесконечно. Подтверждение контроля endpoint и решение модератора о владении — отдельные действия.
-- Для пользовательских ссылок применяется `safeExternalWebUrl` из `packages/validation`. Проверка ссылки для браузера сама по себе не защищает серверные запросы от SSRF.
+- Для пользовательских ссылок применяется `safeExternalWebUrl` из `site/packages/validation`. Проверка ссылки для браузера сама по себе не защищает серверные запросы от SSRF.
 
 ## Интерфейс
 
@@ -58,7 +119,7 @@
 
 ## Доменная модель (указатель)
 
-Ключевые сущности и связи (детали и исключения — [08-DOMAIN…](ARCHITECTURE.md)): Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `packages/db`; факты runtime — код.
+Ключевые сущности и связи (детали и исключения — [08-DOMAIN…](ARCHITECTURE.md)): Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `site/packages/db`; факты runtime — код.
 
 Storage/scanner/observability цели и границы production mounts — [55…](ARCHITECTURE.md) + [OPERATIONS](OPERATIONS.md); Security Center / quarantine admin — также [TRUST-STAFF](TRUST-STAFF.md) и [35…](TRUST-STAFF.md).
 

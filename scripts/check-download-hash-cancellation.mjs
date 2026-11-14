@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
 assert.equal(process.env.NEXUS_HASH_PROBE, "disposable-ci");
-assert.equal(process.cwd(), "/app/apps/web");
+assert.equal(process.cwd(), "/app/site");
 const control = await mkdtemp("/tmp/nexus-hash-probe-");
 const port = 3001;
 const report = {

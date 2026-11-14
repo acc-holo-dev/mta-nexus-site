@@ -1,0 +1,136 @@
+"use client";
+
+import { Button, ErrorState } from "@nexus/ui";
+import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
+
+export function BuildQuarantineControls({
+  buildId,
+  status,
+}: {
+  buildId: string;
+  status: "published" | "quarantined";
+}) {
+  const router = useRouter();
+  const { dictionary, locale } = useNexusLocale();
+  const copy = dictionary.admin;
+  const [reason, setReason] = useState("");
+  const [notifyAffectedDownloaders, setNotifyAffectedDownloaders] = useState(false);
+  const [pending, setPending] = useState<"quarantine" | "restore" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const hasReason = reason.trim().length >= 3;
+
+  async function act(action: "quarantine" | "restore") {
+    if (pending || !hasReason) return;
+    const labels = verificationCopy(locale);
+    if (
+      !(await confirmAction({
+        title: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
+        object: buildId,
+        consequences:
+          action === "quarantine"
+            ? notifyAffectedDownloaders
+              ? copy.quarantineBuildNotifyConfirm
+              : copy.quarantineBuildConfirm
+            : copy.restoreBuildConfirm,
+        confirmLabel: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
+        ...(action === "restore" ? { danger: false } : {}),
+      }))
+    )
+      return;
+
+    setPending(action);
+    setError(null);
+    try {
+      const response = await fetch("/api/admin/actions", {
+        method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetType: "build",
+          targetId: buildId,
+          action,
+          notes: reason.trim(),
+          ...(action === "quarantine" ? { notifyAffectedDownloaders } : {}),
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      const data = await response.json().catch(() => null);
+      if (!confirmsAdminAction(response.status, data, buildId, action)) {
+        setError(data?.error || copy.quarantineBuildFailed);
+        return;
+      }
+      setReason("");
+      router.refresh();
+    } catch {
+      setError(copy.quarantineBuildUnavailable);
+    } finally {
+      setPending(null);
+    }
+  }
+
+  const action = status === "quarantined" ? "restore" : "quarantine";
+
+  return (
+    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+      <label className="block space-y-1">
+        <span className="font-label uppercase text-muted">
+          {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
+        </span>
+        <textarea
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          minLength={3}
+          maxLength={2000}
+          rows={2}
+          placeholder={copy.quarantineReasonHint}
+          className="w-full resize-y rounded-md border border-base bg-inset px-2.5 py-2 text-xs text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
+        />
+      </label>
+      {status === "published" ? (
+        <label className="flex items-start gap-2 text-[11px] text-secondary">
+          <input
+            type="checkbox"
+            className={`mt-0.5 ${actionConfirmCheckboxFocusClass}`}
+            checked={notifyAffectedDownloaders}
+            onChange={(event) => setNotifyAffectedDownloaders(event.target.checked)}
+            disabled={pending !== null}
+          />
+          <span>{copy.quarantineNotifyDownloaders}</span>
+        </label>
+      ) : null}
+      <Button
+        type="button"
+        variant="outline"
+        disabled={!hasReason || pending !== null}
+        onClick={() => void act(action)}
+        className={
+          action === "quarantine"
+            ? "min-h-11 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
+            : "min-h-11 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
+        }
+      >
+        {pending ? (
+          <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+        ) : action === "quarantine" ? (
+          <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
+        ) : (
+          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+        )}
+        {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
+      </Button>
+      {error ? (
+        <ErrorState title={error} description={copy.quarantineBuildFailedDescription} />
+      ) : null}
+    </div>
+  );
+}

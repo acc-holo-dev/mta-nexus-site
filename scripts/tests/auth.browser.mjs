@@ -180,7 +180,7 @@ async function readSyntheticProof(email, purpose = "email_verify") {
     [
       "exec",
       "--workdir",
-      "/app/packages/db",
+      "/app/site/packages/db",
       "-e",
       "GITHUB_ACTIONS=true",
       "-e",

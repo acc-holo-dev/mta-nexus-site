@@ -11,15 +11,15 @@ import { waitForReadyCapture } from "../browser-page-ready.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
-const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
-const { discoveryCopy } = await import("../../apps/web/src/lib/discovery-copy.ts");
-const { notificationInboxCopy } = await import("../../apps/web/src/lib/notification-inbox-copy.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n.ts");
+const { discoveryCopy } = await import("../../site/src/lib/discovery-copy.ts");
+const { notificationInboxCopy } = await import("../../site/src/lib/notification-inbox-copy.ts");
 // Strip-types cannot execute notification-inbox-contract (zod/@nexus graph); keep the
 // category list synced by reading the exported INBOX_CATEGORIES source of truth.
 const inboxCategoriesMatch = readFileSync(
   join(
     dirname(fileURLToPath(import.meta.url)),
-    "../../apps/web/src/lib/notification-inbox-contract.ts",
+    "../../site/src/lib/notification-inbox-contract.ts",
   ),
   "utf8",
 ).match(/export const INBOX_CATEGORIES = \[([^\]]*)\] as const;/u);

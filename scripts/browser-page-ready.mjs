@@ -4,7 +4,7 @@
  * Ready captures must wait for stable final content. Loading / empty / error
  * frames are named separately when retained — never as the default "ready" PNG.
  *
- * Mirrors apps/web/src/app/loading.tsx (role=status + localized aria-label).
+ * Mirrors site/src/app/loading.tsx (role=status + localized aria-label).
  */
 
 export const GLOBAL_LOADING_LABELS = Object.freeze(["Loading content", "Загрузка содержимого"]);

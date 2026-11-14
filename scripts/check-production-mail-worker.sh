@@ -57,7 +57,7 @@ export COMPOSE_DISABLE_ENV_FILE=true
 phase=compose-contract
 echo 'D5 phase: compose contract'
 docker compose --env-file /dev/null \
-  -f deploy/compose.production.yaml -f deploy/compose.recovery.yaml -f deploy/compose.mail-worker.yaml \
+  -f docker/compose.production.yaml -f docker/compose.recovery.yaml -f docker/compose.mail-worker.yaml \
   config --format json > /tmp/nexus-d5-worker-compose.json
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 node scripts/tests/recovery-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
@@ -80,7 +80,7 @@ echo 'D5 phase: seed synthetic mail'
 seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
   ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
   ACCOUNT_MAIL_KEY_ID=ci-previous ACCOUNT_MAIL_KEY="$previous_mail_key" \
-  node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
+  node --import tsx site/packages/db/scripts/seed-account-mail-ci.ts)
 challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
 mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ame_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
 
@@ -111,7 +111,7 @@ start_worker() {
     --env ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000 \
     --env ACCOUNT_MAIL_BATCH_SIZE=2 \
     --env ACCOUNT_MAIL_POLL_INTERVAL_MS=60000 \
-    "$image" sh -c 'cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready' >/dev/null
+    "$image" sh -c 'cd /app/site/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready' >/dev/null
 }
 
 wait_ready() {
@@ -144,7 +144,7 @@ phase=tls-settlement
 echo 'D5 phase: wait for TLS acceptance and DB settlement'
 accepted=0
 for attempt in $(seq 1 40); do
-  if NEXUS_D5_MAIL_CHECK=true node --import tsx packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail" > /tmp/nexus-d5-check.out 2> /tmp/nexus-d5-check.err; then
+  if NEXUS_D5_MAIL_CHECK=true node --import tsx site/packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail" > /tmp/nexus-d5-check.out 2> /tmp/nexus-d5-check.err; then
     code=0
   else
     code=$?
@@ -205,7 +205,7 @@ if docker run --rm --add-host host.docker.internal:host-gateway \
   --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
   --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465 \
   --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
-  "$image" sh -c 'cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --once' \
+  "$image" sh -c 'cd /app/site/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --once' \
   > /tmp/nexus-d5-missing.out 2> /tmp/nexus-d5-missing.err; then
   code=0
 else

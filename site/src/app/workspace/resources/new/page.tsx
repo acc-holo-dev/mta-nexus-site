@@ -1,0 +1,23 @@
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { NewResourceForm } from "../../../../features/resources/create-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { authService } from "../../../../lib/services/auth-service";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Submit resource | MTA NEXUS",
+  robots: { index: false, follow: false },
+};
+
+export default async function NewResourcePage() {
+  const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
+  const actor = await authService.getSession(store.get("nexus_session")?.value).catch(() => null);
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/resources/new" />;
+  return (
+    <div className="min-w-0 overflow-x-clip">
+      <NewResourceForm key={actor.id} actorId={actor.id} />
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 /**
  * Node ESM cannot resolve extensionless TypeScript directory imports
  * (`./i18n/index`, `./en`). Import this module first, then *dynamically*
- * import apps/web i18n trees — static sibling imports are linked before
+ * import site i18n trees — static sibling imports are linked before
  * hooks run, so they will not see this resolver.
  */
 import { existsSync } from "node:fs";

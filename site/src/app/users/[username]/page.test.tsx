@@ -1,0 +1,299 @@
+vi.mock("../../../components/follow-button", () => ({
+  FollowButton: (props: { initial?: unknown }) => (
+    <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
+      Follow
+    </button>
+  ),
+}));
+vi.mock("../../../components/object-report-form", () => ({
+  ObjectReportForm: () => null,
+}));
+
+import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
+const state = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
+  exists: true,
+  showActivity: true,
+  products: vi.fn(),
+  servers: vi.fn(),
+  directory: vi.fn(),
+  session: vi.fn(
+    async (): Promise<{ id: string; role: string } | null> => ({
+      id: "viewer",
+      role: "user",
+    }),
+  ),
+  followStates: vi.fn(async (): Promise<string[]> => []),
+  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
+}));
+vi.mock("@nexus/db", () => ({
+  userRepository: {
+    findByUsername: async () =>
+      state.exists
+        ? {
+            id: "user",
+            username: "member",
+            displayName: "Member",
+            role: "user",
+            createdAt: new Date("2026-01-01"),
+          }
+        : null,
+  },
+  productRepository: { pagePublishedFreeByAuthor: state.products },
+  serverRepository: { pageActivePublicByOwner: state.servers },
+  followWorkspaceRepository: {
+    states: state.followStates,
+    muteState: state.muteState,
+  },
+}));
+vi.mock("../../../lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+  getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
+}));
+vi.mock("../../../lib/services/product-service", () => ({
+  productService: { getPublicAttributions: async () => new Map() },
+}));
+vi.mock("../../../lib/services/profile-privacy-service", () => ({
+  profilePrivacyService: {
+    visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
+  },
+}));
+vi.mock("../../../lib/services/mta-master-directory-service", () => ({
+  mtaMasterDirectoryService: { getDirectory: state.directory },
+  indexMtaObservations: () => () => undefined,
+}));
+vi.mock("../../../features/resources/view", () => ({
+  ProductCard: ({ product }: { product: { title: string; slug?: string } }) => (
+    <article>
+      <a href={`/market/${product.slug ?? "resource"}`}>{product.title}</a>
+    </article>
+  ),
+}));
+vi.mock("../../../features/servers/client", () => ({
+  ServerCard: ({ server }: { server: { name: string; slug?: string } }) => (
+    <article>
+      <a href={`/servers/${server.slug ?? "server"}`}>{server.name}</a>
+    </article>
+  ),
+}));
+vi.mock("@nexus/ui", () => ({
+  Avatar: () => null,
+  ErrorState: ({ title, action }: { title: string; action?: ReactNode }) => (
+    <div role="alert">
+      <h2>{title}</h2>
+      {action}
+    </div>
+  ),
+  StatCard: ({ label, value }: { label: string; value: number }) => (
+    <p>
+      {label}: {value}
+    </p>
+  ),
+}));
+vi.mock("next/navigation", () => ({
+  notFound: () => {
+    throw new Error("NOT_FOUND");
+  },
+}));
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => ({ value: "session" }) }),
+}));
+vi.mock("../../../lib/services/auth-service", () => ({
+  authService: {
+    getSession: () => state.session(),
+  },
+}));
+
+import { getDictionary } from "../../../lib/i18n";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import Page, { generateMetadata } from "./page";
+
+const input = (page?: string | string[]) => ({
+  params: Promise.resolve({ username: "member" }),
+  searchParams: Promise.resolve({ page }),
+});
+
+beforeEach(() => {
+  state.locale = "en";
+  state.exists = true;
+  state.showActivity = true;
+  state.products.mockReset();
+  state.servers.mockReset();
+  state.directory.mockReset();
+  state.session.mockReset();
+  state.followStates.mockReset();
+  state.muteState.mockReset();
+  state.session.mockResolvedValue({ id: "viewer", role: "user" });
+  state.followStates.mockResolvedValue([]);
+  state.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
+  state.products.mockResolvedValue({
+    products: [{ id: "resource", slug: "second-page-resource", title: "Second-page resource" }],
+    total: 49,
+    page: 2,
+    pageSize: 24,
+    totalPages: 3,
+  });
+  state.servers.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });
+});
+
+it("SSR-hydrates guest follow controls without querying mute state", async () => {
+  state.session.mockResolvedValue(null);
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+  expect(html).toContain(
+    'data-follow-initial="{&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+  );
+});
+
+it("SSR-hydrates authenticated user follow and mute", async () => {
+  state.followStates.mockResolvedValue(["user"]);
+  state.muteState.mockResolvedValue({
+    muted: true,
+    mutedUntil: "2026-12-01T00:00:00.000Z",
+  });
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).toHaveBeenCalledWith("viewer", "user", ["user"]);
+  expect(state.muteState).toHaveBeenCalledWith("viewer", "user", "user");
+  expect(html).toContain("&quot;authenticated&quot;:true");
+  expect(html).toContain("&quot;following&quot;:true");
+  expect(html).toContain("&quot;muted&quot;:true");
+  expect(html).toContain("2026-12-01T00:00:00.000Z");
+});
+
+it.each(["en", "ru"] as const)(
+  "renders bounded resources, total and navigation in %s",
+  async (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(await Page(input("2")));
+    expect(state.products).toHaveBeenCalledWith("user", 2, 24);
+    expect(html).toContain("49");
+    expect(html).toContain("Second-page resource");
+    expect(html).toContain('href="/market/second-page-resource"');
+    expect(html).toContain("min-w-0 space-y-10 overflow-x-clip");
+    expect(html).toContain('href="/users/member?page=1#resources"');
+    expect(html).toContain('href="/users/member?page=3#resources"');
+    expect(html.match(/<h1\b/g)).toHaveLength(1);
+    expect(state.directory).not.toHaveBeenCalled();
+  },
+);
+
+it.each(["en", "ru"] as const)(
+  "shows profile load failures as alerts instead of an empty portfolio in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getDictionary(locale).profiles;
+    state.products.mockRejectedValueOnce(new Error("private-database-detail"));
+    const html = renderToStaticMarkup(await Page(input("2")));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/users/member"');
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).not.toContain("private-database-detail");
+    expect(html).not.toContain("Second-page resource");
+    expect(html).not.toContain('id="resources"');
+  },
+);
+
+it.each(["0", "-1", "abc", ["1", "2"], undefined])("normalizes malformed page %j", async (page) => {
+  await Page(input(page));
+  expect(state.products).toHaveBeenCalledWith("user", 1, 24);
+});
+
+it("keeps public servers visible when the external directory fails", async () => {
+  state.servers.mockResolvedValue({
+    servers: [{ id: "server", slug: "public-server", name: "Public server" }],
+    total: 1,
+    page: 1,
+    pageSize: 12,
+    totalPages: 1,
+  });
+  state.directory.mockRejectedValue(new Error("directory unavailable"));
+  const html = renderToStaticMarkup(await Page(input("2")));
+  expect(html).toContain("Public server");
+  expect(html).toContain('href="/servers/public-server"');
+  expect(html).toContain("Second-page resource");
+});
+
+it("does not query resources for an absent user", async () => {
+  state.exists = false;
+  await expect(Page(input())).rejects.toThrow("NOT_FOUND");
+  expect(state.products).not.toHaveBeenCalled();
+  expect(state.servers).not.toHaveBeenCalled();
+});
+
+it("omits the resource section for an empty portfolio", async () => {
+  state.products.mockResolvedValue({
+    products: [],
+    total: 0,
+    page: 1,
+    pageSize: 24,
+    totalPages: 1,
+  });
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).not.toContain('id="resources"');
+  expect(html).not.toContain('rel="next"');
+});
+
+it("preserves resource and server pages independently", async () => {
+  state.servers.mockResolvedValue({
+    servers: [{ id: "server", slug: "second-page-server", name: "Second-page server" }],
+    total: 25,
+    page: 2,
+    pageSize: 12,
+    totalPages: 3,
+  });
+  state.directory.mockResolvedValue({ servers: [] });
+  const html = renderToStaticMarkup(
+    await Page({ ...input("2"), searchParams: Promise.resolve({ page: "2", serverPage: "2" }) }),
+  );
+  expect(state.servers).toHaveBeenCalledWith("user", 2, 12);
+  expect(html).toContain('href="/users/member?page=3&amp;serverPage=2#resources"');
+  expect(html).toContain('href="/users/member?page=2&amp;serverPage=3#servers"');
+  expect(html).toContain("25");
+  expect(html).toContain("Second-page server");
+});
+
+it.each(["en", "ru"] as const)(
+  "excludes missing user profiles from indexing in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.exists = false;
+    expect(await generateMetadata(input())).toEqual({
+      title: getDictionary(locale).profiles.userNotFound,
+      robots: { index: false, follow: false },
+    });
+    expect(state.products).not.toHaveBeenCalled();
+    expect(state.servers).not.toHaveBeenCalled();
+  },
+);
+it("uses the stored user identity for canonical metadata", async () => {
+  expect(await generateMetadata(input())).toMatchObject({
+    title: "Member (@member)",
+    alternates: { canonical: "/users/member" },
+  });
+});
+it("hides the direct activity link while keeping public resources available", async () => {
+  state.showActivity = false;
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).not.toContain('href="/users/member/activity"');
+  expect(html).toContain("Second-page resource");
+  state.showActivity = true;
+  expect(renderToStaticMarkup(await Page(input()))).toContain('href="/users/member/activity"');
+});
+it("renders owner guest preview without follow chrome while keeping resources and attribution path", async () => {
+  state.session.mockResolvedValue({ id: "user", role: "user" });
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ username: "member" }),
+      searchParams: Promise.resolve({ preview: "guest" }),
+    }),
+  );
+  expect(html).toContain(profilePrivacyCopy("en").guestPreviewNote);
+  expect(html).toContain(profilePrivacyCopy("en").scope);
+  expect(html).not.toContain(">Follow</button>");
+  expect(html).toContain("Second-page resource");
+});

@@ -18,22 +18,24 @@
 Установите Docker и Docker Compose. Рекомендуемый full Docker development stack:
 
 ```sh
-docker compose -p nexus-local -f deploy/compose.yaml up --build --detach --wait --wait-timeout 600
-docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check-local-readiness.mjs
+docker compose -p nexus-local -f docker/compose.yaml up --build --detach --wait --wait-timeout 600
+docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
-Копия заготовки переменных окружения для локального Compose-стека: `cp configs/env/.env.example deploy/.env` — Compose читает `deploy/.env` как project directory; без копии стек работает на безопасных dev-дефолтах из `deploy/compose.yaml`. Для host-only Next (`pnpm dev:host`) переменные задаются в корневом `.env`.
+Копия заготовки переменных окружения для локального Compose-стека: `cp config/env/.env.example docker/.env` — Compose читает `docker/.env` как project directory; без копии стек работает на безопасных dev-дефолтах из `docker/compose.yaml`. Для host-only Next (`pnpm dev:host`) переменные задаются в корневом `.env`.
 
 При установленных Node.js 26.11.1 и pnpm 12.4.2:
 
 | Команда                            | Назначение                                             |
 | ---------------------------------- | ------------------------------------------------------ |
-| `pnpm nexus:doctor`                | Preflight: Node/pnpm/Docker/порт/`deploy/compose.yaml` |
+| `pnpm nexus:doctor`                | Preflight: Node/pnpm/Docker/порт/`docker/compose.yaml` |
 | `pnpm dev`                         | Полный Compose-стек (тот же, что выше)                 |
 | `pnpm dev:docker:check`            | Readiness app + push / license / resource-release      |
 | `pnpm dev:host`                    | Только Next.js (Postgres/storage/scanner уже снаружи)  |
 | `pnpm dev:mail`                    | Стек + Mailpit для локального захвата писем            |
 | `pnpm db:migrate` / `pnpm db:seed` | Миграции и демо-данные                                 |
+
+При обновлении со старым `deploy/.env` сохраните его значения; порядок перехода — в [OPERATIONS](docs/OPERATIONS.md#infrastructure-directory-migration).
 
 ## Проверки
 
@@ -52,9 +54,9 @@ docker compose -p nexus-local -f deploy/compose.yaml exec app node scripts/check
 
 ## Структура
 
-- `apps/web` — страницы, интерфейс, HTTP API и сервисы.
-- `packages/db` — схема PostgreSQL, миграции, репозитории и работники.
-- `packages/domain`, `validation`, `security`, `storage`, `config`, `ui` — общие правила и компоненты.
+- `site` — страницы, интерфейс, HTTP API и сервисы.
+- `site/packages/db` — схема PostgreSQL, миграции, репозитории и работники.
+- `site/packages/domain`, `validation`, `security`, `storage`, `config`, `ui` — общие правила и компоненты.
 - `tests`, `scripts` — поведенческие проверки и инструменты эксплуатации.
 
 Слои и границы пакетов: [архитектура](docs/ARCHITECTURE.md). Таблица путей и CI: [карта проекта](docs/PROJECT-MAP.md).

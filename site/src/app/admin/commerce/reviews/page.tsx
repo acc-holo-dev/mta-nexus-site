@@ -1,0 +1,26 @@
+import type { Metadata } from "next";
+import { ResourceReviewReportScreen } from "../../../../features/resources/review-report-server";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
+export const dynamic = "force-dynamic";
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceReviewCopy(await getRequestLocale()).queue} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return (
+    <div className={pageShellClass}>
+      {await ResourceReviewReportScreen({ staff: true, query: await searchParams })}
+    </div>
+  );
+}

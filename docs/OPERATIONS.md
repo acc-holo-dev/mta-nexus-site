@@ -27,10 +27,10 @@ This document covers development startup, verification and production boundaries
 
 ## 1. Supported DEV startup
 
-Use the `deploy/compose.yaml` overlay directly when you want a Docker-only startup:
+Use the `docker/compose.yaml` overlay directly when you want a Docker-only startup:
 
 ```bash
-docker compose -p nexus-local -f deploy/compose.yaml up --build --detach --wait --wait-timeout 600
+docker compose -p nexus-local -f docker/compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
 When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is shown below. Host tooling distinguishes **major-ok** (`package.json#engines.node`: `>=26.0.0 <27`) from the **exact** host/CI pin (`.nvmrc` and `.node-version`: `26.11.1`) and exact pnpm (`package.json#packageManager`: `pnpm@12.4.2`). `pnpm nexus:doctor` passes major-ok and warns on exact drift; release evidence requires exact matches. Docker images use `node:26-alpine` for the same major branch. Use the repository version files before running host-side commands:
@@ -55,7 +55,7 @@ Only the application port is published to the host and it is bound to loopback. 
 
 Both supported Compose stacks set `CLAMD_CONF_AlertExceedsMax=yes`. ClamAV otherwise treats some files skipped because of archive scan limits as clean. With this setting, NEXUS rejects incomplete scans before storage; deployments that provide their own ClamAV daemon must enable the same `AlertExceedsMax` directive. The build upload route counts streamed multipart bytes, so omitting `Content-Length` does not bypass its request-body limit. The file cap is shared by the API, storage, and browser UI; its multipart headroom is checked against the production proxy limit. If the initial build is rejected, the publishing form keeps the saved draft and retries the build against it instead of creating duplicate resources. If the resource-creation response is lost, retrying the same request recovers the draft only when its metadata matches and the current author owns it. For recovery, the form stores an actor-scoped original product request (including title, descriptions, tags and compatibility), build version and release notes, file name, size and SHA-256, and the confirmed product ID, slug and compatibility target when available, in the current tab’s sessionStorage. The archive itself is not stored; after reload the author must select the same file. A pending submission locks its original fields, and an unavailable recovery store prevents the initial submission. MTA sortable release targets such as `1.6.0-9.22279.0` are accepted consistently for resource compatibility and build metadata; the manifest inspector only copies a minimum into the shared form when its client/server scope is unambiguous, and warns in Russian and English when the declaration is missing, malformed, repeated, or conflicting. Its ACL and export previews show up to 20 manifest declarations as written without judging their policy or security. Run `pnpm test:scanner` to exercise INSTREAM framing, real TCP request/response handling, timeout and response limits, RU/EN resource creation and scan errors, duplicate-slug privacy, draft recovery and retry, scan-limit rejection, multipart size enforcement with and without `Content-Length`, proxy-limit alignment, manifest structure and localized version diagnostics, ACL/export previews, and version suggestions, plus accepted uploads without a running ClamAV database or PostgreSQL.
 
-Source directories are bind-mounted read-only. Next.js uses polling in Docker so edits under `apps/web/src` and workspace `src` directories hot-reload. Package/dependency and image changes still require a rebuild.
+Source directories are bind-mounted read-only. Edits under `site/src` and workspace `src` directories hot-reload. The current Turbopack development server uses filesystem events; `WATCHPACK_POLLING` remains available for Webpack. Package/dependency and image changes still require a rebuild.
 
 Readiness:
 
@@ -172,7 +172,7 @@ Pull requests use the following change-based scopes; the local commands remain a
 | Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                                                                                      |
-| `unit_ci`         | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown)                                                                                     | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
+| `unit_ci`         | Only `site/packages/ui/**` and/or `site/src/components/**` (plus markdown)                                                                                    | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
 | `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
 | `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
 
@@ -278,7 +278,7 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 Use `pnpm analyze:architecture` and `pnpm analyze:unused` for dependency boundaries and unused code. Dependency-cruiser currently warns about TypeScript 7 compatibility; do not treat its result as complete without resolving that limitation.
 
-`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database. When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <tests/...integration.test.ts>` to create a disposable database on the Compose network, migrate it, run the focused files, and drop the database. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
+`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database. When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <site/tests/...integration.test.ts>` to create a disposable database on the Compose network, migrate it, run the focused files, and drop the database. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
 
 `pnpm ci:diagnose --run-id <id>` reads one GitHub Actions run and its annotations. It may require an appropriate read-only GitHub credential. A workflow with zero executed steps is not a successful test.
 
@@ -300,6 +300,34 @@ Required properties include:
 - explicit recovery/email configuration before claiming email delivery is operational.
 
 Paid commerce remains disabled.
+
+### Infrastructure directory migration
+
+Compose files, Dockerfile, Caddyfile and image pins live in `docker/`; the env
+example lives in `config/env/.env.example`. Run commands from the repository root.
+All base build contexts resolve to that root; Caddy binds resolve to the real
+`docker/Caddyfile`, relative to the first Compose file.
+
+The base files intentionally keep `name: deploy`: this is the previous default
+Compose identity, independent of the directory name. Existing `--project-name`
+(`-p`) and `COMPOSE_PROJECT_NAME` overrides retain priority. Preserve the actual
+project name of an existing installation; no volume rename or cleanup is part
+of this migration. Local scripts continue to use `-p nexus-local`; CI uses its
+own disposable names.
+
+Git does not move ignored private files. If an existing `deploy/.env` remains,
+preserve its values: move the reviewed file to `docker/.env`, or select its
+absolute path explicitly with `COMPOSE_ENV_FILES` for the local pnpm wrappers.
+Do not overwrite a working env with the example template. Doctor fails when the
+legacy env would silently stop being loaded; it checks existence without reading
+or printing secrets. An explicit env selection or disabled implicit env loading
+is respected.
+
+Production commands must keep the existing absolute `--env-file` and project
+name. Review relative `NEXUS_*_HOST_FILE` bindings before changing the Compose
+base directory: use absolute paths to the existing protected files. The fixed
+container `/run/secrets` targets and stored keys do not change. Rendering with
+synthetic values verifies paths and shape; it does not authorize a live deploy.
 
 ### Compose overlay matrix
 
@@ -330,7 +358,7 @@ production base. Supported scenarios (OPS-04 / ARC09):
 | Scanner                  | `clamav`                  | Keep available; not an application writer                       |
 
 Production rendered config must not carry development source bind-mounts
-(`./apps/...`, `./packages/...`). CI must not publish non-loopback host ports.
+(`./site/src/...`, `./site/packages/...`). CI must not publish non-loopback host ports.
 Static `docker compose config` with synthetic values confirms shape; it does not
 prove live readiness. Contract tests: `scripts/tests/compose-overlay-matrix.node-test.mjs`
 plus recovery/mail fixtures under `scripts/tests/*compose*`.
@@ -352,8 +380,8 @@ must not read `NEXT_PUBLIC_APP_URL` for links or CSRF. Caddy uses runtime
 
 ```bash
 node --test scripts/tests/production-entrypoint.node-test.mjs
-pnpm test:focus tests/config.test.ts tests/production-runtime-readiness.test.ts \
-  tests/production-tracing-bounds.test.ts tests/production-edge-security.test.ts
+pnpm test:focus site/tests/unit/config.test.ts site/tests/database/production-runtime-readiness.test.ts \
+  site/tests/unit/production-tracing-bounds.test.ts site/tests/unit/production-edge-security.test.ts
 ```
 
 Full disposable image rehearse remains `scripts/check-production-startup.sh` on a
@@ -365,13 +393,13 @@ asserted PASS here.
 
 Schema history is forward-only ([ARCHITECTURE](ARCHITECTURE.md)): new changes are
 new SQL migrations; rolling back an image does not roll back the database. Applied
-SQL files and `packages/db/migrations/meta/_journal.json` are not rewritten.
+SQL files and `site/packages/db/migrations/meta/_journal.json` are not rewritten.
 
 **Current generator risk (OPS-06 / ARC14):** the journal contains migrations through
 the latest `0087_*` tag, while Drizzle meta snapshots still stop at `0000` /
 `0001`. Plain `pnpm db:generate` / `drizzle-kit generate` against that lag is
 unsafe in the main checkout and is refused by
-`packages/db/scripts/guard-db-generate.mjs`.
+`site/packages/db/scripts/guard-db-generate.mjs`.
 
 **Supported authoring path (manual/custom + guards):**
 
@@ -382,10 +410,10 @@ unsafe in the main checkout and is refused by
 3. Hand-author only the expected forward-only delta in the new SQL file. Keep
    retries/idempotency compatible with existing upgrade rehearsal.
 4. Update the release-upgrade contract target when the journal advances
-   (`packages/db/scripts/release-upgrade-contract.mjs` and
+   (`site/packages/db/scripts/release-upgrade-contract.mjs` and
    `scripts/tests/release-upgrade.node-test.mjs`).
 5. On hosted CI, run the existing disposable upgrade path
-   (`packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
+   (`site/packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
    working production database.
 
 Plain generate remains unsupported while snapshots lag. A disposable experiment
@@ -872,7 +900,7 @@ engine major upgrade is a separate operator procedure from application schema
 migrations.
 
 Release candidates record exact digests and platform in
-[`deploy/infra-image-pins.json`](../deploy/infra-image-pins.json). Resolve them
+[`docker/infra-image-pins.json`](../docker/infra-image-pins.json). Resolve them
 when preparing a candidate (does not publish images or authorize production):
 
 ```bash
@@ -1227,7 +1255,7 @@ success. These reports extend the core release evidence; they are separate requi
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
 Upgrade evidence is versioned (`schemaVersion: 1` on newly written artifacts). The
-strict validator in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs)
+strict validator in [`release-upgrade-contract.mjs`](../site/packages/db/scripts/release-upgrade-contract.mjs)
 rejects missing/mismatched SHA, wrong `baseline`/`target`, incomplete `phase`
 (must be `complete`), and missing/false/wrong-type required boolean flags.
 Retained full-format CI artifacts that omit `schemaVersion` remain accepted when
@@ -1306,7 +1334,7 @@ set -eu
 umask 077
 dc() {
   docker compose --env-file "$PRODUCTION_ENV" --project-name "$PROJECT" \
-    --file "$RELEASE_DIR/compose.production.yaml" "$@"
+    --file "$RELEASE_DIR/docker/compose.production.yaml" "$@"
 }
 app_id=$(dc ps --quiet app)
 postgres_id=$(dc ps --quiet postgres)

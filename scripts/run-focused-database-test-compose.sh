@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <tests/database/...integration.test.ts> [more test files...]" >&2
+  echo "Usage: $0 <site/tests/database/...integration.test.ts> [more test files...]" >&2
   exit 1
 fi
 
@@ -23,14 +23,14 @@ if ! docker_context=$(docker context show) || [[ "$docker_context" != "default" 
 fi
 
 PROJECT="nexus-local"
-COMPOSE=(docker compose -p "$PROJECT" -f deploy/compose.yaml)
+COMPOSE=(docker compose -p "$PROJECT" -f docker/compose.yaml)
 DB_NAME="nexus_focus_$(date +%s)_${RANDOM}"
 DATABASE_URL="postgres://nexus:nexus_secret@postgres:5432/${DB_NAME}"
 database_created=0
 
 for arg in "$@"; do
-  if [[ "$arg" == -* || ! -f "$arg" || "$arg" != tests/* ]]; then
-    echo "Expected an existing tests/... file path: $arg" >&2
+  if [[ "$arg" == -* || ! -f "$arg" || "$arg" != site/tests/* ]]; then
+    echo "Expected an existing site/tests/... file path: $arg" >&2
     exit 1
   fi
 done
@@ -102,9 +102,9 @@ echo "Running focused database tests: $*"
   -e NEXUS_DISPOSABLE_DATABASE=1 \
   -e AUTH_SECRET=development-only-secret-change-before-production \
   -e NODE_ENV=test \
-  -v "$(pwd)/tests:/app/tests:ro" \
-  -v "$(pwd)/packages/db/src:/app/packages/db/src:ro" \
-  -v "$(pwd)/packages/db/migrations:/app/packages/db/migrations:ro" \
+  -v "$(pwd)/site/tests:/app/site/tests:ro" \
+  -v "$(pwd)/site/packages/db/src:/app/site/packages/db/src:ro" \
+  -v "$(pwd)/site/packages/db/migrations:/app/site/packages/db/migrations:ro" \
   -v "$(pwd)/scripts:/app/scripts:ro" \
   app \
   pnpm test:focus "$@"
