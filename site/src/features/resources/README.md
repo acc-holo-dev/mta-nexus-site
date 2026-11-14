@@ -18,6 +18,9 @@ Services и repositories не дублируются и не переносят�
 | `create-controls.ts`        | `NewResourceForm`; клиентская форма создания                                                                |
 | `copy-controls.ts`          | `ResourceCopyForm`; клиентская форма копирования                                                            |
 | `copy-view.ts`              | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
+| `author-controls.ts`        | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
+| `lifecycle-controls.ts`     | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
+| `moderation-controls.ts`    | `ResourceModerationControls`; staff moderation UI                                                           |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
@@ -134,3 +137,7 @@ draft, revision, подтверждения и серверные огранич
 Создание и копирование ресурса принадлежат Resources; клиентские формы и
 представление метаданных экспортируются раздельно. Draft/intent, подтверждения,
 валидация файла и серверная проверка прав сохраняются.
+
+Авторские формы, lifecycle и staff moderation controls принадлежат Resources.
+Подтверждения, revision, draft, проверки scan и права на сервере сохраняются;
+shared request helpers, services и repositories не дублируются.

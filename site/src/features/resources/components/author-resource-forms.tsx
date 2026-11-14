@@ -13,28 +13,31 @@ import {
   parseAuthorResourceDraft,
   reconcileAuthorDetails,
   sameAuthorDetails,
-} from "../lib/author-resource-draft";
+} from "../../../lib/author-resource-draft";
 import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
-} from "../lib/author-resource-requests";
+} from "../../../lib/author-resource-requests";
 import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,
   confirmedRetiredBuild,
-} from "../lib/author-resource-response";
+} from "../../../lib/author-resource-response";
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
-} from "../lib/build-file-validation";
-import { buildPackageCopy } from "../lib/build-package-i18n";
-import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
-import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
-import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/build-file-validation";
+import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
+import {
+  getResourceCommerceCopy,
+  resourceCommerceError,
+} from "../../../lib/resource-commerce-i18n";
+import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

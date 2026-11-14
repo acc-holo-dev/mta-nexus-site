@@ -27,13 +27,13 @@ import { ReportModerationControls } from "../../src/components/report-moderation
 
 const exclusive = [
   "site/src/features/resources/components/new-resource-form.tsx",
-  "site/src/components/author-resource-forms.tsx",
+  "site/src/features/resources/components/author-resource-forms.tsx",
   "site/src/features/resources/components/resource-media-editor.tsx",
   "site/src/features/resources/components/resource-compatibility-form.tsx",
   "site/src/features/resources/components/resource-variants-form.tsx",
   "site/src/features/resources/components/resource-copy-form.tsx",
-  "site/src/components/resource-lifecycle-controls.tsx",
-  "site/src/components/resource-moderation-controls.tsx",
+  "site/src/features/resources/components/resource-lifecycle-controls.tsx",
+  "site/src/features/resources/components/resource-moderation-controls.tsx",
   "site/src/features/resources/components/build-moderation-controls.tsx",
   "site/src/components/build-quarantine-controls.tsx",
   "site/src/components/content-moderation-controls.tsx",

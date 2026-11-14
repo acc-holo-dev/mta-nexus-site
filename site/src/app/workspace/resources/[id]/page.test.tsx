@@ -40,14 +40,14 @@ vi.mock("../../../../features/resources/publisher-view", () => ({
   ResourcePublicationReadinessPanel: () => null,
 }));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../../../../components/author-resource-forms", () => ({
+vi.mock("../../../../features/resources/author-controls", () => ({
   AuthorResourceForms: (props: unknown) => {
     mocks.forms(props);
     return null;
   },
   RetireBuildForm: () => null,
 }));
-vi.mock("../../../../components/resource-lifecycle-controls", () => ({
+vi.mock("../../../../features/resources/lifecycle-controls", () => ({
   ResourceLifecycleControls: () => null,
 }));
 

@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/author-resource-forms.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/author-resource-forms.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: new-version uploadBlocked PRODUCT_STATE_CHANGED → ErrorState. */
 it("locks author resource uploadBlocked product-state change to ErrorState", () => {

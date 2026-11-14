@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+import {
+  AuthorResourceForms,
+  RetireBuildForm,
+} from "../../../../features/resources/author-controls";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
+import { ResourceLifecycleControls } from "../../../../features/resources/lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../../../features/resources/publisher-view";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";

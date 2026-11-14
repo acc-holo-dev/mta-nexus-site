@@ -6,7 +6,10 @@ import { expect, it } from "vitest";
 /** Honesty lock: details uploadBlocked soft secondary readonly → ErrorState. */
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/author-resource-forms.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/author-resource-forms.tsx"),
+  "utf8",
+);
 
 it("locks author resource details readonly notice to ErrorState without soft secondary caption", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');

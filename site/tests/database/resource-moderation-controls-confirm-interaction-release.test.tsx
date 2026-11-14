@@ -29,7 +29,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { ResourceModerationControls } from "../../src/components/resource-moderation-controls";
+import { ResourceModerationControls } from "../../src/features/resources/components/resource-moderation-controls";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 const { render, submit, seedRelease } = createResourceModerationControlsConfirmInteractionHelpers(

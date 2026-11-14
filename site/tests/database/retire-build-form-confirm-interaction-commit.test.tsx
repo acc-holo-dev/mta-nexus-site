@@ -29,7 +29,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { RetireBuildForm } from "../../src/components/author-resource-forms";
+import { RetireBuildForm } from "../../src/features/resources/components/author-resource-forms";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render, submit } = createRetireBuildFormConfirmInteractionHelpers(

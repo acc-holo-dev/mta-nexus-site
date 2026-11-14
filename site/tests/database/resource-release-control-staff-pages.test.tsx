@@ -41,7 +41,7 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
 vi.mock("../../src/lib/services/product-service", () => ({
   productService: { getManagedProduct: state.managed },
 }));
-vi.mock("../../src/components/resource-moderation-controls", () => ({
+vi.mock("../../src/features/resources/moderation-controls", () => ({
   ResourceModerationControls: ({ product }: { product: { status: string } }) => (
     <span data-status={product.status}>Moderation</span>
   ),

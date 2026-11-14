@@ -128,7 +128,7 @@ import { NewResourceForm } from "../../src/features/resources/components/new-res
 import { PublicProfileForm } from "../../src/components/public-profile-form";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../../src/features/resources/components/resource-copy-form";
-import { ResourceLifecycleControls } from "../../src/components/resource-lifecycle-controls";
+import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
 import { ResourcePublisherFilters } from "../../src/features/resources/components/resource-publisher-filters";
 import { getResourcePublicationReadinessCopy } from "../../src/lib/resource-publication-readiness-i18n";
