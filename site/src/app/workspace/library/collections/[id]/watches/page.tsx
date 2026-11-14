@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
-import { ResourceReleaseWatchControl } from "../../../../../../components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
 import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";

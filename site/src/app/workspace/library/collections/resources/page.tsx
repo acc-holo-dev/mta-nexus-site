@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 import { LibraryReleaseFollowLatest } from "../../../../../components/library-release-follow-latest";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
-import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../../../../features/resources/release-watch";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../../../lib/library-collection-inventory-i18n";

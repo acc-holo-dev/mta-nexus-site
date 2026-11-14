@@ -123,7 +123,7 @@ vi.mock("../../src/features/resources/components/resource-download-button", asyn
   };
 });
 
-vi.mock("../../src/components/resource-release-watch-control", async () => {
+vi.mock("../../src/features/resources/components/resource-release-watch-control", async () => {
   const ReactModule = await import("react");
   return {
     ResourceReleaseWatchControl: ({ guest, hasAccess }: { guest?: boolean; hasAccess?: boolean }) =>

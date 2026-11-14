@@ -64,6 +64,14 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/features/resources/download.ts",
     '"use client"; export { page } from "./server";',
   );
+  write(
+    "site/src/features/resources/release-watch.ts",
+    '"use client"; export { page } from "./server";',
+  );
+  write(
+    "site/src/app/release-watch.ts",
+    'export { page } from "../features/resources/release-watch";',
+  );
   write("site/src/app/download.ts", 'export { page } from "../features/resources/download";');
   write("site/src/features/resources/evidence.ts", 'export { page } from "./server";');
   write("site/src/app/media.ts", 'export { card } from "../features/resources/client";');
@@ -168,6 +176,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/review-controls.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
+    ["features/resources/release-watch.ts", "resources-view-isolation"],
     ["features/resources/download.ts", "resources-view-isolation"],
     ["features/resources/evidence.ts", "resources-view-isolation"],
     ["app/versions-deep.ts", "resources-feature-public-api"],
@@ -192,6 +201,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/review-controls.ts",
     "app/reviews-view.ts",
     "app/media.ts",
+    "app/release-watch.ts",
     "app/download.ts",
     "app/evidence.ts",
     "app/versions.ts",
@@ -211,6 +221,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
 
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/resources/release-watch.ts",
     "site/src/features/resources/download.ts",
     "site/src/features/resources/client.ts",
     "site/src/features/resources/evidence.ts",
@@ -252,6 +263,11 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     readFileSync(resolve(root, "site/src/features/resources/download.ts"), "utf8"),
     /"use client"/u,
   );
+  assert.match(
+    readFileSync(resolve(root, "site/src/features/resources/release-watch.ts"), "utf8"),
+    /"use client"/u,
+  );
+  visit("site/src/features/resources/release-watch.ts");
   visit("site/src/features/resources/download.ts");
   visit("site/src/features/resources/client.ts");
   visit("site/src/features/resources/evidence.ts");
@@ -268,6 +284,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "components/resource-review-controls.tsx",
     "components/resource-qa-panel.tsx",
     "components/resource-review-list.tsx",
+    "components/resource-release-watch-control.tsx",
     "components/resource-download-button.tsx",
     "components/resource-preview.tsx",
     "components/resource-gallery-lightbox.tsx",

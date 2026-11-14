@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../../src/components/locale-context";
 import { AddResourceToCart } from "../../src/components/resource-cart-controls";
-import { ResourceReleaseWatchControl } from "../../src/components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";
 import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/navigation", () => ({

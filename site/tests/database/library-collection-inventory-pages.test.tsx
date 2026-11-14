@@ -53,7 +53,7 @@ vi.mock("../../src/components/library-release-follow-latest", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/resource-release-watch-control", () => ({
+vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: ({
     watch,
   }: {

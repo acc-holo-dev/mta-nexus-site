@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
-import { ResourceReleaseWatchControl } from "../../../../components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../../../features/resources/release-watch";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";

@@ -35,7 +35,7 @@ vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
     }),
   },
 }));
-vi.mock("../../src/components/resource-release-watch-control", () => ({
+vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: () => <span>Release watch</span>,
 }));
 vi.mock("../../src/lib/i18n-server", () => ({
@@ -77,7 +77,7 @@ vi.mock("../../src/components/library-release-follow-latest", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/resource-release-watch-control", () => ({
+vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: ({
     watch,
   }: {

@@ -34,6 +34,8 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/src/features/resources/view.ts",
     "site/src/features/resources/client.ts",
     "site/src/features/resources/download.ts",
+    "site/src/features/resources/release-watch.ts",
+    "site/src/features/resources/components/resource-release-watch-control.tsx",
     "site/src/features/resources/components/resource-download-button.tsx",
     "site/src/features/resources/reviews-view.ts",
     "site/src/features/resources/review-controls.ts",

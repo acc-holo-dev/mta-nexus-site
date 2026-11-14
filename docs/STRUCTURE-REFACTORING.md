@@ -13,7 +13,8 @@ Phase 4.5 проверена: Resources media/evidence presentation.
 Phase 4.6 проверена: Resources reviews/Q&A UI.
 Phase 4.7 проверена: Resources review и Q&A forms.
 Phase 4.8 проверена: Resources dependency и version-help UI.
-Выполняется Phase 4.9: Resources download UI. Владелец явно
+Phase 4.9 проверена: Resources download UI.
+Выполняется Phase 4.10: Resources release-watch UI. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -470,3 +471,7 @@ Review/Q&A forms прошли полный [CI #4644](https://github.com/acc-hol
 ### Phase 4.9: Resources download UI
 
 Dependency/version-help UI прошли полный [CI #4645](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43496622259) на `87b01a88`. Кнопка скачивания объединена в Resources через отдельный client port; detail и versions используют private implementation, library consumers — public port. Клиентский fetch adapter, hash/size/pin/cancellation, HTTP/service authorization и audit остаются прежними. Тело компонента сохранено после адаптации imports. Boundary fixtures проверяют client/server isolation и реальный transitive graph; `test:resource-integrity` следует за перенесённым colocated test.
+
+### Phase 4.10: Resources release-watch UI
+
+Download UI прошёл полный [CI #4646](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43513489988) на `0981698d`. Release-watch control перенесён в Resources с отдельным client port для library; detail использует private implementation. Тело компонента сохранено после адаптации imports. ConfirmAction, request adapter, service, repository и outbox остаются прежними; revision/retry, подавление уведомлений и server authority сохраняются. Boundary fixtures проверяют новый port и реальный transitive graph.

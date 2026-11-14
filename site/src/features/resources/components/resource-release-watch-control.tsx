@@ -4,13 +4,13 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { getDictionary } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
-import { useNexusLocale } from "./locale-context";
+import { getDictionary } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { confirmAction } from "../../../components/confirm-action";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { useNexusLocale } from "../../../components/locale-context";
 
 export function ResourceReleaseWatchControl({
   watch,

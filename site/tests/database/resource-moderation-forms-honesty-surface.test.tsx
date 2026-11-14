@@ -39,7 +39,7 @@ const exclusive = [
   "site/src/components/content-moderation-controls.tsx",
   "site/src/components/report-moderation-controls.tsx",
   "site/src/components/verification-moderation-controls.tsx",
-  "site/src/components/resource-release-watch-control.tsx",
+  "site/src/features/resources/components/resource-release-watch-control.tsx",
   "site/src/components/resource-release-watch-batch-controls.tsx",
 ] as const;
 

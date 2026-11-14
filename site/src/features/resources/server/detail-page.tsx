@@ -19,7 +19,7 @@ import { ResourceDownloadButton } from "../components/resource-download-button";
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourcePreview } from "../components/resource-preview";
 import { ResourceQaPanel } from "../components/resource-qa-panel";
-import { ResourceReleaseWatchControl } from "../../../components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../components/resource-release-watch-control";
 import { ResourceReviewList } from "../components/resource-review-list";
 import { ResourceVariantChoices } from "../components/resource-variant-choices";
 import { ResourceVersionHelpSection } from "../components/resource-version-help-section";

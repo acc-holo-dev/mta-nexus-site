@@ -1,6 +1,6 @@
 # Resources: публичные страницы, UI и модели
 
-Read-only срез объединяет composition каталога, detail, публичной истории версий и
+Resources feature объединяет composition каталога, detail, публичной истории версий и
 отзывов, карточку, preview/gallery, build provenance/package evidence и чистые
 query/gallery/provenance helpers. Остальной detail/review UI, editor, builds,
 download handlers и Q&A остаются в существующих модулях.
@@ -13,6 +13,7 @@ Services и repositories не дублируются и не переносят�
 | `detail-view.ts`     | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
 | `review-controls.ts` | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`    | `ResourceReviewPager`; общая пагинация для workspace                                                        |
+| `release-watch.ts`   | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
 | `download.ts`        | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
 | `client.ts`          | `ResourcePreview`, `ResourceGallery`, `ResourceQaPanel`; client components                                  |
 | `evidence.ts`        | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
@@ -29,9 +30,9 @@ lightbox остаётся приватным. Общие locale, безопас�
 остаются в lib, общий native-dialog hook — в components. Внутри feature используются
 прямые implementation imports; workspace/media/build/library используют public ports.
 Внешний production-код использует только entrypoints; приватные implementation
-imports, feature→routing и client/evidence/view/model→server/services/infra запрещены анализатором.
+imports, feature→routing и UI/model→server/services/infra запрещены анализатором.
 Model также не импортирует app helpers, UI, frameworks или Node builtins. Negative
-fixtures проверяют value/type edges; реальные графы client/evidence/view/model проверяются отдельно.
+fixtures проверяют value/type edges; реальные графы public UI/model проверяются отдельно.
 
 `server.ts` отвечает только за каталог; `detail-server.ts` — только за детальную
 страницу. Они не реэкспортируют друг друга: SSR hydration сессии, entitlement,
@@ -97,3 +98,7 @@ Download UI принадлежит Resources и экспортируется ч�
 checks сохраняют прежние реализации; UI не является разрешением на выдачу.
 Проверки: `pnpm test:resource-integrity`, consumers library/detail/versions и
 полный browser acceptance с exact-byte download, timeout и cancellation.
+
+Release-watch UI принадлежит Resources и использует отдельный client port. Подтверждения,
+revision/retry, suppressed notices и guest return path сохраняются; HTTP/service,
+repository и outbox продолжают проверять права и доставку на сервере.

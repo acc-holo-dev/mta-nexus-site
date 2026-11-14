@@ -8,7 +8,7 @@ import { BuildProvenanceDetails } from "../../../../../features/resources/eviden
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
-import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../../../../features/resources/release-watch";
 import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";

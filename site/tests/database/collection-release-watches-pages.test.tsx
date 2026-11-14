@@ -21,7 +21,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
-vi.mock("../../src/components/resource-release-watch-control", () => ({
+vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: ({ watch }: { watch: { productId: string; enabled: boolean } }) => (
     <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
       Watch

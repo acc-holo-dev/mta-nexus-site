@@ -19,7 +19,7 @@ import { libraryCollectionsService } from "../lib/services/library-collections-s
 import { LibraryReleaseFollowLatest } from "./library-release-follow-latest";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceDownloadButton } from "../features/resources/download";
-import { ResourceReleaseWatchControl } from "./resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../features/resources/release-watch";
 export async function CollectionReleasesScreen({
   params,
   searchParams,

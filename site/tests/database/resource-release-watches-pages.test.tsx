@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../../src/components/locale-context";
-import { ResourceReleaseWatchControl } from "../../src/components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,

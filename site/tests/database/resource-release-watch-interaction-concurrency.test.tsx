@@ -21,7 +21,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
 
-import { ResourceReleaseWatchControl } from "../../src/components/resource-release-watch-control";
+import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";
 
 const helpers = createResourceReleaseWatchInteractionHelpers(
   h,
