@@ -18,7 +18,8 @@ Phase 4.10 проверена: Resources release-watch UI.
 Phase 4.11 проверена: Resources media editor и server composition.
 Phase 4.12 проверена: Resources build screen и controls.
 Phase 4.13 проверена: Resources build moderation controls.
-Выполняется Phase 4.14: Resources author management UI. Владелец явно
+Phase 4.14 проверена: Resources author management UI.
+Выполняется Phase 4.15: Resources publisher workspace views. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -495,3 +496,7 @@ Build screen прошёл полный [CI #4650](https://github.com/acc-holo-de
 ### Phase 4.14: Resources author management UI
 
 Build moderation controls прошли полный [CI #4651](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43539435074) на `b9f9545f`. Формы совместимости и вариантов и ссылка поддержки версий объединены в Resources. Workspace routes используют отдельные client ports; тела компонентов сохранены после адаптации imports. Actor/draft/revision guards, подтверждения, HTTP adapters и server authority остаются прежними. Negative fixtures и реальные client graphs проверяют новые границы.
+
+### Phase 4.15: Resources publisher workspace views
+
+Author management UI прошёл полный [CI #4652](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43542338801) на `4eb502ac`. Фильтры авторского списка, панель готовности и навигация ресурса объединены в Resources. Серверные представления используют `publisher-view`, клиентская навигация — отдельный `publisher-navigation`. Тела компонентов сохранены после адаптации imports; локализация, ссылки, состояния готовности и server authority остаются прежними. Negative fixtures и реальные графы проверяют новые границы.

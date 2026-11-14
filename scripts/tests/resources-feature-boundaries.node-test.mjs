@@ -110,7 +110,12 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "site/src/app/review-controls.ts",
     'export { page } from "../features/resources/review-controls";',
   );
-  for (const port of ["compatibility-controls", "variant-controls"]) {
+  for (const port of [
+    "compatibility-controls",
+    "variant-controls",
+    "publisher-view",
+    "publisher-navigation",
+  ]) {
     write(
       `site/src/features/resources/${port}.ts`,
       '"use client"; export { page } from "./server";',
@@ -209,6 +214,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/review-controls.ts", "resources-view-isolation"],
     ["features/resources/compatibility-controls.ts", "resources-view-isolation"],
     ["features/resources/variant-controls.ts", "resources-view-isolation"],
+    ["features/resources/publisher-view.ts", "resources-view-isolation"],
+    ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/release-watch.ts", "resources-view-isolation"],
@@ -236,6 +243,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/review-controls.ts",
     "app/compatibility-controls.ts",
     "app/variant-controls.ts",
+    "app/publisher-view.ts",
+    "app/publisher-navigation.ts",
     "app/reviews-view.ts",
     "app/build-route.ts",
     "app/media-route.ts",
@@ -260,6 +269,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
 
 test("real client, evidence, view and model entrypoints have no transitive server dependencies", () => {
   const result = cruise(root, [
+    "site/src/features/resources/publisher-view.ts",
+    "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/release-watch.ts",
     "site/src/features/resources/compatibility-controls.ts",
     "site/src/features/resources/variant-controls.ts",
@@ -311,9 +322,19 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     readFileSync(resolve(root, "site/src/features/resources/release-watch.ts"), "utf8"),
     /"use client"/u,
   );
+  assert.match(
+    readFileSync(resolve(root, "site/src/features/resources/publisher-navigation.ts"), "utf8"),
+    /^"use client";/u,
+  );
+  assert.doesNotMatch(
+    readFileSync(resolve(root, "site/src/features/resources/publisher-view.ts"), "utf8"),
+    /^"use client";/u,
+  );
   visit("site/src/features/resources/release-watch.ts");
   visit("site/src/features/resources/compatibility-controls.ts");
   visit("site/src/features/resources/variant-controls.ts");
+  visit("site/src/features/resources/publisher-view.ts");
+  visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");

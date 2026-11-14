@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
-import { ResourcePublicationReadinessPanel } from "../../../../components/resource-publication-readiness-panel";
+import { ResourcePublicationReadinessPanel } from "../../../../features/resources/publisher-view";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../lib/resource-build-workspace-i18n";

@@ -1,13 +1,13 @@
 import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
   publicationReadinessOverview,
-} from "../lib/resource-publication-readiness-i18n";
-import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+} from "../../../lib/resource-publication-readiness-i18n";
+import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
 
 const stateTone: Partial<
   Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>

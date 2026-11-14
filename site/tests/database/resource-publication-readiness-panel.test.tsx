@@ -2,7 +2,7 @@ import { buildResourcePublicationReadiness } from "@nexus/domain";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { ResourcePublicationReadinessPanel } from "../../src/components/resource-publication-readiness-panel";
+import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,

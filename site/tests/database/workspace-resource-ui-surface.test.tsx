@@ -129,8 +129,8 @@ import { PublicProfileForm } from "../../src/components/public-profile-form";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../../src/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../../src/components/resource-lifecycle-controls";
-import { ResourcePublicationReadinessPanel } from "../../src/components/resource-publication-readiness-panel";
-import { ResourcePublisherFilters } from "../../src/components/resource-publisher-filters";
+import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
+import { ResourcePublisherFilters } from "../../src/features/resources/components/resource-publisher-filters";
 import { getResourcePublicationReadinessCopy } from "../../src/lib/resource-publication-readiness-i18n";
 
 describe("workspace and resource UI surface", () => {
@@ -183,7 +183,7 @@ describe("workspace and resource UI surface", () => {
   );
 
   it("locks publisher filter native selects to min-h-11 without h-10 chrome", () => {
-    const source = read("site/src/components/resource-publisher-filters.tsx");
+    const source = read("site/src/features/resources/components/resource-publisher-filters.tsx");
     expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
     expect(source).not.toContain("h-10");
   });

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { ResourcePublisherWorkspaceNav } from "../../../../components/resource-publisher-workspace-nav";
+import { ResourcePublisherWorkspaceNav } from "../../../../features/resources/publisher-navigation";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 

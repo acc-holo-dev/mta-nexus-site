@@ -27,7 +27,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-import { ResourcePublisherWorkspaceNav } from "../../src/components/resource-publisher-workspace-nav";
+import { ResourcePublisherWorkspaceNav } from "../../src/features/resources/components/resource-publisher-workspace-nav";
 import { ServerWorkspaceNav } from "../../src/components/server-workspace-nav";
 
 describe("workspace publisher and server navigation", () => {

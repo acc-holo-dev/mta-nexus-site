@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/resource-publication-readiness-panel.tsx";
+const surface = "site/src/features/resources/components/resource-publication-readiness-panel.tsx";
 
 it("locks publication readiness blocked and pending notices to ErrorState", () => {
   const source = read(surface);

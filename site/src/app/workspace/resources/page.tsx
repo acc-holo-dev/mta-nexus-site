@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
+import { ResourcePublisherFilters } from "../../../features/resources/publisher-view";
 import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

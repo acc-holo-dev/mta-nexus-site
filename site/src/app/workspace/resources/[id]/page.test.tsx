@@ -36,7 +36,7 @@ vi.mock("../../../../lib/services/resource-publication-readiness-service", () =>
     }),
   },
 }));
-vi.mock("../../../../components/resource-publication-readiness-panel", () => ({
+vi.mock("../../../../features/resources/publisher-view", () => ({
   ResourcePublicationReadinessPanel: () => null,
 }));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));

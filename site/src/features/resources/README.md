@@ -13,6 +13,8 @@ Services и repositories не дублируются и не переносят�
 | `detail-view.ts`            | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
 | `compatibility-controls.ts` | `ResourceCompatibilityForm`; клиентская форма совместимости workspace                                       |
 | `variant-controls.ts`       | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
+| `publisher-view.ts`         | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
+| `publisher-navigation.ts`   | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
@@ -121,3 +123,7 @@ confirm и server mutation authority сохраняются.
 Формы совместимости и вариантов принадлежат Resources и доступны workspace через
 отдельные client ports; ссылка поддержки версий остаётся private. Проверки actor,
 draft, revision, подтверждения и серверные ограничения сохраняются.
+
+Фильтры, готовность публикации и навигация авторского workspace принадлежат Resources.
+Представления используют RSC-compatible port, навигация — отдельный client port;
+фильтрация и авторитетная проверка готовности сохраняются на сервере.
