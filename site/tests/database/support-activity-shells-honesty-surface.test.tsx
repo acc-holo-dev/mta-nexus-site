@@ -161,7 +161,9 @@ it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
   expect(read("site/src/components/copyable-plain-code-block.tsx")).toContain(
     'className="min-h-11"',
   );
-  expect(read("site/src/components/community-report-form.tsx")).not.toContain("min-h-9");
+  expect(read("site/src/features/community/components/community-report-form.tsx")).not.toContain(
+    "min-h-9",
+  );
 });
 
 it("locks support-center create-case primary submit to size=touch", () => {

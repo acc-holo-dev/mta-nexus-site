@@ -26,7 +26,7 @@ vi.mock("../../src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 
-import { ContentDiscussion } from "../../src/components/content-discussion";
+import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
 
 const item = {
   id: "older",

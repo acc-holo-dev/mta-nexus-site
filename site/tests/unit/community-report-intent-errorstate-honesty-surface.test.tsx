@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/community-report-form.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/community/components/community-report-form.tsx"),
+  "utf8",
+);
 
 it("routes unconfirmed community-report intent through ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');

@@ -9,16 +9,16 @@ import {
   clearCommunityTopicIntent,
   readCommunityTopicIntent,
   writeCommunityTopicIntent,
-} from "../lib/community-topic-intent";
+} from "../../../lib/community-topic-intent";
 import {
   buildCommunityTopicSubmission,
   type CommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
-} from "../lib/community-topic-submission";
-import { privateApiRequest } from "../lib/private-api-request";
-import { authEntryHref } from "./auth-return-path";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/community-topic-submission";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { authEntryHref } from "../../../components/auth-return-path";
+import { useNexusLocale } from "../../../components/locale-context";
 
 function communityTopicErrorMessage(
   payload: unknown,

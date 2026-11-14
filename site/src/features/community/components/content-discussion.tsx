@@ -10,29 +10,32 @@ import {
   createCommentIntentKey,
   parseCommentIntentKey,
   submitContentCommentRequest,
-} from "../lib/content-comment-client";
-import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
+} from "../../../lib/content-comment-client";
+import {
+  type DiscussionPage,
+  discussionPageSchema,
+} from "../../../lib/content-discussion-contract";
 import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../lib/content-discussion-copy";
+} from "../../../lib/content-discussion-copy";
 import {
   clearDiscussionComposeDraft,
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
-} from "../lib/discussion-compose-draft";
-import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
-import { followCopy } from "../lib/follow-workspace-copy";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+} from "../../../lib/discussion-compose-draft";
+import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
+import { followCopy } from "../../../lib/follow-workspace-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
-import { ContentFollowControls } from "./content-follow-controls";
+import { ContentFollowControls } from "../../../components/content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-import { GuestAuthLinks } from "./guest-auth-links";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
 
 const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
 const navLinkClass =

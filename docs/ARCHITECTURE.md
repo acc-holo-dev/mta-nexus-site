@@ -52,6 +52,15 @@ infrastructure packages. Model не зависит от UI и Node builtins. Э�
 проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
 HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
 
+### Community feature
+
+`site/src/features/community` объединяет client UI обсуждения, жалоб и создания
+тем. Явные `discussion`, `topic-form`, `report-form` и `comment-actions` entries
+защищают private implementations; routing, services, server и infrastructure не
+входят в client graph. Actor/draft/intent, confirmation, revision и server authority
+остаются прежними. [Контракт feature](../site/src/features/community/README.md)
+и boundary suite проверяют прямые и транзитивные зависимости; изменения требуют полного CI.
+
 ### Resources feature
 
 `site/src/features/resources` выделяет read-only каталог, detail, публичные versions/reviews, карточку и query model.

@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { getDiscussionCopy } from "../lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../../lib/content-discussion-copy";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 
 describe("discussion compose write feedback", () => {

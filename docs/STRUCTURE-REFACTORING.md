@@ -29,7 +29,8 @@ Phase 4.21 проверена: Servers connect и statistics controls.
 Phase 4.22 проверена: Servers statistics, observations и history.
 Phase 4.23 проверена: Servers registration, claim и management UI.
 Phase 4.24 проверена: Servers content, activity и navigation UI.
-Выполняется Phase 4.25: Servers interactions и Resources meta inspector. Владелец явно
+Phase 4.25 проверена: Servers interactions и Resources meta inspector.
+Выполняется Phase 4.26: Community discussion, reports и topics. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -550,3 +551,7 @@ Registration, claim и management UI прошли полный [CI #4662](https:
 ### Phase 4.25: Servers interactions и Resources meta inspector
 
 Content, activity и navigation UI прошли полный [CI #4663](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43576455204) на `37496dce`. Reviews, follow, batch visibility и MTA meta inspector объединены с соответствующими features. Тела компонентов сохранены после адаптации imports; actor/revision, review eligibility, confirmation, abort/retry, наблюдения и серверные проверки прав остаются прежними. Shared follow UI и services не дублируются. Boundary fixtures, реальные client graphs и project membership проверяются.
+
+### Phase 4.26: Community discussion, reports и topics
+
+Servers interactions и Resources meta inspector прошли полный [CI #4664](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43580499675) на `63ac937f`. Обсуждение публикации, обратная связь при отправке, действия с комментариями, форма жалобы и создание темы объединены в Community через отдельные client ports. Тела компонентов сохранены после адаптации imports; actor/draft/intent, подтверждения, revision, восстановление неопределённого результата и серверные проверки прав остаются прежними. Negative fixtures и транзитивные client graphs защищают границы; изменения Community требуют полного CI.

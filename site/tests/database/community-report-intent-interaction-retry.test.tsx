@@ -16,7 +16,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/topic" }));
 vi.mock("next/link", () => ({ default: ({ children }: { children: ReactNode }) => children }));
 
-import { CommunityReportForm } from "../../src/components/community-report-form";
+import { CommunityReportForm } from "../../src/features/community/components/community-report-form";
 
 const { mount, submit, setReason } = createCommunityReportIntentInteractionHelpers(
   harness,

@@ -36,7 +36,7 @@ vi.mock("react", async (importOriginal) => {
   };
 });
 
-import { CommunityReportForm } from "../../src/components/community-report-form";
+import { CommunityReportForm } from "../../src/features/community/components/community-report-form";
 
 beforeEach(() => {
   harness.slots = [];

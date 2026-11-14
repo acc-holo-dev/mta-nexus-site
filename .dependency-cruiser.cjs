@@ -30,6 +30,34 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "community-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/community/)" },
+      to: {
+        path: "^site/src/features/community/(?!(?:discussion|topic-form|report-form|comment-actions)\\.ts$)",
+      },
+    },
+    {
+      name: "community-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/community/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "community-client-isolation",
+      severity: "error",
+      from: { path: "^site/src/features/community/" },
+      to: {
+        path: "^(?:site/src/(?:features/community/server(?:\\.ts$|/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "community-client-has-no-node-builtins",
+      severity: "error",
+      from: { path: "^site/src/features/community/" },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "servers-feature-public-api",
       severity: "error",
       comment:

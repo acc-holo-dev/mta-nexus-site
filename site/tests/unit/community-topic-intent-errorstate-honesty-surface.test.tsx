@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/community-topic-form.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/community/components/community-topic-form.tsx"),
+  "utf8",
+);
 
 it("routes community-topic pending/unknown recovery through ErrorState and keeps busy status", () => {
   expect(source).toContain('import { Button, ErrorState, Field } from "@nexus/ui"');

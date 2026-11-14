@@ -4,13 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { communityReportCreateSchema, REPORT_TYPES } from "../lib/community-report-contract";
-import { communityReportCopy, communityReportMutationError } from "../lib/community-report-copy";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { platformFieldClass } from "../lib/user-platform-client";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
-import { GuestAuthLinks } from "./guest-auth-links";
+import { communityReportCreateSchema, REPORT_TYPES } from "../../../lib/community-report-contract";
+import {
+  communityReportCopy,
+  communityReportMutationError,
+} from "../../../lib/community-report-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { GuestAuthLinks } from "../../../components/guest-auth-links";
 export function CommunityReportForm({
   targetType,
   targetId,

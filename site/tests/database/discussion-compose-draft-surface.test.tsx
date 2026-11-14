@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { DiscussionComposeWriteFeedback } from "../../src/components/content-discussion-compose-feedback";
+import { DiscussionComposeWriteFeedback } from "../../src/features/community/components/content-discussion-compose-feedback";
 import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
 import type { DiscussionComposeDraft } from "../../src/lib/discussion-compose-draft";
 import { getDictionary } from "../../src/lib/i18n";
@@ -22,7 +22,7 @@ vi.mock("../../src/lib/discussion-compose-draft", () => ({
   clearDiscussionComposeDraft: vi.fn(),
 }));
 
-import { ContentDiscussion } from "../../src/components/content-discussion";
+import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
 
 it("announces a session draft restore in the compose form", () => {
   const html = renderToStaticMarkup(

@@ -1,7 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { CommunityTopicForm } from "../../../components/community-topic-form";
+import { CommunityTopicForm } from "../../../features/community/topic-form";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { ContentDiscussion } from "../../src/components/content-discussion";
+import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
 import { OrganizationProfileForm } from "../../src/components/organization-profile-form";
 import { OrganizationWorkspacePanel } from "../../src/components/organization-workspace";
 import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";

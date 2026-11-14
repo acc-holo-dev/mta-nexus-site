@@ -44,7 +44,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { communityReportCopy } from "../lib/community-report-copy";
+import { communityReportCopy } from "../../../lib/community-report-copy";
 import { CommunityReportForm } from "./community-report-form";
 
 type Element = ReactElement<Record<string, unknown>>;

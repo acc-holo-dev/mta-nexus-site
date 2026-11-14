@@ -22,7 +22,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => {
   };
 });
 
-import { DiscussionCommentActions } from "../../src/components/discussion-comment-actions";
+import { DiscussionCommentActions } from "../../src/features/community/components/discussion-comment-actions";
 import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
 
 const { render, control, submit } = createDiscussionCommentActionsConfirmInteractionHelpers(

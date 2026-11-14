@@ -25,7 +25,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { CommunityTopicForm } from "../../src/components/community-topic-form";
+import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render, mount, submit } = createCommunityTopicIntentInteractionHelpers(

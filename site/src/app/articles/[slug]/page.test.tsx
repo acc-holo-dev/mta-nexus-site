@@ -51,7 +51,7 @@ vi.mock("../../../lib/services/auth-service", () => ({
   },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../../../components/content-discussion", () => ({
+vi.mock("../../../features/community/discussion", () => ({
   ContentDiscussion: (props: { followInitial?: unknown }) => (
     <div data-follow-initial={JSON.stringify(props.followInitial ?? null)} />
   ),
