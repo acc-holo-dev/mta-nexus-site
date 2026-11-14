@@ -13,7 +13,7 @@ import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../components/server-follow-button";
 import { ServerHistoryPanel } from "../../../features/servers/history-server";
 import { ServerReviewPanel } from "../../../components/server-review-panel";
-import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
+import { ServerUpdatesPanel } from "../../../features/servers/updates-server";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";

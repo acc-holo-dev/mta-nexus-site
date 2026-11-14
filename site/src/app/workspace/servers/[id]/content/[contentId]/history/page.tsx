@@ -1,4 +1,4 @@
-import { ServerPublicationHistoryScreen } from "../../../../../../../components/server-publication-history-screen";
+import { ServerPublicationHistoryScreen } from "../../../../../../../features/servers/publication-history-server";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 import { serverPublicationHistoryCopy } from "../../../../../../../lib/server-publication-history-copy";
 

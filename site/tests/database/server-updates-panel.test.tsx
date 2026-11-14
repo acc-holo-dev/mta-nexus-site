@@ -16,7 +16,7 @@ vi.mock("../../src/components/article-card", () => ({
   ),
 }));
 
-import { ServerUpdatesPanel } from "../../src/components/server-updates-panel";
+import { ServerUpdatesPanel } from "../../src/features/servers/server/server-updates-panel";
 
 describe("server updates panel behavior", () => {
   it("links even an empty server preview to the full archive", () => {

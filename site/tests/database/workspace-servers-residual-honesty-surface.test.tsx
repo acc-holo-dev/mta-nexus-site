@@ -108,10 +108,10 @@ it("locks managed statistics and observations loading shells to honest busy copy
 
 it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", () => {
   const surfaces = [
-    "site/src/components/server-workspace-history-screen.tsx",
+    "site/src/features/servers/server/server-workspace-history-screen.tsx",
     "site/src/features/servers/server/server-statistics-page.tsx",
     "site/src/features/servers/server/server-observation-browser-page.tsx",
-    "site/src/components/server-content-editor-page.tsx",
+    "site/src/features/servers/server/server-content-editor-page.tsx",
     "site/src/components/context-publication-history-screen.tsx",
     "site/src/components/public-context-trust-page.tsx",
     "site/src/components/license-history-page.tsx",
@@ -123,7 +123,9 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
     expect(source).toContain("min-w-0");
     expect(source).toContain("min-h-11");
   }
-  expect(read("site/src/components/server-workspace-history-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/servers/server/server-workspace-history-screen.tsx")).toContain(
+    "EmptyState",
+  );
   expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
     "EmptyState",
   );

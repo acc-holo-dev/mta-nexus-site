@@ -3,27 +3,32 @@
 Пилот feature architecture объединяет read-only каталог MTA, карточки наблюдений
 и managed listings, их чистые проекции и server composition страницы `/servers`.
 Raw master observation и managed profile остаются разными источниками правды.
-Claim, ownership, management, reviews, history и collectors пока находятся в
-прежних модулях. Services не дублируются и не переносятся этим шагом.
+Claim, management, история и часть presentation объединены в feature; services,
+repositories и collectors остаются в прежних модулях и не дублируются.
 
 ## Публичные entrypoints
 
-| Entry                    | Контракт                                                                                          |
-| ------------------------ | ------------------------------------------------------------------------------------------------- |
-| `connect.ts`             | `ServerConnectControls`; client connect/copy UI                                                   |
-| `statistics-export.ts`   | `ServerStatisticsExportButton`; client экспорт                                                    |
-| `statistics-view.ts`     | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
-| `statistics-server.ts`   | Statistics page, metadata и loading; server-only                                                  |
-| `observations-server.ts` | Observation browser, metadata и loading; server-only                                              |
-| `history-server.ts`      | `ServerHistoryPanel`; server-only                                                                 |
-| `registration.ts`        | `RegisterServerForm`; client регистрация                                                          |
-| `claim-controls.ts`      | `ServerClaimControlPanel`; client подтверждение контроля                                          |
-| `details-controls.ts`    | `ServerDetailsForm`; client настройки                                                             |
-| `claim-status-server.ts` | `ServerClaimStatusPanel`; server-only статус                                                      |
-| `managed-card-server.ts` | `ManagedServerCard`; server-only карточка                                                         |
-| `client.ts`              | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
-| `server.ts`              | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
-| `model.ts`               | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
+| Entry                           | Контракт                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `connect.ts`                    | `ServerConnectControls`; client connect/copy UI                                                   |
+| `statistics-export.ts`          | `ServerStatisticsExportButton`; client экспорт                                                    |
+| `statistics-view.ts`            | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
+| `statistics-server.ts`          | Statistics page, metadata и loading; server-only                                                  |
+| `observations-server.ts`        | Observation browser, metadata и loading; server-only                                              |
+| `history-server.ts`             | `ServerHistoryPanel`; server-only                                                                 |
+| `registration.ts`               | `RegisterServerForm`; client регистрация                                                          |
+| `claim-controls.ts`             | `ServerClaimControlPanel`; client подтверждение контроля                                          |
+| `details-controls.ts`           | `ServerDetailsForm`; client настройки                                                             |
+| `claim-status-server.ts`        | `ServerClaimStatusPanel`; server-only статус                                                      |
+| `managed-card-server.ts`        | `ManagedServerCard`; server-only карточка                                                         |
+| `content-editor-server.ts`      | `ServerContentEditorPage`; server-only редактор публикаций                                        |
+| `activity-server.ts`            | `ServerWorkspaceHistoryScreen`; server-only активность                                            |
+| `publication-history-server.ts` | `ServerPublicationHistoryScreen`; server-only история публикаций                                  |
+| `updates-server.ts`             | `ServerUpdatesPanel`; server-only обновления                                                      |
+| `workspace-navigation.ts`       | `ServerWorkspaceNav`; client навигация workspace                                                  |
+| `client.ts`                     | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
+| `server.ts`                     | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
+| `model.ts`                      | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
@@ -63,3 +68,7 @@ Servers и используют отдельные server-only ports. Metadata, 
 Формы регистрации, claim и настроек, статус claim и managed card принадлежат
 Servers. Actor/draft/revision и challenge сохраняются, права и подтверждение
 владения по-прежнему проверяются сервером.
+
+Редактор, история публикаций, активность, навигация и панель обновлений
+принадлежат Servers. Session/manager authorization, recovery, pagination
+и public visibility сохраняются в существующих сервисах и routing.

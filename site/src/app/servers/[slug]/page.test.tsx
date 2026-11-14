@@ -134,7 +134,7 @@ vi.mock("../../../features/servers/history-server", async () => {
   };
 });
 
-vi.mock("../../../components/server-updates-panel", async () => {
+vi.mock("../../../features/servers/updates-server", async () => {
   const React = await import("react");
   return {
     ServerUpdatesPanel: ({ updates }: { updates: unknown }) =>

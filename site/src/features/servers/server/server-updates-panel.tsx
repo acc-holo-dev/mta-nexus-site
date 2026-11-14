@@ -2,9 +2,9 @@ import type { Content } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { publicationCopy } from "../lib/publication-feed-copy";
-import { ArticleCard } from "./article-card";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { ArticleCard } from "../../../components/article-card";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

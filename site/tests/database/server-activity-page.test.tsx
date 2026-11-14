@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { NotFoundError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";

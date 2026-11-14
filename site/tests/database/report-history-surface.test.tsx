@@ -271,7 +271,7 @@ it.each(["ru", "en"] as const)(
     const { organization: _organization, ...data } = history;
     state.history.mockResolvedValue({ ...data, server: { id: "srv", name: "Server" } });
     const { ServerPublicationHistoryScreen } = await import(
-      "../../src/components/server-publication-history-screen"
+      "../../src/features/servers/server/server-publication-history-screen"
     );
     const { serverPublicationHistoryCopy } = await import(
       "../../src/lib/server-publication-history-copy"
@@ -288,7 +288,7 @@ it.each(["ru", "en"] as const)(
 );
 it("refuses mismatched server DTOs and suppresses restore without current archive proof", async () => {
   const { ServerPublicationHistoryScreen } = await import(
-    "../../src/components/server-publication-history-screen"
+    "../../src/features/servers/server/server-publication-history-screen"
   );
   const { organization: _organization, ...data } = history;
   state.history.mockResolvedValue({ ...data, server: { id: "foreign", name: "Private server" } });

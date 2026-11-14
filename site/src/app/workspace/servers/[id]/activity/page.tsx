@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ServerWorkspaceHistoryScreen } from "../../../../../components/server-workspace-history-screen";
+import { ServerWorkspaceHistoryScreen } from "../../../../../features/servers/activity-server";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getServerActivityCopy } from "../../../../../lib/server-activity-view";
 

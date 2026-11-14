@@ -1,4 +1,4 @@
-import { ServerContentEditorPage } from "../../../../../../components/server-content-editor-page";
+import { ServerContentEditorPage } from "../../../../../../features/servers/content-editor-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 

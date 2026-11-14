@@ -28,7 +28,7 @@ vi.mock("../../src/lib/services/server-content-service", () => ({
 }));
 
 import Page, { generateMetadata } from "../../src/app/workspace/servers/[id]/content/page";
-import { ServerContentEditorPage } from "../../src/components/server-content-editor-page";
+import { ServerContentEditorPage } from "../../src/features/servers/server/server-content-editor-page";
 
 const server = { id: "srv", name: "Team", slug: "team" };
 const content = {
