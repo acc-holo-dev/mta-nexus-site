@@ -7,7 +7,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/resource-media-screen.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/server/media-screen.tsx"),
+  "utf8",
+);
 
 it("locks gallery reviewNote notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');

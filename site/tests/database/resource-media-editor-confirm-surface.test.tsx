@@ -6,10 +6,10 @@ import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 it("gates gallery image removal behind confirmAction with localized copy", () => {
-  const source = read("site/src/components/resource-media-editor.tsx");
+  const source = read("site/src/features/resources/components/resource-media-editor.tsx");
   const i18n = read("site/src/lib/resource-media-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "./confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
   expect(source).toContain("copy.removeConfirmTitle");
   expect(source).toContain("copy.removeConfirm");
   expect(source).toContain("danger: true");
@@ -33,7 +33,7 @@ it("gates gallery image removal behind confirmAction with localized copy", () =>
 });
 
 it("locks gallery cover/up/down/remove controls to size=touch min-h-11 chrome", () => {
-  const source = read("site/src/components/resource-media-editor.tsx");
+  const source = read("site/src/features/resources/components/resource-media-editor.tsx");
   expect(source).toContain("EmptyState");
   expect(source).not.toContain('size="sm"');
   expect(source).not.toContain("min-h-10");

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ResourceMediaScreen } from "../../../../../components/resource-media-screen";
+import { ResourceMediaScreen } from "../../../../../features/resources/media-server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Resource gallery | MTA NEXUS",

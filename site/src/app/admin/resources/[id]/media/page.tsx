@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ResourceMediaScreen } from "../../../../../components/resource-media-screen";
+import { ResourceMediaScreen } from "../../../../../features/resources/media-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

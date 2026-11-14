@@ -54,8 +54,9 @@ App Router сохраняет dynamic config; products API использует 
 Services/repositories и visibility/scan/access policy остаются прежними; detail client UI,
 publishing и download handlers не переносятся. Отдельный `detail-server` entry
 сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
-`versions-server` и `reviews-server` отвечают за публичные подстраницы; их metadata
-и dynamic config также остаются в routing. Все четыре server entries изолированы
+`versions-server` и `reviews-server` отвечают за публичные подстраницы,
+`media-server` — за author/staff media composition; их metadata
+и dynamic config также остаются в routing. Все пять server entries изолированы
 друг от друга и защищены `server-only`. Private imports и server leaks закрыты
 анализатором и negative fixtures; реальные view/model dependencies проверяются.
 Public `client` содержит preview/gallery, нейтральный `evidence` — provenance/package

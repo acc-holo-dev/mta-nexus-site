@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/resource-media-editor.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/resources/components/resource-media-editor.tsx"),
+  "utf8",
+);
 
 it("locks gallery readonly notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState, Input } from "@nexus/ui"');

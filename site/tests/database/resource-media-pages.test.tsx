@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError, type ManagedResourceMedia } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -25,8 +27,8 @@ vi.mock("../../src/lib/services/resource-media-service", () => ({
 }));
 
 import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/loading";
-import { ResourceMediaEditor } from "../../src/components/resource-media-editor";
-import { ResourceMediaScreen } from "../../src/components/resource-media-screen";
+import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";
+import { ResourceMediaScreen } from "../../src/features/resources/media-server";
 import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 
 const initial: ManagedResourceMedia = {

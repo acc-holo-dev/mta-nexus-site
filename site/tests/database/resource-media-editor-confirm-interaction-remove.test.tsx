@@ -15,7 +15,7 @@ const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { ResourceMediaEditor } from "../../src/components/resource-media-editor";
+import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";
 import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 
 const { render, removeButton } = createResourceMediaEditorConfirmInteractionHelpers(

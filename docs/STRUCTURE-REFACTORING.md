@@ -14,7 +14,8 @@ Phase 4.6 проверена: Resources reviews/Q&A UI.
 Phase 4.7 проверена: Resources review и Q&A forms.
 Phase 4.8 проверена: Resources dependency и version-help UI.
 Phase 4.9 проверена: Resources download UI.
-Выполняется Phase 4.10: Resources release-watch UI. Владелец явно
+Phase 4.10 проверена: Resources release-watch UI.
+Выполняется Phase 4.11: Resources media editor и server composition. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -475,3 +476,7 @@ Dependency/version-help UI прошли полный [CI #4645](https://github.c
 ### Phase 4.10: Resources release-watch UI
 
 Download UI прошёл полный [CI #4646](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43513489988) на `0981698d`. Release-watch control перенесён в Resources с отдельным client port для library; detail использует private implementation. Тело компонента сохранено после адаптации imports. ConfirmAction, request adapter, service, repository и outbox остаются прежними; revision/retry, подавление уведомлений и server authority сохраняются. Boundary fixtures проверяют новый port и реальный transitive graph.
+
+### Phase 4.11: Resources media editor и server composition
+
+Release-watch UI прошёл полный [CI #4647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43532217845) на `f01ae576`. Media editor и screen объединены в Resources; workspace и admin routes используют server-only `media-server`, сохраняя metadata и оболочки. Тела screen/editor сохранены после адаптации imports. Session/role/ownership, scan и mutation authority остаются в service/repository и HTTP handlers; confirm, abort и retry не меняются. Negative fixtures и реальные client/server graphs проверяют границы нового порта.

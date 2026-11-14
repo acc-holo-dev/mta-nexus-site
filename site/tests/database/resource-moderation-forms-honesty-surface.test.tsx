@@ -28,7 +28,7 @@ import { ReportModerationControls } from "../../src/components/report-moderation
 const exclusive = [
   "site/src/components/new-resource-form.tsx",
   "site/src/components/author-resource-forms.tsx",
-  "site/src/components/resource-media-editor.tsx",
+  "site/src/features/resources/components/resource-media-editor.tsx",
   "site/src/components/resource-compatibility-form.tsx",
   "site/src/components/resource-variants-form.tsx",
   "site/src/components/resource-copy-form.tsx",
@@ -53,7 +53,7 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
 });
 
 it("locks resource media editor reorder/remove CTAs to size=touch", () => {
-  const source = read("site/src/components/resource-media-editor.tsx");
+  const source = read("site/src/features/resources/components/resource-media-editor.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain('size="touch"');
   expect(source).not.toContain('size="sm"');
