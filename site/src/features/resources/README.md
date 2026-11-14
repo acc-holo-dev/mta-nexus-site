@@ -28,7 +28,7 @@ Services и repositories не дублируются и не переносят�
 | `review-report-server.ts`   | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
 | `qa-report-actions.ts`      | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
 | `release-watch-batch.ts`    | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
-| `cart-controls.ts`          | `AddResourceToCart`, `ResourceCartControls`; client UI корзины                                              |
+| `cart-controls.ts`          | `ResourceCartControls`; client UI корзины                                                                   |
 | `cart-view.ts`              | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
 | `delivery-server.ts`        | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
 | `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |

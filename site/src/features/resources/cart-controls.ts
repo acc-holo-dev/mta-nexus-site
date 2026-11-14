@@ -1,3 +1,3 @@
 "use client";
 
-export { AddResourceToCart, ResourceCartControls } from "./components/resource-cart-controls";
+export { ResourceCartControls } from "./components/resource-cart-controls";
