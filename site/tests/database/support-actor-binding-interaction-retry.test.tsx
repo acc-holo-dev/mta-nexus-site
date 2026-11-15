@@ -49,9 +49,9 @@ it("retains a page heading and can retry after a thread fails to load", async ()
   const nodes = renderThread();
   expect(nodes.find((node) => node.type === "h1")?.props.children).toBe("Support");
   const retry = nodes.find((node) => typeof node.props.onClick === "function");
-  expect(retry).toBeDefined();
+  if (!retry) throw Error("Missing retry");
   h.fetch.mockRejectedValueOnce(new Error("still offline"));
-  (retry?.props.onClick as () => void)();
+  (retry.props.onClick as () => void)();
   await vi.waitFor(() => expect(h.fetch).toHaveBeenCalledTimes(2));
 });
 
