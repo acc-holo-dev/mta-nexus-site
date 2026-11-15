@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { organizationReturnPath } from "./organization-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { organizationContentId } from "../../../lib/organization-content-api";
 import { organizationContentCopy } from "../../../lib/organization-content-copy";
@@ -35,11 +37,25 @@ export default async function OrganizationPublications({
   const locale = await getRequestLocale(),
     copy = getUserPlatformCopy(locale),
     team = organizationContentCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const { id } = await params;
   const path = `/workspace/organizations/${encodeURIComponent(id)}/content`;
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
-  const filters = parseContentPage((await searchParams) ?? {});
+  const query = (await searchParams) ?? {};
+  const returnPath = organizationReturnPath(id, "content", query);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={team.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const filters = parseContentPage(query);
   let failure = copy.unavailable;
   const result = await Promise.resolve()
     .then(() => organizationContentService.page(organizationContentId(id), actor, filters))
@@ -75,7 +91,7 @@ export default async function OrganizationPublications({
         <ErrorState
           title={failure}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={returnPath} className={navLinkClass}>
               {copy.retry}
             </Link>
           }

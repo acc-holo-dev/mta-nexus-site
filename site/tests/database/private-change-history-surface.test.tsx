@@ -34,6 +34,7 @@ vi.mock("../../src/lib/services/organization-governance-service", () => ({
 import ProfilePage, { generateMetadata } from "../../src/app/settings/history/page";
 import OrganizationPage from "../../src/app/workspace/organizations/[id]/activity/page";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
+import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
 import { ProfileChangeHistoryView } from "../../src/components/profile-change-history";
 import { privateChangeHistoryCopy } from "../../src/lib/private-change-history-copy";
 import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
@@ -81,6 +82,27 @@ beforeEach(() => {
   mock.profile.mockResolvedValue(data);
   mock.organization.mockResolvedValue(org);
 });
+it.each(["en", "ru"] as const)(
+  "preserves organization activity filters after session failure in %s",
+  async (locale) => {
+    mock.locale = locale;
+    mock.session.mockRejectedValue(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await OrganizationPage({
+        params: Promise.resolve({ id: "org" }),
+        searchParams: Promise.resolve({ q: "owner & staff", period: "7" }),
+      }),
+    );
+    expect(html).toContain(`>${organizationGovernanceCopy(locale).history}</h1>`);
+    expect(html).toContain(organizationGovernanceCopy(locale).unavailable);
+    expect(html).toContain(
+      'href="/workspace/organizations/org/activity?q=owner+%26+staff&amp;period=7"',
+    );
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mock.organization).not.toHaveBeenCalled();
+  },
+);
 it.each(["en", "ru"] as const)(
   "renders accessible profile filters, recorded fields, verification context and stable export in %s",
   (locale) => {

@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { OrganizationWorkspacePanel } from "../workspace";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { organizationReturnPath } from "./organization-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationWorkspaceSchema,
@@ -28,21 +30,23 @@ export default async function OrganizationPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, query] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  const [locale, { id }, query] = await Promise.all([getRequestLocale(), params, searchParams]);
+  const copy = getOrganizationCopy(locale);
+  const returnPath = organizationReturnPath(id, "", query);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
     return (
-      <PlatformSignIn
+      <PlatformSessionError
         locale={locale}
-        returnPath={`/workspace/organizations/${encodeURIComponent(id)}`}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
       />
     );
-  const copy = getOrganizationCopy(locale);
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const filters = parseOrganizationPage(query);
   let failure = copy.unavailable;
   const result =
@@ -72,17 +76,17 @@ export default async function OrganizationPage({
           />
         </>
       ) : (
-        <ErrorState
-          title={failure}
-          action={
-            <Link
-              className={navLinkClass}
-              href={`/workspace/organizations/${encodeURIComponent(id)}`}
-            >
-              {copy.reload}
-            </Link>
-          }
-        />
+        <div className="space-y-4">
+          <h1 className="font-display text-primary">{copy.title}</h1>
+          <ErrorState
+            title={failure}
+            action={
+              <Link className={navLinkClass} href={returnPath}>
+                {copy.reload}
+              </Link>
+            }
+          />
+        </div>
       )}
     </div>
   );

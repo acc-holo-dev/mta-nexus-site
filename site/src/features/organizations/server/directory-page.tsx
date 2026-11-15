@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { organizationReturnPath } from "./organization-return-path";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
@@ -24,10 +26,23 @@ export default async function OrganizationsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/organizations" />;
+  const [locale, query] = await Promise.all([getRequestLocale(), searchParams]);
   const copy = getOrganizationCopy(locale);
+  const returnPath = organizationReturnPath(undefined, "", query);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const dictionary = getDictionary(locale);
   const filters = parseOrganizationPage(query);
   const result = await organizationWorkspaceService

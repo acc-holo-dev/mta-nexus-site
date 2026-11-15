@@ -12,6 +12,8 @@ import { parseEditableContent } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
 import { AuthorContentForm } from "../../community/author-content-form";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { organizationReturnPath } from "./organization-return-path";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
@@ -26,10 +28,25 @@ export async function OrganizationContentEditorPage({
   const locale = await getRequestLocale(),
     copy = getUserPlatformCopy(locale),
     team = organizationContentCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  const returnPath = contentId
-    ? `/workspace/organizations/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}`
-    : `/workspace/organizations/${encodeURIComponent(id)}/content/new`;
+  const safeContentId =
+    contentId && /^[a-zA-Z0-9_-]{1,128}$/u.test(contentId) ? contentId : undefined;
+  const returnPath = organizationReturnPath(
+    id,
+    contentId && !safeContentId ? "content" : `content/${safeContentId ?? "new"}`,
+  );
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={contentId ? copy.edit : team.new}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let failure = copy.unavailable;
   const result = await Promise.resolve()

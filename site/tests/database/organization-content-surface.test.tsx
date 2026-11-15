@@ -57,6 +57,41 @@ beforeEach(() => {
   mocks.context.mockResolvedValue(organization);
 });
 it.each(["en", "ru"] as const)(
+  "offers safe publication and editor retries when session lookup fails in %s",
+  async (locale) => {
+    mocks.locale = locale;
+    mocks.session.mockRejectedValue(new Error("PRIVATE_SESSION"));
+    const listing = renderToStaticMarkup(
+      await Page({
+        params: Promise.resolve({ id: "org" }),
+        searchParams: Promise.resolve({ q: "team & maps", page: "2" }),
+      }),
+    );
+    const editor = renderToStaticMarkup(
+      await OrganizationContentEditorPage({ id: "org", contentId: "content" }),
+    );
+    expect(listing).toContain(`>${organizationContentCopy(locale).title}</h1>`);
+    expect(listing).toContain(
+      'href="/workspace/organizations/org/content?q=team+%26+maps&amp;page=2"',
+    );
+    expect(editor).toContain(`>${getUserPlatformCopy(locale).edit}</h1>`);
+    expect(editor).toContain('href="/workspace/organizations/org/content/content"');
+    for (const html of [listing, editor]) {
+      expect(html).toContain(getUserPlatformCopy(locale).unavailable);
+      expect(html).not.toContain("/auth/login");
+      expect(html).not.toContain("PRIVATE_SESSION");
+    }
+    expect(mocks.page).not.toHaveBeenCalled();
+    expect(mocks.get).not.toHaveBeenCalled();
+    expect(mocks.context).not.toHaveBeenCalled();
+    const invalid = renderToStaticMarkup(
+      await OrganizationContentEditorPage({ id: "../private", contentId: "content" }),
+    );
+    expect(invalid).toContain('href="/workspace/organizations"');
+    expect(invalid).not.toContain("../private");
+  },
+);
+it.each(["en", "ru"] as const)(
   "renders all-author management, filters and scope-preserving navigation in %s",
   async (locale) => {
     mocks.locale = locale;

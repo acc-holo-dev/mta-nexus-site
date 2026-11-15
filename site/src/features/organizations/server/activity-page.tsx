@@ -2,6 +2,8 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { OrganizationHistoryView } from "../history-view";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { organizationReturnPath } from "./organization-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationChangeHistorySchema,
@@ -29,20 +31,26 @@ export default async function OrganizationHistoryPage({
   params: Promise<{ id: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, query] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  const [locale, { id }, query] = await Promise.all([getRequestLocale(), params, searchParams]);
+  const copy = organizationGovernanceCopy(locale);
+  const returnPath = organizationReturnPath(id, "activity", query);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.history}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor)
     return (
       <div className={pageShellClass}>
-        <PlatformSignIn
-          locale={locale}
-          returnPath={`/workspace/organizations/${encodeURIComponent(id)}/activity`}
-        />
+        <PlatformSignIn locale={locale} returnPath={returnPath} />
       </div>
     );
   const values = new URLSearchParams();
