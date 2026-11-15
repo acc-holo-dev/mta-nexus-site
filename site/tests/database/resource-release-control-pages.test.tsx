@@ -51,7 +51,7 @@ vi.mock("../../src/features/resources/download", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/library-release-selection-controls", () => ({
+vi.mock("../../src/features/library/release-selection", () => ({
   LibraryReleaseSelectionControls: ({
     revision,
     versions,
@@ -64,7 +64,7 @@ vi.mock("../../src/components/library-release-selection-controls", () => ({
     </span>
   ),
 }));
-vi.mock("../../src/components/library-release-follow-latest", () => ({
+vi.mock("../../src/features/library/release-follow", () => ({
   LibraryReleaseFollowLatest: ({
     productId,
     revision,

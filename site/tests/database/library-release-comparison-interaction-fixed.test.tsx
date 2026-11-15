@@ -20,7 +20,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
 
-import { LibraryReleaseComparisonSelection } from "../../src/components/library-release-comparison-selection";
+import { LibraryReleaseComparisonSelection } from "../../src/features/library/components/library-release-comparison-selection";
 
 const { getTarget, render, setSelection } = createLibraryReleaseComparisonInteractionHelpers(
   h,

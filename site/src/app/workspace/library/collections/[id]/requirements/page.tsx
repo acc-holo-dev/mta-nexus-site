@@ -1,4 +1,4 @@
-import { CollectionRequirementsScreen } from "../../../../../../components/collection-requirements-screen";
+import { CollectionRequirementsScreen } from "../../../../../../features/library/collection-requirements-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

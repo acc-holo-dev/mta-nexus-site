@@ -3,14 +3,14 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { collectionPageParams } from "../lib/library-collections-query";
-import { libraryReleaseHistoryCopy } from "../lib/library-release-history-i18n";
-import { libraryReleaseHistoryQuery } from "../lib/library-release-history-query";
-import { authService } from "../lib/services/auth-service";
-import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "./platform-sign-in";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { collectionPageParams } from "../../../lib/library-collections-query";
+import { libraryReleaseHistoryCopy } from "../../../lib/library-release-history-i18n";
+import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history-query";
+import { authService } from "../../../lib/services/auth-service";
+import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {

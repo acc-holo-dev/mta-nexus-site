@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -29,7 +31,7 @@ vi.mock("../../src/features/resources/download", () => ({
     </button>
   ),
 }));
-vi.mock("../../src/components/library-release-follow-latest", () => ({
+vi.mock("../../src/features/library/release-follow", () => ({
   LibraryReleaseFollowLatest: ({ productId }: { productId: string }) => (
     <button type="button" data-follow-latest={productId}>
       Use latest
@@ -44,7 +46,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
   ),
 }));
 
-import { CollectionReleasesScreen } from "../../src/components/collection-releases-screen";
+import { CollectionReleasesScreen } from "../../src/features/library/collection-releases-server";
 import { collectionReleasesCopy } from "../../src/lib/collection-releases-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 

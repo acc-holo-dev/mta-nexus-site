@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
-import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
+import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../../../components/locale-context";
 export function LibraryReleaseSelectionControls({
   productId,
   actorId,

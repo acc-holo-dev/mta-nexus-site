@@ -15,10 +15,20 @@ const clientPorts = [
   "collection-import",
   "collection-restore",
   "membership-batch",
+  "release-follow",
+  "release-selection",
 ];
-const serverPorts = ["collections", "membership-history", "selection-batch"];
+const serverPorts = [
+  "collections",
+  "membership-history",
+  "selection-batch",
+  "release-comparison",
+  "release-history",
+  "collection-releases",
+  "collection-requirements",
+];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|library-release-request|resource-release-control-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -106,7 +116,10 @@ test("Library rejects private, routing, server and infrastructure edges", (t) =>
 
 test("Library client graphs exclude server dependencies transitively", () => {
   const entries = clientPorts.map((port) => `site/src/features/library/${port}.ts`);
-  entries.push("site/src/features/library/components/library-selection-batch-controls.tsx");
+  entries.push(
+    "site/src/features/library/components/library-selection-batch-controls.tsx",
+    "site/src/features/library/components/library-release-comparison-selection.tsx",
+  );
 
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
@@ -118,7 +131,7 @@ test("Library client graphs exclude server dependencies transitively", () => {
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|(?:collections|membership-history|selection-batch)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -147,6 +160,10 @@ test("Library client graphs exclude server dependencies transitively", () => {
     "library-collection-restore",
     "library-membership-batch",
     "library-selection-batch-controls",
+    "library-release-command",
+    "library-release-comparison-selection",
+    "library-release-follow-latest",
+    "library-release-selection-controls",
   ])
     assert(visited.has(`site/src/features/library/components/${child}.tsx`), child);
 });
@@ -156,6 +173,10 @@ test("Library server entries stay server-only and separately composed", () => {
     ["collections", "library-collections-screen.tsx"],
     ["membership-history", "library-membership-history-screen.tsx"],
     ["selection-batch", "library-selection-batch-screen.tsx"],
+    ["release-comparison", "library-release-comparison-screen.tsx"],
+    ["release-history", "library-release-history-screen.tsx"],
+    ["collection-releases", "collection-releases-screen.tsx"],
+    ["collection-requirements", "collection-requirements-screen.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/library/${port}-server.ts`;
@@ -205,6 +226,23 @@ test("Library collection routes preserve dynamic rendering and server entry", ()
     );
     assert.match(source, /export const dynamic = "force-dynamic";/u);
     assert(source.includes("features/library/collections-server"));
+    assert.match(source, /export (?:const metadata|async function generateMetadata)/u);
+  }
+});
+
+test("Library release routes preserve dynamic rendering and server entry", () => {
+  for (const [route, port] of [
+    ["[id]/versions/compare", "release-comparison"],
+    ["version-history", "release-history"],
+    ["collections/[id]/releases", "collection-releases"],
+    ["collections/[id]/requirements", "collection-requirements"],
+  ]) {
+    const source = readFileSync(
+      resolve(root, `site/src/app/workspace/library/${route}/page.tsx`),
+      "utf8",
+    );
+    assert.match(source, /export const dynamic = "force-dynamic";/u);
+    assert(source.includes(`features/library/${port}-server`));
     assert.match(source, /export (?:const metadata|async function generateMetadata)/u);
   }
 });

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -21,7 +23,7 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 
-import { LibraryReleaseHistoryScreen } from "../../src/components/library-release-history-screen";
+import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
 
 const result = () => ({

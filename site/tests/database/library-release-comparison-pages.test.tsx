@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError, compareLibraryReleases, type LibraryComparableRelease } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -23,7 +25,7 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
 
-import { LibraryReleaseComparisonScreen } from "../../src/components/library-release-comparison-screen";
+import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
 import { libraryReleaseComparisonCopy } from "../../src/lib/library-release-comparison-i18n";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({

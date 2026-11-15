@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { buildCollectionRequirementsReport, type ResourceRequirementNode } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -38,7 +40,7 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
   ),
 }));
 
-import { CollectionRequirementsScreen as screen } from "../../src/components/collection-requirements-screen";
+import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
 import { collectionRequirementsCopy } from "../../src/lib/collection-requirements-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 

@@ -54,11 +54,11 @@ const clippedDetailPages = [
 ] as const;
 
 const delegatedHonestyScreens = [
-  "site/src/components/collection-releases-screen.tsx",
-  "site/src/components/collection-requirements-screen.tsx",
+  "site/src/features/library/server/collection-releases-screen.tsx",
+  "site/src/features/library/server/collection-requirements-screen.tsx",
   "site/src/features/library/server/library-selection-batch-screen.tsx",
   "site/src/features/resources/server/resource-requirements-screen.tsx",
-  "site/src/components/library-release-comparison-screen.tsx",
+  "site/src/features/library/server/library-release-comparison-screen.tsx",
 ] as const;
 
 it("locks library collection detail route shells to clipped min-w-0 frames", () => {
@@ -79,15 +79,19 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("site/src/components/collection-releases-screen.tsx")).toContain("EmptyState");
-  expect(read("site/src/components/collection-requirements-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/library/server/collection-releases-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/collection-requirements-screen.tsx")).toContain(
+    "EmptyState",
+  );
   expect(read("site/src/features/library/server/library-selection-batch-screen.tsx")).toContain(
     "EmptyState",
   );
 });
 
 it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
-  const source = read("site/src/components/collection-requirements-screen.tsx");
+  const source = read("site/src/features/library/server/collection-requirements-screen.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toContain("inline-flex min-h-11 items-center");
   expect(source).toContain("unavailableItemCount");

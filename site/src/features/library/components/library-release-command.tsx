@@ -4,18 +4,18 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
   matchesLibraryReleaseRequest,
-} from "../lib/library-release-request";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
+} from "../../../lib/library-release-request";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmedLibraryRelease } from "../../../lib/resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
-} from "../lib/resource-release-control-i18n";
+} from "../../../lib/resource-release-control-i18n";
 export function useLibraryReleaseCommand(productId: string, actorId: string, locale: Locale) {
   const copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),

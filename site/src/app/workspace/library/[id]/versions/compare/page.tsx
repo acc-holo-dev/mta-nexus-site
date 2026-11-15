@@ -1,4 +1,4 @@
-import { LibraryReleaseComparisonScreen } from "../../../../../../components/library-release-comparison-screen";
+import { LibraryReleaseComparisonScreen } from "../../../../../../features/library/release-comparison-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

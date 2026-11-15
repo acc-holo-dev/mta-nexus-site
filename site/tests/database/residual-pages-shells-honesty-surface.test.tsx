@@ -54,7 +54,9 @@ it("keeps residual report and version-history routes as thin clipped shells arou
   expect(read("site/src/features/community/server/community-report-history-page.tsx")).toContain(
     "ErrorState",
   );
-  expect(read("site/src/components/library-release-history-screen.tsx")).toContain("ErrorState");
+  expect(read("site/src/features/library/server/library-release-history-screen.tsx")).toContain(
+    "ErrorState",
+  );
 });
 
 it("keeps admin support messages and report history loadings as clipped re-exports", () => {

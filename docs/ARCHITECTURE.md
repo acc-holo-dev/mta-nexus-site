@@ -54,7 +54,7 @@ HTTP ограничения сохраняются. Новые Servers feature p
 
 ### Library feature
 
-`site/src/features/library` объединяет server-only композиции коллекций, истории и выбора версий и клиентские формы импорта, восстановления, команд и пакетных действий. Публичные входы, отсутствие routing и изоляция клиентских графов проверяются; session, authority, confirmation, сервисы и repository locks сохраняются. [Контракт feature](../site/src/features/library/README.md). Изменения требуют полного CI.
+`site/src/features/library` объединяет server-only композиции коллекций, истории, сравнения и требований и клиентские формы импорта, восстановления, выбора версий и пакетных действий. Публичные входы, отсутствие routing и изоляция клиентских графов проверяются; session, authority, confirmation, сервисы и repository locks сохраняются. [Контракт feature](../site/src/features/library/README.md). Изменения требуют полного CI.
 
 ### Notifications feature
 

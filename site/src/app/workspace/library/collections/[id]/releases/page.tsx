@@ -1,4 +1,4 @@
-import { CollectionReleasesScreen } from "../../../../../../components/collection-releases-screen";
+import { CollectionReleasesScreen } from "../../../../../../features/library/collection-releases-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

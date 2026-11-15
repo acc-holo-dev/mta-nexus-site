@@ -3,16 +3,16 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { collectionPageParams } from "../lib/library-collections-query";
-import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
-import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
-import { authService } from "../lib/services/auth-service";
-import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
-import { PlatformSignIn } from "./platform-sign-in";
-import { ResourceRequirementsReportBody } from "../features/resources/requirements-view";
+import { collectionRequirementsCopy } from "../../../lib/collection-requirements-i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { collectionPageParams } from "../../../lib/library-collections-query";
+import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
+import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
+import { authService } from "../../../lib/services/auth-service";
+import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

@@ -26,7 +26,7 @@ vi.mock("../../src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 
-import { LibraryReleaseSelectionControls } from "../../src/components/library-release-selection-controls";
+import { LibraryReleaseSelectionControls } from "../../src/features/library/release-selection";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 const { button, click } = createResourceReleaseControlInteractionHelpers(

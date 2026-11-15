@@ -23,7 +23,7 @@ const forms = [
   "site/src/features/library/components/library-collection-reconcile.tsx",
   "site/src/features/library/server/library-collections-error-panel.tsx",
   "site/src/features/library/components/library-membership-batch.tsx",
-  "site/src/components/library-release-command.tsx",
+  "site/src/features/library/components/library-release-command.tsx",
   "site/src/features/library/components/library-selection-batch-controls.tsx",
 ] as const;
 

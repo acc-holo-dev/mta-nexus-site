@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const filterSurfaces = [
-  "site/src/components/collection-releases-screen.tsx",
+  "site/src/features/library/server/collection-releases-screen.tsx",
   "site/src/app/workspace/library/collections/resources/page.tsx",
   "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
 ] as const;

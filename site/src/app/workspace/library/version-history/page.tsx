@@ -1,4 +1,4 @@
-import { LibraryReleaseHistoryScreen } from "../../../../components/library-release-history-screen";
+import { LibraryReleaseHistoryScreen } from "../../../../features/library/release-history-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 
