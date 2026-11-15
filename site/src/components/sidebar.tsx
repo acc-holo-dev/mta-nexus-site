@@ -26,16 +26,11 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { communityReportCopy } from "../lib/community-report-copy";
-import { reactionCopy } from "../lib/content-reaction-copy";
-import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { platformReportCopy } from "../lib/platform-report-i18n";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { verificationCopy } from "../lib/verification-workspace-copy";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   adminDestinationAccessibleName,
@@ -45,6 +40,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "./shell-destination-policy";
+import { publicationDestinations } from "./shell-publication-destinations";
 import { useAuthSession } from "./use-auth-session";
 
 type NavItem = {
@@ -110,19 +106,7 @@ export function Sidebar({
     { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
   ];
 
-  const publicationsNav: NavItem[] = [
-    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
-    { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
-    { href: "/workspace/reactions", label: reactionCopy(locale).my, icon: MessageSquare },
-    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
-    {
-      href: "/workspace/platform-reports",
-      label: platformReportCopy(locale).myReports,
-      icon: ShieldAlert,
-    },
-    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
-    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
-  ];
+  const publicationsNav = publicationDestinations(locale);
 
   const accountNav: NavItem[] = [
     { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },

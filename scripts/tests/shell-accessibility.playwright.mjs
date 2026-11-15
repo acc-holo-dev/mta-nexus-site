@@ -14,6 +14,7 @@ assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 const { getDictionary } = await import("../../site/src/lib/i18n.ts");
 const { discoveryCopy } = await import("../../site/src/lib/discovery-copy.ts");
 const { notificationInboxCopy } = await import("../../site/src/lib/notification-inbox-copy.ts");
+const { platformReportCopy } = await import("../../site/src/lib/platform-report-i18n.ts");
 // Strip-types cannot execute notification-inbox-contract (zod/@nexus graph); keep the
 // category list synced by reading the exported INBOX_CATEGORIES source of truth.
 const inboxCategoriesMatch = readFileSync(
@@ -714,6 +715,7 @@ for (const locale of ["en", "ru"]) {
         exact: true,
       }),
     ).toHaveCount(0);
+    await expect(moreDialog.locator('a[href="/workspace/platform-reports"]')).toHaveCount(0);
     await page.keyboard.press("Escape");
     await expect(moreDialog).toHaveCount(0);
     await expect(moreButton).toHaveAttribute("aria-expanded", "false");
@@ -777,6 +779,23 @@ for (const locale of ["en", "ru"]) {
     );
 
     await loginFixture(page);
+    await page.goto("/market");
+    await waitForReadyCapture(page);
+    await moreButton.click();
+    const memberReportLink = moreDialog.locator('a[href="/workspace/platform-reports"]');
+    await expect(memberReportLink).toHaveText(platformReportCopy(locale).myReports);
+    await memberReportLink.click();
+    await expect(page).toHaveURL(/\/workspace\/platform-reports$/u);
+    await waitForReadyCapture(page);
+    await moreButton.click();
+    await expect(moreDialog.locator('a[href="/workspace/platform-reports"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await page.keyboard.press("Escape");
+    evidence.push(
+      `${locale}: mobile member can open platform reports and sees the current destination`,
+    );
     await page.goto("/notifications");
     await waitForReadyCapture(page);
     const inboxCopy = notificationInboxCopy(locale);
