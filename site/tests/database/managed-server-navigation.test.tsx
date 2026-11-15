@@ -110,10 +110,6 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
 it("keeps mobile More menu session checking and staff admin labels in source", () => {
   const source = readFileSync(resolve(process.cwd(), "site/src/components/mobile-nav.tsx"), "utf8");
   expect(source).toContain("dictionary.nav.checkingSession");
-  expect(source).toContain('href: "/workspace/library"');
-  expect(source).toContain('href: "/workspace/resources/new"');
-  expect(source).toContain('href: "/workspace/servers/new"');
-  expect(source).toContain("getManagedServerCopy");
   expect(source).toContain("adminAccessibleName");
   expect(source).toContain('aria-busy="true"');
   expect(source).toContain("aria-label={adminAccessibleName}");

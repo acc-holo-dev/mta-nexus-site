@@ -1,36 +1,13 @@
 "use client";
 
 import { Button } from "@nexus/ui";
-import {
-  Bell,
-  BookMarked,
-  Bookmark,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  Code2,
-  Compass,
-  LayoutDashboard,
-  Library,
-  LifeBuoy,
-  LogIn,
-  MessageSquare,
-  Plus,
-  Server,
-  Settings,
-  ShieldAlert,
-  ShieldCheck,
-  Users,
-  Wrench,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, type Server, ShieldAlert, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   adminDestinationAccessibleName,
@@ -40,7 +17,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "./shell-destination-policy";
-import { publicationDestinations } from "./shell-publication-destinations";
+import { shellNavigation } from "./shell-navigation";
 import { useAuthSession } from "./use-auth-session";
 
 type NavItem = {
@@ -77,41 +54,13 @@ export function Sidebar({
     dictionary.nav.adminStaffHint,
   );
 
-  const primaryNav: NavItem[] = [
-    { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
-    { href: "/discover", label: dictionary.nav.explore, icon: Compass },
-    { href: "/market", label: dictionary.nav.freeResources, icon: Library },
-    { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
-    { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
-    { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
-    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
-  ];
-
-  // Authenticated workspace: grouped by real objects (library / servers / publications), not roles.
-  const libraryNav: NavItem[] = [
-    { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
-    {
-      href: "/workspace/library",
-      label: dictionary.workspace.libraryTitle,
-      icon: BookMarked,
-    },
-    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
-    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
-    { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
-  ];
-
-  const serversNav: NavItem[] = [
-    { href: "/workspace/servers", label: serverCopy.title, icon: Server },
-    { href: "/workspace/servers/new", label: dictionary.nav.registerServer, icon: Server },
-    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
-  ];
-
-  const publicationsNav = publicationDestinations(locale);
-
+  const navigation = shellNavigation(locale);
+  const primaryNav = navigation.primary;
+  const libraryNav = navigation.library;
+  const serversNav = navigation.servers;
+  const publicationsNav = navigation.publications;
   const accountNav: NavItem[] = [
-    { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },
-    { href: "/security", label: dictionary.nav.securityCenter, icon: ShieldCheck },
-    { href: "/settings", label: dictionary.nav.settings, icon: Settings },
+    ...navigation.account,
     ...(process.env.NODE_ENV !== "production"
       ? [{ href: "/dev", label: dictionary.nav.devTools, icon: Wrench }]
       : []),

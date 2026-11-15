@@ -792,9 +792,22 @@ for (const locale of ["en", "ru"]) {
       "aria-current",
       "page",
     );
-    await page.keyboard.press("Escape");
+    await page.goBack();
+    await expect(page).toHaveURL(/\/market$/u);
+    await expect(moreDialog).toHaveCount(0);
+    await moreButton.click();
+    await expect(moreDialog).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 844 });
+    await expect(moreDialog).toHaveCount(0);
+    const desktopSupport = page.locator("aside").getByRole("link", {
+      name: dictionary.nav.support,
+      exact: true,
+    });
+    await desktopSupport.focus();
+    await expect(desktopSupport).toBeFocused();
+    await page.setViewportSize({ width: 390, height: 480 });
     evidence.push(
-      `${locale}: mobile member can open platform reports and sees the current destination`,
+      `${locale}: mobile member can open platform reports, sees the current destination, and the menu closes on history navigation or desktop resize`,
     );
     await page.goto("/notifications");
     await waitForReadyCapture(page);

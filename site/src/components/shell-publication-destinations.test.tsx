@@ -54,3 +54,48 @@ describe("member report navigation", () => {
     expect(desktop).not.toContain('href="/workspace/platform-reports"');
   });
 });
+
+function shellHrefs(html: string): string[] {
+  return [...html.matchAll(/<a\b[^>]*href="([^"]+)"/gu)]
+    .map((match) => match[1])
+    .filter((href): href is string => !!href && href !== "/dev" && !href.startsWith("/auth/"))
+    .sort();
+}
+
+describe("desktop and mobile destination parity", () => {
+  it.each(["en", "ru"] as const)("offers the same member destinations in %s", (locale) => {
+    state.session = { status: "authenticated", user: { username: "member", role: "user" } };
+    const mobile = renderToStaticMarkup(<MobileNav locale={locale} />);
+    const desktop = renderToStaticMarkup(
+      <Sidebar locale={locale} isCollapsed={false} onToggle={() => {}} />,
+    );
+    expect(shellHrefs(mobile)).toEqual(shellHrefs(desktop));
+  });
+
+  it.each(["anonymous", "loading"] as const)(
+    "matches public destinations for %s sessions",
+    (status) => {
+      state.session = { status, user: null };
+      const mobile = renderToStaticMarkup(<MobileNav locale="en" />);
+      const desktop = renderToStaticMarkup(
+        <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+      );
+      expect(shellHrefs(mobile)).toEqual(shellHrefs(desktop));
+      expect(shellHrefs(mobile)).not.toContain("/workspace/library");
+      expect(shellHrefs(mobile)).not.toContain("/admin");
+    },
+  );
+
+  it.each(["user", "moderator", "admin"])(
+    "shows staff navigation consistently for role %s",
+    (role) => {
+      state.session = { status: "authenticated", user: { username: "member", role } };
+      const mobile = renderToStaticMarkup(<MobileNav locale="en" />);
+      const desktop = renderToStaticMarkup(
+        <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+      );
+      expect(shellHrefs(mobile)).toEqual(shellHrefs(desktop));
+      expect(shellHrefs(mobile).includes("/admin")).toBe(role !== "user");
+    },
+  );
+});

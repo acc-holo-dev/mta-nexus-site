@@ -1,35 +1,11 @@
 "use client";
 
 import { Button } from "@nexus/ui";
-import {
-  Bell,
-  BookMarked,
-  Bookmark,
-  BookOpen,
-  Code2,
-  Compass,
-  Home,
-  LayoutDashboard,
-  Library,
-  LifeBuoy,
-  LogIn,
-  Menu,
-  MessageSquare,
-  Plus,
-  Server,
-  Settings,
-  ShieldAlert,
-  ShieldCheck,
-  Users,
-  X,
-} from "lucide-react";
+import { LogIn, Menu, type Server, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
-import { getManagedServerCopy } from "../lib/managed-server-view";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   adminDestinationAccessibleName,
@@ -39,7 +15,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "./shell-destination-policy";
-import { publicationDestinations } from "./shell-publication-destinations";
+import { shellNavigation } from "./shell-navigation";
 import { useAuthSession } from "./use-auth-session";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
@@ -65,67 +41,32 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dialogRef = useModalDialog(isMoreOpen);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Close the dialog after history navigation.
+  useEffect(() => {
+    setIsMoreOpen(false);
+  }, [pathname]);
+
+  // A native modal remains in the top layer when CSS hides the mobile shell.
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const desktop = window.matchMedia("(min-width: 64rem)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setIsMoreOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    closeOnDesktop();
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, [isMoreOpen]);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
   }, [pathname]);
 
-  const items: NavItem[] = [
-    { href: "/", label: dictionary.nav.home, icon: Home },
-    { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
-    { href: "/market", label: dictionary.nav.mobileMarket, icon: Library },
-    {
-      href: "/community",
-      label: dictionary.nav.community,
-      icon: MessageSquare,
-    },
-  ];
-
-  const publicMoreItems: NavItem[] = [
-    { href: "/discover", label: dictionary.nav.explore, icon: Compass },
-    { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
-    { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
-    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
-  ];
-
-  const workspaceMoreItems: NavItem[] = [
-    {
-      href: "/workspace",
-      label: dictionary.nav.mobileWorkspace,
-      icon: LayoutDashboard,
-    },
-    {
-      href: "/workspace/library",
-      label: dictionary.workspace.libraryTitle,
-      icon: BookMarked,
-    },
-    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
-    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
-    {
-      href: "/workspace/resources/new",
-      label: dictionary.nav.publishResource,
-      icon: Plus,
-    },
-    { href: "/workspace/servers", label: getManagedServerCopy(locale).title, icon: Server },
-    {
-      href: "/workspace/servers/new",
-      label: dictionary.nav.registerServer,
-      icon: Plus,
-    },
-    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
-    ...publicationDestinations(locale),
-    {
-      href: "/notifications",
-      label: dictionary.nav.notifications,
-      icon: Bell,
-    },
-    { href: "/settings", label: dictionary.nav.settings, icon: Settings },
-    {
-      href: "/security",
-      label: dictionary.nav.securityCenter,
-      icon: ShieldCheck,
-    },
-  ];
+  const navigation = shellNavigation(locale);
+  const items = navigation.mobilePrimary;
+  const publicMoreItems = navigation.mobilePublic;
+  const workspaceMoreItems = navigation.mobileWorkspace;
 
   const moreItems: NavItem[] = workspaceTools
     ? [...workspaceMoreItems, ...publicMoreItems]
