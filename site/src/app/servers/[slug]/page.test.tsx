@@ -78,7 +78,11 @@ vi.mock("@nexus/ui", async () => {
 vi.mock("../../../features/moderation/object-report", async () => {
   const React = await import("react");
   return {
-    ObjectReportForm: () => React.createElement("div", { "data-testid": "object-report" }),
+    ObjectReportForm: ({ authenticated }: { authenticated: boolean | null }) =>
+      React.createElement("div", {
+        "data-testid": "object-report",
+        "data-report-auth": String(authenticated),
+      }),
   };
 });
 
@@ -231,6 +235,7 @@ describe("server detail review load honesty", () => {
       "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
     );
     expect(html).not.toContain("PRIVATE_SESSION");
+    expect(html).toContain('data-report-auth="null"');
     expect(mocks.followStates).not.toHaveBeenCalled();
     expect(mocks.muteState).not.toHaveBeenCalled();
   });

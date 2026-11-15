@@ -16,13 +16,15 @@ export function ObjectReportForm({
   targetId,
   locale,
   authenticated,
+  retryHref,
   loginHref,
   registerHref,
 }: {
   targetType: ObjectReportTarget;
   targetId: string;
   locale: Locale;
-  authenticated: boolean;
+  authenticated: boolean | null;
+  retryHref?: string;
   loginHref: string;
   registerHref: string;
 }) {
@@ -102,6 +104,23 @@ export function ObjectReportForm({
     }
   }
 
+  if (authenticated === null) {
+    return (
+      <ErrorState
+        title={copy.unavailable}
+        action={
+          retryHref ? (
+            <a
+              href={retryHref}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.retry}
+            </a>
+          ) : undefined
+        }
+      />
+    );
+  }
   if (!authenticated) {
     return (
       <div className="space-y-1">

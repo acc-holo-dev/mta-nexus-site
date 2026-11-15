@@ -11,10 +11,31 @@ vi.mock("@nexus/ui", async () => {
       ...props
     }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
       React.createElement("button", props, children),
-    ErrorState: ({ title }: { title: string }) =>
-      React.createElement("div", { role: "alert" }, title),
+    ErrorState: ({ title, action }: { title: string; action?: React.ReactNode }) =>
+      React.createElement("div", { role: "alert" }, title, action),
   };
 });
+it.each(["en", "ru"] as const)(
+  "offers report recovery when session identity is unavailable in %s",
+  (locale) => {
+    const html = renderToStaticMarkup(
+      <ObjectReportForm
+        targetType="user"
+        targetId="usr_a"
+        locale={locale}
+        authenticated={null}
+        retryHref="/users/alice"
+        loginHref="/auth/login"
+        registerHref="/auth/register"
+      />,
+    );
+    expect(html).toContain(platformReportCopy(locale).unavailable);
+    expect(html).toContain(platformReportCopy(locale).retry);
+    expect(html).toContain('href="/users/alice"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain(platformReportCopy(locale).reportSignIn);
+  },
+);
 
 vi.mock("../../src/components/guest-auth-links", () => ({
   GuestAuthLinks: ({ signInLabel }: { signInLabel: string }) => (

@@ -233,7 +233,8 @@ export default async function ServerDetailPage({
               targetType="server"
               targetId={server.id}
               locale={locale}
-              authenticated={Boolean(reportViewer)}
+              authenticated={followViewer === undefined ? null : Boolean(reportViewer)}
+              retryHref={serverReturnPath}
               loginHref={authEntryHref("login", serverReturnPath)}
               registerHref={authEntryHref("register", serverReturnPath)}
             />

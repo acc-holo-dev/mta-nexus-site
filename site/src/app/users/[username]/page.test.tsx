@@ -6,7 +6,9 @@ vi.mock("../../../components/follow-button", () => ({
   ),
 }));
 vi.mock("../../../features/moderation/object-report", () => ({
-  ObjectReportForm: () => null,
+  ObjectReportForm: ({ authenticated }: { authenticated: boolean | null }) => (
+    <span data-report-auth={String(authenticated)} />
+  ),
 }));
 
 import type { ReactNode } from "react";
@@ -305,6 +307,7 @@ it("keeps the public profile available and shows a recoverable follow error when
     "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
   );
   expect(html).not.toContain("PRIVATE_SESSION");
+  expect(html).toContain('data-report-auth="null"');
   expect(state.followStates).not.toHaveBeenCalled();
   expect(state.muteState).not.toHaveBeenCalled();
 });

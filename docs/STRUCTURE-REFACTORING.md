@@ -356,6 +356,11 @@ planning negatives, default build/image/runtime/anonymous browser/HMR. Эти р
 Phase 2.1 продолжена по поручению владельца в том же draft PR; её результат требует
 нового полного CI на новом SHA. Production и GitHub settings остаются вне scope.
 
+На draft PR полный [CI #43771081541](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43771081541)
+прошёл для `e6f98b4968a0631d1c2197acc164b4982580b1f8`: в том числе unit, database,
+сборка образа, Docker и браузерные сценарии. Последующие коммиты требуют собственной
+проверки; этот результат не подтверждает production-развёртывание.
+
 ### Phase 2.1: граница пакетов
 
 Workspace — `site` + `site/packages/*`; package names и dependency versions сохраняются.

@@ -197,7 +197,8 @@ export default async function UserProfilePage({
                     targetType="user"
                     targetId={user.id}
                     locale={locale}
-                    authenticated={Boolean(actor)}
+                    authenticated={actor === undefined ? null : Boolean(actor)}
+                    retryHref={profileHref}
                     loginHref={authEntryHref("login", profileHref)}
                     registerHref={authEntryHref("register", profileHref)}
                   />
