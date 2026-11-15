@@ -135,6 +135,19 @@ it("keeps authentication, query validation and live authority errors ahead of pr
     ),
   ).toContain("/auth/login");
   expect(mock.page).not.toHaveBeenCalled();
+  const filteredGuest = renderToStaticMarkup(
+    await CommunityReportHistoryPage({
+      id: "report",
+      searchParams: Promise.resolve({ group: "review" }),
+    }),
+  );
+  expect(filteredGuest).toContain(
+    "next=%2Fworkspace%2Freports%2Freport%2Fhistory%3Fgroup%3Dreview",
+  );
+  const invalidGuest = renderToStaticMarkup(
+    await CommunityReportHistoryPage({ id: "../private", searchParams: Promise.resolve({}) }),
+  );
+  expect(invalidGuest).not.toContain("private");
   mock.session.mockResolvedValue({ id: "owner", role: "moderator" });
   expect(
     renderToStaticMarkup(
@@ -154,6 +167,7 @@ it("keeps authentication, query validation and live authority errors ahead of pr
     }),
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(`>${reportHistoryCopy("en").title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/admin/reports/report/history");
   expect(mock.page).toHaveBeenCalledWith(
@@ -164,6 +178,36 @@ it("keeps authentication, query validation and live authority errors ahead of pr
   );
   expect(html).not.toContain("Recorded submission");
 });
+it.each(["en", "ru"] as const)(
+  "retains history filters after session lookup fails in %s",
+  async (locale) => {
+    mock.locale = locale;
+    mock.session.mockRejectedValue(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await CommunityReportHistoryPage({
+        id: "report",
+        staff: true,
+        searchParams: Promise.resolve({ q: "a & b", group: "review" }),
+      }),
+    );
+    expect(html).toContain(`>${reportHistoryCopy(locale).title}</h1>`);
+    expect(html).toContain(reportHistoryCopy(locale).unavailable);
+    expect(html).toContain('href="/admin/reports/report/history?q=a+%26+b&amp;group=review"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mock.page).not.toHaveBeenCalled();
+    expect(mock.rate).not.toHaveBeenCalled();
+    const invalid = renderToStaticMarkup(
+      await CommunityReportHistoryPage({
+        id: "../private",
+        staff: true,
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(invalid).toContain('href="/admin/reports"');
+    expect(invalid).not.toContain("../private");
+  },
+);
 it("localizes private metadata and limits server-rendered reads", async () => {
   mock.locale = "ru";
   expect(await reportHistoryMetadata()).toEqual({

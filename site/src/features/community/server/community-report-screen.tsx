@@ -18,6 +18,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { ReportSessionError } from "./report-session-error";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -30,7 +31,6 @@ export async function CommunityReportScreen({
   const locale = await getRequestLocale(),
     copy = communityReportCopy(locale),
     dictionary = getDictionary(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const base = staff ? "/admin/reports" : "/workspace/reports";
   const listParams = new URLSearchParams();
   if (!id) {
@@ -44,12 +44,28 @@ export async function CommunityReportScreen({
     : listParams.size
       ? `${base}?${listParams}`
       : base;
+  const title = id ? copy.detail : staff ? copy.queue : copy.title;
+  const safeReturn = id && !/^[a-zA-Z0-9_-]{1,128}$/u.test(id) ? base : loginReturn;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <ReportSessionError
+        locale={locale}
+        title={title}
+        message={copy.unavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
   if (!actor) {
-    return <PlatformSignIn locale={locale} returnPath={loginReturn} />;
+    return <PlatformSignIn locale={locale} returnPath={safeReturn} />;
   }
   if (staff && !can(actor, "admin.moderation")) {
     return (
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <h1 className="font-display text-primary">{title}</h1>
         <ErrorState
           title={copy.forbidden}
           action={
@@ -64,7 +80,6 @@ export async function CommunityReportScreen({
       </div>
     );
   }
-  const title = id ? copy.detail : staff ? copy.queue : copy.title;
   const header = (
     <header className="min-w-0 space-y-2">
       <h1 className="text-2xl font-bold text-primary">{title}</h1>

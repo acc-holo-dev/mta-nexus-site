@@ -225,6 +225,25 @@ it("gates anonymous and revoked staff and rejects malformed scopes before privat
   expect(mock.reports).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
+  "preserves grouped report filters when the session is unavailable in %s",
+  async (locale) => {
+    mock.locale = locale;
+    mock.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await CommunityReportGroupsPage({
+        searchParams: Promise.resolve({ q: "a & b", view: "history" }),
+      }),
+    );
+    expect(html).toContain(`>${reportGroupsCopy(locale).title}</h1>`);
+    expect(html).toContain(reportGroupsCopy(locale).unavailable);
+    expect(html).toContain('href="/admin/reports/targets?q=a+%26+b&amp;view=history"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mock.groups).not.toHaveBeenCalled();
+    expect(mock.rate).not.toHaveBeenCalled();
+  },
+);
+it.each(["en", "ru"] as const)(
   "preserves publication report filters when session lookup fails in %s",
   async (locale) => {
     mock.locale = locale;

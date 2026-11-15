@@ -64,6 +64,36 @@ beforeEach(() => {
   mocks.detail.mockResolvedValue(row);
 });
 it.each(["en", "ru"] as const)(
+  "offers a localized safe retry for unavailable report sessions in %s",
+  async (locale) => {
+    mocks.locale = locale;
+    mocks.session.mockRejectedValue(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await CommunityReportScreen({
+        searchParams: Promise.resolve({ q: "a & b", view: "history" }),
+      }),
+    );
+    expect(html).toContain(`>${communityReportCopy(locale).title}</h1>`);
+    expect(html).toContain(communityReportCopy(locale).unavailable);
+    expect(html).toContain('href="/workspace/reports?q=a+%26+b&amp;view=history"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mocks.page).not.toHaveBeenCalled();
+    expect(mocks.detail).not.toHaveBeenCalled();
+    const invalid = renderToStaticMarkup(
+      await CommunityReportScreen({ staff: true, id: "../private" }),
+    );
+    expect(invalid).toContain('href="/admin/reports"');
+    expect(invalid).not.toContain("../private");
+  },
+);
+it("does not return a guest to an invalid report identifier", async () => {
+  mocks.session.mockResolvedValue(null);
+  const html = renderToStaticMarkup(await CommunityReportScreen({ id: "../private" }));
+  expect(html).toContain("next=%2Fworkspace%2Freports");
+  expect(html).not.toContain("private");
+});
+it.each(["en", "ru"] as const)(
   "renders localized bounded filters, escaped reports and real pagination in %s",
   (locale) => {
     const html = renderToStaticMarkup(

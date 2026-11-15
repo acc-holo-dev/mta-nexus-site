@@ -16,6 +16,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { ReportSessionError } from "./report-session-error";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,
@@ -44,20 +45,12 @@ export async function PublicationReportsPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto max-w-5xl space-y-5">
-        <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
-        <ErrorState
-          title={labels.unavailable}
-          action={
-            <Link
-              href={query.size ? `${path}?${query}` : path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {labels.reload}
-            </Link>
-          }
-        />
-      </div>
+      <ReportSessionError
+        locale={locale}
+        title={copy.publicationTitle}
+        message={labels.unavailable}
+        retryHref={query.size ? `${path}?${query}` : path}
+      />
     );
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
