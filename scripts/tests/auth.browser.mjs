@@ -511,11 +511,25 @@ check("J2-06 logout clears cookie, revokes replay and leaves the other account v
     const replay = { page };
     assert((await request(replay, "/api/auth/session")).data.authenticated === true);
     await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
-    // Account chrome confirms sign-out before DELETE (same pattern as fast-smoke).
-    await alice.page
-      .getByRole("dialog", { name: "Sign out" })
-      .getByRole("button", { name: "Sign out", exact: true })
-      .click();
+    // A click on the dialog frame is not a backdrop click; the true backdrop cancels.
+    const signOutDialog = alice.page.getByRole("dialog", { name: "Sign out" });
+    await expect(signOutDialog).toBeVisible();
+    await signOutDialog.evaluate((dialog) => {
+      const bounds = dialog.getBoundingClientRect();
+      dialog.dispatchEvent(
+        new MouseEvent("click", {
+          bubbles: true,
+          clientX: bounds.left + bounds.width / 2,
+          clientY: bounds.top + 1,
+        }),
+      );
+    });
+    await expect(signOutDialog).toBeVisible();
+    await alice.page.mouse.click(1, 1);
+    await expect(signOutDialog).toHaveCount(0);
+    assert((await request(alice, "/api/auth/session")).data.authenticated === true);
+    await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await signOutDialog.getByRole("button", { name: "Sign out", exact: true }).click();
     await alice.page.waitForURL(/\/auth\/login(?:\?|$)/);
     assert(
       !(await alice.context.cookies()).some((item) => item.name === "nexus_session"),

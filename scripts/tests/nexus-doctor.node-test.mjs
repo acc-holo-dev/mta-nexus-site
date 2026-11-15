@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -101,6 +101,71 @@ test("stranded legacy Compose env fails without reading secrets and accepts expl
     }
     await writeFile(join(root, "docker/.env"), "REVIEWED=1\n", { mode: 0o600 });
     assert.equal((await collectDoctor({ ...options, env: {} })).status, "pass");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("explicit Compose env files must all exist, without revealing paths or contents", async () => {
+  const root = await fixtureRoot();
+  try {
+    await mkdir(join(root, "deploy"));
+    await writeFile(join(root, "deploy/.env"), "PRIVATE_SENTINEL=must-never-print\n", {
+      mode: 0o600,
+    });
+    const options = {
+      repositoryRoot: root,
+      nodeVersion: "26.11.1",
+      memoryBytes: 8 * 1024 ** 3,
+      probePort: async () => ({ available: true, code: null }),
+      runCommand: commandRunner({
+        "pnpm --version": { ok: true, stdout: "12.4.2" },
+        "docker version --format {{.Server.Version}}": { ok: true, stdout: "29.0.0" },
+        "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
+        "docker compose version --short": { ok: true, stdout: "2.40.0" },
+        "docker context show": { ok: true, stdout: "default" },
+        "docker compose -f docker/compose.yaml config --quiet": { ok: true, stdout: "" },
+      }),
+    };
+    const files = "deploy/.env,missing-secret-path.env";
+    for (const env of [
+      { COMPOSE_ENV_FILES: files },
+      { COMPOSE_ENV_FILES: files, COMPOSE_DISABLE_ENV_FILE: "1" },
+    ]) {
+      const report = await collectDoctor({ ...options, env });
+      assert.equal(report.status, "fail");
+      assert.equal(report.checks.find((check) => check.id === "compose-env-files")?.status, "fail");
+      assert.doesNotMatch(
+        JSON.stringify(report),
+        /PRIVATE_SENTINEL|must-never-print|missing-secret-path/u,
+      );
+    }
+    await writeFile(join(root, "other.env"), "OTHER_SECRET=never-print\n");
+    const directory = await collectDoctor({
+      ...options,
+      env: { COMPOSE_ENV_FILES: "deploy" },
+    });
+    assert.equal(
+      directory.checks.find((check) => check.id === "compose-env-files")?.status,
+      "fail",
+    );
+    const inaccessible = await collectDoctor({
+      ...options,
+      env: { COMPOSE_ENV_FILES: "deploy/.env" },
+      pathReadable: async () => false,
+    });
+    assert.equal(
+      inaccessible.checks.find((check) => check.id === "compose-env-files")?.status,
+      "fail",
+    );
+    assert.doesNotMatch(JSON.stringify(inaccessible), /PRIVATE_SENTINEL|must-never-print/u);
+    const report = await collectDoctor({
+      ...options,
+      env: { COMPOSE_ENV_FILES: "deploy/.env,other.env" },
+    });
+    assert.equal(report.status, "pass");
+    assert.equal(report.checks.find((check) => check.id === "compose-env-files")?.status, "pass");
+    assert.doesNotMatch(JSON.stringify(report), /OTHER_SECRET|never-print/u);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

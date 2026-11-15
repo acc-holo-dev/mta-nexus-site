@@ -320,8 +320,9 @@ preserve its values: move the reviewed file to `docker/.env`, or select its
 absolute path explicitly with `COMPOSE_ENV_FILES` for the local pnpm wrappers.
 Do not overwrite a working env with the example template. Doctor fails when the
 legacy env would silently stop being loaded; it checks existence without reading
-or printing secrets. An explicit env selection or disabled implicit env loading
-is respected.
+or printing secrets. Explicit `COMPOSE_ENV_FILES` paths must be readable, including when
+implicit env loading is disabled; a missing path fails the preflight without printing
+the path or file contents.
 
 Production commands must keep the existing absolute `--env-file` and project
 name. Review relative `NEXUS_*_HOST_FILE` bindings before changing the Compose

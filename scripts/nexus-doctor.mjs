@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { constants as fsConstants } from "node:fs";
+import { access, readFile, stat } from "node:fs/promises";
 import { createServer } from "node:net";
 import { totalmem } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -89,6 +90,15 @@ async function defaultPathExists(path) {
   }
 }
 
+async function defaultPathReadable(path) {
+  try {
+    await access(path, fsConstants.R_OK);
+    return !(await stat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 async function defaultProbePort(port) {
   return await new Promise((resolveProbe) => {
     const server = createServer();
@@ -112,6 +122,7 @@ function addCheck(checks, id, status, message, hint) {
 export async function collectDoctor(options = {}) {
   const runCommand = options.runCommand ?? defaultRunCommand;
   const pathExists = options.pathExists ?? defaultPathExists;
+  const pathReadable = options.pathReadable ?? defaultPathReadable;
   const probePort = options.probePort ?? defaultProbePort;
   const env = options.env ?? process.env;
   const root = options.repositoryRoot ?? repositoryRoot;
@@ -169,6 +180,30 @@ export async function collectDoctor(options = {}) {
       ? "Preserve the existing values: move the reviewed env file to docker/.env or set COMPOSE_ENV_FILES to its absolute path. Do not overwrite it with the example template."
       : undefined,
   );
+
+  // Compose loads explicit env files even when implicit .env loading is disabled.
+  // Check paths only: env contents and selected file names must not enter the report.
+  const selectedEnvFiles = String(env.COMPOSE_ENV_FILES ?? "")
+    .split(",")
+    .map((path) => path.trim())
+    .filter(Boolean);
+  if (selectedEnvFiles.length > 0) {
+    const present = await Promise.all(
+      selectedEnvFiles.map((path) => pathReadable(resolve(root, path))),
+    );
+    const allPresent = present.every(Boolean);
+    addCheck(
+      checks,
+      "compose-env-files",
+      allPresent ? "pass" : "fail",
+      allPresent
+        ? "All explicitly selected Compose env files are readable."
+        : "At least one explicitly selected Compose env file is missing or inaccessible.",
+      allPresent
+        ? undefined
+        : "Check COMPOSE_ENV_FILES paths before starting Compose; preserve existing private values.",
+    );
+  }
 
   let packageJson = {};
   try {
