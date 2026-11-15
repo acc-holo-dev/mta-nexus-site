@@ -222,6 +222,19 @@ describe("server detail review load honesty", () => {
     );
   });
 
+  it("shows a recoverable server follow error when identity lookup fails", async () => {
+    mocks.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
+    );
+    expect(html).toContain(
+      "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+    );
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mocks.followStates).not.toHaveBeenCalled();
+    expect(mocks.muteState).not.toHaveBeenCalled();
+  });
+
   it("SSR-hydrates authenticated server follow and mute", async () => {
     mocks.session.mockResolvedValue({ id: "usr_a", role: "user" });
     mocks.followStates.mockResolvedValue(["srv_detail"]);

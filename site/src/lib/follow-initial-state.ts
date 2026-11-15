@@ -18,6 +18,9 @@ export function buildFollowInitialState(args: {
   mute: { muted: boolean; mutedUntil: string | null } | null | undefined;
   self?: boolean;
 }): FollowInitialState {
+  if (args.actor === undefined) {
+    return { authenticated: false, actorId: null, following: false, error: true };
+  }
   const actor = args.actor ?? null;
   if (!actor) {
     return {

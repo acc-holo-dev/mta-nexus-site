@@ -85,7 +85,7 @@ export default async function OrganizationProfilePage({
       parseProfilePage(query?.articlePage),
       12,
     ),
-    authService.getSession(sessionToken).catch(() => null),
+    authService.getSession(sessionToken).catch(() => undefined),
   ]).catch(() => {
     loadError = true;
     return null;

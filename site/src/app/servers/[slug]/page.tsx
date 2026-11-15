@@ -86,11 +86,13 @@ export default async function ServerDetailPage({
   if (!server || server.visibility === "private") notFound();
 
   let reportViewer: { id: string } | null = null;
+  let followViewer: { id: string } | null | undefined;
   let claimViewer: { id: string } | null | undefined;
   const claimable = !server.organizationId && !server.ownerId && !server.isVerified;
   try {
     const store = await getRequestCookieStore();
     reportViewer = await authService.getSession(store.get("nexus_session")?.value);
+    followViewer = reportViewer;
     if (claimable) claimViewer = reportViewer;
   } catch {
     reportViewer = null;
@@ -127,7 +129,7 @@ export default async function ServerDetailPage({
         : Promise.resolve(null),
     ]);
   const followInitial = buildFollowInitialState({
-    actor: reportViewer,
+    actor: followViewer,
     targetId: server.id,
     followedIds: savedFollowIds,
     mute: serverMute,

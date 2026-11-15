@@ -71,7 +71,7 @@ export default async function DeveloperProfilePage({
     productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24),
     verificationWorkspaceService.publicProfile(user.id).catch(() => null),
     profilePrivacyService.visibility(user.id),
-    authService.getSession(sessionToken).catch(() => null),
+    authService.getSession(sessionToken).catch(() => undefined),
   ]).catch(() => {
     loadError = true;
     return null;

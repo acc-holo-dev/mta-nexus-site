@@ -297,3 +297,14 @@ it("renders owner guest preview without follow chrome while keeping resources an
   expect(html).not.toContain(">Follow</button>");
   expect(html).toContain("Second-page resource");
 });
+
+it("keeps the public profile available and shows a recoverable follow error when identity lookup fails", async () => {
+  state.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).toContain(
+    "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+  );
+  expect(html).not.toContain("PRIVATE_SESSION");
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+});

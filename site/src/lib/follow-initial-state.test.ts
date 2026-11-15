@@ -17,6 +17,11 @@ it("hydrates guests as anonymous with known unmute", () => {
     mutedUntil: null,
   });
 });
+it("treats an unavailable identity as a recoverable error instead of a guest", () => {
+  expect(
+    buildFollowInitialState({ actor: undefined, targetId: "tgt", followedIds: [], mute: null }),
+  ).toEqual({ authenticated: false, actorId: null, following: false, error: true });
+});
 
 it("marks follow lookup failure without inventing mute hydration", () => {
   expect(

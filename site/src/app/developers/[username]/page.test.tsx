@@ -271,3 +271,14 @@ it("keeps Trust and Publications as separately focusable profile links", async (
   expect(html).toMatch(/aria-label="Creator profile"/);
   expect(html).toContain("sm:gap-x-5");
 });
+
+it("keeps the public profile available and shows a recoverable follow error when identity lookup fails", async () => {
+  state.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+  const html = renderToStaticMarkup(await Page(params()));
+  expect(html).toContain(
+    "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+  );
+  expect(html).not.toContain("PRIVATE_SESSION");
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+});
