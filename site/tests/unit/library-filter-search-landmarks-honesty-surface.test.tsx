@@ -9,8 +9,8 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const filterSurfaces = [
   "site/src/features/library/server/collection-releases-screen.tsx",
-  "site/src/app/workspace/library/collections/resources/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
+  "site/src/features/library/server/collection-inventory-page.tsx",
+  "site/src/features/library/server/collection-compare-page.tsx",
 ] as const;
 
 it("exposes search landmarks and touch-sized filter inputs on residual library filters", () => {

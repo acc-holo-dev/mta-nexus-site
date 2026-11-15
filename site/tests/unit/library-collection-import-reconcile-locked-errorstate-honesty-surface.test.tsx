@@ -7,8 +7,8 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const importSource = read("site/src/app/workspace/library/collections/[id]/import/page.tsx");
-const reconcileSource = read("site/src/app/workspace/library/collections/[id]/reconcile/page.tsx");
+const importSource = read("site/src/features/library/server/collection-import-page.tsx");
+const reconcileSource = read("site/src/features/library/server/collection-reconcile-page.tsx");
 
 /** Honesty lock: import/reconcile max-revision muted notes → ErrorState. */
 it("locks collection import revisionLocked to ErrorState", () => {

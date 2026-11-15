@@ -74,11 +74,11 @@ it.each(["en", "ru"] as const)(
 
 it("locks residual collections page sources to ErrorState/EmptyState honesty chrome", () => {
   const pages = [
-    "site/src/app/workspace/library/collections/[id]/compare/page.tsx",
-    "site/src/app/workspace/library/collections/[id]/import/page.tsx",
-    "site/src/app/workspace/library/collections/[id]/reconcile/page.tsx",
-    "site/src/app/workspace/library/collections/receipts/[id]/page.tsx",
-    "site/src/app/workspace/library/collections/history/page.tsx",
+    "site/src/features/library/server/collection-compare-page.tsx",
+    "site/src/features/library/server/collection-import-page.tsx",
+    "site/src/features/library/server/collection-reconcile-page.tsx",
+    "site/src/features/library/server/collection-receipt-page.tsx",
+    "site/src/features/library/server/collection-history-page.tsx",
     "site/src/app/workspace/library/collections/error.tsx",
   ];
   for (const page of pages) {
@@ -89,13 +89,13 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("site/src/app/workspace/library/collections/history/page.tsx")).toContain(
+  expect(read("site/src/features/library/server/collection-history-page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/app/workspace/library/collections/[id]/compare/page.tsx")).toContain(
+  expect(read("site/src/features/library/server/collection-compare-page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/app/workspace/library/collections/receipts/[id]/page.tsx")).toContain(
+  expect(read("site/src/features/library/server/collection-receipt-page.tsx")).toContain(
     "EmptyState",
   );
   expect(read("site/src/app/workspace/library/collections/[id]/import/loading.tsx")).toContain(

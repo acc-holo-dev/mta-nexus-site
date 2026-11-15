@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 vi.mock("../../src/features/library/membership-batch", () => ({
   LibraryMembershipBatchForm: () => <div data-membership-batch="review" />,
 }));

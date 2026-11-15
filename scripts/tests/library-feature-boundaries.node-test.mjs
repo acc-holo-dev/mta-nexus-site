@@ -26,6 +26,13 @@ const serverPorts = [
   "release-history",
   "collection-releases",
   "collection-requirements",
+  "collection-import-page",
+  "collection-reconcile-page",
+  "collection-compare-page",
+  "collection-receipt-page",
+  "collection-history-page",
+  "collection-inventory-page",
+  "resource-collections-page",
 ];
 const safeLib =
   /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|library-release-request|resource-release-control-confirmation)\.ts$)/u;
@@ -131,7 +138,7 @@ test("Library client graphs exclude server dependencies transitively", () => {
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements|collection-import-page|collection-reconcile-page|collection-compare-page|collection-receipt-page|collection-history-page|collection-inventory-page|resource-collections-page)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -177,6 +184,13 @@ test("Library server entries stay server-only and separately composed", () => {
     ["release-history", "library-release-history-screen.tsx"],
     ["collection-releases", "collection-releases-screen.tsx"],
     ["collection-requirements", "collection-requirements-screen.tsx"],
+    ["collection-import-page", "collection-import-page.tsx"],
+    ["collection-reconcile-page", "collection-reconcile-page.tsx"],
+    ["collection-compare-page", "collection-compare-page.tsx"],
+    ["collection-receipt-page", "collection-receipt-page.tsx"],
+    ["collection-history-page", "collection-history-page.tsx"],
+    ["collection-inventory-page", "collection-inventory-page.tsx"],
+    ["resource-collections-page", "resource-collections-page.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/library/${port}-server.ts`;
@@ -244,5 +258,25 @@ test("Library release routes preserve dynamic rendering and server entry", () =>
     assert.match(source, /export const dynamic = "force-dynamic";/u);
     assert(source.includes(`features/library/${port}-server`));
     assert.match(source, /export (?:const metadata|async function generateMetadata)/u);
+  }
+});
+
+test("Library private page routes preserve dynamic rendering and metadata", () => {
+  for (const [route, port] of [
+    ["collections/[id]/import", "collection-import-page"],
+    ["collections/[id]/reconcile", "collection-reconcile-page"],
+    ["collections/[id]/compare", "collection-compare-page"],
+    ["collections/receipts/[id]", "collection-receipt-page"],
+    ["collections/history", "collection-history-page"],
+    ["collections/resources", "collection-inventory-page"],
+    ["[id]/collections", "resource-collections-page"],
+  ]) {
+    const source = readFileSync(
+      resolve(root, `site/src/app/workspace/library/${route}/page.tsx`),
+      "utf8",
+    );
+    assert.match(source, /export const dynamic = "force-dynamic";/u);
+    assert.match(source, /export\s*\{\s*default,\s*generateMetadata,?\s*\}\s*from/u);
+    assert(source.includes(`/${port}-server";`));
   }
 });

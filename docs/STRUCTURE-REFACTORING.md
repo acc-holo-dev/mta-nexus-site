@@ -43,7 +43,8 @@ Phase 4.35 проверена: Community author pages и following feed.
 Phase 4.36 проверена: Notifications bell, inbox и preferences.
 Phase 4.37 проверена: Library collections и command controls.
 Phase 4.38 проверена: Library import, membership и selection batches.
-Выполняется Phase 4.39: Library release selection и readiness. Владелец явно
+Phase 4.39 проверена: Library release selection и readiness.
+Выполняется Phase 4.40: Library collection server composition. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -620,3 +621,7 @@ Notifications прошла полный [CI #4675](https://github.com/acc-holo-d
 ### Phase 4.39: Library release selection и readiness
 
 Импорт и пакетные действия Library прошли полный [CI #4677](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43668606369) на `fb455f18`. Выбор версии, сравнение, переход на актуальную версию и серверные экраны истории, релизов и требований коллекции объединены в Library. Server-only входы отделены от клиентских форм; session, actor/revision, confirmation, recovery и проверка доступа сохраняются.
+
+### Phase 4.40: Library collection server composition
+
+Выбор версий и готовность Library прошли полный [CI #4678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43673529124) на `9d1dba8f`. Серверные композиции импорта, сверки, сравнения, квитанций, истории, инвентаря и коллекций ресурса перенесены в Library. Динамические маршруты, metadata, session, права, фильтры и существующие сервисы сохраняются.
