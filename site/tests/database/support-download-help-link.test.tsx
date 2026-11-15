@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { SupportDownloadHelpLink } from "../../src/components/support-download-help-link";
+import { SupportDownloadHelpLink } from "../../src/features/support/download-help";
 
 const productId = `prd_${"a".repeat(24)}`;
 const buildId = `bld_${"b".repeat(24)}`;

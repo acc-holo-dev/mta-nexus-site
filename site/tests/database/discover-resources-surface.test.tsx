@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -33,7 +35,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 }));
 
 import DiscoverPage from "../../src/app/discover/page";
-import { DirectoryFilters, DirectoryResults } from "../../src/components/discovery-directory";
+import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
 import { LocaleProvider } from "../../src/components/locale-context";
 import { parseDiscoverQuery } from "../../src/lib/discover-query";
 import { discoveryCopy } from "../../src/lib/discovery-copy";

@@ -13,7 +13,7 @@ import { cache } from "react";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { DeveloperExperience } from "../../../components/developer-experience";
 import { FollowButton } from "../../../components/follow-button";
-import { ObjectReportForm } from "../../../components/object-report-form";
+import { ObjectReportForm } from "../../../features/moderation/object-report";
 import { ProductCard } from "../../../features/resources/view";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { ServerCard } from "../../../features/servers/client";

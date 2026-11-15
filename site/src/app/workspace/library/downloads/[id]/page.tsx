@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDeliveryEvidence } from "../../../../../features/resources/delivery-server";
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
-import { SupportDownloadHelpLink } from "../../../../../components/support-download-help-link";
+import { SupportDownloadHelpLink } from "../../../../../features/support/download-help";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";

@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { DirectoryFilters, DirectoryResults } from "../../../components/discovery-directory";
+import { DirectoryFilters, DirectoryResults } from "../../../features/discovery/directory-server";
 import { discoverHref } from "../../../lib/discover-query";
 import {
   discoveryStreamHref,

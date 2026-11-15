@@ -11,7 +11,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/report-moderation-controls", () => ({
+vi.mock("../../src/features/moderation/report-controls", () => ({
   ReportModerationControls: ({ reportId }: { reportId: string }) => (
     <button type="button" data-report={reportId}>
       Decide

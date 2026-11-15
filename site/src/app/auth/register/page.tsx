@@ -1,4 +1,4 @@
-import { AuthForm } from "../../../components/auth-form";
+import { AuthForm } from "../../../features/accounts/auth";
 import { parseAuthReturnPath } from "../../../components/auth-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 

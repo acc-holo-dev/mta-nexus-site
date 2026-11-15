@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import {
-  type SupportFormObjectContext,
-  supportObjectContextHref,
-} from "../../../components/support-center";
+import { type SupportFormObjectContext, supportObjectContextHref } from "../../support/center";
 
 export function ResourceVersionHelpSupportLink({
   context,

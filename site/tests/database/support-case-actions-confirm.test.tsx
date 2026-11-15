@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
 
-import { SupportCaseActions } from "../../src/components/support-case-actions";
+import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { getDictionary } from "../../src/lib/i18n";
 import { supportWorkspaceCopy } from "../../src/lib/support-workspace-copy";
 

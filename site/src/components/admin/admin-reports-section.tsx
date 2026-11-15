@@ -8,7 +8,7 @@ import { orderCaseCopy } from "../../lib/order-case-i18n";
 import { resourceReviewCopy } from "../../lib/resource-review-i18n";
 import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
 import { ReportEvidenceLinks } from "../report-evidence-links";
-import { ReportModerationControls } from "../report-moderation-controls";
+import { ReportModerationControls } from "../../features/moderation/report-controls";
 import { AdminResourceQaReportActions } from "../../features/resources/qa-report-actions";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];

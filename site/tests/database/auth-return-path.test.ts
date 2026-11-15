@@ -8,7 +8,7 @@ import {
 } from "../../src/components/auth-return-path";
 
 const authFormSource = readFileSync(
-  resolve(process.cwd(), "site/src/components/auth-form.tsx"),
+  resolve(process.cwd(), "site/src/features/accounts/components/auth-form.tsx"),
   "utf8",
 );
 

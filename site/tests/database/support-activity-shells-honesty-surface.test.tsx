@@ -111,9 +111,9 @@ it("locks server statistics and observations loading shells to honest busy copy"
 
 it("locks nested support and activity surfaces to ErrorState/EmptyState honesty chrome", () => {
   const surfaces = [
-    "site/src/components/support-page.tsx",
-    "site/src/components/support-message-page.tsx",
-    "site/src/components/support-center.tsx",
+    "site/src/features/support/server/support-page.tsx",
+    "site/src/features/support/server/support-message-page.tsx",
+    "site/src/features/support/components/support-center.tsx",
     "site/src/components/public-profile-activity.tsx",
     "site/src/components/public-context-trust-page.tsx",
     "site/src/features/servers/server/server-statistics-page.tsx",
@@ -127,7 +127,7 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     expect(source).toContain("min-w-0");
     expect(source).toContain("min-h-11");
   }
-  expect(read("site/src/components/support-center.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/support/components/support-center.tsx")).toContain("EmptyState");
   expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
   expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
     "EmptyState",
@@ -139,10 +139,10 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
 
 it("locks support case/filter/message controls to touch targets without min-h-10", () => {
   const touchSurfaces = [
-    "site/src/components/support-case-actions.tsx",
-    "site/src/components/support-center.tsx",
-    "site/src/components/support-message-browser.tsx",
-    "site/src/components/support-case-thread.tsx",
+    "site/src/features/support/components/support-case-actions.tsx",
+    "site/src/features/support/components/support-center.tsx",
+    "site/src/features/support/components/support-message-browser.tsx",
+    "site/src/features/support/components/support-case-thread.tsx",
   ] as const;
   for (const path of touchSurfaces) {
     const source = read(path);
@@ -150,12 +150,16 @@ it("locks support case/filter/message controls to touch targets without min-h-10
     expect(source, path).not.toContain("min-h-10");
     expect(source, path).not.toContain("min-h-9");
   }
-  expect(read("site/src/components/support-case-actions.tsx")).toContain('size="touch"');
-  expect(read("site/src/components/support-center.tsx")).toContain('size="touch"');
-  expect(read("site/src/components/support-center.tsx")).toContain(
+  expect(read("site/src/features/support/components/support-case-actions.tsx")).toContain(
+    'size="touch"',
+  );
+  expect(read("site/src/features/support/components/support-center.tsx")).toContain('size="touch"');
+  expect(read("site/src/features/support/components/support-center.tsx")).toContain(
     "inline-flex min-h-11 items-center",
   );
-  expect(read("site/src/components/support-message-browser.tsx")).toContain('size="touch"');
+  expect(read("site/src/features/support/components/support-message-browser.tsx")).toContain(
+    'size="touch"',
+  );
 });
 
 it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
@@ -171,7 +175,7 @@ it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
 });
 
 it("locks support-center create-case primary submit to size=touch", () => {
-  const source = read("site/src/components/support-center.tsx");
+  const source = read("site/src/features/support/components/support-center.tsx");
   expect(source).toMatch(
     /type="submit"[\s\S]{0,120}?size="touch"[\s\S]{0,80}?variant="primary"|variant="primary"[\s\S]{0,80}?size="touch"/u,
   );

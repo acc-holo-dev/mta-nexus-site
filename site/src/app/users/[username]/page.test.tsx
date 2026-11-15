@@ -5,7 +5,7 @@ vi.mock("../../../components/follow-button", () => ({
     </button>
   ),
 }));
-vi.mock("../../../components/object-report-form", () => ({
+vi.mock("../../../features/moderation/object-report", () => ({
   ObjectReportForm: () => null,
 }));
 

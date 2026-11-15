@@ -24,7 +24,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("../../src/lib/services/order-case-service", () => ({ orderCaseService: state }));
-vi.mock("../../src/components/support-case-thread", () => ({
+vi.mock("../../src/features/support/thread", () => ({
   SupportCaseThread: ({ caseId }: { caseId: string }) => (
     <div data-case={caseId}>Existing conversation</div>
   ),

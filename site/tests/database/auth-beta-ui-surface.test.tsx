@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { AuthForm } from "../../src/components/auth-form";
+import { AuthForm } from "../../src/features/accounts/auth";
 import { getDictionary } from "../../src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -95,7 +95,7 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
   });
 
   it("uses shared @nexus/ui Input/Button/ErrorState on auth and recovery screens", () => {
-    const auth = read("site/src/components/auth-form.tsx");
+    const auth = read("site/src/features/accounts/components/auth-form.tsx");
     const forgot = read("site/src/app/auth/forgot-password/page.tsx");
     const reset = read("site/src/app/auth/reset-password/page.tsx");
 

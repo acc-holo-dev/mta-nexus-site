@@ -7,7 +7,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { authEntryHref } from "../../../components/auth-return-path";
-import { ObjectReportForm } from "../../../components/object-report-form";
+import { ObjectReportForm } from "../../../features/moderation/object-report";
 import { ServerClaimControlPanel } from "../../../features/servers/claim-controls";
 import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../features/servers/follow";

@@ -8,8 +8,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
-  "site/src/components/support-page.tsx",
-  "site/src/components/support-center.tsx",
+  "site/src/features/support/server/support-page.tsx",
+  "site/src/features/support/components/support-center.tsx",
 ] as const;
 
 it.each(surfaces)(

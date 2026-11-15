@@ -23,7 +23,7 @@ vi.mock("../../src/components/locale-context", () => ({
 import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
 import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
-import { ReportModerationControls } from "../../src/components/report-moderation-controls";
+import { ReportModerationControls } from "../../src/features/moderation/report-controls";
 
 const exclusive = [
   "site/src/features/resources/components/new-resource-form.tsx",
@@ -37,8 +37,8 @@ const exclusive = [
   "site/src/features/resources/components/build-moderation-controls.tsx",
   "site/src/features/resources/components/build-quarantine-controls.tsx",
   "site/src/features/community/components/content-moderation-controls.tsx",
-  "site/src/components/report-moderation-controls.tsx",
-  "site/src/components/verification-moderation-controls.tsx",
+  "site/src/features/moderation/components/report-moderation-controls.tsx",
+  "site/src/features/moderation/components/verification-moderation-controls.tsx",
   "site/src/features/resources/components/resource-release-watch-control.tsx",
   "site/src/features/resources/components/resource-release-watch-batch-controls.tsx",
 ] as const;

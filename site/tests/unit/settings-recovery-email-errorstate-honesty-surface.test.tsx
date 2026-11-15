@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/settings-recovery-email-section.tsx";
+const surface = "site/src/features/accounts/components/settings-recovery-email-section.tsx";
 
 it("locks recovery unavailable and not-verified notices to ErrorState", () => {
   const source = read(surface);

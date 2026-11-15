@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/verification-workspace.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/moderation/components/verification-workspace.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: verification workspace write/intent notices → ErrorState with stable ids. */
 it("locks verification workspace write and unconfirmed-submit notices to ErrorState with stable ids", () => {

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { Content } from "@nexus/domain";
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -45,7 +47,7 @@ vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null })
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 
-import { DirectoryFilters, DirectoryResults } from "../../src/components/discovery-directory";
+import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
 import { LocaleProvider } from "../../src/components/locale-context";
 import { parseDiscoverQuery } from "../../src/lib/discover-query";
 import { discoveryCopy } from "../../src/lib/discovery-copy";

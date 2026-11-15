@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -13,9 +15,9 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 }));
 
 import { LocaleProvider } from "../../src/components/locale-context";
-import { SupportCaseActions } from "../../src/components/support-case-actions";
-import { SupportCenter } from "../../src/components/support-center";
-import { SupportPageSurface, supportMetadata } from "../../src/components/support-page";
+import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
+import { SupportCenter } from "../../src/features/support/center";
+import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { supportWorkspaceCopy } from "../../src/lib/support-workspace-copy";
 

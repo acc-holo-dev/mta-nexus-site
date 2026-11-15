@@ -75,7 +75,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-vi.mock("../../../components/object-report-form", async () => {
+vi.mock("../../../features/moderation/object-report", async () => {
   const React = await import("react");
   return {
     ObjectReportForm: () => React.createElement("div", { "data-testid": "object-report" }),

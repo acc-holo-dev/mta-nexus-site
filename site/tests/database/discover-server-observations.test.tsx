@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";

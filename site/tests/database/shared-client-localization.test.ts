@@ -41,7 +41,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("confirms password changes before ending other sessions", () => {
-    const source = read("site/src/components/settings-page-client.tsx");
+    const source = read("site/src/features/accounts/components/settings-page-client.tsx");
 
     expect(source).toContain("changePasswordConfirmTitle");
     expect(source).toContain("await confirmAction({");
@@ -51,7 +51,7 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("uses the hardened request contract for login and registration", () => {
-    const source = read("site/src/components/auth-form.tsx");
+    const source = read("site/src/features/accounts/components/auth-form.tsx");
 
     expect(source).toContain('cache: "no-store"');
     expect(source).toContain('credentials: "same-origin"');

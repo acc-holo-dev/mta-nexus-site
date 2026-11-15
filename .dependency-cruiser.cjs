@@ -30,6 +30,112 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "support-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/support/)" },
+      to: {
+        path: "^site/src/features/support/(?!(?:center|download-help|messages-server|page-server|thread)\\.ts$)",
+      },
+    },
+    {
+      name: "support-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/support/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "support-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/support/(?:(?:center|download-help|thread)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!support/)|features/support/(?:server/|(?:messages-server|page-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-copy|support-message-discovery-contract|private-change-history-query)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "support-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/support/(?:(?:center|download-help|thread)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
+      name: "moderation-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/moderation/)" },
+      to: {
+        path: "^site/src/features/moderation/(?!(?:object-report|report-controls|reports-server|verification-amend|verification-controls|verification-workspace)\\.ts$)",
+      },
+    },
+    {
+      name: "moderation-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/moderation/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "moderation-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!moderation/)|features/moderation/(?:server/|(?:reports-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy|verification-moderation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "moderation-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
+      name: "accounts-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/accounts/)" },
+      to: { path: "^site/src/features/accounts/(?!(?:auth|controls|settings)\\.ts$)" },
+    },
+    {
+      name: "accounts-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/accounts/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "accounts-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|settings-client-api|private-change-history-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "accounts-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
+      name: "discovery-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/discovery/)" },
+      to: { path: "^site/src/features/discovery/(?!(?:directory-server)\\.ts$)" },
+    },
+    {
+      name: "discovery-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/discovery/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
       name: "library-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/library/)" },

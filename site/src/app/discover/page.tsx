@@ -8,7 +8,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
-import { DirectoryFilters, DirectoryResults } from "../../components/discovery-directory";
+import { DirectoryFilters, DirectoryResults } from "../../features/discovery/directory-server";
 import {
   DISCOVER_TYPES,
   type DiscoverType,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PlatformReportsScreen } from "../../../../components/platform-reports-screen";
+import { PlatformReportsScreen } from "../../../../features/moderation/reports-server";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { platformReportCopy } from "../../../../lib/platform-report-i18n";
 

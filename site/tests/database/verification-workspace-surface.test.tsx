@@ -26,7 +26,7 @@ import DeveloperSettingsPage from "../../src/app/settings/developer/page";
 import VerificationPage, { generateMetadata } from "../../src/app/workspace/verification/page";
 import { DeveloperExperience } from "../../src/components/developer-experience";
 import { DeveloperProfileEditor } from "../../src/components/developer-profile-editor";
-import { VerificationWorkspace } from "../../src/components/verification-workspace";
+import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
 import type { VerificationOverview } from "../../src/lib/verification-workspace-contract";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 

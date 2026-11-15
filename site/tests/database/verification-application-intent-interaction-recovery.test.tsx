@@ -20,7 +20,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => ({
   platformRequest: harness.request,
 }));
 
-import { VerificationWorkspace } from "../../src/components/verification-workspace";
+import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
 import { PlatformRequestError } from "../../src/lib/user-platform-client";
 
 const { render, runEffects, submit, authenticateAndChoose, fillEvidence } =

@@ -20,7 +20,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/account-controls", async () => {
+vi.mock("../../src/features/accounts/controls", async () => {
   const ReactModule = await import("react");
   return {
     AccountControls: () => ReactModule.createElement("span", { "data-mock": "AccountControls" }),

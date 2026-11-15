@@ -34,8 +34,8 @@ vi.mock("../../src/lib/support-retry", () => ({
   clearSupportRetry: h.clear,
 }));
 
-import { SupportCaseThread } from "../../src/components/support-case-thread";
-import { SupportCenter } from "../../src/components/support-center";
+import { SupportCaseThread } from "../../src/features/support/thread";
+import { SupportCenter } from "../../src/features/support/center";
 
 const { fillCaseForm, caseForm, loadOpenThread, fillReply, replyForm } =
   createSupportActorBindingInteractionHelpers(h, SupportCenter, SupportCaseThread);

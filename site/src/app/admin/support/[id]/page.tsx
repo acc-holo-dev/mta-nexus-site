@@ -1,4 +1,4 @@
-import { SupportPageSurface, supportMetadata } from "../../../../components/support-page";
+import { SupportPageSurface, supportMetadata } from "../../../../features/support/page-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

@@ -44,7 +44,9 @@ Phase 4.36 проверена: Notifications bell, inbox и preferences.
 Phase 4.37 проверена: Library collections и command controls.
 Phase 4.38 проверена: Library import, membership и selection batches.
 Phase 4.39 проверена: Library release selection и readiness.
-Выполняется Phase 4.40: Library collection server composition. Владелец явно
+Phase 4.40 проверена: Library collection server composition (CI #4679, commit `33121753`).
+Phase 4.41: Support, Moderation, Accounts и Discovery. Результаты итоговых
+проверок фиксируются для точного head draft PR. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.

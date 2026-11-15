@@ -10,7 +10,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const exclusive = [
   "site/src/components/seller-sales-report.tsx",
   "site/src/features/resources/components/resource-review-controls.tsx",
-  "site/src/components/support-center.tsx",
+  "site/src/features/support/components/support-center.tsx",
   "site/src/components/order-case-page.tsx",
   "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;
@@ -40,7 +40,7 @@ it("locks seller-sales apply and support create-case submit to size=touch", () =
   expect(read("site/src/components/seller-sales-report.tsx")).toMatch(
     /type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u,
   );
-  expect(read("site/src/components/support-center.tsx")).toMatch(
+  expect(read("site/src/features/support/components/support-center.tsx")).toMatch(
     /variant="primary"[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?variant="primary"/u,
   );
   expect(read("site/src/features/servers/components/mta-master-server-directory.tsx")).toMatch(

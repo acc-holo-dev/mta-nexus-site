@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const formComponents = [
-  "site/src/components/account-controls.tsx",
+  "site/src/features/accounts/components/account-controls.tsx",
   "site/src/components/subscription-controls.tsx",
   "site/src/components/subscription-fee-estimator.tsx",
   "site/src/components/commercial-fee-calculator.tsx",

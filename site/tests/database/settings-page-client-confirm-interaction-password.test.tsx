@@ -31,7 +31,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { SettingsPageClient } from "../../src/components/settings-page-client";
+import { SettingsPageClient } from "../../src/features/accounts/settings";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render } = createSettingsPageClientConfirmInteractionHelpers(

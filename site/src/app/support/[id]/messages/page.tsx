@@ -1,7 +1,7 @@
 import {
   SupportMessagePage,
   supportMessageMetadata,
-} from "../../../../components/support-message-page";
+} from "../../../../features/support/messages-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

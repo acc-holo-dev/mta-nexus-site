@@ -32,7 +32,7 @@ vi.mock("../../src/components/use-auth-session", () => ({
   useAuthSession: () => auth.session,
 }));
 
-vi.mock("../../src/components/account-controls", async () => {
+vi.mock("../../src/features/accounts/controls", async () => {
   const ReactModule = await import("react");
   return {
     AccountControls: () => ReactModule.createElement("span", { "data-mock": "account" }),

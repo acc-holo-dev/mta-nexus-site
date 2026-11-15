@@ -6,7 +6,7 @@ import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels
 import type { getDictionary, Locale } from "../../lib/i18n";
 import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
 import { verificationCopy } from "../../lib/verification-workspace-copy";
-import { VerificationModerationControls } from "../verification-moderation-controls";
+import { VerificationModerationControls } from "../../features/moderation/verification-controls";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 

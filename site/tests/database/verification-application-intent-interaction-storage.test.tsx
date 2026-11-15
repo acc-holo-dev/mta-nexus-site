@@ -20,7 +20,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => ({
   platformRequest: harness.request,
 }));
 
-import { VerificationWorkspace } from "../../src/components/verification-workspace";
+import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const { render, runEffects } = createVerificationApplicationIntentInteractionHelpers(

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -21,11 +23,11 @@ vi.mock("../../src/lib/services/support-message-discovery-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
-import { SupportMessageBrowser } from "../../src/components/support-message-browser";
+import { SupportMessageBrowser } from "../../src/features/support/components/support-message-browser";
 import {
   SupportMessagePage,
   supportMessageMetadata,
-} from "../../src/components/support-message-page";
+} from "../../src/features/support/messages-server";
 import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
 
 const id = `sup_${"a".repeat(24)}`,

@@ -1,4 +1,4 @@
-import { DirectoryFilters, DirectoryResults } from "../../components/discovery-directory";
+import { DirectoryFilters, DirectoryResults } from "../../features/discovery/directory-server";
 import { parseDiscoverQuery } from "../../lib/discover-query";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";

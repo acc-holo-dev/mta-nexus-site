@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type * as React from "react";

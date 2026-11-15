@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { AccountControls } from "./account-controls";
+import { AccountControls } from "../features/accounts/controls";
 import { LocaleSwitcher } from "./locale-switcher";
 import { NotificationBell } from "../features/notifications/bell";
 import { ThemeToggle } from "./theme-toggle";

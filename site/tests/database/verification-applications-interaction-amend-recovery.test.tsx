@@ -26,8 +26,8 @@ vi.mock("../../src/components/locale-context", async () => {
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { VerificationApplicationAmend } from "../../src/components/verification-application-amend";
-import { VerificationModerationControls } from "../../src/components/verification-moderation-controls";
+import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
+import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
 import { verificationApplicationsCopy } from "../../src/lib/verification-applications-copy";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 import { flatTreeHasErrorText } from "../helpers/flatten-react-test-tree";

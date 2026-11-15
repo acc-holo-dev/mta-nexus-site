@@ -45,14 +45,14 @@ it("locks residual settings and auth route shells to clipped min-w-0 frames", ()
 });
 
 it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipped shells", () => {
-  const settingsClient = read("site/src/components/settings-page-client.tsx");
+  const settingsClient = read("site/src/features/accounts/components/settings-page-client.tsx");
   expect(settingsClient).toContain("ErrorState");
   expect(settingsClient).toContain("overflow-x-clip");
   expect(settingsClient).toContain("min-w-0");
   expect(settingsClient).toMatch(/min-h-11|size="touch"/u);
   expect(settingsClient).not.toContain('role="alert"');
 
-  const authForm = read("site/src/components/auth-form.tsx");
+  const authForm = read("site/src/features/accounts/components/auth-form.tsx");
   expect(authForm).toContain("ErrorState");
   expect(authForm).toContain("overflow-x-clip");
   expect(authForm).toContain("min-w-0");
@@ -70,8 +70,8 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
 
 it("locks settings password and recovery native controls to fieldControlClass without h-10 chrome", () => {
   for (const path of [
-    "site/src/components/settings-password-form.tsx",
-    "site/src/components/settings-recovery-email-section.tsx",
+    "site/src/features/accounts/components/settings-password-form.tsx",
+    "site/src/features/accounts/components/settings-recovery-email-section.tsx",
   ] as const) {
     const source = read(path);
     expect(source, path).toContain("fieldControlClass");
@@ -83,7 +83,7 @@ it("locks settings password and recovery native controls to fieldControlClass wi
 });
 
 it("locks active sessions empty list to EmptyState and revoke/reload ghosts to size=touch", () => {
-  const source = read("site/src/components/settings-active-sessions.tsx");
+  const source = read("site/src/features/accounts/components/settings-active-sessions.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("noSessions");
   expect(source).toContain("sessionsDescription");

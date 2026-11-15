@@ -47,7 +47,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { AccountControls } from "../../src/components/account-controls";
+import { AccountControls } from "../../src/features/accounts/controls";
 import { getDictionary } from "../../src/lib/i18n";
 import { flattenReactTestTree } from "../helpers/flatten-react-test-tree";
 

@@ -21,7 +21,7 @@ import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
 import { PlatformSignIn } from "./platform-sign-in";
-import { SupportCaseThread } from "./support-case-thread";
+import { SupportCaseThread } from "../features/support/thread";
 
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());

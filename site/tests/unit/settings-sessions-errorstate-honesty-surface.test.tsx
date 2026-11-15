@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/settings-active-sessions.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/accounts/components/settings-active-sessions.tsx"),
+  "utf8",
+);
 
 it("routes unavailable sessions through ErrorState with reload and keeps empty EmptyState", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');

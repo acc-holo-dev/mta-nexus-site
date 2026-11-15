@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { FollowButton } from "../../../components/follow-button";
-import { ObjectReportForm } from "../../../components/object-report-form";
+import { ObjectReportForm } from "../../moderation/object-report";
 import { ProductDependencyList } from "../components/product-dependency-list";
 import { AddResourceToCart } from "../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../components/resource-download-button";

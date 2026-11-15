@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -7,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-vi.mock("../../components/discovery-directory", () => ({
+vi.mock("../../features/discovery/directory-server", () => ({
   DirectoryFilters: () => <form aria-label="filters" />,
   DirectoryResults: mocks.directory,
 }));

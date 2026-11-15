@@ -15,7 +15,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/verification-moderation-controls", () => ({
+vi.mock("../../src/features/moderation/verification-controls", () => ({
   VerificationModerationControls: ({ requestId }: { requestId: string }) => (
     <button type="button" data-verification={requestId}>
       Decide

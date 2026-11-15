@@ -53,7 +53,7 @@ vi.mock("./locale-context", async () => {
 
 import { getDictionary } from "../lib/i18n";
 import { PlatformSignIn } from "./platform-sign-in";
-import { SupportCenter } from "./support-center";
+import { SupportCenter } from "../features/support/center";
 
 beforeEach(() => {
   harness.slots = [[], 1, 1, false, false, null, true];

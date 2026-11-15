@@ -23,8 +23,8 @@ vi.mock("../../src/components/locale-context", async () => {
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
-import { VerificationApplicationAmend } from "../../src/components/verification-application-amend";
-import { VerificationModerationControls } from "../../src/components/verification-moderation-controls";
+import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
+import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
 import { getDictionary } from "../../src/lib/i18n";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
