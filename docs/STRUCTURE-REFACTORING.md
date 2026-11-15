@@ -376,6 +376,20 @@ Phase 2.1 продолжена по поручению владельца в т�
 сборка образа, Docker и браузерные сценарии. Последующие коммиты требуют собственной
 проверки; этот результат не подтверждает production-развёртывание.
 
+В pull request GitHub проверяет временный merge-коммит, а `headSha` запуска указывает
+на ветку PR. Для CI #43771081541 проверен merge `4e4714811a73e2a79c6d138088665d5f6cfbf0b1`
+с родителями `7f6773b3` и `e6f98b49`; его дерево совпадает с деревом head. Для
+[CI #43773587680](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43773587680)
+проверен merge `874831badf3c652154ce03f8f3e2bb627d812680` с родителями `7f6773b3`
+и `fbd53c4b`; дерево merge совпадает с деревом head. CI evidence, upgrade rehearsal и
+disposable backup/restore содержат PASS и SHA этого merge. Совпадение деревьев
+подтверждает проверенный состав файлов, но не превращает merge SHA в SHA head:
+релизные evidence с требованием точного commit SHA нужно получать для него отдельно.
+Для этого `workflow_dispatch` CI с `full=true` на целевой ветке проверяет её head
+напрямую; при этом GHCR publish prep ограничен `main` и version tags. Перед запуском
+и после него нужно сверить SHA ветки и evidence: последующий commit потребует новой
+приёмки. Такой запуск не означает согласование релиза или production deploy.
+
 ### Phase 2.1: граница пакетов
 
 Workspace — `site` + `site/packages/*`; package names и dependency versions сохраняются.
