@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
@@ -190,6 +190,24 @@ test("OPERATIONS documents the supported Compose overlay matrix and writer inven
   assert.match(ops, /mail-worker/u);
   assert.match(ops, /PostgreSQL stays up for pg_dump|Keep PostgreSQL running|postgres.*dump/iu);
   assert.doesNotMatch(ops, /dc stop caddy push-worker app\n(?!#)/u);
+});
+
+test("operator Compose commands and matrix use the current repository paths", () => {
+  const ops = readFileSync(resolve(root, "docs/OPERATIONS.md"), "utf8");
+  assert.doesNotMatch(ops, /(?:^|\s)-f\s+compose(?:\.[a-z-]+)?\.yaml\b/mu);
+  for (const file of [
+    "compose.yaml",
+    "compose.mailpit.yaml",
+    "compose.verify.yaml",
+    "compose.production.yaml",
+    "compose.production-ci.yaml",
+    "compose.recovery.yaml",
+    "compose.mail-worker.yaml",
+    "compose.recovery-file-secrets.yaml",
+  ]) {
+    assert.ok(ops.includes(`docker/${file}`), `Missing current path for ${file}`);
+    assert.ok(existsSync(resolve(root, "docker", file)), `Missing Compose file ${file}`);
+  }
 });
 
 test("OPERATIONS documents the guarded custom migration authoring path", () => {

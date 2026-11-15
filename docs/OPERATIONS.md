@@ -39,7 +39,7 @@ When Node.js 26+ and the pinned pnpm are installed, the supported convenience en
 pnpm dev
 ```
 
-It runs `pnpm dev:preflight` first and then starts the same full Compose development stack. The preflight checks required repository files, Docker/Compose availability, Linux containers, the selected local port and whether `compose.yaml` renders without implicitly importing application secrets.
+It runs `pnpm dev:preflight` first and then starts the same full Compose development stack. The preflight checks required repository files, Docker/Compose availability, Linux containers, the selected local port and whether `docker/compose.yaml` renders without implicitly importing application secrets.
 
 `pnpm dev:host` is intentionally different: it starts only the Next.js development server. Use it only when PostgreSQL, storage and scanner dependencies are already configured externally.
 
@@ -60,7 +60,7 @@ Source directories are bind-mounted read-only. Edits under `site/src` and worksp
 Readiness:
 
 ```bash
-docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
+docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
 `pnpm dev:docker:check` requires app readiness plus push-worker, license-worker and
@@ -79,11 +79,11 @@ after fixing the cause rather than relying on silent restarts.
 
 ### Optional local mail capture
 
-`compose.mailpit.yaml` extends only the development `compose.yaml`. It adds
+`docker/compose.mailpit.yaml` extends only the development `docker/compose.yaml`. It adds
 Mailpit 1.31.4, the existing durable account-mail worker and a one-shot initializer:
 
 ```bash
-docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
+docker compose -p nexus-local -f docker/compose.yaml -f docker/compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
 # Or, with host Node/pnpm:
 pnpm dev:mail
 pnpm dev:mail:check
@@ -149,9 +149,9 @@ pnpm build
 - `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required. Prints the normal reporter and writes timings/results to ignored `artifacts/unit-tests.json`. Run **without** `NEXT_PUBLIC_APP_URL` (same as the CI `unit` job); unit CSRF fixtures use `Origin: http://nexus.test` and correctly fail closed when APP_URL is `http://localhost:3000`.
 - `pnpm test:database`: real DB/integration suites, sequential files against a disposable PostgreSQL database. Run **with** `NEXT_PUBLIC_APP_URL` (same as the CI `verify` job).
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
-- `pnpm test`: both Vitest projects in one process/env. Prefer CI-aligned runners for acceptance: `node scripts/run-ci-aligned-vitest.mjs` (used by `pnpm release:verify` and `compose.verify.yaml` / `NEXUS_LOCAL_VERIFY=true` local disposable verify) runs unit without APP_URL then database with APP_URL. `pnpm test:isolated` runs the same split directly in its owned database. Do not weaken CSRF checks to make a combined `pnpm test` + APP_URL green.
+- `pnpm test`: both Vitest projects in one process/env. Prefer CI-aligned runners for acceptance: `node scripts/run-ci-aligned-vitest.mjs` (used by `pnpm release:verify` and `docker/compose.verify.yaml` / `NEXUS_LOCAL_VERIFY=true` local disposable verify) runs unit without APP_URL then database with APP_URL. `pnpm test:isolated` runs the same split directly in its owned database. Do not weaken CSRF checks to make a combined `pnpm test` + APP_URL green.
 - CI-aligned and release verification require `NEXUS_DISPOSABLE_DATABASE=1` and an explicit PostgreSQL `DATABASE_URL` without query/fragment: host must be loopback or Compose `postgres`, and database name must end in `_test`/`_verify`, or be an owned `nexus_test_<uuid>` / `nexus_focus_<timestamp>_<random>` name. Release verification blocks both migration and test gates if preflight fails. The acknowledgement, host and name do not prove that a database contains no valuable data: the operator must ensure the target is disposable before setting them.
-- Disposable local Docker verify: `NEXUS_LOCAL_VERIFY=true bash scripts/check-local-verification.sh` (or the `.ps1` twin) builds `compose.verify.yaml`, migrates a fresh DB, typechecks, runs CI-aligned Vitest, then a production-shaped `pnpm build`. It is a developer fallback, not a GitHub Actions workflow; CI still runs `check:code` and `test:database` as separate jobs and does **not** invoke `release:verify`.
+- Disposable local Docker verify: `NEXUS_LOCAL_VERIFY=true bash scripts/check-local-verification.sh` (or the `.ps1` twin) builds `docker/compose.verify.yaml`, migrates a fresh DB, typechecks, runs CI-aligned Vitest, then a production-shaped `pnpm build`. It is a developer fallback, not a GitHub Actions workflow; CI still runs `check:code` and `test:database` as separate jobs and does **not** invoke `release:verify`.
 
 CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown or
 mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
@@ -280,7 +280,7 @@ Use `pnpm analyze:architecture` and `pnpm analyze:unused` for dependency boundar
 
 `pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. It runs unit and database projects separately: unit removes `APP_URL` and `NEXT_PUBLIC_APP_URL` to match CI, while database preserves the caller's environment. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database.
 
-When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <site/tests/...test.ts|site/src/...test.ts>` to create a disposable database on the Compose network, migrate it, run the selected files, and drop the database. The development uploads mount is masked by an owned empty read-only host directory, removed with `rmdir` after the run; the application storage root points to the disposable run container's `/tmp`. Test containers disable the scanner and email provider and clear inherited Web Push VAPID values; use dedicated scanner/provider workflows when those integrations are the subject of the test. It validates every test path, including colocated feature tests and symlinks, before starting Docker or creating the database. It starts PostgreSQL with `--no-recreate` so a running development container is not replaced due to configuration drift. It uses current checked-out test configuration and sources; changes to dependencies still require rebuilding the development image. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
+When Compose Postgres is unpublished on the host (`docker/compose.yaml`), use `pnpm test:focus:compose <site/tests/...test.ts|site/src/...test.ts>` to create a disposable database on the Compose network, migrate it, run the selected files, and drop the database. The development uploads mount is masked by an owned empty read-only host directory, removed with `rmdir` after the run; the application storage root points to the disposable run container's `/tmp`. Test containers disable the scanner and email provider and clear inherited Web Push VAPID values; use dedicated scanner/provider workflows when those integrations are the subject of the test. It validates every test path, including colocated feature tests and symlinks, before starting Docker or creating the database. It starts PostgreSQL with `--no-recreate` so a running development container is not replaced due to configuration drift. It uses current checked-out test configuration and sources; changes to dependencies still require rebuilding the development image. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
 
 `pnpm ci:diagnose --run-id <id>` reads one GitHub Actions run and its annotations. It may require an appropriate read-only GitHub credential. A workflow with zero executed steps is not a successful test.
 
@@ -337,15 +337,15 @@ synthetic values verifies paths and shape; it does not authorize a live deploy.
 Compose merge order is significant. Do not combine the development base with the
 production base. Supported scenarios (OPS-04 / ARC09):
 
-| Scenario                                  | Files (left → right merge order)                                                                | Expected roles                                                                                                                      |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Dev                                       | `compose.yaml`                                                                                  | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port)    |
-| Dev + local mail capture                  | `compose.yaml` + `compose.mailpit.yaml`                                                         | Dev roles + Mailpit + durable account-mail worker (capture only)                                                                    |
-| Isolated verify                           | `compose.verify.yaml`                                                                           | Disposable `postgres` + `verify` (no production ports; not a deploy)                                                                |
-| Production                                | `compose.production.yaml`                                                                       | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy`                                    |
-| Production + recovery mail                | `compose.production.yaml` + `compose.recovery.yaml` + `compose.mail-worker.yaml`                | Production roles + optional `mail-worker`; recovery env on `app`                                                                    |
-| Production + recovery mail + file secrets | …previous… + `compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key                                    |
-| Production CI                             | `compose.production.yaml` + `compose.production-ci.yaml`                                        | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
+| Scenario                                  | Files (left → right merge order)                                                                       | Expected roles                                                                                                                      |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Dev                                       | `docker/compose.yaml`                                                                                  | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port)    |
+| Dev + local mail capture                  | `docker/compose.yaml` + `docker/compose.mailpit.yaml`                                                  | Dev roles + Mailpit + durable account-mail worker (capture only)                                                                    |
+| Isolated verify                           | `docker/compose.verify.yaml`                                                                           | Disposable `postgres` + `verify` (no production ports; not a deploy)                                                                |
+| Production                                | `docker/compose.production.yaml`                                                                       | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy`                                    |
+| Production + recovery mail                | `docker/compose.production.yaml` + `docker/compose.recovery.yaml` + `docker/compose.mail-worker.yaml`  | Production roles + optional `mail-worker`; recovery env on `app`                                                                    |
+| Production + recovery mail + file secrets | …previous… + `docker/compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key                                    |
+| Production CI                             | `docker/compose.production.yaml` + `docker/compose.production-ci.yaml`                                 | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
 
 **Inventory (production base writers and edge):**
 
@@ -966,18 +966,16 @@ unreviewed migration. Run `pnpm db:migrate` before the updated application.
 Development baseline commands (shared absolute local storage required):
 
 ```bash
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
-docker compose -p nexus-local -f compose.yaml exec \
+docker compose -p nexus-local -f docker/compose.yaml exec \
   -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
 # Only after inspecting a reported legacy demo metadata mismatch:
-docker compose -p nexus-local -f compose.yaml exec \
+docker compose -p nexus-local -f docker/compose.yaml exec \
   -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair
 # Optional cleanup for exact old Unsplash/DiceBear values written by the seed:
-docker compose -p nexus-local -f compose.yaml exec \
+docker compose -p nexus-local -f docker/compose.yaml exec \
   -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair-media
 # Optional additive one-year history for local UI testing:
-docker compose -p nexus-local -f compose.yaml exec \
+docker compose -p nexus-local -f docker/compose.yaml exec \
   -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:historical
 ```
 
@@ -1348,7 +1346,7 @@ postgres_image=$(docker inspect --format '{{.Image}}' "$postgres_id")
 mkdir -m 700 "$BACKUP_DIR"
 # Full production-base writer set + ingress. PostgreSQL stays up for pg_dump.
 dc stop caddy push-worker license-worker resource-release-worker app
-# If compose.mail-worker.yaml (or another writer overlay) is enabled:
+# If docker/compose.mail-worker.yaml (or another writer overlay) is enabled:
 #   dc stop mail-worker
 # Stop any additional external writer jobs by their configured names too.
 # Proceed only after every application writer is stopped; do not stop postgres.
