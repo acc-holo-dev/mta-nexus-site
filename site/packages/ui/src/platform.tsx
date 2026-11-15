@@ -91,6 +91,7 @@ export function StatCard({ label, value, context, tone = "default", icon, action
    SectionHeader — consistent section title with optional action
    ============================================================ */
 export interface SectionHeaderProps {
+  as?: "h1" | "h2";
   title: string;
   description?: string;
   action?: React.ReactNode;
@@ -104,6 +105,7 @@ export function SectionHeader({
   action,
   className,
   titleId,
+  as: Heading = "h2",
 }: SectionHeaderProps) {
   return (
     <div
@@ -113,9 +115,9 @@ export function SectionHeader({
       )}
     >
       <div className="min-w-0 max-w-full flex-1">
-        <h2 id={titleId} className="break-words font-heading text-primary">
+        <Heading id={titleId} className="break-words font-heading text-primary">
           {title}
-        </h2>
+        </Heading>
         {description && <p className="mt-0.5 break-words font-caption text-muted">{description}</p>}
       </div>
       {action && <div className="max-w-full shrink-0">{action}</div>}

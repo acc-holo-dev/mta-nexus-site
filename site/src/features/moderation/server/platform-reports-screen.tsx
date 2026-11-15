@@ -2,11 +2,11 @@ import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { platformReportCopy } from "../../../lib/platform-report-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { platformReportService } from "../../../lib/services/platform-report-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
   if (status === "resolved") return "success";
@@ -46,6 +46,7 @@ export async function PlatformReportsScreen({
     if (!report) {
       return (
         <div className="space-y-4">
+          <SectionHeader as="h1" title={copy.detail} description={copy.help} />
           <ErrorState title={copy.notFound} />
           <Link
             href="/workspace/platform-reports"
@@ -58,7 +59,7 @@ export async function PlatformReportsScreen({
     }
     return (
       <div className="space-y-4">
-        <SectionHeader title={copy.detail} description={copy.help} />
+        <SectionHeader as="h1" title={copy.detail} description={copy.help} />
         <div className="nexus-panel space-y-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge
@@ -117,24 +118,27 @@ export async function PlatformReportsScreen({
   const loaded = await platformReportService.listForReporter(user, page).catch(() => null);
   if (!loaded) {
     return (
-      <ErrorState
-        title={copy.unavailable}
-        description={copy.unavailableDescription}
-        action={
-          <Link
-            href="/workspace/platform-reports"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          >
-            {copy.retry}
-          </Link>
-        }
-      />
+      <div className="space-y-4">
+        <SectionHeader as="h1" title={copy.title} description={copy.help} />
+        <ErrorState
+          title={copy.unavailable}
+          description={copy.unavailableDescription}
+          action={
+            <Link
+              href="/workspace/platform-reports"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {copy.retry}
+            </Link>
+          }
+        />
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <SectionHeader title={copy.title} description={copy.help} />
+      <SectionHeader as="h1" title={copy.title} description={copy.help} />
       {loaded.reports.length === 0 ? (
         <EmptyState
           title={copy.empty}
