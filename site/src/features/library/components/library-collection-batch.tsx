@@ -12,12 +12,18 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../lib/library-collection-receipts-i18n";
-import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { privateApiRequest } from "../lib/private-api-request";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+} from "../../../lib/library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
+import {
+  libraryCollectionError,
+  libraryCollectionsCopy,
+} from "../../../lib/library-collections-i18n";
+import { collectionHref } from "../../../lib/library-collections-query";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
 
 export function LibraryCollectionBatchForm({
   locale,

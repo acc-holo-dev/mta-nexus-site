@@ -21,7 +21,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh, push: harness.push }),
 }));
 
-import { LibraryCollectionCommandForm } from "../../src/components/library-collection-command";
+import { LibraryCollectionCommandForm } from "../../src/features/library/collection-command";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 
 const { collection, render, mountDuplicate, submit, success } =

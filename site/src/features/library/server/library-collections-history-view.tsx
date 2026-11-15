@@ -1,17 +1,17 @@
 import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
-import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../lib/library-collection-receipts-i18n";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
+} from "../../../lib/library-collection-receipts-i18n";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../lib/library-collections-query";
-import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
+} from "../../../lib/library-collections-query";
+import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import {
   LibraryCollectionsPagination,
   type LibraryCollectionsActor,

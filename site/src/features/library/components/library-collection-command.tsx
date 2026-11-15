@@ -8,11 +8,14 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionSnapshotSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmAction } from "./confirm-action";
+import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
+import {
+  libraryCollectionError,
+  libraryCollectionsCopy,
+} from "../../../lib/library-collections-i18n";
+import { collectionHref } from "../../../lib/library-collections-query";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmAction } from "../../../components/confirm-action";
 export function LibraryCollectionCommandForm({
   locale,
   actorId,

@@ -12,7 +12,7 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { LibraryCollectionBatchForm } from "../../src/components/library-collection-batch";
+import { LibraryCollectionBatchForm } from "../../src/features/library/collection-batch";
 import { LibraryCollectionImport } from "../../src/components/library-collection-import";
 
 const { collection, manifest, preview, response, render, textarea, inspect, child } =

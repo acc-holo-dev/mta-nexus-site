@@ -31,7 +31,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 vi.mock("../../src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { comparison: state.comparison },
 }));
-vi.mock("../../src/components/library-collection-item-copy", () => ({
+vi.mock("../../src/features/library/collection-item-copy", () => ({
   LibraryCollectionItemCopyForm: ({
     source,
     items,

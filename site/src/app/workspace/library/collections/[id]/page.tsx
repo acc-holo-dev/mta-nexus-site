@@ -1,4 +1,4 @@
-import { LibraryCollectionsScreen } from "../../../../../components/library-collections-screen";
+import { LibraryCollectionsScreen } from "../../../../../features/library/collections-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

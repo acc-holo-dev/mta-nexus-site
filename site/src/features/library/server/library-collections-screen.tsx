@@ -1,13 +1,13 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { getRequestLocale } from "../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   collectionHref,
   collectionId,
   collectionPageParams,
-} from "../lib/library-collections-query";
-import { authService } from "../lib/services/auth-service";
+} from "../../../lib/library-collections-query";
+import { authService } from "../../../lib/services/auth-service";
 import { LibraryCollectionsCopyView } from "./library-collections-copy-view";
 import { LibraryCollectionsDetailView } from "./library-collections-detail-view";
 import { LibraryCollectionsErrorPanel } from "./library-collections-error-panel";
@@ -20,7 +20,7 @@ import {
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
-import { PlatformSignIn } from "./platform-sign-in";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 
 export async function LibraryCollectionsScreen({
   view = "list",

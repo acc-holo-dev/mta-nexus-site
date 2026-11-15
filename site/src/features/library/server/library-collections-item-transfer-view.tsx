@@ -1,13 +1,13 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../lib/library-collections-query";
-import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
-import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
+} from "../../../lib/library-collections-query";
+import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,

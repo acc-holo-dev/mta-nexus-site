@@ -21,7 +21,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh, push: harness.push }),
 }));
 
-import { LibraryCollectionCommandForm } from "../../src/components/library-collection-command";
+import { LibraryCollectionCommandForm } from "../../src/features/library/collection-command";
 
 const { collection, render, submit, success } = createLibraryCollectionsInteractionHelpers(
   harness,

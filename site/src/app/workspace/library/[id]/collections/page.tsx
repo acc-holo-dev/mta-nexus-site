@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionCommandForm } from "../../../../../components/library-collection-command";
+import { LibraryCollectionCommandForm } from "../../../../../features/library/collection-command";
 import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getDictionary } from "../../../../../lib/i18n";

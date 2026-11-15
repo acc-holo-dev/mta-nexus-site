@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -44,7 +46,7 @@ vi.mock("../../src/lib/services/library-collections-service", () => ({
     copyItemsPage: state.copyItemsPage,
   },
 }));
-vi.mock("../../src/components/library-collection-command", () => ({
+vi.mock("../../src/features/library/collection-command", () => ({
   LibraryCollectionCommandForm: ({
     action = "create",
     productId,
@@ -65,7 +67,7 @@ vi.mock("../../src/features/resources/download", () => ({
   ),
 }));
 
-import { LibraryCollectionsScreen } from "../../src/components/library-collections-screen";
+import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 

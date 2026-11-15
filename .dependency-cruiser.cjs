@@ -30,6 +30,38 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "library-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/library/)" },
+      to: {
+        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collections-server)\\.ts$)",
+      },
+    },
+    {
+      name: "library-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/library/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "library-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!library/)|features/library/(?:server/|collections-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "library-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "notifications-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/notifications/)" },

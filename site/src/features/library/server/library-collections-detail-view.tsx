@@ -1,22 +1,22 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
-import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
-import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
-import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
-import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { collectionReleasesCopy } from "../../../lib/collection-releases-i18n";
+import { collectionRequirementsCopy } from "../../../lib/collection-requirements-i18n";
+import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
+import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
+import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
-import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
-import { LibraryCollectionBatchForm } from "./library-collection-batch";
-import { LibraryCollectionCommandForm } from "./library-collection-command";
+} from "../../../lib/library-collections-query";
+import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
+import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { LibraryCollectionBatchForm } from "../collection-batch";
+import { LibraryCollectionCommandForm } from "../collection-command";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -24,7 +24,7 @@ import {
   libraryCollectionsLinkClass,
   libraryCollectionsSearchFieldClass,
 } from "./library-collections-screen-shared";
-import { ResourceDownloadButton } from "../features/resources/download";
+import { ResourceDownloadButton } from "../../resources/download";
 
 export async function LibraryCollectionsDetailView({
   locale,

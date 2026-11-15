@@ -8,8 +8,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const filterSurfaces = [
-  "site/src/components/library-collections-detail-view.tsx",
-  "site/src/components/library-collections-item-transfer-view.tsx",
+  "site/src/features/library/server/library-collections-detail-view.tsx",
+  "site/src/features/library/server/library-collections-item-transfer-view.tsx",
 ] as const;
 
 it("exposes search landmarks, EmptyState, and touch-sized filter inputs on collection detail and transfer", () => {

@@ -35,7 +35,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 vi.mock("../../src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { resourceMemberships: state.report },
 }));
-vi.mock("../../src/components/library-collection-command", () => ({
+vi.mock("../../src/features/library/collection-command", () => ({
   LibraryCollectionCommandForm: ({
     collection,
     action,

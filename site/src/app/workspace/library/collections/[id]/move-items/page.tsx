@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LibraryCollectionsScreen } from "../../../../../../components/library-collections-screen";
+import { LibraryCollectionsScreen } from "../../../../../../features/library/collections-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../../../lib/library-collections-i18n";
 

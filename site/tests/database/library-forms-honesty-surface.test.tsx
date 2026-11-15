@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { LibraryCollectionsErrorPanel } from "../../src/components/library-collections-error-panel";
+import { LibraryCollectionsErrorPanel } from "../../src/features/library/server/library-collections-error-panel";
 import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 import { libraryMembershipBatchesCopy } from "../../src/lib/library-membership-batches-i18n";
@@ -16,12 +16,12 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const forms = [
-  "site/src/components/library-collection-batch.tsx",
-  "site/src/components/library-collection-command.tsx",
+  "site/src/features/library/components/library-collection-batch.tsx",
+  "site/src/features/library/components/library-collection-command.tsx",
   "site/src/components/library-collection-import.tsx",
-  "site/src/components/library-collection-item-copy.tsx",
+  "site/src/features/library/components/library-collection-item-copy.tsx",
   "site/src/components/library-collection-reconcile.tsx",
-  "site/src/components/library-collections-error-panel.tsx",
+  "site/src/features/library/server/library-collections-error-panel.tsx",
   "site/src/components/library-membership-batch.tsx",
   "site/src/components/library-release-command.tsx",
   "site/src/components/library-selection-batch-controls.tsx",

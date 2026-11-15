@@ -52,6 +52,10 @@ infrastructure packages. Model не зависит от UI и Node builtins. Э�
 проверяет transitive closure реальных client/model entrypoints. Старые package/domain/
 HTTP ограничения сохраняются. Новые Servers feature paths требуют полного CI.
 
+### Library feature
+
+`site/src/features/library` объединяет server-only композицию коллекций и клиентские формы команд, пакетных действий и переноса элементов. Публичные входы, отсутствие routing и изоляция клиентских графов проверяются; session, authority, confirmation, сервисы и repository locks сохраняются. [Контракт feature](../site/src/features/library/README.md). Изменения требуют полного CI.
+
 ### Notifications feature
 
 `site/src/features/notifications` объединяет колокольчик, inbox, вкладки, настройки и Web Push. Клиентские и server-only входы защищены проверками прямых и транзитивных зависимостей; session, сервисы доставки, outbox и workers остаются прежними. [Контракт feature](../site/src/features/notifications/README.md). Изменения требуют полного CI.
