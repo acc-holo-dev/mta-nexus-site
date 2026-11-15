@@ -10,22 +10,22 @@
 
 ## Границы
 
-| Слой                        | Ответственность                                                                              |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| `site/src/app`              | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
-| `site/src/features/servers` | Публичный read-only Servers pilot: UI, чистые проекции и server composition.                 |
-| `site/src/lib/services`     | Пользовательские операции, оркестрация и правила сценария.                                   |
-| `site/packages/db`          | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
-| `site/packages/domain`      | Независимые доменные типы, ошибки, правила и события.                                        |
-| `site/packages/validation`  | Общие схемы входных данных.                                                                  |
-| `site/packages/security`    | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
-| `site/packages/storage`     | Приватное хранение и проверка целостности файлов.                                            |
-| `site/packages/config`      | Проверка параметров окружения.                                                               |
-| `site/packages/ui`          | Общие элементы интерфейса без импортов серверных пакетов.                                    |
+| Слой                       | Ответственность                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| `site/src/app`             | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
+| `site/src/features`        | Предметные UI и серверные композиции с явными публичными входами.                            |
+| `site/src/lib/services`    | Пользовательские операции, оркестрация и правила сценария.                                   |
+| `site/packages/db`         | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции.                           |
+| `site/packages/domain`     | Независимые доменные типы, ошибки, правила и события.                                        |
+| `site/packages/validation` | Общие схемы входных данных.                                                                  |
+| `site/packages/security`   | Авторизация, идентификаторы, сессии и ограничения запросов.                                  |
+| `site/packages/storage`    | Приватное хранение и проверка целостности файлов.                                            |
+| `site/packages/config`     | Проверка параметров окружения.                                                               |
+| `site/packages/ui`         | Общие элементы интерфейса без импортов серверных пакетов.                                    |
 
 Пакеты не импортируют приложение; domain не зависит от остальных пакетов. `dependency-cruiser` проверяет границы и циклы: SWC разбирает исходники, а отдельный TypeScript 6 выявляет зависимости типов. Проект компилируется TypeScript 7; поддержку его новых синтаксических конструкций анализатором нужно проверять при их использовании. HTTP-обработчик не должен становиться вторым репозиторием или обходить общие проверки.
 
-### Servers feature pilot
+### Servers feature
 
 `site/src/features/servers` объединяет публичный каталог и карточки. Публичный
 контракт включает `client.ts` (клиентский UI), `server.ts` (server-only
@@ -43,7 +43,9 @@ App Router сохраняет URLs/metadata/HTTP parsing/status/headers; `/serve
 feature server composition. Directory API использует чистую model entry, поэтому
 не получает RSC или БД через server barrel. Существующие `serverService` и
 `mtaMasterDirectoryService` остаются единственными реализациями сценариев и cache.
-Claim/ownership/management/collectors не входят в пилот.
+Пилот начинался с read-only каталога; UI регистрации, claim и управления теперь
+также находятся в feature. Проверки владения, сервисы и collectors остаются в
+своих существующих слоях.
 
 Внешний production-код обращается только к публичным entrypoints. Feature не импортирует
 routing; client/model не импортируют services, request locale, server entry или
@@ -80,8 +82,8 @@ routing, services, server и infrastructure не входят в client graph. A
 [Контракт feature](../site/src/features/resources/README.md) задаёт public `view`
 (RSC/client-compatible карточка), `server` (server-only page) и pure `model`.
 App Router сохраняет dynamic config; products API использует model и прежний service.
-Services/repositories и visibility/scan/access policy остаются прежними; detail client UI,
-publishing и download handlers не переносятся. Отдельный `detail-server` entry
+Services/repositories и visibility/scan/access policy остаются прежними. Клиентский
+UI деталей и публикации входит в feature; HTTP и download handlers остаются в app. Отдельный `detail-server` entry
 сохраняет session/access hydration детальной страницы; metadata остаётся в routing.
 `versions-server` и `reviews-server` отвечают за публичные подстраницы,
 `media-server` и `build-server` — за author/staff media и build composition;
@@ -96,6 +98,16 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 Сохраняются client directives и общий modal hook; UI evidence не заменяет выдачу
 по server policy. Все UI entrypoints проверяются на transitive server leaks.
 Все Resources feature paths требуют полного CI.
+
+### Support, Moderation, Accounts и Discovery
+
+[Support](../site/src/features/support/README.md) содержит UI обращений и server-only
+композиции переписки. [Moderation](../site/src/features/moderation/README.md)
+содержит UI жалоб и верификации, а также серверные экраны жалоб.
+[Accounts](../site/src/features/accounts/README.md) объединяет UI входа, аккаунта и
+настроек; [Discovery](../site/src/features/discovery/README.md) — общую серверную
+композицию каталогов. Входы отделены от внутренних модулей, границы проверяются
+анализатором и тестами. Права, сервисы, repositories и workers остаются в своих слоях.
 
 ### HTTP → service → repository
 

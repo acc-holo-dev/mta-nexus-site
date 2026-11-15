@@ -25,6 +25,8 @@ export interface DialogProps {
   children: React.ReactNode;
   /** Localized accessible label for the close control. */
   closeLabel?: string;
+  /** Prevent all dismissal routes while a confirmation is in progress. */
+  disableDismiss?: boolean;
 }
 
 /**
@@ -38,6 +40,7 @@ export function Dialog({
   description,
   children,
   closeLabel = "Close dialog",
+  disableDismiss = false,
 }: DialogProps) {
   const titleId = React.useId();
   const descriptionId = React.useId();
@@ -58,7 +61,9 @@ export function Dialog({
       if (event.key !== "Tab") return;
       const targets = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
         (element) =>
-          element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden",
+          element.tabIndex >= 0 &&
+          element.getClientRects().length > 0 &&
+          getComputedStyle(element).visibility !== "hidden",
       );
       const activeIndex = targets.indexOf(document.activeElement as HTMLElement);
       const nextIndex = nextDialogFocusIndex(targets.length, activeIndex, event.shiftKey);
@@ -66,40 +71,40 @@ export function Dialog({
       event.preventDefault();
       targets[nextIndex]?.focus();
     };
-    const dismissOnBackdrop = (event: MouseEvent) => {
-      if (event.target !== dialog) return;
-      const bounds = dialog.getBoundingClientRect();
-      if (
-        event.clientX < bounds.left ||
-        event.clientX > bounds.right ||
-        event.clientY < bounds.top ||
-        event.clientY > bounds.bottom
-      )
-        onClose();
-    };
     dialog.addEventListener("keydown", wrapFocus);
-    dialog.addEventListener("click", dismissOnBackdrop);
     return () => {
       dialog.removeEventListener("keydown", wrapFocus);
-      dialog.removeEventListener("click", dismissOnBackdrop);
       if (dialog.open) dialog.close();
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
         previousFocus.focus();
       }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Native onCancel handles Escape for the backdrop action.
     <dialog
       ref={dialogRef}
       aria-label={title}
+      aria-busy={disableDismiss || undefined}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!disableDismiss) onClose();
+      }}
+      onClick={(event) => {
+        if (disableDismiss || event.target !== event.currentTarget) return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          onClose();
       }}
       className="fixed inset-0 z-50 m-auto max-h-[min(100%,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-lg open:flex flex-col overflow-hidden rounded-xl border border-base bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/60"
     >
@@ -108,6 +113,7 @@ export function Dialog({
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
+          disabled={disableDismiss}
           className="absolute right-4 top-4 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
           aria-label={closeLabel}
         >
@@ -163,7 +169,13 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <Dialog isOpen={isOpen} onClose={onCancel} title={title} closeLabel={closeLabel}>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onCancel}
+      title={title}
+      closeLabel={closeLabel}
+      disableDismiss={busy}
+    >
       <div className="space-y-4">
         <div className="space-y-2 text-sm">
           <p className="break-words font-semibold text-primary">{object}</p>

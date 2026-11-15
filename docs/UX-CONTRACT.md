@@ -30,7 +30,7 @@ Input уже умеет связывать label/error. Общая оболоч�
 
 ## Диалоги таблицы и короткие экраны
 
-Действующие More и notification panels используют native dialog и useModalDialog. Их focus containment, inert background, Escape и return focus нужно сохранить. Экспортируемый UI Dialog сейчас не используется в app; его ограничение нельзя приписывать реальному shell. Предложение общего modal компонента должно опираться на действующий native pattern. [Текущий modal hook](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/use-modal-dialog.ts#L5-L49).
+More и notification panels используют native dialog и [useModalDialog](../site/src/components/use-modal-dialog.ts). Общий [Dialog](../site/packages/ui/src/dialog.tsx) применяется в ConfirmDialog и `confirmAction` для подтверждения действий. Оба пути сохраняют модальность, доступность с клавиатуры и возврат фокуса; повторный рендер не должен закрывать окно. Во время `busy` ConfirmDialog блокирует подтверждение и отмену, включая Escape и фон, и сообщает состояние через `aria-busy`. Исторический [modal hook на baseline](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/use-modal-dialog.ts#L5-L49) остаётся ссылкой на прежний срез.
 
 У длинного диалога доступен заголовок и закрытие, содержимое прокручивается в пределах доступной высоты с safe area. Для More и SectionHeader сначала проверяются реальные bounding boxes, начало/конец списка и длинные RU подписи; риска по классам недостаточно для заявления о поломке. Новый ConfirmAction — предложение: он показывает объект, масштаб и последствия, но сохраняет password, slug, revision, audit и отмену существующего действия.
 

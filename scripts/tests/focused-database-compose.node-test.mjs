@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -41,6 +41,7 @@ esac
           COMPOSE_PROJECT_NAME: "nexus-local",
           PATH: `${directory}:${process.env.PATH}`,
           FOCUS_TEST_LOG: log,
+          TMPDIR: directory,
           FOCUS_TEST_CREATE_FAIL: scenario === "create-fails" ? "1" : "0",
           FOCUS_TEST_MIGRATE_FAIL: scenario === "migration-fails" ? "1" : "0",
         },
@@ -48,6 +49,24 @@ esac
     );
     const calls = readFileSync(log, "utf8");
     assert.match(calls, /CREATE DATABASE/u);
+    assert.equal(
+      readdirSync(directory).filter((name) => name.startsWith("nexus-focus-empty.")).length,
+      0,
+    );
+    if (scenario !== "create-fails") {
+      const appRuns = calls.split("\n").filter((line) => line.includes(" run --rm "));
+      assert.ok(appRuns.length >= 1);
+      for (const line of appRuns) {
+        assert.match(line, /-e STORAGE_LOCAL_PATH=\/tmp\/nexus-focus-uploads/u);
+        assert.match(line, /nexus-focus-empty\.[^\s]+:\/data\/uploads:ro/u);
+        assert.doesNotMatch(line, /STORAGE_LOCAL_PATH=\/data\/uploads/u);
+        assert.match(line, /-e BUILD_SCANNER=disabled/u);
+        assert.match(line, /-e EMAIL_PROVIDER=disabled/u);
+        assert.match(line, /-e WEB_PUSH_VAPID_PUBLIC_KEY=(?:\s|$)/u);
+        assert.match(line, /-e WEB_PUSH_VAPID_PRIVATE_KEY=(?:\s|$)/u);
+        assert.match(line, /-e WEB_PUSH_VAPID_SUBJECT=(?:\s|$)/u);
+      }
+    }
     if (scenario === "create-fails") {
       assert.notEqual(result.status, 0);
       assert.doesNotMatch(calls, /DROP DATABASE|pg_terminate_backend/u);
@@ -234,4 +253,57 @@ esac
   assert.match(calls, /vitest\.config\.ts:\/app\/vitest\.config\.ts:ro/u);
   assert.ok(calls.includes("pnpm test:focus site/src/app/market/[slug]/page.test.ts"));
   assert.match(calls, /DROP DATABASE/u);
+});
+
+test("focused storage cleanup never recursively deletes unexpected contents", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-focus-mount-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const docker = join(directory, "docker");
+  const log = join(directory, "calls");
+  writeFileSync(
+    docker,
+    `#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$FOCUS_TEST_LOG"
+case "$*" in
+  'context show') echo default ;;
+  *'ps postgres --format'*) echo healthy ;;
+  *'pnpm test:focus'*)
+    for arg in "$@"; do
+      case "$arg" in
+        *nexus-focus-empty.*:/data/uploads:ro) touch "\${arg%:/data/uploads:ro}/unexpected" ;;
+      esac
+    done
+    [[ "$FOCUS_TEST_FAILURE" != 1 ]] || exit 42 ;;
+esac
+`,
+    { mode: 0o755 },
+  );
+  for (const failure of ["0", "1"]) {
+    const result = spawnSync(
+      "bash",
+      [
+        "scripts/run-focused-database-test-compose.sh",
+        "site/tests/database/password-change-transaction.test.ts",
+      ],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          PATH: `${directory}:${process.env.PATH}`,
+          TMPDIR: directory,
+          DOCKER_HOST: "",
+          DOCKER_CONTEXT: "",
+          COMPOSE_PROJECT_NAME: "nexus-local",
+          FOCUS_TEST_LOG: log,
+          FOCUS_TEST_FAILURE: failure,
+        },
+      },
+    );
+    assert.equal(result.status, failure === "1" ? 42 : 1);
+    assert.match(result.stderr, /Could not remove the owned empty focused-test mount directory/u);
+    const mounts = readdirSync(directory).filter((name) => name.startsWith("nexus-focus-empty."));
+    assert.ok(
+      mounts.some((name) => readFileSync(join(directory, name, "unexpected"), "utf8") === ""),
+    );
+  }
 });
