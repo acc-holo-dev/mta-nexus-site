@@ -29,6 +29,7 @@ import {
   supportMessageMetadata,
 } from "../../src/features/support/messages-server";
 import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,
@@ -63,6 +64,37 @@ beforeEach(() => {
   mock.rate.mockResolvedValue({ success: true });
   mock.page.mockResolvedValue(page);
 });
+it.each(["en", "ru"] as const)(
+  "offers a safe localized retry when conversation session lookup fails in %s",
+  async (locale) => {
+    mock.locale = locale;
+    mock.session.mockRejectedValue(new Error("PRIVATE_SESSION_ERROR"));
+    const html = renderToStaticMarkup(
+      await SupportMessagePage({
+        id,
+        searchParams: Promise.resolve({ q: "billing & access", group: "staff" }),
+      }),
+    );
+    expect(html).toContain(`>${supportMessageCopy(locale).title}</h1>`);
+    expect(html).toContain(supportMessageCopy(locale).unavailable);
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain(`href="/support/${id}/messages?q=billing+%26+access&amp;group=staff"`);
+    expect(html).toContain('role="alert"');
+    expect(html).not.toContain("PRIVATE_SESSION_ERROR");
+    expect(html).not.toContain("/auth/login");
+    expect(mock.page).not.toHaveBeenCalled();
+    expect(mock.rate).not.toHaveBeenCalled();
+    const invalid = renderToStaticMarkup(
+      await SupportMessagePage({
+        id: "../private",
+        staff: true,
+        searchParams: Promise.resolve({ q: "x" }),
+      }),
+    );
+    expect(invalid).toContain('href="/admin/support"');
+    expect(invalid).not.toContain("../private");
+  },
+);
 it.each(["en", "ru"] as const)(
   "renders accessible localized search, focused links, navigation and bounded export in %s",
   (locale) => {

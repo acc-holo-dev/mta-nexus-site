@@ -319,6 +319,7 @@ export function SupportCaseThread({
   if (!supportCase) {
     return (
       <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
+        <h1 className="font-display text-primary">{copy.title}</h1>
         <Link
           href={backHref}
           className="inline-flex min-h-11 items-center text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

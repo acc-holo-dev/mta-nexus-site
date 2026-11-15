@@ -129,10 +129,12 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(caseGuest).toContain(`href="/auth/register?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   const forbidden = renderToStaticMarkup(await SupportPageSurface({ staff: true }));
+  expect(forbidden).toContain(`>${getDictionary("en").support.staffQueue}</h1>`);
   expect(forbidden).toContain('role="alert"');
   expect(forbidden).toContain(supportWorkspaceCopy("en").forbidden);
   expect(forbidden).toContain('href="/support"');
   const missing = renderToStaticMarkup(await SupportPageSurface({ id: "../private" }));
+  expect(missing).toContain(`>${getDictionary("en").support.title}</h1>`);
   expect(missing).toContain('role="alert"');
   expect(missing).toContain(supportWorkspaceCopy("en").notFound);
   expect(missing).toContain('href="/support"');
@@ -144,6 +146,7 @@ it("rejects duplicate/unknown page filters and localizes no-index support metada
     await SupportPageSurface({ searchParams: Promise.resolve({ requesterId: "victim" }) }),
   );
   expect(invalidRequester).toContain('role="alert"');
+  expect(invalidRequester).toContain(`>${getDictionary("ru").support.title}</h1>`);
   expect(invalidRequester).toContain(supportWorkspaceCopy("ru").queryInvalid);
   expect(invalidRequester).toContain('href="/support"');
   expect(
@@ -160,6 +163,30 @@ it("rejects duplicate/unknown page filters and localizes no-index support metada
     robots: { index: false, follow: false },
   });
 });
+it.each(["en", "ru"] as const)(
+  "preserves a safe retry path when support session lookup fails in %s",
+  async (locale) => {
+    mocks.locale = locale;
+    mocks.session.mockRejectedValue(new Error("PRIVATE_SESSION_ERROR"));
+    const html = renderToStaticMarkup(
+      await SupportPageSurface({
+        searchParams: Promise.resolve({ q: "billing & access", status: "open" }),
+      }),
+    );
+    expect(html).toContain(`>${getDictionary(locale).support.title}</h1>`);
+    expect(html).toContain(supportWorkspaceCopy(locale).unavailable);
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain('href="/support?q=billing+%26+access&amp;status=open"');
+    expect(html).toContain('role="alert"');
+    expect(html).not.toContain("PRIVATE_SESSION_ERROR");
+    expect(html).not.toContain("/auth/login");
+    const invalid = renderToStaticMarkup(
+      await SupportPageSurface({ staff: true, id: "../private" }),
+    );
+    expect(invalid).toContain('href="/admin/support"');
+    expect(invalid).not.toContain("../private");
+  },
+);
 it("remounts support list and thread when the authenticated actor changes", async () => {
   const id = `sup_${"a".repeat(24)}`;
   mocks.session.mockResolvedValue({ id: "actor_a", role: "user" });

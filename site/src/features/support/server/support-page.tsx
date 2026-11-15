@@ -37,11 +37,32 @@ export async function SupportPageSurface({
     else if (value !== undefined) params.append(key, value);
   }
   const listReturnPath = params.size ? `${base}?${params}` : base;
-  const store = await cookies(),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
+  const validId = id !== undefined && /^sup_[a-f0-9]{24}$/u.test(id);
+  const casePath = validId ? `${base}/${id}` : base;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            <Link
+              href={id === undefined ? listReturnPath : casePath}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   if (!actor) {
     // Case detail uses the shared gate; the list keeps the Support H1 shell a11y asserts.
-    if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={`${base}/${id}`} />;
+    if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={casePath} />;
     return (
       <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
         <header className="space-y-2 border-b border-base pb-6">
@@ -56,6 +77,7 @@ export async function SupportPageSurface({
   if (staff && !can(actor, "admin.moderation"))
     return (
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <h1 className="font-display text-primary">{support.staffQueue}</h1>
         <ErrorState
           title={copy.forbidden}
           action={
@@ -70,7 +92,7 @@ export async function SupportPageSurface({
       </div>
     );
   if (id !== undefined)
-    return /^sup_[a-f0-9]{24}$/u.test(id) ? (
+    return validId ? (
       <SupportCaseThread
         key={`${actor.id}:${id}`}
         caseId={id}
@@ -79,6 +101,7 @@ export async function SupportPageSurface({
       />
     ) : (
       <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.notFound}
           action={
@@ -96,6 +119,7 @@ export async function SupportPageSurface({
   if (!filters)
     return (
       <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.queryInvalid}
           action={

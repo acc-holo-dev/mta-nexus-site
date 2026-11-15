@@ -41,6 +41,20 @@ import { SupportCenter } from "../../src/features/support/center";
 const { render, renderThread, fillCaseForm, caseForm, loadOpenThread, fillReply, replyForm } =
   createSupportActorBindingInteractionHelpers(h, SupportCenter, SupportCaseThread);
 
+it("retains a page heading and can retry after a thread fails to load", async () => {
+  h.fetch.mockRejectedValueOnce(new Error("offline"));
+  renderThread();
+  for (const effect of h.effects) effect();
+  await vi.waitFor(() => expect(renderThread().find((node) => node.type === "h1")).toBeDefined());
+  const nodes = renderThread();
+  expect(nodes.find((node) => node.type === "h1")?.props.children).toBe("Support");
+  const retry = nodes.find((node) => typeof node.props.onClick === "function");
+  expect(retry).toBeDefined();
+  h.fetch.mockRejectedValueOnce(new Error("still offline"));
+  (retry?.props.onClick as () => void)();
+  await vi.waitFor(() => expect(h.fetch).toHaveBeenCalledTimes(2));
+});
+
 it("keeps the original reply key after response loss and an actor change", async () => {
   await loadOpenThread();
   fillReply();

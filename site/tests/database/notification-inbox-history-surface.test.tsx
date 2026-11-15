@@ -278,6 +278,7 @@ it.each(["session", "page"] as const)(
     const html = await render({ state: "unread" });
     expect(html).toContain("temporarily unavailable");
     expect(html).toContain('role="alert"');
+    expect(html).toContain(`>${notificationInboxCopy("en").title}</h1>`);
     expect(html).toContain("Try again");
     expect(html).toContain('href="/notifications?state=unread"');
     expect(html).toContain("overflow-x-clip");

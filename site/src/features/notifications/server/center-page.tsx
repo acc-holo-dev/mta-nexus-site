@@ -48,6 +48,7 @@ export default async function NotificationCenterPage({
   } catch {
     return (
       <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <ErrorState
           title={copy.unavailable}
           action={
