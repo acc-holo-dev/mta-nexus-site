@@ -41,6 +41,7 @@ import {
 } from "../../src/features/community/server/publication-reports-page";
 import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
 import { reportGroupsCopy } from "../../src/lib/community-report-groups-copy";
+import { communityReportCopy } from "../../src/lib/community-report-copy";
 import { reportBatchCopy } from "../../src/lib/report-batch-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
@@ -220,8 +221,29 @@ it("gates anonymous and revoked staff and rejects malformed scopes before privat
     }),
   );
   expect(invalid).toContain('role="alert"');
+  expect(invalid).toContain(`>${reportGroupsCopy("en").publicationTitle}</h1>`);
   expect(mock.reports).not.toHaveBeenCalled();
 });
+it.each(["en", "ru"] as const)(
+  "preserves publication report filters when session lookup fails in %s",
+  async (locale) => {
+    mock.locale = locale;
+    mock.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await PublicationReportsPage({
+        id: "post",
+        searchParams: Promise.resolve({ q: "a & b", view: "history" }),
+      }),
+    );
+    expect(html).toContain(`>${reportGroupsCopy(locale).publicationTitle}</h1>`);
+    expect(html).toContain(communityReportCopy(locale).unavailable);
+    expect(html).toContain('href="/admin/community/post/reports?q=a+%26+b&amp;view=history"');
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(html).not.toContain("/auth/login");
+    expect(mock.reports).not.toHaveBeenCalled();
+    expect(mock.rate).not.toHaveBeenCalled();
+  },
+);
 it("localizes private metadata and does not load groups after an exhausted rate", async () => {
   mock.locale = "ru";
   expect((await reportGroupsMetadata()).title).toBe(reportGroupsCopy("ru").title);

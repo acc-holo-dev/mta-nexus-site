@@ -32,11 +32,37 @@ export async function PublicationReportsPage({
   const locale = await getRequestLocale(),
     copy = reportGroupsCopy(locale),
     labels = communityReportCopy(locale),
-    actor = await authService.getSession((await cookies()).get("nexus_session")?.value),
     path = `/admin/community/${encodeURIComponent(id)}/reports`;
+  const search = await searchParams;
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(search)) {
+    if (Array.isArray(value)) for (const part of value) query.append(key, part);
+    else if (value !== undefined) query.append(key, value);
+  }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <div className="mx-auto max-w-5xl space-y-5">
+        <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
+        <ErrorState
+          title={labels.unavailable}
+          action={
+            <Link
+              href={query.size ? `${path}?${query}` : path}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {labels.reload}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   try {
-    const filters = publicationReportPageQuery(await searchParams);
+    const filters = publicationReportPageQuery(search);
     if (!filters || (filters.target && filters.target !== "content"))
       throw new AppError("Invalid filters", 400, "VALIDATION_ERROR");
     await reportRateLimit(actor.id, "search");
@@ -160,21 +186,24 @@ export async function PublicationReportsPage({
     );
   } catch (error) {
     return (
-      <ErrorState
-        title={communityReportError(
-          locale,
-          error instanceof AppError ? error.code : "INTERNAL_ERROR",
-        )}
-        description={labels.formErrorHint}
-        action={
-          <Link
-            href={path}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {labels.reload}
-          </Link>
-        }
-      />
+      <div className="mx-auto max-w-5xl space-y-5">
+        <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
+        <ErrorState
+          title={communityReportError(
+            locale,
+            error instanceof AppError ? error.code : "INTERNAL_ERROR",
+          )}
+          description={labels.formErrorHint}
+          action={
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {labels.reload}
+            </Link>
+          }
+        />
+      </div>
     );
   }
 }

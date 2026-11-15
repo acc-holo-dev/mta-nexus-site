@@ -29,11 +29,13 @@ function ResourceReviewLoadError({
   backHref,
   backLabel,
   retryHref,
+  staff,
 }: {
   locale: Locale;
   backHref: string;
   backLabel: string;
   retryHref: string;
+  staff: boolean;
 }) {
   const copy = resourceReviewCopy(locale),
     dictionary = getDictionary(locale);
@@ -42,6 +44,7 @@ function ResourceReviewLoadError({
       <Link href={backHref} className={navLinkClass}>
         {backLabel}
       </Link>
+      <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
@@ -64,9 +67,8 @@ export async function ResourceReviewReportScreen({
   id?: string;
   query?: Record<string, string | string[] | undefined>;
 }) {
-  const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
-  const copy = resourceReviewCopy(locale),
-    actor = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => null);
+  const locale = await getRequestLocale();
+  const copy = resourceReviewCopy(locale);
   const base = staff ? "/admin/commerce/reviews" : "/workspace/review-reports";
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
@@ -79,6 +81,20 @@ export async function ResourceReviewReportScreen({
       ? `${base}?${returnParams}`
       : base;
   const listBackHref = staff ? "/admin" : "/workspace/library";
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <ResourceReviewLoadError
+        locale={locale}
+        backHref={id ? base : listBackHref}
+        backLabel={copy.back}
+        retryHref={loginReturn}
+        staff={staff}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={loginReturn} />;
   if (staff && !["admin", "moderator"].includes(actor.role)) notFound();
   if (id) {
@@ -94,6 +110,7 @@ export async function ResourceReviewReportScreen({
           backHref={base}
           backLabel={copy.back}
           retryHref={retryHref}
+          staff={staff}
         />
       );
     }
@@ -148,6 +165,7 @@ export async function ResourceReviewReportScreen({
         backHref={listBackHref}
         backLabel={copy.back}
         retryHref={loginReturn}
+        staff={staff}
       />
     );
   }

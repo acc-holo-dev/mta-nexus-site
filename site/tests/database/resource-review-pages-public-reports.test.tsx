@@ -64,6 +64,7 @@ import Public from "../../src/app/market/[slug]/reviews/page";
 import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
 import { getDictionary } from "../../src/lib/i18n";
 import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 it.each(["en", "ru"] as const)(
   "public %s reviews expose public authors, distinguish legacy evidence and preserve pages",
@@ -167,6 +168,7 @@ it("shows an honest recovery state when the report queue fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.reports}</h1>`);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
@@ -178,10 +180,29 @@ it("shows an honest recovery state when a report detail fails", async () => {
   const copy = resourceReviewCopy("en");
   const html = renderToStaticMarkup(await ResourceReviewReportScreen({ staff: true, id: "rpt_a" }));
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.queue}</h1>`);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain('href="/admin/commerce/reviews/rpt_a"');
   expect(html).not.toContain("INTERNAL_STAFF_NOTE");
 });
+it.each(["en", "ru"] as const)(
+  "shows a retry instead of sign-in when report session lookup fails in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await ResourceReviewReportScreen({ staff: false, query: { view: "history", page: "2" } }),
+    );
+    const copy = resourceReviewCopy(locale);
+    expect(html).toContain(`>${copy.reports}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain('href="/workspace/review-reports?view=history&amp;page=2"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mocks.reportsPage).not.toHaveBeenCalled();
+  },
+);
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
