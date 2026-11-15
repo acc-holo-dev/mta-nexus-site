@@ -49,6 +49,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/collections/receipts/[id]/page";
 import { libraryCollectionReceiptsCopy } from "../../src/lib/library-collection-receipts-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const date = "2026-10-13T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
@@ -133,6 +134,13 @@ it.each(["en", "ru"] as const)(
     });
   },
 );
+it("does not reuse an invalid collection receipt identifier during session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = await screen({}, "../private");
+  expect(html).toContain('href="/workspace/library/collections/history"');
+  expect(html).not.toContain("../private");
+  expect(state.history).not.toHaveBeenCalled();
+});
 it("authenticates before inspecting selectors or receipt IDs", async () => {
   state.actor = null;
   expect(await screen({ userId: "other" })).toContain("Sign in");
@@ -167,11 +175,27 @@ it("shows ErrorState recovery when receipt detail fails to load", async () => {
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
   expect(html).not.toContain(copy.unknownHint);
 });
+it.each(["en", "ru"] as const)(
+  "offers a safe receipt retry after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryCollectionReceiptsCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/workspace/library/collections/receipts/lcr_a"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.history).not.toHaveBeenCalled();
+  },
+);
 it("locks ErrorState for unexpected receipt selectors with retry shell", async () => {
   const copy = libraryCollectionReceiptsCopy("en");
   const html = await screen({ userId: "other" });

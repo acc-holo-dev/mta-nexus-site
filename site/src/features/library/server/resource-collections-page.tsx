@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { LibraryMembershipBatchForm } from "../membership-batch";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
@@ -37,22 +38,26 @@ export default async function ResourceCollectionsPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, query] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, { id }, query] = await Promise.all([getRequestLocale(), params, searchParams]);
   const c = libraryCollectionsCopy(locale),
-    dictionary = getDictionary(locale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+    dictionary = getDictionary(locale);
+  const safeReturn = /^[A-Za-z0-9_-]{1,160}$/u.test(id)
+    ? `/workspace/library/${encodeURIComponent(id)}/collections`
+    : "/workspace/library";
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
     return (
-      <PlatformSignIn
+      <PlatformSessionError
         locale={locale}
-        returnPath={`/workspace/library/${encodeURIComponent(id)}/collections`}
+        title={c.resourceCollections}
+        message={c.loadUnavailable}
+        retryHref={safeReturn}
       />
     );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={safeReturn} />;
   try {
     if (collectionPageParams(query).size)
       throw new AppError("Unexpected resource collections query", 400, "COLLECTION_INVALID");
@@ -66,6 +71,7 @@ export default async function ResourceCollectionsPage({
           <Link href={collectionHref()} className={navLinkClass}>
             {c.title}
           </Link>
+          <h1 className="font-display">{c.resourceCollections}</h1>
           <ErrorState
             title={c.loadUnavailable}
             action={

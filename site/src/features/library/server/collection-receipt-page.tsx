@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
@@ -37,18 +38,28 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, { id }, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const c = libraryCollectionsCopy(typedLocale),
     r = libraryCollectionReceiptsCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={typedLocale} returnPath={collectionReceiptHref(id)} />;
+    dictionary = getDictionary(typedLocale);
+  const safeReturn = /^[A-Za-z0-9_-]{1,160}$/u.test(id)
+    ? collectionReceiptHref(id)
+    : "/workspace/library/collections/history";
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={r.title}
+        message={r.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={typedLocale} returnPath={safeReturn} />;
   try {
     if (collectionPageParams(raw).size)
       throw new AppError("Unexpected receipt query", 400, "COLLECTION_INVALID");
@@ -62,6 +73,7 @@ export default async function Page({
     if (!report) {
       return (
         <div className={pageShellClass}>
+          <h1 className="font-display">{r.title}</h1>
           <ErrorState
             title={r.loadUnavailable}
             description={r.loadUnavailableDescription}

@@ -25,6 +25,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,
@@ -32,31 +33,36 @@ export async function LibraryMembershipHistoryScreen({
   params?: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw, path] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    searchParams,
-    params,
-  ]);
+  const [locale, raw, path] = await Promise.all([getRequestLocale(), searchParams, params]);
   const c = libraryCollectionsCopy(locale),
     h = libraryCollectionHistoryCopy(locale),
     m = libraryMembershipHistoryCopy(locale),
-    dictionary = getDictionary(locale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    let returnPath = membershipHistoryHref();
-    if (path) {
-      returnPath = membershipHistoryHref(path.id);
-    } else {
-      try {
-        const query = libraryMembershipHistoryQuery(collectionPageParams(raw));
-        returnPath = `${membershipHistoryHref()}?${libraryMembershipHistorySuffix(query)}`;
-      } catch {
-        // Keep the list route when filters are invalid for unsigned visitors.
-      }
+    dictionary = getDictionary(locale);
+  let returnPath = membershipHistoryHref();
+  if (path) {
+    if (/^[A-Za-z0-9_-]{1,160}$/u.test(path.id)) returnPath = membershipHistoryHref(path.id);
+  } else {
+    try {
+      const query = libraryMembershipHistoryQuery(collectionPageParams(raw));
+      returnPath = `${membershipHistoryHref()}?${libraryMembershipHistorySuffix(query)}`;
+    } catch {
+      /* Invalid filters return to the history list. */
     }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={path ? m.detail : m.title}
+        message={m.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     const filters = collectionPageParams(raw);
     if (params) {
@@ -83,6 +89,7 @@ export async function LibraryMembershipHistoryScreen({
             >
               {m.history}
             </Link>
+            <h1 className="font-display">{m.detail}</h1>
             <ErrorState
               title={m.loadUnavailable}
               action={
@@ -125,6 +132,7 @@ export async function LibraryMembershipHistoryScreen({
     if (!result) {
       return (
         <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+          <h1 className="font-display">{m.title}</h1>
           <ErrorState
             title={m.loadUnavailable}
             action={

@@ -44,6 +44,7 @@ import Page, {
 } from "../../src/app/workspace/library/collections/membership-history/page";
 import { LibraryMembershipHistoryScreen } from "../../src/features/library/membership-history-server";
 import { libraryMembershipHistoryCopy } from "../../src/lib/library-membership-history-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
@@ -164,6 +165,13 @@ it.each(["en", "ru"] as const)(
     ).toBe(LibraryMembershipHistoryScreen);
   },
 );
+it("does not reuse an invalid membership receipt identifier during session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = await screen({}, "../private");
+  expect(html).toContain('href="/workspace/library/collections/membership-history"');
+  expect(html).not.toContain("../private");
+  expect(state.detail).not.toHaveBeenCalled();
+});
 it("shows stable detail after access and final current references are gone", async () => {
   state.detail.mockResolvedValue({
     schemaVersion: 1,
@@ -267,7 +275,33 @@ it("shows an honest recovery state when membership history fails to load", async
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain('href="/workspace/library/collections/membership-history');
   expect(html).not.toContain("membership history unavailable");
 });
+it.each(["en", "ru"] as const)(
+  "retains membership history and receipt context after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession")
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"))
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const history = await screen();
+    const receipt = await screen({}, "lmb_a");
+    const copy = libraryMembershipHistoryCopy(locale);
+    expect(history).toContain(`>${copy.title}</h1>`);
+    expect(history).toContain(
+      "page=2&amp;days=90&amp;operation=removals&amp;collectionId=lcol_a&amp;productId=prd_lost",
+    );
+    expect(receipt).toContain(`>${copy.detail}</h1>`);
+    expect(receipt).toContain('href="/workspace/library/collections/membership-history/lmb_a"');
+    for (const html of [history, receipt]) {
+      expect(html).toContain(copy.loadUnavailable);
+      expect(html).not.toContain("PRIVATE_SESSION");
+      expect(html).not.toContain("/auth/login");
+    }
+    expect(state.history).not.toHaveBeenCalled();
+    expect(state.detail).not.toHaveBeenCalled();
+  },
+);

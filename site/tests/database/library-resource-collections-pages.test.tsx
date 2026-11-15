@@ -67,6 +67,7 @@ import Page, {
 } from "../../src/app/workspace/library/[id]/collections/page";
 import { getDictionary } from "../../src/lib/i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const collection = {
   id: "lcol_a",
@@ -128,6 +129,18 @@ it.each(["en", "ru"] as const)(
     });
   },
 );
+it("does not reuse an invalid resource identifier during session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library"');
+  expect(html).not.toContain("../private");
+  expect(state.report).not.toHaveBeenCalled();
+});
 it("retains removal and hides names/versions/add controls after access loss", async () => {
   const value = report();
   value.resource = { ...value.resource, title: "Do not reveal", available: false, canAdd: false };
@@ -182,6 +195,22 @@ it("shows an honest recovery state when resource collections fail", async () => 
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(libraryCollectionsCopy("en").loadUnavailable);
+  expect(html).toContain(`>${libraryCollectionsCopy("en").resourceCollections}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/workspace/library/prd_a/collections");
 });
+it.each(["en", "ru"] as const)(
+  "offers a resource collections retry after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryCollectionsCopy(locale);
+    expect(html).toContain(`>${copy.resourceCollections}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/workspace/library/prd_a/collections"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.report).not.toHaveBeenCalled();
+  },
+);
