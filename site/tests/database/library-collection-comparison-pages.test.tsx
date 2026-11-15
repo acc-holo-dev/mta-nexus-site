@@ -66,6 +66,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/compare/page";
 import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
 import { libraryCollectionComparisonCopy } from "../../src/lib/library-collection-comparison-i18n";
 
 const source = {
@@ -234,9 +235,22 @@ it("shows ErrorState recovery when comparison fails to load", async () => {
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
+});
+it("returns to the collection list when the comparison identifier is invalid and session lookup fails", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library/collections"');
+  expect(html).not.toContain("../private");
+  expect(state.comparison).not.toHaveBeenCalled();
 });
 it("authenticates before inspecting query selectors", async () => {
   state.actor = null;
@@ -259,3 +273,20 @@ it("masks an unowned source or destination as a missing page", async () => {
   state.comparison.mockRejectedValue(new AppError("private name", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
 });
+
+it.each(["en", "ru"] as const)(
+  "preserves comparison context when the session is unavailable in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryCollectionComparisonCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain("/workspace/library/collections/lcol_a/compare?");
+    expect(html).toContain("page=");
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.comparison).not.toHaveBeenCalled();
+  },
+);

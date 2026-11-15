@@ -10,6 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { getDictionary } from "../../../lib/i18n";
@@ -44,21 +45,31 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
+  const [locale, raw] = await Promise.all([getRequestLocale(), searchParams]),
     c = libraryCollectionsCopy(locale),
     v = libraryCollectionInventoryCopy(locale),
-    dictionary = getDictionary(locale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    let returnPath = "/workspace/library/collections/resources";
-    try {
-      const query = libraryCollectionInventoryQuery(collectionPageParams(raw));
-      returnPath = `${returnPath}?${libraryCollectionInventorySuffix(query)}`;
-    } catch {
-      // Keep the list route when filters are invalid for unsigned visitors.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    dictionary = getDictionary(locale);
+  let returnPath = "/workspace/library/collections/resources";
+  try {
+    const preview = libraryCollectionInventoryQuery(collectionPageParams(raw));
+    returnPath = `${returnPath}?${libraryCollectionInventorySuffix(preview)}`;
+  } catch {
+    // Invalid filters return to the unfiltered route.
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={v.title}
+        message={v.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     const query = libraryCollectionInventoryQuery(collectionPageParams(raw));
     const report = await libraryCollectionsService.inventory(actor, query).catch((error) => {
@@ -68,6 +79,7 @@ export default async function Page({
     if (!report) {
       return (
         <div className={pageShellClass}>
+          <h1 className="font-display">{v.title}</h1>
           <Link href={collectionHref()} className={navLinkClass}>
             {c.title}
           </Link>

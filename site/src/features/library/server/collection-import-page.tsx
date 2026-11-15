@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryCollectionImport } from "../collection-import";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
@@ -13,7 +14,11 @@ import {
   libraryCollectionError,
   libraryCollectionsCopy,
 } from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import {
+  collectionHref,
+  collectionId as parseCollectionId,
+  collectionPageParams,
+} from "../../../lib/library-collections-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 
@@ -34,17 +39,31 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, { id }, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const c = libraryCollectionsCopy(typedLocale),
     m = libraryCollectionManifestsCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
+    dictionary = getDictionary(typedLocale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let retryHref = collectionHref();
+    try {
+      parseCollectionId(id);
+      retryHref = collectionHref(id, "import");
+    } catch {
+      /* Keep the collections list. */
+    }
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={m.title}
+        message={m.loadUnavailable}
+        retryHref={retryHref}
+      />
+    );
+  }
   if (!actor)
     return <PlatformSignIn locale={typedLocale} returnPath={collectionHref(id, "import")} />;
   try {
@@ -60,6 +79,7 @@ export default async function Page({
     if (!manifest) {
       return (
         <div className={pageShellClass}>
+          <h1 className="font-display">{m.title}</h1>
           <ErrorState
             title={m.loadUnavailable}
             description={m.loadUnavailableDescription}

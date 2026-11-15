@@ -52,6 +52,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/import/page";
 import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
 import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
 
 const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
@@ -114,6 +115,7 @@ it("shows ErrorState recovery when import export fails to load", async () => {
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
@@ -153,9 +155,27 @@ it("shows ErrorState recovery when reconcile export fails to load", async () => 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.reconcileLoadUnavailable);
+  expect(html).toContain(`>${copy.reconcileTitle}</h1>`);
   expect(html).toContain(copy.reconcileLoadUnavailableDescription);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
+});
+it("returns to the collection list for invalid import and reconciliation identifiers", async () => {
+  vi.spyOn(authService, "getSession")
+    .mockRejectedValueOnce(new Error("offline"))
+    .mockRejectedValueOnce(new Error("offline"));
+  const imported = await screen({}, "../private");
+  const reconciled = renderToStaticMarkup(
+    await ReconcilePage({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  for (const html of [imported, reconciled]) {
+    expect(html).toContain('href="/workspace/library/collections"');
+    expect(html).not.toContain("../private");
+  }
+  expect(state.history).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
   "keeps the %s import success shell clipped with touch CTAs",
@@ -165,5 +185,35 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("overflow-x-clip");
     expect(html).toContain("min-h-11");
     expect(html).toContain("min-w-0");
+  },
+);
+
+it.each(["en", "ru"] as const)(
+  "offers a safe retry for import and reconciliation session failures in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession")
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"))
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const imported = await screen();
+    const reconciled = renderToStaticMarkup(
+      await ReconcilePage({
+        params: Promise.resolve({ id: "lcol_a" }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    const copy = libraryCollectionManifestsCopy(locale);
+    expect(imported).toContain(`>${copy.title}</h1>`);
+    expect(imported).toContain(copy.loadUnavailable);
+    expect(imported).toContain('href="/workspace/library/collections/lcol_a/import"');
+    expect(reconciled).toContain(`>${copy.reconcileTitle}</h1>`);
+    expect(reconciled).toContain(copy.reconcileLoadUnavailable);
+    expect(reconciled).toContain('href="/workspace/library/collections/lcol_a/reconcile"');
+    for (const html of [imported, reconciled]) {
+      expect(html).not.toContain("/auth/login");
+      expect(html).not.toContain("PRIVATE_SESSION");
+      expect(html).not.toContain("PRIVATE-REFERENCE");
+    }
+    expect(state.history).not.toHaveBeenCalled();
   },
 );

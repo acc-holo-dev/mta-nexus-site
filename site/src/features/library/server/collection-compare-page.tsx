@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
@@ -17,7 +18,11 @@ import {
   libraryCollectionError,
   libraryCollectionsCopy,
 } from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import {
+  collectionHref,
+  collectionId as parseCollectionId,
+  collectionPageParams,
+} from "../../../lib/library-collections-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 
@@ -38,27 +43,39 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, { id }, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, { id }, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const c = libraryCollectionsCopy(typedLocale),
     h = libraryCollectionComparisonCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    let returnPath = collectionHref(id, "compare");
-    try {
-      const query = libraryCollectionComparisonQuery(collectionPageParams(raw));
-      returnPath = `${returnPath}?${libraryCollectionComparisonSuffix(query)}`;
-    } catch {
-      // Keep the route when filters are invalid for unsigned visitors.
-    }
-    return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
+    dictionary = getDictionary(typedLocale);
+  let returnPath = collectionHref(id, "compare");
+  try {
+    const preview = libraryCollectionComparisonQuery(collectionPageParams(raw));
+    returnPath = `${returnPath}?${libraryCollectionComparisonSuffix(preview)}`;
+  } catch {
+    // Invalid filters return to the comparison route.
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let safeReturn = collectionHref();
+    try {
+      parseCollectionId(id);
+      safeReturn = returnPath;
+    } catch {
+      /* Keep the collections list. */
+    }
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={h.title}
+        message={h.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
   try {
     const query = libraryCollectionComparisonQuery(collectionPageParams(raw));
     const retryHref = `${collectionHref(id, "compare")}?${libraryCollectionComparisonSuffix(query)}`;
@@ -71,6 +88,7 @@ export default async function Page({
     if (!report) {
       return (
         <div className={pageShellClass}>
+          <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}

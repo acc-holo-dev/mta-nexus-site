@@ -71,6 +71,7 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/resources/page";
+import { authService } from "../../src/lib/services/auth-service";
 import { libraryCollectionInventoryCopy } from "../../src/lib/library-collection-inventory-i18n";
 
 const date = "2026-10-13T00:00:00.000Z",
@@ -226,6 +227,7 @@ it("shows an honest recovery state when collection inventory fails", async () =>
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(libraryCollectionInventoryCopy("en").loadUnavailable);
+  expect(html).toContain(`>${libraryCollectionInventoryCopy("en").title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("collectionId=lcol_a");
   expect(html).toContain("release=updates");
@@ -277,3 +279,20 @@ it("does not link an unsupported paid requirements report while retaining exact 
   expect(html).toContain("/versions/compare?from=bld_pin&amp;to=bld_new");
   expect(html).toContain('data-build="bld_pin"');
 });
+
+it.each(["en", "ru"] as const)(
+  "preserves inventory context when the session is unavailable in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryCollectionInventoryCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain("/workspace/library/collections/resources?");
+    expect(html).toContain("collectionId=lcol_a");
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.history).not.toHaveBeenCalled();
+  },
+);

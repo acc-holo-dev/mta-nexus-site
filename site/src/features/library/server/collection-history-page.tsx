@@ -9,6 +9,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
@@ -48,22 +49,32 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  const [locale, raw] = await Promise.all([getRequestLocale(), searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const c = libraryCollectionsCopy(typedLocale),
     h = libraryCollectionHistoryCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    let returnPath = "/workspace/library/collections/history";
-    try {
-      const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
-      returnPath = `${returnPath}?${libraryCollectionHistorySuffix(query)}`;
-    } catch {
-      // Keep the list route when filters are invalid for unsigned visitors.
-    }
-    return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
+    dictionary = getDictionary(typedLocale);
+  let returnPath = "/workspace/library/collections/history";
+  try {
+    const preview = libraryCollectionHistoryQuery(collectionPageParams(raw));
+    returnPath = `${returnPath}?${libraryCollectionHistorySuffix(preview)}`;
+  } catch {
+    // Invalid filters return to the unfiltered route.
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={h.title}
+        message={h.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
   try {
     const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
     const retryHref = `/workspace/library/collections/history?${libraryCollectionHistorySuffix(query)}`;
@@ -76,6 +87,7 @@ export default async function Page({
     if (!result) {
       return (
         <div className={pageShellClass}>
+          <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}

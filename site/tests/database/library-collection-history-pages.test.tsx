@@ -38,6 +38,7 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/history/page";
+import { authService } from "../../src/lib/services/auth-service";
 import { libraryCollectionHistoryCopy } from "../../src/lib/library-collection-history-i18n";
 
 const date = "2026-10-12T00:00:00.000Z",
@@ -196,6 +197,7 @@ it("shows ErrorState recovery when collection history fails to load", async () =
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
@@ -209,3 +211,20 @@ it("locks ErrorState for invalid history filters with retry shell", async () => 
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
 });
+
+it.each(["en", "ru"] as const)(
+  "preserves history context when the session is unavailable in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryCollectionHistoryCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain("/workspace/library/collections/history?");
+    expect(html).toContain("productId=prd_a");
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.history).not.toHaveBeenCalled();
+  },
+);
