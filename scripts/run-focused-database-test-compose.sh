@@ -87,8 +87,8 @@ FOCUS_EMPTY_UPLOADS=$(mktemp -d "${TMPDIR:-/tmp}/nexus-focus-empty.XXXXXXXX")
 absolute_uploads=$(cd "$FOCUS_EMPTY_UPLOADS" && pwd -P)
 FOCUS_EMPTY_UPLOADS=$absolute_uploads
 
-echo "Ensuring postgres is healthy…"
-"${COMPOSE[@]}" up -d postgres
+echo "Ensuring postgres is healthy without recreating an existing container…"
+"${COMPOSE[@]}" up -d --no-recreate postgres
 for _ in $(seq 1 60); do
   health="$("${COMPOSE[@]}" ps postgres --format '{{.Health}}' 2>/dev/null || true)"
   if [[ "$health" == "healthy" ]]; then

@@ -191,7 +191,7 @@ exit 0
     const calls = readFileSync(log, "utf8");
     if (scenario === "local") {
       assert.equal(result.status, 0, result.stderr);
-      assert.match(calls, /compose -p nexus-local .*up -d postgres/u);
+      assert.match(calls, /compose -p nexus-local .*up -d --no-recreate postgres/u);
     } else {
       assert.notEqual(result.status, 0, scenario);
       assert.match(result.stderr, /Refusing focused database tests/u);
