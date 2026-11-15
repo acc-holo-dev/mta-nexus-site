@@ -50,7 +50,7 @@ docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check
 | `pnpm test:isolated`                   | Полный Vitest в одноразовой БД внутри Docker-стека                  |
 | `pnpm release:verify`                  | Релизные свидетельства; **не** deploy                               |
 
-Для тестов БД через `test:focus`: `DATABASE_URL` на одноразовую базу, миграции, `NEXUS_DISPOSABLE_DATABASE=1`. Сначала связанные тесты модуля, затем проверки по риску. Подробнее: [эксплуатация](docs/OPERATIONS.md).
+Для тестов БД через `test:focus`: `DATABASE_URL` на одноразовую базу, миграции, `NEXUS_DISPOSABLE_DATABASE=1`. Unit и database запускаются отдельно с окружением соответствующего CI-проекта. Для Compose доступен `test:focus:compose`, в том числе с тестами рядом с feature-кодом. Подробнее: [эксплуатация](docs/OPERATIONS.md).
 
 ## Структура
 

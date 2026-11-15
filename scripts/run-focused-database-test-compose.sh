@@ -5,9 +5,12 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <site/tests/database/...integration.test.ts> [more test files...]" >&2
+  echo "Usage: $0 <site/tests/...test.ts|site/src/...test.ts> [more test files...]" >&2
   exit 1
 fi
+
+# Validate all inputs before starting containers or creating a database.
+node scripts/validate-focused-compose.mjs "$@"
 
 if [[ -n "${DOCKER_HOST:-}" || -n "${DOCKER_CONTEXT:-}" ]]; then
   echo "Refusing focused database tests with Docker host/context overrides." >&2
@@ -28,12 +31,6 @@ DB_NAME="nexus_focus_$(date +%s)_${RANDOM}"
 DATABASE_URL="postgres://nexus:nexus_secret@postgres:5432/${DB_NAME}"
 database_created=0
 
-for arg in "$@"; do
-  if [[ "$arg" == -* || ! -f "$arg" || "$arg" != site/tests/* ]]; then
-    echo "Expected an existing site/tests/... file path: $arg" >&2
-    exit 1
-  fi
-done
 
 cleanup() {
   local status=$?
@@ -106,5 +103,6 @@ echo "Running focused database tests: $*"
   -v "$(pwd)/site/packages/db/src:/app/site/packages/db/src:ro" \
   -v "$(pwd)/site/packages/db/migrations:/app/site/packages/db/migrations:ro" \
   -v "$(pwd)/scripts:/app/scripts:ro" \
+  -v "$(pwd)/vitest.config.ts:/app/vitest.config.ts:ro" \
   app \
   pnpm test:focus "$@"

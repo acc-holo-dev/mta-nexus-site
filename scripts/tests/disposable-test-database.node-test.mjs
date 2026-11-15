@@ -64,7 +64,7 @@ test("CI-aligned runner fails before spawning pnpm for an unacknowledged or unsa
   const log = join(directory, "calls");
   writeFileSync(
     join(directory, "pnpm"),
-    `#!${process.execPath}\nimport { appendFileSync } from "node:fs";\nappendFileSync(process.env.TEST_RUNNER_LOG, JSON.stringify({ args: process.argv.slice(2), appUrl: process.env.NEXT_PUBLIC_APP_URL ?? null }) + "\\n");\n`,
+    `#!${process.execPath}\nimport { appendFileSync } from "node:fs";\nappendFileSync(process.env.TEST_RUNNER_LOG, JSON.stringify({ args: process.argv.slice(2), appUrl: process.env.NEXT_PUBLIC_APP_URL ?? null, canonicalUrl: process.env.APP_URL ?? null }) + "\\n");\n`,
     { mode: 0o700 },
   );
   const env = {
@@ -73,6 +73,7 @@ test("CI-aligned runner fails before spawning pnpm for an unacknowledged or unsa
     PATH: `${directory}:${process.env.PATH}`,
     TEST_RUNNER_LOG: log,
     NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+    APP_URL: "http://localhost:3000",
   };
   for (const bad of [
     { NEXUS_DISPOSABLE_DATABASE: "" },
@@ -94,8 +95,12 @@ test("CI-aligned runner fails before spawning pnpm for an unacknowledged or unsa
     .split("\n")
     .map((line) => JSON.parse(line));
   assert.deepEqual(calls, [
-    { args: ["test:unit"], appUrl: null },
-    { args: ["test:database"], appUrl: "http://localhost:3000" },
+    { args: ["test:unit"], appUrl: null, canonicalUrl: null },
+    {
+      args: ["test:database"],
+      appUrl: "http://localhost:3000",
+      canonicalUrl: "http://localhost:3000",
+    },
   ]);
 });
 

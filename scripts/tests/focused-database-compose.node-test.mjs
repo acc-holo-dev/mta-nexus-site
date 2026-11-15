@@ -180,3 +180,58 @@ exit 0
     }
   }
 });
+
+test("focused Compose validates every selection before invoking Docker and accepts colocated tests", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-focus-validation-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const docker = join(directory, "docker");
+  const log = join(directory, "calls");
+  writeFileSync(
+    docker,
+    `#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$FOCUS_TEST_LOG"
+case "$*" in
+  'context show') echo default ;;
+  *'ps postgres --format'*) echo healthy ;;
+esac
+`,
+    { mode: 0o755 },
+  );
+  const env = {
+    ...process.env,
+    PATH: `${directory}:${process.env.PATH}`,
+    DOCKER_HOST: "",
+    DOCKER_CONTEXT: "",
+    COMPOSE_PROJECT_NAME: "nexus-local",
+    FOCUS_TEST_LOG: log,
+  };
+  for (const args of [
+    ["site/tests/database/password-change-transaction.test.ts", "site/src/components/sidebar.tsx"],
+    ["site/tests/database/password-change-transaction.test.ts", "site/src/missing.test.ts"],
+    ["scripts/tests/focused-tests.node-test.mjs"],
+  ]) {
+    writeFileSync(log, "");
+    const result = spawnSync("bash", ["scripts/run-focused-database-test-compose.sh", ...args], {
+      encoding: "utf8",
+      env,
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Expected an existing test file/u);
+    assert.equal(readFileSync(log, "utf8"), "");
+  }
+  writeFileSync(log, "");
+  const result = spawnSync(
+    "bash",
+    ["scripts/run-focused-database-test-compose.sh", "site/src/app/market/[slug]/page.test.ts"],
+    {
+      encoding: "utf8",
+      env,
+    },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const calls = readFileSync(log, "utf8");
+  assert.match(calls, /CREATE DATABASE/u);
+  assert.match(calls, /vitest\.config\.ts:\/app\/vitest\.config\.ts:ro/u);
+  assert.ok(calls.includes("pnpm test:focus site/src/app/market/[slug]/page.test.ts"));
+  assert.match(calls, /DROP DATABASE/u);
+});

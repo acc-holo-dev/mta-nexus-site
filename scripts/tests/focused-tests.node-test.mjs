@@ -20,9 +20,10 @@ function fixture(callback) {
     writeFileSync(
       join(root, "pnpm"),
       `#!${process.execPath}
-import { writeFileSync } from "node:fs";
-writeFileSync(process.env.NEXUS_TEST_LOG, JSON.stringify({ args: process.argv.slice(2), selection: process.env.NEXUS_FOCUSED_TEST_FILES }));
-process.exit(Number(process.env.NEXUS_TEST_EXIT || 0));
+import { appendFileSync } from "node:fs";
+appendFileSync(process.env.NEXUS_TEST_LOG, JSON.stringify({ args: process.argv.slice(2), selection: process.env.NEXUS_FOCUSED_TEST_FILES, appUrl: process.env.APP_URL ?? null, publicUrl: process.env.NEXT_PUBLIC_APP_URL ?? null }) + "\\n");
+const project = process.argv[process.argv.indexOf("--project") + 1];
+process.exit(process.env.NEXUS_FAIL_PROJECT === project ? 7 : Number(process.env.NEXUS_TEST_EXIT || 0));
 `,
       { mode: 0o700 },
     );
@@ -53,7 +54,7 @@ test("focused runner dispatches only selected files to each test engine", () =>
   fixture(({ log, tooling, run }) => {
     const result = run(["unit.test.ts", "tool.node-test.mjs", "unit.test.ts"]);
     assert.equal(result.status, 0, result.stderr);
-    const call = JSON.parse(readFileSync(log, "utf8"));
+    const call = JSON.parse(readFileSync(log, "utf8").trim());
     assert.deepEqual(call.args, ["exec", "vitest", "run", "--project", "unit", "unit.test.ts"]);
     assert.deepEqual(JSON.parse(call.selection), ["unit.test.ts"]);
     assert.ok(existsSync(tooling));
@@ -96,6 +97,59 @@ test("focused database selection rejects unsafe URLs before dispatch and accepts
       assert.equal(result.status, 0, result.stderr);
       assert.ok(existsSync(log));
     }
+  }));
+
+test("mixed focused selection separates unit and database environments before tooling", () =>
+  fixture(({ log, tooling, run }) => {
+    const result = run(["database.integration.test.ts", "unit.test.ts", "tool.node-test.mjs"], {
+      DATABASE_URL: "postgres://test:test@127.0.0.1/nexus_test",
+      NEXUS_DISPOSABLE_DATABASE: "1",
+      APP_URL: "https://local.example",
+      NEXT_PUBLIC_APP_URL: "https://local.example",
+    });
+    assert.equal(result.status, 0, result.stderr);
+    const calls = readFileSync(log, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    assert.equal(calls.length, 2);
+    assert.deepEqual(calls[0].args, ["exec", "vitest", "run", "--project", "unit", "unit.test.ts"]);
+    assert.deepEqual(JSON.parse(calls[0].selection), ["unit.test.ts"]);
+    assert.equal(calls[0].appUrl, null);
+    assert.equal(calls[0].publicUrl, null);
+    assert.deepEqual(calls[1].args, [
+      "exec",
+      "vitest",
+      "run",
+      "--project",
+      "database",
+      "database.integration.test.ts",
+    ]);
+    assert.deepEqual(JSON.parse(calls[1].selection), ["database.integration.test.ts"]);
+    assert.equal(calls[1].appUrl, "https://local.example");
+    assert.equal(calls[1].publicUrl, "https://local.example");
+    assert.ok(existsSync(tooling));
+  }));
+
+test("mixed selection stops on a failing project and never starts later tooling", () =>
+  fixture(({ log, tooling, run }) => {
+    const baseEnv = {
+      DATABASE_URL: "postgres://test:test@127.0.0.1/nexus_test",
+      NEXUS_DISPOSABLE_DATABASE: "1",
+    };
+    const result = run(["unit.test.ts", "database.integration.test.ts", "tool.node-test.mjs"], {
+      ...baseEnv,
+      NEXUS_FAIL_PROJECT: "database",
+    });
+    assert.equal(result.status, 7);
+    const calls = readFileSync(log, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].args[4], "unit");
+    assert.equal(calls[1].args[4], "database");
+    assert.ok(!existsSync(tooling));
   }));
 
 test("focused unit tests do not require or inspect a database configuration", () =>
