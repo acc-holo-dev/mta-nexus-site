@@ -6,12 +6,13 @@ import { notFound } from "next/navigation";
 import { collectionRequirementsCopy } from "../../../lib/collection-requirements-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionPageParams } from "../../../lib/library-collections-query";
+import { collectionId, collectionPageParams } from "../../../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
@@ -25,34 +26,45 @@ export async function CollectionRequirementsScreen({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, path, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, path, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
   const requirementsBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/requirements`;
-  if (!actor) {
-    let returnPath = requirementsBase;
-    try {
-      const preview = resourceRequirementsQuery(collectionPageParams(raw), "library");
-      if (preview.targetMta) {
-        returnPath = `${requirementsBase}?${new URLSearchParams({ targetMta: preview.targetMta })}`;
-      }
-    } catch {
-      // Keep the requirements route when query params are invalid for guests.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const c = collectionRequirementsCopy(locale);
+  let returnPath = requirementsBase;
+  try {
+    const preview = resourceRequirementsQuery(collectionPageParams(raw), "library");
+    if (preview.targetMta)
+      returnPath = `${requirementsBase}?${new URLSearchParams({ targetMta: preview.targetMta })}`;
+  } catch {
+    /* Invalid filters return to the readiness route. */
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let safeReturn = "/workspace/library/collections";
+    try {
+      collectionId(path.id);
+      safeReturn = returnPath;
+    } catch {
+      /* Keep the collections list. */
+    }
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={c.title}
+        message={c.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let query: ReturnType<typeof resourceRequirementsQuery>;
   try {
     query = resourceRequirementsQuery(collectionPageParams(raw), "library");
   } catch {
     notFound();
   }
-  const c = collectionRequirementsCopy(locale);
   const retrySuffix = query.targetMta
     ? `?${new URLSearchParams({ targetMta: query.targetMta })}`
     : "";
@@ -71,6 +83,7 @@ export async function CollectionRequirementsScreen({
         >
           {c.back}
         </Link>
+        <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
           action={

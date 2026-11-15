@@ -10,7 +10,11 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import {
+  collectionHref,
+  collectionId,
+  collectionPageParams,
+} from "../../../lib/library-collections-query";
 import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
@@ -18,6 +22,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 export async function CollectionReleasesScreen({
@@ -27,30 +32,39 @@ export async function CollectionReleasesScreen({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, path, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, path, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
   const cc = libraryCollectionsCopy(locale);
   const releasesBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/releases`;
-  if (!actor) {
-    let returnPath = releasesBase;
-    try {
-      const preview = collectionReleasesQuery(collectionPageParams(raw));
-      returnPath = `${releasesBase}?${new URLSearchParams({
-        page: String(preview.page),
-        filter: preview.filter,
-        ...(preview.q ? { q: preview.q } : {}),
-      })}`;
-    } catch {
-      // Keep the releases route when filters are invalid for guests.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const c = collectionReleasesCopy(locale);
+  let returnPath = releasesBase;
+  try {
+    const preview = collectionReleasesQuery(collectionPageParams(raw));
+    returnPath = `${releasesBase}?${new URLSearchParams({ page: String(preview.page), filter: preview.filter, ...(preview.q ? { q: preview.q } : {}) })}`;
+  } catch {
+    /* Invalid filters return to the overview. */
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let safeReturn = collectionHref();
+    try {
+      collectionId(path.id);
+      safeReturn = returnPath;
+    } catch {
+      /* Keep the collections list. */
+    }
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={c.title}
+        message={c.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let query: ReturnType<typeof collectionReleasesQuery>;
   try {
     query = collectionReleasesQuery(collectionPageParams(raw));
@@ -63,8 +77,7 @@ export async function CollectionReleasesScreen({
       if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
       return null;
     });
-  const c = collectionReleasesCopy(locale),
-    copy = getResourceReleaseControlCopy(locale);
+  const copy = getResourceReleaseControlCopy(locale);
   const retryHref = `${collectionHref(path.id, "releases")}?${new URLSearchParams({
     page: String(query.page),
     filter: query.filter,
@@ -79,6 +92,7 @@ export async function CollectionReleasesScreen({
         >
           {cc.back}
         </Link>
+        <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
           action={

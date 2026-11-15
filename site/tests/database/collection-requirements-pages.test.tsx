@@ -43,6 +43,7 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
 import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
 import { collectionRequirementsCopy } from "../../src/lib/collection-requirements-i18n";
 import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -162,7 +163,37 @@ it("shows an honest recovery state when collection readiness fails to load", asy
   const html = renderToStaticMarkup(await screen(props));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/lcol_a/requirements?targetMta=1.6.0");
   expect(html).not.toContain("requirements unavailable");
+});
+it.each(["en", "ru"] as const)(
+  "retains the readiness target after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(await screen(props));
+    const copy = collectionRequirementsCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(
+      'href="/workspace/library/collections/lcol_a/requirements?targetMta=1.6.0"',
+    );
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.report).not.toHaveBeenCalled();
+  },
+);
+it("uses the collections list for an invalid readiness identifier after session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await screen({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library/collections"');
+  expect(html).not.toContain("../private");
+  expect(state.report).not.toHaveBeenCalled();
 });

@@ -49,6 +49,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 import { CollectionReleasesScreen } from "../../src/features/library/collection-releases-server";
 import { collectionReleasesCopy } from "../../src/lib/collection-releases-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const item = {
   productId: "prd_a",
@@ -190,7 +191,37 @@ it("shows an honest recovery state when collection releases fail to load", async
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/lcol_a/releases");
   expect(html).not.toContain("releases unavailable");
+});
+it.each(["en", "ru"] as const)(
+  "preserves release filters when the session is unavailable in %s",
+  async (locale) => {
+    h.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen({ page: "2", filter: "pinned", q: "core & maps" });
+    const copy = collectionReleasesCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(
+      'href="/workspace/library/collections/lcol_a/releases?page=2&amp;filter=pinned&amp;q=core+%26+maps"',
+    );
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(h.releases).not.toHaveBeenCalled();
+  },
+);
+it("uses the collections list for an invalid release overview identifier after session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await CollectionReleasesScreen({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library/collections"');
+  expect(html).not.toContain("../private");
+  expect(h.releases).not.toHaveBeenCalled();
 });

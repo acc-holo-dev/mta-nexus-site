@@ -17,6 +17,7 @@ import { libraryCollectionsService } from "../../../lib/services/library-collect
 import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,
@@ -26,30 +27,43 @@ export async function LibrarySelectionBatchScreen({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
   history?: boolean;
 }) {
-  const [locale, store, path, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, path, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
   const c = librarySelectionBatchesCopy(locale),
     cc = libraryCollectionsCopy(locale);
   const idForGuest = encodeURIComponent(path.id);
   const versionsBase = `/workspace/library/collections/${idForGuest}/versions${history ? "/history" : ""}`;
-  if (!actor) {
-    let returnPath = versionsBase;
-    try {
-      const preview = collectionsQuery(collectionPageParams(raw), history ? "history" : "detail");
-      returnPath = `${versionsBase}?${new URLSearchParams({ page: String(preview.page) })}`;
-    } catch {
-      // Keep the versions route when pagination is invalid for guests.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  let returnPath = versionsBase;
+  try {
+    const preview = collectionsQuery(collectionPageParams(raw), history ? "history" : "detail");
+    returnPath = `${versionsBase}?${new URLSearchParams({ page: String(preview.page), ...(!history && preview.q ? { q: preview.q } : {}) })}`;
+  } catch {
+    /* Invalid filters return to the versions route. */
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let safeReturn = "/workspace/library/collections";
+    try {
+      collectionId(path.id);
+      safeReturn = returnPath;
+    } catch {
+      /* Keep the collections list. */
+    }
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={history ? c.history : c.title}
+        message={c.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const loadFailure = (retryHref: string) => (
     <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <h1 className="font-display">{history ? c.history : c.title}</h1>
       <ErrorState
         title={c.loadUnavailable}
         action={

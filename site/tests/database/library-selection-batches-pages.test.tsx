@@ -33,6 +33,8 @@ vi.mock("../../src/features/library/components/library-selection-batch-controls"
   ),
 }));
 import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
+import { librarySelectionBatchesCopy } from "../../src/lib/library-selection-batches-i18n";
 import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
@@ -132,7 +134,62 @@ it("shows an honest recovery state when batch metadata fails to load", async () 
   const html = renderToStaticMarkup(await screen(props));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/lcol_a/versions");
   expect(html).not.toContain("batch detail unavailable");
+});
+it.each(["en", "ru"] as const)(
+  "retains batch context after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession")
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"))
+      .mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(
+      await screen({ ...props, searchParams: Promise.resolve({ page: "2", q: "core & maps" }) }),
+    );
+    const history = renderToStaticMarkup(
+      await screen({ ...props, history: true, searchParams: Promise.resolve({ page: "2" }) }),
+    );
+    const copy = librarySelectionBatchesCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(history).toContain(`>${copy.history}</h1>`);
+    expect(html).toContain(
+      'href="/workspace/library/collections/lcol_a/versions?page=2&amp;q=core+%26+maps"',
+    );
+    expect(history).toContain(
+      'href="/workspace/library/collections/lcol_a/versions/history?page=2"',
+    );
+    for (const result of [html, history]) {
+      expect(result).toContain(copy.loadUnavailable);
+      expect(result).not.toContain("/auth/login");
+      expect(result).not.toContain("PRIVATE_SESSION");
+    }
+    expect(state.detail).not.toHaveBeenCalled();
+    expect(state.history).not.toHaveBeenCalled();
+  },
+);
+it("uses the collections list for an invalid batch identifier after session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await screen({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library/collections"');
+  expect(html).not.toContain("../private");
+  expect(state.detail).not.toHaveBeenCalled();
+  expect(state.history).not.toHaveBeenCalled();
+});
+it("preserves batch search when a guest signs in", async () => {
+  state.actor = null;
+  const html = renderToStaticMarkup(
+    await screen({ ...props, searchParams: Promise.resolve({ page: "2", q: "core & maps" }) }),
+  );
+  expect(html).toContain(
+    "next=%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fversions%3Fpage%3D2%26q%3Dcore%2B%2526%2Bmaps",
+  );
+  expect(state.detail).not.toHaveBeenCalled();
 });
