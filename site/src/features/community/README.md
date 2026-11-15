@@ -13,6 +13,10 @@ Feature объединяет клиентское обсуждение публ�
 | `own-discussions-page-server.ts`     | Свои обсуждения                                                               |
 | `own-discussion-page-server.ts`      | Деталь своего обсуждения                                                      |
 | `author-desk-page-server.ts`         | Авторский кабинет публикаций                                                  |
+| `author-create-page-server.ts`       | Создание авторской публикации                                                 |
+| `author-edit-page-server.ts`         | Редактирование авторской публикации                                           |
+| `author-history-page-server.ts`      | История авторской публикации                                                  |
+| `following-feed-page-server.ts`      | Лента подписок                                                                |
 | `reports-server.ts`                  | `CommunityReportScreen`; server-only жалобы заявителя и staff                 |
 | `report-history-server.ts`           | `CommunityReportHistoryPage`, metadata; server-only история                   |
 | `report-groups-server.ts`            | `CommunityReportGroupsPage`, metadata; server-only группировка                |
@@ -57,3 +61,5 @@ confirmation и серверные транзакции сохраняются.
 Фильтры каталога, реакции, модерация и форма комментария входят в Community. Общая история публикаций имеет server-only вход и использует прежние сервисы организаций и серверов.
 
 Каталоги, деталь публикации, создание темы, собственные обсуждения и авторский кабинет используют независимые server-only композиции. Динамический режим и metadata маршрутов сохраняются.
+
+Создание, редактирование, история авторской публикации и лента подписок используют независимые server-only композиции с прежними проверками session и прав.

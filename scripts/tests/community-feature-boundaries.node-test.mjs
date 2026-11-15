@@ -98,6 +98,10 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "own-discussions-page",
     "own-discussion-page",
     "author-desk-page",
+    "author-create-page",
+    "author-edit-page",
+    "author-history-page",
+    "following-feed-page",
   ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
@@ -138,6 +142,10 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "own-discussions-page",
     "own-discussion-page",
     "author-desk-page",
+    "author-create-page",
+    "author-edit-page",
+    "author-history-page",
+    "following-feed-page",
   ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
@@ -175,7 +183,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page|author-create-page|author-edit-page|author-history-page|following-feed-page)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -229,6 +237,10 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["own-discussions-page-server.ts", "own-discussions-page.tsx"],
     ["own-discussion-page-server.ts", "own-discussion-page.tsx"],
     ["author-desk-page-server.ts", "author-desk-page.tsx"],
+    ["author-create-page-server.ts", "author-create-page.tsx"],
+    ["author-edit-page-server.ts", "author-edit-page.tsx"],
+    ["author-history-page-server.ts", "author-history-page.tsx"],
+    ["following-feed-page-server.ts", "following-feed-page.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;
@@ -255,6 +267,10 @@ test("Community routes retain dynamic rendering and metadata contracts", () => {
     ["workspace/discussions", "own-discussions-page", true, true],
     ["workspace/discussions/[id]", "own-discussion-page", true, true],
     ["workspace/content", "author-desk-page", true, true],
+    ["workspace/content/new", "author-create-page", true, true],
+    ["workspace/content/[id]", "author-edit-page", true, true],
+    ["workspace/content/[id]/history", "author-history-page", true, true],
+    ["workspace/feed", "following-feed-page", true, true],
   ]) {
     const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
     assert.equal(source.includes('export const dynamic = "force-dynamic";'), dynamic);

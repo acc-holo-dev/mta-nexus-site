@@ -38,7 +38,8 @@ Phase 4.30 проверена: Community catalog, reactions и publication histo
 Phase 4.31 проверена: Organizations workspace, team и content.
 Phase 4.32 проверена: Organizations workspace server composition.
 Phase 4.33 проверена: Organizations public server composition.
-Выполняется Phase 4.34: Community discussion и publication server composition. Владелец явно
+Phase 4.34 проверена: Community discussion и publication server composition.
+Выполняется Phase 4.35: Community author pages и following feed. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -595,3 +596,7 @@ Workspace server composition прошла полный [CI #4671](https://github
 ### Phase 4.34: Community discussion и publication server composition
 
 Публичные страницы Organizations прошли полный [CI #4672](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43643498023) на `66c1eae1`. Каталог обсуждений, создание темы, список и страница статьи, свои обсуждения и авторский кабинет публикаций перенесены в независимые server-only композиции Community. Маршруты, metadata, session, фильтры и серверные проверки прав сохраняются.
+
+### Phase 4.35: Community author pages и following feed
+
+Композиции обсуждений и публикаций прошли полный [CI #4673](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43653596034) на `877e181c`. Создание, редактирование и история авторской публикации и лента подписок перенесены в независимые server-only композиции Community. Динамические маршруты, metadata, session, права, фильтры и серверные сервисы сохраняются.
