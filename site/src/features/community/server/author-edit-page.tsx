@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AuthorContentForm } from "../author-content-form";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -25,12 +26,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
-  const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  const [locale, { id }] = await Promise.all([getRequestLocale(), params]);
   const returnPath = `/workspace/content/${encodeURIComponent(id)}`;
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const copy = getUserPlatformCopy(locale);
   const dictionary = getDictionary(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.edit}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const item = await authorContentService.get(id, actor).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
     return null;

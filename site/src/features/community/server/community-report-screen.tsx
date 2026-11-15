@@ -18,7 +18,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ReportSessionError } from "./report-session-error";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -51,7 +51,7 @@ export async function CommunityReportScreen({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ReportSessionError
+      <PlatformSessionError
         locale={locale}
         title={title}
         message={copy.unavailable}

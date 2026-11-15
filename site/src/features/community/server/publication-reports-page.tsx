@@ -16,7 +16,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ReportSessionError } from "./report-session-error";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,
@@ -45,7 +45,7 @@ export async function PublicationReportsPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ReportSessionError
+      <PlatformSessionError
         locale={locale}
         title={copy.publicationTitle}
         message={labels.unavailable}

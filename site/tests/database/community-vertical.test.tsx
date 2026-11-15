@@ -223,6 +223,8 @@ describe("community topic submission behavior", () => {
     getSession.mockRejectedValueOnce(new Error("unavailable"));
     const html = renderToStaticMarkup(await NewCommunityTopicPage());
     expect(html).toContain(getDictionary("en").community.topicIdentityError);
+    expect(html).toContain(`>${getDictionary("en").community.startTitle}</h1>`);
+    expect(html).toContain('href="/community/new"');
     expect(html).not.toContain('name="body"');
   });
 });

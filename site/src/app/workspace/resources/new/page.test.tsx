@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { getDictionary } from "../../../../lib/i18n";
+import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
+import { authService } from "../../../../lib/services/auth-service";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -42,3 +44,18 @@ it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s",
   expect(html).toContain('href="/auth/register?next=%2Fworkspace%2Fresources%2Fnew"');
   expect(mocks.forms).not.toHaveBeenCalled();
 });
+it.each(["en", "ru"] as const)(
+  "offers a retry when publishing session lookup fails in %s",
+  async (locale) => {
+    mocks.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(await Page());
+    expect(html).toContain(`>${getDictionary(locale).publishing.resourceTitle}</h1>`);
+    expect(html).toContain(getUserPlatformCopy(locale).unavailable);
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain('href="/workspace/resources/new"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(mocks.forms).not.toHaveBeenCalled();
+  },
+);

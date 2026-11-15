@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { communityReportGroupsService } from "../../../lib/services/community-report-groups-service";
 import { CommunityReportGroups } from "../components/community-report-groups";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ReportSessionError } from "./report-session-error";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function reportGroupsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).title,
@@ -36,7 +36,7 @@ export async function CommunityReportGroupsPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ReportSessionError
+      <PlatformSessionError
         locale={locale}
         title={copy.title}
         message={copy.unavailable}

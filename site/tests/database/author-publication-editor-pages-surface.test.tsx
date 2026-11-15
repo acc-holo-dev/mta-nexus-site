@@ -3,14 +3,14 @@ vi.mock("server-only", () => ({}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({ session: vi.fn(), get: vi.fn() }));
+const state = vi.hoisted(() => ({ session: vi.fn(), get: vi.fn(), locale: "en" as "en" | "ru" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => "en" }));
+vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
 }));
@@ -33,11 +33,37 @@ import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspac
 import EditPage, {
   generateMetadata as editMetadata,
 } from "../../src/app/workspace/content/[id]/page";
+import { getDictionary } from "../../src/lib/i18n";
+import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();
   state.session.mockResolvedValue(null);
+  state.locale = "en";
 });
+
+it.each(["en", "ru"] as const)(
+  "offers localized retry without exposing the editor when session lookup fails in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.session.mockRejectedValue(new Error("PRIVATE_SESSION"));
+    const create = renderToStaticMarkup(await NewPage());
+    const edit = renderToStaticMarkup(await EditPage({ params: Promise.resolve({ id: "draft" }) }));
+    const copy = getUserPlatformCopy(locale);
+    expect(create).toContain(`>${copy.create}</h1>`);
+    expect(edit).toContain(`>${copy.edit}</h1>`);
+    for (const html of [create, edit]) {
+      expect(html).toContain(copy.unavailable);
+      expect(html).toContain(getDictionary(locale).errors.retry);
+      expect(html).not.toContain("data-editor");
+      expect(html).not.toContain("data-return-path");
+      expect(html).not.toContain("PRIVATE_SESSION");
+    }
+    expect(create).toContain('href="/workspace/content/new"');
+    expect(edit).toContain('href="/workspace/content/draft"');
+    expect(state.get).not.toHaveBeenCalled();
+  },
+);
 
 it("requires a session before exposing the create or edit form", async () => {
   const create = renderToStaticMarkup(await NewPage());

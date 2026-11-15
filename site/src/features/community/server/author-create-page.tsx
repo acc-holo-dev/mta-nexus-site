@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { AuthorContentForm } from "../author-content-form";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
@@ -19,10 +20,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NewPublicationPage() {
-  const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
-  if (!(await authService.getSession(store.get("nexus_session")?.value)))
-    return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
+  const locale = await getRequestLocale();
   const copy = getUserPlatformCopy(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.create}
+        message={copy.unavailable}
+        retryHref="/workspace/content/new"
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
   return (
     <div className={pageShellClass}>
       <Link href="/workspace/content" className={navLinkClass}>

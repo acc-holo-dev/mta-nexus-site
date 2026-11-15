@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
 import { CommunityReportHistory } from "../components/community-report-history";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ReportSessionError } from "./report-session-error";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,
@@ -45,7 +45,7 @@ export async function CommunityReportHistoryPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ReportSessionError
+      <PlatformSessionError
         locale={locale}
         title={copy.title}
         message={copy.unavailable}
