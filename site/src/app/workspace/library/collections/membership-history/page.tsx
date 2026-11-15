@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LibraryMembershipHistoryScreen } from "../../../../../components/library-membership-history-screen";
+import { LibraryMembershipHistoryScreen } from "../../../../../features/library/membership-history-server";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
 

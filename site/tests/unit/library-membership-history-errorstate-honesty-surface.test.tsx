@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/library-membership-history-item.tsx";
+const surface = "site/src/features/library/server/library-membership-history-item.tsx";
 
 it("locks membership history unknown and unavailable notices to ErrorState", () => {
   const source = read(surface);

@@ -12,11 +12,14 @@ import {
   libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { privateApiRequest } from "../lib/private-api-request";
-import { LibraryCollectionBatchForm } from "../features/library/collection-batch";
+import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
+import {
+  libraryCollectionError,
+  libraryCollectionsCopy,
+} from "../../../lib/library-collections-i18n";
+import { collectionHref } from "../../../lib/library-collections-query";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { LibraryCollectionBatchForm } from "../collection-batch";
 import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 export function LibraryCollectionImport({
   collection,

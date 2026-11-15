@@ -7,21 +7,24 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import {
+  libraryCollectionError,
+  libraryCollectionsCopy,
+} from "../../../lib/library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
 import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
   membershipHistoryHref,
-} from "../lib/library-membership-history-query";
-import { authService } from "../lib/services/auth-service";
-import { libraryCollectionsService } from "../lib/services/library-collections-service";
+} from "../../../lib/library-membership-history-query";
+import { authService } from "../../../lib/services/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
-import { PlatformSignIn } from "./platform-sign-in";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,

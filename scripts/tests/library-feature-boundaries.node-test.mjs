@@ -8,10 +8,17 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const clientPorts = ["collection-command", "collection-batch", "collection-item-copy"];
-const serverPorts = ["collections"];
+const clientPorts = [
+  "collection-command",
+  "collection-batch",
+  "collection-item-copy",
+  "collection-import",
+  "collection-restore",
+  "membership-batch",
+];
+const serverPorts = ["collections", "membership-history", "selection-batch"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -99,6 +106,7 @@ test("Library rejects private, routing, server and infrastructure edges", (t) =>
 
 test("Library client graphs exclude server dependencies transitively", () => {
   const entries = clientPorts.map((port) => `site/src/features/library/${port}.ts`);
+  entries.push("site/src/features/library/components/library-selection-batch-controls.tsx");
 
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
@@ -110,7 +118,9 @@ test("Library client graphs exclude server dependencies transitively", () => {
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|collections-server\.ts$))/u.test(name),
+      !/^site\/src\/(?:app\/|features\/library\/(?:server\/|(?:collections|membership-history|selection-batch)-server\.ts$))/u.test(
+        name,
+      ),
       name,
     );
     assert(!/^site\/packages\/(?:db|storage|security|config)\//u.test(name), name);
@@ -132,12 +142,21 @@ test("Library client graphs exclude server dependencies transitively", () => {
     "library-collection-command",
     "library-collection-batch",
     "library-collection-item-copy",
+    "library-collection-import",
+    "library-collection-reconcile",
+    "library-collection-restore",
+    "library-membership-batch",
+    "library-selection-batch-controls",
   ])
     assert(visited.has(`site/src/features/library/components/${child}.tsx`), child);
 });
 
 test("Library server entries stay server-only and separately composed", () => {
-  const entries = [["collections", "library-collections-screen.tsx"]];
+  const entries = [
+    ["collections", "library-collections-screen.tsx"],
+    ["membership-history", "library-membership-history-screen.tsx"],
+    ["selection-batch", "library-selection-batch-screen.tsx"],
+  ];
   for (const [port, page] of entries) {
     const source = `site/src/features/library/${port}-server.ts`;
     assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
@@ -149,16 +168,23 @@ test("Library server entries stay server-only and separately composed", () => {
     assert(modules.has(`site/src/features/library/server/${page}`));
     for (const [otherPort, otherPage] of entries)
       if (otherPort !== port) assert(!modules.has(`site/src/features/library/server/${otherPage}`));
-    for (const child of [
-      "library-collections-screen-shared",
-      "library-collections-list-view",
-      "library-collections-detail-view",
-      "library-collections-history-view",
-      "library-collections-copy-view",
-      "library-collections-item-transfer-view",
-      "library-collections-error-panel",
-    ])
-      assert(modules.has(`site/src/features/library/server/${child}.tsx`), child);
+    if (port === "collections")
+      for (const child of [
+        "library-collections-screen-shared",
+        "library-collections-list-view",
+        "library-collections-detail-view",
+        "library-collections-history-view",
+        "library-collections-copy-view",
+        "library-collections-item-transfer-view",
+        "library-collections-error-panel",
+      ])
+        assert(modules.has(`site/src/features/library/server/${child}.tsx`), child);
+    if (port === "membership-history")
+      assert(modules.has("site/src/features/library/server/library-membership-history-item.tsx"));
+    if (port === "selection-batch")
+      assert(
+        modules.has("site/src/features/library/components/library-selection-batch-controls.tsx"),
+      );
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
   }
 });

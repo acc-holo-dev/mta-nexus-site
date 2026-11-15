@@ -35,7 +35,7 @@ vi.mock("../../src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { exportManifest: state.history },
 }));
 
-vi.mock("../../src/components/library-collection-import", () => ({
+vi.mock("../../src/features/library/collection-import", () => ({
   LibraryCollectionImport: ({
     collection,
     locale,

@@ -18,13 +18,13 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const forms = [
   "site/src/features/library/components/library-collection-batch.tsx",
   "site/src/features/library/components/library-collection-command.tsx",
-  "site/src/components/library-collection-import.tsx",
+  "site/src/features/library/components/library-collection-import.tsx",
   "site/src/features/library/components/library-collection-item-copy.tsx",
-  "site/src/components/library-collection-reconcile.tsx",
+  "site/src/features/library/components/library-collection-reconcile.tsx",
   "site/src/features/library/server/library-collections-error-panel.tsx",
-  "site/src/components/library-membership-batch.tsx",
+  "site/src/features/library/components/library-membership-batch.tsx",
   "site/src/components/library-release-command.tsx",
-  "site/src/components/library-selection-batch-controls.tsx",
+  "site/src/features/library/components/library-selection-batch-controls.tsx",
 ] as const;
 
 it("locks library form sources to ErrorState honesty without plain alert paragraphs", () => {

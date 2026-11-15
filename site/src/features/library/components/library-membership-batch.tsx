@@ -9,14 +9,17 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { confirmedMembershipBatch } from "../lib/library-membership-batch-confirmation";
-import { libraryMembershipBatchesCopy } from "../lib/library-membership-batches-i18n";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../lib/library-membership-history-query";
-import { privateApiRequest } from "../lib/private-api-request";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
+import {
+  libraryCollectionError,
+  libraryCollectionsCopy,
+} from "../../../lib/library-collections-i18n";
+import { collectionHref } from "../../../lib/library-collections-query";
+import { confirmedMembershipBatch } from "../../../lib/library-membership-batch-confirmation";
+import { libraryMembershipBatchesCopy } from "../../../lib/library-membership-batches-i18n";
+import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
 export function LibraryMembershipBatchForm({
   report,
   locale,

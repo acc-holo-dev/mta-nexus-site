@@ -6,10 +6,13 @@ import { useRef, useState } from "react";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
-} from "../lib/library-selection-batches-confirmation";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+} from "../../../lib/library-selection-batches-confirmation";
+import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
 export function LibrarySelectionBatchControls({
   collectionId,
   locale,

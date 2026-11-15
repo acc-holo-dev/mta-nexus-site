@@ -1,4 +1,4 @@
-vi.mock("../../src/components/library-membership-batch", () => ({
+vi.mock("../../src/features/library/membership-batch", () => ({
   LibraryMembershipBatchForm: () => <div data-membership-batch="review" />,
 }));
 

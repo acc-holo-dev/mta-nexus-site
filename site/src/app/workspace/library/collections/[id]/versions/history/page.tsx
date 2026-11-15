@@ -1,4 +1,4 @@
-import { LibrarySelectionBatchScreen } from "../../../../../../../components/library-selection-batch-screen";
+import { LibrarySelectionBatchScreen } from "../../../../../../../features/library/selection-batch-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

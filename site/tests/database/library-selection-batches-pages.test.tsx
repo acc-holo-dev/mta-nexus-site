@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
@@ -25,13 +27,13 @@ vi.mock("../../src/lib/services/library-collections-service", () => ({
 vi.mock("../../src/lib/services/library-selection-batches-service", () => ({
   librarySelectionBatchesService: { history: state.history },
 }));
-vi.mock("../../src/components/library-selection-batch-controls", () => ({
+vi.mock("../../src/features/library/components/library-selection-batch-controls", () => ({
   LibrarySelectionBatchControls: ({ items }: { items: { productId: string }[] }) => (
     <p data-batch={items.map((i) => i.productId).join(",")}>Batch controls</p>
   ),
 }));
 import { getDictionary } from "../../src/lib/i18n";
-import { LibrarySelectionBatchScreen as screen } from "../../src/components/library-selection-batch-screen";
+import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
 beforeEach(() => {

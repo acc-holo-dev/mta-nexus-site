@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/library-membership-batch.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/library/components/library-membership-batch.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: capacity/access cannotAdd muted note → ErrorState. */
 it("locks library membership cannotAdd blocker to ErrorState", () => {

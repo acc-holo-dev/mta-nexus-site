@@ -30,8 +30,8 @@ vi.mock("react", async (original) => ({
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 
-import { LibraryCollectionRestoreControls } from "../../src/components/library-collection-restore";
-import { LibraryCollectionReconcileForm } from "../../src/components/library-collection-reconcile";
+import { LibraryCollectionRestoreControls } from "../../src/features/library/collection-restore";
+import { LibraryCollectionReconcileForm } from "../../src/features/library/components/library-collection-reconcile";
 import type { LibraryCollectionChangesPreview } from "@nexus/domain";
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(node: ReactNode): Element[] {

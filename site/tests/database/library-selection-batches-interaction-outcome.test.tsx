@@ -13,7 +13,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { LibrarySelectionBatchControls } from "../../src/components/library-selection-batch-controls";
+import { LibrarySelectionBatchControls } from "../../src/features/library/components/library-selection-batch-controls";
 
 const { render, checks, change, click, reviewed, response, preview } =
   createLibrarySelectionBatchesInteractionHelpers(harness, LibrarySelectionBatchControls);

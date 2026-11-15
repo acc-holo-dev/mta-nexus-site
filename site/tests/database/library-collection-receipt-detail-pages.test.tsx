@@ -32,7 +32,7 @@ vi.mock("../../src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { receiptDetail: state.history },
 }));
 
-vi.mock("../../src/components/library-collection-restore", () => ({
+vi.mock("../../src/features/library/collection-restore", () => ({
   LibraryCollectionRestoreControls: ({
     receiptId,
     preview,

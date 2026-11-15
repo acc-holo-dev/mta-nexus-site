@@ -34,7 +34,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/library/)" },
       to: {
-        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collections-server)\\.ts$)",
+        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|collections-server|membership-history-server|selection-batch-server)\\.ts$)",
       },
     },
     {
@@ -47,17 +47,17 @@ module.exports = {
       name: "library-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!library/)|features/library/(?:server/|collections-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!library/)|features/library/(?:server/|(?:collections|membership-history|selection-batch)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "library-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

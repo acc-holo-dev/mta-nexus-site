@@ -3,20 +3,20 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionId,
   collectionPageParams,
   collectionsQuery,
-} from "../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
-import { authService } from "../lib/services/auth-service";
-import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { librarySelectionBatchesService } from "../lib/services/library-selection-batches-service";
-import { LibrarySelectionBatchControls } from "./library-selection-batch-controls";
-import { PlatformSignIn } from "./platform-sign-in";
+} from "../../../lib/library-collections-query";
+import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { authService } from "../../../lib/services/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";
+import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,

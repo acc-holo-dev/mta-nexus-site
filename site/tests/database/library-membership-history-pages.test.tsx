@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -40,7 +42,7 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/membership-history/page";
-import { LibraryMembershipHistoryScreen } from "../../src/components/library-membership-history-screen";
+import { LibraryMembershipHistoryScreen } from "../../src/features/library/membership-history-server";
 import { libraryMembershipHistoryCopy } from "../../src/lib/library-membership-history-i18n";
 
 const date = "2026-10-12T00:00:00.000Z",

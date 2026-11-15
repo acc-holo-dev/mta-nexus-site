@@ -41,7 +41,8 @@ Phase 4.33 проверена: Organizations public server composition.
 Phase 4.34 проверена: Community discussion и publication server composition.
 Phase 4.35 проверена: Community author pages и following feed.
 Phase 4.36 проверена: Notifications bell, inbox и preferences.
-Выполняется Phase 4.37: Library collections и command controls. Владелец явно
+Phase 4.37 проверена: Library collections и command controls.
+Выполняется Phase 4.38: Library import, membership и selection batches. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -610,3 +611,7 @@ Workspace server composition прошла полный [CI #4671](https://github
 ### Phase 4.37: Library collections и command controls
 
 Notifications прошла полный [CI #4675](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43659224566) на `0ad8fc55`. Экран коллекций, его представления и формы команд, пакетных действий и переноса элементов объединены в Library. Client и server-only входы разделены; session, actor/revision, confirmation, recovery и repository locks сохраняются.
+
+### Phase 4.38: Library import, membership и selection batches
+
+Коллекции и формы команд Library прошли полный [CI #4676](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43665541348) на `5ddf228d`. Импорт, сверка, восстановление и пакетное управление членством, а также экраны истории членства и пакетного выбора объединены в Library. Server-only входы отделены от клиентских форм; session, actor/revision, confirmation, recovery и серверные транзакции сохраняются.

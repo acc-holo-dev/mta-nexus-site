@@ -56,7 +56,7 @@ const clippedDetailPages = [
 const delegatedHonestyScreens = [
   "site/src/components/collection-releases-screen.tsx",
   "site/src/components/collection-requirements-screen.tsx",
-  "site/src/components/library-selection-batch-screen.tsx",
+  "site/src/features/library/server/library-selection-batch-screen.tsx",
   "site/src/features/resources/server/resource-requirements-screen.tsx",
   "site/src/components/library-release-comparison-screen.tsx",
 ] as const;
@@ -81,7 +81,9 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
   }
   expect(read("site/src/components/collection-releases-screen.tsx")).toContain("EmptyState");
   expect(read("site/src/components/collection-requirements-screen.tsx")).toContain("EmptyState");
-  expect(read("site/src/components/library-selection-batch-screen.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/library/server/library-selection-batch-screen.tsx")).toContain(
+    "EmptyState",
+  );
 });
 
 it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
