@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,
@@ -19,36 +20,42 @@ export async function LibraryReleaseComparisonScreen({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, path, raw] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
+  const [locale, path, raw] = await Promise.all([getRequestLocale(), params, searchParams]);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
   const compareBase = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
-  if (!actor) {
-    let returnPath = compareBase;
-    try {
-      const preview = libraryReleaseComparisonQuery(collectionPageParams(raw));
-      returnPath = `${compareBase}?${new URLSearchParams({
-        from: preview.from,
-        to: preview.to,
-        returnPage: String(preview.returnPage),
-      })}`;
-    } catch {
-      // Keep the compare route when query params are invalid for guests.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const c = libraryReleaseComparisonCopy(locale);
+  let returnPath = compareBase;
+  try {
+    const preview = libraryReleaseComparisonQuery(collectionPageParams(raw));
+    returnPath = `${compareBase}?${new URLSearchParams({
+      from: preview.from,
+      to: preview.to,
+      returnPage: String(preview.returnPage),
+    })}`;
+  } catch {
+    // Keep the compare route when query params are invalid.
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    const safeReturn = /^[A-Za-z0-9_-]{1,160}$/u.test(path.id) ? returnPath : "/workspace/library";
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={c.title}
+        message={c.loadUnavailable}
+        retryHref={safeReturn}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let query: ReturnType<typeof libraryReleaseComparisonQuery>;
   try {
     query = libraryReleaseComparisonQuery(collectionPageParams(raw));
   } catch {
     notFound();
   }
-  const c = libraryReleaseComparisonCopy(locale);
   const retryHref = `${compareBase}?${new URLSearchParams({
     from: query.from,
     to: query.to,
@@ -69,6 +76,7 @@ export async function LibraryReleaseComparisonScreen({
         >
           {c.back}
         </Link>
+        <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
           action={

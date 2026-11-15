@@ -25,6 +25,8 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
 
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
+import { libraryReleaseHistoryCopy } from "../../src/lib/library-release-history-i18n";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
@@ -115,7 +117,25 @@ it("shows an honest recovery state when version history fails to load", async ()
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("page=1&amp;days=30");
   expect(html).not.toContain("history unavailable");
 });
+it.each(["en", "ru"] as const)(
+  "retains version history filters after session failure in %s",
+  async (locale) => {
+    h.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen({ page: "2", days: "90", productId: "prd_a" });
+    const copy = libraryReleaseHistoryCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(
+      'href="/workspace/library/version-history?page=2&amp;days=90&amp;productId=prd_a"',
+    );
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(h.history).not.toHaveBeenCalled();
+  },
+);

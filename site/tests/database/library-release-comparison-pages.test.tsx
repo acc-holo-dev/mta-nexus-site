@@ -27,6 +27,7 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
 
 import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
 import { libraryReleaseComparisonCopy } from "../../src/lib/library-release-comparison-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,
@@ -134,7 +135,37 @@ it("shows an honest recovery state when comparison data fails to load", async ()
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("from=bld_a&amp;to=bld_b&amp;returnPage=2");
   expect(html).not.toContain("comparison-store-down");
+});
+it.each(["en", "ru"] as const)(
+  "retains the compared pair after session failure in %s",
+  async (locale) => {
+    h.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen();
+    const copy = libraryReleaseComparisonCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(
+      'href="/workspace/library/prd_a/versions/compare?from=bld_a&amp;to=bld_b&amp;returnPage=2"',
+    );
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(h.compare).not.toHaveBeenCalled();
+  },
+);
+it("uses the library for malformed comparison identifiers after session failure", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await LibraryReleaseComparisonScreen({
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve(query),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library"');
+  expect(html).not.toContain("../private");
+  expect(h.compare).not.toHaveBeenCalled();
 });

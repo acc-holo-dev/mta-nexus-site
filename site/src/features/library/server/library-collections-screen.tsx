@@ -21,6 +21,8 @@ import {
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 
 export async function LibraryCollectionsScreen({
   view = "list",
@@ -31,14 +33,29 @@ export async function LibraryCollectionsScreen({
   searchParams: Promise<LibraryCollectionsQuery>;
   params?: Promise<{ id: string }>;
 }) {
-  const [locale, store, queryValues, path] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    searchParams,
-    params,
-  ]);
+  const [locale, queryValues, path] = await Promise.all([getRequestLocale(), searchParams, params]);
   const routeCollectionId = path?.id;
-  const session = await authService.getSession(store.get("nexus_session")?.value);
+  let session: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    session = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    let retryHref = "/workspace/library/collections";
+    try {
+      if (routeCollectionId) collectionId(routeCollectionId);
+      retryHref = guestCollectionsReturnPath(view, queryValues, routeCollectionId);
+    } catch {
+      // Malformed routes and filters return to the collections list.
+    }
+    const copy = libraryCollectionsCopy(locale);
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.loadUnavailable}
+        retryHref={retryHref}
+      />
+    );
+  }
   if (!session) {
     return (
       <PlatformSignIn

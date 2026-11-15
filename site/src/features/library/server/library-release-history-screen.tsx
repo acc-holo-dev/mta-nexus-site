@@ -11,35 +11,46 @@ import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  const [locale, raw] = await Promise.all([getRequestLocale(), searchParams]);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    let returnPath = "/workspace/library/version-history";
-    try {
-      const preview = libraryReleaseHistoryQuery(collectionPageParams(raw));
-      returnPath = `${returnPath}?${new URLSearchParams({
-        page: String(preview.page),
-        days: String(preview.days),
-        ...(preview.productId ? { productId: preview.productId } : {}),
-      })}`;
-    } catch {
-      // Keep the history route when filters are invalid for unsigned visitors.
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const c = libraryReleaseHistoryCopy(locale);
+  let returnPath = "/workspace/library/version-history";
+  try {
+    const preview = libraryReleaseHistoryQuery(collectionPageParams(raw));
+    returnPath = `${returnPath}?${new URLSearchParams({
+      page: String(preview.page),
+      days: String(preview.days),
+      ...(preview.productId ? { productId: preview.productId } : {}),
+    })}`;
+  } catch {
+    // Invalid filters return to the unfiltered history route.
   }
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={c.title}
+        message={c.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let query: ReturnType<typeof libraryReleaseHistoryQuery>;
   try {
     query = libraryReleaseHistoryQuery(collectionPageParams(raw));
   } catch {
     notFound();
   }
-  const c = libraryReleaseHistoryCopy(locale);
   const retryHref = `/workspace/library/version-history?${new URLSearchParams({
     page: String(query.page),
     days: String(query.days),
@@ -58,6 +69,7 @@ export async function LibraryReleaseHistoryScreen({
         >
           {c.back}
         </Link>
+        <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
           action={

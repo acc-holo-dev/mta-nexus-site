@@ -70,6 +70,7 @@ vi.mock("../../src/features/resources/download", () => ({
 import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { authService } from "../../src/lib/services/auth-service";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {
@@ -92,6 +93,34 @@ const screen = async (
       params: Promise.resolve({ id: "lcol_a" }),
     }),
   );
+it.each(["en", "ru"] as const)(
+  "retains collection context after session failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = await screen("detail", { page: "2", q: "map & lua" });
+    const copy = libraryCollectionsCopy(locale);
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/workspace/library/collections/lcol_a?page=2&amp;q=map+%26+lua"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
+    expect(state.detail).not.toHaveBeenCalled();
+  },
+);
+it("uses the collections list for malformed retry context", async () => {
+  vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
+  const html = renderToStaticMarkup(
+    await LibraryCollectionsScreen({
+      view: "detail",
+      params: Promise.resolve({ id: "../private" }),
+      searchParams: Promise.resolve({ page: ["1", "2"] }),
+    }),
+  );
+  expect(html).toContain('href="/workspace/library/collections"');
+  expect(html).not.toContain("../private");
+  expect(state.detail).not.toHaveBeenCalled();
+});
 beforeEach(() => {
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
