@@ -25,6 +25,7 @@ vi.mock("../../src/lib/services/organization-workspace-service", () => ({
 
 import Directory from "../../src/features/organizations/server/directory-page";
 import Workspace from "../../src/features/organizations/server/workspace-page";
+import NewOrganization from "../../src/app/workspace/organizations/new/page";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 beforeEach(() => {
@@ -65,6 +66,20 @@ it.each(["en", "ru"] as const)(
     );
     expect(invalid).toContain('href="/workspace/organizations"');
     expect(invalid).not.toContain("../private");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "offers a safe retry before creating an organization in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
+    const html = renderToStaticMarkup(await NewOrganization());
+    const copy = getOrganizationCopy(locale);
+    expect(html).toContain(`>${copy.create}</h1>`);
+    expect(html).toContain(copy.unavailable);
+    expect(html).toContain('href="/workspace/organizations/new"');
+    expect(html).not.toContain("/auth/login");
+    expect(html).not.toContain("PRIVATE_SESSION");
   },
 );
 

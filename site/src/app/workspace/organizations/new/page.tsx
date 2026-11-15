@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { OrganizationProfileForm } from "../../../../features/organizations/profile";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { PlatformSessionError } from "../../../../components/platform-session-error";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getOrganizationCopy } from "../../../../lib/organization-workspace-copy";
 import { authService } from "../../../../lib/services/auth-service";
@@ -16,10 +17,22 @@ export async function generateMetadata() {
   };
 }
 export default async function NewOrganizationPage() {
-  const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/organizations/new" />;
+  const locale = await getRequestLocale();
   const copy = getOrganizationCopy(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.create}
+        message={copy.unavailable}
+        retryHref="/workspace/organizations/new"
+      />
+    );
+  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/organizations/new" />;
   return (
     <div className={pageShellClass}>
       <Link href="/workspace/organizations" className={navLinkClass}>
