@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getDictionary } from "../lib/i18n";
 import { platformReportCopy } from "../lib/platform-report-i18n";
 import type { ShellAuthSession } from "./shell-destination-policy";
 
@@ -20,6 +21,7 @@ vi.mock("react", async (importOriginal) => {
 vi.mock("next/navigation", () => ({ usePathname: () => "/workspace/platform-reports" }));
 vi.mock("./use-auth-session", () => ({ useAuthSession: () => state.session }));
 
+import { FooterContribute } from "./footer-contribute";
 import { MobileNav } from "./mobile-nav";
 import { Sidebar } from "./sidebar";
 
@@ -99,3 +101,25 @@ describe("desktop and mobile destination parity", () => {
     },
   );
 });
+
+it.each(["en", "ru"] as const)(
+  "keeps unavailable session distinct from guest navigation in %s",
+  (locale) => {
+    state.session = { status: "unavailable", user: null, retry: vi.fn() };
+    const mobile = renderToStaticMarkup(<MobileNav locale={locale} />);
+    const desktop = renderToStaticMarkup(
+      <Sidebar locale={locale} isCollapsed={false} onToggle={() => {}} />,
+    );
+    const footer = renderToStaticMarkup(<FooterContribute locale={locale} />);
+    const collapsed = renderToStaticMarkup(
+      <Sidebar locale={locale} isCollapsed onToggle={() => {}} />,
+    );
+    for (const html of [mobile, desktop, footer, collapsed]) {
+      expect(html).toContain(getDictionary(locale).accountControls.checkError);
+      expect(html).toContain(getDictionary(locale).accountControls.retry);
+      expect(html).not.toContain('href="/auth/login');
+      expect(html).not.toContain('href="/workspace/library"');
+      expect(html).not.toContain('href="/admin"');
+    }
+  },
+);

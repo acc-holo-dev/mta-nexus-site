@@ -18,6 +18,7 @@ import {
   showWorkspaceTools,
 } from "./shell-destination-policy";
 import { shellNavigation } from "./shell-navigation";
+import { ShellSessionUnavailable } from "./shell-session-unavailable";
 import { useAuthSession } from "./use-auth-session";
 
 type NavItem = {
@@ -195,6 +196,12 @@ export function Sidebar({
             <p role="status" className={isCollapsed ? "sr-only" : "px-2.5 text-xs text-muted"}>
               {dictionary.nav.checkingSession}
             </p>
+          </div>
+        ) : null}
+
+        {session.status === "unavailable" ? (
+          <div className="border-t border-base pt-3">
+            <ShellSessionUnavailable locale={locale} retry={session.retry} compact={isCollapsed} />
           </div>
         ) : null}
 

@@ -10,6 +10,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "./shell-destination-policy";
+import { ShellSessionUnavailable } from "./shell-session-unavailable";
 import { useAuthSession } from "./use-auth-session";
 
 const linkClass =
@@ -34,6 +35,8 @@ export function FooterContribute({ locale }: { locale: Locale }) {
         <p role="status" className="text-muted">
           {dictionary.nav.checkingSession}
         </p>
+      ) : session.status === "unavailable" ? (
+        <ShellSessionUnavailable locale={locale} retry={session.retry} />
       ) : showWorkspaceTools(session) ? (
         <ul className="space-y-2 text-muted">
           <li>

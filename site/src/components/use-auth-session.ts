@@ -1,38 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ShellAuthSession } from "./shell-destination-policy";
-
-function parseSessionPayload(data: unknown): ShellAuthSession {
-  if (!data || typeof data !== "object") {
-    return { status: "anonymous", user: null };
-  }
-
-  const payload = data as {
-    authenticated?: unknown;
-    user?: { username?: unknown; role?: unknown } | null;
-  };
-
-  if (payload.authenticated !== true) {
-    return { status: "anonymous", user: null };
-  }
-
-  const username = payload.user?.username;
-  if (typeof username !== "string" || username.length === 0) {
-    return { status: "anonymous", user: null };
-  }
-
-  const role = payload.user?.role;
-  return {
-    status: "authenticated",
-    user: {
-      username,
-      // Role is already on the public User from GET /api/auth/session — no schema change.
-      role: typeof role === "string" ? role : null,
-    },
-  };
-}
+import { parseShellSession } from "./shell-session-payload";
+import { requestShellSessionRefresh, SHELL_SESSION_REFRESH_EVENT } from "./shell-session-refresh";
 
 /**
  * Client session for shell chrome. Same endpoint as AccountControls.
@@ -65,11 +37,18 @@ export function useAuthSession(): ShellAuthSession {
         if (!response.ok) {
           throw new Error("session_unavailable");
         }
-        if (active) setSession(parseSessionPayload(data));
+        const parsed = parseShellSession(data);
+        if (!parsed) throw new Error("session_invalid");
+        if (active) setSession(parsed);
       })
       .catch(() => {
-        // Fail closed for protected destinations: treat as anonymous chrome.
-        if (active) setSession({ status: "anonymous", user: null });
+        // Fail closed without presenting an unavailable probe as a confirmed sign-out.
+        if (active)
+          setSession({
+            status: "unavailable",
+            user: null,
+            retry: requestShellSessionRefresh,
+          });
       })
       .finally(() => {
         window.clearTimeout(timeout);
@@ -86,9 +65,11 @@ export function useAuthSession(): ShellAuthSession {
     const recheck = () => setAttempt((value) => value + 1);
     window.addEventListener("focus", recheck);
     window.addEventListener("pageshow", recheck);
+    window.addEventListener(SHELL_SESSION_REFRESH_EVENT, recheck);
     return () => {
       window.removeEventListener("focus", recheck);
       window.removeEventListener("pageshow", recheck);
+      window.removeEventListener(SHELL_SESSION_REFRESH_EVENT, recheck);
     };
   }, []);
 

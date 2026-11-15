@@ -779,11 +779,34 @@ for (const locale of ["en", "ru"]) {
     );
 
     await loginFixture(page);
+    const sessionRoute = "**/api/auth/session";
+    await page.route(sessionRoute, async (route) => {
+      if (route.request().method() !== "GET") return route.continue();
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "synthetic unavailable" }),
+      });
+    });
     await page.goto("/market");
     await waitForReadyCapture(page);
     await moreButton.click();
+    await expect(
+      moreDialog.getByText(dictionary.accountControls.checkError, { exact: true }),
+    ).toBeVisible();
+    await expect(moreDialog.locator('a[href^="/auth/login"]')).toHaveCount(0);
+    await expect(moreDialog.locator('a[href="/workspace/library"]')).toHaveCount(0);
+    await page.unroute(sessionRoute);
+    await moreDialog
+      .getByRole("button", { name: dictionary.accountControls.retry, exact: true })
+      .click();
     const memberReportLink = moreDialog.locator('a[href="/workspace/platform-reports"]');
     await expect(memberReportLink).toHaveText(platformReportCopy(locale).myReports);
+    await expect(page.locator('header [role="group"] a[href="/workspace"]')).toHaveCount(1);
+    await expect(page.locator('footer a[href="/workspace"]')).toHaveCount(1);
+    evidence.push(
+      `${locale}: unavailable session stays distinct from guest, and one retry refreshes account, footer and member navigation`,
+    );
     await memberReportLink.click();
     await expect(page).toHaveURL(/\/workspace\/platform-reports$/u);
     await waitForReadyCapture(page);

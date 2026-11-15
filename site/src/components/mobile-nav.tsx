@@ -16,6 +16,7 @@ import {
   showWorkspaceTools,
 } from "./shell-destination-policy";
 import { shellNavigation } from "./shell-navigation";
+import { ShellSessionUnavailable } from "./shell-session-unavailable";
 import { useAuthSession } from "./use-auth-session";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
@@ -176,6 +177,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
               >
                 {dictionary.nav.checkingSession}
               </p>
+            ) : null}
+
+            {session.status === "unavailable" ? (
+              <div className="mb-3 rounded-lg border border-base bg-surface px-3 py-2">
+                <ShellSessionUnavailable locale={locale} retry={session.retry} />
+              </div>
             ) : null}
 
             <div className="grid grid-cols-2 gap-2">

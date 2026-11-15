@@ -1,8 +1,8 @@
 /**
  * UX-23 A — guest / capability shell presentation.
  *
- * - Guest / unknown / loading: primary public nav only; hide entire Workspace
- *   cluster and Admin. Sign-in CTA is chrome (not a Workspace group of tools).
+ * - Confirmed guest: public nav and Sign-in CTA; hide Workspace and Admin.
+ * - Loading / unavailable: hide protected destinations and do not claim sign-out.
  * - Authenticated member: Workspace grouped by objects/capabilities.
  * - Admin only when staff capability (admin / moderator).
  *
@@ -13,6 +13,7 @@
 export type ShellAuthSession =
   | { status: "loading"; user: null }
   | { status: "anonymous"; user: null }
+  | { status: "unavailable"; user: null; retry: () => void }
   | {
       status: "authenticated";
       user: { username: string; role: string | null };

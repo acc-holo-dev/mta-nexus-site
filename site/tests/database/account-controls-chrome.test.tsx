@@ -125,3 +125,28 @@ it("binds a confirmed sign-out to the account shown in the dialog", async () => 
   );
   expect(harness.confirm).toHaveBeenCalledOnce();
 });
+
+it("does not show sign-in for a malformed successful session response", async () => {
+  harness.slots = [];
+  vi.stubGlobal("window", {
+    location: { pathname: "/workspace", search: "", hash: "" },
+    setTimeout,
+    clearTimeout,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  harness.fetch.mockResolvedValueOnce(
+    new Response(JSON.stringify({ authenticated: false }), { status: 200 }),
+  );
+  render();
+  await vi.waitFor(() =>
+    expect(harness.slots[3]).toBe(getDictionary("en").accountControls.checkError),
+  );
+  const nodes = render();
+  expect(
+    nodes.some(
+      (node) => typeof node.props.href === "string" && node.props.href.startsWith("/auth/login"),
+    ),
+  ).toBe(false);
+  expect(harness.slots[0]).toBeNull();
+});

@@ -8,6 +8,11 @@ import { useEffect, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
 import { useNexusLocale } from "../../../components/locale-context";
+import { parseSessionResponse } from "../../../components/shell-session-payload";
+import {
+  requestShellSessionRefresh,
+  SHELL_SESSION_REFRESH_EVENT,
+} from "../../../components/shell-session-refresh";
 
 type Account = { id: string; username: string };
 
@@ -44,22 +49,11 @@ export function AccountControls() {
     })
       .then(async (response) => {
         const data = await response.json().catch(() => null);
-        if (
-          !response.ok ||
-          typeof data?.authenticated !== "boolean" ||
-          (data.authenticated &&
-            (typeof data.user?.username !== "string" ||
-              typeof data.user?.id !== "string" ||
-              !data.user.id ||
-              data.user.id.length > 128 ||
-              data.user.id.trim() !== data.user.id))
-        ) {
-          throw new Error(copy.checkError);
-        }
-
+        const session = parseSessionResponse(data);
+        if (!response.ok || !session) throw new Error(copy.checkError);
         if (active) {
           setAccount(
-            data.authenticated ? { id: data.user.id, username: data.user.username } : null,
+            session.authenticated ? { id: session.user.id, username: session.user.username } : null,
           );
         }
       })
@@ -85,9 +79,11 @@ export function AccountControls() {
     const recheck = () => setAttempt((value) => value + 1);
     window.addEventListener("focus", recheck);
     window.addEventListener("pageshow", recheck);
+    window.addEventListener(SHELL_SESSION_REFRESH_EVENT, recheck);
     return () => {
       window.removeEventListener("focus", recheck);
       window.removeEventListener("pageshow", recheck);
+      window.removeEventListener(SHELL_SESSION_REFRESH_EVENT, recheck);
     };
   }, []);
 
@@ -184,7 +180,7 @@ export function AccountControls() {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => setAttempt((value) => value + 1)}
+          onClick={requestShellSessionRefresh}
           className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
         >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
