@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { AccountControls } from "./account-controls";
 import { LocaleSwitcher } from "./locale-switcher";
-import { NotificationBell } from "./notification-bell";
+import { NotificationBell } from "../features/notifications/bell";
 import { ThemeToggle } from "./theme-toggle";
 import { getDictionary, type Locale } from "../lib/i18n";
 

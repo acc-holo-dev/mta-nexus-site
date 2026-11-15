@@ -1,0 +1,17 @@
+# Notifications: inbox и настройки
+
+Feature объединяет существующие колокольчик, inbox, вкладки, настройки и Web Push.
+Сессия, actor identity, серверная авторизация, сервисы доставки, outbox и workers
+остаются прежними.
+
+| Entry              | Контракт                                                       |
+| ------------------ | -------------------------------------------------------------- |
+| `bell.ts`          | `NotificationBell`; клиентский колокольчик                     |
+| `preferences.ts`   | `SettingsNotificationPreferencesSection`; клиентские настройки |
+| `center-server.ts` | Страница inbox и metadata; server-only                         |
+
+Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
+production-код использует публичные входы; маршруты не импортируются feature.
+Client graph проверяется на отсутствие серверных модулей, инфраструктуры и Node
+builtins. Подтверждение действий, actor/session identity, восстановление и события
+синхронизации сохраняют существующее поведение.

@@ -29,7 +29,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { WebPushSettings } from "../../src/components/web-push-settings";
+import { WebPushSettings } from "../../src/features/notifications/components/web-push-settings";
 
 const { render, renderEnabled, disableButton, disableButtonOrEnable } =
   createWebPushSettingsConfirmInteractionHelpers(harness, WebPushSettings, confirmAction);

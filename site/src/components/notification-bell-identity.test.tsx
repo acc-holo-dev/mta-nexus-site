@@ -77,7 +77,7 @@ vi.mock("./locale-context", async (original) => ({
     },
   }),
 }));
-import { NotificationBell } from "./notification-bell";
+import { NotificationBell } from "../features/notifications/bell";
 function flatten(node: ReactNode): ReactElement<Record<string, unknown>>[] {
   if (Array.isArray(node)) return node.flatMap(flatten);
   if (!node || typeof node !== "object" || !("props" in node)) return [];

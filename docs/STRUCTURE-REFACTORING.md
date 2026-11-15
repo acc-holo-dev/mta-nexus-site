@@ -39,7 +39,8 @@ Phase 4.31 проверена: Organizations workspace, team и content.
 Phase 4.32 проверена: Organizations workspace server composition.
 Phase 4.33 проверена: Organizations public server composition.
 Phase 4.34 проверена: Community discussion и publication server composition.
-Выполняется Phase 4.35: Community author pages и following feed. Владелец явно
+Phase 4.35 проверена: Community author pages и following feed.
+Выполняется Phase 4.36: Notifications bell, inbox и preferences. Владелец явно
 разрешил отдельную ветку и draft PR для полного CI. Merge, production deploy,
 реальные данные, удаление volumes, переписывание Git history, GitHub settings и
 активация commerce/DRM этим разрешением не покрываются.
@@ -600,3 +601,7 @@ Workspace server composition прошла полный [CI #4671](https://github
 ### Phase 4.35: Community author pages и following feed
 
 Композиции обсуждений и публикаций прошли полный [CI #4673](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43653596034) на `877e181c`. Создание, редактирование и история авторской публикации и лента подписок перенесены в независимые server-only композиции Community. Динамические маршруты, metadata, session, права, фильтры и серверные сервисы сохраняются.
+
+### Phase 4.36: Notifications bell, inbox и preferences
+
+Авторские страницы и лента Community прошли полный [CI #4674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43656936924) на `8600d8ac`. Колокольчик, inbox, вкладки, настройки и Web Push объединены в Notifications; центр уведомлений использует server-only вход. Session, actor identity, подтверждения, восстановление и существующие outbox/worker сервисы сохраняются.

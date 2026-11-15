@@ -5,7 +5,7 @@ import { getDictionary } from "../lib/i18n";
 import { AccountControls } from "./account-controls";
 import { LocaleProvider } from "./locale-context";
 import { Navbar } from "./navbar";
-import { NotificationBell } from "./notification-bell";
+import { NotificationBell } from "../features/notifications/bell";
 import { ThemeToggle } from "./theme-toggle";
 
 const nav = vi.hoisted(() => ({ pathname: "/" }));

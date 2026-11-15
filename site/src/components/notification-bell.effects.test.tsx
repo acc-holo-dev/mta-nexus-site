@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "./locale-context";
-import { NotificationBell } from "./notification-bell";
+import { NotificationBell } from "../features/notifications/bell";
 
 const effects = vi.hoisted(() => [] as Array<import("react").EffectCallback>);
 vi.mock("react", async (importOriginal) => ({

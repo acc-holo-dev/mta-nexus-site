@@ -29,7 +29,7 @@ vi.mock("../../src/components/locale-context", async () => {
   };
 });
 
-import { WebPushSettings } from "../../src/components/web-push-settings";
+import { WebPushSettings } from "../../src/features/notifications/components/web-push-settings";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render, renderEnabled, disableButton, disableButtonOrEnable } =

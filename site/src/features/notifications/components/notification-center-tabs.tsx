@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import {
   type NotificationInboxQuery,
   notificationInboxHref,
-} from "../lib/notification-inbox-contract";
+} from "../../../lib/notification-inbox-contract";
 
 const STATES = ["all", "unread", "read"] as const;
 

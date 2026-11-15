@@ -8,8 +8,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const formComponents = [
-  "site/src/components/notification-bell.tsx",
-  "site/src/components/notification-inbox.tsx",
+  "site/src/features/notifications/components/notification-bell.tsx",
+  "site/src/features/notifications/components/notification-inbox.tsx",
   "site/src/components/follow-button.tsx",
   "site/src/features/community/components/content-follow-controls.tsx",
   "site/src/components/context-switcher.tsx",
@@ -34,7 +34,7 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
 });
 
 it("locks notification bell empty preview to EmptyState with emptyHint copy", () => {
-  const source = read("site/src/components/notification-bell.tsx");
+  const source = read("site/src/features/notifications/components/notification-bell.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("copy.empty");
   expect(source).toContain("copy.emptyHint");

@@ -23,7 +23,7 @@ vi.mock("../../src/lib/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
 }));
 
-import { NotificationInbox } from "../../src/components/notification-inbox";
+import { NotificationInbox } from "../../src/features/notifications/components/notification-inbox";
 
 const { render, click, acknowledgeSelection } = createNotificationInboxInteractionHelpers(
   harness,

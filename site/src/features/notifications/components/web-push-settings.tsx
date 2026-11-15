@@ -3,9 +3,9 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { notificationInboxCopy } from "../lib/notification-inbox-copy";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 
 type PushStatus =
   | "loading"

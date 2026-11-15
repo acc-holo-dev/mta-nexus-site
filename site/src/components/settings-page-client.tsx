@@ -24,7 +24,7 @@ import { PlatformSignIn } from "./platform-sign-in";
 import { ProfileChangeHistoryLink } from "./private-change-history-controls";
 import { PublicProfileForm } from "./public-profile-form";
 import { SettingsActiveSessions } from "./settings-active-sessions";
-import { SettingsNotificationPreferencesSection } from "./settings-notification-preferences-section";
+import { SettingsNotificationPreferencesSection } from "../features/notifications/preferences";
 import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";

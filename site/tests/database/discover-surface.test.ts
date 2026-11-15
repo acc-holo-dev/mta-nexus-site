@@ -34,7 +34,7 @@ vi.mock("../../src/components/locale-switcher", async () => {
   };
 });
 
-vi.mock("../../src/components/notification-bell", async () => {
+vi.mock("../../src/features/notifications/bell", async () => {
   const ReactModule = await import("react");
   return {
     NotificationBell: () => ReactModule.createElement("span", { "data-mock": "NotificationBell" }),

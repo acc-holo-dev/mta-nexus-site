@@ -30,6 +30,32 @@ module.exports = {
       to: { path: "^(?:site/)?packages/(db|storage|security|config)/" },
     },
     {
+      name: "notifications-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/notifications/)" },
+      to: { path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server)\\.ts$)" },
+    },
+    {
+      name: "notifications-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/notifications/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "notifications-client-isolation",
+      severity: "error",
+      from: { path: "^site/src/features/notifications/(?:(?:bell|preferences)\\.ts$|components/)" },
+      to: {
+        path: "^(?:site/src/(?:features/(?!notifications/)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|notification-inbox-events|private-api-request|visible-polling|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "notifications-client-has-no-node-builtins",
+      severity: "error",
+      from: { path: "^site/src/features/notifications/(?:(?:bell|preferences)\\.ts$|components/)" },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "organizations-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/organizations/)" },

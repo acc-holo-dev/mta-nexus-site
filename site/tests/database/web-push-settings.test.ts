@@ -7,7 +7,7 @@ import {
   matchesApplicationServerKey,
   parsePushServerState,
   readBrowserPushCapability,
-} from "../../src/components/web-push-settings";
+} from "../../src/features/notifications/components/web-push-settings";
 
 describe("Web Push settings state parser", () => {
   it("accepts the exact server state contract", () => {

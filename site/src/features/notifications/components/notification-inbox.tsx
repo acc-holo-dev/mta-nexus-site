@@ -9,17 +9,23 @@ import {
   type NotificationInboxQuery,
   notificationInboxHref,
   notificationInboxPageSchema,
-} from "../lib/notification-inbox-contract";
-import { notificationInboxCopy, notificationInboxError } from "../lib/notification-inbox-copy";
-import { announceNotificationInboxChange } from "../lib/notification-inbox-events";
+} from "../../../lib/notification-inbox-contract";
+import {
+  notificationInboxCopy,
+  notificationInboxError,
+} from "../../../lib/notification-inbox-copy";
+import { announceNotificationInboxChange } from "../../../lib/notification-inbox-events";
 import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
-} from "../lib/notification-inbox-export-client";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/notification-inbox-export-client";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
 export function NotificationInbox({
   initialPage,
   filters,

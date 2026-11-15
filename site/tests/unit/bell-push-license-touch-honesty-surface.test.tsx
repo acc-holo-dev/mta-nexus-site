@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks notification bell empty preview to EmptyState with emptyHint honesty copy", () => {
-  const source = read("site/src/components/notification-bell.tsx");
+  const source = read("site/src/features/notifications/components/notification-bell.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain("ErrorState");
   expect(source).toContain("copy.empty");
@@ -30,7 +30,7 @@ it("locks notification bell empty preview to EmptyState with emptyHint honesty c
 });
 
 it("locks web push enable/disable CTAs to size=touch without size=sm", () => {
-  const source = read("site/src/components/web-push-settings.tsx");
+  const source = read("site/src/features/notifications/components/web-push-settings.tsx");
   expect(source).toContain('size="touch"');
   expect(source).not.toContain('size="sm"');
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);

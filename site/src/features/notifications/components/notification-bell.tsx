@@ -5,17 +5,17 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { formatNotification } from "../lib/notification-copy";
-import { notificationInboxCopy } from "../lib/notification-inbox-copy";
+import { formatNotification } from "../../../lib/notification-copy";
+import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
-} from "../lib/notification-inbox-events";
-import { privateApiRequest } from "../lib/private-api-request";
-import { startVisiblePolling } from "../lib/visible-polling";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
-import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
+} from "../../../lib/notification-inbox-events";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { startVisiblePolling } from "../../../lib/visible-polling";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../../components/locale-context";
+import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
