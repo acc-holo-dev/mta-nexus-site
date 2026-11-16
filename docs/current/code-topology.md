@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `bbcf3026` (`dev`, structural shell absorb).  
+**source_sha:** `2a9d8b4c` (`dev`, shell absorb without unused chrome-controls port).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,7 +29,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `bbcf3026` |
+| Область                    | Факт на `2a9d8b4c` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
 | `components/` tree files   |                 76 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    19 |  50525 |
+| shell         |    18 |  50465 |
 | accounts      |    11 |  51952 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
