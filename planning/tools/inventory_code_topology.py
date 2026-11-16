@@ -1,6 +1,6 @@
 """Inventory AS-IS code topology counts for docs/current/code-topology.md.
 
-Read-only: walks site/src and site/packages, never edits application code.
+Read-only: counts **git-tracked** paths under site/ at a revision (CI-portable).
 Write JSON with --output; verify a committed snapshot with --check.
 """
 from __future__ import annotations
@@ -12,64 +12,95 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SITE_SRC = ROOT / "site" / "src"
-SITE_PACKAGES = ROOT / "site" / "packages"
 
 
-def _files(path: Path) -> list[Path]:
-    if not path.exists():
-        return []
-    return [
-        entry
-        for entry in path.rglob("*")
-        if entry.is_file() and "node_modules" not in entry.parts and ".git" not in entry.parts
-    ]
-
-
-def _bytes(paths: list[Path]) -> int:
-    return sum(entry.stat().st_size for entry in paths)
-
-
-def _root_files(path: Path) -> list[Path]:
-    if not path.exists():
-        return []
-    return [entry for entry in path.iterdir() if entry.is_file()]
-
-
-def _root_dirs(path: Path) -> list[str]:
-    if not path.exists():
-        return []
-    return sorted(entry.name for entry in path.iterdir() if entry.is_dir())
-
-
-def _prefix_hotspots(files: list[Path], limit: int = 12) -> list[dict[str, int | str]]:
-    counts: Counter[str] = Counter()
-    for entry in files:
-        stem = entry.name.split("-", 1)[0] if "-" in entry.name else entry.stem
-        counts[stem] += 1
-    return [{"prefix": name, "files": count} for name, count in counts.most_common(limit)]
-
-
-def _shellish_components(files: list[Path]) -> list[str]:
-    needles = ("nav", "footer", "shell", "header", "sidebar", "auth", "locale")
-    names = sorted(
-        entry.name
-        for entry in files
-        if any(needle in entry.name.lower() for needle in needles)
+def _ls_tree(revision: str, prefix: str) -> list[tuple[str, int]]:
+    """Return (posix-path, byte-size) for blobs under prefix at revision."""
+    raw = subprocess.check_output(
+        ["git", "ls-tree", "-r", "-l", revision, "--", prefix],
+        cwd=ROOT,
+        text=True,
     )
-    return names
+    entries: list[tuple[str, int]] = []
+    for line in raw.splitlines():
+        # <mode> <type> <object> <size>\t<path>
+        meta, _, path = line.partition("\t")
+        if not path:
+            continue
+        parts = meta.split()
+        if len(parts) < 4 or parts[1] != "blob":
+            continue
+        size_token = parts[3]
+        if size_token == "-":
+            continue
+        entries.append((path.replace("\\", "/"), int(size_token)))
+    return entries
 
 
-def _husk_status() -> dict[str, object]:
-    """Git/workspace facts only — host-local leftover dirs are not portable across CI."""
+def _under(entries: list[tuple[str, int]], prefix: str) -> list[tuple[str, int]]:
+    prefix = prefix.rstrip("/") + "/"
+    return [(path, size) for path, size in entries if path.startswith(prefix)]
+
+
+def _root_files(entries: list[tuple[str, int]], directory: str) -> list[tuple[str, int]]:
+    directory = directory.rstrip("/")
+    out: list[tuple[str, int]] = []
+    for path, size in entries:
+        parent = path.rsplit("/", 1)[0]
+        if parent == directory:
+            out.append((path, size))
+    return out
+
+
+def _root_dirs(entries: list[tuple[str, int]], directory: str) -> list[str]:
+    directory = directory.rstrip("/") + "/"
+    names: set[str] = set()
+    for path, _ in entries:
+        if not path.startswith(directory):
+            continue
+        rest = path[len(directory) :]
+        if "/" in rest:
+            names.add(rest.split("/", 1)[0])
+    return sorted(names)
+
+
+def _basename(path: str) -> str:
+    return path.rsplit("/", 1)[-1]
+
+
+def _prefix_hotspots(files: list[tuple[str, int]], limit: int = 12) -> list[dict[str, int | str]]:
+    counts: Counter[str] = Counter()
+    for path, _ in files:
+        name = _basename(path)
+        stem = name.split("-", 1)[0] if "-" in name else Path(name).stem
+        counts[stem] += 1
+    # Deterministic ties: higher count first, then prefix name (CI vs host walk order must not drift).
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:limit]
+    return [{"prefix": name, "files": count} for name, count in ranked]
+
+
+def _shellish_components(files: list[tuple[str, int]]) -> list[str]:
+    needles = ("nav", "footer", "shell", "header", "sidebar", "auth", "locale")
+    return sorted(
+        _basename(path)
+        for path, _ in files
+        if any(needle in _basename(path).lower() for needle in needles)
+    )
+
+
+def _husk_status(revision: str) -> dict[str, object]:
     tracked = subprocess.check_output(
-        ["git", "ls-files", "packages", "apps/web"],
+        ["git", "ls-tree", "-r", "--name-only", revision, "--", "packages", "apps/web"],
         cwd=ROOT,
         text=True,
     ).strip()
-    workspace = (ROOT / "pnpm-workspace.yaml").read_text(encoding="utf8")
+    workspace = subprocess.check_output(
+        ["git", "show", f"{revision}:pnpm-workspace.yaml"],
+        cwd=ROOT,
+        text=True,
+    )
     members = []
-    if '"site"' in workspace or "- \"site\"" in workspace or "- 'site'" in workspace:
+    if "- \"site\"" in workspace or "- 'site'" in workspace:
         members.append("site")
     if "site/packages/*" in workspace:
         members.append("site/packages/*")
@@ -95,49 +126,60 @@ def _husk_status() -> dict[str, object]:
 
 def inventory(revision: str = "HEAD") -> dict[str, object]:
     sha = subprocess.check_output(["git", "rev-parse", revision], cwd=ROOT, text=True).strip()
-    features: dict[str, dict[str, int]] = {}
-    for name in _root_dirs(SITE_SRC / "features"):
-        paths = _files(SITE_SRC / "features" / name)
-        features[name] = {"files": len(paths), "bytes": _bytes(paths)}
+    site = _ls_tree(revision, "site")
 
-    components_tree = _files(SITE_SRC / "components")
-    components_root = _root_files(SITE_SRC / "components")
-    lib_tree = _files(SITE_SRC / "lib")
-    lib_root = _root_files(SITE_SRC / "lib")
-    services_root = _root_files(SITE_SRC / "lib" / "services")
-    i18n = list((SITE_SRC / "lib").rglob("*-i18n.ts")) if (SITE_SRC / "lib").exists() else []
-    routes = list((SITE_SRC / "app").rglob("route.ts")) if (SITE_SRC / "app").exists() else []
+    features: dict[str, dict[str, int]] = {}
+    for name in _root_dirs(site, "site/src/features"):
+        paths = _under(site, f"site/src/features/{name}")
+        features[name] = {
+            "files": len(paths),
+            "bytes": sum(size for _, size in paths),
+        }
+
+    components_tree = _under(site, "site/src/components")
+    components_root = _root_files(site, "site/src/components")
+    lib_tree = _under(site, "site/src/lib")
+    lib_root = _root_files(site, "site/src/lib")
+    services_root = _root_files(site, "site/src/lib/services")
+    i18n = [(path, size) for path, size in lib_tree if path.endswith("-i18n.ts")]
+    routes = [
+        (path, size)
+        for path, size in _under(site, "site/src/app")
+        if _basename(path) == "route.ts"
+    ]
 
     packages: dict[str, int] = {}
-    for name in _root_dirs(SITE_PACKAGES):
-        packages[name] = len(_files(SITE_PACKAGES / name / "src"))
+    for name in _root_dirs(site, "site/packages"):
+        packages[name] = len(_under(site, f"site/packages/{name}/src"))
+
+    tests = _under(site, "site/tests")
 
     return {
         "source_sha": sha,
         "scope": (
-            "Tracked working tree counts under site/src and site/packages; "
-            "excludes node_modules. Local root packages/ and apps/web husks are reported separately."
+            "Git-tracked blobs under site/ at source_sha (git ls-tree). "
+            "Ignores untracked/ignored host files so CI and dirty worktrees match."
         ),
         "features": features,
         "components": {
             "tree_files": len(components_tree),
-            "tree_bytes": _bytes(components_tree),
+            "tree_bytes": sum(size for _, size in components_tree),
             "root_files": len(components_root),
             "shellish_root_files": _shellish_components(components_root),
         },
         "lib": {
             "tree_files": len(lib_tree),
-            "tree_bytes": _bytes(lib_tree),
+            "tree_bytes": sum(size for _, size in lib_tree),
             "root_files": len(lib_root),
-            "root_dirs": _root_dirs(SITE_SRC / "lib"),
-            "services_root_files": len([path for path in services_root if path.is_file()]),
+            "root_dirs": _root_dirs(site, "site/src/lib"),
+            "services_root_files": len(services_root),
             "i18n_modules": len(i18n),
             "root_prefix_hotspots": _prefix_hotspots(lib_root),
         },
         "app": {"route_ts": len(routes)},
         "packages_src_files": packages,
-        "tests": {"site_tests_files": len(_files(ROOT / "site" / "tests"))},
-        "husks": _husk_status(),
+        "tests": {"site_tests_files": len(tests)},
+        "husks": _husk_status(sha),
     }
 
 
@@ -146,10 +188,30 @@ def _canonical(data: dict[str, object]) -> str:
 
 
 def _stable_payload(data: dict[str, object]) -> dict[str, object]:
-    """Counts and structure only — source_sha tracks the measuring commit and may lag HEAD."""
     payload = dict(data)
     payload.pop("source_sha", None)
     return payload
+
+
+def _diff(expected: dict[str, object], actual: dict[str, object], path: str = "$") -> list[str]:
+    lines: list[str] = []
+    if type(expected) is not type(actual):
+        return [f"{path}: type {type(expected).__name__} != {type(actual).__name__}"]
+    if isinstance(expected, dict):
+        for key in sorted(set(expected) | set(actual)):
+            child = f"{path}.{key}"
+            if key not in expected:
+                lines.append(f"{child}: missing in snapshot")
+            elif key not in actual:
+                lines.append(f"{child}: missing in live inventory")
+            else:
+                lines.extend(_diff(expected[key], actual[key], child))
+    elif isinstance(expected, list):
+        if expected != actual:
+            lines.append(f"{path}: {expected!r} != {actual!r}")
+    elif expected != actual:
+        lines.append(f"{path}: {expected!r} != {actual!r}")
+    return lines
 
 
 def main() -> int:
@@ -169,8 +231,9 @@ def main() -> int:
     if args.check:
         expected = json.loads(args.check.read_text(encoding="utf8"))
         if _stable_payload(expected) != _stable_payload(data):
+            details = "\n".join(_diff(_stable_payload(expected), _stable_payload(data))[:40])
             raise SystemExit(
-                f"Topology inventory drift vs {args.check}. "
+                f"Topology inventory drift vs {args.check}.\n{details}\n"
                 "Regenerate with: python3 planning/tools/inventory_code_topology.py "
                 f"--output {args.check}"
             )

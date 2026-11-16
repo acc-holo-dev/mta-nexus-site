@@ -144,11 +144,11 @@
       },
       {
         "files": 6,
-        "prefix": "discussion"
+        "prefix": "content"
       },
       {
         "files": 6,
-        "prefix": "verification"
+        "prefix": "discussion"
       }
     ],
     "services_root_files": 86,
@@ -164,8 +164,8 @@
     "ui": 18,
     "validation": 18
   },
-  "scope": "Tracked working tree counts under site/src and site/packages; excludes node_modules. Local root packages/ and apps/web husks are reported separately.",
-  "source_sha": "caf2900e33ddb5b868646438b1a6fa65a26f56e5",
+  "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
+  "source_sha": "bcb489ea5da6c02b77694e88138e757697f595fd",
   "tests": {
     "site_tests_files": 1443
   }

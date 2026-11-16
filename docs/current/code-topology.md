@@ -4,7 +4,7 @@
 **source_sha:** `f3be421f` (`dev` / merge #1186).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
-**Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (сравнивает counts; `source_sha` информативный)
+**Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
 
 Этот документ — живая карта **внутренней** топологии после foundation-переноса `apps/web` → `site/`. Перенос путей уже сделан; цель программы — читаемость модулей 2027 (features владеют UI/composition, `lib/` и `components/` сжимаются). Слои и depcruise: [`ARCHITECTURE.md`](../ARCHITECTURE.md). Навигация пакетов: [`PROJECT-MAP.md`](../PROJECT-MAP.md).
 
@@ -75,6 +75,8 @@ site/
 | support | 9 |
 | build | 8 |
 | notification | 8 |
+| content | 6 |
+| discussion | 6 |
 
 ### Shell / auth leftovers в `components/` root
 
