@@ -34,7 +34,16 @@ const features = [
   },
   {
     name: "accounts",
-    clients: ["auth", "controls", "settings", "context"],
+    clients: [
+      "auth",
+      "controls",
+      "settings",
+      "context",
+      "profile",
+      "change-history",
+      "profile-change-history",
+      "profile-pagination",
+    ],
     privateClients: [
       "settings-active-sessions",
       "settings-password-form",
@@ -42,7 +51,8 @@ const features = [
       "settings-advertising-preferences-section",
     ],
     servers: [],
-    safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|settings-client-api|private-change-history-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference",
+    clientUtilPorts: ["profile-pagination"],
+    safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|settings-client-api|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference|verification-workspace-contract|verification-workspace-copy",
   },
   {
     name: "shell",

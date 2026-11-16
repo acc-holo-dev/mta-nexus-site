@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { ProfileChangeHistoryView } from "../../../features/accounts/change-history";
+import { ProfileChangeHistoryView } from "../../../features/accounts/profile-change-history";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   privateChangeHistoryCopy,
