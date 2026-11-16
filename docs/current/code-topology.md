@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `3e834be6` (`dev`, slice 24 — legal document layout → shell feature).  
+**source_sha:** `38ea486c` (`dev`, slice 25 — copyable plain-code block → shell feature).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `3e834be6` |
+| Область                    | Факт на `38ea486c` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 12 |
-| `components/` tree files   |                 40 |
-| `components/` root files   |                 35 |
+| `components/` tree files   |                 39 |
+| `components/` root files   |                 34 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -50,14 +50,14 @@ site/
 | ------------- | ----: | -----: |
 | accounts      |    13 |  57526 |
 | community     |    85 | 395306 |
-| discovery     |     3 |  20342 |
+| discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
 | notifications |    10 |  66691 |
 | organizations |    35 | 127327 |
-| resources     |    93 | 447533 |
+| resources     |    93 | 447525 |
 | servers       |    54 | 218716 |
-| shell         |    47 |  86318 |
+| shell         |    49 |  87479 |
 | support       |    14 |  72088 |
 | trust         |     5 |  14574 |
 
@@ -119,6 +119,8 @@ site/
 **Slice 23 done:** `reaction-removal` → [`features/community/reaction-removal.ts`](../../site/src/features/community/reaction-removal.ts) (`ReactionRemoval`); владение **Community** рядом с `reactions.ts` (workspace снятие реакции, confirm + API); depcruise public API + client isolation; потребитель — `app/workspace/reactions/page.tsx`.
 
 **Slice 24 done:** `legal-document` → [`features/shell/legal-document.ts`](../../site/src/features/shell/legal-document.ts) (`LegalDocument`); владение **Shell** (публичный chrome/layout terms, privacy, copyright, community-rules); depcruise public API + client isolation (как `home-personal`); потребители — `app/{terms,privacy,copyright,community-rules}/page.tsx`; корень `components/` −1 production file.
+
+**Slice 25 done:** `copyable-plain-code-block` → [`features/shell/copyable-plain-code-block.ts`](../../site/src/features/shell/copyable-plain-code-block.ts) (`CopyablePlainCodeBlock`); владение **Shell** (shared plain-text copy CTA, min-h-11 touch); depcruise public API + client isolation (как `pwa-service-worker`); порт с `"use client"`; потребитель — [`resource-version-help-section.tsx`](../../site/src/features/resources/components/resource-version-help-section.tsx); корень `components/` −1 production file.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
