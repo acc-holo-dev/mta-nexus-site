@@ -35,7 +35,7 @@ vi.mock("../../src/features/resources/qa-report-actions", () => ({
   ),
 }));
 
-vi.mock("../../src/components/report-evidence-links", () => ({
+vi.mock("../../src/features/community/report-evidence-links", () => ({
   ReportEvidenceLinks: () => null,
 }));
 

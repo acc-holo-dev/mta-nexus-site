@@ -179,6 +179,8 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/community/follow.ts",
     "site/src/features/community/components/follow-button.tsx",
     "site/src/features/community/components/follow-workspace.tsx",
+    "site/src/features/community/report-evidence-links.ts",
+    "site/src/features/community/components/report-evidence-links.tsx",
     "site/src/features/community/moderated-discussion-server.ts",
     "site/src/features/community/discussion-reports-server.ts",
     "site/src/features/community/publication-reports-server.ts",

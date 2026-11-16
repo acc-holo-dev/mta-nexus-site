@@ -19,7 +19,7 @@ import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
 import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { ReportEvidenceLinks } from "../../../components/report-evidence-links";
+import { ReportEvidenceLinks } from "../report-evidence-links";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({

@@ -37,6 +37,7 @@ Feature объединяет клиентское обсуждение публ�
 | `discussion.ts`                      | `ContentDiscussion`; обсуждение публикации                                    |
 | `topic-form.ts`                      | `CommunityTopicForm`; создание темы                                           |
 | `report-form.ts`                     | `CommunityReportForm`; жалоба на публикацию или комментарий                   |
+| `report-evidence-links.ts`           | `ReportEvidenceLinks`; безопасные внешние ссылки на доказательства в жалобе   |
 | `object-mute-controls.ts`            | `ObjectMuteControls`; временный mute уведомлений по объекту подписки          |
 | `follow.ts`                          | `FollowButton`, `FollowWorkspace`; подписка и лента сохранённых               |
 

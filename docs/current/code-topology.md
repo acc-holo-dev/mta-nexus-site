@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `ed9c4a83` (`dev`, support-center test relocate slice 20).  
+**source_sha:** `890a100e` (`dev`, slice 21 partial — report-evidence-links → community).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `ed9c4a83` |
+| Область                    | Факт на `890a100e` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 46 |
-| `components/` root files   |                 41 |
+| `components/` tree files   |                 44 |
+| `components/` root files   |                 39 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    13 |  57526 |
-| community     |    80 | 387796 |
+| community     |    83 | 390439 |
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
@@ -110,6 +110,8 @@ site/
 **Slice 16 done:** orphan suites `notification-bell*.test.tsx` → [`site/tests/database/`](../../site/tests/database/) (effects, identity, interaction suites рядом с [`notification-bell-preview-surface.test.tsx`](../../site/tests/database/notification-bell-preview-surface.test.tsx)); корень `components/` теряет 6 не-production файлов; импорты по конвенции `tests/database` (`../../src/features/...`, harness в `tests/helpers/`).
 
 **Slice 20 done:** orphan [`support-center.test.tsx`](../../site/tests/database/support-center.test.tsx) → [`site/tests/database/`](../../site/tests/database/) (localization для staff/requester filters рядом с [`support-activity-shells-honesty-surface.test.tsx`](../../site/tests/database/support-activity-shells-honesty-surface.test.tsx)); корень `components/` теряет ещё один не-production файл; потребитель — публичный порт [`features/support/center.ts`](../../site/src/features/support/center.ts).
+
+**Slice 21 (partial) done:** trust-кластер в `components/` root — только `report-evidence-links` → [`features/community/report-evidence-links.ts`](../../site/src/features/community/report-evidence-links.ts) (`ReportEvidenceLinks`); владение Community (report UI и admin staff queue через публичный порт); depcruise public API без `"use client"` (как `publication-feed`); остаток: `public-user-trust.tsx`, `public-context-trust-page.tsx`.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
