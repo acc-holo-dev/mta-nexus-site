@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    13 |  57526 |
-| community     |    75 | 356896 |
+| community     |    77 | 362467 |
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
