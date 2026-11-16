@@ -60,7 +60,7 @@ export function BrandMark({
 
   if (href) {
     return (
-      <a href={href} className={classes} aria-label="MTA NEXUS" {...rest}>
+      <a href={href} className={classes} {...rest} aria-label="MTA NEXUS">
         <span className="inline-flex items-center gap-2" aria-hidden="true">
           {mark}
         </span>
