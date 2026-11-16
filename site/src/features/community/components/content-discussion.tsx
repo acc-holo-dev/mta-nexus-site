@@ -30,7 +30,7 @@ import { followCopy } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";

@@ -46,7 +46,8 @@ const features = [
   },
   {
     name: "shell",
-    clients: ["shell", "navbar", "footer", "sidebar", "locale", "session", "auth-session"],
+    clients: ["shell", "navbar", "footer", "sidebar", "locale", "session", "auth-session", "auth-return"],
+    clientUtilPorts: ["auth-return"],
     privateClients: ["shell-session-unavailable"],
     servers: [],
     safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|theme-preference|license-maintenance-i18n|notification-copy|notification-inbox-copy|notification-inbox-events|private-api-request|resource-release-watches-i18n|visible-polling",
@@ -166,7 +167,7 @@ test("Remaining features reject private, routing, server and infrastructure edge
   assert.notEqual(cruise(fixture, ["site/src", "site/packages"], "err").status, 0);
 });
 
-for (const { name, clients, privateClients, servers, safe } of features) {
+for (const { name, clients, privateClients, servers, safe, clientUtilPorts } of features) {
   if (clients.length)
     test(`${name} client graphs exclude server dependencies transitively`, () => {
       const ports = clients.map((port) => `site/src/features/${name}/${port}.ts`);
@@ -197,8 +198,12 @@ for (const { name, clients, privateClients, servers, safe } of features) {
           visit(edge.resolved);
         }
       }
-      for (const port of ports)
-        assert.match(readFileSync(resolve(root, port), "utf8"), /^"use client";/u);
+      const utilPorts = new Set(clientUtilPorts ?? []);
+      for (const portPath of ports) {
+        const portName = portPath.split("/").pop().replace(/\.ts$/u, "");
+        if (utilPorts.has(portName)) continue;
+        assert.match(readFileSync(resolve(root, portPath), "utf8"), /^"use client";/u);
+      }
       for (const entry of entries) visit(entry);
     });
   if (servers.length)

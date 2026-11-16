@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { getDictionary } from "../../../lib/i18n";

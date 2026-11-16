@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../session";
 import { getDictionary } from "../../../lib/i18n";
 import { platformReportCopy } from "../../../lib/platform-report-i18n";
+import type { ShellAuthSession } from "../session";
 
 const state = vi.hoisted(() => ({
   session: { status: "anonymous", user: null } as ShellAuthSession,

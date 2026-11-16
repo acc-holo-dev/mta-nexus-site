@@ -17,7 +17,7 @@ import {
   getResourceCommerceCopy,
   resourceCommerceError,
 } from "../../../lib/resource-commerce-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../../components/confirm-action";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { useNexusLocale } from "../../shell/locale";

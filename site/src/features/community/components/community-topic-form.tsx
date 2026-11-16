@@ -17,7 +17,7 @@ import {
   confirmedCommunityTopicPath,
 } from "../../../lib/community-topic-submission";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authEntryHref } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";
 
 function communityTopicErrorMessage(

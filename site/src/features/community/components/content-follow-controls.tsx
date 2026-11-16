@@ -8,7 +8,7 @@ import type { ObjectMuteDuration } from "../../../lib/follow-workspace-contract"
 import { followCopy, followError } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../../components/confirm-action";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";

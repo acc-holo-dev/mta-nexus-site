@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
 import { useAuthSession } from "../auth-session";
 import { isShellSessionLoading, showGuestSignInCta, showWorkspaceTools } from "../session";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";

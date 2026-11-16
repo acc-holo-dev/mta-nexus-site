@@ -9,7 +9,7 @@ import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-re
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authEntryHref } from "../../shell/auth-return";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { FollowButton } from "../../../components/follow-button";
 import { ObjectReportForm } from "../../moderation/object-report";

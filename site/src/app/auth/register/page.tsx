@@ -1,5 +1,5 @@
 import { AuthForm } from "../../../features/accounts/auth";
-import { parseAuthReturnPath } from "../../../components/auth-return-path";
+import { parseAuthReturnPath } from "../../../features/shell/auth-return";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

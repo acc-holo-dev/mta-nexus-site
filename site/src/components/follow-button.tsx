@@ -3,15 +3,15 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "../features/shell/auth-return";
+import { LocaleProvider, useNexusLocale } from "../features/shell/locale";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { FollowTargetType } from "../lib/follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
-import { LocaleProvider, useNexusLocale } from "../features/shell/locale";
 import { ObjectMuteControls } from "./object-mute-controls";
 
 type InitialFollowState = {

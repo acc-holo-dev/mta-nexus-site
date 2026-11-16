@@ -12,7 +12,7 @@ import {
   fetchResourceDownload,
   ResourceDownloadError,
 } from "../../../lib/resource-download-client";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { useNexusLocale } from "../../shell/locale";
 

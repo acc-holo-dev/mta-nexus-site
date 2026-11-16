@@ -22,7 +22,7 @@ import {
   supportWorkspaceError,
 } from "../../../lib/support-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 

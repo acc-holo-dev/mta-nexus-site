@@ -5,7 +5,10 @@ import { LogIn, Menu, type Server, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
+import { useAuthSession } from "../auth-session";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -14,9 +17,6 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "../session";
-import { useAuthSession } from "../auth-session";
-import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
-import { getDictionary, type Locale } from "../../../lib/i18n";
 import { shellNavigation } from "./shell-navigation";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
 

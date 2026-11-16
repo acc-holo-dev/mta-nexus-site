@@ -13,7 +13,7 @@ import {
   parseIssuedServerClaimChallenge,
 } from "../../../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { useNexusLocale } from "../../shell/locale";
 

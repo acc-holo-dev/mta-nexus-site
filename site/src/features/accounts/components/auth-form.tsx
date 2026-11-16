@@ -4,11 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import {
-  authEntryHref,
-  parseAuthReturnPath,
-  resolveAuthReturnPath,
-} from "../../../components/auth-return-path";
+import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
 
 type AuthMode = "login" | "register";
 

@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `2223fe70` (`dev`, shell session absorb + knip/format fix).  
+**source_sha:** `509bfb83` (`dev`, shell auth-return absorb).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `2223fe70` |
+| Область                    | Факт на `ce21aeb4` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 69 |
-| `components/` root files   |                 64 |
+| `components/` tree files   |                 68 |
+| `components/` root files   |                 63 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    28 |  63622 |
+| shell         |    29 |  65233 |
 | accounts      |    11 |  51824 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
@@ -87,7 +87,9 @@ site/
 
 **Slice 9 done:** session helpers → [`features/shell/session.ts`](../../site/src/features/shell/session.ts) и [`auth-session.ts`](../../site/src/features/shell/auth-session.ts) (`session/*`: payload, refresh, destination policy, `useAuthSession`); порт `session` в accounts isolation; depcruise public API + client graphs.
 
-Остаток в `components/` (cross-feature): `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
+**Slice 10 done:** `auth-return-path` → [`features/shell/auth-return.ts`](../../site/src/features/shell/auth-return.ts) (`parseAuthReturnPath`, `resolveAuthReturnPath`, `authEntryHref`, `currentBrowserReturnPath`); depcruise public API + cross-feature client isolation (как locale/session).
+
+Остаток в `components/` (cross-feature): `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
 Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  

@@ -5,8 +5,8 @@ import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";
 import {
   parseSessionResponse,

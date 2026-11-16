@@ -1,10 +1,10 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../locale";
 import { getDictionary } from "../../../lib/i18n";
 import { AccountControls } from "../../accounts/controls";
 import { NotificationBell } from "../../notifications/bell";
+import { LocaleProvider } from "../locale";
 import { Navbar } from "./navbar";
 import { ThemeToggle } from "./theme-toggle";
 

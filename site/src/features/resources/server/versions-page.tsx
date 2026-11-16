@@ -3,7 +3,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authEntryHref } from "../../shell/auth-return";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";

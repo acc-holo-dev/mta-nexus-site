@@ -5,7 +5,7 @@ import {
   authEntryHref,
   parseAuthReturnPath,
   resolveAuthReturnPath,
-} from "../../src/components/auth-return-path";
+} from "../../src/features/shell/auth-return";
 
 const authFormSource = readFileSync(
   resolve(process.cwd(), "site/src/features/accounts/components/auth-form.tsx"),
