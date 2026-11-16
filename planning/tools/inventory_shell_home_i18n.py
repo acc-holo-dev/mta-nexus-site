@@ -20,8 +20,6 @@ SCAN_PATHS = (
     "site/src/features/shell",
     "site/src/app/page.tsx",
     "site/src/app/layout.tsx",
-    "site/src/components/home-personal-changes-panel.tsx",
-    "site/src/components/home-personal-opt-out.tsx",
     "site/packages/ui/src/brand-mark.tsx",
 )
 

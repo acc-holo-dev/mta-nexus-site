@@ -6,7 +6,7 @@ import {
   HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID,
   HomePersonalChangesPanel,
   type HomePersonalCopy,
-} from "../../src/components/home-personal-changes-panel";
+} from "../../src/features/shell/home-personal";
 import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("@nexus/ui", async (importOriginal) => {
@@ -33,7 +33,7 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/components/home-personal-opt-out", () => ({
+vi.mock("../../src/features/shell/components/home-personal-opt-out", () => ({
   HomePersonalOptOut: ({ describedBy }: { describedBy?: string }) => (
     <button type="button" aria-describedby={describedBy} className="min-h-11" />
   ),

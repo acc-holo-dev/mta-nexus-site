@@ -86,17 +86,15 @@
     "site/src/features/shell",
     "site/src/app/page.tsx",
     "site/src/app/layout.tsx",
-    "site/src/components/home-personal-changes-panel.tsx",
-    "site/src/components/home-personal-opt-out.tsx",
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature, home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "e8f084aedfe4033bd3911fdcc90cd47dfeaf6423",
+  "source_sha": "b5c289f4088d77f35846c7cbfd52c019f2f05b75",
   "summary": {
     "allowlisted": 7,
     "findings": 7,
     "locale_copy_ternaries": 0,
-    "scanned_files": 38,
+    "scanned_files": 39,
     "unallowlisted": 0
   }
 }
