@@ -68,11 +68,11 @@ docs/
 
 Автогенерация сокращает дубли, а не создаёт третий backlog.
 
-| Артефакт | Источник | Правило |
-| -------- | -------- | ------- |
-| `docs/planning/generated/overview.md` | `tasks.json` + milestones | Единственный обзор очереди и фаз; ручные правки запрещены |
-| `docs/planning/generated/status.json` | тот же рендер | Счётчики `done` / `not_started` / blockers для CI и агентов |
-| (удалить как канон) `ROADMAP.md`, `TASKS.md`, `TRACEABILITY.md` | сейчас генерируются в корне `docs/` | После переноса не поддерживать три больших Markdown-копии |
+| Артефакт                                                        | Источник                            | Правило                                                     |
+| --------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------- |
+| `docs/planning/generated/overview.md`                           | `tasks.json` + milestones           | Единственный обзор очереди и фаз; ручные правки запрещены   |
+| `docs/planning/generated/status.json`                           | тот же рендер                       | Счётчики `done` / `not_started` / blockers для CI и агентов |
+| (удалить как канон) `ROADMAP.md`, `TASKS.md`, `TRACEABILITY.md` | сейчас генерируются в корне `docs/` | После переноса не поддерживать три больших Markdown-копии   |
 
 Не генерировать автоматически: предметные контракты, operations runbook, текст решений, список проблем. Их пишет человек/агент по фактам.
 
@@ -80,16 +80,16 @@ docs/
 
 Один вход: `python docs/planning/tools/check_docs.py` (обёртка над существующими checker/renderer + новые гейты).
 
-| Проверка | Защищает от |
-| -------- | ----------- |
-| Schema + DAG `tasks.json` | битый tracker, циклы зависимостей |
-| `render --check` | drift generated overview/status |
-| Markdown links/anchors | мёртвые ссылки |
-| Allowlist дерева `docs/` | случайные новые корневые `.md` и вторые backlog |
-| Front-matter / claim block | документ `current/` или `issues/` без `verified_at` |
-| SHA claim check | указанный SHA отсутствует в Git |
-| One-source grep | запрещённые фразы «единственный tracker» вне planning; ручные списки задач в `future/` |
-| Branch policy | только `main` + `dev`; CI и Dependabot согласованы |
+| Проверка                   | Защищает от                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| Schema + DAG `tasks.json`  | битый tracker, циклы зависимостей                                                      |
+| `render --check`           | drift generated overview/status                                                        |
+| Markdown links/anchors     | мёртвые ссылки                                                                         |
+| Allowlist дерева `docs/`   | случайные новые корневые `.md` и вторые backlog                                        |
+| Front-matter / claim block | документ `current/` или `issues/` без `verified_at`                                    |
+| SHA claim check            | указанный SHA отсутствует в Git                                                        |
+| One-source grep            | запрещённые фразы «единственный tracker» вне planning; ручные списки задач в `future/` |
+| Branch policy              | только `main` + `dev`; CI и Dependabot согласованы                                     |
 
 CI `plan` продолжает гонять эти проверки до выбора scope, включая docs-only изменения.
 
@@ -97,9 +97,9 @@ CI `plan` продолжает гонять эти проверки до выб�
 
 Постоянные ветки репозитория — только две:
 
-| Ветка | Роль |
-| ----- | ---- |
-| `dev` | Интеграционная: сюда идут коммиты разработки и Dependabot |
+| Ветка  | Роль                                                                   |
+| ------ | ---------------------------------------------------------------------- |
+| `dev`  | Интеграционная: сюда идут коммиты разработки и Dependabot              |
 | `main` | Защищённая линия выпуска; обновляется merge PR `dev` → `main` после CI |
 
 Процесс: изменения на `dev` → CI на push в `dev` → PR в `main` → CI на PR → merge → CI на `main`. Прямой push в `main` блокируется ruleset (обязателен `CI result`). Прочие долгоживущие ветки не ведутся; временные ветки Dependabot удаляются после merge/close.
@@ -108,22 +108,22 @@ CI `plan` продолжает гонять эти проверки до выб�
 
 ## 6. Карта переноса (откуда → куда)
 
-| Сейчас | Цель |
-| ------ | ---- |
-| `AGENTS.md` + `docs/AGENT.md` | один полный `AGENTS.md`; короткий указатель на время миграции допустим |
-| `README.md` | продукт + запуск + навигация по новым путям |
-| `CURRENT-STATE.md`, `PRODUCT.md` | `current/system.md` |
-| `ARCHITECTURE.md`, `PROJECT-MAP.md` (инженерная часть) | `current/architecture.md` (+ карта путей внутри) |
-| `GETTING-STARTED.md`, `CONTRIBUTING.md` | `current/development.md` |
-| `OPERATIONS.md` | `current/operations.md` (путь менять только вместе с evidence-потребителями) |
-| `RELEASE-READINESS.md`, CI-описания | `current/quality.md` |
-| trust/security фрагменты | `current/security.md` |
-| `DECISIONS.md` | `current/decisions.md` |
-| `RESOURCES.md` / `COMMUNITY.md` / `SERVERS-ORGS.md` / `TRUST-STAFF.md` | `current/domains/*` |
-| `PROBLEMS.md` | `issues/constraints.md` |
-| `ROADMAP.md`, commercial/retention/ads/server-pack/release планы | `future/*` |
-| корневой `planning/` | `docs/planning/` |
-| `handbook/13-DECISION-REGISTER.md`, baselines, migration journals, pilots | `docs/archive/` |
+| Сейчас                                                                    | Цель                                                                         |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `AGENTS.md` + `docs/AGENT.md`                                             | один полный `AGENTS.md`; короткий указатель на время миграции допустим       |
+| `README.md`                                                               | продукт + запуск + навигация по новым путям                                  |
+| `CURRENT-STATE.md`, `PRODUCT.md`                                          | `current/system.md`                                                          |
+| `ARCHITECTURE.md`, `PROJECT-MAP.md` (инженерная часть)                    | `current/architecture.md` (+ карта путей внутри)                             |
+| `GETTING-STARTED.md`, `CONTRIBUTING.md`                                   | `current/development.md`                                                     |
+| `OPERATIONS.md`                                                           | `current/operations.md` (путь менять только вместе с evidence-потребителями) |
+| `RELEASE-READINESS.md`, CI-описания                                       | `current/quality.md`                                                         |
+| trust/security фрагменты                                                  | `current/security.md`                                                        |
+| `DECISIONS.md`                                                            | `current/decisions.md`                                                       |
+| `RESOURCES.md` / `COMMUNITY.md` / `SERVERS-ORGS.md` / `TRUST-STAFF.md`    | `current/domains/*`                                                          |
+| `PROBLEMS.md`                                                             | `issues/constraints.md`                                                      |
+| `ROADMAP.md`, commercial/retention/ads/server-pack/release планы          | `future/*`                                                                   |
+| корневой `planning/`                                                      | `docs/planning/`                                                             |
+| `handbook/13-DECISION-REGISTER.md`, baselines, migration journals, pilots | `docs/archive/`                                                              |
 
 Порядок исполнения: (1) закрепить ветки и CI, (2) ввести дерево и checker allowlist параллельно со старыми путями, (3) переносить по одному владельцу содержания с обновлением потребителей, (4) удалить superseded пути одним проверяемым шагом, (5) архивировать эту спецификацию.
 
