@@ -109,15 +109,15 @@ site/packages/ui/             # tokens, typography, motion, layout, form control
 4. Запрещён «переезд ради переезда» без удаления сложности и без focused proof на риск.
 5. RU+EN на touched surfaces; silent fail / «0 вместо unknown» не вводить.
 
-## Husks (следующий structural шаг)
+## Husks (quarantine)
 
-| Путь                 | Git           | Workspace      |
-| -------------------- | ------------- | -------------- |
-| `site/packages/*`    | tracked       | member (канон) |
-| `packages/{ui,db,…}` | **untracked** | нет            |
-| `apps/web`           | **untracked** | нет            |
+| Путь                 | Git           | Workspace      | Quarantine                      |
+| -------------------- | ------------- | -------------- | ------------------------------- |
+| `site/packages/*`    | tracked       | member (канон) | keep                            |
+| `packages/{ui,db,…}` | **untracked** | нет            | root `.gitignore`: `/packages/` |
+| `apps/web`           | **untracked** | нет            | root `.gitignore`: `/apps/`     |
 
-JSON inventory фиксирует только git/workspace факты (portable для CI). Локальные пустые деревья на хосте после переноса **могут** существовать и различаться между машинами — их не кладём в snapshot. Следующий slice: quarantine/gitignore этих leftovers **без** поломки workspace. Не удалять `site/packages`.
+JSON inventory фиксирует только git/workspace факты (portable для CI). Корневые leftovers после `apps/web` → `site/` игнорируются Git, чтобы случайно не закоммитить пустые husks. Не удалять `site/packages`. Хостовые каталоги можно снести вручную (`rm -rf packages apps`); workspace от этого не зависит.
 
 ## Tracker и очередь программы
 
@@ -127,13 +127,13 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| #   | Slice                                                            | Ось                              | Статус                           |
-| --- | ---------------------------------------------------------------- | -------------------------------- | -------------------------------- |
-| 1   | Topology scoreboard (этот документ + inventory)                  | скорость разработки / понятность | **done** на `f3be421f` inventory |
-| 2   | Husk & import honesty (`packages/*`, `apps/web` local leftovers) | babysitting tax                  | next                             |
-| 3   | Design direction + `@nexus/ui` tokens/primitives                 | shell 2027                       | queued                           |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell`       | читаемость + путь гостя          | queued                           |
-| 5   | i18n inventory automation (shell+home hard-coded strings)        | честность RU/EN                  | queued                           |
+| #   | Slice                                                      | Ось                              | Статус   |
+| --- | ---------------------------------------------------------- | -------------------------------- | -------- |
+| 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done** |
+| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done** |
+| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | next     |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | queued   |
+| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | queued   |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 

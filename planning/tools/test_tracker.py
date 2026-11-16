@@ -194,10 +194,22 @@ class TrackerContractTests(unittest.TestCase):
             snapshot_data.get('husks', {}),
             'host-local husk probes must stay out of the committed inventory',
         )
+        self.assertEqual(snapshot_data.get('husks', {}).get('git_tracked_paths'), [])
+        gitignore = (ROOT / '.gitignore').read_text(encoding='utf8')
+        self.assertRegex(gitignore, r'(?m)^/packages/$')
+        self.assertRegex(gitignore, r'(?m)^/apps/$')
+        tracked = subprocess.check_output(
+            ['git', 'ls-files', 'packages', 'apps/web'],
+            cwd=ROOT,
+            text=True,
+        ).strip()
+        self.assertEqual(tracked, '', 'root packages/ and apps/web must stay untracked')
         body = doc.read_text(encoding='utf8')
         self.assertIn('planning/code-topology-counts.json', body)
         self.assertIn('inventory_code_topology.py', body)
         self.assertIn('features/shell', body)
+        self.assertIn('/packages/', body)
+        self.assertIn('/apps/', body)
 
 
 if __name__=='__main__':unittest.main()
