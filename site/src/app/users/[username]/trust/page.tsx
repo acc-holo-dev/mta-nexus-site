@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PublicUserTrustPanel } from "../../../../components/public-user-trust";
+import { PublicUserTrustPanel } from "../../../../features/trust/public-user-trust";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { trustCopy } from "../../../../lib/public-user-trust-copy";

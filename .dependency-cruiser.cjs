@@ -62,6 +62,38 @@ module.exports = {
       to: { dependencyTypes: ["core"] },
     },
     {
+      name: "trust-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/trust/)" },
+      to: {
+        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page)\\.ts$)",
+      },
+    },
+    {
+      name: "trust-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/trust/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "trust-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/trust/(?:(?:public-user-trust)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:public-user-trust-contract|public-user-trust-copy|public-verification-history-copy|user-platform-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "trust-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/trust/(?:(?:public-user-trust)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "moderation-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/moderation/)" },

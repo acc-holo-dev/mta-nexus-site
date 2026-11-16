@@ -2,16 +2,16 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   type ContextKind,
   contextTrustHref,
   parseContextTrustQuery,
-} from "../lib/public-context-trust-contract";
-import { contextTrustCopy, contextTrustError } from "../lib/public-context-trust-copy";
-import { approvalCopy } from "../lib/public-verification-history-copy";
-import { publicContextTrustService } from "../lib/services/public-context-trust-service";
+} from "../../../lib/public-context-trust-contract";
+import { contextTrustCopy, contextTrustError } from "../../../lib/public-context-trust-copy";
+import { approvalCopy } from "../../../lib/public-verification-history-copy";
+import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

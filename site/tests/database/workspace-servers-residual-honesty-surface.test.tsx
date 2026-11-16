@@ -113,7 +113,7 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
     "site/src/features/servers/server/server-observation-browser-page.tsx",
     "site/src/features/servers/server/server-content-editor-page.tsx",
     "site/src/features/community/server/context-publication-history-screen.tsx",
-    "site/src/components/public-context-trust-page.tsx",
+    "site/src/features/trust/server/public-context-trust-page.tsx",
     "site/src/components/license-history-page.tsx",
   ];
   for (const surface of surfaces) {
@@ -132,7 +132,9 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
   expect(
     read("site/src/features/community/server/context-publication-history-screen.tsx"),
   ).toContain("EmptyState");
-  expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/trust/server/public-context-trust-page.tsx")).toContain(
+    "EmptyState",
+  );
 });
 
 it("locks residual honesty copy for server and license residual shells", () => {

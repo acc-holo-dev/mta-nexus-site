@@ -2,7 +2,7 @@ import {
   type ContextTrustPageProps,
   contextTrustMetadata,
   PublicContextTrustPage,
-} from "../../../components/public-context-trust-page";
+} from "../../trust/public-context-trust-page";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

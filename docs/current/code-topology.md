@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `890a100e` (`dev`, slice 21 partial — report-evidence-links → community).  
+**source_sha:** `68f7ffbb` (`dev`, slice 22 — public trust UI → trust feature).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -16,7 +16,7 @@
 site/
 ├── src/
 │   ├── app/                 # App Router + HTTP adapters (282× route.ts)
-│   ├── features/            # feature-группировка (11 доменов, incl. shell/)
+│   ├── features/            # feature-группировка (12 доменов, incl. shell/)
 │   ├── components/          # корневой UI вне features (сжимается после shell absorb)
 │   └── lib/                 # плоский helpers + services/ + i18n/
 │       ├── services/        # 86 оркестраторов в одном каталоге
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `890a100e` |
+| Область                    | Факт на `68f7ffbb` |
 | -------------------------- | -----------------: |
-| `features/*` domains       |                 11 |
-| `components/` tree files   |                 44 |
-| `components/` root files   |                 39 |
+| `features/*` domains       |                 12 |
+| `components/` tree files   |                 42 |
+| `components/` root files   |                 37 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -53,12 +53,13 @@ site/
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
-| notifications |    10 |  66532 |
-| organizations |    35 | 127334 |
-| resources     |    93 | 447532 |
-| servers       |    54 | 218715 |
-| shell         |    43 |  83966 |
-| support       |    14 |  71877 |
+| notifications |    10 |  66691 |
+| organizations |    35 | 127327 |
+| resources     |    93 | 447533 |
+| servers       |    54 | 218716 |
+| shell         |    45 |  84502 |
+| support       |    14 |  72088 |
+| trust         |     5 |  14574 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -111,7 +112,9 @@ site/
 
 **Slice 20 done:** orphan [`support-center.test.tsx`](../../site/tests/database/support-center.test.tsx) → [`site/tests/database/`](../../site/tests/database/) (localization для staff/requester filters рядом с [`support-activity-shells-honesty-surface.test.tsx`](../../site/tests/database/support-activity-shells-honesty-surface.test.tsx)); корень `components/` теряет ещё один не-production файл; потребитель — публичный порт [`features/support/center.ts`](../../site/src/features/support/center.ts).
 
-**Slice 21 (partial) done:** trust-кластер в `components/` root — только `report-evidence-links` → [`features/community/report-evidence-links.ts`](../../site/src/features/community/report-evidence-links.ts) (`ReportEvidenceLinks`); владение Community (report UI и admin staff queue через публичный порт); depcruise public API без `"use client"` (как `publication-feed`); остаток: `public-user-trust.tsx`, `public-context-trust-page.tsx`.
+**Slice 21 done:** trust-кластер в `components/` root — `report-evidence-links` → [`features/community/report-evidence-links.ts`](../../site/src/features/community/report-evidence-links.ts) (`ReportEvidenceLinks`); владение Community (report UI и admin staff queue через публичный порт); depcruise public API без `"use client"` (как `publication-feed`).
+
+**Slice 22 done:** остаток публичного trust UI — `public-user-trust` → [`features/trust/public-user-trust.ts`](../../site/src/features/trust/public-user-trust.ts) (`PublicUserTrustPanel`), `public-context-trust-page` → [`features/trust/public-context-trust-page.ts`](../../site/src/features/trust/public-context-trust-page.ts) (`PublicContextTrustPage`, `contextTrustMetadata`); владение **Trust** (публичные сводки пользователя и контекста org/server, не staff moderation); `public-context-trust-page` server-only в `features/trust/server/`; depcruise `trust-feature-*`; trust-кластер в `components/` root **cleared**.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

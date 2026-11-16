@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ContentReactions } from "../../src/features/community/reactions";
-import { PublicUserTrustPanel } from "../../src/components/public-user-trust";
+import { PublicUserTrustPanel } from "../../src/features/trust/public-user-trust";
 import { reactionCopy } from "../../src/lib/content-reaction-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { trustCopy } from "../../src/lib/public-user-trust-copy";

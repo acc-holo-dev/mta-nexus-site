@@ -39,7 +39,7 @@ import TeamPage, { generateMetadata } from "../../src/app/workspace/organization
 import {
   contextTrustMetadata,
   PublicContextTrustPage,
-} from "../../src/components/public-context-trust-page";
+} from "../../src/features/trust/public-context-trust-page";
 
 const time = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ slug: "team" }) },

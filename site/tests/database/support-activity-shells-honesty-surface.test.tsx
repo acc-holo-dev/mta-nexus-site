@@ -115,7 +115,7 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     "site/src/features/support/server/support-message-page.tsx",
     "site/src/features/support/components/support-center.tsx",
     "site/src/components/public-profile-activity.tsx",
-    "site/src/components/public-context-trust-page.tsx",
+    "site/src/features/trust/server/public-context-trust-page.tsx",
     "site/src/features/servers/server/server-statistics-page.tsx",
     "site/src/features/servers/server/server-observation-browser-page.tsx",
     "site/src/features/community/components/publication-feed.tsx",
@@ -128,7 +128,9 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     expect(source).toContain("min-h-11");
   }
   expect(read("site/src/features/support/components/support-center.tsx")).toContain("EmptyState");
-  expect(read("site/src/components/public-context-trust-page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/trust/server/public-context-trust-page.tsx")).toContain(
+    "EmptyState",
+  );
   expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
     "EmptyState",
   );

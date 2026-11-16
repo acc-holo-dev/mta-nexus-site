@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/public-user-trust.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/trust/components/public-user-trust.tsx"),
+  "utf8",
+);
 
 /** Honesty lock for hidden public-user trust activity notice. */
 it("locks hidden activity notice to ErrorState", () => {
