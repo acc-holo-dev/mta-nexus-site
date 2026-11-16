@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `287c638d` (`dev`, notification-bell test relocation slice 16).  
+**source_sha:** `33a5c6b9` (`dev`, community follow absorb slice 19).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `5d7cfa07` |
+| Область                    | Факт на `33a5c6b9` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 51 |
-| `components/` root files   |                 46 |
+| `components/` tree files   |                 47 |
+| `components/` root files   |                 42 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    13 |  57526 |
-| community     |    77 | 362467 |
+| community     |    80 | 387796 |
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
