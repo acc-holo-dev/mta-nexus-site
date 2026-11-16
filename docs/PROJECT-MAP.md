@@ -54,6 +54,7 @@ Services, SQL visibility и download authority сохраняют прежние
 | [Moderation](../site/src/features/moderation/README.md)       | Жалобы и верификация                       |
 | [Accounts](../site/src/features/accounts/README.md)           | Вход, аккаунт и настройки                  |
 | [Discovery](../site/src/features/discovery/README.md)         | Общая композиция каталогов                 |
+| [Commerce](../site/src/features/commerce/README.md)           | Workspace commerce history shell (beta)    |
 
 Маршруты, сервисы, авторизация, repositories и workers сохраняют свои слои; входы и ограничения каждой feature описаны в её README.
 

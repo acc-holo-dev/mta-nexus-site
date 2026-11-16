@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `7e0519b5` (`dev`, slice 27 — accounts/profile cluster `components/` → `features/accounts`).  
+**source_sha:** pending (`dev`, slice 28 — `commerce-history-ui` → `features/commerce/workspace-history`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -16,7 +16,7 @@
 site/
 ├── src/
 │   ├── app/                 # App Router + HTTP adapters (282× route.ts)
-│   ├── features/            # feature-группировка (12 доменов, incl. shell/)
+│   ├── features/            # feature-группировка (13 доменов, incl. shell/)
 │   ├── components/          # корневой UI вне features (сжимается после shell absorb)
 │   └── lib/                 # плоский helpers + services/ + i18n/
 │       ├── services/        # 86 оркестраторов в одном каталоге
@@ -29,20 +29,20 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `7e0519b5` |
-| -------------------------- | -----------------: |
-| `features/*` domains       |                 12 |
-| `components/` tree files   |                 31 |
-| `components/` root files   |                 26 |
-| `lib/` tree files          |                410 |
-| `lib/` root files          |                297 |
-| `lib/services/` root files |                 86 |
-| `lib/**/*-i18n.ts`         |                 46 |
-| `app/**/route.ts`          |                282 |
-| `site/tests` files         |               1450 |
-| `@nexus/ui` src files      |                 18 |
-| `@nexus/domain` src files  |                 54 |
-| `@nexus/db` src files      |                201 |
+| Область                    | Факт на slice 28 |
+| -------------------------- | ---------------: |
+| `features/*` domains       |               13 |
+| `components/` tree files   |               30 |
+| `components/` root files   |               25 |
+| `lib/` tree files          |              410 |
+| `lib/` root files          |              297 |
+| `lib/services/` root files |               86 |
+| `lib/**/*-i18n.ts`         |               46 |
+| `app/**/route.ts`          |              282 |
+| `site/tests` files         |             1450 |
+| `@nexus/ui` src files      |               18 |
+| `@nexus/domain` src files  |               54 |
+| `@nexus/db` src files      |              201 |
 
 ### Features
 
@@ -60,6 +60,7 @@ site/
 | shell         |    49 |  87479 |
 | support       |    14 |  72088 |
 | trust         |     5 |  14574 |
+| commerce      |     3 |  ~3.5k |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -125,6 +126,8 @@ site/
 **Slice 26 done:** orphan [`content-comment-form.test.ts`](../../site/tests/database/content-comment-form.test.ts) → [`site/tests/database/`](../../site/tests/database/) (форма комментария + `content-comment-client` рядом с discussion/comment suites); корень `components/` −1 не-production файл; импорты по конвенции `tests/database` (`../../src/features/community/...`, `../../src/lib/...`).
 
 **Slice 27 done:** accounts/profile cluster в `components/` root — `public-profile-form`, `profile-privacy-editor`, `developer-profile-editor`, `profile-change-history`, `private-change-history-controls`, `profile-resource-pagination` → [`features/accounts/components/`](../../site/src/features/accounts/components/); `public-profile-activity` → [`features/accounts/server/`](../../site/src/features/accounts/server/public-profile-activity.tsx); публичные порты [`profile.ts`](../../site/src/features/accounts/profile.ts), [`change-history.ts`](../../site/src/features/accounts/change-history.ts), [`profile-pagination.ts`](../../site/src/features/accounts/profile-pagination.ts), [`public-profile-activity-server.ts`](../../site/src/features/accounts/public-profile-activity-server.ts); владение **Accounts** (settings/profile/privacy/developer + shared change-history controls для staff/community/org history); depcruise `accounts-feature-*` + cross-feature `change-history` для Community/Organizations; корень `components/` −7 production files.
+
+**Slice 28 done:** `commerce-history-ui` → [`features/commerce/workspace-history.ts`](../../site/src/features/commerce/workspace-history.ts) (`HistoryShell`, `HistoryPagination`); владение **Commerce** (workspace purchases/licenses/sales list shell, beta notice + tab nav); depcruise `commerce-feature-*`; потребители — `app/workspace/{purchases,licenses,sales}/page.tsx`; корень `components/` −1 production file.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

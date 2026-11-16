@@ -324,6 +324,38 @@ module.exports = {
       to: { dependencyTypes: ["core"] },
     },
     {
+      name: "commerce-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/commerce/)" },
+      to: {
+        path: "^site/src/features/commerce/(?!(?:workspace-history)\\.ts$)",
+      },
+    },
+    {
+      name: "commerce-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/commerce/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "commerce-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/commerce/(?:(?:workspace-history)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:lib/(?!(?:i18n(?:\\.ts$|/)|commerce-history-i18n\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "commerce-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/commerce/(?:(?:workspace-history)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "servers-feature-public-api",
       severity: "error",
       comment:

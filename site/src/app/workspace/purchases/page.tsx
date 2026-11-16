@@ -4,7 +4,7 @@ import { Package } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { HistoryPagination, HistoryShell } from "../../../components/commerce-history-ui";
+import { HistoryPagination, HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import {
   formatHistoryAmount,
