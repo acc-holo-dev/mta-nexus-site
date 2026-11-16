@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { ResourceCartReviewEvidence } from "../../../../../features/resources/cart-view";
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";

@@ -7,7 +7,7 @@ import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../lib/library-collections-query";

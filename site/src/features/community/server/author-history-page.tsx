@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AuthorPublicationRestore } from "../author-publication-restore";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,

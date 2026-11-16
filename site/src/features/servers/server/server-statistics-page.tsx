@@ -16,7 +16,7 @@ import {
   type ServerStatisticsResult,
   serverStatisticsService,
 } from "../../../lib/services/server-statistics-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";

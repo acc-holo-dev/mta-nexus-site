@@ -14,7 +14,7 @@ import {
 } from "../../../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
 import { authEntryHref } from "../../shell/auth-return";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 
 function claimMarkerKey(serverId: string, actor: string) {

@@ -20,7 +20,7 @@ import { orderCasePageQuery } from "../lib/order-case-query";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
-import { PlatformSignIn } from "./platform-sign-in";
+import { PlatformSignIn } from "../features/shell/guest-auth";
 import { SupportCaseThread } from "../features/support/thread";
 
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {

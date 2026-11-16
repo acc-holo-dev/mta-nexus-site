@@ -21,7 +21,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =

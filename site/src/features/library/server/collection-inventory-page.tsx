@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryReleaseFollowLatest } from "../release-follow";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";

@@ -3,24 +3,18 @@
     "route_ts": 282
   },
   "components": {
-    "root_files": 63,
-    "shellish_root_files": [
-      "guest-auth-links.tsx",
-      "platform-guest-auth-panel.tsx",
-      "platform-workspace-guest-auth.test.tsx",
-      "platform-workspace-guest-auth.tsx",
-      "support-center-auth-entry.test.tsx"
-    ],
-    "tree_bytes": 376028,
-    "tree_files": 68
+    "root_files": 57,
+    "shellish_root_files": [],
+    "tree_bytes": 366752,
+    "tree_files": 62
   },
   "features": {
     "accounts": {
-      "bytes": 51791,
+      "bytes": 51777,
       "files": 11
     },
     "community": {
-      "bytes": 357292,
+      "bytes": 356998,
       "files": 75
     },
     "discovery": {
@@ -28,35 +22,35 @@
       "files": 3
     },
     "library": {
-      "bytes": 284187,
+      "bytes": 283991,
       "files": 57
     },
     "moderation": {
-      "bytes": 63566,
+      "bytes": 63538,
       "files": 14
     },
     "notifications": {
-      "bytes": 66558,
+      "bytes": 66544,
       "files": 10
     },
     "organizations": {
-      "bytes": 127517,
+      "bytes": 127419,
       "files": 35
     },
     "resources": {
-      "bytes": 447726,
+      "bytes": 447544,
       "files": 93
     },
     "servers": {
-      "bytes": 218799,
+      "bytes": 218715,
       "files": 54
     },
     "shell": {
-      "bytes": 65233,
-      "files": 29
+      "bytes": 75007,
+      "files": 36
     },
     "support": {
-      "bytes": 71942,
+      "bytes": 71877,
       "files": 14
     }
   },
@@ -143,7 +137,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "e8d0a013b3f525e138c29c31617957aa13ea69de",
+  "source_sha": "2a855ffa4df6e92665db02fbeb5790e4109f8fc0",
   "tests": {
     "site_tests_files": 1443
   }

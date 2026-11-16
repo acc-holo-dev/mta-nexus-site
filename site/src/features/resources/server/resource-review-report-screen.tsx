@@ -11,7 +11,7 @@ import { resourceReviewCopy, resourceReviewState } from "../../../lib/resource-r
 import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { ResourceReviewDecisionForm } from "../review-controls";
 import { ResourceReviewPager } from "../reviews-view";
 

@@ -7,8 +7,8 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { supportQuery } from "../../../lib/support-workspace-contract";
 import { supportWorkspaceCopy } from "../../../lib/support-workspace-copy";
-import { PlatformGuestAuthPanel } from "../../../components/platform-guest-auth-panel";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformGuestAuthPanel } from "../../shell/guest-auth";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { SupportCaseThread } from "../thread";
 import { SupportCenter } from "../center";
 

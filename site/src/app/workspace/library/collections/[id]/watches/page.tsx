@@ -3,7 +3,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../features/resources/release-watch-batch";
 import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
 import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";

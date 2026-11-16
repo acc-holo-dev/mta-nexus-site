@@ -11,7 +11,7 @@ import { libraryReleaseComparisonQuery } from "../../../lib/library-release-comp
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibraryReleaseComparisonScreen({
   params,

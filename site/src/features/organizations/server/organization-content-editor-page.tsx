@@ -11,7 +11,7 @@ import { organizationContentService } from "../../../lib/services/organization-c
 import { parseEditableContent } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
 import { AuthorContentForm } from "../../community/author-content-form";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 import { organizationReturnPath } from "./organization-return-path";
 

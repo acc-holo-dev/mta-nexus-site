@@ -9,7 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HistoryShell } from "../../../components/commerce-history-ui";
 import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,

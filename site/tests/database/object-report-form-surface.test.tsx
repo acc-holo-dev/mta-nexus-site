@@ -37,7 +37,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 
-vi.mock("../../src/components/guest-auth-links", () => ({
+vi.mock("../../src/features/shell/guest-auth", () => ({
   GuestAuthLinks: ({ signInLabel }: { signInLabel: string }) => (
     <a href="/auth/login">{signInLabel}</a>
   ),

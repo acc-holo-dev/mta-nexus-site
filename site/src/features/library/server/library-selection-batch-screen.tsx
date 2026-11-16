@@ -16,7 +16,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibrarySelectionBatchScreen({
   params,

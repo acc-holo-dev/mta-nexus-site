@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LicenseControlPanel } from "../../../../components/license-control-panel";
 import { LicenseDetailView } from "../../../../components/license-detail-view";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../../lib/license-control-i18n";

@@ -3,8 +3,8 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../../components/guest-auth-links";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { platformSignInFocusClass } from "../../shell/guest-auth";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,

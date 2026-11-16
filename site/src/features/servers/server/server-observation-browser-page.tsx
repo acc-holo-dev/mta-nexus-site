@@ -23,7 +23,7 @@ import {
   serverStatisticsService,
 } from "../../../lib/services/server-statistics-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { ServerObservationPeriodControls } from "../statistics-view";
 import { ServerStatisticsExportButton } from "../statistics-export";
 

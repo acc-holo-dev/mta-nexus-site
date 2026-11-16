@@ -11,7 +11,7 @@ import { followActionCopy, followCopy, followError } from "../lib/follow-workspa
 import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmAction } from "./confirm-action";
-import { GuestAuthLinks } from "./guest-auth-links";
+import { GuestAuthLinks } from "../features/shell/guest-auth";
 import { ObjectMuteControls } from "./object-mute-controls";
 
 type InitialFollowState = {

@@ -24,7 +24,7 @@ import {
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 

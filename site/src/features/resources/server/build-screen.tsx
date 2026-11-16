@@ -16,7 +16,7 @@ import { resourceBuildWorkspaceService } from "../../../lib/services/resource-bu
 import { BuildModerationControls } from "../components/build-moderation-controls";
 import { BuildPackageEvidencePanel } from "../evidence";
 import { BuildProvenanceDetails } from "../evidence";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { ResourceBuildControls } from "../components/resource-build-controls";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";

@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PublicationFeed } from "../publication-feed";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { publicationCopy } from "../../../lib/publication-feed-copy";

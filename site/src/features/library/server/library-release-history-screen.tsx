@@ -10,7 +10,7 @@ import { libraryReleaseHistoryCopy } from "../../../lib/library-release-history-
 import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function LibraryReleaseHistoryScreen({
   searchParams,

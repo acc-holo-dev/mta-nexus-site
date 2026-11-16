@@ -14,7 +14,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 export function ContentReactions({
   slug,
   contentId,

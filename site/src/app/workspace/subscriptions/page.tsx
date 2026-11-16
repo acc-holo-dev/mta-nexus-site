@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewTerms } from "../../../components/plan-review-terms";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { SubscriptionControls } from "../../../components/subscription-controls";
 import { SubscriptionRecovery } from "../../../components/subscription-recovery";
 import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";

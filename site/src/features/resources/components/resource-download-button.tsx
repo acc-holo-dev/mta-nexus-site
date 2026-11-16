@@ -13,7 +13,7 @@ import {
   ResourceDownloadError,
 } from "../../../lib/resource-download-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 
 export function ResourceDownloadButton({

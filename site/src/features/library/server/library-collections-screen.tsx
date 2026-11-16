@@ -20,7 +20,7 @@ import {
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 

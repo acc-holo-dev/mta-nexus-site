@@ -6,7 +6,7 @@ import { type FormEvent, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformReportCopy, platformReportError } from "../../../lib/platform-report-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
 type ObjectReportTarget = "product" | "server" | "user";

@@ -11,7 +11,7 @@ import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18
 import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
 

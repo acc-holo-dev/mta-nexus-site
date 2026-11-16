@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { NewResourceForm } from "../../../../features/resources/create-controls";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../components/platform-session-error";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getDictionary } from "../../../../lib/i18n";

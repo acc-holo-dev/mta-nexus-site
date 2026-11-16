@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../shell/auth-return";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

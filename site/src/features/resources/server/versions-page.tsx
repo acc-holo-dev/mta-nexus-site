@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { authEntryHref } from "../../shell/auth-return";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 import { ResourceDownloadButton } from "../components/resource-download-button";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getDictionary } from "../../../lib/i18n";

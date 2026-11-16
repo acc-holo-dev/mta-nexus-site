@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { ServerClaimStatusPanel } from "../../../../features/servers/claim-status-server";
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
 import { getDictionary } from "../../../../lib/i18n";

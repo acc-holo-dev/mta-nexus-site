@@ -2,7 +2,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { ResourceReviewPager } from "../../../../features/resources/reviews-view";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";

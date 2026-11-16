@@ -1,5 +1,5 @@
-import { authEntryHref } from "../features/shell/auth-return";
-import { getDictionary, type Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { authEntryHref } from "../auth-return";
 import { GuestAuthLinks } from "./guest-auth-links";
 
 function workspaceGuestAuthCopy(locale: Locale) {

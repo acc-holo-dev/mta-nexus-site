@@ -35,7 +35,7 @@ import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../shell/guest-auth";
 
 const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
 const navLinkClass =

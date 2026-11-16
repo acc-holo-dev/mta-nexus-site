@@ -3,10 +3,10 @@ import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../../components/guest-auth-links";
+import { platformSignInFocusClass } from "../../../features/shell/guest-auth";
 import { ManagedServerCard } from "../../../features/servers/managed-card-server";
 import { ManagedServerVisibilityBatch } from "../../../features/servers/visibility-batch";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {

@@ -6,7 +6,7 @@ import {
   ContentCatalogControls,
   ContentPageNavigation,
 } from "../../../../../features/community/catalog-controls";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { serverContentId } from "../../../../../lib/server-content-api";
 import { serverContentCopy } from "../../../../../lib/server-content-copy";

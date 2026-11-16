@@ -2,7 +2,7 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { ProductDependencyList } from "../../../../../features/resources/detail-view";
 import { ResourceCompatibilityForm } from "../../../../../features/resources/compatibility-controls";
 import { getDictionary } from "../../../../../lib/i18n";

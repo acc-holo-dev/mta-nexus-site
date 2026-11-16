@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderTermsReportView } from "../../../../../components/order-terms-report";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";

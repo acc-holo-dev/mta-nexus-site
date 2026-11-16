@@ -22,7 +22,7 @@ vi.mock("../../src/features/community/author-content-form", () => ({
     <div data-editor={initial?.id ?? "new"} />
   ),
 }));
-vi.mock("../../src/components/platform-sign-in", () => ({
+vi.mock("../../src/features/shell/guest-auth", () => ({
   PlatformSignIn: ({ returnPath }: { returnPath: string }) => <div data-return-path={returnPath} />,
 }));
 vi.mock("../../src/lib/user-platform-client", () => ({

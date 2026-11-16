@@ -5,7 +5,7 @@ import { CheckCircle2, Library, PackageOpen, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
-import { GuestAuthLinks } from "../../components/guest-auth-links";
+import { GuestAuthLinks } from "../../features/shell/guest-auth";
 import { authEntryHref } from "../../features/shell/auth-return";
 import { useNexusLocale } from "../../features/shell/locale";
 import { licenseModelLabel } from "../../lib/license-model-i18n";

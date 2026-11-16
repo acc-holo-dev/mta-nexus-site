@@ -55,6 +55,7 @@ const features = [
       "session",
       "auth-session",
       "auth-return",
+      "guest-auth",
     ],
     clientUtilPorts: ["auth-return"],
     privateClients: ["shell-session-unavailable"],

@@ -12,7 +12,7 @@ import {
   supportMessageCopy,
   supportMessageError,
 } from "../../../lib/support-message-discovery-copy";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 
 export async function supportMessageMetadata() {

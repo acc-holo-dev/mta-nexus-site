@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { GuestAuthLinks } from "../../src/components/guest-auth-links";
+import { GuestAuthLinks } from "../../src/features/shell/guest-auth";
 import { getDictionary } from "../../src/lib/i18n";
 
 const harness = vi.hoisted(() => ({

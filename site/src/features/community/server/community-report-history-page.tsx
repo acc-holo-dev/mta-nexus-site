@@ -9,7 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
 import { CommunityReportHistory } from "../components/community-report-history";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function reportHistoryMetadata() {
   return {

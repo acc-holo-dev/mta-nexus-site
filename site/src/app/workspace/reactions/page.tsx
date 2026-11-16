@@ -2,7 +2,7 @@ import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/doma
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { ReactionRemoval } from "../../../components/reaction-removal";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";

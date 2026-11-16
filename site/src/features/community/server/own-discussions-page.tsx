@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import {
   ownDiscussionHref,
   parseOwnDiscussionQuery,

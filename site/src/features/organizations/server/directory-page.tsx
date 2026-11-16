@@ -1,8 +1,8 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../../components/guest-auth-links";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { platformSignInFocusClass } from "../../shell/guest-auth";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../../components/platform-session-error";
 import { organizationReturnPath } from "./organization-return-path";
 import { getDictionary } from "../../../lib/i18n";

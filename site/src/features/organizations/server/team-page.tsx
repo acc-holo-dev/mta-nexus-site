@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { OrganizationTeamDirectory } from "../team";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationTeamHref,

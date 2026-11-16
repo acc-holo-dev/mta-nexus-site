@@ -8,7 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceMediaService } from "../../../lib/services/resource-media-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourceMediaEditor } from "../components/resource-media-editor";
 

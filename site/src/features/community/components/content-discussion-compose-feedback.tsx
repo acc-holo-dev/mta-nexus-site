@@ -2,7 +2,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDiscussionCopy } from "../../../lib/content-discussion-copy";
 import type { Locale } from "../../../lib/i18n";
-import { GuestAuthLinks, platformSignInFocusClass } from "../../../components/guest-auth-links";
+import { GuestAuthLinks, platformSignInFocusClass } from "../../shell/guest-auth";
 
 export function DiscussionComposeWriteFeedback({
   error,

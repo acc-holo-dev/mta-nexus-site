@@ -44,16 +44,16 @@ vi.mock("next/link", () => ({
     </a>
   ),
 }));
-vi.mock("../features/shell/locale", async () => {
-  const { getDictionary } = await import("../lib/i18n");
+vi.mock("../locale", async () => {
+  const { getDictionary } = await import("../../../lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
-import { getDictionary } from "../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { SupportCenter } from "../../support/center";
 import { PlatformSignIn } from "./platform-sign-in";
-import { SupportCenter } from "../features/support/center";
 
 beforeEach(() => {
   harness.slots = [[], 1, 1, false, false, null, true];

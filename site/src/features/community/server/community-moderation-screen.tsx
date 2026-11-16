@@ -22,7 +22,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { ContentModerationControls } from "../content-moderation";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { PlatformSignIn } from "../../shell/guest-auth";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
