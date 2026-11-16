@@ -35,7 +35,7 @@ import ProfilePage, { generateMetadata } from "../../src/app/settings/history/pa
 import OrganizationPage from "../../src/app/workspace/organizations/[id]/activity/page";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
 import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
-import { ProfileChangeHistoryView } from "../../src/components/profile-change-history";
+import { ProfileChangeHistoryView } from "../../src/features/accounts/change-history";
 import { privateChangeHistoryCopy } from "../../src/lib/private-change-history-copy";
 import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
 import type { ProfileChangeHistory } from "../../src/lib/profile-change-history-contract";
@@ -257,7 +257,7 @@ it("preserves normalized organization selectors and renders a read failure disti
 });
 
 it("locks private change-history filter selects to min-h-11 without h-10 chrome", () => {
-  const source = read("site/src/components/private-change-history-controls.tsx");
+  const source = read("site/src/features/accounts/components/private-change-history-controls.tsx");
   expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
   expect(source).not.toContain("h-10");
   expect(source).toContain("<search aria-label={search ? copy.search : copy.apply}>");

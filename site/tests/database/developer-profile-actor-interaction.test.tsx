@@ -27,7 +27,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => ({
   platformRequest: harness.request,
 }));
 
-import { DeveloperProfileEditor } from "../../src/components/developer-profile-editor";
+import { DeveloperProfileEditor } from "../../src/features/accounts/profile";
 
 type Element = ReactElement<Record<string, unknown>>;
 function descendants(node: ReactNode): Element[] {

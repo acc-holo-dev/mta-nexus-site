@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
-import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
+import { ProfileChangeHistoryLink } from "../../../features/accounts/change-history";
+import { ProfilePrivacyEditor } from "../../../features/accounts/profile";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { editablePrivacySchema } from "../../../lib/profile-privacy-contract";
 import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";

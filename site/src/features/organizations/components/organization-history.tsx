@@ -14,7 +14,7 @@ import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
-} from "../../../components/private-change-history-controls";
+} from "../../accounts/change-history";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
 const navLinkClass =

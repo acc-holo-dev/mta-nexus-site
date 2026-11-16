@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `3551cfb8` (`dev`, slice 26 — orphan `content-comment-form.test.ts` → `tests/database`).  
+**source_sha:** (regenerated at commit; slice 27 — accounts/profile cluster `components/` → `features/accounts`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -123,6 +123,8 @@ site/
 **Slice 25 done:** `copyable-plain-code-block` → [`features/shell/copyable-plain-code-block.ts`](../../site/src/features/shell/copyable-plain-code-block.ts) (`CopyablePlainCodeBlock`); владение **Shell** (shared plain-text copy CTA, min-h-11 touch); depcruise public API + client isolation (как `pwa-service-worker`); порт с `"use client"`; потребитель — [`resource-version-help-section.tsx`](../../site/src/features/resources/components/resource-version-help-section.tsx); корень `components/` −1 production file.
 
 **Slice 26 done:** orphan [`content-comment-form.test.ts`](../../site/tests/database/content-comment-form.test.ts) → [`site/tests/database/`](../../site/tests/database/) (форма комментария + `content-comment-client` рядом с discussion/comment suites); корень `components/` −1 не-production файл; импорты по конвенции `tests/database` (`../../src/features/community/...`, `../../src/lib/...`).
+
+**Slice 27 done:** accounts/profile cluster в `components/` root — `public-profile-form`, `profile-privacy-editor`, `developer-profile-editor`, `profile-change-history`, `private-change-history-controls`, `profile-resource-pagination` → [`features/accounts/components/`](../../site/src/features/accounts/components/); `public-profile-activity` → [`features/accounts/server/`](../../site/src/features/accounts/server/public-profile-activity.tsx); публичные порты [`profile.ts`](../../site/src/features/accounts/profile.ts), [`change-history.ts`](../../site/src/features/accounts/change-history.ts), [`profile-pagination.ts`](../../site/src/features/accounts/profile-pagination.ts), [`public-profile-activity-server.ts`](../../site/src/features/accounts/public-profile-activity-server.ts); владение **Accounts** (settings/profile/privacy/developer + shared change-history controls для staff/community/org history); depcruise `accounts-feature-*` + cross-feature `change-history` для Community/Organizations; корень `components/` −7 production files.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

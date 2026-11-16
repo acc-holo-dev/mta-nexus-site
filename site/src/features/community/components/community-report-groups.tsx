@@ -12,7 +12,7 @@ import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
 import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { PrivateChangeHistoryCutoff } from "../../../components/private-change-history-controls";
+import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 export function CommunityReportGroups({
   page,
   filters,

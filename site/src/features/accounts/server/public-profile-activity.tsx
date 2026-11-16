@@ -2,12 +2,12 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
-import { publicationCopy } from "../lib/publication-feed-copy";
-import { publicationFeedView } from "../lib/publication-feed-view";
-import { publicationFeedService } from "../lib/services/publication-feed-service";
-import { PublicationFeed } from "../features/community/publication-feed";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { publicationFeedView } from "../../../lib/publication-feed-view";
+import { publicationFeedService } from "../../../lib/services/publication-feed-service";
+import { PublicationFeed } from "../../community/publication-feed";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

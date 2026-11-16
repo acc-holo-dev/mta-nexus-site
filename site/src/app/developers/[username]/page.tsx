@@ -8,7 +8,7 @@ import { cache } from "react";
 import { DeveloperExperience } from "../../../components/developer-experience";
 import { FollowButton } from "../../../features/community/follow";
 import { ProductCard } from "../../../features/resources/view";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { ProfileResourcePagination } from "../../../features/accounts/profile-pagination";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";

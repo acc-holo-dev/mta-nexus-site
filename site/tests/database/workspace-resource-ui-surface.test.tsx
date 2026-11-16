@@ -125,7 +125,7 @@ vi.mock("@nexus/ui", async () => {
 });
 
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
-import { PublicProfileForm } from "../../src/components/public-profile-form";
+import { PublicProfileForm } from "../../src/features/accounts/profile";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../../src/features/resources/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";

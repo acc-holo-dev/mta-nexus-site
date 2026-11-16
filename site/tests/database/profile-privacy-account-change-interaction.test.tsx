@@ -28,7 +28,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => ({
   platformRequest: harness.request,
 }));
 
-import { ProfilePrivacyEditor } from "../../src/components/profile-privacy-editor";
+import { ProfilePrivacyEditor } from "../../src/features/accounts/profile";
 import { PlatformRequestError } from "../../src/lib/user-platform-client";
 
 const initial = {

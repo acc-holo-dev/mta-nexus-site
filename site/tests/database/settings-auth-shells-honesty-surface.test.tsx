@@ -59,7 +59,7 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
   expect(authForm).toMatch(/min-h-11|size="touch"/u);
   expect(authForm).not.toContain('role="alert"');
 
-  const history = read("site/src/components/profile-change-history.tsx");
+  const history = read("site/src/features/accounts/components/profile-change-history.tsx");
   expect(history).toContain("ErrorState");
   expect(history).toContain("EmptyState");
   expect(history).toContain("overflow-x-clip");

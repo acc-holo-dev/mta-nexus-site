@@ -14,7 +14,7 @@ import { cache } from "react";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../../features/community/follow";
 import { ProductCard } from "../../resources/view";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { ProfileResourcePagination } from "../../accounts/profile-pagination";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";

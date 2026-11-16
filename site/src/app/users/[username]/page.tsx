@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { DeveloperExperience } from "../../../components/developer-experience";
 import { FollowButton } from "../../../features/community/follow";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { ProfileResourcePagination } from "../../../features/accounts/profile-pagination";
 import { ObjectReportForm } from "../../../features/moderation/object-report";
 import { ProductCard } from "../../../features/resources/view";
 import { ServerCard } from "../../../features/servers/client";

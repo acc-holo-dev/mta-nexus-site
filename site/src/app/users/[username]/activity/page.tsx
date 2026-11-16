@@ -1,4 +1,4 @@
-import { PublicProfileActivity } from "../../../../components/public-profile-activity";
+import { PublicProfileActivity } from "../../../../features/accounts/public-profile-activity-server";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { publicationCopy } from "../../../../lib/publication-feed-copy";
 

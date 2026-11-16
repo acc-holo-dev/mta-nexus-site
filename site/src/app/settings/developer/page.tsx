@@ -1,9 +1,9 @@
 import { EmptyState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
+import { DeveloperProfileEditor } from "../../../features/accounts/profile";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
+import { ProfileChangeHistoryLink } from "../../../features/accounts/change-history";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";

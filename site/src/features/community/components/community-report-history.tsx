@@ -14,7 +14,7 @@ import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { PrivateChangeHistoryCutoff } from "../../../components/private-change-history-controls";
+import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 export function CommunityReportHistory({
   page,
   filters,

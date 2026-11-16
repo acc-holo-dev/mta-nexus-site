@@ -26,7 +26,7 @@ vi.mock("../../src/lib/user-platform-client", async (originalModule) => ({
   platformRequest: harness.request,
 }));
 
-import { PublicProfileForm } from "../../src/components/public-profile-form";
+import { PublicProfileForm } from "../../src/features/accounts/profile";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 const { render, load, save } = createPublicProfileConflictInteractionHelpers(

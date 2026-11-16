@@ -3,19 +3,19 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,
   parseEditablePrivacy,
-} from "../lib/profile-privacy-contract";
+} from "../../../lib/profile-privacy-contract";
 import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../lib/profile-privacy-copy";
-import { PlatformRequestError, platformRequest } from "../lib/user-platform-client";
-import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+} from "../../../lib/profile-privacy-copy";
+import { PlatformRequestError, platformRequest } from "../../../lib/user-platform-client";
+import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
 
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

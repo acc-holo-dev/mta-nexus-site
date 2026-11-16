@@ -129,7 +129,9 @@ module.exports = {
       name: "accounts-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/accounts/)" },
-      to: { path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context)\\.ts$)" },
+      to: {
+        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-pagination|public-profile-activity-server)\\.ts$)",
+      },
     },
     {
       name: "accounts-feature-does-not-import-routing",
@@ -141,17 +143,17 @@ module.exports = {
       name: "accounts-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-pagination)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|settings-client-api|private-change-history-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|settings-client-api|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference|verification-workspace-contract|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "accounts-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-pagination)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -278,7 +280,7 @@ module.exports = {
         path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!organizations/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!organizations/|accounts/change-history\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

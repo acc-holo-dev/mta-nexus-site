@@ -2,18 +2,18 @@
 import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { platformRequest } from "../lib/user-platform-client";
+import type { Locale } from "../../../lib/i18n";
+import { platformRequest } from "../../../lib/user-platform-client";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
   editableDeveloperSchema,
-} from "../lib/verification-workspace-contract";
+} from "../../../lib/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,
   verificationMutationError,
-} from "../lib/verification-workspace-copy";
+} from "../../../lib/verification-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
