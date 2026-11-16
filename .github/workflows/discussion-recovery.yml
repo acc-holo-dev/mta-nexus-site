@@ -1,7 +1,7 @@
 name: Discussion recovery PostgreSQL
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths:
       - .github/workflows/discussion-recovery.yml
       - scripts/verify-discussion-recovery.mjs

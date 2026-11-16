@@ -3,6 +3,7 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -29,6 +30,7 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -41,6 +43,7 @@ updates:
   # (scripts/resolve-infra-image-digests.mjs) and must not block Dependabot forever.
   - package-ecosystem: "docker"
     directory: "/docker"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "monday"

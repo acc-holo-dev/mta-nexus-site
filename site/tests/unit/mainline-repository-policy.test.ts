@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("mainline repository policy", () => {
-  it("keeps maintained automation on main", () => {
+  it("keeps maintained automation on main and permanent dev", () => {
     const coordinator = read(".github/workflows/ci.yml");
     expect(coordinator).toContain("main");
-    expect(coordinator).not.toMatch(/branches:\s*\[[^\]]*\bdev\b/);
-    expect(coordinator).not.toMatch(/^\s*- dev\s*$/m);
+    expect(coordinator).toMatch(/^\s+- dev\s*$/m);
+    expect(coordinator).toMatch(/pull_request:[\s\S]*branches:[\s\S]*- main/);
     const dollar = "$";
     const imageCacheKey = `nexus-production-image-${dollar}{{ runner.os }}-${dollar}{{ github.sha }}`;
     const bestEffortArtifact = `continue-on-error: ${dollar}{{ github.ref_type != 'tag' }}`;
@@ -38,8 +38,8 @@ describe("mainline repository policy", () => {
     }
 
     const dependabot = read(".github/dependabot.yml");
-    expect(dependabot).not.toContain('target-branch: "dev"');
-    expect(dependabot).not.toMatch(/^\s+target-branch:/m);
+    expect(dependabot).toContain('target-branch: "dev"');
+    expect(dependabot.match(/target-branch:\s*"dev"/g)?.length).toBe(3);
     expect(dependabot.match(/package-ecosystem:/g)?.length).toBe(3);
   });
 
@@ -79,6 +79,10 @@ describe("mainline repository policy", () => {
       "TRUST-STAFF.md",
       "UX-CONTRACT.md",
     ]);
+
+    // Planned layout lives under docs/future until the documentation-system migration lands.
+    const futureDocs = readdirSync(resolve(process.cwd(), "docs/future")).sort();
+    expect(futureDocs).toEqual(["documentation-system.md"]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     // DOC-04: superseded subject chapters removed; thin nav + decision register remain.
@@ -121,10 +125,12 @@ describe("mainline repository policy", () => {
     expect(compose).toContain("./site/packages/ui/src:/app/site/packages/ui/src:ro");
   });
 
-  it("documents main as the only maintained development branch", () => {
+  it("documents permanent branches as main and dev only", () => {
     const readme = read("README.md");
-    expect(readme).toMatch(/\*\*Active development branch:\*\* `main` only\./);
-    expect(readme).not.toContain("--branch dev");
+    expect(readme).toMatch(
+      /\*\*Permanent branches:\*\* `dev` \(integration\) → `main` \(release line\)\./,
+    );
+    expect(readme).not.toMatch(/\*\*Active development branch:\*\* `main` only\./);
   });
 
   it("assigns a unique identifier to each recorded product decision", () => {
