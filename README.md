@@ -6,9 +6,8 @@
 
 ## Состояние в 30 секунд
 
-- **Для кого:** игроки, владельцы серверов, авторы ресурсов, команды-организации, покупатели/продавцы и staff. Кому и какую задачу решаем — [PRODUCT.md](docs/PRODUCT.md).
-- **Что уже подтверждено сейчас:** [CURRENT-STATE.md](docs/CURRENT-STATE.md). Что ещё открыто: [PROBLEMS.md](docs/PROBLEMS.md).
-- **Что реально запускается локально:** `pnpm dev` → приложение http://127.0.0.1:3000 (шаг за шагом — [GETTING-STARTED.md](docs/GETTING-STARTED.md)).
+- **Для кого и что подтверждено:** [docs/current/system.md](docs/current/system.md). Что ещё открыто: [docs/issues/constraints.md](docs/issues/constraints.md).
+- **Что реально запускается локально:** `pnpm dev` → приложение http://127.0.0.1:3000 (шаг за шагом — [docs/current/development.md](docs/current/development.md)).
 - **Где спросить/куда двигаться:** [карта проекта](docs/PROJECT-MAP.md); правила исполнителя — [AGENTS.md](AGENTS.md) и [контракт агента](docs/AGENT.md).
 
 > **Языки:** контракты и большинство `docs/` — русский; `OPERATIONS.md` — English-first и authoritative для команд; код, коммиты и CI — английский; интерфейс — RU/EN. Из языка файла не выводите его важность.
@@ -63,12 +62,12 @@ docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check
 
 ## Документация
 
-**Начать здесь:** [Быстрый старт](docs/GETTING-STARTED.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Состояние](docs/CURRENT-STATE.md) · [Продукт](docs/PRODUCT.md).
+**Начать здесь:** [Система](docs/current/system.md) · [Разработка](docs/current/development.md) · [CI / качество](docs/current/quality.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Ограничения](docs/issues/constraints.md).
 
-**Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Механика вклада](CONTRIBUTING.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Проблемы](docs/PROBLEMS.md).
+**Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Механика вклада](CONTRIBUTING.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Инициативы](docs/future/initiatives.md).
 
-**Предметные контракты:** [Ресурсы](docs/RESOURCES.md) · [Сообщество](docs/COMMUNITY.md) · [Серверы/org](docs/SERVERS-ORGS.md) · [Trust/staff](docs/TRUST-STAFF.md) · [Коммерция](docs/COMMERCIAL-FUTURE.md).
+**Предметные контракты:** [Ресурсы](docs/RESOURCES.md) · [Сообщество](docs/COMMUNITY.md) · [Серверы/org](docs/SERVERS-ORGS.md) · [Trust/staff](docs/TRUST-STAFF.md) · [Коммерция](docs/future/commerce.md).
 
 **Справочник и эксплуатация:** [Архитектура](docs/ARCHITECTURE.md) · [Эксплуатация](docs/OPERATIONS.md) — authoritative runbook · [Handbook](docs/handbook/00-README.md) — вступление и реестры.
 
-Единственный рабочий tracker: [`planning/tasks.json`](planning/tasks.json) ([контракт](planning/TRACKER.md); Markdown — ROADMAP/TASKS/TRACEABILITY). Замороженный import baseline для будущего Issues: `planning/import-baseline/`. Миграция handbook: [DOCS-MIGRATION](docs/DOCS-MIGRATION.md). Проект самодостаточной документации 2026: [documentation-system](docs/future/documentation-system.md). Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.
+Единственный рабочий tracker: [`planning/tasks.json`](planning/tasks.json) ([контракт](planning/TRACKER.md); Markdown — ROADMAP/TASKS/TRACEABILITY). Замороженный import baseline для будущего Issues: `planning/import-baseline/`. Система документации: [documentation-system](docs/future/documentation-system.md). Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.

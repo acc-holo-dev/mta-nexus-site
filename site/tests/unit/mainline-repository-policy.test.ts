@@ -80,9 +80,31 @@ describe("mainline repository policy", () => {
       "UX-CONTRACT.md",
     ]);
 
-    // Planned layout lives under docs/future until the documentation-system migration lands.
+    // Documentation-system migration in progress: new trees coexist with root redirect stubs.
     const futureDocs = readdirSync(resolve(process.cwd(), "docs/future")).sort();
-    expect(futureDocs).toEqual(["documentation-system.md"]);
+    expect(futureDocs).toEqual([
+      "advertising.md",
+      "commerce.md",
+      "documentation-system.md",
+      "initiatives.md",
+      "release.md",
+      "retention.md",
+      "server-packs.md",
+    ]);
+    expect(readdirSync(resolve(process.cwd(), "docs/current")).sort()).toEqual([
+      "development.md",
+      "domains",
+      "quality.md",
+      "system.md",
+    ]);
+    expect(readdirSync(resolve(process.cwd(), "docs/current/domains")).sort()).toEqual([
+      ".gitkeep",
+    ]);
+    expect(readdirSync(resolve(process.cwd(), "docs/issues")).sort()).toEqual(["constraints.md"]);
+    expect(readdirSync(resolve(process.cwd(), "docs/archive")).sort()).toEqual([
+      "migrations",
+      "pilots",
+    ]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     // DOC-04: superseded subject chapters removed; thin nav + decision register remain.

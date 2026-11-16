@@ -155,7 +155,8 @@ pnpm build
 
 CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown or
 mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
-`full_acceptance`. Local commands stay aligned with those scopes.
+`full_acceptance`. Local commands stay aligned with those scopes. Canonical
+scope contract (tiers, timings, when full does **not** run): [quality](current/quality.md).
 
 Workspace install jobs (`unit`, `verify`, `mail-worker`) must keep
 `pnpm/action-setup` **before** `actions/setup-node` with `cache: pnpm`, then
@@ -164,21 +165,21 @@ Workspace install jobs (`unit`, `verify`, `mail-worker`) must keep
 Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optional
 `node scripts/summarize-unit-timings.mjs` ranks slow files from
 `artifacts/unit-tests.json` (gitignored). Measured host timings live in
-[PROBLEMS](PROBLEMS.md#проверки-и-сопровождение); cache contract summary:
+[constraints](issues/constraints.md#проверки-и-сопровождение); cache contract summary:
 [PROJECT-MAP](PROJECT-MAP.md#ci-install-cache-проверено).
 
-Pull requests use the following change-based scopes; the local commands remain aligned with them:
+Pull requests and pushes to `dev` use path-based scopes; local commands stay aligned:
 
-| Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                                                                                      |
-| `unit_ci`         | Only `site/packages/ui/**` and/or `site/src/components/**` (plus markdown)                                                                                    | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
-| `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
-| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
+| Scope             | When                                                                                                                                                                        | CI jobs                                               | Local analogue                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `documentation`   | Markdown / planning (`README`, `AGENTS`, `CONTRIBUTING`, `docs/**/*.md`, planning JSON·md·py)                                                                               | `plan` (tracker + doc links)                          | `node scripts/check-doc-links.mjs`                                                                                      |
+| `unit_ci`         | Only UI (`packages/ui`, `src/components`) and/or docs allowlist guard `mainline-repository-policy` (+ markdown)                                                             | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
+| `fast_ci`         | Application code including `site/src/features/**`, without infra/trust hot paths                                                                                            | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
+| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust APIs/repos, inventory guards; tags `v*`; dispatch `full`; **code** push to `main` | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
 
-Every push to `main`, release tags (`v*`) and explicit full workflow dispatch run `full_acceptance`.
-Main pushes can cancel an earlier run, so even a documentation-only successor must
-verify the exact new commit rather than rely on its cancelled predecessor.
+Docs-only updates on `main` stay `documentation`. Non-docs pushes to `main`, release
+tags (`v*`) and explicit full workflow dispatch run `full_acceptance`. `main` does not
+cancel in-flight runs; `dev`/PR may cancel superseded tip runs.
 The CI unit job and host development use the same `check:code` command. It uses
 the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
 with an anchored selector for exactly seven scripts. `--sequential` bounds memory;

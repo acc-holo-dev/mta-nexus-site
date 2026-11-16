@@ -62,6 +62,7 @@ test("a move from a full-acceptance script to docs keeps full acceptance", (t) =
     code: "true",
     unit_only: "false",
     full: "true",
+    scope: "full_acceptance",
   });
 });
 
@@ -97,8 +98,8 @@ test("a docs-only main push stays docs-scoped while the prior security push stay
   // Docs-only tip pushes no longer force full_acceptance; security diffs still do.
   // In-flight cancellation of an earlier full run is workflow policy, not this classifier.
   const expectations = [
-    [base, security, { code: "true", unit_only: "false", full: "true" }],
-    [security, docs, { code: "false", unit_only: "false", full: "false" }],
+    [base, security, { code: "true", unit_only: "false", full: "true", scope: "full_acceptance" }],
+    [security, docs, { code: "false", unit_only: "false", full: "false", scope: "documentation" }],
   ];
   for (const [before, head, expected] of expectations) {
     git("checkout", "-q", "--detach", head);
@@ -131,7 +132,7 @@ test("a docs-only main push stays docs-scoped while the prior security push stay
 test("a move from application code to a UI component keeps the wider fast profile", (t) => {
   assert.deepEqual(
     classifyRename(t, "apps/web/src/app/example.tsx", "apps/web/src/components/example.tsx"),
-    { code: "true", unit_only: "false", full: "false" },
+    { code: "true", unit_only: "false", full: "false", scope: "fast_ci" },
   );
 });
 
@@ -145,6 +146,7 @@ test("moving new sensitive paths into documentation preserves full acceptance", 
       code: "true",
       unit_only: "false",
       full: "true",
+      scope: "full_acceptance",
     });
   }
 });

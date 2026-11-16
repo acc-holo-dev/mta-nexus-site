@@ -31,6 +31,13 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/src/lib/browser-route-adapter.ts",
     "site/src/lib/license-bearer-route-adapter.ts",
     "site/tests/unit/browser-api-route-inventory.test.ts",
+  ]) {
+    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
+  }
+});
+
+test("product feature modules stay on fast_ci", () => {
+  for (const file of [
     "site/src/features/resources/view.ts",
     "site/src/features/resources/client.ts",
     "site/src/features/resources/download.ts",
@@ -205,7 +212,8 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/src/features/servers/components/server-card.tsx",
     "site/src/features/servers/model/mta-directory-page.ts",
   ]) {
-    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
+    // Feature modules stay on fast_ci; full_acceptance is reserved for infra/trust paths.
+    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: false }, file);
   }
   assert.deepEqual(classifyChanges(["site/src/components/server-card.tsx"]), {
     code: true,

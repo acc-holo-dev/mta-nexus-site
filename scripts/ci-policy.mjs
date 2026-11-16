@@ -2,11 +2,18 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-// Markdown docs plus planning JSON/tooling specs from DOC-02 (not executable app code).
+// Markdown docs plus planning JSON/tooling specs (not executable app code).
 const documentationPath =
-  /^(?:README\.md|AGENTS\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md|planning\/(?:[^/\n]+\/)*[^/\n]+\.(?:json|md|py))$/;
+  /^(?:README\.md|AGENTS\.md|CONTRIBUTING\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md|planning\/(?:[^/\n]+\/)*[^/\n]+\.(?:json|md|py))$/;
 
-// Changes to deployment, dependencies and trust boundaries require full acceptance.
+/**
+ * Full acceptance = infrastructure, dependency pins, schema/migrations, and
+ * trust-boundary server surfaces where a silent miss is release-blocking.
+ *
+ * Product feature UI under site/src/features/** is intentionally NOT here:
+ * those changes use fast_ci (unit + DB + image + smoke). Full browsers and
+ * production rehearse stay reserved for true risk paths and release line.
+ */
 const fullAcceptancePaths = [
   /^\.github\/workflows\//,
   /^Dockerfile$/,
@@ -20,7 +27,6 @@ const fullAcceptancePaths = [
   /^pnpm-(?:lock|workspace)\.yaml$/,
   /^\.(?:nvmrc|node-version)$/,
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
-  /^apps\/web\/src\/features\/(?:servers|resources|community|organizations|notifications|library|support|moderation|accounts|discovery)\//,
   /^packages\/(?:config|security|storage)\//,
   /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans|order-operations|subscriptions|entitlements|resource-cart|community-reports|notifications|discussion-management|organization-governance|license-controls)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:library-collections|library-collection-(?:command|internals)|library-membership-batches|library-selection-batches)\.ts$/,
@@ -31,15 +37,20 @@ const fullAcceptancePaths = [
   /^apps\/web\/src\/app\/api\/auth\//,
   /^apps\/web\/src\/app\/api\/(?:follow|object-mute|products|support|workspace\/(?:organizations|reports))(?:\/|$)/,
   /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
-  /^tests\/unit\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
+  // Guard inventories that encode production/upload/API surface contracts.
+  /^tests\/unit\/(?:j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
 
-// Narrow unit profile: only shared UI and web components (and their colocated tests).
-// Anything else — including unknown paths — stays on fast_ci or full_acceptance.
+/**
+ * Unit-only profile: shared UI / presentational components, plus the docs
+ * allowlist guard. Docs migrations that only touch Markdown + that guard must
+ * not escalate to image/smoke/full browsers.
+ */
 const unitOnlyPaths = [
   /^packages\/ui\//,
   /^apps\/web\/src\/components\//,
   /^apps\/web\/src\/components\/.+\.(?:test|spec)\.[cm]?[jt]sx?$/,
+  /^tests\/unit\/mainline-repository-policy\.test\.ts$/,
 ];
 
 // Interpret both sides of each approved structural move using the current
@@ -77,8 +88,8 @@ export function classifyChanges(
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),
   );
-  // Main concurrency no longer cancels in-flight runs. Docs-only tip updates can
-  // stay documentation-scoped; code on main still takes full_acceptance.
+  // Release line belt: any non-docs push to main still takes full_acceptance.
+  // On dev / PR, only infrastructure/trust paths escalate — feature UI stays fast_ci.
   const full = explicitFull || release || infrastructure || (mainPush && code);
   const codeFiles = files.filter((file) => !isDocumentation(file));
   // Empty or unknown-heavy sets must not claim unit_only; default wider, never narrower.
@@ -184,9 +195,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     policy.code = true;
     policy.unitOnly = false;
   }
+  const scope = summarizeJobs(policy, {}).scope;
   appendFileSync(
     process.env.GITHUB_OUTPUT,
-    `code=${policy.code}\nunit_only=${policy.unitOnly}\nfull=${policy.full}\n`,
+    `code=${policy.code}\nunit_only=${policy.unitOnly}\nfull=${policy.full}\nscope=${scope}\n`,
   );
-  console.log(JSON.stringify({ ...policy, changedFiles: files.length }));
+  console.log(JSON.stringify({ ...policy, scope, changedFiles: files.length }));
 }

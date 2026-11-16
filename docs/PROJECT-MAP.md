@@ -91,7 +91,7 @@ Preflight: `pnpm nexus:doctor` (также `dev:preflight`).
 
 ## CI контуры
 
-`scripts/ci-policy.mjs` выбирает scope по изменённым путям: `documentation` → `unit_ci` → `fast_ci` → `full_acceptance`. Полный контур включает database, production image, browser smoke (axe WCAG A/AA), Compose startup, backup/restore rehearsal. Отдельные workflow: auth/directory/resource browser, discussion recovery.
+`scripts/ci-policy.mjs` выбирает scope по изменённым путям: `documentation` → `unit_ci` → `fast_ci` → `full_acceptance`. Контракт tiers и типичное время — [quality](current/quality.md). Feature UI на `dev`/PR → `fast_ci`; full — infra/trust и code push на `main`. Полный контур: database, production image, browser smoke (axe WCAG A/AA), Compose startup, backup/restore. Отдельные workflow: auth/directory/resource browser, discussion recovery.
 
 ### CI install cache (проверено)
 
@@ -103,7 +103,7 @@ Jobs that run `pnpm install --frozen-lockfile` (`unit`, `verify`, `mail-worker`)
 
 Jobs that only need Node for scripts or isolated browser tool installs (`plan`, `smoke`, `postgres-persistence`, `summary`, browser workflows) correctly **omit** `cache: pnpm` — they do not install the workspace. Optional extra `pnpm cache path` metadata caching is deferred until install time is measured on CI; do not share writable stores across untrusted fork jobs.
 
-Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-timings.mjs`. Measured host snapshot and slow-file list: [PROBLEMS](PROBLEMS.md#проверки-и-сопровождение).
+Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-timings.mjs`. Measured host snapshot and slow-file list: [constraints](issues/constraints.md#проверки-и-сопровождение).
 
 ## Где не искать «магических» ускорителей
 

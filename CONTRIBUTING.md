@@ -35,7 +35,7 @@ disposable database (see [docs/OPERATIONS.md](docs/OPERATIONS.md)).
 The normal integration PR is `dev` → `main`. Keep it focused; prefer merging a coherent
 `dev` tip rather than stacking unrelated long-lived branches. Do **not** change GitHub
 repository settings, branch protection, or permissions: those require an explicit owner order
-per [docs/CURRENT-STATE.md](docs/CURRENT-STATE.md). Merging, pushing and production deploy also
+per [docs/current/system.md](docs/current/system.md). Merging, pushing and production deploy also
 require explicit owner instruction — a passing CI gate is not permission to push or release.
 Do not claim "PASS" or production readiness without a real, verified status on the exact SHA.
 
