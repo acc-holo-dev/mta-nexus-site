@@ -21,7 +21,7 @@ import {
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 
 export async function LibraryCollectionsScreen({

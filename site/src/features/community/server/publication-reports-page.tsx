@@ -16,7 +16,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LibraryCollectionImport } from "../collection-import";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";

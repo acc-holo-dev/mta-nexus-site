@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { OrganizationProfileForm } from "../../../../features/organizations/profile";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { PlatformSessionError } from "../../../../components/platform-session-error";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getOrganizationCopy } from "../../../../lib/organization-workspace-copy";
 import { authService } from "../../../../lib/services/auth-service";

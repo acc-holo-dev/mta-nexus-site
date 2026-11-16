@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `cc165027` (`dev`, shell guest-auth absorb).  
+**source_sha:** `6f874a69` (`dev`, shell session-error absorb).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `d69d5f27` |
+| Область                    | Факт на `2be7fd77` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 62 |
-| `components/` root files   |                 57 |
+| `components/` tree files   |                 61 |
+| `components/` root files   |                 56 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,14 +48,14 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    36 |  74879 |
+| shell         |    38 |  75911 |
 | accounts      |    11 |  51777 |
-| community     |    75 | 356998 |
+| community     |    75 | 356896 |
 | discovery     |     3 |  20342 |
-| library       |    57 | 283991 |
+| library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
 | notifications |    10 |  66544 |
-| organizations |    35 | 127419 |
+| organizations |    35 | 127334 |
 | resources     |    93 | 447544 |
 | servers       |    54 | 218715 |
 | support       |    14 |  71877 |
@@ -91,7 +91,9 @@ site/
 
 **Slice 11 done:** guest-auth / platform sign-in → [`features/shell/guest-auth.ts`](../../site/src/features/shell/guest-auth.ts) (`GuestAuthLinks`, `PlatformSignIn`, `PlatformGuestAuthPanel`, workspace copy/links); depcruise public API + cross-feature client isolation (как auth-return).
 
-Остаток в `components/` (cross-feature): `use-modal-dialog.ts`, `platform-session-error.tsx`.
+**Slice 12 done:** platform session recovery UI → [`features/shell/session-error.ts`](../../site/src/features/shell/session-error.ts) (`PlatformSessionError`); depcruise public API + cross-feature client isolation (как auth-return); `clientUtilPorts` без `"use client"`.
+
+Остаток в `components/` (cross-feature): `use-modal-dialog.ts`.
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
 Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  

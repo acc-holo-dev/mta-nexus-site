@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { LibraryMembershipBatchForm } from "../membership-batch";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";

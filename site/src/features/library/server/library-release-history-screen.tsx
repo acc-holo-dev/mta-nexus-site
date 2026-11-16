@@ -11,7 +11,7 @@ import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {

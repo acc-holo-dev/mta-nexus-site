@@ -25,7 +25,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,

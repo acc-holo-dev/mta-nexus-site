@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
 import { CommunityReportHistory } from "../components/community-report-history";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,

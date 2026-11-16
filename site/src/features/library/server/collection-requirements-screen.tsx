@@ -12,7 +12,7 @@ import { resourceRequirementsQuery } from "../../../lib/resource-requirements-qu
 import { authService } from "../../../lib/services/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";

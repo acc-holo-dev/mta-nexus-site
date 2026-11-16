@@ -12,7 +12,7 @@ import { parseEditableContent } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
 import { AuthorContentForm } from "../../community/author-content-form";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 import { organizationReturnPath } from "./organization-return-path";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";

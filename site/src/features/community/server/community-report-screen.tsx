@@ -18,7 +18,7 @@ import { communityReportService } from "../../../lib/services/community-report-s
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function CommunityReportScreen({
   staff = false,
   id,

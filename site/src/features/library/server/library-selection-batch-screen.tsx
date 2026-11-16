@@ -17,7 +17,7 @@ import { libraryCollectionsService } from "../../../lib/services/library-collect
 import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { PlatformSessionError } from "../../shell/session-error";
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,
