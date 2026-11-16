@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `2a9d8b4c` (`dev`, shell absorb without unused chrome-controls port).  
+**source_sha:** `bed3bf18` (`dev`, sidebar BrandMark honesty).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,7 +29,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `2a9d8b4c` |
+| Область                    | Факт на `bed3bf18` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
 | `components/` tree files   |                 76 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    18 |  50465 |
+| shell         |    18 |  49434 |
 | accounts      |    11 |  51952 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
@@ -144,6 +144,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done** |
 | 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done** |
 | 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done** |
+| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 
