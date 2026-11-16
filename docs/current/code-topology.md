@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `5200defb` (`dev`, slice 25 — copyable plain-code block → shell feature).  
+**source_sha:** `dbff8e78` (`dev`, slice 26 — orphan `content-comment-form.test.ts` → `tests/database`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,7 +29,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `5200defb` |
+| Область                    | Факт на `dbff8e78` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 12 |
 | `components/` tree files   |                 39 |
@@ -121,6 +121,8 @@ site/
 **Slice 24 done:** `legal-document` → [`features/shell/legal-document.ts`](../../site/src/features/shell/legal-document.ts) (`LegalDocument`); владение **Shell** (публичный chrome/layout terms, privacy, copyright, community-rules); depcruise public API + client isolation (как `home-personal`); потребители — `app/{terms,privacy,copyright,community-rules}/page.tsx`; корень `components/` −1 production file.
 
 **Slice 25 done:** `copyable-plain-code-block` → [`features/shell/copyable-plain-code-block.ts`](../../site/src/features/shell/copyable-plain-code-block.ts) (`CopyablePlainCodeBlock`); владение **Shell** (shared plain-text copy CTA, min-h-11 touch); depcruise public API + client isolation (как `pwa-service-worker`); порт с `"use client"`; потребитель — [`resource-version-help-section.tsx`](../../site/src/features/resources/components/resource-version-help-section.tsx); корень `components/` −1 production file.
+
+**Slice 26 done:** orphan [`content-comment-form.test.ts`](../../site/tests/database/content-comment-form.test.ts) → [`site/tests/database/`](../../site/tests/database/) (форма комментария + `content-comment-client` рядом с discussion/comment suites); корень `components/` −1 не-production файл; импорты по конвенции `tests/database` (`../../src/features/community/...`, `../../src/lib/...`).
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
