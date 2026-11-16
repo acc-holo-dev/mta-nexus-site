@@ -96,6 +96,9 @@ describe("mainline repository policy", () => {
       "domains",
       "system.md",
     ]);
+    expect(readdirSync(resolve(process.cwd(), "docs/current/domains")).sort()).toEqual([
+      ".gitkeep",
+    ]);
     expect(readdirSync(resolve(process.cwd(), "docs/issues")).sort()).toEqual(["constraints.md"]);
     expect(readdirSync(resolve(process.cwd(), "docs/archive")).sort()).toEqual([
       "migrations",
