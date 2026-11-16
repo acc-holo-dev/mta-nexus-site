@@ -19,12 +19,6 @@
       "text": "NX"
     },
     {
-      "id": "brand.footer.copyright",
-      "kind": "jsx-text",
-      "path": "site/src/features/shell/components/footer.tsx",
-      "text": "© 2026 MTA Nexus ·"
-    },
-    {
       "id": "meta.title-template",
       "kind": "template",
       "path": "site/src/app/layout.tsx",
@@ -86,13 +80,6 @@
       "line": 86,
       "path": "site/src/app/page.tsx",
       "text": "—"
-    },
-    {
-      "allowlist_id": "brand.footer.copyright",
-      "kind": "jsx-text",
-      "line": 48,
-      "path": "site/src/features/shell/components/footer.tsx",
-      "text": "© 2026 MTA Nexus ·"
     }
   ],
   "scan_roots": [
@@ -104,10 +91,10 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature, home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "5418a01fad0060a169c3c41f6cbaadb003c6eab8",
+  "source_sha": "707dda4edf13a0a3f3f93481eefdc3677f17599a",
   "summary": {
-    "allowlisted": 8,
-    "findings": 8,
+    "allowlisted": 7,
+    "findings": 7,
     "locale_copy_ternaries": 0,
     "scanned_files": 20,
     "unallowlisted": 0
