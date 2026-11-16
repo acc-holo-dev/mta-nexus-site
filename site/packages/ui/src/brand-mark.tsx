@@ -24,6 +24,8 @@ const wordmarkBySize: Record<BrandMarkSize, string> = {
 /**
  * Shared NX tile + optional wordmark for shell chrome.
  * Renders `<a>` when `href` is set; otherwise a non-interactive span.
+ * Linked marks always expose a single accessible name so responsive
+ * CSS that hides the wordmark cannot leave an empty link.
  */
 export function BrandMark({
   href = "/",
@@ -39,12 +41,11 @@ export function BrandMark({
         "inline-flex items-center justify-center bg-accent text-white",
         tileBySize[size],
       )}
-      aria-hidden={showWordmark ? true : undefined}
     >
       NX
     </span>
   );
-  const content = (
+  const mark = (
     <>
       {tile}
       {showWordmark ? (
@@ -59,13 +60,10 @@ export function BrandMark({
 
   if (href) {
     return (
-      <a
-        href={href}
-        className={classes}
-        aria-label={showWordmark ? undefined : "MTA NEXUS"}
-        {...rest}
-      >
-        {content}
+      <a href={href} className={classes} aria-label="MTA NEXUS" {...rest}>
+        <span className="inline-flex items-center gap-2" aria-hidden="true">
+          {mark}
+        </span>
       </a>
     );
   }
@@ -73,14 +71,16 @@ export function BrandMark({
   if (showWordmark) {
     return (
       <span className={classes} {...rest}>
-        {content}
+        {mark}
       </span>
     );
   }
 
   return (
     <span className={classes} role="img" aria-label="MTA NEXUS" {...rest}>
-      {content}
+      <span className="inline-flex items-center gap-2" aria-hidden="true">
+        {mark}
+      </span>
     </span>
   );
 }
