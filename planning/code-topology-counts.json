@@ -31,7 +31,7 @@
       "use-auth-session.test.ts",
       "use-auth-session.ts"
     ],
-    "tree_bytes": 440657,
+    "tree_bytes": 440055,
     "tree_files": 89
   },
   "features": {
@@ -155,11 +155,11 @@
     "domain": 54,
     "security": 10,
     "storage": 6,
-    "ui": 18,
+    "ui": 20,
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "bcb489ea5da6c02b77694e88138e757697f595fd",
+  "source_sha": "ba38852e7bd226fdb696aceabc9320611ce14403",
   "tests": {
     "site_tests_files": 1443
   }
