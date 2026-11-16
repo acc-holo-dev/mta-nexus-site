@@ -18,11 +18,13 @@ import {
 import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { AdminAdPlacementSection } from "../../components/admin/admin-ad-placement-section";
-import { AdminBuildsQuarantineSection } from "../../components/admin/admin-builds-quarantine-section";
-import { AdminHealthStats } from "../../components/admin/admin-health-stats";
-import { AdminReportsSection } from "../../components/admin/admin-reports-section";
-import { AdminVerificationQueueSection } from "../../components/admin/admin-verification-queue-section";
+import {
+  AdminAdPlacementSection,
+  AdminBuildsQuarantineSection,
+  AdminHealthStats,
+  AdminReportsSection,
+  AdminVerificationQueueSection,
+} from "../../features/moderation/admin-home";
 import { ContentModerationControls } from "../../features/community/content-moderation";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { getCommercialCopy } from "../../lib/commercial-i18n";

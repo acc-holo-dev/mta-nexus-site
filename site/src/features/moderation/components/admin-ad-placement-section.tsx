@@ -1,6 +1,6 @@
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { AdSlotPlan } from "@nexus/domain";
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../../lib/i18n";
 
 /**
  * UX-24 -- admin overview of the (feature-flagged) advertising placement

@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "./i18n";
 
 const ADMIN_STATUS_LABELS = {
   en: {

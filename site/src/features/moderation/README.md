@@ -1,7 +1,14 @@
 # Модерация
 
-Жалобы на объекты, обработка жалоб и заявки на верификацию.
+Жалобы на объекты, обработка жалоб, заявки на верификацию и staff dashboard `/admin`.
 
-`object-report`, `report-controls`, `verification-workspace`, `verification-amend`, `verification-controls` — клиентские входы; `reports-server` — серверные экраны.
+| Entry                                                                            | Контракт                                     |
+| -------------------------------------------------------------------------------- | -------------------------------------------- |
+| `object-report.ts`                                                               | Форма жалобы на объект                       |
+| `report-controls.ts`                                                             | `ReportModerationControls`                   |
+| `verification-workspace.ts`, `verification-amend.ts`, `verification-controls.ts` | Верификация workspace                        |
+| `reports-server.ts`                                                              | Серверные экраны жалоб                       |
+| `admin-home.ts`                                                                  | `Admin*Section` blocks для `/admin` overview |
 
-Внутренние компоненты не являются публичным API. Маршруты остаются в App Router; сервисы, авторизация, доступ к данным и существующие правила предметной области сохраняются в прежних слоях. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
+Внутренние `components/` не являются публичным API. Границы — dependency-cruiser и
+`scripts/tests/moderation-feature-boundaries.node-test.mjs`.

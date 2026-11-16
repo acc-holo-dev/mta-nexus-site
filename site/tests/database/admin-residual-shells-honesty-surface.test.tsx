@@ -126,7 +126,9 @@ it("keeps admin support messages and report history loadings as clipped re-expor
 });
 
 it("locks admin builds quarantine actionable links to min-h-11 touch targets", () => {
-  const source = read("site/src/components/admin/admin-builds-quarantine-section.tsx");
+  const source = read(
+    "site/src/features/moderation/components/admin-builds-quarantine-section.tsx",
+  );
   expect(source).toContain("touchLinkClass");
   expect(source).toContain("inline-flex min-h-11 items-center");
   expect(source).not.toContain('className="text-accent underline');

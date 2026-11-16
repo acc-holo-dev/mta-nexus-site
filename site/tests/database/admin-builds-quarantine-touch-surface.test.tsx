@@ -13,7 +13,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   }),
 }));
 
-import { AdminBuildsQuarantineSection } from "../../src/components/admin/admin-builds-quarantine-section";
+import { AdminBuildsQuarantineSection } from "../../src/features/moderation/components/admin-builds-quarantine-section";
 
 it.each(["en", "ru"] as const)(
   "renders admin builds quarantine actionable links with min-h-11 touch targets in %s",

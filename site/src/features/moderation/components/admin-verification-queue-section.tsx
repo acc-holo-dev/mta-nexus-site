@@ -2,11 +2,11 @@ import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
-import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels";
-import type { getDictionary, Locale } from "../../lib/i18n";
-import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
-import { verificationCopy } from "../../lib/verification-workspace-copy";
-import { VerificationModerationControls } from "../../features/moderation/verification-controls";
+import { adminStatusLabel, adminStatusTone } from "../../../lib/admin-status-labels";
+import type { getDictionary, Locale } from "../../../lib/i18n";
+import { verificationApplicationsCopy } from "../../../lib/verification-applications-copy";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { VerificationModerationControls } from "../verification-controls";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 

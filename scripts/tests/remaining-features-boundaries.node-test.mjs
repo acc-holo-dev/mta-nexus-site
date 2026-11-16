@@ -30,7 +30,7 @@ const features = [
     ],
     privateClients: [],
     servers: [["reports-server", "platform-reports-screen.tsx"]],
-    safe: "platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy|verification-moderation",
+    safe: "platform-report-i18n|private-api-request|admin-action-confirmation|admin-status-labels|community-report-copy|order-case-i18n|resource-review-i18n|storage-maintenance-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy|verification-moderation",
   },
   {
     name: "accounts",

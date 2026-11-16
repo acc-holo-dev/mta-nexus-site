@@ -129,6 +129,8 @@ site/
 
 **Slice 28 done:** `commerce-history-ui` → [`features/commerce/workspace-history.ts`](../../site/src/features/commerce/workspace-history.ts) (`HistoryShell`, `HistoryPagination`); владение **Commerce** (workspace purchases/licenses/sales list shell, beta notice + tab nav); depcruise `commerce-feature-*`; потребители — `app/workspace/{purchases,licenses,sales}/page.tsx`; корень `components/` −1 production file.
 
+**Slice 29 done:** `components/admin/*` → [`features/moderation/admin-home.ts`](../../site/src/features/moderation/admin-home.ts) (`Admin*Section` for `/admin` overview: health, reports, verification, builds quarantine, ad inventory); `app/admin/status-labels` → [`lib/admin-status-labels.ts`](../../site/src/lib/admin-status-labels.ts); владение **Moderation** (staff dashboard composition + cross-feature ports `community/report-evidence-links`, `resources/qa-report-actions`, `resources/quarantine-controls`); depcruise `moderation-feature-*` + `moderation-feature-boundaries.node-test.mjs`; `components/` −5 production files (`admin/` cleared).
+
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
