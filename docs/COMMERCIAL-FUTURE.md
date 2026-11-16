@@ -160,12 +160,12 @@ Marketplace organic signals: relevance, sales, rating, freshness, update frequen
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------- |
 | Управление | Staff/оператор                                                                   | Рекламодатель self-serve                  |
 | Оплата     | Вне или без live self-checkout                                                   | Checkout, обязательства, биллинг          |
-| Статус     | Предложение/нужен продуктовый выбор слотов и lifecycle                           | Отдельная коммерческая программа          |
+| Статус     | Lifecycle и admin overview за флагом; публичный запуск требует отдельной приёмки | Отдельная коммерческая программа          |
 | Граница    | Органика, trust, auth, download, support не превращаются в преграду ради показов | Выплаты, DRM, payouts — только после gate |
 
-**предложение.** Конкретный lifecycle placement, no-fill, hide/report rules, measurement units (impression/click/useful action) — UX-24/26; whitelist поверхностей — UX F5. Personalization inputs и full opt-out — owner-delegated target; explainability типов причин без anti-abuse weights. Детали organic search UX — [UX-CONTRACT.md](UX-CONTRACT.md).
+**предложение.** Правила hide/report, измерения (impression/click/useful action) и whitelist поверхностей требуют отдельной приёмки UX-25/26 и F5. Personalization inputs и full opt-out — owner-delegated target; explainability типов причин без anti-abuse weights. Детали organic search UX — [UX-CONTRACT.md](UX-CONTRACT.md).
 
-**текущий runtime.** Sponsored badge / labeling primitives могут существовать; законченный runtime placements и live inventory **не** установлены (**живой неизвестно** на production).
+**текущий код.** Модель placement и read-only admin overview существуют за выключенным по умолчанию флагом; renderer и настройка opt-out реализованы частично. Публичный serve-путь и live inventory не подтверждены; состояние production неизвестно.
 
 ---
 
