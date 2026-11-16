@@ -1,6 +1,6 @@
 # Продуктовый контракт и границы ближайшего выпуска
 
-**Статус:** обогащено DOC-05. Опирается на P-001…P-008, [01-PROJECT-CONCEPT](PRODUCT.md), [32-LAUNCH…](PRODUCT.md), [37-HOME…](PRODUCT.md). База: `385e577e7443cf7d7b817419ce5c3b8afe87b690`.
+**Статус:** предметный контракт; опирается на решения P-001…P-008. Историческая база DOC-05 — `385e577e7443cf7d7b817419ce5c3b8afe87b690`.
 
 Предметные контракты: [RESOURCES](RESOURCES.md) · [COMMUNITY](COMMUNITY.md) · [SERVERS-ORGS](SERVERS-ORGS.md) · [TRUST-STAFF](TRUST-STAFF.md) · [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Сценарии — [FLOWS](FLOWS.md); UI — [UX-CONTRACT](UX-CONTRACT.md).
 
@@ -21,7 +21,7 @@ MTA NEXUS объединяет публичные серверы Multi Theft Aut
 
 ## Действующая граница (current runtime)
 
-Код закрытой беты распространяет **бесплатные** ресурсы; реальные платежи, выплаты и production DRM **не** включены. Платный marketplace, подписки и seller-opt-in DRM — утверждённое направление ([COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md)).
+Код бесплатной беты распространяет **бесплатные** ресурсы; реальные платежи, выплаты и production DRM **не** включены. Платный marketplace, подписки и seller-opt-in DRM — утверждённое направление ([COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md)).
 
 Все публичные серверы из master list видимы независимо от регистрации владельца. Claim открывает управление и доказывает контроль, но **не** условие появления в каталоге. Live-данные не подменяются редактором страницы ([SERVERS-ORGS](SERVERS-ORGS.md)).
 
@@ -42,7 +42,7 @@ MTA NEXUS объединяет публичные серверы Multi Theft Aut
 
 ## Home / Discover (owner target)
 
-Общая Home для гостя и аккаунта: конечные секции с дальнейшим переходом, без обязательного dashboard redirect. Гость понимает площадку и читает публичное; защита действия не превращает всё знакомство в registration wall. Personal changes summary — proposal полезного модуля, не новое имя главной ([37-HOME…](PRODUCT.md), [UX-CONTRACT](UX-CONTRACT.md)).
+Общая Home для гостя и аккаунта: конечные секции с дальнейшим переходом, без обязательного dashboard redirect. Гость понимает площадку и читает публичное; защита действия не превращает всё знакомство в registration wall. Personal changes summary — proposal полезного модуля, не новое имя главной ([UX-CONTRACT](UX-CONTRACT.md)).
 
 ## Принципы развития
 
@@ -62,6 +62,6 @@ MTA NEXUS объединяет публичные серверы Multi Theft Aut
 
 ## Launch / production gates (указатель)
 
-Условия публичного запуска, onboarding и human gates — [32-LAUNCH…](PRODUCT.md), операторский runbook — [OPERATIONS](OPERATIONS.md), проект доставки — [RELEASE-PLAN](RELEASE-PLAN.md). Technical PASS ≠ deploy authorization.
+Условия публичного запуска, onboarding и human gates — [RELEASE-READINESS](RELEASE-READINESS.md), операторский runbook — [OPERATIONS](OPERATIONS.md), проект доставки — [RELEASE-PLAN](RELEASE-PLAN.md). Technical PASS ≠ deploy authorization.
 
-**Источники DOC-05:** [01-PROJECT-CONCEPT](PRODUCT.md), [02-ROLES…](TRUST-STAFF.md) (роли → TRUST-STAFF), [32-LAUNCH…](PRODUCT.md), [37-HOME…](PRODUCT.md), [03-FEATURES…](PROJECT-MAP.md). Handbook остаётся до DOC-04.
+Исторические источники и карта переноса — в [DOCS-MIGRATION](DOCS-MIGRATION.md); исходные главы доступны в Git.

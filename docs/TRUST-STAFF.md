@@ -1,6 +1,6 @@
 # Доверие, безопасность, staff и аккаунт
 
-**Статус:** предметный контракт DOC-05 (semantic merge). База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Полный текст исходных решений остаётся в [реестре](handbook/13-DECISION-REGISTER.md); NX-дополнения — в [DECISIONS.md](DECISIONS.md). Удаление handbook-глав — только DOC-04 после проверки потребителей.
+**Статус:** предметный контракт DOC-05 (semantic merge). База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Полный текст исходных решений остаётся в [реестре](handbook/13-DECISION-REGISTER.md); NX-дополнения — в [DECISIONS.md](DECISIONS.md). Перенос и удаление superseded handbook-глав завершены в DOC-04; история и карта потребителей — в [DOCS-MIGRATION](DOCS-MIGRATION.md).
 
 **Метки состояния смысла** (обязательны при чтении и доработке):
 

@@ -24,7 +24,7 @@ pnpm install --frozen-lockfile
 Для полного Compose-стека `docker/.env` необязателен: без копии стек работает на безопасных dev-дефолтах из `docker/compose.yaml`. Если нужны свои значения:
 
 ```sh
-cp config/env/.env.example docker/.env
+test ! -e docker/.env && cp config/env/.env.example docker/.env
 ```
 
 При обновлении существующего checkout со старым `deploy/.env` сохраните его значения: перенесите проверенный файл в `docker/.env` либо задайте `COMPOSE_ENV_FILES` абсолютным путём к нему. Не заменяйте рабочий env шаблоном. `nexus:doctor` остановит запуск, если старый файл остался без явного выбора окружения.
@@ -45,7 +45,8 @@ pnpm dev:docker:check           # readiness app + worker liveness
 Приложение: **http://127.0.0.1:3000**. Демо-данные (каталог):
 
 ```sh
-NEXUS_DEMO_SEED_ACK=development-only pnpm db:seed
+docker compose -p nexus-local -f docker/compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
 ```
 
 > Host-only Next без внешних Postgres/storage/scanner не запускайте: это `pnpm dev:host`, и он требует уже настроенные зависимости.

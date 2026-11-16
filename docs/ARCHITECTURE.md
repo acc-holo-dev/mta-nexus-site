@@ -2,7 +2,7 @@
 
 Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
 
-**DOC-05:** смысловые правила доменной модели и storage/scanner сохранены здесь и в указанных контрактах; полный текст [08-DOMAIN…](ARCHITECTURE.md) и [55-PRODUCTION-STORAGE…](ARCHITECTURE.md) не удалён (DOC-04).
+Доменная модель и правила storage/scanner объединены здесь и в предметных контрактах. Исторические главы доступны в Git; карта переноса — в [DOCS-MIGRATION](DOCS-MIGRATION.md).
 
 ## Форма системы
 
@@ -143,13 +143,13 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 
 ## Доменная модель (указатель)
 
-Ключевые сущности и связи (детали и исключения — [08-DOMAIN…](ARCHITECTURE.md)): Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `site/packages/db`; факты runtime — код.
+Ключевые сущности и связи: Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `site/packages/db`; факты runtime — код.
 
-Storage/scanner/observability цели и границы production mounts — [55…](ARCHITECTURE.md) + [OPERATIONS](OPERATIONS.md); Security Center / quarantine admin — также [TRUST-STAFF](TRUST-STAFF.md) и [35…](TRUST-STAFF.md).
+Цели и границы storage, scanner, observability и production mounts — в [OPERATIONS](OPERATIONS.md); Security Center и quarantine admin — в [TRUST-STAFF](TRUST-STAFF.md).
 
 ## Граница продукта
 
-Закрытая бета поддерживает распространение бесплатных ресурсов. Платные покупки, реальные выплаты и production DRM не включены. Для будущих коммерческих файлов утверждены приватное объектное хранилище и подписанная доставка через CDN; текущая локальная реализация не является этим целевым решением. Утверждённые будущие решения — в [реестре](handbook/13-DECISION-REGISTER.md) и [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); текущую реализацию проверяйте в коде.
+Бесплатная бета поддерживает распространение бесплатных ресурсов. Платные покупки, реальные выплаты и production DRM не включены. Для будущих коммерческих файлов утверждены приватное объектное хранилище и подписанная доставка через CDN; текущая локальная реализация не является этим целевым решением. Утверждённые будущие решения — в [реестре](handbook/13-DECISION-REGISTER.md) и [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); текущую реализацию проверяйте в коде.
 
 ## Проверка изменений
 
