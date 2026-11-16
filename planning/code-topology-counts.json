@@ -1,0 +1,195 @@
+{
+  "app": {
+    "route_ts": 282
+  },
+  "components": {
+    "root_files": 84,
+    "shellish_root_files": [
+      "auth-return-path.ts",
+      "footer-contribute.tsx",
+      "footer.tsx",
+      "global-shell-controls.test.tsx",
+      "guest-auth-links.tsx",
+      "locale-context.tsx",
+      "locale-switcher.tsx",
+      "mobile-nav.tsx",
+      "navbar.tsx",
+      "nexus-shell.tsx",
+      "platform-guest-auth-panel.tsx",
+      "platform-workspace-guest-auth.test.tsx",
+      "platform-workspace-guest-auth.tsx",
+      "shell-destination-policy.ts",
+      "shell-navigation.ts",
+      "shell-publication-destinations.test.tsx",
+      "shell-publication-destinations.ts",
+      "shell-session-payload.test.ts",
+      "shell-session-payload.ts",
+      "shell-session-refresh.ts",
+      "shell-session-unavailable.tsx",
+      "sidebar.tsx",
+      "support-center-auth-entry.test.tsx",
+      "use-auth-session.test.ts",
+      "use-auth-session.ts"
+    ],
+    "tree_bytes": 440657,
+    "tree_files": 89
+  },
+  "features": {
+    "accounts": {
+      "bytes": 51952,
+      "files": 11
+    },
+    "community": {
+      "bytes": 357421,
+      "files": 75
+    },
+    "discovery": {
+      "bytes": 20342,
+      "files": 3
+    },
+    "library": {
+      "bytes": 284219,
+      "files": 57
+    },
+    "moderation": {
+      "bytes": 63598,
+      "files": 14
+    },
+    "notifications": {
+      "bytes": 66606,
+      "files": 10
+    },
+    "organizations": {
+      "bytes": 127517,
+      "files": 35
+    },
+    "resources": {
+      "bytes": 448089,
+      "files": 93
+    },
+    "servers": {
+      "bytes": 218921,
+      "files": 54
+    },
+    "support": {
+      "bytes": 72003,
+      "files": 14
+    }
+  },
+  "husks": {
+    "git_tracked_paths": [],
+    "local_leftovers": {
+      "apps/web": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/config": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/db": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/domain": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/security": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/storage": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/ui": {
+        "exists": true,
+        "src_file_count": 0
+      },
+      "packages/validation": {
+        "exists": true,
+        "src_file_count": 0
+      }
+    },
+    "workspace_members": [
+      "site",
+      "site/packages/*"
+    ]
+  },
+  "lib": {
+    "i18n_modules": 46,
+    "root_dirs": [
+      "i18n",
+      "services"
+    ],
+    "root_files": 297,
+    "root_prefix_hotspots": [
+      {
+        "files": 50,
+        "prefix": "resource"
+      },
+      {
+        "files": 27,
+        "prefix": "server"
+      },
+      {
+        "files": 23,
+        "prefix": "library"
+      },
+      {
+        "files": 15,
+        "prefix": "organization"
+      },
+      {
+        "files": 12,
+        "prefix": "community"
+      },
+      {
+        "files": 10,
+        "prefix": "license"
+      },
+      {
+        "files": 9,
+        "prefix": "public"
+      },
+      {
+        "files": 9,
+        "prefix": "support"
+      },
+      {
+        "files": 8,
+        "prefix": "build"
+      },
+      {
+        "files": 8,
+        "prefix": "notification"
+      },
+      {
+        "files": 6,
+        "prefix": "discussion"
+      },
+      {
+        "files": 6,
+        "prefix": "verification"
+      }
+    ],
+    "services_root_files": 86,
+    "tree_bytes": 1602361,
+    "tree_files": 410
+  },
+  "packages_src_files": {
+    "config": 1,
+    "db": 201,
+    "domain": 54,
+    "security": 10,
+    "storage": 6,
+    "ui": 18,
+    "validation": 18
+  },
+  "scope": "Tracked working tree counts under site/src and site/packages; excludes node_modules. Local root packages/ and apps/web husks are reported separately.",
+  "source_sha": "f3be421f9bad28e014db5ce36ec6085b863b3b98",
+  "tests": {
+    "site_tests_files": 1443
+  }
+}

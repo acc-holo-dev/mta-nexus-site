@@ -171,5 +171,27 @@ class TrackerContractTests(unittest.TestCase):
         result=subprocess.run([sys.executable,str(ROOT/'planning/tools/render_backlog.py'),'--check'],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
+    def test_code_topology_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'code-topology-counts.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/code-topology-counts.json')
+        self.assertTrue(doc.is_file(), 'missing docs/current/code-topology.md')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_code_topology.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/code-topology-counts.json', body)
+        self.assertIn('inventory_code_topology.py', body)
+        self.assertIn('features/shell', body)
+
 
 if __name__=='__main__':unittest.main()

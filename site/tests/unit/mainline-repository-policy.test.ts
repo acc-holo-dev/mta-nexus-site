@@ -92,6 +92,7 @@ describe("mainline repository policy", () => {
       "server-packs.md",
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/current")).sort()).toEqual([
+      "code-topology.md",
       "development.md",
       "domains",
       "quality.md",

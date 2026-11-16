@@ -72,6 +72,7 @@ MTA NEXUS объединяет публичные серверы Multi Theft Aut
 - Tracker: [`planning/tasks.json`](../../planning/tasks.json) (пока в корневом `planning/`; перенос в `docs/planning/` — следующий шаг).
 - Ограничения и открытые проблемы: [`docs/issues/constraints.md`](../issues/constraints.md).
 - Локальный запуск и вклад: [`docs/current/development.md`](development.md).
+- Топология кода (AS-IS counts / TO-BE / очередь slices): [`docs/current/code-topology.md`](code-topology.md).
 - Операторский runbook: [`docs/OPERATIONS.md`](../OPERATIONS.md) (путь пока прежний из‑за evidence-потребителей).
 - Будущие инициативы: [`docs/future/initiatives.md`](../future/initiatives.md).
 
