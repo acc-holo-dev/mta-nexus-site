@@ -16,7 +16,7 @@ import { publicationHref } from "../lib/publication-feed-contract";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { confirmAction } from "./confirm-action";
-import { ObjectMuteControls } from "./object-mute-controls";
+import { ObjectMuteControls } from "../features/community/object-mute-controls";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

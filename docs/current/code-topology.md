@@ -99,6 +99,8 @@ site/
 
 **Slice 17 done:** `pwa-service-worker` → [`features/shell/pwa-service-worker.ts`](../../site/src/features/shell/pwa-service-worker.ts) (`PwaServiceWorker`); depcruise public API + cross-feature client isolation (как modal-dialog); порт с `"use client"`; единственный потребитель — `app/layout.tsx`.
 
+**Slice 18 done:** `object-mute-controls` → [`features/community/object-mute-controls.ts`](../../site/src/features/community/object-mute-controls.ts) (`ObjectMuteControls`); follow/mute UI under Community; depcruise public API + client isolation (как `reactions`); потребители — `follow-button`, `follow-workspace` в корне `components/` (до их absorb).
+
 ### Accounts / workspace leftovers в `components/` root
 
 **Slice 15 done:** `context-switcher` → [`features/accounts/context.ts`](../../site/src/features/accounts/context.ts) (`ContextSwitcher`); depcruise public API + accounts client isolation (как settings); порт с `"use client"`.

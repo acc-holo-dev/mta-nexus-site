@@ -12,7 +12,7 @@ import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "../features/shell/guest-auth";
-import { ObjectMuteControls } from "./object-mute-controls";
+import { ObjectMuteControls } from "../features/community/object-mute-controls";
 
 type InitialFollowState = {
   authenticated: boolean;
