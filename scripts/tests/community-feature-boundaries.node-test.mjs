@@ -19,6 +19,7 @@ const ports = [
   "author-publication-restore",
   "catalog-controls",
   "reactions",
+  "reaction-removal",
   "content-moderation",
   "object-mute-controls",
   "follow",
@@ -176,6 +177,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     "moderated-discussion-removal",
     "discussion-report-batch",
     "content-comment-form",
+    "reaction-removal",
   ].map((name) => `site/src/features/community/components/${name}.tsx`);
   const result = cruise(root, [...entries, ...componentEntries]);
   assert.equal(result.status, 0, result.stderr);

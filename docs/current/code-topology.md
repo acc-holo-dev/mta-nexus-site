@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `68f7ffbb` (`dev`, slice 22 — public trust UI → trust feature).  
+**source_sha:** `4e7086b1` (`dev`, slice 23 — workspace reaction removal → community feature).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `68f7ffbb` |
+| Область                    | Факт на `918db194` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 12 |
-| `components/` tree files   |                 42 |
-| `components/` root files   |                 37 |
+| `components/` tree files   |                 41 |
+| `components/` root files   |                 36 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    13 |  57526 |
-| community     |    83 | 390439 |
+| community     |    85 | 395306 |
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
@@ -115,6 +115,8 @@ site/
 **Slice 21 done:** trust-кластер в `components/` root — `report-evidence-links` → [`features/community/report-evidence-links.ts`](../../site/src/features/community/report-evidence-links.ts) (`ReportEvidenceLinks`); владение Community (report UI и admin staff queue через публичный порт); depcruise public API без `"use client"` (как `publication-feed`).
 
 **Slice 22 done:** остаток публичного trust UI — `public-user-trust` → [`features/trust/public-user-trust.ts`](../../site/src/features/trust/public-user-trust.ts) (`PublicUserTrustPanel`), `public-context-trust-page` → [`features/trust/public-context-trust-page.ts`](../../site/src/features/trust/public-context-trust-page.ts) (`PublicContextTrustPage`, `contextTrustMetadata`); владение **Trust** (публичные сводки пользователя и контекста org/server, не staff moderation); `public-context-trust-page` server-only в `features/trust/server/`; depcruise `trust-feature-*`; trust-кластер в `components/` root **cleared**.
+
+**Slice 23 done:** `reaction-removal` → [`features/community/reaction-removal.ts`](../../site/src/features/community/reaction-removal.ts) (`ReactionRemoval`); владение **Community** рядом с `reactions.ts` (workspace снятие реакции, confirm + API); depcruise public API + client isolation; потребитель — `app/workspace/reactions/page.tsx`.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

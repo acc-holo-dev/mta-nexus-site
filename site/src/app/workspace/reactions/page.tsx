@@ -3,7 +3,7 @@ import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { ReactionRemoval } from "../../../components/reaction-removal";
+import { ReactionRemoval } from "../../../features/community/reaction-removal";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
 import { getDictionary } from "../../../lib/i18n";
