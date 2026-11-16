@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** pending (`dev`, slice 28 — `commerce-history-ui` → `features/commerce/workspace-history`).  
+**source_sha:** `9a2fa6af` (`dev`, slice 28 — `commerce-history-ui` → `features/commerce/workspace-history`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -39,7 +39,7 @@ site/
 | `lib/services/` root files |               86 |
 | `lib/**/*-i18n.ts`         |               46 |
 | `app/**/route.ts`          |              282 |
-| `site/tests` files         |             1450 |
+| `site/tests` files         |             1451 |
 | `@nexus/ui` src files      |               18 |
 | `@nexus/domain` src files  |               54 |
 | `@nexus/db` src files      |              201 |
@@ -48,19 +48,19 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    24 | 100723 |
-| community     |    85 | 395306 |
+| accounts      |    25 | 100894 |
+| commerce      |     3 |   4022 |
+| community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
 | notifications |    10 |  66691 |
-| organizations |    35 | 127327 |
+| organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
 | servers       |    54 | 218716 |
 | shell         |    49 |  87479 |
 | support       |    14 |  72088 |
 | trust         |     5 |  14574 |
-| commerce      |     3 |  ~3.5k |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
