@@ -1,6 +1,6 @@
 # Community, identity и social — предметный контракт
 
-**Статус:** интегрированный черновик DOC-05 (предметный контракт). База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Handbook-главы остаются действующими источниками до DOC-04. Реестр ID — в [DECISIONS.md](DECISIONS.md) / [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
+**Статус:** предметный контракт, интегрированный в DOC-05. Историческая база: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Исходные главы доступны в Git; реестр ID — в [DECISIONS.md](DECISIONS.md) и [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
 
 **Метки смысла.** `текущий runtime` — подтверждено кодом на базе сверки. `owner target` — принятое целевое правило владельца. `proposal` — направление без обязательства внедрения. `live unknown` — live/production факт не установлен этим контрактом.
 
@@ -203,7 +203,7 @@
 - Telegram/Discord bots как release gate текущего этапа.
 - Opaque единый reputation score как единственную правду.
 - Измеренный retention uplift от community features — только через [RETENTION-PLAN.md](RETENTION-PLAN.md) пилоты.
-- **live unknown** production routing, capacity и фактическая модерационная нагрузка — вне этого черновика.
+- **live unknown** production routing, capacity и фактическая модерационная нагрузка — вне этого контракта.
 
 ---
 
@@ -222,13 +222,7 @@
 
 ## Источники
 
-Handbook (сохраняются до DOC-04):
-
-- [19-COMMUNITY-AND-RETENTION.md](COMMUNITY.md)
-- [21-REPUTATION-VERIFICATION-AND-REVIEWS.md](COMMUNITY.md)
-- [27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md](COMMUNITY.md)
-- [36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md](COMMUNITY.md)
-- [45-USER-PROFILE-COMMUNITY-SCREENS.md](COMMUNITY.md)
+Исторические handbook-главы перечислены в [карте переноса](DOCS-MIGRATION.md) и доступны в Git.
 
 Смежные интегрированные контракты:
 

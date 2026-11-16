@@ -1,12 +1,12 @@
 # Ресурсы, библиотека и публикация
 
-**Статус:** integrated DOC-05 draft subject contract.
+**Статус:** предметный контракт, интегрированный в DOC-05.
 
-Предметный контракт DOC-05 для каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Не активирует коммерцию и не заменяет [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md). Платежи, settlement, commission, DRM-модели, payout и dispute timing — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) (план) и исходные handbook-главы до DOC-04.
+Предметный контракт DOC-05 для каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Не активирует коммерцию и не заменяет [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md). Платежи, settlement, commission, DRM-модели, payout и dispute timing — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) (план). Исторические handbook-главы доступны в Git.
 
 | Метка               | Значение                                                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------- |
-| **Текущий runtime** | Что делает код / closed beta сейчас                                                       |
+| **Текущий runtime** | Что делает код бесплатной беты                                                            |
 | **Цель владельца**  | Утверждённая цель; строить можно при поручении, но free beta не включает реальные платежи |
 | **Предложение**     | Не утверждено к сборке без владельца                                                      |
 | **Live unknown**    | Нужно свидетельство кода/CI/среды                                                         |
@@ -17,7 +17,7 @@
 
 - Первая коммерческая вертикаль — **MTA Scripts**; архитектура не навечно ограничена scripts, но первый paid depth — вокруг них (**цель**).
 - **Коллекции и библиотека — не versioned server packs.** Приватные подборки организуют доступные ресурсы; snapshot/pack целого сервера — отдельное будущее направление ([PRODUCT.md](PRODUCT.md)).
-- Free closed beta: **нет реальных платежей**, checkout/payout/DRM production не активируются. Цели license/access сохраняются как контракт, без включения commerce.
+- Бесплатная beta: **нет реальных платежей**, checkout/payout/DRM production не активируются. Цели license/access сохраняются как контракт, без включения commerce.
 - Любой зарегистрированный пользователь может стать seller фактом публикации коммерческого продукта и принятия Seller/Publishing Agreement; отдельная обязательная seller application отсутствует. Verification — независимый evidence layer (**цель**).
 - Workspace — единый адаптивный `/workspace`, не отдельные кабинеты ролей; после login **нет** авто-редиректа в dashboard (**цель**; навигация — [UX-CONTRACT.md](UX-CONTRACT.md)).
 
@@ -270,7 +270,7 @@ Delist/archive UX: unlist доступен; history/buyer records survive; publi
 - молчаливую подмену цены/SKU/build;
 - выдачу без published + clean scan (scanner id + time);
 - объявление коллекций versioned server packs;
-- активацию real payments в free closed beta.
+- активацию real payments в бесплатной beta.
 
 ---
 
@@ -302,6 +302,6 @@ Delist/archive UX: unlist доступен; history/buyer records survive; publi
 
 Смежные контракты без дублирования: [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md) + [handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
 
-**Пока DOC-04 не завершён, исходные главы handbook остаются авторитетными** при любом расхождении с этим черновиком. Этот файл — интегрированный DOC-05 draft subject contract, не разрешение удалять handbook и не активация commerce.
+История переноса исходных глав — в [DOCS-MIGRATION](DOCS-MIGRATION.md). Этот контракт не активирует коммерцию.
 
 Resource creation (`POST /api/products`) and build submission (`POST /api/products/:id/builds`) require `X-Nexus-Actor-Id` matching the authenticated session. Missing headers return 428; changed accounts return 409. Clients must keep the original actor and exact submission when a response is lost. The author form keeps an actor-scoped pending intent and requires the same filename and SHA-256 after a reload; an exact retry can recover the existing draft or pending build. A failed recovery attempt, including rate limiting, does not establish that an earlier request failed.

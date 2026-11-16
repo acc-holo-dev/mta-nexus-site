@@ -1,6 +1,6 @@
 # Серверы и организации — предметный контракт
 
-**Статус DOC-05:** смысловой перенос глав 24, 30, 31, 48 и 49 в один предметный контракт. База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Handbook-источники не удалены (DOC-04 отдельно). Этот файл не активирует платежи, co-owner transfer, page builder и полный messaging-продукт.
+**Статус DOC-05:** смысловой перенос глав 24, 30, 31, 48 и 49 в один предметный контракт. База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Исторические handbook-источники доступны в Git; карта переноса — в [DOCS-MIGRATION](DOCS-MIGRATION.md). Этот файл не активирует платежи, co-owner transfer, page builder и полный messaging-продукт.
 
 Метки состояния:
 
@@ -257,12 +257,6 @@ Customization target: avatar; banner; bio; links; portfolio; showcase resources/
 
 ## Источники
 
-Смысл перенесён из:
-
-- [docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md](SERVERS-ORGS.md)
-- [docs/handbook/30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md](SERVERS-ORGS.md)
-- [docs/handbook/31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md](SERVERS-ORGS.md)
-- [docs/handbook/48-SERVER-OWNER-SCREENS.md](SERVERS-ORGS.md)
-- [docs/handbook/49-ORGANIZATION-SCREENS.md](SERVERS-ORGS.md)
+Исторические handbook-главы перечислены в [карте переноса](DOCS-MIGRATION.md) и доступны в Git.
 
 Перекрёстные контракты: [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md), [TRUST-STAFF.md](TRUST-STAFF.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [PRODUCT.md](PRODUCT.md).

@@ -1,6 +1,6 @@
 # MTA NEXUS
 
-Платформа сообщества Multi Theft Auto: каталог серверов, публикации, профили и безопасное распространение ресурсов. Текущая версия: `1.2.0-beta.3`, открытая бесплатная бета. Платежи и выплаты не включены; коммерческий marketplace и DRM — утверждённая цель, а не действующая функция.
+Платформа сообщества Multi Theft Auto: каталог серверов, публикации, профили и безопасное распространение ресурсов. Текущая версия: `1.2.0-beta.3`; ближайшая линия выпуска — бесплатная бета. Платежи и выплаты не включены; коммерческий marketplace и DRM — утверждённая цель, а не действующая функция.
 
 **Active development branch:** `main` only. Production-развёртывание требует отдельного решения.
 
@@ -22,7 +22,7 @@ docker compose -p nexus-local -f docker/compose.yaml up --build --detach --wait 
 docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
-Копия заготовки переменных окружения для локального Compose-стека: `cp config/env/.env.example docker/.env` — Compose читает `docker/.env` как project directory; без копии стек работает на безопасных dev-дефолтах из `docker/compose.yaml`. Для host-only Next (`pnpm dev:host`) переменные задаются в корневом `.env`.
+При необходимости создайте `docker/.env` из `config/env/.env.example`, не перезаписывая существующий файл. Compose читает `docker/.env` как project directory; без него стек работает на dev-дефолтах из `docker/compose.yaml`. Для host-only Next (`pnpm dev:host`) переменные задаются в корневом `.env`.
 
 При установленных Node.js 26.11.1 и pnpm 12.4.2:
 
