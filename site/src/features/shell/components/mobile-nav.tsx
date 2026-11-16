@@ -5,7 +5,7 @@ import { LogIn, Menu, type Server, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
+import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
 import { useAuthSession } from "../auth-session";

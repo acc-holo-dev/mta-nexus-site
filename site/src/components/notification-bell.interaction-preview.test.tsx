@@ -33,7 +33,7 @@ vi.mock("../lib/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
   observeNotificationInboxChange: harness.observe,
 }));
-vi.mock("./use-modal-dialog", () => ({
+vi.mock("../features/shell/modal-dialog", () => ({
   useModalDialog: () => ({ current: null }),
   clickedDialogBackdrop: () => false,
 }));

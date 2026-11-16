@@ -57,6 +57,7 @@ const features = [
       "auth-return",
       "guest-auth",
       "session-error",
+      "modal-dialog",
     ],
     clientUtilPorts: ["auth-return", "session-error"],
     privateClients: ["shell-session-unavailable"],

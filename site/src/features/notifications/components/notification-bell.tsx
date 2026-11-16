@@ -15,7 +15,7 @@ import { privateApiRequest } from "../../../lib/private-api-request";
 import { startVisiblePolling } from "../../../lib/visible-polling";
 import { confirmAction } from "../../../components/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
+import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();

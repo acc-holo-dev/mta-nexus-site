@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `6f874a69` (`dev`, shell session-error absorb).  
+**source_sha:** `e8f084ae` (`dev`, shell modal-dialog absorb).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `72f134d2` |
+| Область                    | Факт на `e8f084ae` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 61 |
-| `components/` root files   |                 56 |
+| `components/` tree files   |                 60 |
+| `components/` root files   |                 55 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -53,11 +53,11 @@ site/
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
 | moderation    |    14 |  63538 |
-| notifications |    10 |  66544 |
+| notifications |    10 |  66532 |
 | organizations |    35 | 127334 |
-| resources     |    93 | 447544 |
+| resources     |    93 | 447532 |
 | servers       |    54 | 218715 |
-| shell         |    38 |  75911 |
+| shell         |    40 |  78289 |
 | support       |    14 |  71877 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
@@ -93,7 +93,9 @@ site/
 
 **Slice 12 done:** platform session recovery UI → [`features/shell/session-error.ts`](../../site/src/features/shell/session-error.ts) (`PlatformSessionError`); depcruise public API + cross-feature client isolation (как auth-return); `clientUtilPorts` без `"use client"`.
 
-Остаток в `components/` (cross-feature): `use-modal-dialog.ts`.
+**Slice 13 done:** `use-modal-dialog` → [`features/shell/modal-dialog.ts`](../../site/src/features/shell/modal-dialog.ts) (`useModalDialog`, `clickedDialogBackdrop`); depcruise public API + cross-feature client isolation (как session-error); порт с `"use client"`, вне `clientUtilPorts`.
+
+Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
 Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  
