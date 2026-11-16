@@ -1,9 +1,9 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../lib/i18n";
-import { LocaleProvider } from "../features/shell/locale";
-import { SupportCenter } from "../features/support/center";
+import { getDictionary } from "../../src/lib/i18n";
+import { LocaleProvider } from "../../src/features/shell/locale";
+import { SupportCenter } from "../../src/features/support/center";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 
