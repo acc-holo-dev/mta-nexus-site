@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LegalDocument } from "../../components/legal-document";
+import { LegalDocument } from "../../features/shell/legal-document";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 
