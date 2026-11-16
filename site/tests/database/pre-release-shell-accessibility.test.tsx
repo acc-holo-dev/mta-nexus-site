@@ -39,10 +39,16 @@ vi.mock("../../src/features/accounts/controls", async () => {
   };
 });
 
-vi.mock("../../src/features/shell/chrome-controls", async () => {
+vi.mock("../../src/features/shell/components/locale-switcher", async () => {
   const ReactModule = await import("react");
   return {
     LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "locale" }),
+  };
+});
+
+vi.mock("../../src/features/shell/components/theme-toggle", async () => {
+  const ReactModule = await import("react");
+  return {
     ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "theme" }),
   };
 });
@@ -54,8 +60,8 @@ vi.mock("../../src/features/notifications/bell", async () => {
   };
 });
 
-import { MobileNav, Sidebar } from "../../src/features/shell/sidebar";
 import { NexusShell } from "../../src/features/shell/shell";
+import { MobileNav, Sidebar } from "../../src/features/shell/sidebar";
 
 describe("pre-release shell accessibility behavior", () => {
   beforeEach(() => {
