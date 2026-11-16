@@ -3,10 +3,10 @@
     "route_ts": 282
   },
   "components": {
-    "root_files": 34,
+    "root_files": 33,
     "shellish_root_files": [],
-    "tree_bytes": 273540,
-    "tree_files": 39
+    "tree_bytes": 269692,
+    "tree_files": 38
   },
   "features": {
     "accounts": {
@@ -141,8 +141,8 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "dbff8e784ab5a7a4b248d9ae3b92dfc30ff1577b",
+  "source_sha": "3551cfb888d3dc48d76ca8c8d007ab3526c32884",
   "tests": {
-    "site_tests_files": 1450
+    "site_tests_files": 1451
   }
 }

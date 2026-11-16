@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `dbff8e78` (`dev`, slice 26 — orphan `content-comment-form.test.ts` → `tests/database`).  
+**source_sha:** `3551cfb8` (`dev`, slice 26 — orphan `content-comment-form.test.ts` → `tests/database`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `dbff8e78` |
+| Область                    | Факт на `3551cfb8` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 12 |
-| `components/` tree files   |                 39 |
-| `components/` root files   |                 34 |
+| `components/` tree files   |                 38 |
+| `components/` root files   |                 33 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
