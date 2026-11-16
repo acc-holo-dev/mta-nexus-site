@@ -15,3 +15,6 @@ production-код использует публичные входы; маршр
 Client graph проверяется на отсутствие серверных модулей, инфраструктуры и Node
 builtins. Подтверждение действий, actor/session identity, восстановление и события
 синхронизации сохраняют существующее поведение.
+
+Focused bell suites (effects, identity, interaction, preview surface) живут в
+`site/tests/database/notification-bell*.test.tsx`, не в `components/`.

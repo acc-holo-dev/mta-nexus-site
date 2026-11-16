@@ -39,22 +39,22 @@ vi.mock("react", async (original) => ({
     }
   },
 }));
-vi.mock("../lib/visible-polling", () => ({
+vi.mock("../../src/lib/visible-polling", () => ({
   startVisiblePolling: (options: typeof h.poll) => {
     h.poll = options;
     return () => {};
   },
 }));
-vi.mock("../lib/notification-inbox-events", () => ({
+vi.mock("../../src/lib/notification-inbox-events", () => ({
   observeNotificationInboxChange: () => () => {},
   announceNotificationInboxChange: () => {},
 }));
-vi.mock("../features/shell/modal-dialog", () => ({
+vi.mock("../../src/features/shell/modal-dialog", () => ({
   useModalDialog: () => ({ current: null }),
   clickedDialogBackdrop: () => false,
 }));
-vi.mock("../features/shell/locale", async (original) => ({
-  ...(await original<typeof import("../features/shell/locale")>()),
+vi.mock("../../src/features/shell/locale", async (original) => ({
+  ...(await original<typeof import("../../src/features/shell/locale")>()),
   useNexusLocale: () => ({
     locale: "en",
     dictionary: {
@@ -77,7 +77,7 @@ vi.mock("../features/shell/locale", async (original) => ({
     },
   }),
 }));
-import { NotificationBell } from "../features/notifications/bell";
+import { NotificationBell } from "../../src/features/notifications/bell";
 function flatten(node: ReactNode): ReactElement<Record<string, unknown>>[] {
   if (Array.isArray(node)) return node.flatMap(flatten);
   if (!node || typeof node !== "object" || !("props" in node)) return [];

@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `fb6340b7` (`dev`, accounts context-switcher absorb).  
+**source_sha:** `287c638d` (`dev`, notification-bell test relocation slice 16).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,17 +29,17 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `fb6340b7` |
+| Область                    | Факт на `2c67fa22` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 57 |
-| `components/` root files   |                 52 |
+| `components/` tree files   |                 51 |
+| `components/` root files   |                 46 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
 | `lib/**/*-i18n.ts`         |                 46 |
 | `app/**/route.ts`          |                282 |
-| `site/tests` files         |               1443 |
+| `site/tests` files         |               1449 |
 | `@nexus/ui` src files      |                 18 |
 | `@nexus/domain` src files  |                 54 |
 | `@nexus/db` src files      |                201 |
@@ -100,6 +100,8 @@ site/
 ### Accounts / workspace leftovers в `components/` root
 
 **Slice 15 done:** `context-switcher` → [`features/accounts/context.ts`](../../site/src/features/accounts/context.ts) (`ContextSwitcher`); depcruise public API + accounts client isolation (как settings); порт с `"use client"`.
+
+**Slice 16 done:** orphan suites `notification-bell*.test.tsx` → [`site/tests/database/`](../../site/tests/database/) (effects, identity, interaction suites рядом с [`notification-bell-preview-surface.test.tsx`](../../site/tests/database/notification-bell-preview-surface.test.tsx)); корень `components/` теряет 6 не-production файлов; импорты по конвенции `tests/database` (`../../src/features/...`, harness в `tests/helpers/`).
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

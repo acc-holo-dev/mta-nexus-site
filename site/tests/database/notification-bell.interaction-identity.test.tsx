@@ -5,7 +5,7 @@ import {
   notificationBellDictionary,
   response,
   sample,
-} from "../../tests/helpers/notification-bell-interaction-harness";
+} from "../helpers/notification-bell-interaction-harness";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -17,27 +17,27 @@ const harness = vi.hoisted(() => ({
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 
-vi.mock("./confirm-action", () => ({
+vi.mock("../../src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../features/shell/locale", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: notificationBellDictionary,
   }),
 }));
-vi.mock("../lib/notification-inbox-events", () => ({
+vi.mock("../../src/lib/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
   observeNotificationInboxChange: harness.observe,
 }));
-vi.mock("../features/shell/modal-dialog", () => ({
+vi.mock("../../src/features/shell/modal-dialog", () => ({
   useModalDialog: () => ({ current: null }),
   clickedDialogBackdrop: () => false,
 }));
 
-import { NotificationBell } from "../features/notifications/bell";
+import { NotificationBell } from "../../src/features/notifications/bell";
 
 const { bellButton, openPopover, markAllButton } = createNotificationBellInteractionHelpers(
   harness,
