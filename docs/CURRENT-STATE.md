@@ -1,8 +1,8 @@
 # Проверенный срез проекта
 
-**Дата сверки:** 16 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия:** `1.2.0-beta.3`.
+**Дата сверки:** 16 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Постоянные ветки:** `dev` → `main`. **Версия:** `1.2.0-beta.3`.
 
-На дату сверки `main` — `c31bc8c5f50cf730d2e71fe84de8694cfb904eb8`, merge [PR #1176](https://github.com/acc-holo-dev/mta-nexus-site/pull/1176). Архитектурный перенос объединён: приложение и пакеты находятся в `site/`, инфраструктура — в `docker/` и `config/`, функциональный код сгруппирован в `site/src/features/`. Пути и границы — в [карте проекта](PROJECT-MAP.md) и [архитектуре](ARCHITECTURE.md).
+На дату сверки tip `main` — `bb0301dd78af158de594d056aa1acd9708dd08e9` (merge [PR #1179](https://github.com/acc-holo-dev/mta-nexus-site/pull/1179)); ветка `dev` вводится как единственная интеграционная линия перед `main`. Архитектурный перенос объединён: приложение и пакеты находятся в `site/`, инфраструктура — в `docker/` и `config/`, функциональный код сгруппирован в `site/src/features/`. Пути и границы — в [карте проекта](PROJECT-MAP.md) и [архитектуре](ARCHITECTURE.md). Проект переноса документации: [future/documentation-system.md](future/documentation-system.md).
 
 ## Проверки
 

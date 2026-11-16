@@ -2,7 +2,7 @@
 
 Платформа сообщества Multi Theft Auto: каталог серверов, публикации, профили и безопасное распространение ресурсов. Текущая версия: `1.2.0-beta.3`; ближайшая линия выпуска — бесплатная бета. Платежи и выплаты не включены; коммерческий marketplace и DRM — утверждённая цель, а не действующая функция.
 
-**Active development branch:** `main` only. Production-развёртывание требует отдельного решения.
+**Permanent branches:** `dev` (integration) → `main` (release line). Других долгоживущих веток нет. Production-развёртывание требует отдельного решения.
 
 ## Состояние в 30 секунд
 
@@ -71,4 +71,4 @@ docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check
 
 **Справочник и эксплуатация:** [Архитектура](docs/ARCHITECTURE.md) · [Эксплуатация](docs/OPERATIONS.md) — authoritative runbook · [Handbook](docs/handbook/00-README.md) — вступление и реестры.
 
-Единственный рабочий tracker: [`planning/tasks.json`](planning/tasks.json) ([контракт](planning/TRACKER.md); Markdown — ROADMAP/TASKS/TRACEABILITY). Замороженный import baseline для будущего Issues: `planning/import-baseline/`. Миграция handbook: [DOCS-MIGRATION](docs/DOCS-MIGRATION.md). Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.
+Единственный рабочий tracker: [`planning/tasks.json`](planning/tasks.json) ([контракт](planning/TRACKER.md); Markdown — ROADMAP/TASKS/TRACEABILITY). Замороженный import baseline для будущего Issues: `planning/import-baseline/`. Миграция handbook: [DOCS-MIGRATION](docs/DOCS-MIGRATION.md). Проект самодостаточной документации 2026: [documentation-system](docs/future/documentation-system.md). Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.

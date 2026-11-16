@@ -6,8 +6,10 @@ selection and the result format, read [docs/AGENT.md](docs/AGENT.md) first, then
 
 ## Branch and commits
 
-- Work on the canonical branch `main`. Create a feature/patch directly on `main` unless an owner
-  request says otherwise.
+- Permanent branches are only `dev` and `main`. Land work on `dev`; open a pull request
+  `dev` → `main` after CI on `dev` is green. Do not keep other long-lived branches.
+- Dependabot targets `dev`. Release-line protection on `main` still requires the `CI result`
+  check before merge.
 - Commit message format: `type(scope): result` — a short imperative summary of the achieved
   behaviour, in English. Examples: `docs(project-map): correct compose and handbook pointers`,
   `fix(notifications): retry fanout admission on exhausted attempts`.
@@ -30,7 +32,8 @@ disposable database (see [docs/OPERATIONS.md](docs/OPERATIONS.md)).
 
 ## Pull requests
 
-If a PR is proposed, keep it small and focused on one behaviour. Do **not** change GitHub
+The normal integration PR is `dev` → `main`. Keep it focused; prefer merging a coherent
+`dev` tip rather than stacking unrelated long-lived branches. Do **not** change GitHub
 repository settings, branch protection, or permissions: those require an explicit owner order
 per [docs/CURRENT-STATE.md](docs/CURRENT-STATE.md). Merging, pushing and production deploy also
 require explicit owner instruction — a passing CI gate is not permission to push or release.
