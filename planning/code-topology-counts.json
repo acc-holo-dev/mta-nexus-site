@@ -78,40 +78,17 @@
   },
   "husks": {
     "git_tracked_paths": [],
-    "local_leftovers": {
-      "apps/web": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/config": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/db": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/domain": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/security": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/storage": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/ui": {
-        "exists": true,
-        "src_file_count": 0
-      },
-      "packages/validation": {
-        "exists": true,
-        "src_file_count": 0
-      }
-    },
+    "legacy_root_paths_not_in_workspace": [
+      "packages/config",
+      "packages/db",
+      "packages/domain",
+      "packages/security",
+      "packages/storage",
+      "packages/ui",
+      "packages/validation",
+      "apps/web"
+    ],
+    "note": "Canonical packages live under site/packages/*. Root packages/* and apps/web are not workspace members and must stay untracked; host leftovers vary by machine.",
     "workspace_members": [
       "site",
       "site/packages/*"
@@ -188,7 +165,7 @@
     "validation": 18
   },
   "scope": "Tracked working tree counts under site/src and site/packages; excludes node_modules. Local root packages/ and apps/web husks are reported separately.",
-  "source_sha": "f3be421f9bad28e014db5ce36ec6085b863b3b98",
+  "source_sha": "caf2900e33ddb5b868646438b1a6fa65a26f56e5",
   "tests": {
     "site_tests_files": 1443
   }

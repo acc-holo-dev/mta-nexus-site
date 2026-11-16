@@ -61,33 +61,35 @@ def _shellish_components(files: list[Path]) -> list[str]:
 
 
 def _husk_status() -> dict[str, object]:
-    """Local leftover trees after apps/web → site move; not workspace members."""
+    """Git/workspace facts only — host-local leftover dirs are not portable across CI."""
     tracked = subprocess.check_output(
         ["git", "ls-files", "packages", "apps/web"],
         cwd=ROOT,
         text=True,
     ).strip()
-    local = {}
-    for relative in (
-        "packages/config",
-        "packages/db",
-        "packages/domain",
-        "packages/security",
-        "packages/storage",
-        "packages/ui",
-        "packages/validation",
-        "apps/web",
-    ):
-        path = ROOT / relative
-        src = path / "src"
-        local[relative] = {
-            "exists": path.exists(),
-            "src_file_count": len(_files(src)) if src.exists() else None,
-        }
+    workspace = (ROOT / "pnpm-workspace.yaml").read_text(encoding="utf8")
+    members = []
+    if '"site"' in workspace or "- \"site\"" in workspace or "- 'site'" in workspace:
+        members.append("site")
+    if "site/packages/*" in workspace:
+        members.append("site/packages/*")
     return {
         "git_tracked_paths": tracked.splitlines() if tracked else [],
-        "workspace_members": ["site", "site/packages/*"],
-        "local_leftovers": local,
+        "workspace_members": members,
+        "legacy_root_paths_not_in_workspace": [
+            "packages/config",
+            "packages/db",
+            "packages/domain",
+            "packages/security",
+            "packages/storage",
+            "packages/ui",
+            "packages/validation",
+            "apps/web",
+        ],
+        "note": (
+            "Canonical packages live under site/packages/*. Root packages/* and apps/web "
+            "are not workspace members and must stay untracked; host leftovers vary by machine."
+        ),
     }
 
 

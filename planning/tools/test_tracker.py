@@ -188,6 +188,12 @@ class TrackerContractTests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertNotIn(
+            'local_leftovers',
+            snapshot_data.get('husks', {}),
+            'host-local husk probes must stay out of the committed inventory',
+        )
         body = doc.read_text(encoding='utf8')
         self.assertIn('planning/code-topology-counts.json', body)
         self.assertIn('inventory_code_topology.py', body)

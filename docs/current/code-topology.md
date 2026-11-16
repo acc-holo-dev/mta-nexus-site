@@ -109,13 +109,13 @@ site/packages/ui/             # tokens, typography, motion, layout, form control
 
 ## Husks (следующий structural шаг)
 
-| Путь | Git | Workspace | src files (local) |
-| --- | --- | --- | ---: |
-| `site/packages/*` | tracked | member | канон |
-| `packages/{ui,db,…}` | **untracked** | нет | 0 |
-| `apps/web` | **untracked** | нет | 0 |
+| Путь | Git | Workspace |
+| --- | --- | --- |
+| `site/packages/*` | tracked | member (канон) |
+| `packages/{ui,db,…}` | **untracked** | нет |
+| `apps/web` | **untracked** | нет |
 
-Следующий slice: inventory consumers + безопасная уборка/quarantine локальных husks **без** поломки workspace (см. очередь ниже). Не удалять `site/packages`.
+JSON inventory фиксирует только git/workspace факты (portable для CI). Локальные пустые деревья на хосте после переноса **могут** существовать и различаться между машинами — их не кладём в snapshot. Следующий slice: quarantine/gitignore этих leftovers **без** поломки workspace. Не удалять `site/packages`.
 
 ## Tracker и очередь программы
 
