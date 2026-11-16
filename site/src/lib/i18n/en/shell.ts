@@ -56,6 +56,7 @@ export const shell = {
     privacy: "Privacy",
     communityRules: "Community rules",
     copyright: "Copyright",
+    creditLine: "© 2026 MTA Nexus",
     disclaimer: "Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.",
   },
 };

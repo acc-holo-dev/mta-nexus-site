@@ -45,7 +45,9 @@ export function Footer({ locale }: { locale: Locale }) {
         <FooterContribute locale={locale} />
       </div>
       <div className="mx-auto flex max-w-7xl min-w-0 flex-col items-center justify-between gap-2 overflow-x-clip border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
-        <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.openFreeBeta}</div>
+        <div className="font-caption">
+          {dictionary.footer.creditLine} · {dictionary.nav.openFreeBeta}
+        </div>
         <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 font-caption">
           <Link
             href="/support"

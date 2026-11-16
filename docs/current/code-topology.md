@@ -91,7 +91,7 @@ site/
 Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app/layout.tsx` metadata, `@nexus/ui` BrandMark. Brand / unknown-marker literals живут в allowlist; `locale === "ru"|"en" ? "copy" : "copy"` в scope должен оставаться **0**. Новые не-allowlisted литералы валят plan CI.
 
 **Slice 6 done:** sidebar chrome uses shared `@nexus/ui` `BrandMark` (collapsed tile-only, expanded wordmark + locale `openFreeBeta` tag); duplicate `brand.sidebar.*` literals removed from shell inventory allowlist.  
-**Next:** remaining allowlisted shell brand literals (e.g. footer copyright glue) → locale keys or shared copy helpers (slice 7 / journey honesty).
+**Slice 7 done:** footer credit line moved to `dictionary.footer.creditLine` (en/ru); inventory allowlist no longer tracks footer copyright glue.
 
 ## TO-BE (цель читаемости)
 
@@ -145,6 +145,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done** |
 | 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done** |
 | 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done** |
+| 7   | Footer credit line → `footer.creditLine` i18n              | честность RU/EN                  | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 

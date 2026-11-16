@@ -56,6 +56,7 @@ export const shell = {
     privacy: "Конфиденциальность",
     communityRules: "Правила сообщества",
     copyright: "Авторские права",
+    creditLine: "© 2026 MTA Nexus",
     disclaimer:
       "MTA Nexus не связан с Rockstar Games, Take-Two Interactive или проектом Multi Theft Auto.",
   },
