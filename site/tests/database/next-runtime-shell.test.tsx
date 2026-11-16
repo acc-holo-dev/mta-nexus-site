@@ -44,7 +44,7 @@ vi.mock("../../src/features/shell/shell", async () => {
   };
 });
 
-vi.mock("../../src/components/pwa-service-worker", async () => {
+vi.mock("../../src/features/shell/pwa-service-worker", async () => {
   const ReactModule = await import("react");
   return {
     PwaServiceWorker: () => ReactModule.createElement("span", { "data-pwa": "registered" }),

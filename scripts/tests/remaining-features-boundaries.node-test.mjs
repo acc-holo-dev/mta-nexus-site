@@ -59,6 +59,7 @@ const features = [
       "session-error",
       "home-personal",
       "modal-dialog",
+      "pwa-service-worker",
     ],
     clientUtilPorts: ["auth-return", "session-error", "home-personal"],
     privateClients: ["shell-session-unavailable"],
