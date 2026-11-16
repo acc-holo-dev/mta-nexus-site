@@ -46,7 +46,16 @@ const features = [
   },
   {
     name: "shell",
-    clients: ["shell", "navbar", "footer", "sidebar", "locale", "session", "auth-session", "auth-return"],
+    clients: [
+      "shell",
+      "navbar",
+      "footer",
+      "sidebar",
+      "locale",
+      "session",
+      "auth-session",
+      "auth-return",
+    ],
     clientUtilPorts: ["auth-return"],
     privateClients: ["shell-session-unavailable"],
     servers: [],
