@@ -71,5 +71,5 @@ Traceability: filler probe is gated on the chosen starter-collection pilot and i
 
 ## Relation to code
 
-Today: `packages/domain/src/library-collections.ts` (product-level collections).
+Today: `site/packages/domain/src/library-collections.ts` (product-level collections).
 Future implementation would add a separate pack/snapshot type rather than overloading collection item rows.

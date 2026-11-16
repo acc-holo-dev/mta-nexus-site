@@ -14,7 +14,7 @@ export const OBSERVABILITY_REQUIRED_SCRIPTS = Object.freeze([
   "scripts/check-account-mail-worker-health.mjs",
   "scripts/check-license-worker-health.mjs",
   "scripts/check-resource-release-worker-health.mjs",
-  "apps/web/src/lib/observability.ts",
+  "site/src/lib/observability.ts",
   "docs/OPERATIONS.md",
 ]);
 
@@ -25,7 +25,7 @@ export const OBSERVABILITY_ALERT_ENV_KEYS = Object.freeze([
   "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS",
 ]);
 
-// Mirrors readQueueAlertThreshold in packages/db/scripts/run-web-push-dispatcher.ts.
+// Mirrors readQueueAlertThreshold in site/packages/db/scripts/run-web-push-dispatcher.ts.
 const ALERT_THRESHOLD_LIMITS = Object.freeze({
   WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT: [1, 99],
   WEB_PUSH_QUEUE_ALERT_DUE_JOBS: [1, 50_000],
@@ -119,7 +119,7 @@ export function buildObservabilityReadinessEvidence({
     if (!ok) failures.push(`runbook:${needle}`);
   }
 
-  const structuredLogging = existsSync(resolve(repoRoot, "apps/web/src/lib/observability.ts"));
+  const structuredLogging = existsSync(resolve(repoRoot, "site/src/lib/observability.ts"));
   if (!structuredLogging) failures.push("structured_logging_module");
 
   const verdict = Object.freeze({

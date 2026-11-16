@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 const fixtures = new Set(["mail-worker-compose.node-test.mjs", "recovery-compose.node-test.mjs"]);
 
 export function discoverToolingTests(
-  directories = ["scripts/tests", "packages/db/scripts"],
+  directories = ["scripts/tests", "site/packages/db/scripts"],
   { root = process.cwd() } = {},
 ) {
   const files = [];

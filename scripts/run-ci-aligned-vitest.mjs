@@ -2,7 +2,7 @@
 /**
  * Run Vitest the way CI does, not as a single env for both projects.
  *
- * CI unit job (`pnpm check:code` → `test:unit`): no NEXT_PUBLIC_APP_URL.
+ * CI unit job (`pnpm check:code` → `test:unit`): no APP_URL or NEXT_PUBLIC_APP_URL.
  * CI verify job (`pnpm test:database`): DATABASE_URL + NEXT_PUBLIC_APP_URL set.
  *
  * Unit suites that POST with Origin http://nexus.test correctly fail closed when
@@ -39,9 +39,14 @@ try {
 
 const sharedEnv = { ...process.env };
 const unitEnv = { ...sharedEnv };
+delete unitEnv.APP_URL;
 delete unitEnv.NEXT_PUBLIC_APP_URL;
 
-const unitStatus = run("unit (CI shape: no NEXT_PUBLIC_APP_URL)", ["test:unit"], unitEnv);
+const unitStatus = run(
+  "unit (CI shape: no APP_URL or NEXT_PUBLIC_APP_URL)",
+  ["test:unit"],
+  unitEnv,
+);
 if (unitStatus !== 0) {
   process.exit(unitStatus);
 }

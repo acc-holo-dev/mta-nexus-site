@@ -7,14 +7,14 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const recoveryDatabaseTests = [
-  "tests/database/notification-inbox-history.integration.test.ts",
-  "tests/database/discussion-watch-persistence.integration.test.ts",
-  "tests/database/discovery-follow-persistence.integration.test.ts",
-  "tests/database/notification-preference-serialization.integration.test.ts",
-  "tests/database/web-push-outbox.integration.test.ts",
-  "tests/database/web-push-outbox-capacity.integration.test.ts",
-  "tests/database/web-push-worker.integration.test.ts",
-  "tests/database/web-push-worker-concurrency.integration.test.ts",
+  "site/tests/database/notification-inbox-history.integration.test.ts",
+  "site/tests/database/discussion-watch-persistence.integration.test.ts",
+  "site/tests/database/discovery-follow-persistence.integration.test.ts",
+  "site/tests/database/notification-preference-serialization.integration.test.ts",
+  "site/tests/database/web-push-outbox.integration.test.ts",
+  "site/tests/database/web-push-outbox-capacity.integration.test.ts",
+  "site/tests/database/web-push-worker.integration.test.ts",
+  "site/tests/database/web-push-worker-concurrency.integration.test.ts",
 ];
 
 export function validateRecoveryDatabaseEnvironment(env) {
@@ -75,7 +75,7 @@ export function recoveryTestCounts(report) {
   return { tests: report.numPassedTests, files: report.testResults.length };
 }
 async function migrationDigest() {
-  const folder = resolve(root, "packages/db/migrations");
+  const folder = resolve(root, "site/packages/db/migrations");
   const journal = await readFile(resolve(folder, "meta/_journal.json"), "utf8");
   const hash = createHash("sha256").update(journal);
   for (const entry of JSON.parse(journal).entries)
@@ -128,7 +128,7 @@ export async function verifyDiscussionRecovery() {
     evidence.migrationDigest = await migrationDigest();
     evidence.stage = "database-preflight";
     await save();
-    const require = createRequire(resolve(root, "packages/db/package.json"));
+    const require = createRequire(resolve(root, "site/packages/db/package.json"));
     const postgres = require("postgres");
     const client = postgres(process.env.DATABASE_URL, {
       max: 1,
@@ -145,7 +145,7 @@ export async function verifyDiscussionRecovery() {
     }
     evidence.stage = "migrations";
     await save();
-    run(["--import", "tsx", "packages/db/src/migrate.ts"]);
+    run(["--import", "tsx", "site/packages/db/src/migrate.ts"]);
     evidence.stage = "database-tests";
     await save();
     run([

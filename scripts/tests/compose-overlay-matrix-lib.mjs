@@ -16,7 +16,7 @@ export const PRODUCTION_BASE_SERVICES = Object.freeze([
 export const SUPPORTED_COMPOSE_SCENARIOS = Object.freeze([
   {
     id: "dev",
-    files: ["deploy/compose.yaml"],
+    files: ["docker/compose.yaml"],
     services: [
       "app",
       "clamav",
@@ -28,26 +28,26 @@ export const SUPPORTED_COMPOSE_SCENARIOS = Object.freeze([
   },
   {
     id: "verify",
-    files: ["deploy/compose.verify.yaml"],
+    files: ["docker/compose.verify.yaml"],
     services: ["postgres", "verify"],
   },
   {
     id: "production",
-    files: ["deploy/compose.production.yaml"],
+    files: ["docker/compose.production.yaml"],
     services: [...PRODUCTION_BASE_SERVICES].sort(),
   },
   {
     id: "production-recovery-mail",
     files: [
-      "deploy/compose.production.yaml",
-      "deploy/compose.recovery.yaml",
-      "deploy/compose.mail-worker.yaml",
+      "docker/compose.production.yaml",
+      "docker/compose.recovery.yaml",
+      "docker/compose.mail-worker.yaml",
     ],
     services: [...PRODUCTION_BASE_SERVICES, "mail-worker"].sort(),
   },
   {
     id: "production-ci",
-    files: ["deploy/compose.production.yaml", "deploy/compose.production-ci.yaml"],
+    files: ["docker/compose.production.yaml", "docker/compose.production-ci.yaml"],
     services: [...PRODUCTION_BASE_SERVICES].sort(),
   },
 ]);

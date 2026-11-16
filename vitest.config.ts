@@ -48,7 +48,7 @@ export default defineConfig({
           include: testFiles.database,
           // Queue capacity, leases and exact counts share one disposable DB.
           fileParallelism: false,
-          // Temp-table suites mock `packages/db/src/client` with a per-file Proxy.
+          // Temp-table suites mock `site/packages/db/src/client` with a per-file Proxy.
           // Sharing the module graph across files leaves repositories bound to
           // another file's Proxy/`active.db`, so inserts hit public tables and
           // reads return empty. Isolate each file so its client mock applies.
@@ -60,13 +60,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@nexus/config": path.resolve(rootDir, "./packages/config/src"),
-      "@nexus/domain": path.resolve(rootDir, "./packages/domain/src"),
-      "@nexus/validation": path.resolve(rootDir, "./packages/validation/src"),
-      "@nexus/security": path.resolve(rootDir, "./packages/security/src"),
-      "@nexus/storage": path.resolve(rootDir, "./packages/storage/src"),
-      "@nexus/db": path.resolve(rootDir, "./packages/db/src"),
-      "@nexus/ui": path.resolve(rootDir, "./packages/ui/src"),
+      "@nexus/config": path.resolve(rootDir, "./site/packages/config/src"),
+      "@nexus/domain": path.resolve(rootDir, "./site/packages/domain/src"),
+      "@nexus/validation": path.resolve(rootDir, "./site/packages/validation/src"),
+      "@nexus/security": path.resolve(rootDir, "./site/packages/security/src"),
+      "@nexus/storage": path.resolve(rootDir, "./site/packages/storage/src"),
+      "@nexus/db": path.resolve(rootDir, "./site/packages/db/src"),
+      "@nexus/ui": path.resolve(rootDir, "./site/packages/ui/src"),
     },
   },
 });

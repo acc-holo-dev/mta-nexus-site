@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { grantsServerManagement } from "../../packages/domain/src/organization-server-permissions.ts";
+import { grantsServerManagement } from "../../site/packages/domain/src/organization-server-permissions.ts";
 
 for (const [label, membership, allowed] of [
   // Owner authority is proven via the organization row, not this membership helper.

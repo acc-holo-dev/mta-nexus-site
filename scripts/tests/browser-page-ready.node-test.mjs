@@ -101,7 +101,7 @@ test("treats missing main heading without an error banner as still loading", () 
   );
 });
 
-test("exports the localized GlobalLoading labels used by apps/web loading.tsx", () => {
+test("exports the localized GlobalLoading labels used by site loading.tsx", () => {
   assert.deepEqual([...GLOBAL_LOADING_LABELS], ["Loading content", "Загрузка содержимого"]);
   assert.deepEqual([...PAGE_EVIDENCE_STATES], ["ready", "loading", "empty", "error"]);
 });

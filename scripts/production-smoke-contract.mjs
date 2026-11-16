@@ -117,7 +117,7 @@ export function assertIsolatedProduction(config, project, caddyFile) {
         if (mount.target === "/etc/caddy/Caddyfile") assert.equal(mount.source, caddyFile);
         else {
           assert.equal(mount.target, "/etc/caddy/ProductionCaddyfile");
-          assert(mount.source.endsWith("/deploy/Caddyfile"));
+          assert(mount.source.endsWith("/docker/Caddyfile"));
         }
       }
     }

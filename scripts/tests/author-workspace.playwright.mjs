@@ -3,7 +3,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
-import { notificationInboxCopy } from "../../apps/web/src/lib/notification-inbox-copy.ts";
+import { notificationInboxCopy } from "../../site/src/lib/notification-inbox-copy.ts";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");

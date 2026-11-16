@@ -4,7 +4,7 @@ import { join } from "node:path";
 import {
   evaluateReleaseUpgradeEvidence,
   sameFullGitSha,
-} from "../packages/db/scripts/release-upgrade-contract.mjs";
+} from "../site/packages/db/scripts/release-upgrade-contract.mjs";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "./backup-restore-contract.mjs";
 import { requiredJobs } from "./ci-policy.mjs";
 import { evaluateLegalSurfaces } from "./legal-surfaces-lib.mjs";

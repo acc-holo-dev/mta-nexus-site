@@ -37,7 +37,7 @@ function run(t, manifests, platform) {
 }
 
 test("default platform resolves the unique matching digest and preserves current pin policy", (t) => {
-  const current = JSON.parse(readFileSync("deploy/infra-image-pins.json", "utf8"));
+  const current = JSON.parse(readFileSync("docker/infra-image-pins.json", "utf8"));
   assert.equal(evaluateInfraImagePins(current).ok, true);
   const { result } = run(t, [descriptor("amd64", undefined, "a"), descriptor("arm64", "v8", "b")]);
   assert.equal(result.status, 0, result.stderr);

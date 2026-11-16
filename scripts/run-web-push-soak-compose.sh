@@ -10,7 +10,7 @@ if [[ "${NEXUS_WEB_PUSH_SOAK_ACK:-}" != "YES" ]]; then
 fi
 
 PROJECT="${COMPOSE_PROJECT_NAME:-nexus-local}"
-COMPOSE=(docker compose -p "$PROJECT" -f deploy/compose.yaml)
+COMPOSE=(docker compose -p "$PROJECT" -f docker/compose.yaml)
 DURATION_MS="${NEXUS_WEB_PUSH_SOAK_DURATION_MS:-60000}"
 EVIDENCE_HOST="$(pwd)/artifacts"
 EVIDENCE_CONTAINER="/workspace/artifacts/web-push-soak-evidence.json"

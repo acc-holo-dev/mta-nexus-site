@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
+import { createReleaseUpgradeEvidence } from "../../site/packages/db/scripts/release-upgrade-contract.mjs";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "../backup-restore-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,
@@ -155,7 +155,7 @@ test("dated env backup porcelain alone is not a dirty working tree", () => {
     isDirtyWorkingTreeBeyondEnvBackups("?? .env.backup-20251011\n?? scripts/scratch.mjs\n"),
     true,
   );
-  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M apps/web/src/lib/i18n.ts\n"), true);
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M site/src/lib/i18n.ts\n"), true);
 });
 
 test("web_push residual stays residual without inventing PASS for mere file presence", () => {

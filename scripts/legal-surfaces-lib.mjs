@@ -6,27 +6,27 @@ export const LEGAL_SURFACE_ROUTES = Object.freeze([
   Object.freeze({
     id: "terms",
     path: "/terms",
-    pageRelative: "apps/web/src/app/terms/page.tsx",
+    pageRelative: "site/src/app/terms/page.tsx",
     dictionaryKey: "terms",
   }),
   Object.freeze({
     id: "privacy",
     path: "/privacy",
-    pageRelative: "apps/web/src/app/privacy/page.tsx",
+    pageRelative: "site/src/app/privacy/page.tsx",
     dictionaryKey: "privacy",
   }),
   Object.freeze({
     id: "community_rules",
     path: "/community-rules",
-    pageRelative: "apps/web/src/app/community-rules/page.tsx",
+    pageRelative: "site/src/app/community-rules/page.tsx",
     dictionaryKey: "communityRules",
   }),
 ]);
 
-const FOOTER_RELATIVE = "apps/web/src/components/footer.tsx";
+const FOOTER_RELATIVE = "site/src/components/footer.tsx";
 const I18N_LOCALE_LEGAL = Object.freeze([
-  Object.freeze({ locale: "en", relative: "apps/web/src/lib/i18n/en/legal.ts" }),
-  Object.freeze({ locale: "ru", relative: "apps/web/src/lib/i18n/ru/legal.ts" }),
+  Object.freeze({ locale: "en", relative: "site/src/lib/i18n/en/legal.ts" }),
+  Object.freeze({ locale: "ru", relative: "site/src/lib/i18n/ru/legal.ts" }),
 ]);
 const MIN_SECTION_BODY = 40;
 

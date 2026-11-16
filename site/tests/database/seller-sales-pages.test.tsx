@@ -1,0 +1,276 @@
+import { AppError } from "@nexus/domain";
+import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
+const state = vi.hoisted(() => ({
+  actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
+  locale: "en" as "en" | "ru",
+  report: vi.fn(),
+  detail: vi.fn(),
+  scopes: vi.fn(),
+}));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/sales/report",
+  notFound: () => {
+    throw new Error("NEXT_NOT_FOUND");
+  },
+}));
+vi.mock("next/link", async () => {
+  const React = await import("react");
+  return {
+    default: ({ href, children, ...props }: { href: string; children: ReactNode }) =>
+      React.createElement("a", { href, ...props }, children),
+  };
+});
+vi.mock("../../src/lib/services/auth-service", () => ({
+  authService: { getSession: async () => state.actor },
+}));
+vi.mock("../../src/lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
+vi.mock("../../src/lib/services/seller-sales-service", () => ({
+  sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
+}));
+
+import DetailLoading from "../../src/app/workspace/sales/report/[id]/loading";
+import Detail from "../../src/app/workspace/sales/report/[id]/page";
+import ReportLoading from "../../src/app/workspace/sales/report/loading";
+import Page, { metadata } from "../../src/app/workspace/sales/report/page";
+import { sellerSalesCopy } from "../../src/lib/seller-sales-i18n";
+
+const date = new Date("2026-10-11T00:00:00Z"),
+  sale = {
+    id: "itm_a",
+    productId: "prd_a",
+    productTitle: "<script>sale</script>",
+    orderNumber: "ORDER-A",
+    status: "completed",
+    unitPrice: 50,
+    currency: "USD",
+    createdAt: date,
+    evidence: "capture_recorded",
+    buyerEmail: "PRIVATE-BUYER",
+    providerTransactionId: "PRIVATE-PROVIDER",
+  };
+const input = {
+  searchParams: Promise.resolve({
+    page: "2",
+    days: "90",
+    organizationId: "org_a",
+    currency: "RUB",
+    evidence: "review",
+    productId: "prd_a",
+  }),
+};
+beforeEach(() => {
+  vi.clearAllMocks();
+  state.actor = { id: "usr_a", role: "user" };
+  state.locale = "en";
+  state.report.mockResolvedValue({
+    scope: { id: "org:org_a", name: "<script>organization</script>" },
+    product: { id: "prd_a", title: "<script>sale</script>" },
+    observedAt: date,
+    sales: [sale],
+    totals: [
+      { currency: "USD", lines: 21, orders: 20, gross: "9007199254740993", reviewLines: 2 },
+      { currency: "OTHER", lines: 1, orders: 1, gross: null, reviewLines: 1 },
+    ],
+    periods: [{ period: "2026-10-01", currency: "USD", lines: 21, gross: "50" }],
+    periodUnit: "month",
+    periodStart: date,
+    page: 2,
+    pageSize: 20,
+    total: 21,
+    totalPages: 3,
+  });
+  state.scopes.mockResolvedValue({
+    scopes: [{ id: "org_a", name: "Organization" }],
+    page: 2,
+    totalPages: 3,
+  });
+  state.detail.mockResolvedValue({ sale, scope: { name: "Organization" }, observedAt: date });
+});
+it("does not read reports when signed out and disables indexing", async () => {
+  state.actor = null;
+  expect(renderToStaticMarkup(await Page(input))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%3Fpage%3D2%26days%3D90%26organizationId%3Dorg_a%26currency%3DRUB%26evidence%3Dreview%26productId%3Dprd_a"',
+  );
+  expect(
+    renderToStaticMarkup(
+      await Detail({
+        ...input,
+        params: Promise.resolve({ id: "itm_a" }),
+        searchParams: Promise.resolve({}),
+      }),
+    ),
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%2Fitm_a"');
+  expect(state.report).not.toHaveBeenCalled();
+  expect(state.detail).not.toHaveBeenCalled();
+  expect(metadata.robots).toEqual({ index: false, follow: false });
+});
+it.each(["en", "ru"] as const)(
+  "renders %s filters and accurate per-currency records without private payment data",
+  async (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(await Page(input)),
+      copy = sellerSalesCopy(locale);
+    expect(html).toContain(copy.title);
+    expect(html).toContain("&lt;script&gt;sale&lt;/script&gt;");
+    expect(html).toContain("&lt;script&gt;organization&lt;/script&gt;");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("PRIVATE-BUYER");
+    expect(html).not.toContain("PRIVATE-PROVIDER");
+    expect(html).toContain(copy.unknown);
+    expect(html).toContain('action="/workspace/sales/report"');
+    expect(html).toContain("/api/sales/export?page=2");
+    expect(html).toContain("organizationId=org_a");
+    expect(html).toContain("evidence=review");
+    expect(html).toContain("scopePage=3");
+    expect(html).toContain(copy.paymentNotice);
+    expect(html).not.toContain('name="withdraw"');
+  },
+);
+it("normalizes empty GET form controls and masks unauthorized products", async () => {
+  await Page({ searchParams: Promise.resolve({ currency: "all", productId: "" }) });
+  expect(state.report).toHaveBeenCalledWith(state.actor, {
+    page: 1,
+    days: "all",
+    status: "completed",
+    evidence: "all",
+  });
+  state.report.mockRejectedValue(new AppError("Private organization", 404, "NOT_FOUND"));
+  await expect(Page(input)).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("invalid filters render a localized ErrorState recovery before data reads", async () => {
+  const copy = sellerSalesCopy("en");
+  const html = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ userId: "other" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.invalid);
+  expect(html).toContain(copy.invalidDescription);
+  expect(html).toContain(copy.reset);
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/workspace/sales/report"');
+  expect(state.report).not.toHaveBeenCalled();
+  expect(state.scopes).not.toHaveBeenCalled();
+});
+it("detail renders only its scoped line with safe management and return links", async () => {
+  const html = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ organizationId: "org_a" }),
+    }),
+  );
+  expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a");
+  expect(html).toContain("&lt;script&gt;sale&lt;/script&gt;");
+  expect(html).toContain("/workspace/resources/prd_a");
+  expect(html).not.toContain("PRIVATE-BUYER");
+  expect(html).not.toContain("PRIVATE-PROVIDER");
+  expect(html).toContain("organizationId=org_a");
+});
+it("detail refuses unknown, repeated and unavailable account selectors", async () => {
+  await expect(
+    Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ userId: "other" }),
+    }),
+  ).rejects.toThrow("NEXT_NOT_FOUND");
+  expect(state.detail).not.toHaveBeenCalled();
+  state.detail.mockRejectedValue(new AppError("hidden", 404, "NOT_FOUND"));
+  await expect(
+    Detail({ params: Promise.resolve({ id: "itm_other" }), searchParams: Promise.resolve({}) }),
+  ).rejects.toThrow("NEXT_NOT_FOUND");
+});
+
+it.each(["en", "ru"] as const)(
+  "offers a filter reset beside empty sales only when filters differ from defaults in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = sellerSalesCopy(locale),
+      emptyReport = {
+        scope: { id: "usr_a", name: null },
+        product: null,
+        observedAt: date,
+        sales: [],
+        totals: [],
+        periods: [],
+        periodUnit: "month" as const,
+        periodStart: date,
+        page: 1,
+        pageSize: 20,
+        total: 0,
+        totalPages: 1,
+      };
+    state.report.mockResolvedValue(emptyReport);
+    const defaultHtml = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
+    expect(defaultHtml).toContain(copy.empty);
+    expect(defaultHtml.match(new RegExp(copy.reset, "gu"))?.length).toBe(1);
+    const filteredHtml = renderToStaticMarkup(await Page(input));
+    expect(filteredHtml).toContain(copy.empty);
+    expect(filteredHtml).toContain("days=all&amp;status=completed&amp;evidence=all");
+    expect(filteredHtml.match(new RegExp(copy.reset, "gu"))?.length).toBe(2);
+  },
+);
+it("recorded attribution stays in exports/details and hides management for former owners", async () => {
+  const html = renderToStaticMarkup(
+    await Page({
+      searchParams: Promise.resolve({ attribution: "recorded", organizationId: "org_a" }),
+    }),
+  );
+  expect(html).toContain(sellerSalesCopy("en").recordedNotice);
+  expect(html).toContain("attribution=recorded");
+  const detail = await state.detail();
+  state.detail.mockResolvedValue({
+    ...detail,
+    sale: { ...detail.sale, inCurrentPortfolio: false, titleSource: "recorded" },
+  });
+  const line = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ organizationId: "org_a", attribution: "recorded" }),
+    }),
+  );
+  expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a", "recorded");
+  expect(line).not.toContain("/workspace/resources/prd_a");
+  expect(line).toContain("attribution=recorded");
+});
+it("shows an honest recovery state when the sales report fails to load", async () => {
+  state.report.mockRejectedValueOnce(new Error("report unavailable"));
+  state.scopes.mockResolvedValueOnce({ scopes: [], page: 1, totalPages: 1 });
+  const copy = sellerSalesCopy("en");
+  const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ page: "2" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/workspace/sales/report?page=2"');
+  expect(html).not.toContain("report unavailable");
+});
+it("shows an honest recovery state when a sale line fails to load", async () => {
+  state.detail.mockRejectedValueOnce(new Error("detail unavailable"));
+  const copy = sellerSalesCopy("en");
+  const html = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ organizationId: "org_a" }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/sales/report/itm_a?organizationId=org_a"');
+});
+it("clips honest sales loading shells on narrow layouts", async () => {
+  for (const Loading of [ReportLoading, DetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+  }
+  expect(renderToStaticMarkup(await DetailLoading())).toContain(
+    sellerSalesCopy("en").detailLoading,
+  );
+});

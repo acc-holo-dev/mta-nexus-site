@@ -31,7 +31,7 @@ export function classifyTests(root, files = discoverTests(root)) {
     const base = name.startsWith("@nexus/")
       ? path.join(
           root,
-          "packages",
+          "site/packages",
           name.slice(7).split("/")[0],
           "src",
           ...name.slice(7).split("/").slice(1),
@@ -162,7 +162,7 @@ export function classifyTests(root, files = discoverTests(root)) {
     function usesDatabase(file) {
       if (seen.has(file)) return false;
       seen.add(file);
-      if (file === path.join(root, "packages/db/src/client.ts")) return true;
+      if (file === path.join(root, "site/packages/db/src/client.ts")) return true;
       const info = inspect(file);
       if (info.unknownImport || info.imports.includes("postgres")) return true;
       return info.imports.some((name) => {

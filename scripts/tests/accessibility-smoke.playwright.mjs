@@ -5,7 +5,7 @@ import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
-const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n.ts");
 
 for (const locale of ["en", "ru"]) {
   for (const theme of ["light", "dark"]) {

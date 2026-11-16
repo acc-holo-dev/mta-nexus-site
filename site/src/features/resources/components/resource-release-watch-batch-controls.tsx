@@ -1,0 +1,269 @@
+"use client";
+import {
+  RESOURCE_RELEASE_WATCH_BATCH_LIMIT,
+  RESOURCE_RELEASE_WATCH_LIMIT,
+  type ResourceReleaseWatchDisableCommand,
+  type ResourceReleaseWatchEnableCommand,
+} from "@nexus/domain";
+import { Button, ErrorState } from "@nexus/ui";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import type { Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmedResourceReleaseWatchBatch } from "../../../lib/resource-release-watch-batch-confirmation";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
+import { confirmAction } from "../../../components/confirm-action";
+export function ResourceReleaseWatchBatchControls({
+  items,
+  locale,
+  collection,
+  activeWatchCount = 0,
+  resume = false,
+}: {
+  items: {
+    productId: string;
+    enabled: boolean;
+    revision: number;
+    title: string | null;
+    available?: boolean;
+  }[];
+  collection?: { id: string; revision: number; status: "active" | "archived" };
+  activeWatchCount?: number;
+  resume?: boolean;
+  locale: Locale;
+}) {
+  const enabling = collection !== undefined || resume;
+  const eligible = items.filter((item) =>
+    enabling
+      ? item.available === true && !item.enabled && (!resume || item.revision >= 1)
+      : item.enabled,
+  );
+  const skipped = enabling
+    ? items
+        .filter((item) => !eligible.some((row) => row.productId === item.productId))
+        .map((item) => ({
+          productId: item.productId,
+          title: item.title,
+          reason: item.enabled
+            ? "alreadyOn"
+            : item.available === false
+              ? "noAccessItem"
+              : resume && item.revision < 1
+                ? "noAccessItem"
+                : "noAccessItem",
+        }))
+    : [];
+  const capacity = enabling
+    ? Math.max(
+        0,
+        Math.min(
+          RESOURCE_RELEASE_WATCH_BATCH_LIMIT,
+          RESOURCE_RELEASE_WATCH_LIMIT - activeWatchCount,
+        ),
+      )
+    : RESOURCE_RELEASE_WATCH_BATCH_LIMIT;
+  const copy = resourceReleaseWatchesCopy(locale),
+    router = useRouter(),
+    lock = useRef(false),
+    settled = useRef(false),
+    active = useRef<AbortController | null>(null),
+    scope = useRef<{ url: string; enabling: boolean } | null>(null);
+  useEffect(
+    () => () => {
+      active.current?.abort();
+      active.current = null;
+    },
+    [],
+  );
+  const [selected, setSelected] = useState<string[]>([]),
+    [pending, setPending] = useState<
+      ResourceReleaseWatchDisableCommand | ResourceReleaseWatchEnableCommand | null
+    >(null),
+    [busy, setBusy] = useState(false),
+    [saved, setSaved] = useState(false),
+    [blocked, setBlocked] = useState(false),
+    [error, setError] = useState("");
+  const frozen = useRef<
+    ResourceReleaseWatchDisableCommand | ResourceReleaseWatchEnableCommand | null
+  >(null);
+  const title = resume ? copy.resumeTitle : enabling ? copy.enrollTitle : copy.batchTitle,
+    note = resume ? copy.resumeNote : enabling ? copy.enrollNote : copy.batchNote,
+    confirm = resume ? copy.confirmResume : enabling ? copy.confirmEnroll : copy.confirmBatch,
+    apply = resume ? copy.applyResume : enabling ? copy.applyEnroll : copy.applyBatch;
+  async function send() {
+    if (lock.current || settled.current || saved || blocked || (!pending && !selected.length))
+      return;
+    const command = frozen.current ?? {
+      ...(collection ? { expectedCollectionRevision: collection.revision } : {}),
+      items: eligible
+        .filter((item) => selected.includes(item.productId))
+        .map(({ productId, revision }) => ({ productId, expectedRevision: revision }))
+        .sort((a, b) => (a.productId < b.productId ? -1 : a.productId > b.productId ? 1 : 0)),
+    };
+    if (
+      !command.items.length ||
+      command.items.length > RESOURCE_RELEASE_WATCH_BATCH_LIMIT ||
+      (!pending && command.items.length > capacity)
+    ) {
+      if (!pending && command.items.length > RESOURCE_RELEASE_WATCH_BATCH_LIMIT) {
+        setError(copy.batchMaximum);
+      }
+      return;
+    }
+    if (
+      !frozen.current &&
+      !(await confirmAction({
+        title: enabling ? title : copy.stopConfirmTitle,
+        object: copy.title,
+        scope: `${command.items.length}`,
+        consequences: enabling ? confirm : copy.stopConfirm,
+        confirmLabel: apply,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: false,
+      }))
+    )
+      return;
+    frozen.current = command;
+    const requestScope = scope.current ?? {
+      url: collection
+        ? `/api/library/collections/${encodeURIComponent(collection.id)}/watches`
+        : resume
+          ? "/api/library/watches/resume"
+          : "/api/library/watches/disable",
+      enabling,
+    };
+    scope.current = requestScope;
+    const controller = new AbortController();
+    active.current = controller;
+    lock.current = true;
+    setPending(command);
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(
+        requestScope.url,
+        privateApiRequest({ method: "POST", json: command, signal: controller.signal }),
+      );
+      const body = await response.json().catch(() => null);
+      if (active.current !== controller) return;
+      if (
+        !response.ok ||
+        !confirmedResourceReleaseWatchBatch(body, command, requestScope.enabling)
+      ) {
+        setError(
+          body?.code === "RELEASE_WATCH_LIMIT"
+            ? copy.maximum
+            : body?.code === "RELEASE_WATCH_UNAVAILABLE"
+              ? copy.access
+              : response.status === 409
+                ? copy.conflict
+                : copy.failed,
+        );
+        if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
+          settled.current = true;
+          setBlocked(true);
+        }
+        return;
+      }
+      settled.current = true;
+      setSaved(true);
+      router.refresh();
+    } catch {
+      if (active.current === controller) setError(copy.failed);
+    } finally {
+      if (active.current === controller) {
+        active.current = null;
+        lock.current = false;
+        setBusy(false);
+      }
+    }
+  }
+  if (!pending && (!eligible.length || collection?.status === "archived")) return null;
+  return (
+    <section className="nexus-panel space-y-4 p-5">
+      <h2>{title}</h2>
+      <p className="text-sm text-secondary">{note}</p>
+      <p className="text-xs text-muted">{copy.batchLimit}</p>
+      {enabling && capacity === 0 ? (
+        <ErrorState id="resource-release-watch-batch-maximum" title={copy.maximum} />
+      ) : null}
+      {enabling && skipped.length > 0 ? (
+        <div className="space-y-2" role="note">
+          <p className="text-sm text-muted">{copy.skippedNote}</p>
+          <ul className="space-y-1 text-sm text-secondary">
+            {skipped.map((item) => (
+              <li key={item.productId}>
+                {item.title ?? copy.privateResource}:{" "}
+                {item.reason === "alreadyOn" ? copy.alreadyOn : copy.noAccessItem}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <fieldset disabled={busy || saved || pending !== null} className="space-y-3">
+        <legend className="sr-only">{title}</legend>
+        {eligible.map((item) => (
+          <label key={item.productId} className="flex items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={selected.includes(item.productId)}
+              disabled={!selected.includes(item.productId) && selected.length >= capacity}
+              onChange={(event) => {
+                const checked = event.target.checked;
+                setSelected((previous) =>
+                  checked
+                    ? [...new Set([...previous, item.productId])]
+                    : previous.filter((id) => id !== item.productId),
+                );
+              }}
+            />
+            <span className="break-words">{item.title ?? copy.privateResource}</span>
+          </label>
+        ))}
+      </fieldset>
+      {!pending && (
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11"
+          disabled={busy || saved || !selected.length || selected.length > capacity}
+          onClick={() => void send()}
+        >
+          {apply}
+        </Button>
+      )}
+      {pending && !saved && (
+        <div className="space-y-3">
+          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          {!blocked && (
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled={busy}
+              onClick={() => void send()}
+            >
+              {copy.retrySame}
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            disabled={busy}
+            onClick={() => router.refresh()}
+          >
+            {copy.reloadState}
+          </Button>
+        </div>
+      )}
+      {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
+      {saved && (
+        <p role="status" className="text-sm text-success">
+          {copy.saved}
+        </p>
+      )}
+    </section>
+  );
+}

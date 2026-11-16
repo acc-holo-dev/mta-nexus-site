@@ -1,0 +1,497 @@
+"use client";
+import type { OrganizationTeamRole } from "@nexus/domain";
+import {
+  canChangeOrganizationMember,
+  canManageOrganization,
+  organizationTeamRoles,
+} from "@nexus/domain";
+import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import type { Locale } from "../../../lib/i18n";
+import { organizationContentCopy } from "../../../lib/organization-content-copy";
+import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
+import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
+import { organizationTeamCopy } from "../../../lib/organization-team-copy";
+import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
+import {
+  editableOrganizationSchema,
+  memberAddSchema,
+  type OrganizationWorkspace,
+  organizationWorkspaceSchema,
+} from "../../../lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { confirmAction } from "../../../components/confirm-action";
+import { OrganizationMemberEditor } from "./organization-member-editor";
+import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
+import { OrganizationProfileForm } from "./organization-profile-form";
+
+export function OrganizationWorkspacePanel({
+  initial,
+  locale,
+  actorId,
+  query,
+}: {
+  initial: OrganizationWorkspace;
+  locale: Locale;
+  actorId: string;
+  query: string;
+}) {
+  const copy = getOrganizationCopy(locale);
+  const governanceCopy = organizationGovernanceCopy(locale);
+  const router = useRouter();
+  const [data, setData] = useState(initial);
+  useEffect(() => {
+    setData(initial);
+  }, [initial]);
+  const guard = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
+  const [role, setRole] = useState<OrganizationTeamRole>("member");
+  const [servers, setServers] = useState(false);
+  const [ownershipTarget, setOwnershipTarget] = useState<
+    OrganizationWorkspace["members"][number] | null
+  >(null);
+  const manageable = canManageOrganization(data.role);
+  const path = `/api/workspace/organizations/${encodeURIComponent(data.organization.id)}`;
+  async function mutate(
+    method: string,
+    suffix: string,
+    fields: Record<string, unknown>,
+    expected: {
+      userId?: string;
+      username?: string;
+      role?: string;
+      managesServers?: boolean;
+      removed?: boolean;
+    },
+    success: string,
+  ) {
+    if (guard.current) return false;
+    guard.current = true;
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      const result = await platformRequest(
+        path + suffix,
+        locale,
+        method,
+        {
+          ...fields,
+          expectedUpdatedAt: data.organization.updatedAt,
+        },
+        undefined,
+        { "x-nexus-actor-id": actorId },
+      );
+      const committed = confirmsOrganizationMemberMutation(
+        result,
+        data.organization,
+        expected,
+        method === "POST",
+      );
+      if (!committed) throw new Error(copy.unavailable);
+      // Retain the committed revision even if refreshing the team subsequently fails.
+      setData((current) => ({ ...current, organization: committed }));
+      setMessage(success);
+      const filters = new URLSearchParams({ page: String(data.page), q: query });
+      try {
+        const refreshed = organizationWorkspaceSchema.safeParse(
+          await platformRequest(`${path}?${filters}`, locale, "GET", undefined, undefined, {
+            "x-nexus-actor-id": actorId,
+          }),
+        );
+        if (!refreshed.success || refreshed.data.organization.id !== data.organization.id)
+          throw new Error(copy.unavailable);
+        setData(refreshed.data);
+      } catch {
+        setError(governanceCopy.refreshFailed);
+      }
+      router.refresh();
+      return true;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      return false;
+    } finally {
+      guard.current = false;
+      setBusy(false);
+    }
+  }
+  async function leave() {
+    if (guard.current) return;
+    if (
+      !(await confirmAction({
+        title: copy.leave,
+        object: data.organization.name,
+        consequences: copy.leaveConfirm,
+        confirmLabel: copy.leave,
+        cancelLabel: governanceCopy.cancel,
+        closeLabel: governanceCopy.cancel,
+      }))
+    )
+      return;
+    guard.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await platformRequest(
+        `${path}/leave`,
+        locale,
+        "POST",
+        {
+          expectedUpdatedAt: data.organization.updatedAt,
+        },
+        undefined,
+        { "x-nexus-actor-id": actorId },
+      );
+      const organization = editableOrganizationSchema.safeParse(result.organization);
+      if (
+        !organization.success ||
+        organization.data.id !== data.organization.id ||
+        organization.data.updatedAt === data.organization.updatedAt ||
+        result.userId !== actorId ||
+        result.removed !== true
+      )
+        throw new Error(copy.unavailable);
+      router.push("/workspace/organizations");
+      router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : copy.unavailable);
+    } finally {
+      guard.current = false;
+      setBusy(false);
+    }
+  }
+  async function add(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const parsed = memberAddSchema.safeParse({
+      username,
+      role,
+      managesServers: servers,
+      expectedUpdatedAt: data.organization.updatedAt,
+    });
+    if (!parsed.success) {
+      setError(copy.invalid);
+      return;
+    }
+    if (
+      await mutate(
+        "POST",
+        "/members",
+        parsed.data,
+        { username: parsed.data.username, role, managesServers: servers },
+        copy.added,
+      )
+    ) {
+      setUsername("");
+      setRole("member");
+      setServers(false);
+    }
+  }
+  const navLinkClass =
+    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+  return (
+    <div className="min-w-0 space-y-6 overflow-x-clip">
+      <Link
+        href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
+        className={navLinkClass}
+      >
+        {organizationTeamCopy(locale).title}
+      </Link>
+      {!manageable && <ErrorState id="organization-workspace-readonly" title={copy.readOnly} />}
+      <OrganizationProfileForm
+        key={`${actorId}:${data.organization.id}`}
+        locale={locale}
+        actorId={actorId}
+        initial={data.organization}
+        canEdit={manageable}
+        disabled={!manageable || busy}
+        onBusyChange={(value) => {
+          guard.current = value;
+          setBusy(value);
+        }}
+        onSave={(organization) => {
+          setData((current) => ({ ...current, organization }));
+          setMessage(copy.saved);
+        }}
+      />
+      {manageable && (
+        <Link
+          className={navLinkClass}
+          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
+        >
+          {organizationContentCopy(locale).title}
+        </Link>
+      )}
+      {manageable && (
+        <Link
+          className={navLinkClass}
+          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
+        >
+          {governanceCopy.history}
+        </Link>
+      )}
+      {data.role === "owner" && data.organization.ownerId === actorId && (
+        <OrganizationOwnershipTransfer
+          key={`${ownershipTarget?.id ?? "none"}:${data.organization.updatedAt}`}
+          data={data}
+          target={ownershipTarget}
+          actorId={actorId}
+          locale={locale}
+          busy={busy}
+          onBusyChange={(value) => {
+            guard.current = value;
+            setBusy(value);
+          }}
+          onCancel={() => setOwnershipTarget(null)}
+          onReload={() => router.refresh()}
+          onSaved={(result) => {
+            setData((current) => ({
+              ...current,
+              organization: result.organization,
+              owner: result.owner,
+              role: result.role,
+              members: current.members.filter((member) => member.id !== result.owner.id),
+            }));
+            setOwnershipTarget(null);
+            setMessage(governanceCopy.transferred);
+            setError("");
+            router.refresh();
+          }}
+        />
+      )}
+      <section className="nexus-panel space-y-5 p-5" aria-busy={busy}>
+        <h2 className="font-heading text-primary">{copy.team}</h2>
+        <p className="text-sm text-muted">{copy.roleHelp}</p>
+        <p className="text-xs text-muted">{copy.accessHelp}</p>
+        {data.owner && (
+          <div className="flex items-center gap-3 rounded-lg border border-base p-3">
+            <Avatar
+              src={data.owner.avatarUrl ?? undefined}
+              alt={data.owner.displayName}
+              fallback={data.owner.username}
+            />
+            <Link
+              href={`/users/${encodeURIComponent(data.owner.username)}`}
+              className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {data.owner.displayName} (@{data.owner.username})
+            </Link>
+            <span className="ml-auto text-xs text-muted">{copy.owner}</span>
+          </div>
+        )}
+        {manageable && (
+          <form onSubmit={add} className="space-y-3 rounded-lg border border-base p-4">
+            <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1 text-sm text-secondary">
+                <span>{copy.username}</span>
+                <input
+                  className={platformFieldClass}
+                  required
+                  maxLength={80}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <span className="block text-xs text-muted">{copy.usernameHelp}</span>
+              </label>
+              <label className="block space-y-1 text-sm text-secondary">
+                <span>{copy.role}</span>
+                <select
+                  className={platformFieldClass}
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as OrganizationTeamRole)}
+                >
+                  {organizationTeamRoles
+                    .filter((value) => data.role === "owner" || value !== "admin")
+                    .map((value) => (
+                      <option key={value} value={value}>
+                        {copy[value]}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="flex items-center gap-2 text-sm text-secondary">
+                <input
+                  type="checkbox"
+                  checked={servers}
+                  onChange={(e) => setServers(e.target.checked)}
+                />
+                {copy.serverAccess}
+              </label>
+              <Button
+                type="submit"
+                disabled={!username.trim()}
+                isLoading={busy}
+                className="min-h-11"
+              >
+                {copy.add}
+              </Button>
+            </fieldset>
+          </form>
+        )}
+        <search aria-label={copy.searchTeam}>
+          <form
+            method="GET"
+            action={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
+            className="flex flex-wrap items-end gap-2"
+          >
+            <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+              <span>{copy.searchTeam}</span>
+              <input
+                type="search"
+                name="q"
+                defaultValue={query}
+                maxLength={120}
+                className={`${platformFieldClass} min-h-11`}
+              />
+            </label>
+            <Button type="submit" size="sm" className="min-h-11">
+              {copy.filter}
+            </Button>
+          </form>
+        </search>
+        {data.members.length ? (
+          <div className="space-y-3">
+            {data.members.map((member) => (
+              <OrganizationMemberEditor
+                key={`${member.id}:${member.role}:${member.managesServers}`}
+                member={member}
+                locale={locale}
+                actorRole={data.role}
+                canEdit={canChangeOrganizationMember(
+                  data.role,
+                  member.role,
+                  null,
+                  member.id === actorId,
+                  member.id === data.organization.ownerId,
+                )}
+                busy={busy}
+                onSave={(nextRole, managesServers) =>
+                  mutate(
+                    "PATCH",
+                    `/members/${encodeURIComponent(member.id)}`,
+                    { role: nextRole, managesServers },
+                    { userId: member.id, role: nextRole, managesServers },
+                    copy.updated,
+                  )
+                }
+                onRemove={async () => {
+                  if (
+                    !(await confirmAction({
+                      title: copy.remove,
+                      object: `${member.displayName} (@${member.username})`,
+                      consequences: copy.removeConfirm,
+                      confirmLabel: copy.remove,
+                      cancelLabel: governanceCopy.cancel,
+                      closeLabel: governanceCopy.cancel,
+                    }))
+                  )
+                    return;
+                  void mutate(
+                    "DELETE",
+                    `/members/${encodeURIComponent(member.id)}`,
+                    {},
+                    { userId: member.id, removed: true },
+                    copy.removed,
+                  );
+                }}
+                onSelectOwner={
+                  data.role === "owner" && ["admin", "developer", "member"].includes(member.role)
+                    ? () => {
+                        setOwnershipTarget(member);
+                        document
+                          .getElementById("organization-ownership-transfer")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState title={copy.noMembers} description={copy.noMembersHint} />
+        )}
+        <nav
+          className="flex flex-wrap items-center justify-between gap-3 text-sm"
+          aria-label={copy.team}
+        >
+          {data.page > 1 ? (
+            <Link
+              className={navLinkClass}
+              href={teamHref(data.organization.id, data.page - 1, query)}
+            >
+              {copy.previous}
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span className="inline-flex min-h-11 items-center text-muted">
+            {copy.page} {data.page}
+          </span>
+          {data.hasMore && (
+            <Link
+              className={navLinkClass}
+              href={teamHref(data.organization.id, data.page + 1, query)}
+            >
+              {copy.next}
+            </Link>
+          )}
+        </nav>
+        {error && (
+          <ErrorState
+            title={error}
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={busy}
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                onClick={() => router.refresh()}
+              >
+                {copy.reload}
+              </Button>
+            }
+          />
+        )}
+        {message && (
+          <p
+            role="status"
+            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {message}
+          </p>
+        )}
+        {data.role !== "owner" && (
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={busy}
+            className="h-auto min-h-11 px-0 text-sm text-danger underline"
+            onClick={() => void leave()}
+          >
+            {copy.leave}
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={busy}
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          onClick={() => router.refresh()}
+        >
+          {copy.reload}
+        </Button>
+      </section>
+    </div>
+  );
+}
+function teamHref(id: string, page: number, query: string) {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (page > 1) params.set("page", String(page));
+  return `/workspace/organizations/${encodeURIComponent(id)}${params.size ? `?${params}` : ""}`;
+}

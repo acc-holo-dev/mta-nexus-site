@@ -146,7 +146,7 @@ function run() {
           "--project-name",
           "nexus-backup-contract",
           "--file",
-          join(root, "deploy", "compose.production.yaml"),
+          join(root, "docker", "compose.production.yaml"),
           "config",
           "--format",
           "json",
@@ -211,7 +211,7 @@ function run() {
         ]),
       ).trim();
 
-    const migrationsDir = join(root, "packages", "db", "migrations");
+    const migrationsDir = join(root, "site", "packages", "db", "migrations");
     const migrationFiles = readdirSync(migrationsDir)
       .filter((name) => /^\d+.*\.sql$/u.test(name))
       .sort((a, b) => a.localeCompare(b));

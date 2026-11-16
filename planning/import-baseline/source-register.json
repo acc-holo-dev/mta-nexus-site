@@ -27,7 +27,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/page.tsx · строки 14-75\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L14-L75\n\ndocs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md · строки 17-39\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md#L17-L39",
-      "task_ids": ["UX-14"]
+      "task_ids": [
+        "UX-14"
+      ]
     },
     {
       "id": "PX02",
@@ -54,7 +56,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/app/page.tsx · строки 97-116\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L97-L116\n\napps/web/src/components/server-card.tsx · файл целиком\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-card.tsx",
-      "task_ids": ["UX-15"]
+      "task_ids": [
+        "UX-15"
+      ]
     },
     {
       "id": "PX03",
@@ -81,7 +85,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/market/page.tsx · строки 30-50\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/page.tsx#L30-L50\n\napps/web/src/app/discover/page.tsx · строки 40-100\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/discover/page.tsx#L40-L100",
-      "task_ids": ["UX-16"]
+      "task_ids": [
+        "UX-16"
+      ]
     },
     {
       "id": "PX04",
@@ -113,7 +119,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/product-card.tsx · файл целиком\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/product-card.tsx\n\napps/web/src/app/market/[slug]/page.tsx · строки 190-240\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L190-L240\n\ndocs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md · строки 5-24\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md#L5-L24",
-      "task_ids": ["UX-09"]
+      "task_ids": [
+        "UX-09"
+      ]
     },
     {
       "id": "PX05",
@@ -145,7 +153,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "packages/domain/src/entities.ts · строки 18-23\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/entities.ts#L18-L23\n\napps/web/src/app/market/[slug]/page.tsx · строки 382-389\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L382-L389\n\ndocs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md · строки 5-24\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md#L5-L24",
-      "task_ids": ["UX-17"]
+      "task_ids": [
+        "UX-17"
+      ]
     },
     {
       "id": "PX06",
@@ -167,7 +177,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/product-card.tsx · строки 39-52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/product-card.tsx#L39-L52",
-      "task_ids": ["UX-18"]
+      "task_ids": [
+        "UX-18"
+      ]
     },
     {
       "id": "PX07",
@@ -194,7 +206,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/resource-gallery.tsx · строки 1-46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-gallery.tsx#L1-L46\n\napps/web/src/components/resource-media-editor.tsx · строки 98-180\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-media-editor.tsx#L98-L180",
-      "task_ids": ["UX-19"]
+      "task_ids": [
+        "UX-19"
+      ]
     },
     {
       "id": "PX08",
@@ -221,7 +235,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/market/[slug]/page.tsx · строки 225-250\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L225-L250\n\ndocs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md · строки 38-55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md#L38-L55",
-      "task_ids": ["UX-20"]
+      "task_ids": [
+        "UX-20"
+      ]
     },
     {
       "id": "PX09",
@@ -253,7 +269,10 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/resource-cart-controls.tsx · строки 24-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-cart-controls.tsx#L24-L85\n\napps/web/src/components/resource-cart-controls.tsx · строки 173-220\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-cart-controls.tsx#L173-L220\n\napps/web/src/app/market/[slug]/page.tsx · строки 424-449\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L424-L449",
-      "task_ids": ["UX-21", "UX-27"]
+      "task_ids": [
+        "UX-21",
+        "UX-27"
+      ]
     },
     {
       "id": "PX10",
@@ -285,7 +304,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/new-resource-form.tsx · строки 84-108\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/new-resource-form.tsx#L84-L108\n\napps/web/src/components/author-resource-forms.tsx · строки 157-195\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/author-resource-forms.tsx#L157-L195\n\napps/web/src/app/workspace/resources/[id]/media/page.tsx · файл целиком\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/resources/[id]/media/page.tsx",
-      "task_ids": ["UX-22"]
+      "task_ids": [
+        "UX-22"
+      ]
     },
     {
       "id": "PX11",
@@ -307,7 +328,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/workspace/page.tsx · строки 99-183\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/page.tsx#L99-L183",
-      "task_ids": ["UX-23"]
+      "task_ids": [
+        "UX-23"
+      ]
     },
     {
       "id": "PX12",
@@ -339,7 +362,9 @@
       "chapter": "Функции и страницы",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/market/[slug]/page.tsx · строки 399-420\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L399-L420\n\napps/web/src/app/support/page.tsx · файл целиком\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/support/page.tsx\n\ndocs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md · строки 126-140\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md#L126-L140",
-      "task_ids": ["UX-20"]
+      "task_ids": [
+        "UX-20"
+      ]
     },
     {
       "id": "UI01",
@@ -381,7 +406,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/notification-center-tabs.tsx · строки 7-55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-center-tabs.tsx#L7-L55\n\napps/web/src/app/notifications/page.tsx · строки 39-50\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/notifications/page.tsx#L39-L50\n\napps/web/src/app/notifications/page.tsx · строки 94-105\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/notifications/page.tsx#L94-L105\n\napps/web/src/app/notifications/page.tsx · строки 172-175\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/notifications/page.tsx#L172-L175\n\nscripts/tests/shell-accessibility.playwright.mjs · строки 618-642\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/tests/shell-accessibility.playwright.mjs#L618-L642",
-      "task_ids": ["UX-01"]
+      "task_ids": [
+        "UX-01"
+      ]
     },
     {
       "id": "UI02",
@@ -418,7 +445,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/button.tsx · строки 4-49\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/button.tsx#L4-L49\n\napps/web/src/app/page.tsx · строки 58-70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L58-L70\n\napps/web/src/components/account-controls.tsx · строки 103-106\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/account-controls.tsx#L103-L106\n\napps/web/src/app/error.tsx · строки 27-43\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/error.tsx#L27-L43",
-      "task_ids": ["UX-02"]
+      "task_ids": [
+        "UX-02"
+      ]
     },
     {
       "id": "UI03",
@@ -455,7 +484,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/product-card.tsx · строки 15-19\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/product-card.tsx#L15-L19\n\napps/web/src/components/product-card.tsx · строки 49-70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/product-card.tsx#L49-L70\n\napps/web/src/components/server-card.tsx · строки 35-39\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-card.tsx#L35-L39\n\napps/web/src/components/server-card.tsx · строки 75-109\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-card.tsx#L75-L109",
-      "task_ids": ["UX-02"]
+      "task_ids": [
+        "UX-02"
+      ]
     },
     {
       "id": "UI04",
@@ -477,7 +508,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/server-review-panel.tsx · строки 197-243\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-review-panel.tsx#L197-L243",
-      "task_ids": ["UX-11"]
+      "task_ids": [
+        "UX-11"
+      ]
     },
     {
       "id": "UI05",
@@ -514,7 +547,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/input.tsx · строки 29-53\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/input.tsx#L29-L53\n\npackages/ui/src/field-classes.ts · строки 1-9\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/field-classes.ts#L1-L9\n\napps/web/src/components/server-details-form.tsx · строки 44-48\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-details-form.tsx#L44-L48\n\napps/web/src/app/workspace/library/collections/[id]/compare/page.tsx · строки 85-150\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/collections/[id]/compare/page.tsx#L85-L150",
-      "task_ids": ["UX-03"]
+      "task_ids": [
+        "UX-03"
+      ]
     },
     {
       "id": "UI06",
@@ -551,7 +586,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/input.tsx · строки 23-53\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/input.tsx#L23-L53\n\npackages/ui/src/index.ts · строки 1-14\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/index.ts#L1-L14\n\napps/web/src/components/community-topic-form.tsx · строки 62-95\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L62-L95\n\ntests/ui-accessibility.test.tsx · строки 8-45\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/ui-accessibility.test.tsx#L8-L45",
-      "task_ids": ["UX-03"]
+      "task_ids": [
+        "UX-03"
+      ]
     },
     {
       "id": "UI07",
@@ -588,7 +625,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/community-topic-form.tsx · строки 20-29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L20-L29\n\napps/web/src/components/community-topic-form.tsx · строки 36-52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L36-L52\n\napps/web/src/components/community-topic-form.tsx · строки 57-100\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L57-L100\n\napps/web/src/components/server-details-form.tsx · строки 151-173\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-details-form.tsx#L151-L173",
-      "task_ids": ["UX-04"]
+      "task_ids": [
+        "UX-04"
+      ]
     },
     {
       "id": "UI08",
@@ -625,7 +664,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/community-topic-form.tsx · строки 43-52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L43-L52\n\napps/web/src/components/community-topic-form.tsx · строки 92-95\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/community-topic-form.tsx#L92-L95\n\napps/web/src/app/notifications/page.tsx · строки 51-55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/notifications/page.tsx#L51-L55\n\npackages/ui/src/input.tsx · строки 39-52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/input.tsx#L39-L52",
-      "task_ids": ["UX-04"]
+      "task_ids": [
+        "UX-04"
+      ]
     },
     {
       "id": "UI09",
@@ -667,7 +708,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/button.tsx · строки 15-16\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/button.tsx#L15-L16\n\npackages/ui/src/button.tsx · строки 35-46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/button.tsx#L35-L46\n\npackages/ui/src/input.tsx · строки 35-48\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/input.tsx#L35-L48\n\npackages/ui/src/field-classes.ts · строки 5-9\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/field-classes.ts#L5-L9\n\napps/web/src/app/workspace/library/collections/[id]/compare/page.tsx · строки 144-154\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/collections/[id]/compare/page.tsx#L144-L154",
-      "task_ids": ["UX-03"]
+      "task_ids": [
+        "UX-03"
+      ]
     },
     {
       "id": "UI10",
@@ -709,7 +752,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/button.tsx · строки 27-31\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/button.tsx#L27-L31\n\napps/web/src/components/theme-toggle.tsx · строки 67-77\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/theme-toggle.tsx#L67-L77\n\napps/web/src/components/locale-switcher.tsx · строки 19-30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/locale-switcher.tsx#L19-L30\n\napps/web/src/components/notification-bell.tsx · строки 164-184\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L164-L184\n\nscripts/tests/shell-accessibility.playwright.mjs · строки 535-540\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/tests/shell-accessibility.playwright.mjs#L535-L540",
-      "task_ids": ["UX-02"]
+      "task_ids": [
+        "UX-02"
+      ]
     },
     {
       "id": "UI11",
@@ -741,7 +786,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/globals.css · строки 9-106\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/globals.css#L9-L106\n\napps/web/src/components/theme-toggle.tsx · строки 31-45\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/theme-toggle.tsx#L31-L45\n\napps/web/src/app/sw.js/route.ts · строки 58-58\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/sw.js/route.ts#L58",
-      "task_ids": ["UX-05"]
+      "task_ids": [
+        "UX-05"
+      ]
     },
     {
       "id": "UI12",
@@ -768,7 +815,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P3",
       "sourceText": "apps/web/src/components/theme-toggle.tsx · строки 31-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/theme-toggle.tsx#L31-L85\n\napps/web/src/lib/theme-preference.ts · строки 1-33\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/theme-preference.ts#L1-L33",
-      "task_ids": ["UX-05"]
+      "task_ids": [
+        "UX-05"
+      ]
     },
     {
       "id": "UI13",
@@ -810,7 +859,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/dialog.tsx · строки 32-47\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/dialog.tsx#L32-L47\n\npackages/ui/src/dialog.tsx · строки 69-105\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/dialog.tsx#L69-L105\n\napps/web/src/components/use-modal-dialog.ts · строки 5-49\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/use-modal-dialog.ts#L5-L49\n\napps/web/src/components/mobile-nav.tsx · строки 133-152\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/mobile-nav.tsx#L133-L152\n\napps/web/src/components/notification-bell.tsx · строки 146-173\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L146-L173",
-      "task_ids": ["UX-06"]
+      "task_ids": [
+        "UX-06"
+      ]
     },
     {
       "id": "UI14",
@@ -852,7 +903,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/mobile-nav.tsx · строки 53-81\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/mobile-nav.tsx#L53-L81\n\napps/web/src/components/mobile-nav.tsx · строки 133-190\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/mobile-nav.tsx#L133-L190\n\napps/web/src/components/notification-bell.tsx · строки 160-160\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L160\n\napps/web/src/components/notification-bell.tsx · строки 210-210\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L210\n\nscripts/tests/shell-accessibility.playwright.mjs · строки 644-651\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/tests/shell-accessibility.playwright.mjs#L644-L651",
-      "task_ids": ["UX-07"]
+      "task_ids": [
+        "UX-07"
+      ]
     },
     {
       "id": "UI15",
@@ -889,7 +942,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/organization-ownership-transfer.tsx · строки 50-77\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/organization-ownership-transfer.tsx#L50-L77\n\napps/web/src/components/notification-inbox.tsx · строки 145-150\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-inbox.tsx#L145-L150\n\napps/web/src/components/author-content-form.tsx · строки 140-145\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/author-content-form.tsx#L140-L145\n\napps/web/src/components/organization-team-batch.tsx · строки 73-79\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/organization-team-batch.tsx#L73-L79",
-      "task_ids": ["UX-06"]
+      "task_ids": [
+        "UX-06"
+      ]
     },
     {
       "id": "UI16",
@@ -921,7 +976,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P3",
       "sourceText": "packages/ui/src/tabs.tsx · строки 18-69\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/tabs.tsx#L18-L69\n\napps/web/src/components/notification-center-tabs.tsx · строки 17-55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-center-tabs.tsx#L17-L55\n\ntests/ui-accessibility.test.tsx · строки 48-94\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/ui-accessibility.test.tsx#L48-L94",
-      "task_ids": ["UX-01"]
+      "task_ids": [
+        "UX-01"
+      ]
     },
     {
       "id": "UI17",
@@ -958,7 +1015,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/platform.tsx · строки 187-234\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L187-L234\n\napps/web/src/components/server-statistics-panel.tsx · строки 13-29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-statistics-panel.tsx#L13-L29\n\napps/web/src/components/server-statistics-panel.tsx · строки 95-118\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-statistics-panel.tsx#L95-L118\n\napps/web/src/app/admin/page.tsx · строки 815-842\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/admin/page.tsx#L815-L842",
-      "task_ids": ["UX-08"]
+      "task_ids": [
+        "UX-08"
+      ]
     },
     {
       "id": "UI18",
@@ -985,7 +1044,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P3",
       "sourceText": "packages/ui/src/platform.tsx · строки 201-222\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L201-L222\n\napps/web/src/app/admin/page.tsx · строки 820-835\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/admin/page.tsx#L820-L835",
-      "task_ids": ["UX-08"]
+      "task_ids": [
+        "UX-08"
+      ]
     },
     {
       "id": "UI19",
@@ -1007,7 +1068,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/platform.tsx · строки 50-69\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L50-L69",
-      "task_ids": ["UX-07"]
+      "task_ids": [
+        "UX-07"
+      ]
     },
     {
       "id": "UI20",
@@ -1029,7 +1092,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/developers/[username]/page.tsx · строки 94-106\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/developers/[username]/page.tsx#L94-L106",
-      "task_ids": ["UX-09"]
+      "task_ids": [
+        "UX-09"
+      ]
     },
     {
       "id": "UI21",
@@ -1071,7 +1136,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/globals.css · строки 46-57\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/globals.css#L46-L57\n\napps/web/src/app/globals.css · строки 214-233\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/globals.css#L214-L233\n\npackages/ui/src/platform.tsx · строки 133-146\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L133-L146\n\napps/web/src/components/notification-bell.tsx · строки 174-203\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L174-L203\n\ntests/design-token-contrast.test.ts · строки 70-120\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/design-token-contrast.test.ts#L70-L120",
-      "task_ids": ["UX-05"]
+      "task_ids": [
+        "UX-05"
+      ]
     },
     {
       "id": "UI22",
@@ -1123,7 +1190,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/platform.tsx · строки 133-146\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L133-L146\n\npackages/ui/src/platform.tsx · строки 170-179\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L170-L179\n\napps/web/src/components/managed-server-card.tsx · строки 58-63\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/managed-server-card.tsx#L58-L63\n\napps/web/src/app/admin/page.tsx · строки 328-336\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/admin/page.tsx#L328-L336\n\napps/web/src/app/admin/page.tsx · строки 449-457\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/admin/page.tsx#L449-L457\n\napps/web/src/app/admin/page.tsx · строки 764-773\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/admin/page.tsx#L764-L773\n\napps/web/src/app/workspace/library/page.tsx · строки 162-165\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/page.tsx#L162-L165",
-      "task_ids": ["UX-10"]
+      "task_ids": [
+        "UX-10"
+      ]
     },
     {
       "id": "UI23",
@@ -1170,7 +1239,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/button.tsx · строки 35-46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/button.tsx#L35-L46\n\npackages/ui/src/skeleton.tsx · строки 4-10\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/skeleton.tsx#L4-L10\n\napps/web/src/app/loading.tsx · строки 10-17\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/loading.tsx#L10-L17\n\napps/web/src/components/follow-button.tsx · строки 139-158\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L139-L158\n\napps/web/src/components/follow-button.tsx · строки 187-218\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L187-L218\n\napps/web/src/app/globals.css · строки 272-287\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/globals.css#L272-L287",
-      "task_ids": ["UX-04"]
+      "task_ids": [
+        "UX-04"
+      ]
     },
     {
       "id": "UI24",
@@ -1207,7 +1278,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P3",
       "sourceText": "apps/web/src/app/global-error.tsx · строки 38-64\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/global-error.tsx#L38-L64\n\napps/web/src/app/global-error.tsx · строки 109-145\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/global-error.tsx#L109-L145\n\napps/web/src/app/error.tsx · строки 8-13\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/error.tsx#L8-L13\n\napps/web/src/app/error.tsx · строки 27-43\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/error.tsx#L27-L43",
-      "task_ids": ["UX-12"]
+      "task_ids": [
+        "UX-12"
+      ]
     },
     {
       "id": "UI25",
@@ -1249,7 +1322,9 @@
       "chapter": "UI и удобство",
       "priorityCode": "P2",
       "sourceText": "tests/ui-accessibility.test.tsx · строки 8-45\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/ui-accessibility.test.tsx#L8-L45\n\ntests/dialog-accessibility.test.tsx · строки 9-54\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/dialog-accessibility.test.tsx#L9-L54\n\ntests/design-token-contrast.test.ts · строки 70-120\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/design-token-contrast.test.ts#L70-L120\n\nscripts/tests/shell-accessibility.playwright.mjs · строки 618-642\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/tests/shell-accessibility.playwright.mjs#L618-L642\n\nscripts/tests/public-portfolio.playwright.mjs · строки 70-105\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/tests/public-portfolio.playwright.mjs#L70-L105",
-      "task_ids": ["UX-13"]
+      "task_ids": [
+        "UX-13"
+      ]
     },
     {
       "id": "INT01",
@@ -1286,7 +1361,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/discovery-directory.tsx · строки 151–158, 189–221\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/discovery-directory.tsx#L151-L158\n\napps/web/src/components/follow-button.tsx · строки 115–203\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L115-L203\n\npackages/db/src/repositories/follow-workspace.ts · строки 418–524\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L418-L524\n\napps/web/src/app/market/[slug]/page.tsx · строки 381–450\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L381-L450",
-      "task_ids": ["FLOW-02"]
+      "task_ids": [
+        "FLOW-02"
+      ]
     },
     {
       "id": "INT02",
@@ -1323,7 +1400,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/app/workspace/library/[id]/versions/page.tsx · строки 125–153\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/[id]/versions/page.tsx#L125-L153\n\npackages/domain/src/resource-release-watches.ts · строки 1–26\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/resource-release-watches.ts#L1-L26\n\npackages/db/src/repositories/resource-release-watches.ts · строки 96–174\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-watches.ts#L96-L174\n\napps/web/src/components/resource-release-watch-control.tsx · строки 42–97, 106–160\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-release-watch-control.tsx#L42-L97",
-      "task_ids": ["FLOW-03"]
+      "task_ids": [
+        "FLOW-03"
+      ]
     },
     {
       "id": "INT03",
@@ -1360,7 +1439,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "packages/db/src/repositories/resource-release-worker.ts · строки 93–190\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-worker.ts#L93-L190\n\napps/web/src/app/settings/page.tsx · строки 99–128\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/settings/page.tsx#L99-L128\n\napps/web/src/lib/resource-release-watches-i18n.ts · строки 86–97\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/resource-release-watches-i18n.ts#L86-L97\n\napps/web/src/lib/i18n/ru/admin.ts · строки 243–250\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/i18n/ru/admin.ts#L243-L250",
-      "task_ids": ["FLOW-03"]
+      "task_ids": [
+        "FLOW-03"
+      ]
     },
     {
       "id": "INT04",
@@ -1397,7 +1478,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/domain/src/resource-release-watches.ts · строки 1–26\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/resource-release-watches.ts#L1-L26\n\npackages/db/src/repositories/resource-release-watches.ts · строки 141–174\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-watches.ts#L141-L174\n\napps/web/src/lib/resource-release-watches-i18n.ts · строки 2–28, 61–70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/resource-release-watches-i18n.ts#L2-L28\n\napps/web/src/app/workspace/library/[id]/versions/page.tsx · строки 138–153\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/[id]/versions/page.tsx#L138-L153",
-      "task_ids": ["FLOW-03"]
+      "task_ids": [
+        "FLOW-03"
+      ]
     },
     {
       "id": "INT05",
@@ -1434,7 +1517,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/content-discussion.tsx · строки 180–203\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-discussion.tsx#L180-L203\n\npackages/db/src/repositories/notifications.ts · строки 429–475\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/notifications.ts#L429-L475\n\npackages/db/src/repositories/follow-workspace.ts · строки 172–214, 361–415\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L172-L214\n\napps/web/src/lib/follow-workspace-copy.ts · строки 62–63\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/follow-workspace-copy.ts#L62-L63",
-      "task_ids": ["FLOW-04"]
+      "task_ids": [
+        "FLOW-04"
+      ]
     },
     {
       "id": "INT06",
@@ -1466,7 +1551,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/db/src/schema.ts · строки 1251–1269, 1308–1323\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L1251-L1269\n\npackages/db/src/repositories/notifications.ts · строки 341–390, 450–455\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/notifications.ts#L341-L390\n\npackages/db/src/repositories/resource-release-watches.ts · строки 141–174\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-watches.ts#L141-L174",
-      "task_ids": ["FLOW-05"]
+      "task_ids": [
+        "FLOW-05"
+      ]
     },
     {
       "id": "INT07",
@@ -1503,7 +1590,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/db/src/schema.ts · строки 1251–1269\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L1251-L1269\n\npackages/db/src/repositories/follow-workspace.ts · строки 26–39, 71–169\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L26-L39\n\napps/web/src/components/content-discussion.tsx · строки 180–203\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-discussion.tsx#L180-L203\n\napps/web/src/lib/follow-workspace-copy.ts · строки 52–63\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/follow-workspace-copy.ts#L52-L63",
-      "task_ids": ["FLOW-06"]
+      "task_ids": [
+        "FLOW-06"
+      ]
     },
     {
       "id": "INT08",
@@ -1545,7 +1634,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/lib/follow-workspace-contract.ts · строки 1–22\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/follow-workspace-contract.ts#L1-L22\n\napps/web/src/components/follow-button.tsx · строки 169–203\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L169-L203\n\napps/web/src/components/follow-workspace.tsx · строки 230–276\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-workspace.tsx#L230-L276\n\npackages/db/src/repositories/user-follow-notice.ts · строки 19–36\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/user-follow-notice.ts#L19-L36\n\npackages/db/src/repositories/publication-notification-delivery.ts · строки 134–173\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/publication-notification-delivery.ts#L134-L173",
-      "task_ids": ["FLOW-02"]
+      "task_ids": [
+        "FLOW-02"
+      ]
     },
     {
       "id": "INT09",
@@ -1577,7 +1668,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/db/src/repositories/follow-workspace.ts · строки 71–169, 428–440\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L71-L169\n\napps/web/src/components/follow-workspace.tsx · строки 104–130, 178–219, 272–300\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-workspace.tsx#L104-L130\n\napps/web/src/lib/follow-workspace-contract.ts · строки 52–58\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/follow-workspace-contract.ts#L52-L58",
-      "task_ids": ["FLOW-07"]
+      "task_ids": [
+        "FLOW-07"
+      ]
     },
     {
       "id": "INT10",
@@ -1604,7 +1697,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/notification-bell.tsx · строки 21–62, 73–100, 141–160, 174–207, 242–255\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-bell.tsx#L21-L62\n\napps/web/src/lib/visible-polling.ts · строки 1–40\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/visible-polling.ts#L1-L40",
-      "task_ids": ["FLOW-08"]
+      "task_ids": [
+        "FLOW-08"
+      ]
     },
     {
       "id": "INT11",
@@ -1646,7 +1741,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/notification-inbox.tsx · строки 146–211\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/notification-inbox.tsx#L146-L211\n\napps/web/src/lib/notification-inbox-contract.ts · строки 1–32, 100–151\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/notification-inbox-contract.ts#L1-L32\n\npackages/db/src/repositories/notifications.ts · строки 176–211\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/notifications.ts#L176-L211\n\napps/web/src/app/api/notifications/inbox/route.ts · строки 1–49\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/notifications/inbox/route.ts#L1-L49\n\npackages/security/src/rate-limit-policy.ts · строки 12–14, 30–32\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L12-L14",
-      "task_ids": ["FLOW-08"]
+      "task_ids": [
+        "FLOW-08"
+      ]
     },
     {
       "id": "INT12",
@@ -1678,7 +1775,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/web-push-settings.tsx · строки 100–152, 156–207, 219–255\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/web-push-settings.tsx#L100-L152\n\npackages/db/src/schema.ts · строки 1308–1323\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L1308-L1323\n\npackages/db/src/repositories/notifications.ts · строки 341–390\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/notifications.ts#L341-L390",
-      "task_ids": ["FLOW-09"]
+      "task_ids": [
+        "FLOW-09"
+      ]
     },
     {
       "id": "INT13",
@@ -1720,7 +1819,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/content-discussion.tsx · строки 145–177, 245–290\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-discussion.tsx#L145-L177\n\napps/web/src/lib/content-comment-client.ts · строки 10–58\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/content-comment-client.ts#L10-L58\n\napps/web/src/app/api/content/[slug]/comments/route.ts · строки 68–110\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/content/[slug]/comments/route.ts#L68-L110\n\napps/web/src/lib/services/content-service.ts · строки 135–187\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/services/content-service.ts#L135-L187\n\npackages/security/src/rate-limit-policy.ts · строки 26–28\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L26-L28",
-      "task_ids": ["FLOW-10"]
+      "task_ids": [
+        "FLOW-10"
+      ]
     },
     {
       "id": "INT14",
@@ -1757,7 +1858,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/discussion-comment-actions.tsx · строки 38–100, 211–219\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/discussion-comment-actions.tsx#L38-L100\n\npackages/db/src/repositories/discussion-management.ts · строки 90–185\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/discussion-management.ts#L90-L185\n\napps/web/src/app/api/content/[slug]/comments/[id]/route.ts · строки 1–39\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/content/[slug]/comments/[id]/route.ts#L1-L39\n\npackages/security/src/rate-limit-policy.ts · строки 28–29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L28-L29",
-      "task_ids": ["FLOW-11"]
+      "task_ids": [
+        "FLOW-11"
+      ]
     },
     {
       "id": "INT15",
@@ -1794,7 +1897,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/content-discussion.tsx · строки 60–102, 128–177, 217–243\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-discussion.tsx#L60-L102\n\npackages/db/src/repositories/content-discussion.ts · строки 40–105\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/content-discussion.ts#L40-L105\n\npackages/db/src/repositories/notifications.ts · строки 467–475\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/notifications.ts#L467-L475\n\napps/web/src/lib/content-discussion-contract.ts · строки 1–55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/content-discussion-contract.ts#L1-L55",
-      "task_ids": ["FLOW-11"]
+      "task_ids": [
+        "FLOW-11"
+      ]
     },
     {
       "id": "INT16",
@@ -1831,7 +1936,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/market/[slug]/page.tsx · строки 346–378\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L346-L378\n\npackages/db/src/repositories/follow-workspace.ts · строки 26–39\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L26-L39\n\npackages/db/src/repositories/content-discussion.ts · строки 40–65\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/content-discussion.ts#L40-L65\n\npackages/db/src/repositories/resource-reviews.ts · строки 61–116\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-reviews.ts#L61-L116",
-      "task_ids": ["FLOW-12"]
+      "task_ids": [
+        "FLOW-12"
+      ]
     },
     {
       "id": "INT17",
@@ -1868,7 +1975,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/content-reactions.tsx · строки 1–135\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-reactions.tsx#L1-L135\n\npackages/db/src/repositories/content-reactions.ts · строки 152–210\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/content-reactions.ts#L152-L210\n\npackages/db/src/repositories/content-reaction-notice.ts · строки 16–34\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/content-reaction-notice.ts#L16-L34\n\npackages/security/src/rate-limit-policy.ts · строки 27–30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L27-L30",
-      "task_ids": ["FLOW-13"]
+      "task_ids": [
+        "FLOW-13"
+      ]
     },
     {
       "id": "INT18",
@@ -1905,7 +2014,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/discovery-directory.tsx · строки 25–75, 125–180, 212–221\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/discovery-directory.tsx#L25-L75\n\napps/web/src/app/discover/page.tsx · строки 49–96\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/discover/page.tsx#L49-L96\n\napps/web/src/app/api/search/route.ts · строки 1–126\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/search/route.ts#L1-L126\n\npackages/security/src/rate-limit-policy.ts · строки 30–32\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L30-L32",
-      "task_ids": ["FLOW-14"]
+      "task_ids": [
+        "FLOW-14"
+      ]
     },
     {
       "id": "INT19",
@@ -1942,7 +2053,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/components/profile-privacy-editor.tsx · строки 1–145\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/profile-privacy-editor.tsx#L1-L145\n\npackages/db/src/repositories/profile-privacy.ts · строки 6–8, 41–78\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/profile-privacy.ts#L6-L8\n\npackages/db/src/repositories/developer-profile.ts · строки 20–30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/developer-profile.ts#L20-L30\n\napps/web/src/app/users/[username]/page.tsx · строки 116–124\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/users/[username]/page.tsx#L116-L124",
-      "task_ids": ["FLOW-15"]
+      "task_ids": [
+        "FLOW-15"
+      ]
     },
     {
       "id": "INT20",
@@ -1969,7 +2082,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "apps/web/src/app/servers/[slug]/page.tsx · строки 108–116, 193–199, 320–323\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/servers/[slug]/page.tsx#L108-L116\n\npackages/db/src/repositories/follow-workspace.ts · строки 112–119\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/follow-workspace.ts#L112-L119",
-      "task_ids": ["FLOW-16"]
+      "task_ids": [
+        "FLOW-16"
+      ]
     },
     {
       "id": "INT21",
@@ -2001,7 +2116,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/resource-download-button.tsx · строки 48–100, 115–157\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-download-button.tsx#L48-L100\n\napps/web/src/app/api/products/[id]/download/route.ts · строки 65–115\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/products/[id]/download/route.ts#L65-L115\n\npackages/security/src/rate-limit-policy.ts · строки 7–8\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L7-L8",
-      "task_ids": ["FLOW-17"]
+      "task_ids": [
+        "FLOW-17"
+      ]
     },
     {
       "id": "INT22",
@@ -2038,7 +2155,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/app/market/[slug]/page.tsx · строки 391–430\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L391-L430\n\napps/web/src/app/workspace/library/[id]/versions/page.tsx · строки 62–93, 125–153\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/[id]/versions/page.tsx#L62-L93\n\napps/web/src/app/api/products/[id]/download/route.ts · строки 99–115\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/products/[id]/download/route.ts#L99-L115\n\npackages/db/src/repositories/resource-library-selections.ts · строки 99–158\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-library-selections.ts#L99-L158",
-      "task_ids": ["FLOW-17"]
+      "task_ids": [
+        "FLOW-17"
+      ]
     },
     {
       "id": "INT23",
@@ -2070,7 +2189,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/domain/src/library-collections.ts · строки 1–46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/library-collections.ts#L1-L46\n\npackages/db/src/repositories/library-collection-internals.ts · строки 71–79\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/library-collection-internals.ts#L71-L79\n\napps/web/src/components/library-collections-screen.tsx · строки 392–457\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/library-collections-screen.tsx#L392-L457",
-      "task_ids": ["FLOW-07"]
+      "task_ids": [
+        "FLOW-07"
+      ]
     },
     {
       "id": "INT24",
@@ -2107,7 +2228,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/db/src/repositories/resource-reviews.ts · строки 61–116\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-reviews.ts#L61-L116\n\napps/web/src/components/resource-review-controls.tsx · строки 91–128\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-review-controls.tsx#L91-L128\n\napps/web/src/app/market/[slug]/page.tsx · строки 346–378\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/market/[slug]/page.tsx#L346-L378\n\npackages/security/src/rate-limit-policy.ts · строки 29–30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L29-L30",
-      "task_ids": ["FLOW-18"]
+      "task_ids": [
+        "FLOW-18"
+      ]
     },
     {
       "id": "INT25",
@@ -2134,7 +2257,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P2",
       "sourceText": "packages/db/src/repositories/server-reviews.ts · строки 48–111, 158–189, 238–297\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/server-reviews.ts#L48-L111\n\napps/web/src/components/server-review-panel.tsx · строки 147–198\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/server-review-panel.tsx#L147-L198",
-      "task_ids": ["FLOW-18"]
+      "task_ids": [
+        "FLOW-18"
+      ]
     },
     {
       "id": "INT26",
@@ -2176,7 +2301,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/follow-button.tsx · строки 169–172\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L169-L172\n\napps/web/src/components/content-reactions.tsx · строки 128–134\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-reactions.tsx#L128-L134\n\napps/web/src/components/content-discussion.tsx · строки 245–290\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/content-discussion.tsx#L245-L290\n\napps/web/src/components/resource-download-button.tsx · строки 135–141\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-download-button.tsx#L135-L141\n\napps/web/src/app/workspace/library/[id]/versions/page.tsx · строки 40–55\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/workspace/library/[id]/versions/page.tsx#L40-L55",
-      "task_ids": ["FLOW-01"]
+      "task_ids": [
+        "FLOW-01"
+      ]
     },
     {
       "id": "INT27",
@@ -2223,7 +2350,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "apps/web/src/components/support-center.tsx · строки 140–162\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/support-center.tsx#L140-L162\n\napps/web/src/components/support-case-thread.tsx · строки 120–202, 425–455\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/support-case-thread.tsx#L120-L202\n\napps/web/src/components/support-case-actions.tsx · строки 20–38\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/support-case-actions.tsx#L20-L38\n\npackages/db/src/repositories/support.ts · строки 265–296, 374–420, 612–650\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/support.ts#L265-L296\n\npackages/security/src/rate-limit-policy.ts · строки 31–32\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/security/src/rate-limit-policy.ts#L31-L32\n\npackages/validation/src/index.ts · строки 363–387\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/validation/src/index.ts#L363-L387",
-      "task_ids": ["FLOW-19"]
+      "task_ids": [
+        "FLOW-19"
+      ]
     },
     {
       "id": "INT28",
@@ -2265,7 +2394,9 @@
       "chapter": "Действия пользователя",
       "priorityCode": "P1",
       "sourceText": "packages/domain/src/resource-commerce.ts · строки 19–29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/resource-commerce.ts#L19-L29\n\npackages/domain/src/resource-release-control.ts · строки 3–39\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/domain/src/resource-release-control.ts#L3-L39\n\napps/web/src/components/resource-lifecycle-controls.tsx · строки 32–65\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-lifecycle-controls.tsx#L32-L65\n\napps/web/src/components/resource-moderation-controls.tsx · строки 33–90\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/resource-moderation-controls.tsx#L33-L90\n\npackages/db/src/repositories/resource-release-watches.ts · строки 119–131\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-watches.ts#L119-L131",
-      "task_ids": ["FLOW-20"]
+      "task_ids": [
+        "FLOW-20"
+      ]
     },
     {
       "id": "AD01",
@@ -2292,7 +2423,9 @@
       "chapter": "Реклама",
       "priorityCode": "P3",
       "sourceText": "packages/ui/src/platform.tsx · строки 80-125\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L80-L125\n\ndocs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 70-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L70-L85",
-      "task_ids": ["UX-24"]
+      "task_ids": [
+        "UX-24"
+      ]
     },
     {
       "id": "AD02",
@@ -2319,7 +2452,9 @@
       "chapter": "Реклама",
       "priorityCode": "P2",
       "sourceText": "packages/ui/src/platform.tsx · строки 121-125\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/platform.tsx#L121-L125\n\ndocs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · строки 47-58\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L47-L58",
-      "task_ids": ["UX-25"]
+      "task_ids": [
+        "UX-25"
+      ]
     },
     {
       "id": "AD03",
@@ -2346,7 +2481,9 @@
       "chapter": "Реклама",
       "priorityCode": "P2",
       "sourceText": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 74-81\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L74-L81\n\napps/web/src/app/page.tsx · строки 35-75\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/page.tsx#L35-L75",
-      "task_ids": ["UX-25"]
+      "task_ids": [
+        "UX-25"
+      ]
     },
     {
       "id": "AD04",
@@ -2368,7 +2505,9 @@
       "chapter": "Реклама",
       "priorityCode": "P2",
       "sourceText": "docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · строки 35-58\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L35-L58",
-      "task_ids": ["UX-25"]
+      "task_ids": [
+        "UX-25"
+      ]
     },
     {
       "id": "AD05",
@@ -2390,7 +2529,9 @@
       "chapter": "Реклама",
       "priorityCode": "P2",
       "sourceText": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 83-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85",
-      "task_ids": ["UX-25"]
+      "task_ids": [
+        "UX-25"
+      ]
     },
     {
       "id": "AD06",
@@ -2412,7 +2553,9 @@
       "chapter": "Реклама",
       "priorityCode": "P2",
       "sourceText": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 93-101\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L93-L101",
-      "task_ids": ["UX-25"]
+      "task_ids": [
+        "UX-25"
+      ]
     },
     {
       "id": "AD07",
@@ -2439,7 +2582,9 @@
       "chapter": "Реклама",
       "priorityCode": "P3",
       "sourceText": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 83-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85\n\ndocs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · строки 92-103\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L92-L103",
-      "task_ids": ["UX-24"]
+      "task_ids": [
+        "UX-24"
+      ]
     },
     {
       "id": "AD08",
@@ -2461,7 +2606,9 @@
       "chapter": "Реклама",
       "priorityCode": "P3",
       "sourceText": "docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · строки 60-91\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L60-L91",
-      "task_ids": ["UX-26"]
+      "task_ids": [
+        "UX-26"
+      ]
     },
     {
       "id": "AD09",
@@ -2488,7 +2635,9 @@
       "chapter": "Реклама",
       "priorityCode": "P3",
       "sourceText": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md · строки 83-85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md#L83-L85\n\ndocs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md · строки 93-103\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md#L93-L103",
-      "task_ids": ["UX-26"]
+      "task_ids": [
+        "UX-26"
+      ]
     },
     {
       "id": "ARC01",
@@ -2520,7 +2669,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "docs/ARCHITECTURE.md · строки 7–23\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L7-L23\n\n.dependency-cruiser.cjs · строки 3–35\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.dependency-cruiser.cjs#L3-L35\n\napps/web/package.json · строки 16–22\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/package.json#L16-L22",
-      "task_ids": ["OPS-01"]
+      "task_ids": [
+        "OPS-01"
+      ]
     },
     {
       "id": "ARC02",
@@ -2557,7 +2708,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "docs/ARCHITECTURE.md · строки 13–23\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L13-L23\n\n.dependency-cruiser.cjs · строки 3–35\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.dependency-cruiser.cjs#L3-L35\n\napps/web/src/app/api/admin/actions/route.ts · строки 110–118\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/admin/actions/route.ts#L110-L118\n\napps/web/src/app/api/notifications/mark-read/route.ts · строки 26–70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/notifications/mark-read/route.ts#L26-L70",
-      "task_ids": ["OPS-01"]
+      "task_ids": [
+        "OPS-01"
+      ]
     },
     {
       "id": "ARC03",
@@ -2594,7 +2747,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "package.json · строки 2–4\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/package.json#L2-L4\n\napps/web/package.json · строки 2–4\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/package.json#L2-L4\n\napps/web/package.json · строки 16–22\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/package.json#L16-L22\n\ntests/release-version-consistency.test.ts · строки 5–34\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/tests/release-version-consistency.test.ts#L5-L34",
-      "task_ids": ["OPS-02"]
+      "task_ids": [
+        "OPS-02"
+      ]
     },
     {
       "id": "ARC04",
@@ -2642,12 +2797,17 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/nexus-doctor.mjs#L158-L225"
         }
       ],
-      "official": ["W1", "W2"],
+      "official": [
+        "W1",
+        "W2"
+      ],
       "confidence": "Высокая для конфигурации; фактическая версия Node каждого контейнера не инспектировалась.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": ".nvmrc · строки 1\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.nvmrc#L1\n\n.node-version · строки 1\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.node-version#L1\n\npackage.json · строки 94–98\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/package.json#L94-L98\n\n.github/workflows/ci.yml · строки 57–67\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L57-L67\n\nDockerfile · строки 2–19\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L2-L19\n\nDockerfile · строки 48–50\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L48-L50\n\nscripts/nexus-doctor.mjs · строки 158–225\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/nexus-doctor.mjs#L158-L225",
-      "task_ids": ["OPS-02"]
+      "task_ids": [
+        "OPS-02"
+      ]
     },
     {
       "id": "ARC05",
@@ -2694,7 +2854,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "package.json · строки 76–98\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/package.json#L76-L98\n\npnpm-workspace.yaml · строки 4–22\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/pnpm-workspace.yaml#L4-L22\n\nDockerfile · строки 7–9\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L7-L9\n\n.github/workflows/ci.yml · строки 57–67\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L57-L67\n\ndocs/PROBLEMS.md · строки 9–11\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PROBLEMS.md#L9-L11\n\npackages/ui/package.json · строки 13–15\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/package.json#L13-L15",
-      "task_ids": ["OPS-02"]
+      "task_ids": [
+        "OPS-02"
+      ]
     },
     {
       "id": "ARC06",
@@ -2727,12 +2889,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.dockerignore#L1-L18"
         }
       ],
-      "official": ["W4"],
+      "official": [
+        "W4"
+      ],
       "confidence": "Высокая: сборочный путь явно задан и уже участвовал в exact-SHA CI.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "Dockerfile · строки 31–70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L31-L70\n\napps/web/next.config.mjs · строки 13–50\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/next.config.mjs#L13-L50\n\nscripts/start-production.sh · строки 4–16\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L4-L16\n\n.dockerignore · строки 1–18\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.dockerignore#L1-L18",
-      "task_ids": ["OPS-05"]
+      "task_ids": [
+        "OPS-05"
+      ]
     },
     {
       "id": "ARC07",
@@ -2770,12 +2936,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/dependabot.yml#L39-L46"
         }
       ],
-      "official": ["W1"],
+      "official": [
+        "W1"
+      ],
       "confidence": "Высокая для деклараций; текущие registry digests production не проверялись.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "Dockerfile · строки 2–19\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L2-L19\n\nDockerfile · строки 48–50\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L48-L50\n\ncompose.production.yaml · строки 3–27\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L3-L27\n\ncompose.production.yaml · строки 123–136\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L123-L136\n\n.github/dependabot.yml · строки 39–46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/dependabot.yml#L39-L46",
-      "task_ids": ["OPS-03"]
+      "task_ids": [
+        "OPS-03"
+      ]
     },
     {
       "id": "ARC08",
@@ -2822,7 +2992,11 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": ".github/workflows/ci.yml · строки 266–294\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L266-L294\n\ncompose.production-ci.yaml · строки 1–23\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production-ci.yaml#L1-L23\n\ncompose.production.yaml · строки 34–38\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L34-L38\n\ncompose.production.yaml · строки 141–171\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L141-L171\n\ncompose.mail-worker.yaml · строки 1–5\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.mail-worker.yaml#L1-L5\n\ndocs/OPERATIONS.md · строки 1062–1083\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1062-L1083",
-      "task_ids": ["OPS-10", "OPS-16", "OPS-17"]
+      "task_ids": [
+        "OPS-10",
+        "OPS-16",
+        "OPS-17"
+      ]
     },
     {
       "id": "ARC09",
@@ -2870,12 +3044,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/nexus-doctor.mjs#L261-L281"
         }
       ],
-      "official": ["W5"],
+      "official": [
+        "W5"
+      ],
       "confidence": "Высокая для файлов; все комбинации заново не запускались.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "compose.yaml · строки 1–15\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.yaml#L1-L15\n\ncompose.yaml · строки 35–81\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.yaml#L35-L81\n\ncompose.verify.yaml · строки 1–36\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.verify.yaml#L1-L36\n\ncompose.production-ci.yaml · строки 1–36\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production-ci.yaml#L1-L36\n\ncompose.recovery.yaml · строки 1–10\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.recovery.yaml#L1-L10\n\ncompose.recovery-file-secrets.yaml · строки 1–27\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.recovery-file-secrets.yaml#L1-L27\n\nscripts/nexus-doctor.mjs · строки 261–281\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/nexus-doctor.mjs#L261-L281",
-      "task_ids": ["OPS-04"]
+      "task_ids": [
+        "OPS-04"
+      ]
     },
     {
       "id": "ARC10",
@@ -2918,12 +3096,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L11-L16"
         }
       ],
-      "official": ["W3"],
+      "official": [
+        "W3"
+      ],
       "confidence": "Высокая для различия env; средняя для риска будущего клиентского использования, текущая ошибка не заявляется.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "Dockerfile · строки 20–30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/Dockerfile#L20-L30\n\ncompose.production.yaml · строки 40–52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L40-L52\n\ncompose.production-ci.yaml · строки 5–14\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production-ci.yaml#L5-L14\n\npackages/config/src/index.ts · строки 200–214\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/config/src/index.ts#L200-L214\n\npackages/config/src/index.ts · строки 332–357\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/config/src/index.ts#L332-L357\n\nscripts/start-production.sh · строки 11–16\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L11-L16",
-      "task_ids": ["OPS-05"]
+      "task_ids": [
+        "OPS-05"
+      ]
     },
     {
       "id": "ARC11",
@@ -2961,12 +3143,18 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-local-readiness.mjs#L7-L53"
         }
       ],
-      "official": ["W3"],
+      "official": [
+        "W3"
+      ],
       "confidence": "Высокая для конфигурации и кода; фактические firewall/DNS/TLS production не инспектировались.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "deploy/Caddyfile · строки 5–31\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/deploy/Caddyfile#L5-L31\n\ncompose.production.yaml · строки 34–72\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L34-L72\n\ncompose.production.yaml · строки 123–139\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L123-L139\n\napps/web/src/app/api/health/route.ts · строки 9–18\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/health/route.ts#L9-L18\n\nscripts/check-local-readiness.mjs · строки 7–53\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-local-readiness.mjs#L7-L53",
-      "task_ids": ["OPS-05", "OPS-14", "OPS-17"]
+      "task_ids": [
+        "OPS-05",
+        "OPS-14",
+        "OPS-17"
+      ]
     },
     {
       "id": "ARC12",
@@ -3004,12 +3192,17 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L994-L1012"
         }
       ],
-      "official": ["W6"],
+      "official": [
+        "W6"
+      ],
       "confidence": "Высокая: текущий mount соответствует официальному образу 18.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "compose.yaml · строки 3–15\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.yaml#L3-L15\n\ncompose.verify.yaml · строки 3–13\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.verify.yaml#L3-L13\n\ncompose.production.yaml · строки 18–32\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L18-L32\n\n.github/workflows/ci.yml · строки 83–92\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L83-L92\n\ndocs/OPERATIONS.md · строки 994–1012\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L994-L1012",
-      "task_ids": ["OPS-03", "OPS-17"]
+      "task_ids": [
+        "OPS-03",
+        "OPS-17"
+      ]
     },
     {
       "id": "ARC13",
@@ -3056,7 +3249,10 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "packages/db/migrations/meta/_journal.json · строки 614–622\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/migrations/meta/_journal.json#L614-L622\n\npackages/db/src/migrate.ts · строки 9–18\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/migrate.ts#L9-L18\n\nscripts/start-production.sh · строки 8–16\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/start-production.sh#L8-L16\n\npackages/db/scripts/release-upgrade-contract.mjs · строки 1–44\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/release-upgrade-contract.mjs#L1-L44\n\ndocs/handbook/08-DOMAIN-AND-DATA-MODEL.md · строки 25–30\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/08-DOMAIN-AND-DATA-MODEL.md#L25-L30\n\ndocs/OPERATIONS.md · строки 981–1012\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L981-L1012",
-      "task_ids": ["OPS-12", "OPS-17"]
+      "task_ids": [
+        "OPS-12",
+        "OPS-17"
+      ]
     },
     {
       "id": "ARC14",
@@ -3109,12 +3305,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L2139-L2145"
         }
       ],
-      "official": ["W7"],
+      "official": [
+        "W7"
+      ],
       "confidence": "Высокая для статического расхождения; средняя для конкретного результата следующей генерации. Это риск workflow, не доказательство неверной текущей БД.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "package.json · строки 28–29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/package.json#L28-L29\n\npackages/db/package.json · строки 8–10\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/package.json#L8-L10\n\npackages/db/drizzle.config.ts · строки 3–6\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/drizzle.config.ts#L3-L6\n\npackages/db/migrations/meta/0001_snapshot.json · строки 1–10\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/migrations/meta/0001_snapshot.json#L1-L10\n\npackages/db/migrations/meta/_journal.json · строки 614–619\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/migrations/meta/_journal.json#L614-L619\n\npackages/db/src/schema.ts · строки 1197–1204\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L1197-L1204\n\npackages/db/src/schema.ts · строки 1558–1564\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L1558-L1564\n\npackages/db/src/schema.ts · строки 2139–2145\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L2139-L2145",
-      "task_ids": ["OPS-06"]
+      "task_ids": [
+        "OPS-06"
+      ]
     },
     {
       "id": "ARC15",
@@ -3157,7 +3357,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P1",
       "sourceText": "scripts/beta-candidate-lib.mjs · строки 185–245\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/beta-candidate-lib.mjs#L185-L245\n\npackages/db/scripts/check-release-upgrade.mjs · строки 37–85\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/check-release-upgrade.mjs#L37-L85\n\npackages/db/scripts/check-release-upgrade.mjs · строки 898–940\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/check-release-upgrade.mjs#L898-L940\n\npackages/db/scripts/release-upgrade-contract.mjs · строки 1–44\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/release-upgrade-contract.mjs#L1-L44\n\ndocs/OPERATIONS.md · строки 964–988\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L964-L988",
-      "task_ids": ["OPS-07"]
+      "task_ids": [
+        "OPS-07"
+      ]
     },
     {
       "id": "ARC16",
@@ -3200,7 +3402,10 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "docs/OPERATIONS.md · строки 1017–1044\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L1017-L1044\n\ncompose.production.yaml · строки 141–190\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L141-L190\n\npackages/db/src/repositories/resource-release-worker.ts · строки 23–99\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-worker.ts#L23-L99\n\npackages/db/scripts/run-license-maintenance.ts · строки 1–70\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/run-license-maintenance.ts#L1-L70\n\ndocs/OPERATIONS.md · строки 994–1012\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md#L994-L1012",
-      "task_ids": ["OPS-12", "OPS-17"]
+      "task_ids": [
+        "OPS-12",
+        "OPS-17"
+      ]
     },
     {
       "id": "ARC17",
@@ -3237,7 +3442,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "packages/validation/src/index.ts · строки 261–272\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/validation/src/index.ts#L261-L272\n\npackages/db/src/schema.ts · строки 409–480\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/schema.ts#L409-L480\n\npackages/db/migrations/0011_build_version_uniqueness.sql · строки 5–13\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/migrations/0011_build_version_uniqueness.sql#L5-L13\n\npackages/storage/src/storage-service.ts · строки 44–68\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/storage-service.ts#L44-L68",
-      "task_ids": ["OPS-19"]
+      "task_ids": [
+        "OPS-19"
+      ]
     },
     {
       "id": "ARC18",
@@ -3279,7 +3486,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P3",
       "sourceText": "packages/storage/src/provider-factory.ts · строки 7–17\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/provider-factory.ts#L7-L17\n\npackages/storage/src/types.ts · строки 12–29\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/types.ts#L12-L29\n\npackages/storage/src/local-provider.ts · строки 145–217\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L145-L217\n\npackages/storage/src/local-provider.ts · строки 273–280\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L273-L280\n\ndocs/ARCHITECTURE.md · строки 44–46\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L44-L46",
-      "task_ids": ["OPS-20"]
+      "task_ids": [
+        "OPS-20"
+      ]
     },
     {
       "id": "ARC19",
@@ -3321,7 +3530,10 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "docs/ARCHITECTURE.md · строки 34–36\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L34-L36\n\npackages/db/src/repositories/resource-release-worker.ts · строки 23–99\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/repositories/resource-release-worker.ts#L23-L99\n\npackages/db/scripts/run-resource-release-worker.ts · строки 14–47\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/run-resource-release-worker.ts#L14-L47\n\nscripts/check-resource-release-worker-health.mjs · строки 7–22\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/check-resource-release-worker-health.mjs#L7-L22\n\ncompose.mail-worker.yaml · строки 1–56\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.mail-worker.yaml#L1-L56",
-      "task_ids": ["OPS-14", "OPS-15"]
+      "task_ids": [
+        "OPS-14",
+        "OPS-15"
+      ]
     },
     {
       "id": "ARC20",
@@ -3358,7 +3570,9 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "compose.production.yaml · строки 74–121\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L74-L121\n\ncompose.production.yaml · строки 141–191\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production.yaml#L141-L191\n\ncompose.mail-worker.yaml · строки 5–23\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.mail-worker.yaml#L5-L23\n\npackages/db/scripts/run-resource-release-worker.ts · строки 14–35\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/run-resource-release-worker.ts#L14-L35",
-      "task_ids": ["OPS-15"]
+      "task_ids": [
+        "OPS-15"
+      ]
     },
     {
       "id": "ARC21",
@@ -3401,12 +3615,16 @@
           "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L167-L194"
         }
       ],
-      "official": ["W3"],
+      "official": [
+        "W3"
+      ],
       "confidence": "Высокая для ограничений конфигурации; производственная capacity не измерялась.",
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "docs/ARCHITECTURE.md · строки 7–7\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md#L7-L7\n\npackages/db/src/client.ts · строки 7–13\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/src/client.ts#L7-L13\n\napps/web/src/lib/services/mta-master-directory-service.ts · строки 92–93\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/services/mta-master-directory-service.ts#L92-L93\n\napps/web/src/lib/services/mta-master-directory-service.ts · строки 395–414\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/lib/services/mta-master-directory-service.ts#L395-L414\n\napps/web/next.config.mjs · строки 1–52\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/next.config.mjs#L1-L52\n\npackages/storage/src/local-provider.ts · строки 167–194\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/storage/src/local-provider.ts#L167-L194",
-      "task_ids": ["OPS-18"]
+      "task_ids": [
+        "OPS-18"
+      ]
     },
     {
       "id": "ARC22",
@@ -3448,7 +3666,11 @@
       "chapter": "Архитектура и запуск",
       "priorityCode": "P2",
       "sourceText": "scripts/release-evidence.mjs · строки 197–239\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/release-evidence.mjs#L197-L239\n\n.github/workflows/ci.yml · строки 278–294\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L278-L294\n\n.github/workflows/ci.yml · строки 646–661\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L646-L661\n\npackages/db/scripts/release-upgrade-contract.mjs · строки 1–44\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/db/scripts/release-upgrade-contract.mjs#L1-L44\n\napps/web/src/app/api/health/route.ts · строки 9–18\nhttps://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/api/health/route.ts#L9-L18",
-      "task_ids": ["OPS-08", "OPS-10", "OPS-16"]
+      "task_ids": [
+        "OPS-08",
+        "OPS-10",
+        "OPS-16"
+      ]
     }
   ],
   "additional_source_ids": [

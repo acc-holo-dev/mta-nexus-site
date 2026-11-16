@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const files = ["deploy/compose.yaml", "deploy/compose.production.yaml"];
+const files = ["docker/compose.yaml", "docker/compose.production.yaml"];
 const label = "io.nexus.persistence-test";
 
 // Accept only the storage contract under test, never a runnable app configuration.

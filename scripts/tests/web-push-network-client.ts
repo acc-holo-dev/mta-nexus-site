@@ -5,7 +5,7 @@ import {
   createWebPushHttpSender,
   sendWebPushHttpsRequest,
   type WebPushHttpsRequest,
-} from "../../packages/db/src/web-push-runtime";
+} from "../../site/packages/db/src/web-push-runtime";
 
 const port = Number(process.env.NEXUS_PUSH_TEST_PORT);
 assert(Number.isSafeInteger(port) && port > 0 && port < 65536);

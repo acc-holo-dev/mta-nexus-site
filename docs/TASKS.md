@@ -2,13 +2,13 @@
 
 Сгенерировано из `planning/tasks.json`. Команды проверок в карточках — план проверки, а не выполненный PASS, пока `execution_state` не `done` и нет свидетельств. Читайте только выбранную задачу и её зависимости. Источники закреплены на baseline SHA. Рабочий tracker: [TRACKER.md](../planning/TRACKER.md).
 
-## OPS-09 — Подготовить private repository с реально действующей защитой main и release refs
+## OPS-09 — Действующая защита main и release refs в public репозитории с проверяемым CI merge-gate
 
 **Фаза:** F1. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** github_settings.
 
 **Исходные пункты:** OPSNEW-09. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Root подтвердил public personal repository, main без protection/rulesets; тариф неизвестен. Private branch protections/rulesets доступны personal Pro, но не Free.
+**Сейчас.** Готово и проверено на public репозитории acc-holo-dev/mta-nexus-site (владелец выбрал public). Созданы и подтверждены активными два repository ruleset с bypass_actors=[] и current_user_can_bypass=never: Protect main (OPS-09) [id 26842428, refs/heads/main: pull_request required_approving_review_count=1, required_status_checks context=CI result strict=true, deletion, non_fast_forward]; Protect release tags v* (OPS-09) [id 26842432, refs/tags/v*: deletion, non_fast_forward]. Merge-gate проверен двумя scratch-PR от origin/main: провал CI (сломанный unit-тест) -> CI result failure -> merge BLOCKED; docs-only ветка -> CI result success на выбранном scope (тяжёлые jobs skipping) -> CI не блокирует. Scratch-PR закрыты, ветки удалены, main не менялся. Локальный main e53f93fa (hub-hygiene) в origin не отправлен. [2026-11-10, Option A] Protect main (26842428) приведено к обычному виду: required_approving_review СНЯТО; остались required_status_checks(context=CI result, strict) + deletion + non_fast_forward; bypass_actors=[] и current_user_can_bypass=never (read-only GET). Release tags v* (26842432: deletion+non_fast_forward на refs/tags/v*) активен. CI merge-gate подтверждён влитыми PR #1163 и #1164 (CI result success); main=875eb3eb, дерево чистое, 0/0. Закрытие OPS-09 остаётся за принятием владельца (фулл acceptance не заявляется).
 
 **Результат.** После решения владельца о плане перевести видимость и защиты в согласованное проверяемое состояние, сохранив PR/CI review path.
 
@@ -18,10 +18,10 @@
 
 ### Приёмка
 
-- Владелец выбрал personal Pro либо иной поддерживаемый ownership/план; платная покупка/transfer не подразумевается.
-- Только после явного разрешения проверены private visibility, доступ нужных людей/ИИ и действующий main rule: PR, CI result, force/delete ограничения и явный bypass policy.
-- Release refs защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку.
-- Private environment reviewers на Pro/Team не обещаются; manual deploy остаётся отдельно.
+- Владелец явно выбрал оставить репозиторий public (private/pro покупка не требуется); дублирующее требование про выбор тарифа снято.
+- Проверено: действующий main rule с required check ровно CI result, force/delete ограничения, явный bypass policy (bypass_actors не настроен; git admin владельца — единственный неавтоматический override).
+- Release refs (v*) защищены от непреднамеренного изменения; неправильный check source/name не создаёт обход или вечную блокировку (context жёстко равен battle job CI result).
+- Private environment reviewers не обещаются; manual deploy остаётся отдельно.
 
 ### Проверки при реализации
 
@@ -42,6 +42,10 @@ Release applicability: before_authorized_private_visibility_and_protection_chang
 - [.github/workflows/ci.yml · 619–661](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L619-L661)
 - [GitHub Docs: protected branches · 24–38](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
 - [GitHub Docs: environments · 25–44](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)
+- [GitHub ruleset: Protect main (OPS-09) · rules required_status_checks[].context=CI result](https://github.com/acc-holo-dev/mta-nexus-site/rules/26842428)
+- [GitHub ruleset: Protect release tags v* (OPS-09) · deletion + non_fast_forward on refs/tags/v*](https://github.com/acc-holo-dev/mta-nexus-site/rules/26842432)
+- [Verification PR #1160 (RED): failing unit test · CI result failure -> mergeStateStatus BLOCKED](https://github.com/acc-holo-dev/mta-nexus-site/pull/1160)
+- [Verification PR #1161 (GREEN): docs-only · CI result success on selected scope; only approval remains](https://github.com/acc-holo-dev/mta-nexus-site/pull/1161)
 
 ### Ограничения
 
@@ -49,6 +53,7 @@ Release applicability: before_authorized_private_visibility_and_protection_chang
 - Permission обозначает требуемый отдельный допуск, а не выданное разрешение менять GitHub.
 - Private не делает сайт закрытым: открытая бесплатная бета сохраняется.
 - Не вводить фиктивного второго reviewer, если независимого человека нет.
+- Single-owner override: у одного владельца нет возможности само-одобрить PR; 1 обязательный approval оставляет даже green PR заблокированным до одобрения. Фиктивного второго reviewer не вводить. Единственный реальный неавтоматический override для заблокированного merge — права GitHub admin самого владельца.
 
 ## OPS-11 — Принять private GHCR visibility и минимальные права доступа
 
@@ -408,13 +413,13 @@ Release applicability: only_after_evidence_based_storage_trigger_and_selected_sc
 
 ## UX-24 — Управляемое рекламное размещение и его lifecycle
 
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** in_progress. **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Исходные пункты:** AD01, AD07. **Решения обсуждения:** NX-010, NX-011.
 
-**Сейчас.** Есть sponsored badge и fixed-price inventory target; runtime основа placements установлена за флагом `NEXT_PUBLIC_ADVERTISING_LIFECYCLE` (выключен по умолчанию). Slot/placement разделены; определены start/end/capacity/audience/target/moderation и lifecycle со статусами draft/pending_approval/scheduled/live/paused/ended/rejected/cancelled и причиной pause. Биллинг/самообслуживание/live кампании и external trackers — вне UX-24.
+**Сейчас.** Парт A выпущена и влита в main (4359b975): да-main слой slot/placement, lifecycle статусы (moderation/paused/live в источнике), причина pause и audit, fault = перед flag NEXT_PUBLIC_ADVERTISING_LIFECYCLE (выключен) и dark role admin; админ-секция placement на странице /admin за флагом; migration 0090 применима. CI (run 42876723508) зелёный, включая Sequential database tests/release-upgrade rehearsal на tip 0090. Оплата/продажа инвентаря/live кампании/external trackers — вне UX-24.
 
-**Результат.** Принят и локально реализован admin-managed placement contract слоя slot/time/capacity/eligibility/audit за флагом (domain, schema, repository, admin-секция чтения). Вне производственных слотов; решение владельца остается за lifecycle контрактом.
+**Результат.** Согласовать admin-managed placement contract; после принятия локально реализовать slot/time/capacity/eligibility/audit основу.
 
 ### Область изменений
 
@@ -462,13 +467,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-25 — Рекламный слот маркирован и отделён от органики
 
-**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** частично (часть A выполнена, остальное — not_started). **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
 
 **Исходные пункты:** AD02, AD03, AD04, AD05, AD06. **Решения обсуждения:** NX-010, NX-011.
 
-**Сейчас.** Маркировка и отдельный organic score — confirmed target; точные места/no-fill/экранные исключения ещё требуют выбора.
-
-**Часть A выполнена (PR #1172, merge `e54cde4d`).** SponsoredPlacementSlot renderer (`packages/ui/src/sponsored-placement-slot.tsx`) — маркированный `<section aria-label>`, `Реклама`/`Sponsored` и `Рекламодатель`/`Advertiser` до клика в RU/EN, инертный зарезервированный слот через `slotHeight` (без mobile layout shift), and `null`/zero-DOM для no-fill/error/expired/ineligible; серверное участие (`serveable`/`targetEligible`/`transition`) остаётся ВНЕ рендерера в `packages/db`. Рендерер инертен: не подключён к публичным страницам, флаг `NEXT_PUBLIC_AD_SLOT_RENDERER` выключен по умолчанию. Контракт — в `docs/UX-CONTRACT.md` (§Слот SponsoredPlacement). Не меняет органику/trust. Публичные позиции (Home/catalog/mobile), матрица запрещённых страниц и подключение к страницам — отдельное решение, ещё proposal.
+**Сейчас.** Часть A (SponsoredPlacementSlot renderer + флаг + тест + контракт) выполнена и в main (PR #1172, merge e54cde4d) под выключенным NEXT_PUBLIC_AD_SLOT_RENDERER; органику не меняет. Публичные позиции Home/catalog/mobile, матрица запрещённых страниц и подключение к страницам — отдельное решение, ещё proposal.
 
 **Результат.** Согласовать SponsoredPlacement renderer: маркировка, стабильная композиция, независимая органика и критические исключения.
 
@@ -520,11 +523,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-26 — Причины показа контроль рекламы и честные измерения
 
-**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** in_progress. **Область полномочий:** local_development.
+**Фаза:** F5. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
 
 **Исходные пункты:** AD08, AD09. **Решения обсуждения:** NX-010, NX-011.
 
-**Сейчас.** Часть A выпущена: контракт UX-26 в docs/UX-CONTRACT.md (why shown по типу причины без private/anti-abuse; contextual opt-out без behavioral-profile ranking; hidden placement не возвращается немедленно; report привязан к placement/target без чужих данных; единицы отдачи/показа/клика/действия с period/dedup/internal traffic/unknown различены; ad report не меняет organic reputation и не доказывает обязательства). Settings-секция Advertising preferences даёт opt-out preference (cookie nexus_ad_opt_out, in/out, SameSite=Lax) только за флагами advertisingLifecycleEnabled и rendererEnabled (выключены по умолчанию) и честно сообщает, что публичного рендера нет. Реализации hide/report action'ов и наблюдаемых рекламных единиц нет: любое telemetry/live-эксперимент требует отдельного разрешения и ревью privacy/event schema.
+**Сейчас.** UX-26 часть A (контракт + opt-out-предпочтение) выпущена: секция UX-26 в docs/UX-CONTRACT.md (why-shown по типу причины без private/anti-abuse, contextual opt-out без behavioral-profile ranking, hidden placement не возвращается немедленно, report привязан к placement/target без чужих данных, единицы отдачи/показа/клика/действия с period/dedup/internal traffic/unknown, ad report не меняет organic reputation и не доказывает обязательства); settings-секция Advertising preferences даёт opt-out (cookie nexus_ad_opt_out in/out, SameSite=Lax) только за флагами advertisingLifecycleEnabled и rendererEnabled (выключены по умолчанию). Реализации hide/report и наблюдаемых единиц нет: telemetry/live-эксперимент — отдельное разрешение + ревью privacy/event schema.
 
 **Результат.** Согласовать why shown, hide/report и честную отчётность без скрытого профилирования.
 
@@ -2746,11 +2749,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F2. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open.
+**Заметка исполнения.** Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe closed (initiating-session-lock-barrier.test.ts, 4/4 PASS).
 
 **Исходные пункты:** INT21, INT22. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe остаётся открытым.
+**Сейчас.** Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe закрыт (initiating-session-lock-barrier.test.ts, 4/4 PASS).
 
 **Результат.** Различать «скачать последнюю» и «скачать выбранную», сохранять явный выбор при unavailable fixed build; показывать только подтверждённый handoff с переходом к квитанции/инструкции/контекстному support.
 
@@ -2974,11 +2977,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open.
+**Заметка исполнения.** Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB is CLOSED (initiating-session-lock-barrier.test.ts, 4/4 PASS).
 
 **Исходные пункты:** F08. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; a controlled multi-connection barrier probe on disposable/live DB remains open (see PROBLEMS F08).
+**Сейчас.** Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; the controlled multi-connection barrier probe on disposable DB is CLOSED (4/4 PASS; holding the initiating session row FOR UPDATE makes a queued lockInitiatingSession block, and revoke/expire/remove of the row yields UnauthorizedError with no grant). Live/CI re-run stays open if a fresh SHA is promoted (see PROBLEMS F08).
 
 **Результат.** Провести initiating token до final transaction и применить existing lockInitiatingSession с согласованным lock order; добавить контролируемую проверку revoke/expiry между initial auth и final gate.
 

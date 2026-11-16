@@ -8,7 +8,7 @@ import { capturePageEvidence, waitForReadyCapture } from "../browser-page-ready.
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
-const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n.ts");
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 const results = [];

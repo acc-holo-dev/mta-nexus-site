@@ -38,7 +38,7 @@ test("hash-cancellation probe refuses a non-production web working directory", (
     cwd: process.cwd(),
   });
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /\/app\/apps\/web|AssertionError/u);
+  assert.match(result.stderr, /\/app\/site|AssertionError/u);
 });
 
 test("download-network probe refuses hosts outside disposable GitHub Actions", () => {

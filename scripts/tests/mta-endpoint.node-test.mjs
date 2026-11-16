@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { isValidMtaAddress, normalizeMtaAddress } from "../../packages/domain/src/mta-endpoint.ts";
+import {
+  isValidMtaAddress,
+  normalizeMtaAddress,
+} from "../../site/packages/domain/src/mta-endpoint.ts";
 
 // Independent of Vitest and PostgreSQL: runs in the existing tooling suite
 // with Node.js 26 native TypeScript stripping.

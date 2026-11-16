@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { observationSequenceForEndpoint } from "../../apps/web/src/lib/services/server-observation-sequence.mjs";
+import { observationSequenceForEndpoint } from "../../site/src/lib/services/server-observation-sequence.mjs";
 
 const SNAPSHOT = "2026-10-09T07:30:00.000Z";
 

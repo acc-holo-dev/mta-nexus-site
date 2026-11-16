@@ -11,15 +11,16 @@ import { waitForReadyCapture } from "../browser-page-ready.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
-const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
-const { discoveryCopy } = await import("../../apps/web/src/lib/discovery-copy.ts");
-const { notificationInboxCopy } = await import("../../apps/web/src/lib/notification-inbox-copy.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n.ts");
+const { discoveryCopy } = await import("../../site/src/lib/discovery-copy.ts");
+const { notificationInboxCopy } = await import("../../site/src/lib/notification-inbox-copy.ts");
+const { platformReportCopy } = await import("../../site/src/lib/platform-report-i18n.ts");
 // Strip-types cannot execute notification-inbox-contract (zod/@nexus graph); keep the
 // category list synced by reading the exported INBOX_CATEGORIES source of truth.
 const inboxCategoriesMatch = readFileSync(
   join(
     dirname(fileURLToPath(import.meta.url)),
-    "../../apps/web/src/lib/notification-inbox-contract.ts",
+    "../../site/src/lib/notification-inbox-contract.ts",
   ),
   "utf8",
 ).match(/export const INBOX_CATEGORIES = \[([^\]]*)\] as const;/u);
@@ -714,6 +715,7 @@ for (const locale of ["en", "ru"]) {
         exact: true,
       }),
     ).toHaveCount(0);
+    await expect(moreDialog.locator('a[href="/workspace/platform-reports"]')).toHaveCount(0);
     await page.keyboard.press("Escape");
     await expect(moreDialog).toHaveCount(0);
     await expect(moreButton).toHaveAttribute("aria-expanded", "false");
@@ -777,6 +779,59 @@ for (const locale of ["en", "ru"]) {
     );
 
     await loginFixture(page);
+    const sessionRoute = "**/api/auth/session";
+    await page.route(sessionRoute, async (route) => {
+      if (route.request().method() !== "GET") return route.continue();
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "synthetic unavailable" }),
+      });
+    });
+    await page.goto("/market");
+    await waitForReadyCapture(page);
+    await moreButton.click();
+    await expect(
+      moreDialog.getByText(dictionary.accountControls.checkError, { exact: true }),
+    ).toBeVisible();
+    await expect(moreDialog.locator('a[href^="/auth/login"]')).toHaveCount(0);
+    await expect(moreDialog.locator('a[href="/workspace/library"]')).toHaveCount(0);
+    await page.unroute(sessionRoute);
+    await moreDialog
+      .getByRole("button", { name: dictionary.accountControls.retry, exact: true })
+      .click();
+    const memberReportLink = moreDialog.locator('a[href="/workspace/platform-reports"]');
+    await expect(memberReportLink).toHaveText(platformReportCopy(locale).myReports);
+    await expect(page.locator('header [role="group"] a[href="/workspace"]')).toHaveCount(1);
+    await expect(page.locator('footer a[href="/workspace"]')).toHaveCount(1);
+    evidence.push(
+      `${locale}: unavailable session stays distinct from guest, and one retry refreshes account, footer and member navigation`,
+    );
+    await memberReportLink.click();
+    await expect(page).toHaveURL(/\/workspace\/platform-reports$/u);
+    await waitForReadyCapture(page);
+    await moreButton.click();
+    await expect(moreDialog.locator('a[href="/workspace/platform-reports"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await page.goBack();
+    await expect(page).toHaveURL(/\/market$/u);
+    await expect(moreDialog).toHaveCount(0);
+    await moreButton.click();
+    await expect(moreDialog).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 844 });
+    await expect(moreDialog).toHaveCount(0);
+    const desktopSupport = page.locator("aside").getByRole("link", {
+      name: dictionary.nav.support,
+      exact: true,
+    });
+    await desktopSupport.focus();
+    await expect(desktopSupport).toBeFocused();
+    await page.setViewportSize({ width: 390, height: 480 });
+    evidence.push(
+      `${locale}: mobile member can open platform reports, sees the current destination, and the menu closes on history navigation or desktop resize`,
+    );
     await page.goto("/notifications");
     await waitForReadyCapture(page);
     const inboxCopy = notificationInboxCopy(locale);

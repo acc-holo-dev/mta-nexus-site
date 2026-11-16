@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { constants as fsConstants } from "node:fs";
+import { access, readFile, stat } from "node:fs/promises";
 import { createServer } from "node:net";
 import { totalmem } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -89,6 +90,15 @@ async function defaultPathExists(path) {
   }
 }
 
+async function defaultPathReadable(path) {
+  try {
+    await access(path, fsConstants.R_OK);
+    return !(await stat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 async function defaultProbePort(port) {
   return await new Promise((resolveProbe) => {
     const server = createServer();
@@ -112,6 +122,7 @@ function addCheck(checks, id, status, message, hint) {
 export async function collectDoctor(options = {}) {
   const runCommand = options.runCommand ?? defaultRunCommand;
   const pathExists = options.pathExists ?? defaultPathExists;
+  const pathReadable = options.pathReadable ?? defaultPathReadable;
   const probePort = options.probePort ?? defaultProbePort;
   const env = options.env ?? process.env;
   const root = options.repositoryRoot ?? repositoryRoot;
@@ -138,8 +149,8 @@ export async function collectDoctor(options = {}) {
   for (const relativePath of [
     "package.json",
     "pnpm-lock.yaml",
-    "deploy/compose.yaml",
-    "deploy/Dockerfile",
+    "docker/compose.yaml",
+    "docker/Dockerfile",
   ]) {
     const present = await pathExists(resolve(root, relativePath));
     addCheck(
@@ -149,6 +160,48 @@ export async function collectDoctor(options = {}) {
       present
         ? `Required project file is present: ${relativePath}`
         : `Required project file is missing: ${relativePath}`,
+    );
+  }
+
+  const legacyComposeEnv = await pathExists(resolve(root, "deploy/.env"));
+  const currentComposeEnv = await pathExists(resolve(root, "docker/.env"));
+  const explicitEnvSelection =
+    Boolean(env.COMPOSE_ENV_FILES) ||
+    ["true", "1"].includes(String(env.COMPOSE_DISABLE_ENV_FILE).toLowerCase());
+  const strandedComposeEnv = legacyComposeEnv && !currentComposeEnv && !explicitEnvSelection;
+  addCheck(
+    checks,
+    "compose-env-location",
+    strandedComposeEnv ? "fail" : "pass",
+    strandedComposeEnv
+      ? "A legacy deploy/.env exists, but docker/.env is absent."
+      : "No implicit environment-file migration is required.",
+    strandedComposeEnv
+      ? "Preserve the existing values: move the reviewed env file to docker/.env or set COMPOSE_ENV_FILES to its absolute path. Do not overwrite it with the example template."
+      : undefined,
+  );
+
+  // Compose loads explicit env files even when implicit .env loading is disabled.
+  // Check paths only: env contents and selected file names must not enter the report.
+  const selectedEnvFiles = String(env.COMPOSE_ENV_FILES ?? "")
+    .split(",")
+    .map((path) => path.trim())
+    .filter(Boolean);
+  if (selectedEnvFiles.length > 0) {
+    const present = await Promise.all(
+      selectedEnvFiles.map((path) => pathReadable(resolve(root, path))),
+    );
+    const allPresent = present.every(Boolean);
+    addCheck(
+      checks,
+      "compose-env-files",
+      allPresent ? "pass" : "fail",
+      allPresent
+        ? "All explicitly selected Compose env files are readable."
+        : "At least one explicitly selected Compose env file is missing or inaccessible.",
+      allPresent
+        ? undefined
+        : "Check COMPOSE_ENV_FILES paths before starting Compose; preserve existing private values.",
     );
   }
 
@@ -383,7 +436,7 @@ export async function collectDoctor(options = {}) {
     };
     const composeConfig = await runCommand(
       "docker",
-      ["compose", "-f", "deploy/compose.yaml", "config", "--quiet"],
+      ["compose", "-f", "docker/compose.yaml", "config", "--quiet"],
       { cwd: root, env: composeEnv, timeout: 30_000 },
     );
     addCheck(
@@ -391,11 +444,11 @@ export async function collectDoctor(options = {}) {
       "compose-config",
       composeConfig.ok ? "pass" : "fail",
       composeConfig.ok
-        ? "Local deploy/compose.yaml renders successfully without an implicit .env file."
-        : "Local deploy/compose.yaml did not render successfully.",
+        ? "Local docker/compose.yaml renders successfully without an implicit .env file."
+        : "Local docker/compose.yaml did not render successfully.",
       composeConfig.ok
-        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge deploy/compose.yaml with deploy/compose.production.yaml."
-        : "Inspect deploy/compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
+        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge docker/compose.yaml with docker/compose.production.yaml."
+        : "Inspect docker/compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
     );
   }
 
