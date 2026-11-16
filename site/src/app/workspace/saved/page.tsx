@@ -1,7 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { FollowWorkspace } from "../../../components/follow-workspace";
+import { FollowWorkspace } from "../../../features/community/follow";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { FOLLOW_TYPES, type FollowTargetType } from "../../../lib/follow-workspace-contract";
 import { followCopy } from "../../../lib/follow-workspace-copy";

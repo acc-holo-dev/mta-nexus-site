@@ -163,7 +163,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../../src/components/follow-button", async () => {
+vi.mock("../../src/features/community/follow", async () => {
   const ReactModule = await import("react");
   return {
     FollowButton: ({ targetType, targetId }: { targetType: string; targetId: string }) =>

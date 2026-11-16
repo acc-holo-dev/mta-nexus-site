@@ -12,7 +12,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../components/follow-button";
+import { FollowButton } from "../../../features/community/follow";
 import { ProductCard } from "../../resources/view";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { buildFollowInitialState } from "../../../lib/follow-initial-state";

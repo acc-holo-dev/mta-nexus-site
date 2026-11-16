@@ -27,7 +27,7 @@ import {
 } from "../../../lib/services/mta-master-directory-service";
 import { productService } from "../../../lib/services/product-service";
 import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../components/follow-button";
+import { FollowButton } from "../../../features/community/follow";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
 

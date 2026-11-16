@@ -10,7 +10,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const formComponents = [
   "site/src/features/notifications/components/notification-bell.tsx",
   "site/src/features/notifications/components/notification-inbox.tsx",
-  "site/src/components/follow-button.tsx",
+  "site/src/features/community/components/follow-button.tsx",
   "site/src/features/community/components/content-follow-controls.tsx",
   "site/src/features/accounts/components/context-switcher.tsx",
   "site/src/features/community/components/community-report-form.tsx",

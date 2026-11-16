@@ -1,4 +1,4 @@
-vi.mock("../../../components/follow-button", () => ({
+vi.mock("../../../features/community/follow", () => ({
   FollowButton: (props: { initial?: unknown }) => (
     <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
       Follow

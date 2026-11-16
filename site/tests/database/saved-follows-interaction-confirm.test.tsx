@@ -19,7 +19,7 @@ vi.mock("../../src/components/confirm-action", () => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { FollowWorkspace } from "../../src/components/follow-workspace";
+import { FollowWorkspace } from "../../src/features/community/follow";
 
 const { render, removeButton } = createSavedFollowsInteractionHelpers(
   harness,

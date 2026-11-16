@@ -11,7 +11,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../shell/auth-return";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
-import { FollowButton } from "../../../components/follow-button";
+import { FollowButton } from "../../../features/community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { ProductDependencyList } from "../components/product-dependency-list";
 import { AddResourceToCart } from "../components/resource-cart-controls";

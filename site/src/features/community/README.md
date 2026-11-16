@@ -38,6 +38,7 @@ Feature объединяет клиентское обсуждение публ�
 | `topic-form.ts`                      | `CommunityTopicForm`; создание темы                                           |
 | `report-form.ts`                     | `CommunityReportForm`; жалоба на публикацию или комментарий                   |
 | `object-mute-controls.ts`            | `ObjectMuteControls`; временный mute уведомлений по объекту подписки          |
+| `follow.ts`                          | `FollowButton`, `FollowWorkspace`; подписка и лента сохранённых               |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

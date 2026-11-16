@@ -11,7 +11,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { DeveloperExperience } from "../../../components/developer-experience";
-import { FollowButton } from "../../../components/follow-button";
+import { FollowButton } from "../../../features/community/follow";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { ObjectReportForm } from "../../../features/moderation/object-report";
 import { ProductCard } from "../../../features/resources/view";

@@ -19,7 +19,7 @@ vi.mock("../../src/lib/services/follow-workspace-service", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/follow-workspace", () => ({
+vi.mock("../../src/features/community/follow", () => ({
   FollowWorkspace: ({
     initial,
     type,

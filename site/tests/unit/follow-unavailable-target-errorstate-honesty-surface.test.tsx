@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/follow-workspace.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/community/components/follow-workspace.tsx"),
+  "utf8",
+);
 
 /** Honesty lock for follow items whose target href is unavailable. */
 it("locks follow unavailable target notice to ErrorState", () => {

@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/saved",
 }));
 
-import { FollowButton } from "../../src/components/follow-button";
+import { FollowButton } from "../../src/features/community/follow";
 import { followActionCopy, followCopy } from "../../src/lib/follow-workspace-copy";
 
 const { render, toggle } = createFollowButtonUnfollowInteractionHelpers(

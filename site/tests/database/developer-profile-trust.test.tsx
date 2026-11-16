@@ -19,7 +19,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined })
 vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
-vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null }));
 vi.mock("../../src/lib/services/discovery-service", () => ({
   discoveryService: { page: directoryPage },
 }));

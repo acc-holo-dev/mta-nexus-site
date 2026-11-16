@@ -41,7 +41,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined })
 vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
-vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null }));
 vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
 vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
 vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {

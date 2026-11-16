@@ -22,7 +22,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
 
-import { FollowButton } from "../../src/components/follow-button";
+import { FollowButton } from "../../src/features/community/follow";
 
 const { render, toggle } = createDiscussionWatchInteractionHelpers(
   harness,
