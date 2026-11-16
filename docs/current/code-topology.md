@@ -53,7 +53,7 @@ site/
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
-| moderation    |    20 | 103179 |
+| moderation    |    22 | 115011 |
 | notifications |    10 |  66691 |
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
