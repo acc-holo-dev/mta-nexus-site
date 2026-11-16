@@ -81,7 +81,7 @@ site/
 
 ### Shell / auth leftovers в `components/` root
 
-**Slice 4 done:** nav/footer/chrome — [`features/shell`](../../site/src/features/shell/README.md) (`shell`, `navbar`, `footer`, `sidebar`, `chrome-controls`).
+**Slice 4 done:** nav/footer/chrome — [`features/shell`](../../site/src/features/shell/README.md) (`shell`, `navbar`, `footer`, `sidebar`).
 
 Остаток в `components/` (cross-feature / session policy): `locale-context.tsx`, `shell-destination-policy.ts`, `shell-session-payload.ts`, `shell-session-refresh.ts`, `use-auth-session.ts`, `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
 
