@@ -4,7 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../../features/shell/locale";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,

@@ -2,7 +2,7 @@
 import { commercialPlanTermsSchema, subscriptionCommandSchema } from "@nexus/validation";
 import { useEffect, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 import { SubscriptionControls } from "./subscription-controls";
 import { PlanReviewTerms } from "./plan-review-terms";
 

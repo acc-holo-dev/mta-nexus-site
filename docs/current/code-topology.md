@@ -83,7 +83,9 @@ site/
 
 **Slice 4 done:** nav/footer/chrome — [`features/shell`](../../site/src/features/shell/README.md) (`shell`, `navbar`, `footer`, `sidebar`).
 
-Остаток в `components/` (cross-feature / session policy): `locale-context.tsx`, `shell-destination-policy.ts`, `shell-session-payload.ts`, `shell-session-refresh.ts`, `use-auth-session.ts`, `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
+**Slice 8 done:** `locale-context` → [`features/shell/locale.ts`](../../site/src/features/shell/locale.ts) (`LocaleProvider`, `useNexusLocale`); depcruise isolation exceptions для cross-feature locale.
+
+Остаток в `components/` (cross-feature / session policy): `shell-destination-policy.ts`, `shell-session-payload.ts`, `shell-session-refresh.ts`, `use-auth-session.ts`, `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
 Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  

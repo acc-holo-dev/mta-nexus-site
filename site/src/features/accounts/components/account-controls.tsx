@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { parseSessionResponse } from "../../../components/shell-session-payload";
 import {
   requestShellSessionRefresh,

@@ -7,7 +7,7 @@ import { parseCommercialAmount } from "../lib/commercial-confirmation";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedSubscriptionEstimate } from "../lib/subscription-confirmation";
 import { subscriptionsCopy } from "../lib/subscriptions-i18n";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 export function SubscriptionFeeEstimator({
   actorId,
   organizationId,

@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
 import { authEntryHref } from "../../components/auth-return-path";
 import { GuestAuthLinks } from "../../components/guest-auth-links";
-import { useNexusLocale } from "../../components/locale-context";
+import { useNexusLocale } from "../../features/shell/locale";
 import { licenseModelLabel } from "../../lib/license-model-i18n";
 import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
 import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";

@@ -19,7 +19,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),

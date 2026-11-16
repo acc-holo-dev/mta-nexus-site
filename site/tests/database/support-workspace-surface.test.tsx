@@ -14,7 +14,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { SupportCenter } from "../../src/features/support/center";
 import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";

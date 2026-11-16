@@ -7,7 +7,7 @@ import {
   createCommentIntentKey,
   submitContentCommentRequest,
 } from "../../../lib/content-comment-client";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
   const router = useRouter();

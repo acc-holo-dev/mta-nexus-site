@@ -25,7 +25,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../../components/action-confirm-checkbox";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 export function NotificationInbox({
   initialPage,
   filters,

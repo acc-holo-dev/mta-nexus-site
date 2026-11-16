@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 /** Compact control for library updates cards: switch a pinned preference to latest. */
 export function LibraryReleaseFollowLatest({

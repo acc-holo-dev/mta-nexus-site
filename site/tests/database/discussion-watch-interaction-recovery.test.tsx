@@ -16,7 +16,7 @@ const harness = vi.hoisted(() => ({
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));

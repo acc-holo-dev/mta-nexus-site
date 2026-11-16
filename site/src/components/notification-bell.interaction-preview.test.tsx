@@ -23,7 +23,7 @@ vi.mock("./confirm-action", () => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("./locale-context", () => ({
+vi.mock("../features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: notificationBellDictionary,

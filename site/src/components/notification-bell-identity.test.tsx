@@ -53,8 +53,8 @@ vi.mock("./use-modal-dialog", () => ({
   useModalDialog: () => ({ current: null }),
   clickedDialogBackdrop: () => false,
 }));
-vi.mock("./locale-context", async (original) => ({
-  ...(await original<typeof import("./locale-context")>()),
+vi.mock("../features/shell/locale", async (original) => ({
+  ...(await original<typeof import("../features/shell/locale")>()),
   useNexusLocale: () => ({
     locale: "en",
     dictionary: {

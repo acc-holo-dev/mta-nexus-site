@@ -13,7 +13,7 @@ import { confirmedCommercialPlan, parseCommercialAmount } from "../lib/commercia
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 export function CommercialPlanForm({
   plan,

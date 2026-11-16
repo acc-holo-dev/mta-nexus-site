@@ -15,7 +15,7 @@ const harness = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 

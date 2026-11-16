@@ -14,7 +14,7 @@ import {
 import { subscriptionError, subscriptionsCopy } from "../lib/subscriptions-i18n";
 import { subscriptionAccountHref, subscriptionReceiptHref } from "../lib/subscriptions-query";
 import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 type Props = {
   actorId: string;

@@ -14,7 +14,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../../components/action-confirm-checkbox";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 type Candidate = { productId: string; title: string; slug: string; status: string };
 type CandidatePage = { candidates: Candidate[]; page: number; hasMore: boolean };

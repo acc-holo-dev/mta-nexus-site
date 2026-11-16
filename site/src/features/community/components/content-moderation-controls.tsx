@@ -11,7 +11,7 @@ import {
 } from "../../../lib/community-moderation-contract";
 import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 export function ContentModerationControls({
   contentId,

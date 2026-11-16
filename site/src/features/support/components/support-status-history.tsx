@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { supportActivitySchema } from "../../../lib/support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../../../lib/support-workspace-copy";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

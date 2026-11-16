@@ -15,7 +15,7 @@ import {
 import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 function claimMarkerKey(serverId: string, actor: string) {
   return `nexus:server-claim:v1:${encodeURIComponent(actor)}:${encodeURIComponent(serverId)}`;

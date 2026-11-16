@@ -16,7 +16,7 @@ vi.mock("../../src/components/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 vi.mock("../../src/lib/notification-inbox-events", () => ({

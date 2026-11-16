@@ -1,6 +1,6 @@
 "use client";
 
-import { useNexusLocale } from "../components/locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 const PLACEHOLDER_KEYS = [1, 2, 3] as const;
 

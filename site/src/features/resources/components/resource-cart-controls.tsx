@@ -20,7 +20,7 @@ import {
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =

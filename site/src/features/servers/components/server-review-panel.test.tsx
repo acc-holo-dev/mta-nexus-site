@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { serverReviewCopy, serverReviewLoadCopy } from "../../../lib/server-review-i18n";
 
-vi.mock("../../../components/locale-context", () => ({
+vi.mock("../../shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 vi.mock("next/navigation", () => ({

@@ -22,7 +22,7 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../../../lib/support-workspace-copy";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";

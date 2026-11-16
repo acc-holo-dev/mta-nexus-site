@@ -35,7 +35,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("../../../components/locale-context", async () => {
+vi.mock("../../shell/locale", async () => {
   const { getDictionary } = await import("../../../lib/i18n");
   return {
     useNexusLocale: () => ({

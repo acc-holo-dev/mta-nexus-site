@@ -17,7 +17,7 @@ import {
   resourceReleaseControlError,
 } from "../../../lib/resource-release-control-i18n";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =

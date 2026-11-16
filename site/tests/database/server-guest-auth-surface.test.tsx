@@ -38,7 +38,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo-server",
 }));
 
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en" as const,
     dictionary: getDictionary("en"),

@@ -6,7 +6,7 @@ import type { FollowTargetType, ObjectMuteDuration } from "../lib/follow-workspa
 import { followCopy, followError } from "../lib/follow-workspace-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { LocaleProvider, useNexusLocale } from "./locale-context";
+import { LocaleProvider, useNexusLocale } from "../features/shell/locale";
 
 /**
  * Temporary notice mute for a followable object. Independent of follow/unfollow

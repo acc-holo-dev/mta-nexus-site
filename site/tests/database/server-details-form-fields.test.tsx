@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
 }));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),

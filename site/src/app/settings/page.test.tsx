@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/settings",
 }));
 
-import { LocaleProvider } from "../../components/locale-context";
+import { LocaleProvider } from "../../features/shell/locale";
 import SettingsLoading from "./loading";
 import SettingsPage from "./page";
 

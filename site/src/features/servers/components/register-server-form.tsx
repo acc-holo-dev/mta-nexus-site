@@ -10,7 +10,7 @@ import {
   parseServerOrganizations,
   type ServerOrganizationOption,
 } from "../../../lib/server-organization-options";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 const nativeLabelClass = "block font-label uppercase text-secondary";
 

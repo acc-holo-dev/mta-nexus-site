@@ -44,7 +44,7 @@ vi.mock("next/link", () => ({
     </a>
   ),
 }));
-vi.mock("./locale-context", async () => {
+vi.mock("../features/shell/locale", async () => {
   const { getDictionary } = await import("../lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),

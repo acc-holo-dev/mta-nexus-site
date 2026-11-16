@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, ErrorState } from "@nexus/ui";
-import { useNexusLocale } from "../../../../components/locale-context";
+import { useNexusLocale } from "../../../../features/shell/locale";
 import { libraryCollectionsCopy } from "../../../../lib/library-collections-i18n";
 
 export default function ErrorPage({ reset }: { reset: () => void }) {

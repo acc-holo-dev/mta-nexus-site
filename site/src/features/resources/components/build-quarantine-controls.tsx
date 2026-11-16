@@ -8,7 +8,7 @@ import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 export function BuildQuarantineControls({
   buildId,

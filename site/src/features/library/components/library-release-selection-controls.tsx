@@ -3,7 +3,7 @@ import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 export function LibraryReleaseSelectionControls({
   productId,
   actorId,

@@ -54,7 +54,7 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => null,
   mtaLiveStatus: () => "unknown",
 }));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: mocks.locale, dictionary: getDictionary(mocks.locale) }),

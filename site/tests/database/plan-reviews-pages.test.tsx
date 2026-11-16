@@ -40,7 +40,7 @@ vi.mock("../../src/lib/services/plan-reviews-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 

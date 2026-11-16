@@ -34,7 +34,7 @@ vi.mock("react", async (original) => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/resource" }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),

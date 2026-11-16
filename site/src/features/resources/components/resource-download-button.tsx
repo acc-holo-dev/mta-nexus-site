@@ -14,7 +14,7 @@ import {
 } from "../../../lib/resource-download-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 export function ResourceDownloadButton({
   productId,

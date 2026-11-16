@@ -11,7 +11,7 @@ import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
-import { LocaleProvider, useNexusLocale } from "./locale-context";
+import { LocaleProvider, useNexusLocale } from "../features/shell/locale";
 import { ObjectMuteControls } from "./object-mute-controls";
 
 type InitialFollowState = {

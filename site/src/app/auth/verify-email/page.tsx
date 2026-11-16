@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../../features/shell/locale";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,

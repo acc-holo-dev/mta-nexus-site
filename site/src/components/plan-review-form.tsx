@@ -10,7 +10,7 @@ import { confirmedPlanReview, expectedPlanReviewId } from "../lib/plan-review-co
 import { planReviewError, planReviewsCopy } from "../lib/plan-reviews-i18n";
 import { planReviewHref } from "../lib/plan-reviews-query";
 import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 import { PlanReviewTerms } from "./plan-review-terms";
 export function PlanReviewForm({
   plan,

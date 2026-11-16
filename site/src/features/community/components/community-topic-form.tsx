@@ -18,7 +18,7 @@ import {
 } from "../../../lib/community-topic-submission";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { authEntryHref } from "../../../components/auth-return-path";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 function communityTopicErrorMessage(
   payload: unknown,

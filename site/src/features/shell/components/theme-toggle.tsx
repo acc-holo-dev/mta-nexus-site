@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../locale";
 import {
   colorSchemeForTheme,
   nextThemePreference,

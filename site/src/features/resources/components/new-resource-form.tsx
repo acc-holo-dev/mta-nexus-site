@@ -24,7 +24,7 @@ import {
   resourceFileHash,
   resourceIntentKey,
 } from "../../../lib/resource-submission-intent";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 

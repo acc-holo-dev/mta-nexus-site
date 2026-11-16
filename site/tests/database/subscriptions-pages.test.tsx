@@ -42,7 +42,7 @@ vi.mock("../../src/lib/services/subscriptions-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 

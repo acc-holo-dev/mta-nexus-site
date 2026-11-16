@@ -18,7 +18,7 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 

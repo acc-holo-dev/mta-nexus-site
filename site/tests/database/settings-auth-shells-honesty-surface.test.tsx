@@ -21,7 +21,7 @@ vi.mock("next/navigation", () => ({
 import LoginPage from "../../src/app/auth/login/page";
 import RegisterPage from "../../src/app/auth/register/page";
 import SettingsPage from "../../src/app/settings/page";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {

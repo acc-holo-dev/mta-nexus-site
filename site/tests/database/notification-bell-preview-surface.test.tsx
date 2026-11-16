@@ -25,7 +25,7 @@ vi.mock("react", async (importOriginal) => {
 });
 vi.mock("next/link", () => ({ default: "a" }));
 
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { NotificationBell } from "../../src/features/notifications/bell";
 
 beforeEach(() => {

@@ -7,7 +7,7 @@ import { formatHistoryAmount } from "../lib/commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../lib/commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 type Plan = { id: string; title: string; revision: number; commissionBps: number };
 export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {

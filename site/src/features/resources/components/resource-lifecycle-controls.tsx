@@ -21,7 +21,7 @@ import {
 } from "../../../lib/resource-commerce-i18n";
 import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";
 
 const controlClass =

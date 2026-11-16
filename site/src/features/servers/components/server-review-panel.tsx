@@ -14,7 +14,7 @@ import {
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
 import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useState } from "react";
-import { LocaleProvider } from "../../../components/locale-context";
+import { LocaleProvider } from "../locale";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { Footer } from "./footer";
 import { MobileNav } from "./mobile-nav";

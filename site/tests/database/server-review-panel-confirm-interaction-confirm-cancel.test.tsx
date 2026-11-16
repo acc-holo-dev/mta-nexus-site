@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" as const }),
 }));
 

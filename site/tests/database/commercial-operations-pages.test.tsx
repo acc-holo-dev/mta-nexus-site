@@ -57,7 +57,7 @@ import CatalogLoading from "../../src/app/subscriptions/loading";
 import Catalog from "../../src/app/subscriptions/page";
 import OperationsLoading from "../../src/app/workspace/purchases/[id]/operations/loading";
 import Operations, { metadata } from "../../src/app/workspace/purchases/[id]/operations/page";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getCommercialCopy } from "../../src/lib/commercial-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 

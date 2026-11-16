@@ -82,7 +82,7 @@ import ErrorPage from "../../src/app/error";
 import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error";
 import RootLayout from "../../src/app/layout";
 import NotFound from "../../src/app/not-found";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 
 function executeThemeScript(

@@ -8,7 +8,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedResourceCopy } from "../../../lib/resource-copy-confirmation";
 import { resourceCopyCopy, resourceCopyError } from "../../../lib/resource-copy-i18n";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { ResourceCopyMetadataView } from "./resource-copy-metadata";
 export function ResourceCopyForm({
   preview,

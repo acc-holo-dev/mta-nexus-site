@@ -18,7 +18,7 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 

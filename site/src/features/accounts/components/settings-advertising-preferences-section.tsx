@@ -7,7 +7,7 @@ import {
   adPreferenceCookie,
   parseAdPreference,
 } from "../../../lib/ad-preference";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 /**
  * UX-26 -- advertising opt-out preference on /settings.

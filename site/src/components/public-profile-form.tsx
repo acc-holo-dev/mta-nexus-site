@@ -10,7 +10,7 @@ import {
 } from "../lib/user-platform-client";
 import type { EditableProfile } from "../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

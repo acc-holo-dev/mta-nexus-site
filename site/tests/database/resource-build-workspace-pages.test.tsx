@@ -21,7 +21,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 vi.mock("../../src/lib/services/auth-service", () => ({

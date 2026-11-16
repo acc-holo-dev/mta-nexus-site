@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh }),
 }));
 
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const actual = await vi.importActual<typeof import("../../src/lib/i18n")>("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({

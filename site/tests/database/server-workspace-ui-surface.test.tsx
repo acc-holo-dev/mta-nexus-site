@@ -20,7 +20,7 @@ const localeState = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({

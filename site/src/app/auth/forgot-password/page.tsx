@@ -4,7 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../../features/shell/locale";
 import { recoveryJsonRequest } from "../../../lib/account-recovery-browser";
 
 const pageShellClass = "mx-auto min-w-0 max-w-md overflow-x-clip py-12";

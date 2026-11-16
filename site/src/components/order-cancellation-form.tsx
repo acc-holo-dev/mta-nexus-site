@@ -8,7 +8,7 @@ import { confirmedOrderCancellation } from "../lib/commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 export function OrderCancellationForm({
   actorId,

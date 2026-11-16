@@ -19,7 +19,7 @@ import {
 } from "../../../lib/settings-client-api";
 import { confirmAction } from "../../../components/confirm-action";
 import { ContextSwitcher } from "../../../components/context-switcher";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { PublicProfileForm } from "../../../components/public-profile-form";

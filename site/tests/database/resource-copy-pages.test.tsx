@@ -34,7 +34,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 vi.mock("../../src/lib/services/resource-copy-service", () => ({
   resourceCopyService: { preview: state.preview, page: state.page, detail: state.detail },
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 

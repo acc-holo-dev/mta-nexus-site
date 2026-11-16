@@ -9,7 +9,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
-vi.mock("./locale-context", () => ({
+vi.mock("../features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),

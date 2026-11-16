@@ -9,7 +9,7 @@ import { communityReportCopy } from "../../../lib/community-report-copy";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
 import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { useNexusLocale } from "../../shell/locale";
 
 /**
  * Staff bridge: remove the reported Q&A thread, then resolve the report record.

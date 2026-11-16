@@ -15,7 +15,7 @@ import { getLicenseControlCopy, licenseControlError } from "../lib/license-contr
 import { privateApiRequest } from "../lib/private-api-request";
 import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
-import { useNexusLocale } from "./locale-context";
+import { useNexusLocale } from "../features/shell/locale";
 
 type ServerPage = { servers: { id: string; name: string }[]; page: number; totalPages: number };
 export type LicensePanelData = {

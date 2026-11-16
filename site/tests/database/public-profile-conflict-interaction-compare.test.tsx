@@ -17,7 +17,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (originalModule) => mockReactHooks(harness)(originalModule));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
 vi.mock("../../src/lib/user-platform-client", async (originalModule) => ({

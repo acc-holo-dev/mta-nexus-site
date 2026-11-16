@@ -23,7 +23,7 @@ vi.mock("../../src/lib/services/notification-inbox-service", () => ({
 
 import Loading from "../../src/app/notifications/loading";
 import Page, { generateMetadata } from "../../src/app/notifications/page";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 import { notificationInboxCopy } from "../../src/lib/notification-inbox-copy";
 

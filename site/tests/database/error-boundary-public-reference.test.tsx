@@ -19,7 +19,7 @@ vi.mock("next/link", async () => {
 
 import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error";
 import ErrorPage from "../../src/app/error";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 import { readSafePublicErrorReference } from "../../src/lib/safe-public-error-reference";
 

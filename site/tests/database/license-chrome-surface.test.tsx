@@ -14,7 +14,7 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href }, children),
   };
 });
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
