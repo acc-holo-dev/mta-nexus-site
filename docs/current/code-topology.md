@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** (regenerated at commit; slice 27 — accounts/profile cluster `components/` → `features/accounts`).  
+**source_sha:** `7e0519b5` (`dev`, slice 27 — accounts/profile cluster `components/` → `features/accounts`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `3551cfb8` |
+| Область                    | Факт на `7e0519b5` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 12 |
-| `components/` tree files   |                 38 |
-| `components/` root files   |                 33 |
+| `components/` tree files   |                 31 |
+| `components/` root files   |                 26 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    13 |  57526 |
+| accounts      |    24 | 100723 |
 | community     |    85 | 395306 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
