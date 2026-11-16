@@ -30,7 +30,7 @@ import ListLoading from "../../src/app/admin/storage/loading";
 import DetailLoading from "../../src/app/admin/storage/objects/[id]/loading";
 import Detail from "../../src/app/admin/storage/objects/[id]/page";
 import Page from "../../src/app/admin/storage/page";
-import { StorageCleanupControls } from "../../src/components/storage-maintenance-controls";
+import { StorageCleanupControls } from "../../src/features/moderation/storage-maintenance";
 import { storageMaintenanceCopy } from "../../src/lib/storage-maintenance-i18n";
 
 const stamp = new Date("2026-10-01T00:00:00Z"),

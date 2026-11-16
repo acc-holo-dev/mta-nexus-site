@@ -22,7 +22,7 @@ const formComponents = [
   "site/src/components/license-runtime-probe.tsx",
   "site/src/features/organizations/components/organization-ownership-transfer.tsx",
   "site/src/features/servers/components/register-server-form.tsx",
-  "site/src/components/storage-maintenance-controls.tsx",
+  "site/src/features/moderation/components/storage-maintenance-controls.tsx",
 ] as const;
 
 it("locks commerce and account form failures to ErrorState with touch CTAs", () => {

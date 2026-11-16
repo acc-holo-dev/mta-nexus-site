@@ -103,7 +103,7 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 
 [Support](../site/src/features/support/README.md) содержит UI обращений и server-only
 композиции переписки. [Moderation](../site/src/features/moderation/README.md)
-содержит UI жалоб и верификации, серверные экраны жалоб и порт `admin-home` для staff dashboard `/admin`.
+содержит UI жалоб и верификации, серверные экраны жалоб, порт `admin-home` для staff dashboard `/admin` и порт `storage-maintenance` для `/admin/storage`.
 [Accounts](../site/src/features/accounts/README.md) объединяет UI входа, аккаунта и
 настроек; [Discovery](../site/src/features/discovery/README.md) — общую серверную
 композицию каталогов; [Commerce](../site/src/features/commerce/README.md) — общий

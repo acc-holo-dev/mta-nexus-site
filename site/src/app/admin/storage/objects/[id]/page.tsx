@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { StorageCleanupControls } from "../../../../../components/storage-maintenance-controls";
+import { StorageCleanupControls } from "../../../../../features/moderation/storage-maintenance";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
