@@ -1,5 +1,5 @@
 /**
- * Pure GROW-01 retention window helpers (docs/RETENTION-PLAN.md §4.2).
+ * Pure GROW-01 retention window helpers (docs/future/retention.md §4.2).
  * Definition checks only — not a live analytics pipeline or pilot.
  * Tip CI re-verification marker for cancelled superseding docs pushes.
  */

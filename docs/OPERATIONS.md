@@ -164,7 +164,7 @@ Workspace install jobs (`unit`, `verify`, `mail-worker`) must keep
 Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optional
 `node scripts/summarize-unit-timings.mjs` ranks slow files from
 `artifacts/unit-tests.json` (gitignored). Measured host timings live in
-[PROBLEMS](PROBLEMS.md#проверки-и-сопровождение); cache contract summary:
+[constraints](issues/constraints.md#проверки-и-сопровождение); cache contract summary:
 [PROJECT-MAP](PROJECT-MAP.md#ci-install-cache-проверено).
 
 Pull requests use the following change-based scopes; the local commands remain aligned with them:

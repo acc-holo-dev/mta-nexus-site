@@ -68,4 +68,4 @@ Git commit с тем же значением. Это evidence registry без ex
 CI `plan` запускает полный audit, негативные tests и renderer check до выбора
 scope, включая docs-only изменения. `fetch-depth: 0` нужен для Git evidence.
 Указания исполнителю — в [AGENT](../docs/AGENT.md), миграция — в
-[техническом плане](../docs/STRUCTURE-REFACTORING.md).
+[техническом плане](../docs/archive/migrations/structure-refactoring.md).

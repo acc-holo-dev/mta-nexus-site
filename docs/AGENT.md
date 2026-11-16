@@ -11,9 +11,9 @@ MTA NEXUS — единая площадка сообщества MTA: ресур
 ## 2. Начало работы: шесть действий
 
 1. Прочитайте запрос владельца и проверьте `git status`, branch и HEAD. Сохраните существующие изменения. Если HEAD отличается от базы карточки, сначала проверьте, осталась ли проблема: не переносите старый вывод автоматически.
-2. Откройте [CURRENT-STATE.md](CURRENT-STATE.md) и нужную фазу [ROADMAP.md](ROADMAP.md). Найдите карточку в единственном рабочем tracker `planning/tasks.json` ([TRACKER.md](../planning/TRACKER.md)); [TASKS.md](TASKS.md) — производное представление.
+2. Откройте [current/system.md](current/system.md) и нужную фазу [ROADMAP.md](ROADMAP.md). Найдите карточку в единственном рабочем tracker `planning/tasks.json` ([TRACKER.md](../planning/TRACKER.md)); [TASKS.md](TASKS.md) — производное представление.
 3. Проверьте зависимости, `decision_status`, `queue_state`, `permission` и разрешение текущего задания. `specified` означает достаточную спецификацию, а не разрешение на работу или готовность результата.
-4. Прочитайте только релевантные код, тесты, [DECISIONS.md](DECISIONS.md), [PROBLEMS.md](PROBLEMS.md) и предметный контракт. Действующие baseline-решения — в `docs/handbook/13-DECISION-REGISTER.md`; NX-дополнения — в [DECISIONS.md](DECISIONS.md); индекс ID — `planning/decision-baseline.json`. Предметные контракты — RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF/COMMERCIAL-FUTURE.
+4. Прочитайте только релевантные код, тесты, [DECISIONS.md](DECISIONS.md), [issues/constraints.md](issues/constraints.md) и предметный контракт. Действующие baseline-решения — в `docs/handbook/13-DECISION-REGISTER.md`; NX-дополнения — в [DECISIONS.md](DECISIONS.md); индекс ID — `planning/decision-baseline.json`. Предметные контракты — RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF; коммерция — [future/commerce.md](future/commerce.md).
 5. Выберите небольшой завершённый пользовательский или инженерный результат. При параллельной работе закрепите владельцев файлов; общие schema/UI/CI-контракты интегрирует основной агент. Передавайте исполнителю только необходимый контекст без полной истории чата и повторного чтения handbook.
 6. Выполняйте задачу до проверяемого результата. Если внешняя среда или существенное продуктовое решение недоступны, завершите независимую локальную часть, опишите точный остаток и продолжите следующую разрешённую задачу.
 

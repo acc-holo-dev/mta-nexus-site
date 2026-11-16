@@ -103,7 +103,7 @@ Jobs that run `pnpm install --frozen-lockfile` (`unit`, `verify`, `mail-worker`)
 
 Jobs that only need Node for scripts or isolated browser tool installs (`plan`, `smoke`, `postgres-persistence`, `summary`, browser workflows) correctly **omit** `cache: pnpm` — they do not install the workspace. Optional extra `pnpm cache path` metadata caching is deferred until install time is measured on CI; do not share writable stores across untrusted fork jobs.
 
-Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-timings.mjs`. Measured host snapshot and slow-file list: [PROBLEMS](PROBLEMS.md#проверки-и-сопровождение).
+Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-timings.mjs`. Measured host snapshot and slow-file list: [constraints](issues/constraints.md#проверки-и-сопровождение).
 
 ## Где не искать «магических» ускорителей
 
