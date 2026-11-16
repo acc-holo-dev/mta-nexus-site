@@ -205,7 +205,8 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/src/features/servers/components/server-card.tsx",
     "site/src/features/servers/model/mta-directory-page.ts",
   ]) {
-    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
+    // Feature modules stay on fast_ci; full_acceptance is reserved for infra/trust paths.
+    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: false }, file);
   }
   assert.deepEqual(classifyChanges(["site/src/components/server-card.tsx"]), {
     code: true,

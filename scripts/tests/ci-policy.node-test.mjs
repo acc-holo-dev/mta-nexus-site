@@ -11,7 +11,7 @@ import {
 } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
-  assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), {
+  assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md", "CONTRIBUTING.md"]), {
     code: false,
     unitOnly: false,
     full: false,
@@ -24,6 +24,7 @@ test("documentation does not trigger builds; executable docs/configuration do", 
     classifyChanges([
       "AGENTS.md",
       "docs/AGENT.md",
+      "docs/current/system.md",
       "planning/tasks.json",
       "planning/milestones.json",
     ]),
@@ -59,6 +60,28 @@ test("shared UI and web component changes use the unit CI profile", () => {
     summarizeJobs(policy, { plan: { result: "success" }, unit: { result: "success" } }).scope,
     "unit_ci",
   );
+});
+
+test("docs allowlist guard stays on unit_ci and does not escalate to full", () => {
+  const policy = classifyChanges([
+    "docs/current/system.md",
+    "site/tests/unit/mainline-repository-policy.test.ts",
+  ]);
+  assert.deepEqual(policy, { code: true, unitOnly: true, full: false });
+  assert.deepEqual(requiredJobs(policy), ["plan", "unit"]);
+  assert.equal(summarizeJobs(policy, {}).scope, "unit_ci");
+});
+
+test("product feature modules use fast_ci rather than full acceptance", () => {
+  for (const file of [
+    "site/src/features/resources/page.tsx",
+    "apps/web/src/features/community/feed.tsx",
+    "site/src/features/servers/claim-form.tsx",
+  ]) {
+    const policy = classifyChanges([file]);
+    assert.deepEqual(policy, { code: true, unitOnly: false, full: false }, file);
+    assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);
+  }
 });
 
 test("unknown or mixed application paths never claim unit_only", () => {
@@ -144,12 +167,18 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ].map((name) => [`packages/db/src/repositories/${name}.ts`]),
     [".github/workflows/ci.yml"],
     ["deploy/Dockerfile"],
-    ["tests/unit/mainline-repository-policy.test.ts"],
+    ["tests/unit/browser-api-route-inventory.test.ts"],
+    ["tests/unit/j4-production-upload-integration.test.ts"],
   ]) {
     const policy = classifyChanges(files);
-    assert.equal(policy.full, true);
-    assert.equal(policy.unitOnly, false);
+    assert.equal(policy.full, true, files.join(","));
+    assert.equal(policy.unitOnly, false, files.join(","));
   }
+  assert.deepEqual(classifyChanges(["tests/unit/mainline-repository-policy.test.ts"]), {
+    code: true,
+    unitOnly: true,
+    full: false,
+  });
   for (const option of [{ explicitFull: true }, { release: true }]) {
     const policy = classifyChanges([], option);
     assert.equal(policy.code, true);

@@ -28,12 +28,7 @@ const moves = [
     "packages/db/src/repositories/web-push-admission-recovery.ts",
     "site/packages/db/src/repositories/web-push-admission-recovery.ts",
   ],
-  ["tests/mainline-repository-policy.test.ts", "site/tests/mainline-repository-policy.test.ts"],
   ["tests/browser-api-route-inventory.test.ts", "site/tests/browser-api-route-inventory.test.ts"],
-  [
-    "tests/unit/mainline-repository-policy.test.ts",
-    "site/tests/unit/mainline-repository-policy.test.ts",
-  ],
   [
     "tests/unit/browser-api-route-inventory.test.ts",
     "site/tests/unit/browser-api-route-inventory.test.ts",
@@ -80,5 +75,19 @@ test("migration preserves UI scope without narrowing mixed or unknown changes", 
     assert.equal(policy.code, true);
     assert.equal(policy.unitOnly, false);
     assert.ok(requiredJobs(policy).includes("verify"));
+  }
+});
+
+test("docs allowlist guard stays unit_ci across legacy and site paths", () => {
+  for (const files of [
+    ["tests/unit/mainline-repository-policy.test.ts"],
+    ["site/tests/unit/mainline-repository-policy.test.ts"],
+    ["tests/mainline-repository-policy.test.ts"],
+    ["site/tests/mainline-repository-policy.test.ts"],
+    ["docs/current/quality.md", "site/tests/unit/mainline-repository-policy.test.ts"],
+  ]) {
+    const policy = classifyChanges(files);
+    assert.deepEqual(policy, { code: true, unitOnly: true, full: false }, files.join(", "));
+    assert.deepEqual(requiredJobs(policy), ["plan", "unit"]);
   }
 });

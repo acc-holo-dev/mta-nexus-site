@@ -30,6 +30,7 @@ jobs:
       code: ${{ steps.scope.outputs.code }}
       unit_only: ${{ steps.scope.outputs.unit_only }}
       full: ${{ steps.scope.outputs.full }}
+      scope: ${{ steps.scope.outputs.scope }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7

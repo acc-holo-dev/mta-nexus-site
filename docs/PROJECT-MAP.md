@@ -91,7 +91,7 @@ Preflight: `pnpm nexus:doctor` (также `dev:preflight`).
 
 ## CI контуры
 
-`scripts/ci-policy.mjs` выбирает scope по изменённым путям: `documentation` → `unit_ci` → `fast_ci` → `full_acceptance`. Полный контур включает database, production image, browser smoke (axe WCAG A/AA), Compose startup, backup/restore rehearsal. Отдельные workflow: auth/directory/resource browser, discussion recovery.
+`scripts/ci-policy.mjs` выбирает scope по изменённым путям: `documentation` → `unit_ci` → `fast_ci` → `full_acceptance`. Контракт tiers и типичное время — [quality](current/quality.md). Feature UI на `dev`/PR → `fast_ci`; full — infra/trust и code push на `main`. Полный контур: database, production image, browser smoke (axe WCAG A/AA), Compose startup, backup/restore. Отдельные workflow: auth/directory/resource browser, discussion recovery.
 
 ### CI install cache (проверено)
 

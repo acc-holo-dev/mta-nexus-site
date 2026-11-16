@@ -94,6 +94,7 @@ describe("mainline repository policy", () => {
     expect(readdirSync(resolve(process.cwd(), "docs/current")).sort()).toEqual([
       "development.md",
       "domains",
+      "quality.md",
       "system.md",
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/current/domains")).sort()).toEqual([

@@ -62,7 +62,7 @@ docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check
 
 ## Документация
 
-**Начать здесь:** [Система](docs/current/system.md) · [Разработка](docs/current/development.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Ограничения](docs/issues/constraints.md).
+**Начать здесь:** [Система](docs/current/system.md) · [Разработка](docs/current/development.md) · [CI / качество](docs/current/quality.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Ограничения](docs/issues/constraints.md).
 
 **Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Механика вклада](CONTRIBUTING.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Инициативы](docs/future/initiatives.md).
 
