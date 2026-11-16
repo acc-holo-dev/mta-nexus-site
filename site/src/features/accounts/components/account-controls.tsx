@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import { confirmAction } from "../../../components/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { parseSessionResponse } from "../../../components/shell-session-payload";
 import {
+  parseSessionResponse,
   requestShellSessionRefresh,
   SHELL_SESSION_REFRESH_EVENT,
-} from "../../../components/shell-session-refresh";
+} from "../../shell/session";
 
 type Account = { id: string; username: string };
 

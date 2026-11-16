@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../../../components/shell-destination-policy";
+import type { ShellAuthSession } from "../session";
 import { getDictionary } from "../../../lib/i18n";
 import { platformReportCopy } from "../../../lib/platform-report-i18n";
 
@@ -19,7 +19,7 @@ vi.mock("react", async (importOriginal) => {
   };
 });
 vi.mock("next/navigation", () => ({ usePathname: () => "/workspace/platform-reports" }));
-vi.mock("../../../components/use-auth-session", () => ({ useAuthSession: () => state.session }));
+vi.mock("../auth-session", () => ({ useAuthSession: () => state.session }));
 
 import { FooterContribute } from "./footer-contribute";
 import { MobileNav } from "./mobile-nav";

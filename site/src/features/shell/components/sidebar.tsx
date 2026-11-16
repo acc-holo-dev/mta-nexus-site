@@ -13,8 +13,8 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../../components/shell-destination-policy";
-import { useAuthSession } from "../../../components/use-auth-session";
+} from "../session";
+import { useAuthSession } from "../auth-session";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getManagedServerCopy } from "../../../lib/managed-server-copy";
 import { publicationCopy } from "../../../lib/publication-feed-copy";

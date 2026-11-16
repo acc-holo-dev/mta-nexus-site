@@ -3,7 +3,7 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../src/components/shell-destination-policy";
+} from "../../src/features/shell/session";
 import { parseHomePersonalPreference } from "../../src/lib/home-personal-preference";
 
 describe("home personal preference", () => {

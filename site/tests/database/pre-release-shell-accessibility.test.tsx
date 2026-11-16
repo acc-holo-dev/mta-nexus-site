@@ -1,7 +1,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../../src/components/shell-destination-policy";
+import type { ShellAuthSession } from "../../src/features/shell/session";
 import { getDictionary } from "../../src/lib/i18n";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
@@ -28,7 +28,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/use-auth-session", () => ({
+vi.mock("../../src/features/shell/auth-session", () => ({
   useAuthSession: () => auth.session,
 }));
 

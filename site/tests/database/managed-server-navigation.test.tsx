@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../../src/components/shell-destination-policy";
+import type { ShellAuthSession } from "../../src/features/shell/session";
 
 const state = vi.hoisted(() => ({
   path: "/workspace/servers",
@@ -13,7 +13,7 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => state.path }));
-vi.mock("../../src/components/use-auth-session", () => ({
+vi.mock("../../src/features/shell/auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
@@ -26,7 +26,7 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../src/components/shell-destination-policy";
+} from "../../src/features/shell/session";
 import { Sidebar } from "../../src/features/shell/sidebar";
 import { getDictionary } from "../../src/lib/i18n";
 

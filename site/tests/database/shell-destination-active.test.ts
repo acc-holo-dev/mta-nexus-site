@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { shellDestinationActive } from "../../src/components/shell-destination-policy";
+import { shellDestinationActive } from "../../src/features/shell/session";
 
 it("keeps one current shell destination for nested workspace routes", () => {
   expect(shellDestinationActive("/workspace", "/workspace")).toBe(true);

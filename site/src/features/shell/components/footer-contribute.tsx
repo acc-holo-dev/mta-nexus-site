@@ -8,8 +8,8 @@ import {
   isShellSessionLoading,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../../components/shell-destination-policy";
-import { useAuthSession } from "../../../components/use-auth-session";
+} from "../session";
+import { useAuthSession } from "../auth-session";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
 

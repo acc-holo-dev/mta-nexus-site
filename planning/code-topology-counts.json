@@ -3,27 +3,21 @@
     "route_ts": 282
   },
   "components": {
-    "root_files": 70,
+    "root_files": 64,
     "shellish_root_files": [
       "auth-return-path.ts",
       "guest-auth-links.tsx",
       "platform-guest-auth-panel.tsx",
       "platform-workspace-guest-auth.test.tsx",
       "platform-workspace-guest-auth.tsx",
-      "shell-destination-policy.ts",
-      "shell-session-payload.test.ts",
-      "shell-session-payload.ts",
-      "shell-session-refresh.ts",
-      "support-center-auth-entry.test.tsx",
-      "use-auth-session.test.ts",
-      "use-auth-session.ts"
+      "support-center-auth-entry.test.tsx"
     ],
-    "tree_bytes": 390322,
-    "tree_files": 75
+    "tree_bytes": 377552,
+    "tree_files": 69
   },
   "features": {
     "accounts": {
-      "bytes": 51904,
+      "bytes": 51824,
       "files": 11
     },
     "community": {
@@ -59,8 +53,8 @@
       "files": 54
     },
     "shell": {
-      "bytes": 50426,
-      "files": 20
+      "bytes": 63646,
+      "files": 28
     },
     "support": {
       "bytes": 71955,
@@ -150,7 +144,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "641ca370b2c7892181e5c04a7b432a6a51c54e73",
+  "source_sha": "61f39b2f7e4553e0d4f4d5e332a9bc0e193101e8",
   "tests": {
     "site_tests_files": 1443
   }

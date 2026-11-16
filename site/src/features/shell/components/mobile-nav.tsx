@@ -13,8 +13,8 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../../components/shell-destination-policy";
-import { useAuthSession } from "../../../components/use-auth-session";
+} from "../session";
+import { useAuthSession } from "../auth-session";
 import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { shellNavigation } from "./shell-navigation";
