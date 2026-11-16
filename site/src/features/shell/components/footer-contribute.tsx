@@ -4,13 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import {
-  isShellSessionLoading,
-  showGuestSignInCta,
-  showWorkspaceTools,
-} from "../session";
-import { useAuthSession } from "../auth-session";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { useAuthSession } from "../auth-session";
+import { isShellSessionLoading, showGuestSignInCta, showWorkspaceTools } from "../session";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
 
 const linkClass =

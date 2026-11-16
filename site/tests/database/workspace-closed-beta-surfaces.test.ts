@@ -1,9 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  showAdminDestination,
-  showWorkspaceTools,
-} from "../../src/features/shell/session";
+import { showAdminDestination, showWorkspaceTools } from "../../src/features/shell/session";
 import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({

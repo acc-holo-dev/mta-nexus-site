@@ -10,8 +10,8 @@ export {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "./session/shell-destination-policy";
-export { parseSessionResponse, parseShellSession } from "./session/shell-session-payload";
+export { parseSessionResponse } from "./session/shell-session-payload";
 export {
-  SHELL_SESSION_REFRESH_EVENT,
   requestShellSessionRefresh,
+  SHELL_SESSION_REFRESH_EVENT,
 } from "./session/shell-session-refresh";
