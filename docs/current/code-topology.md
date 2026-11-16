@@ -29,7 +29,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `cc165027` |
+| Область                    | Факт на `d69d5f27` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
 | `components/` tree files   |                 62 |
@@ -48,17 +48,17 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    36 |  75007 |
-| accounts      |    11 |  51824 |
-| community     |    75 | 357421 |
+| shell         |    36 |  74879 |
+| accounts      |    11 |  51777 |
+| community     |    75 | 356998 |
 | discovery     |     3 |  20342 |
-| library       |    57 | 284219 |
-| moderation    |    14 |  63598 |
-| notifications |    10 |  66606 |
-| organizations |    35 | 127517 |
-| resources     |    93 | 448089 |
-| servers       |    54 | 218921 |
-| support       |    14 |  72003 |
+| library       |    57 | 283991 |
+| moderation    |    14 |  63538 |
+| notifications |    10 |  66544 |
+| organizations |    35 | 127419 |
+| resources     |    93 | 447544 |
+| servers       |    54 | 218715 |
+| support       |    14 |  71877 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
