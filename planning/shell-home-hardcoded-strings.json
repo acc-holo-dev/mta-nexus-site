@@ -19,30 +19,6 @@
       "text": "NX"
     },
     {
-      "id": "brand.sidebar.aria",
-      "kind": "aria-label",
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "MTA Nexus"
-    },
-    {
-      "id": "brand.sidebar.tile",
-      "kind": "jsx-text",
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "NX"
-    },
-    {
-      "id": "brand.sidebar.mta",
-      "kind": "jsx-text",
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "MTA"
-    },
-    {
-      "id": "brand.sidebar.nexus",
-      "kind": "jsx-text",
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "NEXUS"
-    },
-    {
       "id": "brand.footer.copyright",
       "kind": "jsx-text",
       "path": "site/src/features/shell/components/footer.tsx",
@@ -117,41 +93,6 @@
       "line": 48,
       "path": "site/src/features/shell/components/footer.tsx",
       "text": "© 2026 MTA Nexus ·"
-    },
-    {
-      "allowlist_id": "brand.sidebar.aria",
-      "kind": "aria-label",
-      "line": 113,
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "MTA Nexus"
-    },
-    {
-      "allowlist_id": "brand.sidebar.tile",
-      "kind": "jsx-text",
-      "line": 116,
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "NX"
-    },
-    {
-      "allowlist_id": "brand.sidebar.tile",
-      "kind": "jsx-text",
-      "line": 126,
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "NX"
-    },
-    {
-      "allowlist_id": "brand.sidebar.mta",
-      "kind": "jsx-text",
-      "line": 130,
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "MTA"
-    },
-    {
-      "allowlist_id": "brand.sidebar.nexus",
-      "kind": "jsx-text",
-      "line": 132,
-      "path": "site/src/features/shell/components/sidebar.tsx",
-      "text": "NEXUS"
     }
   ],
   "scan_roots": [
@@ -163,10 +104,10 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature, home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "7e445b7acd269dda33ab57a979cc70f66bd50ab5",
+  "source_sha": "5418a01fad0060a169c3c41f6cbaadb003c6eab8",
   "summary": {
-    "allowlisted": 13,
-    "findings": 13,
+    "allowlisted": 8,
+    "findings": 8,
     "locale_copy_ternaries": 0,
     "scanned_files": 20,
     "unallowlisted": 0

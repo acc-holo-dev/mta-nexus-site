@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { BrandMark, Button } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, LogIn, type Server, ShieldAlert, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -107,36 +107,15 @@ export function Sidebar({
     >
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-base px-3">
         {isCollapsed ? (
-          <Link
-            href="/"
-            className="mx-auto rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            aria-label="MTA Nexus"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
-              NX
-            </div>
-          </Link>
+          <BrandMark href="/" showWordmark={false} className="mx-auto rounded-lg" />
         ) : (
           <>
-            <Link
-              href="/"
-              className="flex min-w-0 items-center space-x-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
-                NX
-              </div>
-              <div className="flex min-w-0 flex-col">
-                <span className="font-heading leading-tight text-primary">
-                  MTA{" "}
-                  <span className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
-                    NEXUS
-                  </span>
-                </span>
-                <span className="font-caption leading-tight text-faint">
-                  {dictionary.nav.openFreeBeta}
-                </span>
-              </div>
-            </Link>
+            <div className="flex min-w-0 flex-col">
+              <BrandMark href="/" className="min-w-0" />
+              <span className="ml-10 font-caption leading-tight text-faint">
+                {dictionary.nav.openFreeBeta}
+              </span>
+            </div>
             <Button
               type="button"
               variant="ghost"

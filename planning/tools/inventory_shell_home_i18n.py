@@ -80,30 +80,6 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "text": "NX",
     },
     {
-        "id": "brand.sidebar.aria",
-        "path": "site/src/features/shell/components/sidebar.tsx",
-        "kind": "aria-label",
-        "text": "MTA Nexus",
-    },
-    {
-        "id": "brand.sidebar.tile",
-        "path": "site/src/features/shell/components/sidebar.tsx",
-        "kind": "jsx-text",
-        "text": "NX",
-    },
-    {
-        "id": "brand.sidebar.mta",
-        "path": "site/src/features/shell/components/sidebar.tsx",
-        "kind": "jsx-text",
-        "text": "MTA",
-    },
-    {
-        "id": "brand.sidebar.nexus",
-        "path": "site/src/features/shell/components/sidebar.tsx",
-        "kind": "jsx-text",
-        "text": "NEXUS",
-    },
-    {
         "id": "brand.footer.copyright",
         "path": "site/src/features/shell/components/footer.tsx",
         "kind": "jsx-text",
