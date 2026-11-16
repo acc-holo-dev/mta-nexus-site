@@ -131,8 +131,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | --- | ---------------------------------------------------------- | -------------------------------- | -------- |
 | 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done** |
 | 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done** |
-| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | next     |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | queued   |
+| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done** |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | next     |
 | 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | queued   |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.

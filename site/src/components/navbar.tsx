@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { BrandMark } from "@nexus/ui";
 import { Search } from "lucide-react";
+import Link from "next/link";
 import { AccountControls } from "../features/accounts/controls";
-import { LocaleSwitcher } from "./locale-switcher";
 import { NotificationBell } from "../features/notifications/bell";
-import { ThemeToggle } from "./theme-toggle";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { LocaleSwitcher } from "./locale-switcher";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);
@@ -14,16 +15,7 @@ export function Navbar({ locale }: { locale: Locale }) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-base bg-surface/95 backdrop-blur">
       <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-6">
-        <Link
-          href="/"
-          className="flex items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] lg:hidden"
-          aria-label="MTA NEXUS"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
-            NX
-          </span>
-          <span className="hidden text-sm font-bold text-primary sm:inline">MTA NEXUS</span>
-        </Link>
+        <BrandMark href="/" className="lg:hidden" wordmarkClassName="hidden sm:inline" />
 
         <div className="order-3 min-w-0 basis-full sm:order-none sm:flex-1 lg:max-w-xl">
           <NavbarSearchTrigger placeholder={dictionary.nav.search} />

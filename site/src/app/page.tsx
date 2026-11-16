@@ -1,9 +1,9 @@
-import { buttonClassName, ErrorState, SectionHeader } from "@nexus/ui";
+import { buttonClassName, ErrorState, Rise, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { ArticleCard } from "../features/community/article-view";
 import { HomePersonalChangesPanel } from "../components/home-personal-changes-panel";
+import { ArticleCard } from "../features/community/article-view";
 import { ProductCard } from "../features/resources/view";
 import { HomeNetworkServerCard } from "../features/servers/client";
 import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
@@ -91,26 +91,34 @@ export default async function HomePage() {
       <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--nexus-accent-soft),transparent_55%),linear-gradient(180deg,var(--nexus-elevated),var(--nexus-page))]"
+          className="nexus-hero-atmosphere pointer-events-none absolute inset-0"
         />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,var(--nexus-border-strong),transparent)]"
         />
         <div className="relative mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-center gap-6 px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent motion-safe:animate-[fade-in_500ms_ease-out]">
-            {dictionary.home.liveEcosystem}
-          </p>
-          <h1 className="font-display text-5xl tracking-tight text-primary motion-safe:animate-[fade-in_700ms_ease-out] sm:text-7xl">
-            {dictionary.home.brand}
-          </h1>
-          <p className="max-w-2xl text-lg font-semibold text-primary motion-safe:animate-[fade-in_850ms_ease-out] sm:text-xl">
-            {dictionary.home.title}
-          </p>
-          <p className="max-w-xl text-sm leading-relaxed text-secondary motion-safe:animate-[fade-in_1s_ease-out] sm:text-base">
-            {dictionary.home.description}
-          </p>
-          <div className="flex flex-wrap gap-3 pt-1 motion-safe:animate-[fade-in_1.1s_ease-out]">
+          <Rise delay="none">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+              {dictionary.home.liveEcosystem}
+            </p>
+          </Rise>
+          <Rise delay="short">
+            <h1 className="font-display text-5xl tracking-tight text-primary sm:text-7xl">
+              {dictionary.home.brand}
+            </h1>
+          </Rise>
+          <Rise delay="medium">
+            <p className="max-w-2xl text-lg font-semibold text-primary sm:text-xl">
+              {dictionary.home.title}
+            </p>
+          </Rise>
+          <Rise delay="long">
+            <p className="max-w-xl text-sm leading-relaxed text-secondary sm:text-base">
+              {dictionary.home.description}
+            </p>
+          </Rise>
+          <Rise delay="long" className="flex flex-wrap gap-3 pt-1">
             <Link
               href="/servers"
               className={buttonClassName({
@@ -133,7 +141,7 @@ export default async function HomePage() {
             >
               {dictionary.home.browseResources}
             </Link>
-          </div>
+          </Rise>
         </div>
       </section>
 

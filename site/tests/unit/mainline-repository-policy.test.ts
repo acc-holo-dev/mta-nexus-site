@@ -93,6 +93,7 @@ describe("mainline repository policy", () => {
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/current")).sort()).toEqual([
       "code-topology.md",
+      "design-direction.md",
       "development.md",
       "domains",
       "quality.md",

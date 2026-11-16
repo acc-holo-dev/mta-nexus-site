@@ -1,3 +1,4 @@
+import { BrandMark } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { FooterContribute } from "./footer-contribute";
@@ -9,12 +10,7 @@ export function Footer({ locale }: { locale: Locale }) {
     <footer className="mb-16 mt-12 border-t border-base bg-surface lg:mb-0">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 text-xs sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="col-span-2">
-          <div className="mb-3 flex items-center space-x-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-accent text-[10px] font-bold text-white">
-              NX
-            </div>
-            <span className="font-heading text-primary">MTA NEXUS</span>
-          </div>
+          <BrandMark href="/" size="sm" className="mb-3" />
           <p className="max-w-sm leading-relaxed text-muted">{dictionary.footer.summary}</p>
         </div>
         <div>

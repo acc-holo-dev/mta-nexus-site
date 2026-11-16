@@ -117,7 +117,7 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 приложения, packages и tests в `site/`, инфраструктуры в `docker/`,
 шаблонов env в `config/env/`. Compose identity и данные сохраняются отдельно от путей.
 
-Живой AS-IS/TO-BE scoreboard внутренней топологии (counts `lib/` / `components/` / `features`, husks, очередь slices): [code-topology](current/code-topology.md). Снимок: `planning/code-topology-counts.json`; регенерация — `planning/tools/inventory_code_topology.py`.
+Живой AS-IS/TO-BE scoreboard внутренней топологии (counts `lib/` / `components/` / `features`, husks, очередь slices): [code-topology](current/code-topology.md). Снимок: `planning/code-topology-counts.json`; регенерация — `planning/tools/inventory_code_topology.py`. Направление shell 2027: [design-direction](current/design-direction.md).
 
 ## Документы по роли
 
