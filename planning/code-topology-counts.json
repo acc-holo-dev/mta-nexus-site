@@ -3,36 +3,24 @@
     "route_ts": 282
   },
   "components": {
-    "root_files": 84,
+    "root_files": 71,
     "shellish_root_files": [
       "auth-return-path.ts",
-      "footer-contribute.tsx",
-      "footer.tsx",
-      "global-shell-controls.test.tsx",
       "guest-auth-links.tsx",
       "locale-context.tsx",
-      "locale-switcher.tsx",
-      "mobile-nav.tsx",
-      "navbar.tsx",
-      "nexus-shell.tsx",
       "platform-guest-auth-panel.tsx",
       "platform-workspace-guest-auth.test.tsx",
       "platform-workspace-guest-auth.tsx",
       "shell-destination-policy.ts",
-      "shell-navigation.ts",
-      "shell-publication-destinations.test.tsx",
-      "shell-publication-destinations.ts",
       "shell-session-payload.test.ts",
       "shell-session-payload.ts",
       "shell-session-refresh.ts",
-      "shell-session-unavailable.tsx",
-      "sidebar.tsx",
       "support-center-auth-entry.test.tsx",
       "use-auth-session.test.ts",
       "use-auth-session.ts"
     ],
-    "tree_bytes": 440055,
-    "tree_files": 89
+    "tree_bytes": 390949,
+    "tree_files": 76
   },
   "features": {
     "accounts": {
@@ -70,6 +58,10 @@
     "servers": {
       "bytes": 218921,
       "files": 54
+    },
+    "shell": {
+      "bytes": 50525,
+      "files": 19
     },
     "support": {
       "bytes": 72003,
@@ -159,7 +151,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "ba38852e7bd226fdb696aceabc9320611ce14403",
+  "source_sha": "bbcf3026cfe56ed491a909b23e6bfc64b460b317",
   "tests": {
     "site_tests_files": 1443
   }

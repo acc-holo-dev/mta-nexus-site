@@ -3,9 +3,9 @@
 import { BrandMark } from "@nexus/ui";
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { AccountControls } from "../features/accounts/controls";
-import { NotificationBell } from "../features/notifications/bell";
-import { getDictionary, type Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { AccountControls } from "../../accounts/controls";
+import { NotificationBell } from "../../notifications/bell";
 import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeToggle } from "./theme-toggle";
 

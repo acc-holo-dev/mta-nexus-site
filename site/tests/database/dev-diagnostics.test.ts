@@ -47,7 +47,7 @@ describe("development diagnostics", () => {
   });
 
   it("only exposes the navigation entry outside production", () => {
-    const sidebar = read("site/src/components/sidebar.tsx");
+    const sidebar = read("site/src/features/shell/components/sidebar.tsx");
     expect(sidebar).toContain('process.env.NODE_ENV !== "production"');
     expect(sidebar).toContain('href: "/dev"');
     expect(sidebar).toContain("dictionary.nav.devTools");

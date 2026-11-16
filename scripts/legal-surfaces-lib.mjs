@@ -23,7 +23,7 @@ export const LEGAL_SURFACE_ROUTES = Object.freeze([
   }),
 ]);
 
-const FOOTER_RELATIVE = "site/src/components/footer.tsx";
+const FOOTER_RELATIVE = "site/src/features/shell/components/footer.tsx";
 const I18N_LOCALE_LEGAL = Object.freeze([
   Object.freeze({ locale: "en", relative: "site/src/lib/i18n/en/legal.ts" }),
   Object.freeze({ locale: "ru", relative: "site/src/lib/i18n/ru/legal.ts" }),

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { NexusShell } from "../components/nexus-shell";
 import { PwaServiceWorker } from "../components/pwa-service-worker";
+import { NexusShell } from "../features/shell/shell";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { bodyFont, displayFont } from "./fonts";

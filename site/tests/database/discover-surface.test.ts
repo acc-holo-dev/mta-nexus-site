@@ -27,10 +27,11 @@ vi.mock("../../src/features/accounts/controls", async () => {
   };
 });
 
-vi.mock("../../src/components/locale-switcher", async () => {
+vi.mock("../../src/features/shell/chrome-controls", async () => {
   const ReactModule = await import("react");
   return {
     LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "LocaleSwitcher" }),
+    ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
   };
 });
 
@@ -41,15 +42,8 @@ vi.mock("../../src/features/notifications/bell", async () => {
   };
 });
 
-vi.mock("../../src/components/theme-toggle", async () => {
-  const ReactModule = await import("react");
-  return {
-    ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
-  };
-});
-
-import { Sidebar } from "../../src/components/sidebar";
-import { Navbar } from "../../src/components/navbar";
+import { Navbar } from "../../src/features/shell/navbar";
+import { Sidebar } from "../../src/features/shell/sidebar";
 import ExplorePage from "../../src/app/explore/page";
 import { DISCOVER_TYPES, discoverHref, parseDiscoverQuery } from "../../src/lib/discover-query";
 

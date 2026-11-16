@@ -5,8 +5,7 @@ import { LogIn, Menu, type Server, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -14,11 +13,12 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "./shell-destination-policy";
+} from "../../../components/shell-destination-policy";
+import { useAuthSession } from "../../../components/use-auth-session";
+import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { shellNavigation } from "./shell-navigation";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
-import { useAuthSession } from "./use-auth-session";
-import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
 type NavItem = {
   href: string;

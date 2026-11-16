@@ -124,6 +124,38 @@ module.exports = {
       to: { dependencyTypes: ["core"] },
     },
     {
+      name: "shell-feature-public-api",
+      severity: "error",
+      from: { path: "^site/src/(?!features/shell/)" },
+      to: {
+        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|chrome-controls)\\.ts$)",
+      },
+    },
+    {
+      name: "shell-feature-does-not-import-routing",
+      severity: "error",
+      from: { path: "^site/src/features/shell/" },
+      to: { path: "^site/src/app/" },
+    },
+    {
+      name: "shell-client-isolation",
+      severity: "error",
+      from: {
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|chrome-controls)\\.ts$|components/)",
+      },
+      to: {
+        path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$)|features/shell/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|theme-preference|license-maintenance-i18n|notification-copy|notification-inbox-copy|notification-inbox-events|private-api-request|resource-release-watches-i18n|visible-polling)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+      },
+    },
+    {
+      name: "shell-client-has-no-node-builtins",
+      severity: "error",
+      from: {
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|chrome-controls)\\.ts$|components/)",
+      },
+      to: { dependencyTypes: ["core"] },
+    },
+    {
       name: "discovery-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/discovery/)" },

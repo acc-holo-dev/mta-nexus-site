@@ -17,7 +17,7 @@ vi.mock("../../src/components/use-auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
-import { FooterContribute } from "../../src/components/footer-contribute";
+import { FooterContribute } from "../../src/features/shell/footer";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -27,7 +27,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "../../src/components/shell-destination-policy";
-import { Sidebar } from "../../src/components/sidebar";
+import { Sidebar } from "../../src/features/shell/sidebar";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
@@ -108,7 +108,10 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
 });
 
 it("keeps mobile More menu session checking and staff admin labels in source", () => {
-  const source = readFileSync(resolve(process.cwd(), "site/src/components/mobile-nav.tsx"), "utf8");
+  const source = readFileSync(
+    resolve(process.cwd(), "site/src/features/shell/components/mobile-nav.tsx"),
+    "utf8",
+  );
   expect(source).toContain("dictionary.nav.checkingSession");
   expect(source).toContain("adminAccessibleName");
   expect(source).toContain('aria-busy="true"');

@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../lib/i18n";
-import { platformReportCopy } from "../lib/platform-report-i18n";
-import type { ShellAuthSession } from "./shell-destination-policy";
+import type { ShellAuthSession } from "../../../components/shell-destination-policy";
+import { getDictionary } from "../../../lib/i18n";
+import { platformReportCopy } from "../../../lib/platform-report-i18n";
 
 const state = vi.hoisted(() => ({
   session: { status: "anonymous", user: null } as ShellAuthSession,
@@ -19,7 +19,7 @@ vi.mock("react", async (importOriginal) => {
   };
 });
 vi.mock("next/navigation", () => ({ usePathname: () => "/workspace/platform-reports" }));
-vi.mock("./use-auth-session", () => ({ useAuthSession: () => state.session }));
+vi.mock("../../../components/use-auth-session", () => ({ useAuthSession: () => state.session }));
 
 import { FooterContribute } from "./footer-contribute";
 import { MobileNav } from "./mobile-nav";

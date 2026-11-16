@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import {
   isShellSessionLoading,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "./shell-destination-policy";
+} from "../../../components/shell-destination-policy";
+import { useAuthSession } from "../../../components/use-auth-session";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
-import { useAuthSession } from "./use-auth-session";
 
 const linkClass =
   "rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `f3be421f` (`dev` / merge #1186).  
+**source_sha:** `bbcf3026` (`dev`, structural shell absorb).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -16,8 +16,8 @@
 site/
 ├── src/
 │   ├── app/                 # App Router + HTTP adapters (282× route.ts)
-│   ├── features/            # частичная feature-группировка (10 доменов)
-│   ├── components/          # корневой UI вне features (84 файла в корне)
+│   ├── features/            # feature-группировка (11 доменов, incl. shell/)
+│   ├── components/          # корневой UI вне features (сжимается после shell absorb)
 │   └── lib/                 # плоский helpers + services/ + i18n/
 │       ├── services/        # 86 оркестраторов в одном каталоге
 │       └── i18n/            # общий locale primitive
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `f3be421f` |
+| Область                    | Факт на `bbcf3026` |
 | -------------------------- | -----------------: |
-| `features/*` domains       |                 10 |
-| `components/` tree files   |                 89 |
-| `components/` root files   |                 84 |
+| `features/*` domains       |                 11 |
+| `components/` tree files   |                 76 |
+| `components/` root files   |                 71 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,6 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
+| shell         |    19 |  50525 |
 | accounts      |    11 |  51952 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
@@ -80,8 +81,9 @@ site/
 
 ### Shell / auth leftovers в `components/` root
 
-Кандидаты на поглощение в `features/shell` или accounts (не полный список):  
-`navbar.tsx`, `footer.tsx`, `footer-contribute.tsx`, `mobile-nav.tsx`, `sidebar.tsx`, `nexus-shell.tsx`, `shell-*.ts(x)`, `locale-switcher.tsx`, `locale-context.tsx`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`, `auth-return-path.ts`, `use-auth-session.ts`.
+**Slice 4 done:** nav/footer/chrome — [`features/shell`](../../site/src/features/shell/README.md) (`shell`, `navbar`, `footer`, `sidebar`, `chrome-controls`).
+
+Остаток в `components/` (cross-feature / session policy): `locale-context.tsx`, `shell-destination-policy.ts`, `shell-session-payload.ts`, `shell-session-refresh.ts`, `use-auth-session.ts`, `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
 
 ## TO-BE (цель читаемости)
 
@@ -132,8 +134,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done** |
 | 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done** |
 | 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done** |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | next     |
-| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | queued   |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done** |
+| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | next     |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 

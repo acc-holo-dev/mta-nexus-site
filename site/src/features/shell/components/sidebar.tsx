@@ -5,10 +5,7 @@ import { ChevronLeft, ChevronRight, LogIn, type Server, ShieldAlert, Wrench } fr
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { getManagedServerCopy } from "../lib/managed-server-view";
-import { publicationCopy } from "../lib/publication-feed-copy";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -16,10 +13,13 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "./shell-destination-policy";
+} from "../../../components/shell-destination-policy";
+import { useAuthSession } from "../../../components/use-auth-session";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getManagedServerCopy } from "../../../lib/managed-server-copy";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { shellNavigation } from "./shell-navigation";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
-import { useAuthSession } from "./use-auth-session";
 
 type NavItem = {
   href: string;

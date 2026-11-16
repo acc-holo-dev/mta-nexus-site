@@ -1,11 +1,11 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../lib/i18n";
-import { AccountControls } from "../features/accounts/controls";
-import { LocaleProvider } from "./locale-context";
+import { LocaleProvider } from "../../../components/locale-context";
+import { getDictionary } from "../../../lib/i18n";
+import { AccountControls } from "../../accounts/controls";
+import { NotificationBell } from "../../notifications/bell";
 import { Navbar } from "./navbar";
-import { NotificationBell } from "../features/notifications/bell";
 import { ThemeToggle } from "./theme-toggle";
 
 const nav = vi.hoisted(() => ({ pathname: "/" }));

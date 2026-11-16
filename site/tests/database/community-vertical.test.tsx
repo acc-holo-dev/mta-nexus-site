@@ -58,7 +58,7 @@ vi.mock("../../src/lib/services/content-service", () => ({
 import NewCommunityTopicPage from "../../src/app/community/new/page";
 import CommunityPage from "../../src/app/community/page";
 import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
-import { Sidebar } from "../../src/components/sidebar";
+import { Sidebar } from "../../src/features/shell/sidebar";
 
 describe("community topic submission behavior", () => {
   beforeEach(() => {

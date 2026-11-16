@@ -36,7 +36,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => runtime.locale,
 }));
 
-vi.mock("../../src/components/nexus-shell", async () => {
+vi.mock("../../src/features/shell/shell", async () => {
   const ReactModule = await import("react");
   return {
     NexusShell: ({ children, locale }: { children?: React.ReactNode; locale: string }) =>

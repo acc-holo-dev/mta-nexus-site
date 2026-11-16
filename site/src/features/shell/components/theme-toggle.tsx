@@ -3,6 +3,7 @@
 import { Button } from "@nexus/ui";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNexusLocale } from "../../../components/locale-context";
 import {
   colorSchemeForTheme,
   nextThemePreference,
@@ -10,8 +11,7 @@ import {
   resolveThemePreference,
   SYSTEM_THEME_QUERY,
   type ThemePreference,
-} from "../lib/theme-preference";
-import { useNexusLocale } from "./locale-context";
+} from "../../../lib/theme-preference";
 
 export function ThemeToggle() {
   const { dictionary } = useNexusLocale();

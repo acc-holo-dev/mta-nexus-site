@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
-import { Footer } from "../../src/components/footer";
+import { Footer } from "../../src/features/shell/footer";
 import { getDictionary } from "../../src/lib/i18n";
 
 describe("footer legal link reflow", () => {
