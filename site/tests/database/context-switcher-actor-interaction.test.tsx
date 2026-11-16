@@ -22,7 +22,7 @@ vi.mock("../../src/features/shell/locale", async () => {
   return { useNexusLocale: () => ({ dictionary: getDictionary("en") }) };
 });
 
-import { ContextSwitcher } from "../../src/components/context-switcher";
+import { ContextSwitcher } from "../../src/features/accounts/context";
 
 function render() {
   harness.cursor = 0;

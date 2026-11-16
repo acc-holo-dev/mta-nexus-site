@@ -38,7 +38,7 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps context switching non-optimistic", () => {
-    const source = read("site/src/components/context-switcher.tsx");
+    const source = read("site/src/features/accounts/components/context-switcher.tsx");
 
     const requestStart = source.indexOf('fetch("/api/auth/context"');
     const confirmation = source.indexOf("data?.success !== true");

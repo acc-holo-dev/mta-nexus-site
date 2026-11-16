@@ -97,7 +97,7 @@ module.exports = {
       name: "accounts-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/accounts/)" },
-      to: { path: "^site/src/features/accounts/(?!(?:auth|controls|settings)\\.ts$)" },
+      to: { path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context)\\.ts$)" },
     },
     {
       name: "accounts-feature-does-not-import-routing",
@@ -109,7 +109,7 @@ module.exports = {
       name: "accounts-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|settings-client-api|private-change-history-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -119,7 +119,7 @@ module.exports = {
       name: "accounts-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

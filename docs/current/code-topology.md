@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `b5c289f4` (`dev`, shell home-personal absorb).  
+**source_sha:** `fb6340b7` (`dev`, accounts context-switcher absorb).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `b5c289f4` |
+| Область                    | Факт на `fb6340b7` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 58 |
-| `components/` root files   |                 53 |
+| `components/` tree files   |                 57 |
+| `components/` root files   |                 52 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    11 |  51777 |
+| accounts      |    13 |  57526 |
 | community     |    75 | 356896 |
 | discovery     |     3 |  20342 |
 | library       |    57 | 283753 |
@@ -96,6 +96,10 @@ site/
 **Slice 13 done:** `use-modal-dialog` → [`features/shell/modal-dialog.ts`](../../site/src/features/shell/modal-dialog.ts) (`useModalDialog`, `clickedDialogBackdrop`); depcruise public API + cross-feature client isolation (как session-error); порт с `"use client"`, вне `clientUtilPorts`.
 
 **Slice 14 done:** home personal changes UI → [`features/shell/home-personal.ts`](../../site/src/features/shell/home-personal.ts) (`HomePersonalChangesPanel`, heading/scope ids, `HomePersonalCopy`); `lib/home-personal-changes*` вне scope; depcruise public API + cross-feature client isolation (как modal-dialog); порт без `"use client"` (server panel + client opt-out внутри).
+
+### Accounts / workspace leftovers в `components/` root
+
+**Slice 15 done:** `context-switcher` → [`features/accounts/context.ts`](../../site/src/features/accounts/context.ts) (`ContextSwitcher`); depcruise public API + accounts client isolation (как settings); порт с `"use client"`.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

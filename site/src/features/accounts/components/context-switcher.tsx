@@ -3,7 +3,7 @@
 import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useNexusLocale } from "../features/shell/locale";
+import { useNexusLocale } from "../../shell/locale";
 
 type ContextOption = {
   id: string;

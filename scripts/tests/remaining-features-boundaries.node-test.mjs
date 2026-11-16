@@ -34,7 +34,7 @@ const features = [
   },
   {
     name: "accounts",
-    clients: ["auth", "controls", "settings"],
+    clients: ["auth", "controls", "settings", "context"],
     privateClients: [
       "settings-active-sessions",
       "settings-password-form",

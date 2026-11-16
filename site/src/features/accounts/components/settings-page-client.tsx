@@ -18,7 +18,7 @@ import {
   settingsClientRequest,
 } from "../../../lib/settings-client-api";
 import { confirmAction } from "../../../components/confirm-action";
-import { ContextSwitcher } from "../../../components/context-switcher";
+import { ContextSwitcher } from "./context-switcher";
 import { useNexusLocale } from "../../shell/locale";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";

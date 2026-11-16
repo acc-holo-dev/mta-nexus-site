@@ -7,7 +7,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("shared client localization and request hardening", () => {
   it("localizes workspace context switching and hardens both requests", () => {
-    const source = read("site/src/components/context-switcher.tsx");
+    const source = read("site/src/features/accounts/components/context-switcher.tsx");
 
     expect(source).toContain("useNexusLocale");
     expect(source).toContain("dictionary.workspaceContext");

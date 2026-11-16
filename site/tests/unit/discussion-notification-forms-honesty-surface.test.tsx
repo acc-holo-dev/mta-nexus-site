@@ -12,7 +12,7 @@ const formComponents = [
   "site/src/features/notifications/components/notification-inbox.tsx",
   "site/src/components/follow-button.tsx",
   "site/src/features/community/components/content-follow-controls.tsx",
-  "site/src/components/context-switcher.tsx",
+  "site/src/features/accounts/components/context-switcher.tsx",
   "site/src/features/community/components/community-report-form.tsx",
   "site/src/features/community/components/content-comment-form.tsx",
   "site/src/features/community/components/content-discussion-compose-feedback.tsx",
@@ -55,7 +55,7 @@ it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
 });
 
 it("locks context switcher native select to fieldControlClass without h-10 chrome", () => {
-  const source = read("site/src/components/context-switcher.tsx");
+  const source = read("site/src/features/accounts/components/context-switcher.tsx");
   expect(source).toContain("fieldControlClass");
   expect(source).toContain("min-h-11");
   expect(source).not.toContain("h-10");
