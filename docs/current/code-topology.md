@@ -85,6 +85,11 @@ site/
 
 Остаток в `components/` (cross-feature / session policy): `locale-context.tsx`, `shell-destination-policy.ts`, `shell-session-payload.ts`, `shell-session-refresh.ts`, `use-auth-session.ts`, `auth-return-path.ts`, `use-modal-dialog.ts`, `guest-auth-links.tsx`, `platform-*-auth*.tsx`.
 
+**Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
+Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  
+Проверка: `python3 planning/tools/inventory_shell_home_i18n.py --check planning/shell-home-hardcoded-strings.json`  
+Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app/layout.tsx` metadata, `@nexus/ui` BrandMark. Brand / unknown-marker literals живут в allowlist; `locale === "ru"|"en" ? "copy" : "copy"` в scope должен оставаться **0**. Новые не-allowlisted литералы валят plan CI.
+
 ## TO-BE (цель читаемости)
 
 ```text
@@ -135,7 +140,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done** |
 | 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done** |
 | 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done** |
-| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | next     |
+| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 
