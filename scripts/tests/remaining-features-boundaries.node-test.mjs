@@ -61,6 +61,7 @@ const features = [
       "modal-dialog",
       "pwa-service-worker",
       "legal-document",
+      "copyable-plain-code-block",
     ],
     clientUtilPorts: ["auth-return", "session-error", "home-personal", "legal-document"],
     privateClients: ["shell-session-unavailable"],

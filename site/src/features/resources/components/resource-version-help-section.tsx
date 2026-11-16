@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { licenseModelLabel } from "../../../lib/license-model-i18n";
-import { CopyablePlainCodeBlock } from "../../../components/copyable-plain-code-block";
+import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
 function renderSectionBody({

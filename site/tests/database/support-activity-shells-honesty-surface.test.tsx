@@ -168,7 +168,7 @@ it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
   const feed = read("site/src/features/community/components/publication-feed.tsx");
   expect(feed).toContain("inline-flex min-h-11 items-center break-all");
   expect(feed).not.toContain("min-h-8");
-  expect(read("site/src/components/copyable-plain-code-block.tsx")).toContain(
+  expect(read("site/src/features/shell/components/copyable-plain-code-block.tsx")).toContain(
     'className="min-h-11"',
   );
   expect(read("site/src/features/community/components/community-report-form.tsx")).not.toContain(
