@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `ed90a2a3` (`dev`, shell session absorb slice 9).  
+**source_sha:** `2223fe70` (`dev`, shell session absorb + knip/format fix).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,7 +29,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `ed90a2a3` |
+| Область                    | Факт на `2223fe70` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
 | `components/` tree files   |                 69 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    28 |  63646 |
+| shell         |    28 |  63622 |
 | accounts      |    11 |  51824 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
