@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `641ca370` (`dev`, shell locale absorb slice 8).  
+**source_sha:** `a04259f9` (`dev`, shell locale absorb slice 8).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `707dda4e` |
+| Область                    | Факт на `a04259f9` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 76 |
-| `components/` root files   |                 71 |
+| `components/` tree files   |                 75 |
+| `components/` root files   |                 70 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,7 +48,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    18 |  49467 |
+| shell         |    20 |  50426 |
 | accounts      |    11 |  51952 |
 | community     |    75 | 357421 |
 | discovery     |     3 |  20342 |
