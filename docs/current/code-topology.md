@@ -29,54 +29,54 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область | Факт на `f3be421f` |
-| --- | ---: |
-| `features/*` domains | 10 |
-| `components/` tree files | 89 |
-| `components/` root files | 84 |
-| `lib/` tree files | 410 |
-| `lib/` root files | 297 |
-| `lib/services/` root files | 86 |
-| `lib/**/*-i18n.ts` | 46 |
-| `app/**/route.ts` | 282 |
-| `site/tests` files | 1443 |
-| `@nexus/ui` src files | 18 |
-| `@nexus/domain` src files | 54 |
-| `@nexus/db` src files | 201 |
+| Область                    | Факт на `f3be421f` |
+| -------------------------- | -----------------: |
+| `features/*` domains       |                 10 |
+| `components/` tree files   |                 89 |
+| `components/` root files   |                 84 |
+| `lib/` tree files          |                410 |
+| `lib/` root files          |                297 |
+| `lib/services/` root files |                 86 |
+| `lib/**/*-i18n.ts`         |                 46 |
+| `app/**/route.ts`          |                282 |
+| `site/tests` files         |               1443 |
+| `@nexus/ui` src files      |                 18 |
+| `@nexus/domain` src files  |                 54 |
+| `@nexus/db` src files      |                201 |
 
 ### Features
 
-| Feature | files | bytes |
-| --- | ---: | ---: |
-| accounts | 11 | 51952 |
-| community | 75 | 357421 |
-| discovery | 3 | 20342 |
-| library | 57 | 284219 |
-| moderation | 14 | 63598 |
-| notifications | 10 | 66606 |
-| organizations | 35 | 127517 |
-| resources | 93 | 448089 |
-| servers | 54 | 218921 |
-| support | 14 | 72003 |
+| Feature       | files |  bytes |
+| ------------- | ----: | -----: |
+| accounts      |    11 |  51952 |
+| community     |    75 | 357421 |
+| discovery     |     3 |  20342 |
+| library       |    57 | 284219 |
+| moderation    |    14 |  63598 |
+| notifications |    10 |  66606 |
+| organizations |    35 | 127517 |
+| resources     |    93 | 448089 |
+| servers       |    54 | 218921 |
+| support       |    14 |  72003 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
 ### Hotspots `lib/` root (по префиксу имени)
 
-| prefix | files |
-| --- | ---: |
-| resource | 50 |
-| server | 27 |
-| library | 23 |
-| organization | 15 |
-| community | 12 |
-| license | 10 |
-| public | 9 |
-| support | 9 |
-| build | 8 |
-| notification | 8 |
-| content | 6 |
-| discussion | 6 |
+| prefix       | files |
+| ------------ | ----: |
+| resource     |    50 |
+| server       |    27 |
+| library      |    23 |
+| organization |    15 |
+| community    |    12 |
+| license      |    10 |
+| public       |     9 |
+| support      |     9 |
+| build        |     8 |
+| notification |     8 |
+| content      |     6 |
+| discussion   |     6 |
 
 ### Shell / auth leftovers в `components/` root
 
@@ -111,11 +111,11 @@ site/packages/ui/             # tokens, typography, motion, layout, form control
 
 ## Husks (следующий structural шаг)
 
-| Путь | Git | Workspace |
-| --- | --- | --- |
-| `site/packages/*` | tracked | member (канон) |
-| `packages/{ui,db,…}` | **untracked** | нет |
-| `apps/web` | **untracked** | нет |
+| Путь                 | Git           | Workspace      |
+| -------------------- | ------------- | -------------- |
+| `site/packages/*`    | tracked       | member (канон) |
+| `packages/{ui,db,…}` | **untracked** | нет            |
+| `apps/web`           | **untracked** | нет            |
 
 JSON inventory фиксирует только git/workspace факты (portable для CI). Локальные пустые деревья на хосте после переноса **могут** существовать и различаться между машинами — их не кладём в snapshot. Следующий slice: quarantine/gitignore этих leftovers **без** поломки workspace. Не удалять `site/packages`.
 
@@ -127,13 +127,13 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| # | Slice | Ось | Статус |
-| --- | --- | --- | --- |
-| 1 | Topology scoreboard (этот документ + inventory) | скорость разработки / понятность | **done** на `f3be421f` inventory |
-| 2 | Husk & import honesty (`packages/*`, `apps/web` local leftovers) | babysitting tax | next |
-| 3 | Design direction + `@nexus/ui` tokens/primitives | shell 2027 | queued |
-| 4 | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя | queued |
-| 5 | i18n inventory automation (shell+home hard-coded strings) | честность RU/EN | queued |
+| #   | Slice                                                            | Ось                              | Статус                           |
+| --- | ---------------------------------------------------------------- | -------------------------------- | -------------------------------- |
+| 1   | Topology scoreboard (этот документ + inventory)                  | скорость разработки / понятность | **done** на `f3be421f` inventory |
+| 2   | Husk & import honesty (`packages/*`, `apps/web` local leftovers) | babysitting tax                  | next                             |
+| 3   | Design direction + `@nexus/ui` tokens/primitives                 | shell 2027                       | queued                           |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell`       | читаемость + путь гостя          | queued                           |
+| 5   | i18n inventory automation (shell+home hard-coded strings)        | честность RU/EN                  | queued                           |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
 

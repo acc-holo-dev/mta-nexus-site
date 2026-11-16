@@ -187,6 +187,20 @@ def _canonical(data: dict[str, object]) -> str:
     return json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def _biome_format(path: Path) -> None:
+    """Match repo format:check when the Biome CLI is available."""
+    biome = ROOT / "node_modules" / "@biomejs" / "biome" / "bin" / "biome"
+    if not biome.is_file():
+        return
+    subprocess.run(
+        ["node", str(biome), "format", "--write", str(path)],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
 def _stable_payload(data: dict[str, object]) -> dict[str, object]:
     payload = dict(data)
     payload.pop("source_sha", None)
@@ -228,6 +242,7 @@ def main() -> int:
     text = _canonical(data)
     if args.output:
         args.output.write_text(text, encoding="utf8")
+        _biome_format(args.output)
     if args.check:
         expected = json.loads(args.check.read_text(encoding="utf8"))
         if _stable_payload(expected) != _stable_payload(data):

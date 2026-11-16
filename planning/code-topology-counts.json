@@ -89,17 +89,11 @@
       "apps/web"
     ],
     "note": "Canonical packages live under site/packages/*. Root packages/* and apps/web are not workspace members and must stay untracked; host leftovers vary by machine.",
-    "workspace_members": [
-      "site",
-      "site/packages/*"
-    ]
+    "workspace_members": ["site", "site/packages/*"]
   },
   "lib": {
     "i18n_modules": 46,
-    "root_dirs": [
-      "i18n",
-      "services"
-    ],
+    "root_dirs": ["i18n", "services"],
     "root_files": 297,
     "root_prefix_hotspots": [
       {
