@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `5255b4f2` (`dev`, slice 29 — `components/admin/*` → `features/moderation/admin-home`).  
+**source_sha:** `83ce3c01` (`dev`, slice 30 — `storage-maintenance-controls` → `features/moderation/storage-maintenance`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 29 |
+| Область                    | Факт на slice 30 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
-| `components/` tree files   |               25 |
-| `components/` root files   |               25 |
+| `components/` tree files   |               24 |
+| `components/` root files   |               24 |
 | `lib/` tree files          |              410 |
 | `lib/` root files          |              298 |
 | `lib/services/` root files |               86 |
@@ -53,7 +53,7 @@ site/
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
-| moderation    |    14 |  63538 |
+| moderation    |    20 | 103179 |
 | notifications |    10 |  66691 |
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
