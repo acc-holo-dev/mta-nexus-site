@@ -31,7 +31,7 @@ vi.mock("react", async (original) => ({
   },
 }));
 
-import { LicenseRuntimeProbe } from "../../src/components/license-runtime-probe";
+import { LicenseRuntimeProbe } from "../../src/features/commerce/license-controls";
 
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {

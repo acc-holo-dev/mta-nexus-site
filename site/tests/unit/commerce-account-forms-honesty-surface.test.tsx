@@ -18,8 +18,8 @@ const formComponents = [
   "site/src/components/order-cancellation-form.tsx",
   "site/src/features/resources/components/resource-cart-controls.tsx",
   "site/src/features/resources/components/resource-download-button.tsx",
-  "site/src/components/license-control-panel.tsx",
-  "site/src/components/license-runtime-probe.tsx",
+  "site/src/features/commerce/components/license-control-panel.tsx",
+  "site/src/features/commerce/components/license-runtime-probe.tsx",
   "site/src/features/organizations/components/organization-ownership-transfer.tsx",
   "site/src/features/servers/components/register-server-form.tsx",
   "site/src/features/moderation/components/storage-maintenance-controls.tsx",
@@ -61,7 +61,7 @@ it("keeps additive formErrorHint / errorHint copy for commerce and account hones
 });
 
 it("locks license bind noServers empty to EmptyState with honesty hint copy", () => {
-  const panel = read("site/src/components/license-control-panel.tsx");
+  const panel = read("site/src/features/commerce/components/license-control-panel.tsx");
   expect(panel).toContain("EmptyState");
   expect(panel).toContain("copy.noServers");
   expect(panel).toContain("copy.noServersHint");
@@ -74,7 +74,7 @@ it("locks license bind noServers empty to EmptyState with honesty hint copy", ()
 });
 
 it("locks license control ghost pagination and token CTAs to size=touch", () => {
-  const panel = read("site/src/components/license-control-panel.tsx");
+  const panel = read("site/src/features/commerce/components/license-control-panel.tsx");
   expect(panel).toContain('size="touch"');
   expect(panel).not.toContain('size="sm"');
   expect(panel.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(6);

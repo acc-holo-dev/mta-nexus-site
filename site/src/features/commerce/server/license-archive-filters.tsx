@@ -1,8 +1,8 @@
 import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
-import { licenseArchiveUrl } from "../lib/license-archive-query";
-import { getLicenseMaintenanceCopy } from "../lib/license-maintenance-i18n";
+import { licenseArchiveUrl } from "../../../lib/license-archive-query";
+import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 
 const filterLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

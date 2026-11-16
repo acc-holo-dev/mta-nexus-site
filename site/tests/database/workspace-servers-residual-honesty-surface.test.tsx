@@ -114,7 +114,7 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
     "site/src/features/servers/server/server-content-editor-page.tsx",
     "site/src/features/community/server/context-publication-history-screen.tsx",
     "site/src/features/trust/server/public-context-trust-page.tsx",
-    "site/src/components/license-history-page.tsx",
+    "site/src/features/commerce/server/license-history-page.tsx",
   ];
   for (const surface of surfaces) {
     const source = read(surface);

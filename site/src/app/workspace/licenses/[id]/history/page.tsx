@@ -1,7 +1,7 @@
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
-} from "../../../../../components/license-history-page";
+} from "../../../../../features/commerce/license-history-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

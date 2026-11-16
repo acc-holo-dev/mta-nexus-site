@@ -18,8 +18,8 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { LicenseArchiveFilters } from "../../src/components/license-archive-filters";
-import { LicenseControlPanel } from "../../src/components/license-control-panel";
+import { LicenseArchiveFilters } from "../../src/features/commerce/license-archive";
+import { LicenseControlPanel } from "../../src/features/commerce/license-controls";
 
 describe("license chrome surface", () => {
   it.each(["en", "ru"] as const)(

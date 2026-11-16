@@ -41,7 +41,7 @@ it("locks web push enable/disable CTAs to size=touch without size=sm", () => {
 });
 
 it("locks license control ghost CTAs to size=touch without size=sm stragglers", () => {
-  const source = read("site/src/components/license-control-panel.tsx");
+  const source = read("site/src/features/commerce/components/license-control-panel.tsx");
   expect(source).toContain("EmptyState");
   expect(source).toContain('size="touch"');
   expect(source).not.toContain('size="sm"');

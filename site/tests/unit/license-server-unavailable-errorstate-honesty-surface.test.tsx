@@ -8,7 +8,7 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/license-detail-view.tsx";
+const surface = "site/src/features/commerce/server/license-detail-view.tsx";
 
 it("locks license server unavailable and binding changed notices to ErrorState", () => {
   const source = read(surface);

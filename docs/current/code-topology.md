@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `83ce3c01` (`dev`, slice 30 — `storage-maintenance-controls` → `features/moderation/storage-maintenance`).  
+**source_sha:** `feb83bc7` (`dev`, slice 31 — `license-*` cluster → `features/commerce` license ports).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 30 |
+| Область                    | Факт на slice 31 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
-| `components/` tree files   |               24 |
-| `components/` root files   |               24 |
+| `components/` tree files   |               19 |
+| `components/` root files   |               19 |
 | `lib/` tree files          |              410 |
 | `lib/` root files          |              298 |
 | `lib/services/` root files |               86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    25 | 100894 |
-| commerce      |     3 |   4022 |
+| commerce      |    12 |  28500 |
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
@@ -132,6 +132,8 @@ site/
 **Slice 29 done:** `components/admin/*` → [`features/moderation/admin-home.ts`](../../site/src/features/moderation/admin-home.ts) (`Admin*Section` for `/admin` overview: health, reports, verification, builds quarantine, ad inventory); `app/admin/status-labels` → [`lib/admin-status-labels.ts`](../../site/src/lib/admin-status-labels.ts); владение **Moderation** (staff dashboard composition + cross-feature ports `community/report-evidence-links`, `resources/qa-report-actions`, `resources/quarantine-controls`); depcruise `moderation-feature-*` + `moderation-feature-boundaries.node-test.mjs`; `components/` −5 production files (`admin/` cleared).
 
 **Slice 30 done:** `storage-maintenance-controls` → [`features/moderation/storage-maintenance.ts`](../../site/src/features/moderation/storage-maintenance.ts) (`StorageDiscoveryControls`, `StorageCleanupControls`); владение **Moderation** (staff storage discovery/cleanup на `/admin/storage`, API и services без изменений); depcruise public API + `moderation-client-isolation` для порта `storage-maintenance`; потребители — `app/admin/storage/page.tsx`, `app/admin/storage/objects/[id]/page.tsx`; корень `components/` −1 production file.
+
+**Slice 31 done:** `license-*` cluster в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client port [`license-controls.ts`](../../site/src/features/commerce/license-controls.ts) (`LicenseControlPanel`, `LicenseRuntimeProbe`), server ports [`license-detail.ts`](../../site/src/features/commerce/license-detail.ts), [`license-archive.ts`](../../site/src/features/commerce/license-archive.ts), [`license-history-server.ts`](../../site/src/features/commerce/license-history-server.ts); владение **Commerce** (workspace/admin license detail, archive filters, owner/staff control panel, runtime probe); server composition в `features/commerce/server/` вне client-isolation; depcruise `commerce-feature-*` + `commerce-feature-boundaries.node-test.mjs`; корень `components/` −5 production files.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

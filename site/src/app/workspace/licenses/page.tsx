@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HistoryShell } from "../../../features/commerce/workspace-history";
-import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
+import { LicenseArchiveFilters } from "../../../features/commerce/license-archive";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import {
   effectiveLicenseStatus,

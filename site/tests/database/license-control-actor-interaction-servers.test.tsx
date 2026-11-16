@@ -22,7 +22,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { LicenseControlPanel } from "../../src/components/license-control-panel";
+import { LicenseControlPanel } from "../../src/features/commerce/license-controls";
 
 const { render } = createLicenseControlActorInteractionHelpers(h, LicenseControlPanel);
 

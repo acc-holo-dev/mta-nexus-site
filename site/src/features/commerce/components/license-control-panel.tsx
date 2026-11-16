@@ -10,12 +10,15 @@ import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexu
 import { Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { confirmedLicenseControl } from "../lib/license-control-confirmation";
-import { getLicenseControlCopy, licenseControlError } from "../lib/license-control-i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { confirmedLicenseControl } from "../../../lib/license-control-confirmation";
+import { getLicenseControlCopy, licenseControlError } from "../../../lib/license-control-i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
-import { useNexusLocale } from "../features/shell/locale";
 
 type ServerPage = { servers: { id: string; name: string }[]; page: number; totalPages: number };
 export type LicensePanelData = {

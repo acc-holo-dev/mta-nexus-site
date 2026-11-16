@@ -3,13 +3,13 @@ import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/dom
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import { getLicenseControlCopy } from "../lib/license-control-i18n";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import {
   confirmLicenseRelease,
   type LicenseRuntimeContext,
   parseLicenseRuntimeContext,
-} from "../lib/license-runtime-response";
-import { privateApiRequest } from "../lib/private-api-request";
+} from "../../../lib/license-runtime-response";
+import { privateApiRequest } from "../../../lib/private-api-request";
 
 /** Uses only the parent's transient, one-time credential; never persists it. */
 export function LicenseRuntimeProbe({

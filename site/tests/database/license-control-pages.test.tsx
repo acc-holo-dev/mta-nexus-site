@@ -39,7 +39,7 @@ vi.mock("../../src/lib/services/license-control-service", () => ({
     history: state.history,
   },
 }));
-vi.mock("../../src/components/license-control-panel", () => ({
+vi.mock("../../src/features/commerce/license-controls", () => ({
   LicenseControlPanel: (props: unknown) => {
     state.panel(props);
     return <section>Controls</section>;
@@ -59,7 +59,7 @@ import OwnerPage, { metadata } from "../../src/app/workspace/licenses/[id]/page"
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
-} from "../../src/components/license-history-page";
+} from "../../src/features/commerce/license-history-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";

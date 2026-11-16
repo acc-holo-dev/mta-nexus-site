@@ -8,8 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const clientPorts = ["workspace-history"];
-const safeLib = /^(?:i18n(?:\.ts$|\/)|commerce-history-i18n\.ts$)/u;
+const clientPorts = ["workspace-history", "license-controls"];
+const safeLib =
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|private-api-request)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -85,11 +86,7 @@ test("Commerce rejects private, routing and infrastructure edges", (t) => {
   assert.notEqual(cruise(fixture, ["site/src", "site/packages"], "err").status, 0);
 });
 
-test("real Commerce workspace-history graphs have no transitive server dependencies", () => {
-  const entries = [
-    "site/src/features/commerce/workspace-history.ts",
-    "site/src/features/commerce/components/workspace-history.tsx",
-  ];
+function assertClientGraphsHaveNoServerLeaks(entries) {
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
   const graph = JSON.parse(result.stdout);
@@ -109,4 +106,19 @@ test("real Commerce workspace-history graphs have no transitive server dependenc
     }
   }
   for (const entry of entries) visit(entry.replace(/^\.\//, ""));
+}
+
+test("real Commerce workspace-history graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/workspace-history.ts",
+    "site/src/features/commerce/components/workspace-history.tsx",
+  ]);
+});
+
+test("real Commerce license-controls graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/license-controls.ts",
+    "site/src/features/commerce/components/license-control-panel.tsx",
+    "site/src/features/commerce/components/license-runtime-probe.tsx",
+  ]);
 });

@@ -107,7 +107,8 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 [Accounts](../site/src/features/accounts/README.md) объединяет UI входа, аккаунта и
 настроек; [Discovery](../site/src/features/discovery/README.md) — общую серверную
 композицию каталогов; [Commerce](../site/src/features/commerce/README.md) — общий
-shell списков покупок, лицензий и продаж в workspace. Входы отделены от внутренних
+shell списков покупок, лицензий и продаж в workspace, license control/detail/archive UI.
+Входы отделены от внутренних
 модулей, границы проверяются анализатором и тестами. Права, сервисы, repositories и
 workers остаются в своих слоях.
 
