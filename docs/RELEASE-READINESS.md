@@ -3,6 +3,10 @@
 Статус: рабочая редакция, 2026-11-10, версия приложения 1.2.0-beta.3.
 Бета-цепочка кандидата (**beta:fetch + beta:candidate**) выполнена на merged main `dd6c6f7d` в 2026-11-10: `status=awaiting_owner_deploy_decision`, `checkableCandidate=true`, `openBetaLive=false`, `productionAuthorized=false`. Открытая бета не объявлена live; production не авторизован.
 
+Это исторический результат для `dd6c6f7d`, а не приёмка текущего `main`. Для нового
+кандидата повторите цепочку с evidence его точного SHA; актуальный проверенный срез —
+в [CURRENT-STATE](CURRENT-STATE.md).
+
 ---
 
 ## 1. Цель и границы
