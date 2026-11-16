@@ -66,6 +66,18 @@ vi.mock("next/link", async () => {
   };
 });
 
+vi.mock("next/font/google", () => {
+  const font = (variable: string) => () => ({
+    className: "",
+    variable,
+    style: { fontFamily: variable },
+  });
+  return {
+    Unbounded: font("--font-nexus-display"),
+    Source_Sans_3: font("--font-nexus-sans"),
+  };
+});
+
 import ErrorPage from "../../src/app/error";
 import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error";
 import RootLayout from "../../src/app/layout";

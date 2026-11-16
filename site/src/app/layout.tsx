@@ -1,24 +1,11 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Unbounded } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { NexusShell } from "../components/nexus-shell";
 import { PwaServiceWorker } from "../components/pwa-service-worker";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
-
-/** Display: Unbounded (Latin + Cyrillic) — brand-first hero/headings, not Inter/system. */
-const displayFont = Unbounded({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-nexus-display",
-  display: "swap",
-});
-
-const bodyFont = Source_Sans_3({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-nexus-sans",
-  display: "swap",
-});
+import { bodyFont, displayFont } from "./fonts";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
