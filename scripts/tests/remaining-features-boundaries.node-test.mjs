@@ -58,10 +58,7 @@ const features = [
       "guest-auth",
       "session-error",
     ],
-    clientUtilPorts: [
-      "auth-return",
-      "session-error",
-    ],
+    clientUtilPorts: ["auth-return", "session-error"],
     privateClients: ["shell-session-unavailable"],
     servers: [],
     safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|theme-preference|license-maintenance-i18n|notification-copy|notification-inbox-copy|notification-inbox-events|private-api-request|resource-release-watches-i18n|visible-polling",

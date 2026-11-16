@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `2be7fd77` |
+| Область                    | Факт на `c2a51944` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 11 |
-| `components/` tree files   |                 61 |
-| `components/` root files   |                 56 |
+| `components/` tree files   |                61 |
+| `components/` root files   |                56 |
 | `lib/` tree files          |                410 |
 | `lib/` root files          |                297 |
 | `lib/services/` root files |                 86 |
@@ -48,17 +48,17 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| shell         |    38 |  75911 |
-| accounts      |    11 |  51777 |
-| community     |    75 | 356896 |
-| discovery     |     3 |  20342 |
-| library       |    57 | 283753 |
-| moderation    |    14 |  63538 |
-| notifications |    10 |  66544 |
-| organizations |    35 | 127334 |
-| resources     |    93 | 447544 |
-| servers       |    54 | 218715 |
-| support       |    14 |  71877 |
+| accounts      |   11 |  51777 |
+| community     |   75 | 356896 |
+| discovery     |    3 |  20342 |
+| library       |   57 | 283753 |
+| moderation    |   14 |  63538 |
+| notifications |   10 |  66544 |
+| organizations |   35 | 127334 |
+| resources     |   93 | 447544 |
+| servers       |   54 | 218715 |
+| shell         |   38 |  75911 |
+| support       |   14 |  71877 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
