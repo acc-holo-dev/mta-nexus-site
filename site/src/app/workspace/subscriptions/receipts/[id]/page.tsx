@@ -15,7 +15,7 @@ import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../../lib/services/subscriptions-service";
-import { formatSubscriptionTime } from "../../../../../lib/subscription-time";
+import { formatSubscriptionTime } from "../../../../../features/commerce/subscription-time";
 import {
   subscriptionAccountHref,
   subscriptionPageParams,
