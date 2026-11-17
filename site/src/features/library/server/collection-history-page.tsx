@@ -26,7 +26,7 @@ import {
   libraryCollectionsCopy,
 } from "../../../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";

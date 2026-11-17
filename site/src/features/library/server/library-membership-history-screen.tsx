@@ -15,7 +15,7 @@ import {
   libraryCollectionsCopy,
 } from "../../../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,

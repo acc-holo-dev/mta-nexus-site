@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
+import { libraryMembershipHistoryCopy } from "../../../../../features/library/library-membership-history-i18n";
 
 // Honest loading shell for /workspace/library/collections/membership-history.
 export default async function Loading() {

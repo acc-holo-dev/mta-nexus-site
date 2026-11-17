@@ -49,6 +49,7 @@ Feature объединяет существующие представления
 | `library-collection-inventory-query.ts`     | util port `library-collection-inventory-query`                |
 | `library-membership-history-query.ts` | util port `library-membership-history-query` |
 | `library-collection-history-i18n.ts` | util port `library-collection-history-i18n` |
+| `library-membership-history-i18n.ts` | util port `library-membership-history-i18n` |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует
