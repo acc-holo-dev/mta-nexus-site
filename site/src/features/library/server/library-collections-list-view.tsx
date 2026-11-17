@@ -2,7 +2,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {

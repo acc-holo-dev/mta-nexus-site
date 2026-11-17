@@ -7,7 +7,7 @@ import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {

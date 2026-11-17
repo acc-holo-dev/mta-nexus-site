@@ -15,7 +15,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
   collectionInventoryHref,
   libraryCollectionInventoryQuery,

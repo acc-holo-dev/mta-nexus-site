@@ -72,7 +72,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/collections/resources/page";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionInventoryCopy } from "../../src/lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../../src/features/library/library-collection-inventory-i18n";
 
 const date = "2026-10-13T00:00:00.000Z",
   a = { id: "lcol_a", name: "Own <active>", status: "active", revision: 4, itemCount: 2 },

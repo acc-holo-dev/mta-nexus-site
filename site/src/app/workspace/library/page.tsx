@@ -8,7 +8,7 @@ import { ResourceDownloadButton } from "../../../features/resources/download";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../../../features/library/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {

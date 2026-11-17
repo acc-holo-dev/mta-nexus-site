@@ -3,7 +3,7 @@ import Link from "next/link";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
