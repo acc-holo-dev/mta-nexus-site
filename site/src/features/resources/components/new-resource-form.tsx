@@ -3,7 +3,7 @@
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedAuthorBuild } from "../../../lib/author-resource-response";
+import { confirmedAuthorBuild } from "../author-resource-response";
 import {
   MAX_BUILD_FILE_SIZE_BYTES,
   validateBuildFileSelection,

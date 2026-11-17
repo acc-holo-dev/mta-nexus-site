@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "author-resource-response",
     "resource-review-confirmation",
     "resource-copy-confirmation",
     "resource-build-workspace-response",
@@ -256,6 +257,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/author-resource-response.ts", "resources-view-isolation"],
     ["features/resources/resource-review-confirmation.ts", "resources-view-isolation"],
     ["features/resources/resource-copy-confirmation.ts", "resources-view-isolation"],
     ["features/resources/resource-build-workspace-response.ts", "resources-view-isolation"],
@@ -313,6 +315,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/author-resource-response.ts",
     "app/resource-review-confirmation.ts",
     "app/resource-copy-confirmation.ts",
     "app/resource-build-workspace-response.ts",
@@ -364,6 +367,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/author-resource-response.ts",
     "site/src/features/resources/resource-review-confirmation.ts",
     "site/src/features/resources/resource-copy-confirmation.ts",
     "site/src/features/resources/resource-build-workspace-response.ts",
@@ -495,6 +499,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/author-resource-response.ts");
   visit("site/src/features/resources/resource-review-confirmation.ts");
   visit("site/src/features/resources/resource-copy-confirmation.ts");
   visit("site/src/features/resources/resource-build-workspace-response.ts");

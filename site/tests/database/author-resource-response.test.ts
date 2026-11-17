@@ -8,7 +8,7 @@ import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,
   confirmedRetiredBuild,
-} from "../../src/lib/author-resource-response";
+} from "../../src/features/resources/author-resource-response";
 
 const details = {
   title: "A resource",

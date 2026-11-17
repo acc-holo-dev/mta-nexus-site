@@ -23,7 +23,7 @@ import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,
   confirmedRetiredBuild,
-} from "../../../lib/author-resource-response";
+} from "../author-resource-response";
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
