@@ -31,6 +31,7 @@ const utilPorts = [
   "library-collection-comparison-query",
   "library-release-history-i18n",
   "collection-releases-query",
+  "library-release-comparison-query",
 ];
 const serverPorts = [
   "collections",
