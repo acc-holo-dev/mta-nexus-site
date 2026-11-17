@@ -2,7 +2,7 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { trustError } from "../../../../../lib/public-user-trust-copy";
+import { trustError } from "../../../../../features/trust/public-user-trust-copy";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { publicUserTrustService } from "../../../../../lib/services/public-user-trust-service";
 export async function GET(

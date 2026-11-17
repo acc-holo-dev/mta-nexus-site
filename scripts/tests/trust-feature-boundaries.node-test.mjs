@@ -8,10 +8,13 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
+const utilPorts = [
+  "public-user-trust-copy",
+];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|public-user-trust-copy|public-verification-history-copy|user-platform-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|public-verification-history-copy|user-platform-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -46,7 +49,7 @@ test("Trust rejects private, routing, server and infrastructure edges", (t) => {
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/trust/components/private.ts", "export const value = 1;");
   write("site/src/features/trust/server/private-page.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(`site/src/features/trust/${port}.ts`, 'export { value } from "./server/private-page";');
     write(`site/src/app/${port}.ts`, `export { value } from "../features/trust/${port}";`);
   }
@@ -77,7 +80,7 @@ test("Trust rejects private, routing, server and infrastructure edges", (t) => {
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(rules(`features/trust/${port}.ts`).includes("trust-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }

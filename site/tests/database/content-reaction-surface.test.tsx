@@ -5,7 +5,7 @@ import { ContentReactions } from "../../src/features/community/reactions";
 import { PublicUserTrustPanel } from "../../src/features/trust/public-user-trust";
 import { reactionCopy } from "../../src/lib/content-reaction-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { trustCopy } from "../../src/lib/public-user-trust-copy";
+import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

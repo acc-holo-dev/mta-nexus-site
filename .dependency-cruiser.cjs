@@ -66,7 +66,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/trust/)" },
       to: {
-        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page)\\.ts$)",
+        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy)\\.ts$)",
       },
     },
     {
@@ -79,17 +79,17 @@ module.exports = {
       name: "trust-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:public-user-trust-contract|public-user-trust-copy|public-verification-history-copy|user-platform-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:public-user-trust-contract|public-verification-history-copy|user-platform-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "trust-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

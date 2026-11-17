@@ -2,7 +2,7 @@ import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import type { PublicUserTrust } from "../../../lib/public-user-trust-contract";
-import { trustCopy } from "../../../lib/public-user-trust-copy";
+import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../../../lib/public-verification-history-copy";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";

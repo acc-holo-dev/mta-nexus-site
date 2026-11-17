@@ -22,7 +22,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
-import { trustCopy } from "../../../lib/public-user-trust-copy";
+import { trustCopy } from "../../../features/trust/public-user-trust-copy";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {
