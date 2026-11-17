@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { SupportCenter } from "../center";
 import { supportQuery } from "../support-workspace-contract";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
@@ -43,20 +44,12 @@ export async function SupportPageSurface({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={id === undefined ? listReturnPath : casePath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={id === undefined ? base : casePath}
+      />
     );
   }
   if (!actor) {
