@@ -14,7 +14,7 @@ import {
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
-} from "../../../lib/support-idempotency";
+} from "../../../features/support/support-idempotency";
 import { supportQuery } from "../../../lib/support-workspace-contract";
 
 export async function GET(request: NextRequest) {

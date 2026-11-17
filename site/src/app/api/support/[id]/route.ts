@@ -15,7 +15,7 @@ import {
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
-} from "../../../../lib/support-idempotency";
+} from "../../../../features/support/support-idempotency";
 
 async function loadAuthorizedCase(currentToken: string | undefined, id: string) {
   const user = currentToken ? await authService.getSession(currentToken) : null;

@@ -12,7 +12,7 @@ const features = [
   {
     name: "support",
     clients: ["center", "thread", "download-help"],
-    clientUtilPorts: ["support-message-discovery-copy"],
+    clientUtilPorts: ["support-message-discovery-copy", "support-idempotency"],
     privateClients: ["support-case-actions", "support-status-history", "support-message-browser"],
     servers: [
       ["page-server", "support-page.tsx"],
