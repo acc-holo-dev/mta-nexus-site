@@ -52,9 +52,11 @@ exit 0
         shell === "bash"
           ? ["scripts/check-local-verification.sh"]
           : ["-NoProfile", "-File", "scripts/check-local-verification.ps1"];
+      // Contended CI runners can spend several seconds starting pwsh; keep bash tight
+      // but give PowerShell enough headroom so spawnSync does not return status=null.
       const result = spawnSync(shell, args, {
         encoding: "utf8",
-        timeout: 5_000,
+        timeout: shell === "pwsh" ? 20_000 : 5_000,
         env: {
           ...process.env,
           PATH: `${directory}:${process.env.PATH}`,
@@ -68,6 +70,11 @@ exit 0
         },
       });
       const calls = readFileSync(log, "utf8");
+      assert.notEqual(
+        result.status,
+        null,
+        `${shell}/${scenario} timed out: stdout=${result.stdout} stderr=${result.stderr} error=${result.error}`,
+      );
       if (scenario === "success") {
         assert.equal(result.status, 0, result.stderr);
         assert.match(result.stdout, /PASS:/u);
