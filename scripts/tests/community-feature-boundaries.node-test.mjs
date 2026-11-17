@@ -42,9 +42,10 @@ const utilPorts = [
   "community-moderation-copy",
   "moderated-discussion-copy",
   "community-report-history-copy",
+  "author-publication-desk-copy",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-copy|content-discussion-contract|discussion-workspace-copy|follow-workspace-contract|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|moderated-discussion-contract|discussion-reports-contract|report-batch-contract|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-copy|content-discussion-contract|discussion-workspace-copy|follow-workspace-contract|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|moderated-discussion-contract|discussion-reports-contract|report-batch-contract|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

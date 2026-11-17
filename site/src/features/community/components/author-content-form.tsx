@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   organizationContentCopy,

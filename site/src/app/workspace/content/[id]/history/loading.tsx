@@ -1,4 +1,4 @@
-import { authorPublicationDeskCopy } from "../../../../../lib/author-publication-desk-copy";
+import { authorPublicationDeskCopy } from "../../../../../features/community/author-publication-desk-copy";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/content/[id]/history.

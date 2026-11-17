@@ -9,7 +9,7 @@ import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publicat
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
-} from "../../../lib/author-publication-desk-copy";
+} from "../author-publication-desk-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";

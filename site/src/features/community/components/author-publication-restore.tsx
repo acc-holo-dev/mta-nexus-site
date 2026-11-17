@@ -7,7 +7,7 @@ import { confirmedAuthorPublicationRestore } from "../../../lib/author-publicati
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
-} from "../../../lib/author-publication-desk-copy";
+} from "../author-publication-desk-copy";
 import type { Locale } from "../../../lib/i18n";
 import { confirmedOrganizationPublicationRestore } from "../organization-publication-history-contract";
 import {

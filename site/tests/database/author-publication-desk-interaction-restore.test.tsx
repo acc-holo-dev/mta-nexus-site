@@ -21,7 +21,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
 import { AuthorPublicationRestore } from "../../src/features/community/author-publication-restore";
-import { authorPublicationDeskCopy } from "../../src/lib/author-publication-desk-copy";
+import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
 
 const { render, button, click } = createAuthorPublicationDeskInteractionHelpers(
   harness,

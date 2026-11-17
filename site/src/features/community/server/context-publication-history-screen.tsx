@@ -4,7 +4,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
-import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { organizationContentCopy } from "../../../lib/organization-content-copy";
 import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";

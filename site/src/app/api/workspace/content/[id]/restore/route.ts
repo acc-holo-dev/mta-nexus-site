@@ -1,7 +1,7 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { authorPublicationDeskError } from "../../../../../../lib/author-publication-desk-copy";
+import { authorPublicationDeskError } from "../../../../../../features/community/author-publication-desk-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { authorContentService } from "../../../../../../lib/services/author-content-service";

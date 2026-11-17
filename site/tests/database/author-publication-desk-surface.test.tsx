@@ -38,7 +38,7 @@ import Desk, { generateMetadata as deskMetadata } from "../../src/app/workspace/
 import Following from "../../src/app/workspace/feed/page";
 import { FollowWorkspace } from "../../src/features/community/follow";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { authorPublicationDeskCopy } from "../../src/lib/author-publication-desk-copy";
+import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
 import { publicationCopy } from "../../src/lib/publication-feed-copy";
 
 const revision = "2026-10-11T00:00:00.123456Z";
