@@ -2,14 +2,14 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {

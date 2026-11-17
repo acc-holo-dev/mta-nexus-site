@@ -3,7 +3,7 @@ import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/dom
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,

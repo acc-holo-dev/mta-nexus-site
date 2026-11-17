@@ -5,14 +5,14 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { parseWebPushSubscription } from "../../../../features/notifications/web-push-subscription";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { parseWebPushEndpoint } from "../../../../lib/services/notifications/web-push-endpoint-policy";
 

@@ -65,7 +65,7 @@ const utilPorts = [
   "user-platform-client",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|private-api-request|private-change-history-query|private-change-history-copy|community-moderation-contract|report-batch-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:community-report-contract|http\/private-api-request|private-change-history-query|private-change-history-copy|community-moderation-contract|report-batch-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

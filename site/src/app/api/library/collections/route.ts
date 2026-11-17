@@ -2,8 +2,8 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { collectionsQuery } from "../../../../features/library/library-collections-query";
 import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
-import { readBoundedJson } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import { libraryCollectionsService } from "../../../../lib/services/library/library-collections-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) =>

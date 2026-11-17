@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { resourceReviewCopy } from "../../../features/resources/resource-review-i18n";
 import { ResourceReviewReportScreen } from "../../../features/resources/review-report-server";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

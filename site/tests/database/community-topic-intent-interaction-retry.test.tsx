@@ -22,7 +22,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: harness.locale, dictionary: getDictionary(harness.locale) }),
   };
@@ -30,7 +30,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { readCommunityTopicIntent } from "../../src/features/community/community-topic-intent";
 import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const { render, mount, submit } = createCommunityTopicIntentInteractionHelpers(
   harness,

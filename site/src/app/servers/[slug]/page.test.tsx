@@ -108,7 +108,7 @@ vi.mock("../../../lib/services/servers/server-review-service", () => ({
   serverReviewService: { publicPage: mocks.publicPage },
 }));
 
-vi.mock("../../../lib/i18n-server", () => ({
+vi.mock("../../../lib/platform/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));

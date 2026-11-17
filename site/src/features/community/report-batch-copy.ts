@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../lib/platform/i18n";
 import { communityReportDecisionError } from "./community-report-copy";
 
 const en = {

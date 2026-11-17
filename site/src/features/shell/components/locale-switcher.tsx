@@ -2,7 +2,7 @@
 
 import { Button } from "@nexus/ui";
 import { Languages } from "lucide-react";
-import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/platform/i18n";
 
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);

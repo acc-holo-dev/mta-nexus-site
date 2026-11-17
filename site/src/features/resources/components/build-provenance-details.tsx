@@ -1,6 +1,6 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
-import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/platform/i18n";
 import { getBuildProvenance } from "../model/build-provenance";
 
 const toneClass = {

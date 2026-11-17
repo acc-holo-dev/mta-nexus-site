@@ -5,9 +5,12 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { reactionCommandSchema } from "../../../../../features/community/content-reaction-contract";
 import { reactionError } from "../../../../../features/community/content-reaction-copy";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { publicPlatformApi } from "../../../../../lib/http/public-platform-api";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../../../lib/services/community/content-reaction-service";
 

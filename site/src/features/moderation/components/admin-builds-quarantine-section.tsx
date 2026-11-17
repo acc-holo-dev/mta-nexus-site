@@ -1,7 +1,7 @@
 import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
-import type { getDictionary, Locale } from "../../../lib/i18n";
+import type { getDictionary, Locale } from "../../../lib/platform/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 

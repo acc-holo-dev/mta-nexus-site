@@ -12,9 +12,9 @@ import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../../features/support/support-idempotency";
-import { parseBoundedJson } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext } from "../../../../lib/observability";
+import { parseBoundedJson } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { createRequestLogContext } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 async function loadAuthorizedCase(currentToken: string | undefined, id: string) {

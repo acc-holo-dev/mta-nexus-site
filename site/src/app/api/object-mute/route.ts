@@ -4,14 +4,14 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../features/accounts/user-platform-api";
 import { objectMuteCommandSchema } from "../../../features/community/follow-workspace-contract";
 import { followError } from "../../../features/community/follow-workspace-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { resolveLocale } from "../../../lib/i18n";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../lib/observability";
+} from "../../../lib/platform/observability";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 

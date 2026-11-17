@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {

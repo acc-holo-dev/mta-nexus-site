@@ -1,6 +1,6 @@
 import { moderationCopy } from "../../../../../../../features/community/community-moderation-copy";
 import { discussionReportsCopy } from "../../../../../../../features/community/discussion-reports-copy";
-import { getRequestLocale } from "../../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../../lib/platform/i18n-server";
 
 export default async function Loading() {
   const locale = await getRequestLocale();

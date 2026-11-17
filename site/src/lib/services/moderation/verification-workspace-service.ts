@@ -18,7 +18,7 @@ import type {
   verificationApplicationSchema,
   verificationDecisionSchema,
 } from "../../../features/trust/verification-workspace-contract";
-import { isPostgresDeadlock } from "../../postgres-error";
+import { isPostgresDeadlock } from "../../platform/postgres-error";
 
 const editable = (row: Awaited<ReturnType<typeof developerProfileRepository.own>>) => ({
   id: row.id,

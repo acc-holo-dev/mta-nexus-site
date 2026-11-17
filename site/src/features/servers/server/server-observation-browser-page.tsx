@@ -4,8 +4,8 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Locale } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import type { Locale } from "../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   type ServerObservationBrowserResult,

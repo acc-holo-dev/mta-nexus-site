@@ -7,7 +7,7 @@ import {
 import { Button, EmptyState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import Link from "next/link";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";

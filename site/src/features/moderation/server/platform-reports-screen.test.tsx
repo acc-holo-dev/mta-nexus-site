@@ -8,7 +8,9 @@ const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/platform/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => ({ id: "member" }) },
 }));

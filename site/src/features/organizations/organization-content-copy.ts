@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../lib/platform/i18n";
 import { userPlatformError } from "../community/user-platform-copy";
 export const organizationContentCopy = (locale: Locale) =>
   locale === "ru"

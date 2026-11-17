@@ -1,5 +1,5 @@
 import { serverContentCopy } from "../../../../../../features/servers/server-content-copy";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/servers/[id]/content/[contentId].
 export default async function Loading() {

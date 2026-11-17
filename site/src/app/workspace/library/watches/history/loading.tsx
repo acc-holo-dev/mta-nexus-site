@@ -1,5 +1,5 @@
 import { resourceReleaseWatchHistoryCopy } from "../../../../../features/resources/resource-release-watch-history-i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/library/watches/history.
 export default async function Loading() {

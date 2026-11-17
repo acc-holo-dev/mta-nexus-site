@@ -1,6 +1,6 @@
 import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
 import { subscriptionsCopy } from "../../features/commerce/subscriptions-i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { getRequestLocale } from "../../lib/platform/i18n-server";
 
 // Honest loading shell for /subscriptions.
 export default async function Loading() {

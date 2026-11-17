@@ -12,8 +12,8 @@ import {
 } from "../../../../../features/commerce/plan-reviews-query";
 import { planReviewNavLinkClass } from "../../../../../features/commerce/plan-reviews-workspace";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getDictionary } from "../../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../../../lib/services/commerce/plan-reviews-service";
 

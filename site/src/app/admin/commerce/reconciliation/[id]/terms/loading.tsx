@@ -1,5 +1,5 @@
 import { orderTermsCopy } from "../../../../../../features/commerce/order-terms-i18n";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /admin/commerce/reconciliation/[id]/terms.
 export default async function Loading() {

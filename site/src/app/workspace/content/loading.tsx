@@ -1,5 +1,5 @@
 import { authorPublicationDeskCopy } from "../../../features/community/author-publication-desk-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/content.
 export default async function AuthorPublicationLoading() {

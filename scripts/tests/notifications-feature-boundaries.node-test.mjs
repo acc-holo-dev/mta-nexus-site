@@ -21,7 +21,7 @@ const utilPorts = [
 ];
 const serverPorts = ["center"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|private-api-request|content-discussion-contract)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|http\/private-api-request|content-discussion-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

@@ -9,7 +9,7 @@ import {
   PRODUCT_CATEGORY_KEYS,
   PRODUCT_PUBLISHING_KEYS,
 } from "../../src/features/resources/product-type-labels";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 it.each(PRODUCT_TYPES)(
   "supports %s consistently across validation, catalog and translations",

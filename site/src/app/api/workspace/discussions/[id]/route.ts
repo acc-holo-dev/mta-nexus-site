@@ -5,8 +5,11 @@ import { z } from "zod";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { discussionEditSchema } from "../../../../../features/community/content-discussion-contract";
 import { ownDiscussionError } from "../../../../../features/community/discussion-workspace-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { discussionWorkspaceService } from "../../../../../lib/services/community/discussion-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };

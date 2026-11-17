@@ -2,7 +2,7 @@ import type { User } from "@nexus/domain";
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../lib/bounded-json";
+import { readBoundedJson, requireServerJsonContentType } from "../../lib/http/bounded-json";
 import { userPlatformApi } from "../accounts/user-platform-api";
 import { organizationError } from "./organization-workspace-copy";
 export function organizationApi(

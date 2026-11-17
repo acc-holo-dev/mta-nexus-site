@@ -1,8 +1,8 @@
 import { PageHeader } from "@nexus/ui";
 import { Plus, Server as ServerIcon } from "lucide-react";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getDictionary } from "../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { serverService } from "../../../lib/services/servers/server-service";
 import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";

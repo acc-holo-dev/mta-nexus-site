@@ -1,8 +1,8 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import type { Locale } from "../../../lib/platform/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { confirmedReactionRemoval } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";

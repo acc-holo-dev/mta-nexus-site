@@ -5,14 +5,14 @@ import {
   SESSION_COOKIE_NAME,
   sessionCookieOptions,
 } from "../../../../features/accounts/session-cookie";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {

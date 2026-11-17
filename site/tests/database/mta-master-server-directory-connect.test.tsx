@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { MtaMasterServerDirectory } from "../../src/features/servers/client";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 describe("MTA master directory connect honesty", () => {
   it.each(["en", "ru"] as const)(

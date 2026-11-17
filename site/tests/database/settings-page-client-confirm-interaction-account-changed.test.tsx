@@ -26,14 +26,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
 import { SettingsPageClient } from "../../src/features/accounts/settings";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const { render } = createSettingsPageClientConfirmInteractionHelpers(
   harness,

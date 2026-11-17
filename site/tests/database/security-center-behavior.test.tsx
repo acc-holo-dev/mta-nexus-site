@@ -47,7 +47,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 

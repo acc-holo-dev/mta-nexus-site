@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { Locale } from "../../src/lib/i18n";
+import type { Locale } from "../../src/lib/platform/i18n";
 
 type ResourceReleaseControlHarness = {
   slots: unknown[];

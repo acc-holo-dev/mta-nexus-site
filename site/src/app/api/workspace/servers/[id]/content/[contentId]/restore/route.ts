@@ -9,8 +9,8 @@ import { serverPublicationHistoryError } from "../../../../../../../../features/
 import {
   readBoundedJson,
   requireServerJsonContentType,
-} from "../../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
+} from "../../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../../lib/http/browser-route-adapter";
 import { serverContentService } from "../../../../../../../../lib/services/servers/server-content-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; contentId: string }> }) => {

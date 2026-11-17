@@ -3,7 +3,7 @@
 import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
-import type { getDictionary } from "../../../lib/i18n";
+import type { getDictionary } from "../../../lib/platform/i18n";
 import type { SettingsRecoveryEmail } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];

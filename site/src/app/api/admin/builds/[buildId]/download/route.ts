@@ -15,7 +15,7 @@ import {
   logRequestEvent,
   REQUEST_ID_HEADER,
   type RequestLogContext,
-} from "../../../../../../lib/observability";
+} from "../../../../../../lib/platform/observability";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {

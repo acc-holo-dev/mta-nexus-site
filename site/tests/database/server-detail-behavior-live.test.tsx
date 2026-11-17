@@ -87,7 +87,7 @@ vi.mock("../../src/lib/services/community/content-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));

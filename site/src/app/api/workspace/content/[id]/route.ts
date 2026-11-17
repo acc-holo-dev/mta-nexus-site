@@ -2,8 +2,11 @@ import { NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { authorContentService } from "../../../../../lib/services/organizations/author-content-service";
 
 type Context = { params: Promise<{ id: string }> };

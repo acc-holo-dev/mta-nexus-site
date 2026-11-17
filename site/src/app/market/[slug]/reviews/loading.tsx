@@ -1,5 +1,5 @@
 import { resourceReviewCopy } from "../../../../features/resources/resource-review-i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /market/[slug]/reviews.
 export default async function Loading() {

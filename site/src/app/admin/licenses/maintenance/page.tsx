@@ -13,8 +13,8 @@ import { getCommerceHistoryCopy } from "../../../../features/commerce/commerce-h
 import { getLicenseMaintenanceCopy } from "../../../../features/commerce/license-maintenance-i18n";
 import { licenseRuntimePage } from "../../../../features/commerce/license-runtime-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getDictionary } from "../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../../lib/services/commerce/license-control-service";
 export const dynamic = "force-dynamic";

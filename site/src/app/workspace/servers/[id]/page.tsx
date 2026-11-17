@@ -8,8 +8,8 @@ import { ServerClaimStatusPanel } from "../../../../features/servers/claim-statu
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
 import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getDictionary } from "../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { serverService } from "../../../../lib/services/servers/server-service";
 

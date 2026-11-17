@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/releases",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/platform/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));

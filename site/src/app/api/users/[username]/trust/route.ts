@@ -3,7 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { trustError } from "../../../../../features/trust/public-user-trust-copy";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
+import { publicPlatformApi } from "../../../../../lib/http/public-platform-api";
 import { publicUserTrustService } from "../../../../../lib/services/trust/public-user-trust-service";
 export async function GET(
   request: NextRequest,

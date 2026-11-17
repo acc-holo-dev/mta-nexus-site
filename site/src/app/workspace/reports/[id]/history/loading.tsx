@@ -1,5 +1,5 @@
 import { reportHistoryCopy } from "../../../../../features/community/community-report-history-copy";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 
 export default async function Loading() {
   const copy = reportHistoryCopy(await getRequestLocale());

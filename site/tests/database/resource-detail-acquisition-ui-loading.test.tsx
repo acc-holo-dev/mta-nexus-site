@@ -22,8 +22,8 @@ vi.mock("@nexus/db", () => ({
 
 import "../helpers/resource-detail-acquisition-ui-harness";
 import ProductDetailPage, { generateMetadata } from "../../src/app/market/[slug]/page";
-import { getDictionary } from "../../src/lib/i18n";
-import { getRequestLocale } from "../../src/lib/i18n-server";
+import { getDictionary } from "../../src/lib/platform/i18n";
+import { getRequestLocale } from "../../src/lib/platform/i18n-server";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 import { commerceService } from "../../src/lib/services/commerce/commerce-service";
 import { resourceReviewService } from "../../src/lib/services/resources/resource-review-service";

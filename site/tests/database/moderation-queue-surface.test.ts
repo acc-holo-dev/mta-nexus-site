@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -31,7 +31,7 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 

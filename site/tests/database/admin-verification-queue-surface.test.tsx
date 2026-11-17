@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { AdminVerificationQueueSection } from "../../src/features/moderation/components/admin-verification-queue-section";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");

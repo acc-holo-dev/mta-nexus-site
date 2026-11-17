@@ -45,13 +45,13 @@ vi.mock("next/link", () => ({
   ),
 }));
 vi.mock("../locale", async () => {
-  const { getDictionary } = await import("../../../lib/i18n");
+  const { getDictionary } = await import("../../../lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
-import { getDictionary } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { SupportCenter } from "../../support/center";
 import { PlatformSignIn } from "./platform-sign-in";
 

@@ -1,12 +1,12 @@
 import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { requireServerJsonContentType } from "../../lib/bounded-json";
+import { requireServerJsonContentType } from "../../lib/http/bounded-json";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 
 export async function resourceCommerceRequest(

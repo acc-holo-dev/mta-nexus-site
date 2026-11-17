@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../lib/platform/i18n";
 import { serverStatisticsError } from "./server-statistics-copy";
 
 const en = {

@@ -3,8 +3,11 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { verificationApplicationsError } from "../../../../../features/moderation/verification-applications-copy";
 import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { verificationWorkspaceService } from "../../../../../lib/services/moderation/verification-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };

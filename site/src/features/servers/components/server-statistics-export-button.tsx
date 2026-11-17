@@ -1,7 +1,7 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { fetchServerStatisticsCsv } from "../server-statistics-download";
 

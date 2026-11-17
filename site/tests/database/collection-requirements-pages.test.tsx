@@ -16,7 +16,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/requirements",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -42,7 +42,7 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
 
 import { collectionRequirementsCopy } from "../../src/features/library/collection-requirements-i18n";
 import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const root: ResourceRequirementNode = {

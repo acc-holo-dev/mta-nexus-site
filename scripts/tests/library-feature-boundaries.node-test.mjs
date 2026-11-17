@@ -65,7 +65,7 @@ const serverPorts = [
   "resource-collections-page",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|private-api-request)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:library-collection-receipts-i18n|http\/private-api-request)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

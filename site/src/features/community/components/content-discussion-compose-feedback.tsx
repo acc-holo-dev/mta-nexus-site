@@ -1,6 +1,6 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { GuestAuthLinks, platformSignInFocusClass } from "../../shell/guest-auth";
 import { getDiscussionCopy } from "../content-discussion-copy";
 

@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
-import { SUPPORT_JSON_MAX_BYTES } from "../../src/lib/bounded-json";
+import { SUPPORT_JSON_MAX_BYTES } from "../../src/lib/http/bounded-json";
 
 vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>("next/server");

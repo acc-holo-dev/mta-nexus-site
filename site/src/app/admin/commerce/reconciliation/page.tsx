@@ -14,8 +14,8 @@ import {
   getFinancialCopy,
 } from "../../../../features/commerce/financial-i18n";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getDictionary } from "../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

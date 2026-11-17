@@ -12,7 +12,7 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -29,7 +29,7 @@ import {
   supportMessageMetadata,
 } from "../../src/features/support/messages-server";
 import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

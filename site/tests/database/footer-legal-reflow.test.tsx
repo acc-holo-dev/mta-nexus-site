@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
 import { Footer } from "../../src/features/shell/footer";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 describe("footer legal link reflow", () => {
   it.each(["en", "ru"] as const)(

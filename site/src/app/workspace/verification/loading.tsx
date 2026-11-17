@@ -1,5 +1,5 @@
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/verification.
 export default async function Loading() {

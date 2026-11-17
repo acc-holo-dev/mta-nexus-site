@@ -26,10 +26,10 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "site/packages/config/src/env.ts",
     "site/next.config.mjs",
     "site/src/app/api/auth/login/route.ts",
-    "site/src/lib/browser-request-policy.ts",
-    "site/src/lib/browser-request-guard.ts",
-    "site/src/lib/browser-route-adapter.ts",
-    "site/src/lib/license-bearer-route-adapter.ts",
+    "site/src/lib/http/browser-request-policy.ts",
+    "site/src/lib/http/browser-request-guard.ts",
+    "site/src/lib/http/browser-route-adapter.ts",
+    "site/src/lib/http/license-bearer-route-adapter.ts",
     "site/tests/unit/browser-api-route-inventory.test.ts",
   ]) {
     assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);

@@ -23,7 +23,7 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/i18n-server", async () => {
+vi.mock("../../src/lib/platform/i18n-server", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });

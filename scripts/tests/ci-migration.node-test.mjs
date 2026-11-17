@@ -6,7 +6,7 @@ const moves = [
   ["apps/web/next.config.mjs", "site/next.config.mjs"],
   ["apps/web/src/app/api/auth/login/route.ts", "site/src/app/api/auth/login/route.ts"],
   ["apps/web/src/app/api/products/[id]/route.ts", "site/src/app/api/products/[id]/route.ts"],
-  ["apps/web/src/lib/browser-route-adapter.ts", "site/src/lib/browser-route-adapter.ts"],
+  ["apps/web/src/lib/browser-route-adapter.ts", "site/src/lib/http/browser-route-adapter.ts"],
   ["packages/config/src/index.ts", "site/packages/config/src/index.ts"],
   ["packages/security/src/policy.ts", "site/packages/security/src/policy.ts"],
   ["packages/storage/src/provider.ts", "site/packages/storage/src/provider.ts"],

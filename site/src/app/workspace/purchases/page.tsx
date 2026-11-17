@@ -15,8 +15,8 @@ import { getCommercialCopy } from "../../../features/commerce/commercial-i18n";
 import { orderCaseCopy } from "../../../features/commerce/order-case-i18n";
 import { HistoryPagination, HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getDictionary } from "../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

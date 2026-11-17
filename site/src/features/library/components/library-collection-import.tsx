@@ -12,7 +12,7 @@ import {
   libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";

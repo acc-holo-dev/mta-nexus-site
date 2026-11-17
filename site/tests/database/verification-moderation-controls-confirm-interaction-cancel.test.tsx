@@ -19,14 +19,14 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
 import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
 import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
 import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const { moderation, actionButton, reviewNotes } = createVerificationApplicationsInteractionHelpers(
   harness,

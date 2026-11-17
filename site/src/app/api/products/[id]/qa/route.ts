@@ -5,13 +5,13 @@ import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { resourceQaQuery } from "../../../../../features/resources/resource-qa-query";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
+} from "../../../../../lib/platform/observability";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { resourceQaService } from "../../../../../lib/services/resources/resource-qa-service";
 

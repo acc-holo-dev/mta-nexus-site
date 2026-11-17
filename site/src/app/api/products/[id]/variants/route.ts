@@ -2,8 +2,8 @@ import { AppError } from "@nexus/domain";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { resourceManagementService } from "../../../../../lib/services/resources/resource-management-service";
 
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

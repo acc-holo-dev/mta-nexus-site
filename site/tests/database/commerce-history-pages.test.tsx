@@ -26,7 +26,7 @@ vi.mock("@nexus/db", () => ({
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/link", async () => {
@@ -51,7 +51,7 @@ import Purchases, { metadata as purchasesMeta } from "../../src/app/workspace/pu
 import Sales, { metadata as salesMeta } from "../../src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });

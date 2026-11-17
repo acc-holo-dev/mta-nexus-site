@@ -1,8 +1,8 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getDictionary } from "../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
 import { platformFieldClass } from "../../community/user-platform-client";

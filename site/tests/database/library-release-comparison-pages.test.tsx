@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/platform/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));

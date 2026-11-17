@@ -8,8 +8,8 @@ import { StorageDiscoveryControls } from "../../../features/moderation/storage-m
 import { storageMaintenanceCopy } from "../../../features/moderation/storage-maintenance-i18n";
 import { storageQuery } from "../../../features/moderation/storage-maintenance-query";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getDictionary } from "../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { storageMaintenanceService } from "../../../lib/services/moderation/storage-maintenance-service";
 export const dynamic = "force-dynamic";

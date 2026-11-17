@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { commercialPlanTermsSchema, planReviewCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";

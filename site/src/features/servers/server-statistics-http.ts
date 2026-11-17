@@ -1,12 +1,12 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { resolveLocale } from "../../lib/i18n";
+import { resolveLocale } from "../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 import { serverStatisticsService } from "../../lib/services/servers/server-statistics-service";
 import { getTrustedRequestIp } from "../shell/request-client-ip";

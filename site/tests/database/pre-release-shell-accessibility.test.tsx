@@ -2,7 +2,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ShellAuthSession } from "../../src/features/shell/session";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
 const auth = vi.hoisted(() => ({

@@ -4,7 +4,7 @@ import { AppError, NotFoundError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import type { z } from "zod";
 import type { profilePrivacyUpdateSchema } from "../../../features/accounts/profile-privacy-contract";
-import { isPostgresDeadlock } from "../../postgres-error";
+import { isPostgresDeadlock } from "../../platform/postgres-error";
 
 const editable = (row: Awaited<ReturnType<typeof profilePrivacyRepository.own>>) => ({
   id: row.id,

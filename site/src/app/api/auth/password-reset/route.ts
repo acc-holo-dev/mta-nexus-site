@@ -9,14 +9,14 @@ import {
   waitForPasswordResetFloor,
 } from "../../../../features/accounts/account-recovery-request-policy";
 import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const headers = {

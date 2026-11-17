@@ -18,7 +18,7 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/settings/history" }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({

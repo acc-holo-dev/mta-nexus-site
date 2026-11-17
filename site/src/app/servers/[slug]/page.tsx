@@ -18,8 +18,8 @@ import { serverStatisticsCopy } from "../../../features/servers/server-statistic
 import { ServerUpdatesPanel } from "../../../features/servers/updates-server";
 import { authEntryHref } from "../../../features/shell/auth-return";
 import { contextTrustCopy } from "../../../features/trust/public-context-trust-copy";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
+import { getDictionary } from "../../../lib/platform/i18n";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentService } from "../../../lib/services/community/content-service";
 import {

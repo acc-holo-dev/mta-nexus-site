@@ -1,6 +1,6 @@
 import { ServerContentEditorPage } from "../../../../../../features/servers/content-editor-server";
 import { serverContentCopy } from "../../../../../../features/servers/server-content-copy";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

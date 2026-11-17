@@ -2,7 +2,7 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";

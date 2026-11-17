@@ -1,5 +1,5 @@
-import { getDictionary } from "../../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getDictionary } from "../../../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/library/[id]/versions/compare.
 export default async function Loading() {

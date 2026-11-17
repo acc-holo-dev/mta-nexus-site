@@ -5,7 +5,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../lib/observability";
+} from "../../../lib/platform/observability";
 import {
   discoveryService,
   type SearchResultType,

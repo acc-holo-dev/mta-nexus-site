@@ -7,7 +7,7 @@ import {
   parseContextTrustQuery,
 } from "../../../../../features/trust/public-context-trust-contract";
 import { contextTrustError } from "../../../../../features/trust/public-context-trust-copy";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
+import { publicPlatformApi } from "../../../../../lib/http/public-platform-api";
 import { publicContextTrustService } from "../../../../../lib/services/trust/public-context-trust-service";
 export async function GET(
   request: NextRequest,

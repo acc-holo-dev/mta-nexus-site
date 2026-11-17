@@ -1,5 +1,5 @@
 import type { ResourceDeliveryReceipt } from "@nexus/domain";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 /** Server-only evidence projection; never serialize account/storage context. */

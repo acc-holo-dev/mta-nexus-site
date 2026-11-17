@@ -50,7 +50,7 @@ const clientPorts = [
   "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|private-api-request|support-retry)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:commerce-history-format|http\/private-api-request|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(

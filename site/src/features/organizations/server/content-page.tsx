@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationContentService } from "../../../lib/services/organizations/organization-content-service";
 import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";

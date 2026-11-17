@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ResourceBuildScreen } from "../../../../../../features/resources/build-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../../../features/resources/resource-build-workspace-i18n";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

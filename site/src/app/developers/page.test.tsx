@@ -8,13 +8,13 @@ const mocks = vi.hoisted(() => ({
   directory: vi.fn(),
 }));
 
-vi.mock("../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../lib/platform/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../../features/discovery/directory-server", () => ({
   DirectoryFilters: () => <form aria-label="filters" />,
   DirectoryResults: mocks.directory,
 }));
 
-import { getDictionary } from "../../lib/i18n";
+import { getDictionary } from "../../lib/platform/i18n";
 import DevelopersLoading from "./loading";
 import DevelopersPage from "./page";
 

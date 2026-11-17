@@ -6,7 +6,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../../lib/observability";
+} from "../../../../../../lib/platform/observability";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
 import { resourceQaService } from "../../../../../../lib/services/resources/resource-qa-service";
 

@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

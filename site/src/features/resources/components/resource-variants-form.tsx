@@ -3,7 +3,7 @@ import { type ManagedResourceVariants, RESOURCE_VARIANT_LIMIT } from "@nexus/dom
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { parseEditableProfile } from "../../community/user-platform-client";
 import {
   ActionConfirmCheckbox,

@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { createRequestLogContext, jsonWithRequestId } from "../../../lib/observability";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { createRequestLogContext, jsonWithRequestId } from "../../../lib/platform/observability";
 
 /**
  * Paid checkout is intentionally unavailable in the player-first open free beta.

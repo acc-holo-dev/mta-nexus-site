@@ -315,7 +315,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
         name,
       ),
       name,

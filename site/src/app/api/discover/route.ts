@@ -3,12 +3,12 @@ import type { NextRequest } from "next/server";
 import { parseDiscoverApiQuery } from "../../../features/discovery/discover-query";
 import { discoveryCopy } from "../../../features/discovery/discovery-copy";
 import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
-import { resolveLocale } from "../../../lib/i18n";
+import { resolveLocale } from "../../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../lib/observability";
+} from "../../../lib/platform/observability";
 import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);

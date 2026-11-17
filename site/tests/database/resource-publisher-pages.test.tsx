@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/resources/prd_a/history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -28,7 +28,7 @@ vi.mock("../../src/lib/services/resources/resource-publisher-service", () => ({
 import HistoryPage from "../../src/app/workspace/resources/[id]/history/page";
 import InventoryPage from "../../src/app/workspace/resources/page";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const context = {
   params: Promise.resolve({ id: "prd_a" }),

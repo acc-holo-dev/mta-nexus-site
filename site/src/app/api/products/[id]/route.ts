@@ -2,14 +2,14 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { editProductDetailsSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../lib/services/commerce/product-service";
 

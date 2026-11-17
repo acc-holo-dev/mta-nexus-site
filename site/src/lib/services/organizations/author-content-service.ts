@@ -18,7 +18,7 @@ import {
   writerCreateSchema,
   writerUpdateSchema,
 } from "../../../features/community/user-platform-contract";
-import { isPostgresDeadlock } from "../../postgres-error";
+import { isPostgresDeadlock } from "../../platform/postgres-error";
 
 class AuthorContentService {
   async desk(actor: User, filters: AuthorPublicationDeskQuery) {

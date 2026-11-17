@@ -3,7 +3,7 @@
 import { Button, fieldControlClass } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import type { FormEvent } from "react";
-import type { getDictionary } from "../../../lib/i18n";
+import type { getDictionary } from "../../../lib/platform/i18n";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
 

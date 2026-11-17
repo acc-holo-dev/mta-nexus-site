@@ -11,7 +11,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
@@ -23,7 +23,7 @@ import RequirementsLoading from "../../src/app/workspace/resources/[id]/requirem
 import ResourcesLoading from "../../src/app/workspace/resources/loading";
 import NewResourceLoading from "../../src/app/workspace/resources/new/loading";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 beforeEach(() => {
   state.locale = "en";

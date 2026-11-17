@@ -5,8 +5,8 @@ import {
   storageParse,
 } from "../../../../../../../features/moderation/storage-maintenance-query";
 import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
-import { readBoundedJson } from "../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
 import { storageMaintenanceService } from "../../../../../../../lib/services/moderation/storage-maintenance-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {

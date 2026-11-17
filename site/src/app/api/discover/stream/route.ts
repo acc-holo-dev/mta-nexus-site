@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { parseDiscoveryStreamQuery } from "../../../../features/discovery/discovery-stream-contract";
 import { discoveryStreamError } from "../../../../features/discovery/discovery-stream-copy";
 import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
-import { publicPlatformApi } from "../../../../lib/public-platform-api";
+import { publicPlatformApi } from "../../../../lib/http/public-platform-api";
 import { discoveryService } from "../../../../lib/services/discovery/discovery-service";
 export async function GET(request: NextRequest) {
   return publicPlatformApi(

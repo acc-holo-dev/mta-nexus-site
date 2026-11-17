@@ -2,7 +2,7 @@
 import type { commercialFeeEstimate } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";

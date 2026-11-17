@@ -38,7 +38,7 @@ vi.mock("../../src/lib/services/resources/resource-release-watches-service", () 
 vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: () => <span>Release watch</span>,
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({

@@ -3,15 +3,15 @@ import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createContentSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { isPostgresDeadlock } from "../../../lib/postgres-error";
+} from "../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { serverService } from "../../../lib/services/servers/server-service";

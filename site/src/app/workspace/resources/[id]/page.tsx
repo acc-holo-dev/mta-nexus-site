@@ -13,8 +13,8 @@ import { getResourceBuildWorkspaceCopy } from "../../../../features/resources/re
 import { getResourceCommerceCopy } from "../../../../features/resources/resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getDictionary } from "../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../lib/services/commerce/product-service";
 import { resourcePublicationReadinessService } from "../../../../lib/services/resources/resource-publication-readiness-service";

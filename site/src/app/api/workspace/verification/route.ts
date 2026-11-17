@@ -10,8 +10,8 @@ import {
   verificationError,
   verificationMutationError,
 } from "../../../../features/trust/verification-workspace-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import { verificationWorkspaceService } from "../../../../lib/services/moderation/verification-workspace-service";
 
 export async function GET(request: NextRequest) {

@@ -1,7 +1,7 @@
 import type { ManagedServerItem } from "@nexus/db";
 import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { getManagedServerCopy } from "../managed-server-view";
 import { type MtaMasterServer, mtaLiveStatus } from "../model";
 import { getServerActivityCopy } from "../server-activity-view";

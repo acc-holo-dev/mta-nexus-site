@@ -1,8 +1,12 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import type { Locale } from "./i18n";
-import { resolveLocale } from "./i18n";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
+import type { Locale } from "../platform/i18n";
+import { resolveLocale } from "../platform/i18n";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../platform/observability";
 export async function publicPlatformApi(
   request: NextRequest,
   action: () => Promise<unknown>,

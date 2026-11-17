@@ -5,7 +5,7 @@ import { FollowButton, FollowWorkspace } from "../../src/features/community/foll
 import type { FollowPage } from "../../src/features/community/follow-workspace-contract";
 import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 import { followWorkspaceItemBase } from "../helpers/discovery-follow-surface-harness";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));

@@ -25,7 +25,7 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/i18n-server", async () => {
+vi.mock("../../src/lib/platform/i18n-server", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
@@ -63,7 +63,7 @@ import ReviewsLoading from "../../src/app/admin/commerce/reviews/loading";
 import Public from "../../src/app/market/[slug]/reviews/page";
 import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 
 it.each(["en", "ru"] as const)(

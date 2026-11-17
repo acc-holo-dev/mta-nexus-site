@@ -9,7 +9,7 @@ const { getDirectory, logEvent } = vi.hoisted(() => ({
 vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory },
 }));
-vi.mock("../../src/lib/observability", () => ({
+vi.mock("../../src/lib/platform/observability", () => ({
   createRequestLogContext: () => ({ requestId: "test-request" }),
   jsonWithRequestId: (context: { requestId: string }, body: unknown, init: ResponseInit) => {
     const headers = new Headers(init.headers);

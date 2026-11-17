@@ -1,5 +1,5 @@
 import { reportGroupsCopy } from "../../../../features/community/community-report-groups-copy";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /admin/reports/targets.
 export default async function Loading() {

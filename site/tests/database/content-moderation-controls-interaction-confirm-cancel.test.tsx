@@ -19,7 +19,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
   };
@@ -27,7 +27,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { moderationCopy } from "../../src/features/community/community-moderation-copy";
 import { ContentModerationControls } from "../../src/features/community/content-moderation";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const { click, ready } = createCommunityModerationInteractionHelpers(
   harness,

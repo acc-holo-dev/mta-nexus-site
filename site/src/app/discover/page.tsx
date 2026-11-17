@@ -17,8 +17,8 @@ import {
 } from "../../features/discovery/discover-query";
 import { discoveryStreamHref } from "../../features/discovery/discovery-stream-contract";
 import { discoveryStreamCopy } from "../../features/discovery/discovery-stream-copy";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { getDictionary } from "../../lib/platform/i18n";
+import { getRequestLocale } from "../../lib/platform/i18n-server";
 
 export const dynamic = "force-dynamic";
 

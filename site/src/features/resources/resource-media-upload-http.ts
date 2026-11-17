@@ -5,12 +5,12 @@ import type { NextRequest } from "next/server";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
-} from "../../lib/bounded-multipart";
+} from "../../lib/http/bounded-multipart";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 import { resourceMediaService } from "../../lib/services/resources/resource-media-service";
 export async function resourceMediaUpload(request: NextRequest, productId: string) {

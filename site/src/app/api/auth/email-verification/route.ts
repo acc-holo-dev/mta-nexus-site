@@ -4,9 +4,9 @@ import {
   requestRecoveryEmailVerificationSchema,
 } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };

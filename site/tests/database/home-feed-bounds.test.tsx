@@ -48,7 +48,7 @@ vi.mock("../../src/features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
@@ -79,7 +79,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../../src/lib/home-personal-changes", () => ({
+vi.mock("../../src/lib/platform/home-personal-changes", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 
@@ -94,7 +94,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import HomePage from "../../src/app/page";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 describe("bounded home feed reads", () => {
   beforeEach(() => {

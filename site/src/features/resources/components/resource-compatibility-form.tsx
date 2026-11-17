@@ -4,7 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 import { confirmedCompatibility } from "../resource-management-confirmation";

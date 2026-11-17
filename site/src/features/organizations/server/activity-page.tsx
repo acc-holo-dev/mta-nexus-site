@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationGovernanceService } from "../../../lib/services/organizations/organization-governance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

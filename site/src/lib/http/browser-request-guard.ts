@@ -1,6 +1,10 @@
 import type { NextRequest } from "next/server";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../platform/observability";
 import { browserRequestDecision } from "./browser-request-policy";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
 
 /** Call before reading a body, consuming a rate limit, or resolving a session. */
 export function rejectUnsafeBrowserRequest(request: NextRequest) {

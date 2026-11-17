@@ -9,7 +9,7 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 import { organizationContentCopy } from "../organization-content-copy";

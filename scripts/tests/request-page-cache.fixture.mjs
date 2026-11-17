@@ -39,7 +39,7 @@ const sourceFiles = new Set([
   resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
   resolve(sourceRoot, "features/trust/verification-workspace-copy.ts"),
   resolve(sourceRoot, "features/servers/server-statistics-copy.ts"),
-  ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
+  ...collectTsFiles(resolve(sourceRoot, "lib/platform/i18n")),
 ]);
 const emptyPage = async () => ({
   products: [],
@@ -245,7 +245,9 @@ registerHooks({
   },
 });
 
-const { getRequestLocale } = await import(pathToFileURL(resolve(sourceRoot, "lib/i18n-server.ts")));
+const { getRequestLocale } = await import(
+  pathToFileURL(resolve(sourceRoot, "lib/platform/i18n-server.ts"))
+);
 async function render(route, key, request) {
   const [name, parameter, kind] = route;
   const { default: Page, generateMetadata } = await import(

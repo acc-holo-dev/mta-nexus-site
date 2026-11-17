@@ -14,7 +14,7 @@ import {
   serverVisibilityPreviewSchema,
   serverVisibilityResultSchema,
 } from "../../../features/servers/server-workspace-contract";
-import { isUniqueConstraintViolation } from "../../postgres-error";
+import { isUniqueConstraintViolation } from "../../platform/postgres-error";
 
 function throwServerMutationConflict(error: unknown): never {
   if (isUniqueConstraintViolation(error, ["servers_slug_idx", "servers_slug_unique"])) {

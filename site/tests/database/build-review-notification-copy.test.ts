@@ -1,7 +1,7 @@
 import type { Notification } from "@nexus/domain";
 import { expect, it } from "vitest";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const notice = {
   title: "Fallback",

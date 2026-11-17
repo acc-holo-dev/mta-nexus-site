@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@nexus/ui";
-import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/platform/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import type { SupportCaseData, SupportCaseStatus } from "../support-response";
 import { supportWorkspaceCopy } from "../support-workspace-copy";

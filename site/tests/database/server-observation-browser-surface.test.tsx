@@ -24,7 +24,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
@@ -34,7 +34,7 @@ import {
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
 } from "../../src/features/servers/server/server-observation-browser-page";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

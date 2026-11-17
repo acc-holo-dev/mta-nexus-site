@@ -1,4 +1,4 @@
-import type { getDictionary } from "../../lib/i18n";
+import type { getDictionary } from "../../lib/platform/i18n";
 import type { MetaInspectionIssue } from "./mta-meta-inspector";
 
 type StructuralIssueMessages = ReturnType<

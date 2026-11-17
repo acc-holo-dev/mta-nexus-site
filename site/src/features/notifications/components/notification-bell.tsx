@@ -5,7 +5,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";

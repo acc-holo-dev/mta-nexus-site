@@ -9,14 +9,17 @@ import {
 } from "../../../../../features/community/content-discussion-contract";
 import { discussionError } from "../../../../../features/community/content-discussion-copy";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resolveLocale } from "../../../../../lib/i18n";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
+} from "../../../../../lib/platform/observability";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { contentService } from "../../../../../lib/services/community/content-service";
 

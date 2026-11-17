@@ -1,5 +1,5 @@
 import type { Notification } from "@nexus/domain";
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../lib/platform/i18n";
 import { licenseTermNotification } from "../commerce/license-maintenance-i18n";
 import { resourceReleaseNotification } from "../resources/resource-release-watches-i18n";
 

@@ -8,7 +8,7 @@ import { changeHistoryHref } from "../../../features/accounts/private-change-his
 import { ProfileChangeHistoryView } from "../../../features/accounts/profile-change-history";
 import { parseProfileChangeHistoryQuery } from "../../../features/accounts/profile-change-history-contract";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/accounts/profile-change-history-service";
 

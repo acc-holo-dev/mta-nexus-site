@@ -1,7 +1,7 @@
 import { DirectoryFilters, DirectoryResults } from "../../features/discovery/directory-server";
 import { parseDiscoverQuery } from "../../features/discovery/discover-query";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { getDictionary } from "../../lib/platform/i18n";
+import { getRequestLocale } from "../../lib/platform/i18n-server";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const locale = await getRequestLocale();

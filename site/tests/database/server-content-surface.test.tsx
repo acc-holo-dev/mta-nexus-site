@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/servers/srv/content",
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({

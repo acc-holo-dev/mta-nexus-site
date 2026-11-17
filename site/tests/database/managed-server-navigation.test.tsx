@@ -28,7 +28,7 @@ import {
   showWorkspaceTools,
 } from "../../src/features/shell/session";
 import { Sidebar } from "../../src/features/shell/sidebar";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 beforeEach(() => {
   state.path = "/workspace/servers";

@@ -1,12 +1,12 @@
 import type { User } from "@nexus/domain";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { type Locale, resolveLocale } from "../../lib/i18n";
+import { type Locale, resolveLocale } from "../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 import { userPlatformError } from "../community/user-platform-copy";
 

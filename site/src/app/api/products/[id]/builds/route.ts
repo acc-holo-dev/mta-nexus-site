@@ -12,13 +12,13 @@ import {
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
-} from "../../../../../lib/bounded-multipart";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+} from "../../../../../lib/http/bounded-multipart";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
+} from "../../../../../lib/platform/observability";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../../lib/services/commerce/product-service";
 import { inspectBuildPackage } from "../../../../../lib/services/resources/build-package-inspection";

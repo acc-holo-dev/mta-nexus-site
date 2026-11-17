@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("next/navigation", () => ({

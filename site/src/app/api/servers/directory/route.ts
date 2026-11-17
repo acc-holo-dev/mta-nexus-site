@@ -8,7 +8,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { mtaMasterDirectoryService } from "../../../../lib/services/servers/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";

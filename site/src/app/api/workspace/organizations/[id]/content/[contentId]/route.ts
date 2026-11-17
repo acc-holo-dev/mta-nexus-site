@@ -8,8 +8,8 @@ import {
 import {
   readBoundedJson,
   requireServerJsonContentType,
-} from "../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
+} from "../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
 import { organizationContentService } from "../../../../../../../lib/services/organizations/organization-content-service";
 
 type Context = { params: Promise<{ id: string; contentId: string }> };

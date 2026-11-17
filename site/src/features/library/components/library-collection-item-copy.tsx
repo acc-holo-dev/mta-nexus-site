@@ -5,7 +5,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";

@@ -12,8 +12,8 @@ import {
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { OrderCancellationForm } from "../../../../../features/commerce/order-cancellation";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getDictionary } from "../../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../../../lib/services/commerce/commercial-plan-service";
 

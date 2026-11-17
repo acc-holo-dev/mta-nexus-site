@@ -1,5 +1,5 @@
 import { reactionCopy } from "../../../features/community/content-reaction-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/reactions.
 export default async function Loading() {

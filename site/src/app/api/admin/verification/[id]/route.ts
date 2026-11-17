@@ -4,8 +4,11 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
 import { verificationDecisionSchema } from "../../../../../features/trust/verification-workspace-contract";
 import { verificationDecisionError } from "../../../../../features/trust/verification-workspace-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { verificationWorkspaceService } from "../../../../../lib/services/moderation/verification-workspace-service";
 export const PATCH = withBrowserMutation(
   async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {

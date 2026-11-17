@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../lib/bounded-json";
+import { readBoundedJson, requireServerJsonContentType } from "../../lib/http/bounded-json";
 import { communityModerationService } from "../../lib/services/community/community-moderation-service";
 import { userPlatformApi } from "../accounts/user-platform-api";
 import { parseModerationDetailQuery } from "../moderation/community-moderation-contract";

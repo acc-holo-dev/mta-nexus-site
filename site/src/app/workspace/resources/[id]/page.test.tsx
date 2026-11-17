@@ -39,7 +39,9 @@ vi.mock("../../../../lib/services/resources/resource-publication-readiness-servi
 vi.mock("../../../../features/resources/publisher-view", () => ({
   ResourcePublicationReadinessPanel: () => null,
 }));
-vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../../lib/platform/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../../../features/resources/author-controls", () => ({
   AuthorResourceForms: (props: unknown) => {
     mocks.forms(props);

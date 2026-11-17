@@ -36,7 +36,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", async () => {
+vi.mock("../../src/lib/platform/i18n-server", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     getRequestLocale: vi.fn(async () => state.locale),

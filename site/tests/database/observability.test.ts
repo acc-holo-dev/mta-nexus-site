@@ -6,7 +6,7 @@ import {
   errorLogMetadata,
   jsonWithRequestId,
   REQUEST_ID_HEADER,
-} from "../../src/lib/observability";
+} from "../../src/lib/platform/observability";
 
 function fakeRequest(path = "/api/example") {
   return {

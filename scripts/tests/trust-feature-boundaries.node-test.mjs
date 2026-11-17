@@ -21,7 +21,8 @@ const utilPorts = [
 ];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];
-const safeLib = /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
+const safeLib =
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

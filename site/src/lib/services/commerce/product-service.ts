@@ -25,7 +25,7 @@ import {
   buildReverseDependencySummary,
   reverseDependencyLimits,
 } from "../../../features/resources/reverse-dependency-summary";
-import { isUniqueConstraintViolation } from "../../postgres-error";
+import { isUniqueConstraintViolation } from "../../platform/postgres-error";
 
 export type { PublicResourceAttribution };
 

@@ -20,7 +20,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
@@ -28,7 +28,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { communityReportCopy } from "../../src/features/community/community-report-copy";
 import { ReportModerationControls } from "../../src/features/moderation/report-controls";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const { render, actionButton, seedControls } =
   createReportModerationControlsConfirmInteractionHelpers(

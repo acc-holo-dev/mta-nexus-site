@@ -10,9 +10,9 @@ import {
   HOME_PERSONAL_COOKIE,
   parseHomePersonalPreference,
 } from "../features/shell/home-personal-preference";
-import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
-import { getDictionary } from "../lib/i18n";
-import { getRequestLocale } from "../lib/i18n-server";
+import { loadPersonalChangesSummary } from "../lib/platform/home-personal-changes";
+import { getDictionary } from "../lib/platform/i18n";
+import { getRequestLocale } from "../lib/platform/i18n-server";
 import { authService } from "../lib/services/accounts/auth-service";
 import { productService } from "../lib/services/commerce/product-service";
 import { contentService } from "../lib/services/community/content-service";

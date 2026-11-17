@@ -41,14 +41,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/i18n");
+  const { getDictionary } = await import("../../src/lib/platform/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
 });
 
 import { AccountControls } from "../../src/features/accounts/controls";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 import { flattenReactTestTree } from "../helpers/flatten-react-test-tree";
 
 function render() {

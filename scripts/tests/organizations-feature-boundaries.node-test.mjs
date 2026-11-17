@@ -37,7 +37,7 @@ const serverPorts = [
   "public-trust",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|content-discussion-contract)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:organization-governance-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|http\/private-api-request|content-discussion-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

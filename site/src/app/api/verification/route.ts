@@ -4,15 +4,15 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { externalWebUrlSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { isPostgresDeadlock } from "../../../lib/postgres-error";
+} from "../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {

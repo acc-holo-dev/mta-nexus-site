@@ -2,7 +2,7 @@ import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

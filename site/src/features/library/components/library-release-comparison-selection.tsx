@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";

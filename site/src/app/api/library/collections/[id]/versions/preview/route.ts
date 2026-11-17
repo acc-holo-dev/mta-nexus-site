@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
-import { readBoundedJson } from "../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
 import { librarySelectionBatchesService as service } from "../../../../../../../lib/services/library/library-selection-batches-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {

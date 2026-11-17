@@ -1,7 +1,7 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Activity, BarChart3 } from "lucide-react";
 import Link from "next/link";
-import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/platform/i18n";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
 import {
   formatHistoryIntervalUtc,

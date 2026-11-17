@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { SupportCenter } from "../../src/features/support/center";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

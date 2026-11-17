@@ -4,15 +4,15 @@ import { createProductSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 import { parseMarketQuery } from "../../../features/resources/model";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
+} from "../../../lib/platform/observability";
+import { isUniqueConstraintViolation } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 

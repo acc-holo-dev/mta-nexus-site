@@ -9,8 +9,8 @@ import { organizationPublicationHistoryError } from "../../../../../../../../fea
 import {
   readBoundedJson,
   requireServerJsonContentType,
-} from "../../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
+} from "../../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../../lib/http/browser-route-adapter";
 import { organizationContentService } from "../../../../../../../../lib/services/organizations/organization-content-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; contentId: string }> }) => {

@@ -19,7 +19,7 @@ import { serverContentId } from "../../../../../features/servers/server-content-
 import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
 import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { serverContentService } from "../../../../../lib/services/servers/server-content-service";
 export const dynamic = "force-dynamic";

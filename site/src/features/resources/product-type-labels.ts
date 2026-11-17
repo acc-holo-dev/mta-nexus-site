@@ -1,5 +1,5 @@
 import type { ProductType } from "@nexus/domain";
-import type { getDictionary } from "../../lib/i18n";
+import type { getDictionary } from "../../lib/platform/i18n";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 export const PRODUCT_CATEGORY_KEYS = {

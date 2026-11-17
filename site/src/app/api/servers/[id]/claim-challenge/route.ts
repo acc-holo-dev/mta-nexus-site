@@ -1,14 +1,14 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../../lib/observability";
-import { isPostgresDeadlock } from "../../../../../lib/postgres-error";
+} from "../../../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../../../lib/platform/postgres-error";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { serverClaimService } from "../../../../../lib/services/servers/server-claim-service";
 

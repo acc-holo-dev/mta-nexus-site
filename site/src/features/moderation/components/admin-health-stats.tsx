@@ -1,6 +1,6 @@
 import { StatCard } from "@nexus/ui";
 import { AlertTriangle, BookOpen, Box, Server, Users } from "lucide-react";
-import type { getDictionary } from "../../../lib/i18n";
+import type { getDictionary } from "../../../lib/platform/i18n";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 

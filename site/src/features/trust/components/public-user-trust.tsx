@@ -1,6 +1,6 @@
 import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/i18n";
+import type { Locale } from "../../../lib/platform/i18n";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";

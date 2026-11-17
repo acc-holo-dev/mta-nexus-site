@@ -1,5 +1,5 @@
 import { getFinancialCopy } from "../../../../features/commerce/financial-i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /admin/commerce/reconciliation.
 export default async function Loading() {

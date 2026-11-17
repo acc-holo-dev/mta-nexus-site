@@ -7,8 +7,11 @@ import {
   discussionRemoveSchema,
 } from "../../../../../../features/community/content-discussion-contract";
 import { discussionMutationError } from "../../../../../../features/community/content-discussion-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/http/browser-route-adapter";
 import { contentService } from "../../../../../../lib/services/community/content-service";
 
 type Context = { params: Promise<{ slug: string; id: string }> };

@@ -4,12 +4,12 @@ import type { NextRequest } from "next/server";
 import { parsePublicationQuery } from "../../../../../features/community/publication-feed-contract";
 import { publicationError } from "../../../../../features/community/publication-feed-copy";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
-import { resolveLocale } from "../../../../../lib/i18n";
+import { resolveLocale } from "../../../../../lib/platform/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
+} from "../../../../../lib/platform/observability";
 import { publicationFeedService } from "../../../../../lib/services/discovery/publication-feed-service";
 export const dynamic = "force-dynamic";
 export async function GET(

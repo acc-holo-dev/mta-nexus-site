@@ -4,12 +4,12 @@ import { notificationRepository, resourceReleaseWatchesRepository } from "@nexus
 import type {
   PersonalChangeReason,
   PersonalChangesSummary,
-} from "../features/shell/home-personal-changes-types";
+} from "../../features/shell/home-personal-changes-types";
+import { followWorkspaceService } from "../services/community/follow-workspace-service";
+import { formatNotificationInboxPage } from "../services/notifications/notification-inbox-service";
 import type { Locale } from "./i18n";
-import { followWorkspaceService } from "./services/community/follow-workspace-service";
-import { formatNotificationInboxPage } from "./services/notifications/notification-inbox-service";
 
-export type { PersonalChangesSummary } from "../features/shell/home-personal-changes-types";
+export type { PersonalChangesSummary } from "../../features/shell/home-personal-changes-types";
 
 const LIMIT = 12;
 

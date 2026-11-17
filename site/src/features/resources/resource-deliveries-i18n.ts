@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/i18n";
+import type { Locale } from "../../lib/platform/i18n";
 
 const en = {
   loadUnavailable: "Resource delivery evidence is temporarily unavailable. Please try again.",

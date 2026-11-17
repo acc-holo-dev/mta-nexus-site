@@ -133,12 +133,12 @@ function mutationAdapters(source: string, file: string) {
       const name = specifier.imported?.value ?? specifier.local.value;
       if (
         name === "withBrowserMutation" &&
-        target === path.join(repoRoot, "site/src/lib/browser-route-adapter.ts")
+        target === path.join(repoRoot, "site/src/lib/http/browser-route-adapter.ts")
       )
         imports.set(specifier.local.value, "browser");
       if (
         name === "withLicenseBearerRoute" &&
-        target === path.join(repoRoot, "site/src/lib/license-bearer-route-adapter.ts")
+        target === path.join(repoRoot, "site/src/lib/http/license-bearer-route-adapter.ts")
       )
         imports.set(specifier.local.value, "bearer");
     }
@@ -231,7 +231,7 @@ describe("browser API route adapter inventory", () => {
   it("detects mixed methods, markers in comments, fake adapters and indirect exports", () => {
     const file = path.join(apiRoot, "demo/route.ts");
     const wrapped =
-      'import { withBrowserMutation as guard } from "../../../lib/browser-route-adapter"; export const POST = guard(async () => new Response());';
+      'import { withBrowserMutation as guard } from "../../../lib/http/browser-route-adapter"; export const POST = guard(async () => new Response());';
     expect(mutationAdapters(`${wrapped} export function DELETE() {}`, file)).toEqual([
       { method: "POST", adapter: "browser" },
       { method: "DELETE", adapter: null },

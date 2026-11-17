@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { requireServerJsonContentType } from "../../lib/bounded-json";
-import { resolveLocale } from "../../lib/i18n";
-import { jsonWithRequestId, logRequestEvent } from "../../lib/observability";
+import { requireServerJsonContentType } from "../../lib/http/bounded-json";
+import { resolveLocale } from "../../lib/platform/i18n";
+import { jsonWithRequestId, logRequestEvent } from "../../lib/platform/observability";
 import { supportWorkspaceError } from "./support-workspace-copy";
 
 type Context = Parameters<typeof jsonWithRequestId>[0];

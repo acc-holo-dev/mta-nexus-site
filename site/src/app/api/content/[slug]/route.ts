@@ -3,7 +3,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { contentService } from "../../../../lib/services/community/content-service";
 
 const publicHeaders = {

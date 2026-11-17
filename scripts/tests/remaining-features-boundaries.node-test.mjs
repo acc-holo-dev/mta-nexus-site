@@ -25,7 +25,7 @@ const features = [
       ["page-server", "support-page.tsx"],
       ["messages-server", "support-message-page.tsx"],
     ],
-    safe: "private-api-request|user-platform-client|user-platform-contract|user-platform-copy|private-change-history-query|support-idempotency",
+    safe: "http/private-api-request|user-platform-client|user-platform-contract|user-platform-copy|private-change-history-query|support-idempotency",
   },
   {
     name: "moderation",
@@ -51,7 +51,7 @@ const features = [
     ],
     privateClients: [],
     servers: [["reports-server", "platform-reports-screen.tsx"]],
-    safe: "private-api-request|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",
+    safe: "http/private-api-request|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",
   },
   {
     name: "accounts",
@@ -92,7 +92,7 @@ const features = [
       "retention-activation-windows",
       "security-activity",
     ],
-    safe: "notification-preferences-confirmation|notification-inbox-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
+    safe: "notification-preferences-confirmation|notification-inbox-copy|user-platform-client|http/private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
   },
   {
     name: "shell",
@@ -130,7 +130,7 @@ const features = [
     ],
     privateClients: ["shell-session-unavailable"],
     servers: [],
-    safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|private-api-request|resource-release-watches-i18n",
+    safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|http/private-api-request|resource-release-watches-i18n",
   },
   {
     name: "discovery",
@@ -267,7 +267,10 @@ for (const { name, clients, privateClients, servers, safe, clientUtilPorts } of 
       assert.deepEqual(graph.summary.violations, []);
       const modules = new Map(graph.modules.map((mod) => [mod.source, mod]));
       const visited = new Set();
-      const safeLib = new RegExp(`^(?:i18n(?:\\.ts$|/)|(?:${safe})\\.ts$)`, "u");
+      const safeLib = new RegExp(
+        `^(?:(?:i18n(?:\\.ts$|/)|platform\\/i18n\\.ts$)|(?:${safe})\\.ts$)`,
+        "u",
+      );
       function visit(path) {
         if (visited.has(path)) return;
         visited.add(path);

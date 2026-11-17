@@ -7,7 +7,7 @@ import {
   parseSupportCaseList,
   parseSupportCasePage,
   parseSupportThread,
-} from "../features/support/support-response";
+} from "../../src/features/support/support-response";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const anotherId = `sup_${"b".repeat(24)}`;

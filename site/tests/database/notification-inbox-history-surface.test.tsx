@@ -11,7 +11,7 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", session: vi.fn(),
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/notifications" }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -25,7 +25,7 @@ import Loading from "../../src/app/notifications/loading";
 import Page, { generateMetadata } from "../../src/app/notifications/page";
 import { notificationInboxCopy } from "../../src/features/notifications/notification-inbox-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

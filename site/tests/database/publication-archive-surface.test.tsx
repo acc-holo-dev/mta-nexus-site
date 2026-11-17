@@ -11,7 +11,7 @@ import {
 import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 const state = vi.hoisted(() => ({ locale: "en" as "ru" | "en", resolve: vi.fn(), page: vi.fn() }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/platform/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({

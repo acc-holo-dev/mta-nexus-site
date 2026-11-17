@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { serverMutationErrorMessage } from "../../src/features/servers/server-mutation-errors";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 describe("localized server mutation errors", () => {
   it.each(["en", "ru"] as const)(

@@ -4,7 +4,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
+} from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {

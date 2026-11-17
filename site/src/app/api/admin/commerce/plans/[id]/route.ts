@@ -2,8 +2,8 @@ import { AppError, ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
-import { readBoundedJson } from "../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import { readBoundedJson } from "../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/http/browser-route-adapter";
 import { commercialPlanService } from "../../../../../../lib/services/commerce/commercial-plan-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {

@@ -73,7 +73,7 @@ vi.mock("../features/servers/client", async () => {
   };
 });
 
-vi.mock("../lib/i18n-server", () => ({
+vi.mock("../lib/platform/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
@@ -106,7 +106,7 @@ vi.mock("../lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../lib/home-personal-changes", () => ({
+vi.mock("../lib/platform/home-personal-changes", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 

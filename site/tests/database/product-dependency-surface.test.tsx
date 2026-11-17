@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ResourceVersionHelpSection } from "../../src/features/resources/components/resource-version-help-section";
 import { ProductDependencyList } from "../../src/features/resources/detail-view";
 import { buildProductDependencyResolution } from "../../src/features/resources/product-dependency-resolution";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const mocks = vi.hoisted(() => ({
   findPublishedFreeBySlugs: vi.fn(),

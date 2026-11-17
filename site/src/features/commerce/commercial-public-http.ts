@@ -5,7 +5,7 @@ import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
 
 export async function commercialPublicRequest(

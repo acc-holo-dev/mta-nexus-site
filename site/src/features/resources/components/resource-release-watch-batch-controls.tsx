@@ -8,8 +8,8 @@ import {
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import type { Locale } from "../../../lib/platform/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { confirmedResourceReleaseWatchBatch } from "../resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";

@@ -1,12 +1,12 @@
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit, digestLicenseRuntimeToken } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { requireServerJsonContentType } from "../../lib/bounded-json";
+import { requireServerJsonContentType } from "../../lib/http/bounded-json";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../lib/observability";
+} from "../../lib/platform/observability";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
 
 /** Shared bearer-only runtime boundary; cookies never replace a runtime token. */

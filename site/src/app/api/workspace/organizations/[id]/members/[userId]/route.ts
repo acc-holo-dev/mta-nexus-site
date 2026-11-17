@@ -5,7 +5,7 @@ import {
   organizationInput,
   organizationMutationToken,
 } from "../../../../../../../features/organizations/organization-workspace-api";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
 import { organizationWorkspaceService } from "../../../../../../../lib/services/organizations/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string; userId: string }> };

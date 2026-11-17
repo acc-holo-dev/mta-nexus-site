@@ -1,6 +1,6 @@
 import { OrganizationContentEditorPage } from "../../../../../../features/organizations/content-editor-server";
 import { organizationContentCopy } from "../../../../../../features/organizations/organization-content-copy";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 
 export const dynamic = "force-dynamic";
 

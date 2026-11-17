@@ -1,6 +1,6 @@
 import { resourceMediaCopy } from "../../../../../features/resources/resource-media-i18n";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { getDictionary } from "../../../../../lib/platform/i18n";
+import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /admin/resources/[id]/media.
 export default async function Loading() {

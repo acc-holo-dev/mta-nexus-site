@@ -19,7 +19,9 @@ vi.mock("../../../lib/services/commerce/product-service", () => ({
 vi.mock("../../../lib/services/community/content-service", () => ({ contentService: {} }));
 vi.mock("../../../lib/services/accounts/auth-service", () => ({ authService: {} }));
 vi.mock("../../../lib/services/commerce/commerce-service", () => ({ commerceService: {} }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/platform/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 
 import { generateMetadata } from "./page";
 

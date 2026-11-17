@@ -7,8 +7,11 @@ import {
   communityReportDecisionError,
   communityReportError,
 } from "../../../../../features/community/community-report-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { communityReportService } from "../../../../../lib/services/community/community-report-service";
 
 type Context = { params: Promise<{ id: string }> };

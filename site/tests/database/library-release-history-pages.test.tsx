@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/version-history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/platform/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
@@ -25,7 +25,7 @@ vi.mock("../../src/lib/services/resources/resource-release-control-service", () 
 
 import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
-import { getDictionary } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/platform/i18n";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const result = () => ({
