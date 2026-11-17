@@ -11,6 +11,8 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
@@ -160,7 +162,20 @@ function Pagination({
 export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]),
     copy = orderCaseCopy(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/purchases/"}
+      />
+    );
+  }
+
   if (!actor)
     return (
       <PlatformSignIn
