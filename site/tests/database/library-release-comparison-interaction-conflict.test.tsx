@@ -21,7 +21,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { LibraryReleaseComparisonSelection } from "../../src/features/library/components/library-release-comparison-selection";
-import { libraryReleaseComparisonCopy } from "../../src/lib/library-release-comparison-i18n";
+import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
 import { flatTreeHasErrorText } from "../helpers/flatten-react-test-tree";
 
 const { click, confirm, render } = createLibraryReleaseComparisonInteractionHelpers(
