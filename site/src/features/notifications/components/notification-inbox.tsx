@@ -19,7 +19,7 @@ import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
-} from "../../../lib/notification-inbox-export-client";
+} from "../notification-inbox-export-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,

@@ -1,12 +1,12 @@
 import { z } from "zod";
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
 import {
   INBOX_CATEGORIES,
   INBOX_PERIODS,
   type NotificationInboxQuery,
   notificationInboxHref,
   notificationInboxPageSchema,
-} from "./notification-inbox-contract";
+} from "../../lib/notification-inbox-contract";
 
 export const INBOX_EXPORT_MAX_BYTES = 1024 * 1024;
 export const INBOX_EXPORT_FILE_NAME = "nexus-notification-page.json";

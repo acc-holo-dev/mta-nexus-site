@@ -238,7 +238,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/notifications/)" },
       to: {
-        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling)\\.ts$)",
+        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling|notification-inbox-export-client)\\.ts$)",
       },
     },
     {
@@ -251,17 +251,17 @@ module.exports = {
       name: "notifications-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!notifications/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!notifications/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "notifications-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

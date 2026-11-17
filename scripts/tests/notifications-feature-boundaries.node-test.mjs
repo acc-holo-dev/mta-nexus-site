@@ -9,10 +9,14 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const clientPorts = ["bell", "preferences"];
-const utilPorts = ["notification-inbox-events", "visible-polling"];
+const utilPorts = [
+  "notification-inbox-events",
+  "visible-polling",
+  "notification-inbox-export-client",
+];
 const serverPorts = ["center"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-preferences-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
