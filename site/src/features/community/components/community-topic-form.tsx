@@ -15,7 +15,7 @@ import {
   type CommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
-} from "../../../lib/community-topic-submission";
+} from "../community-topic-submission";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { authEntryHref } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";

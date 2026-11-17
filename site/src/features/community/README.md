@@ -47,6 +47,7 @@ Feature объединяет клиентское обсуждение публ�
 | `discussion-compose-draft.ts`            | util port `discussion-compose-draft`                                          |
 | `community-topic-intent.ts`              | util port `community-topic-intent`                                            |
 | `discussion-reports-copy.ts`             | util port `discussion-reports-copy`                                           |
+| `community-topic-submission.ts` | util port `community-topic-submission` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

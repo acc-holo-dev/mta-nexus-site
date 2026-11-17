@@ -7,7 +7,7 @@ import {
   buildCommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
-} from "../../src/lib/community-topic-submission";
+} from "../../src/features/community/community-topic-submission";
 import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
