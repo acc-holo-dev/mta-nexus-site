@@ -12,13 +12,13 @@ const features = [
   {
     name: "support",
     clients: ["center", "thread", "download-help"],
-    clientUtilPorts: ["support-message-discovery-copy", "support-idempotency"],
+    clientUtilPorts: ["support-message-discovery-copy"],
     privateClients: ["support-case-actions", "support-status-history", "support-message-browser"],
     servers: [
       ["page-server", "support-page.tsx"],
       ["messages-server", "support-message-page.tsx"],
     ],
-    safe: "support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query",
+    safe: "support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency",
   },
   {
     name: "moderation",
@@ -35,7 +35,9 @@ const features = [
       "admin-status-labels",
       "verification-moderation",
       "storage-maintenance-i18n",
-      "verification-applications-copy", "storage-maintenance-query"],
+      "verification-applications-copy",
+      "storage-maintenance-query",
+    ],
     privateClients: [],
     servers: [["reports-server", "platform-reports-screen.tsx"]],
     safe: "platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",

@@ -134,7 +134,9 @@ it.each(["en", "ru"] as const)(
 );
 it("shows an honest recovery state when variant management fails", async () => {
   state.managed.mockRejectedValue(new Error("variants unavailable"));
-  const { getResourceManagementCopy } = await import("../../src/features/resources/resource-management-i18n");
+  const { getResourceManagementCopy } = await import(
+    "../../src/features/resources/resource-management-i18n"
+  );
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await VariantsPage(context));
   expect(html).toContain('role="alert"');
@@ -143,7 +145,9 @@ it("shows an honest recovery state when variant management fails", async () => {
 });
 it("shows an honest recovery state when compatibility resolution fails", async () => {
   state.resolution.mockRejectedValue(new Error("compatibility unavailable"));
-  const { getResourceManagementCopy } = await import("../../src/features/resources/resource-management-i18n");
+  const { getResourceManagementCopy } = await import(
+    "../../src/features/resources/resource-management-i18n"
+  );
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await CompatibilityPage(context));
   expect(html).toContain('role="alert"');

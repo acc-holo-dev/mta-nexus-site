@@ -44,8 +44,8 @@ repositories и collectors остаются в прежних модулях и 
 | `server-review-i18n.ts`           | util port `server-review-i18n`                                                                    |
 | `server-mutation-errors.ts`       | util port `server-mutation-errors`                                                                |
 | `server-workspace-copy.ts`        | util port `server-workspace-copy`                                                                 |
-| `server-review-query.ts` | util port `server-review-query` |
-| `server-follow-notifications.ts` | util port `server-follow-notifications` |
+| `server-review-query.ts`          | util port `server-review-query`                                                                   |
+| `server-follow-notifications.ts`  | util port `server-follow-notifications`                                                           |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

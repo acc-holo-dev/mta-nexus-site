@@ -9,7 +9,9 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const serverPorts = ["admin-home"];
-const utilPorts = ["storage-maintenance-i18n", "verification-applications-copy",
+const utilPorts = [
+  "storage-maintenance-i18n",
+  "verification-applications-copy",
   "storage-maintenance-query",
 ];
 const clientPorts = ["storage-maintenance"];

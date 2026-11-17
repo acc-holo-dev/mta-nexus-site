@@ -79,20 +79,19 @@ Services и repositories не дублируются и не переносят�
 | `resource-copy-i18n.ts`                        | util port `resource-copy-i18n`                                                                              |
 | `resource-publisher-i18n.ts`                   | util port `resource-publisher-i18n`                                                                         |
 | `resource-build-workspace-i18n.ts`             | util port `resource-build-workspace-i18n`                                                                   |
-| `resource-qa-query.ts` | util port `resource-qa-query` |
-| `resource-cart-receipts-csv.ts` | util port `resource-cart-receipts-csv` |
-| `build-download-metadata.ts` | util port `build-download-metadata` |
-| `resource-deliveries-csv.ts` | util port `resource-deliveries-csv` |
-| `resource-download-policy.ts` | util port `resource-download-policy` |
-| `resource-activity-view.ts` | util port `resource-activity-view` |
-| `resource-attachment-filename.ts` | util port `resource-attachment-filename` |
-| `resource-activity-query.ts` | util port `resource-activity-query` |
-| `resource-release-watch-history-i18n.ts` | util port `resource-release-watch-history-i18n` |
-| `resource-activity-i18n.ts` | util port `resource-activity-i18n` |
-| `resource-release-watches-query.ts` | util port `resource-release-watches-query` |
-| `resource-deliveries-query.ts` | util port `resource-deliveries-query` |
-| `resource-media-i18n.ts` | util port `resource-media-i18n` |
-| `resource-management-i18n.ts` | util port `resource-management-i18n` |
+| `resource-qa-query.ts`                         | util port `resource-qa-query`                                                                               |
+| `resource-cart-receipts-csv.ts`                | util port `resource-cart-receipts-csv`                                                                      |
+| `build-download-metadata.ts`                   | util port `build-download-metadata`                                                                         |
+| `resource-deliveries-csv.ts`                   | util port `resource-deliveries-csv`                                                                         |
+| `resource-download-policy.ts`                  | util port `resource-download-policy`                                                                        |
+| `resource-activity-view.ts`                    | util port `resource-activity-view`                                                                          |
+| `resource-activity-query.ts`                   | util port `resource-activity-query`                                                                         |
+| `resource-release-watch-history-i18n.ts`       | util port `resource-release-watch-history-i18n`                                                             |
+| `resource-activity-i18n.ts`                    | util port `resource-activity-i18n`                                                                          |
+| `resource-release-watches-query.ts`            | util port `resource-release-watches-query`                                                                  |
+| `resource-deliveries-query.ts`                 | util port `resource-deliveries-query`                                                                       |
+| `resource-media-i18n.ts`                       | util port `resource-media-i18n`                                                                             |
+| `resource-management-i18n.ts`                  | util port `resource-management-i18n`                                                                        |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

@@ -4,17 +4,14 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedVariantCommand } from "../resource-management-confirmation";
-import {
-  getResourceManagementCopy,
-  resourceManagementError,
-} from "../resource-management-i18n";
 import { parseEditableProfile } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
+import { confirmedVariantCommand } from "../resource-management-confirmation";
+import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
 type Candidate = { productId: string; title: string; slug: string; status: string };
 type CandidatePage = { candidates: Candidate[]; page: number; hasMore: boolean };

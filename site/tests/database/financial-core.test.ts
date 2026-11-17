@@ -1,7 +1,11 @@
+import { type LedgerPosting, validateLedgerPosting } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { validateLedgerPosting, type LedgerPosting } from "@nexus/domain";
-import { financialStatementQuery, financialReviewQuery } from "../../src/features/commerce/financial-query";
 import { formatFinancialMinor } from "../../src/features/commerce/financial-i18n";
+import {
+  financialReviewQuery,
+  financialStatementQuery,
+} from "../../src/features/commerce/financial-query";
+
 const lines: LedgerPosting[] = [
   {
     id: "leg_a",

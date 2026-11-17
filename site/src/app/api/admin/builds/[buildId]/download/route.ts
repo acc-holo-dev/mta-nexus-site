@@ -15,7 +15,7 @@ import {
   REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../../lib/observability";
-import { reviewerAttachmentFileName } from "../../../../../../features/resources/resource-attachment-filename";
+import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
 import { authService } from "../../../../../../lib/services/auth-service";
 
 const privateHeaders = {

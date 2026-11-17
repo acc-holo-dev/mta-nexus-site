@@ -13,7 +13,7 @@ Feature объединяет существующие колокольчик, in
 | `notification-inbox-export-client.ts` | Inbox page export fetch/validate (`fetchNotificationInboxExport`)   |
 | `center-server.ts`                    | Страница inbox и metadata; server-only                              |
 | `notification-inbox-copy.ts`          | util port `notification-inbox-copy`                                 |
-| `notification-read.ts` | util port `notification-read` |
+| `notification-read.ts`                | util port `notification-read`                                       |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
 production-код использует публичные входы; маршруты не импортируются feature.
