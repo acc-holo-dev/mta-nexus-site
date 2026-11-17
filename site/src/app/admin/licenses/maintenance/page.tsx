@@ -13,6 +13,8 @@ import { getCommerceHistoryCopy } from "../../../../features/commerce/commerce-h
 import { getLicenseMaintenanceCopy } from "../../../../features/commerce/license-maintenance-i18n";
 import { licenseRuntimePage } from "../../../../features/commerce/license-runtime-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -29,8 +31,21 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
+  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/admin/licenses/maintenance"}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/admin/licenses/maintenance" />;
   if (actor.role !== "admin") notFound();
   const params = new URLSearchParams();
