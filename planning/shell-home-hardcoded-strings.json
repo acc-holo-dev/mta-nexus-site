@@ -80,24 +80,6 @@
       "line": 89,
       "path": "site/src/app/page.tsx",
       "text": "—"
-    },
-    {
-      "kind": "jsx-text",
-      "line": 17,
-      "path": "site/src/features/shell/home-personal-changes.ts",
-      "text": "char.charCodeAt(0)"
-    },
-    {
-      "kind": "jsx-text",
-      "line": 23,
-      "path": "site/src/features/shell/offline-cache-policy.ts",
-      "text": "entry.toLowerCase() === value.toLowerCase()))"
-    },
-    {
-      "kind": "jsx-text",
-      "line": 12,
-      "path": "site/src/features/shell/public-platform-api.ts",
-      "text": "Promise"
     }
   ],
   "scan_roots": [
@@ -107,12 +89,12 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature, home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "13dcfb947d58f64e5719d09787736cbc4703760b",
+  "source_sha": "883a8e0cdcf0ea55ae01bd8697d71fc0fee98012",
   "summary": {
     "allowlisted": 7,
-    "findings": 10,
+    "findings": 7,
     "locale_copy_ternaries": 0,
-    "scanned_files": 58,
-    "unallowlisted": 3
+    "scanned_files": 55,
+    "unallowlisted": 0
   }
 }
