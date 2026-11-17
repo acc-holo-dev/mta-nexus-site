@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
-import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
+import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {

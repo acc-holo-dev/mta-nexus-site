@@ -4,7 +4,7 @@ import { confirmedResourceReleaseWatchBatch } from "../../src/features/resources
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
-} from "../../src/lib/resource-release-watches-query";
+} from "../../src/features/resources/resource-release-watches-query";
 const command = {
   items: [
     { productId: "prd_a", expectedRevision: 1 },

@@ -16,7 +16,7 @@ import {
 import { getResourceReleaseControlCopy } from "../../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../../features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
-import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
+import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
 

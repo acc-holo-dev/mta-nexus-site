@@ -3,7 +3,7 @@ import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
-} from "../../src/lib/resource-release-watches-query";
+} from "../../src/features/resources/resource-release-watches-query";
 import { resourceReleaseNotification } from "../../src/lib/resource-release-watches-i18n";
 import { resourceReleaseWorkerOptions } from "../../packages/db/src/resource-release-worker-config";
 import { formatNotification } from "../../src/lib/notification-copy";

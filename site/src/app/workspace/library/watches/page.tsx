@@ -14,7 +14,7 @@ import { resourceReleaseWatchesCopy } from "../../../../lib/resource-release-wat
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
-} from "../../../../lib/resource-release-watches-query";
+} from "../../../../features/resources/resource-release-watches-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../lib/services/resource-release-watches-service";
 
