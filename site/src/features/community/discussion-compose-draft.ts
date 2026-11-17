@@ -3,7 +3,7 @@
  * Never auto-publishes after restore; clears only after a confirmed publish.
  */
 
-import { parseCommentIntentKey } from "./content-comment-client";
+import { parseCommentIntentKey } from "../../lib/content-comment-client";
 
 export type DiscussionComposeDraft = {
   version: 1;

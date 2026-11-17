@@ -5,7 +5,7 @@ import {
   parseDiscussionComposeDraft,
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
-} from "../../src/lib/discussion-compose-draft";
+} from "../../src/features/community/discussion-compose-draft";
 
 function memoryStore(): DiscussionComposeDraftStore & { data: Map<string, string> } {
   const data = new Map<string, string>();

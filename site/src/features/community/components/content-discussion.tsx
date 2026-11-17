@@ -24,7 +24,7 @@ import {
   clearDiscussionComposeDraft,
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
-} from "../../../lib/discussion-compose-draft";
+} from "../discussion-compose-draft";
 import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
 import { followCopy } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
