@@ -1,4 +1,3 @@
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
@@ -6,9 +5,11 @@ import {
   type ResourceReleaseWatchDisableResult,
 } from "@nexus/domain";
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, resourceReleaseWatches as watches, users } from "../schema";
+import { auditEvents, users, resourceReleaseWatches as watches } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
+
 const fail = () => new AppError("Watch batch changed", 409, "RELEASE_WATCH_BATCH_CONFLICT");
 const fields = {
   productId: watches.productId,

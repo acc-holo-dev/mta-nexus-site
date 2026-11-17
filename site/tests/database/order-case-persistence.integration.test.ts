@@ -1,21 +1,21 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { and, count, eq, sql } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   db,
-  userRepository,
+  orderCasesRepository as repo,
   sessionRepository,
   sessions,
-  orderCasesRepository as repo,
+  userRepository,
 } from "@nexus/db";
+import { and, count, eq, sql } from "drizzle-orm";
+import { expect, it } from "vitest";
 import {
   auditEvents,
   commerceOrderCases,
   notifications,
   orders,
   payments,
-  supportCases,
   supportCaseMessages,
+  supportCases,
 } from "../../packages/db/src/schema";
 
 // Requires disposable PostgreSQL migrated through 0052. The completed payment

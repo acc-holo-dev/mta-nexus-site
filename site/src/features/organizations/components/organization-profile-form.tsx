@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
   editableOrganizationSchema,
@@ -13,8 +12,9 @@ import {
   organizationUpdateSchema,
   organizationWorkspaceSchema,
 } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { PlatformRequestError, parseEditableProfile } from "../../../lib/user-platform-client";
+import { organizationRequest as platformRequest } from "../organization-workspace-client";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

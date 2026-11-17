@@ -36,10 +36,10 @@ import History, {
 import Loading from "../../src/app/workspace/content/loading";
 import Desk, { generateMetadata as deskMetadata } from "../../src/app/workspace/content/page";
 import Following from "../../src/app/workspace/feed/page";
+import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
 import { FollowWorkspace } from "../../src/features/community/follow";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 const revision = "2026-10-11T00:00:00.123456Z";
 const cursor = JSON.stringify({

@@ -9,9 +9,9 @@ import {
   userRepository,
 } from "@nexus/db";
 import { and, eq } from "drizzle-orm";
+import { assertProductMutationAuthority } from "../../packages/db/src/repositories/product-mutation-authority";
 import { productService } from "../../src/lib/services/product-service";
 import { serverService } from "../../src/lib/services/server-service";
-import { assertProductMutationAuthority } from "../../packages/db/src/repositories/product-mutation-authority";
 
 export {
   assertProductMutationAuthority,

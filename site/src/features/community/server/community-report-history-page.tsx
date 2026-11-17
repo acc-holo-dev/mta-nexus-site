@@ -4,13 +4,13 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportId, reportRateLimit } from "../../../lib/community-report-api";
 import { parseReportHistoryQuery } from "../../../lib/community-report-history-contract";
-import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
-import { CommunityReportHistory } from "../components/community-report-history";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
+import { CommunityReportHistory } from "../components/community-report-history";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,

@@ -1,5 +1,5 @@
-import { and, eq, gt } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
+import { and, eq, gt } from "drizzle-orm";
 import { sessions } from "../schema";
 import type { ResourceTransaction } from "../transaction";
 import { digestSessionToken } from "./sessions";

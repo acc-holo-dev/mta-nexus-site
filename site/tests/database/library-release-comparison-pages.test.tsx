@@ -25,8 +25,8 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
 
-import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
 import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
+import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
 import { authService } from "../../src/lib/services/auth-service";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({

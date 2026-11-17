@@ -12,18 +12,18 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { DeveloperExperience } from "../../../features/accounts/developer-experience";
 import { ProfileResourcePagination } from "../../../features/accounts/profile-pagination";
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { FollowButton } from "../../../features/community/follow";
+import { buildFollowInitialState } from "../../../features/community/follow-initial-state";
+import { publicationCopy } from "../../../features/community/publication-feed-copy";
 import { ObjectReportForm } from "../../../features/moderation/object-report";
 import { ProductCard } from "../../../features/resources/view";
 import { ServerCard } from "../../../features/servers/client";
 import { authEntryHref } from "../../../features/shell/auth-return";
-import { buildFollowInitialState } from "../../../lib/follow-initial-state";
+import { trustCopy } from "../../../features/trust/public-user-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
-import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
-import { trustCopy } from "../../../features/trust/public-user-trust-copy";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {
   indexMtaObservations,

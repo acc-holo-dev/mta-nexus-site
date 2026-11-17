@@ -11,7 +11,6 @@ import {
   platformFieldClass,
   platformRequest,
 } from "../../../lib/user-platform-client";
-import { verificationApplicationsCopy } from "../verification-applications-copy";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -25,7 +24,8 @@ import {
   verificationCopy,
   verificationError,
   verificationMutationError,
-} from "../../../lib/verification-workspace-copy";
+} from "../../trust/verification-workspace-copy";
+import { verificationApplicationsCopy } from "../verification-applications-copy";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
 

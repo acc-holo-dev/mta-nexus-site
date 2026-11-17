@@ -22,8 +22,8 @@ vi.mock("../../src/lib/user-platform-client", async (original) => ({
 }));
 
 import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { PlatformRequestError } from "../../src/lib/user-platform-client";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const { render, submit, authenticateAndChoose, fillEvidence } =
   createVerificationApplicationIntentInteractionHelpers(harness, VerificationWorkspace);

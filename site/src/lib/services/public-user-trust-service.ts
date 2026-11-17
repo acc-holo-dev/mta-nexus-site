@@ -2,6 +2,7 @@ import { publicUserTrustRepository } from "@nexus/db";
 import { NotFoundError } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { PublicUserTrust } from "../public-user-trust-contract";
+
 const iso = (value: Date | string | null) =>
   value === null ? null : new Date(value).toISOString();
 class PublicUserTrustService {

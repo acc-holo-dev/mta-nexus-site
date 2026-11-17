@@ -1,5 +1,5 @@
+import { communityReportCopy } from "../../../features/community/community-report-copy";
 import { CommunityReportScreen } from "../../../features/community/reports-server";
-import { communityReportCopy } from "../../../lib/community-report-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

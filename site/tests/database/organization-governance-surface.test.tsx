@@ -27,15 +27,15 @@ vi.mock("../../src/lib/services/organization-governance-service", () => ({
 import HistoryPage, {
   generateMetadata,
 } from "../../src/app/workspace/organizations/[id]/activity/page";
-import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
 import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
+import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 import {
   confirmOwnershipTransfer,
   type OrganizationHistory,
   ownershipTransferSchema,
 } from "../../src/lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 
 const time = "2026-10-11T00:00:00.000Z",

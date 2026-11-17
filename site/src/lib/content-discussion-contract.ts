@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { createContentCommentSchema } from "@nexus/validation";
+import { z } from "zod";
 export const discussionCommentSchema = createContentCommentSchema
   .extend({
     text: z.string().trim().min(2).max(5000),

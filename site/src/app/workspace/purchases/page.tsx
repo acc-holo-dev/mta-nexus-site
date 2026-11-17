@@ -4,19 +4,19 @@ import { Package } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { HistoryPagination, HistoryShell } from "../../../features/commerce/workspace-history";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   orderStatusLabel,
   parseHistoryPage,
-} from "../../../lib/commerce-history-format";
+} from "../../../features/commerce/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
 import { getCommercialCopy } from "../../../features/commerce/commercial-i18n";
+import { orderCaseCopy } from "../../../features/commerce/order-case-i18n";
+import { HistoryPagination, HistoryShell } from "../../../features/commerce/workspace-history";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { orderCaseCopy } from "../../../lib/order-case-i18n";
 import { authService } from "../../../lib/services/auth-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

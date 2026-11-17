@@ -1,11 +1,11 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import { confirmAction } from "../../shell/confirm-action";
 import { confirmedReactionRemoval } from "../../../lib/content-reaction-contract";
-import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
 import type { Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmAction } from "../../shell/confirm-action";
+import { reactionCopy, reactionError } from "../content-reaction-copy";
 
 export function ReactionRemoval({
   contentId,

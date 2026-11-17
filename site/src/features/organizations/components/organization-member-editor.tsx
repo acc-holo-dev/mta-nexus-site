@@ -4,11 +4,11 @@ import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
+import { platformFieldClass } from "../../../lib/user-platform-client";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
-import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationMemberEditor({
   member,
   locale,

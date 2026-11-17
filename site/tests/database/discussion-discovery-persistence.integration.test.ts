@@ -1,14 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { eq, inArray, sql } from "drizzle-orm";
-import { afterEach, expect, it } from "vitest";
 import {
+  comments,
+  content,
   db,
   contentDiscussionRepository as discussion,
   userRepository,
-  comments,
-  content,
   users,
 } from "@nexus/db";
+import { eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+
 const actors: string[] = [];
 afterEach(async () => {
   if (actors.length) {

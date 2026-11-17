@@ -2,8 +2,6 @@ import { randomUUID } from "node:crypto";
 import { contentRepository, db, contentReactionsRepository as repository } from "@nexus/db";
 import { and, eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import { parseReactionPage } from "../../src/lib/content-reaction-contract";
-import { contentReactionService } from "../../src/lib/services/content-reaction-service";
 import {
   content,
   notificationPreferences,
@@ -11,6 +9,8 @@ import {
   reactions,
   users,
 } from "../../packages/db/src/schema";
+import { parseReactionPage } from "../../src/lib/content-reaction-contract";
+import { contentReactionService } from "../../src/lib/services/content-reaction-service";
 import {
   actor,
   command,

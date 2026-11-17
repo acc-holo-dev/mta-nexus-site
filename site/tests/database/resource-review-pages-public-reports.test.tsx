@@ -61,9 +61,9 @@ setupResourceReviewPages();
 import ReviewDetailLoading from "../../src/app/admin/commerce/reviews/[id]/loading";
 import ReviewsLoading from "../../src/app/admin/commerce/reviews/loading";
 import Public from "../../src/app/market/[slug]/reviews/page";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
 import { getDictionary } from "../../src/lib/i18n";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 import { authService } from "../../src/lib/services/auth-service";
 
 it.each(["en", "ru"] as const)(

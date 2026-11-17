@@ -16,8 +16,8 @@ vi.mock("../../src/features/shell/locale", () => ({
   }),
 }));
 
-import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 import { ContentCommentForm } from "../../src/features/community/components/content-comment-form";
+import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 
 describe("content discussion form", () => {
   beforeEach(() => {

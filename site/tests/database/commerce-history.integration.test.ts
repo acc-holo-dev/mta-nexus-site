@@ -1,17 +1,17 @@
-import { describe, expect, it } from "vitest";
-import { eq, inArray } from "drizzle-orm";
 import {
   db,
-  licenses,
-  orders,
-  orderItems,
-  products,
-  users,
   licenseRepository,
+  licenses,
+  orderItems,
   orderRepository,
+  orders,
   productRepository,
+  products,
   userRepository,
+  users,
 } from "@nexus/db";
+import { eq, inArray } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("private historical commerce queries (PostgreSQL)", () => {
   it("paginates buyer orders and seller items without cross-account data", async () => {

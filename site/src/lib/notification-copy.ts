@@ -1,6 +1,6 @@
 import type { Notification } from "@nexus/domain";
-import type { Locale } from "./i18n";
 import { licenseTermNotification } from "../features/commerce/license-maintenance-i18n";
+import type { Locale } from "./i18n";
 import { resourceReleaseNotification } from "./resource-release-watches-i18n";
 
 /** Localize structured review notices; older notifications keep their stored text. */

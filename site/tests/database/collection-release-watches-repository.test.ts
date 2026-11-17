@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
@@ -25,10 +26,12 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
+
 import {
   enableCollectionReleaseWatches as enable,
   readCollectionReleaseWatches as page,
 } from "../../packages/db/src/repositories/collection-release-watches";
+
 const stamp = "2026-10-12T00:00:00.000Z";
 const input = {
   userId: "usr_a",

@@ -5,13 +5,16 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
+import {
+  formatHistoryDate,
+  parseHistoryPage,
+} from "../../../features/commerce/commerce-history-format";
 import {
   financialReferenceLabel,
   formatFinancialMinor,
   getFinancialCopy,
 } from "../../../features/commerce/financial-i18n";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";

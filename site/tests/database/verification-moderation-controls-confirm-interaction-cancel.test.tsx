@@ -25,8 +25,8 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
 import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const { moderation, actionButton, reviewNotes } = createVerificationApplicationsInteractionHelpers(
   harness,

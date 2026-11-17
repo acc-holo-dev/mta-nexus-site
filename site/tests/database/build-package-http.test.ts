@@ -1,6 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   rate: true,
@@ -19,10 +20,12 @@ vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
 vi.mock("../../src/lib/services/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
-import { GET as report } from "../../src/app/api/products/[id]/builds/[buildId]/package/route";
+
+import { GET as staffFiles } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
 import { GET as staffReport } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/route";
 import { GET as files } from "../../src/app/api/products/[id]/builds/[buildId]/package/files/route";
-import { GET as staffFiles } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
+import { GET as report } from "../../src/app/api/products/[id]/builds/[buildId]/package/route";
+
 const context = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const request = (suffix = "") =>
   new NextRequest(`http://nexus.test/api/products/prd_a/builds/bld_a/package${suffix}`);

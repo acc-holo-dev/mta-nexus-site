@@ -1,4 +1,5 @@
 import { AppError, RESOURCE_DELIVERY_STATUSES, type ResourceDeliveryQuery } from "@nexus/domain";
+
 function invalid(): never {
   throw new AppError("Invalid delivery query", 400, "DELIVERY_QUERY_INVALID");
 }

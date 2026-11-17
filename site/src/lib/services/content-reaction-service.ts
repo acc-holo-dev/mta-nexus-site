@@ -2,13 +2,14 @@ import { createHash } from "node:crypto";
 import { contentReactionsRepository } from "@nexus/db";
 import {
   AppError,
-  NotFoundError,
-  contentReactionFromEmoji,
   type ContentReaction,
+  contentReactionFromEmoji,
+  NotFoundError,
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import type { ReactionPage, ReactionPageQuery, ReactionState } from "../content-reaction-contract";
+
 const validSlug = (slug: string) => /^[a-z0-9-]{1,200}$/u.test(slug);
 class ContentReactionService {
   async state(slug: string, actorId?: string): Promise<ReactionState & { actorId: string | null }> {

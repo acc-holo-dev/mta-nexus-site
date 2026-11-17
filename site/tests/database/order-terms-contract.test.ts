@@ -1,7 +1,7 @@
 import { readOrderLineTerms, validatePendingOrder } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { orderTermsId, orderTermsPageQuery } from "../../src/lib/order-terms-query";
 import { sellerSalesCsv } from "../../src/features/commerce/seller-sales-csv";
+import { orderTermsId, orderTermsPageQuery } from "../../src/lib/order-terms-query";
 import {
   sellerSalesDetailQuery,
   sellerSalesQuery,

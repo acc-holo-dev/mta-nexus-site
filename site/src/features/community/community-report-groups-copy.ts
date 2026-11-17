@@ -1,5 +1,5 @@
-import { communityReportError } from "../../lib/community-report-copy";
 import type { Locale } from "../../lib/i18n";
+import { communityReportError } from "./community-report-copy";
 
 const en = {
   title: "Reports grouped by target",

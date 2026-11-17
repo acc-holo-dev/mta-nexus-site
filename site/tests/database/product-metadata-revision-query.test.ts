@@ -1,6 +1,7 @@
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   condition: undefined as SQL | undefined,
   values: undefined as { updatedAt: SQL } | undefined,
@@ -32,7 +33,9 @@ vi.mock("../../packages/db/src/client", () => ({
       }),
   },
 }));
+
 import { ProductRepository } from "../../packages/db/src/repositories/products";
+
 const repository = new ProductRepository();
 const dialect = new PgDialect();
 const actor = { id: "author", role: "developer" as const };

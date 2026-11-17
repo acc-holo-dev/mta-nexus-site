@@ -15,6 +15,8 @@
 | `storage-maintenance-i18n.ts`                                                    | util port `storage-maintenance-i18n`                                      |
 | `verification-applications-copy.ts`                                              | util port `verification-applications-copy`                                |
 | `storage-maintenance-query.ts`                                                   | util port `storage-maintenance-query`                                     |
+| `admin-action-confirmation.ts`                                                   | util port `admin-action-confirmation`                                     |
+| `platform-report-i18n.ts`                                                        | util port `platform-report-i18n`                                          |
 
 Внутренние `components/` не являются публичным API. Границы — dependency-cruiser и
 `scripts/tests/moderation-feature-boundaries.node-test.mjs`.

@@ -58,8 +58,8 @@ setupResourceReviewPages();
 
 import Editor from "../../src/app/workspace/library/review/[id]/page";
 import Own from "../../src/app/workspace/library/reviews/page";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../src/features/resources/review-controls";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 
 it.each(["en", "ru"] as const)(
   "renders own unavailable reviews and history navigation in %s",

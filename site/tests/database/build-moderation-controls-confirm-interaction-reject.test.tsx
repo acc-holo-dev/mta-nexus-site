@@ -28,8 +28,8 @@ vi.mock("../../src/features/shell/locale", async () => {
 });
 
 import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const { render, actionButton, seedControls } =
   createBuildModerationControlsConfirmInteractionHelpers(

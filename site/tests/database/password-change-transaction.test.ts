@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { auditRepository, authRepository, sessionRepository, userRepository } from "@nexus/db";
 import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
+import { describe, expect, it } from "vitest";
 import { authService } from "../../src/lib/services/auth-service";
 
 const oldPassword = "Synthetic-old-password-005b!";

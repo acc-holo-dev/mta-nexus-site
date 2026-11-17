@@ -1,24 +1,24 @@
-import {
-  productRepository,
-  serverRepository,
-  contentRepository,
-  userRepository,
-  organizationRepository,
-  publicDirectoryRepository,
-  authorContentRepository,
-} from "@nexus/db";
-import { safeExternalWebUrl } from "@nexus/validation";
 import { createHash } from "node:crypto";
+import {
+  authorContentRepository,
+  contentRepository,
+  organizationRepository,
+  productRepository,
+  publicDirectoryRepository,
+  serverRepository,
+  userRepository,
+} from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import type { DiscoveryStreamQuery } from "../discovery-stream-contract";
+import { safeExternalWebUrl } from "@nexus/validation";
 import type { DiscoverQuery } from "../discover-query";
 import { DISCOVER_CONTENT_TYPES } from "../discover-query";
-import { productService } from "./product-service";
+import type { DiscoveryStreamQuery } from "../discovery-stream-contract";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
   mtaMasterDirectoryService,
 } from "./mta-master-directory-service";
+import { productService } from "./product-service";
 
 interface SearchResultItem {
   id: string;

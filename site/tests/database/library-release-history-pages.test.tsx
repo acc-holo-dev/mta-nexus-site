@@ -23,10 +23,10 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 
+import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",

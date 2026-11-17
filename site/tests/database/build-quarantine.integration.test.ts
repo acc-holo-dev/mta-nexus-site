@@ -1,4 +1,3 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import {
   auditRepository,
   buildRepository,
@@ -6,6 +5,7 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("build quarantine lifecycle", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

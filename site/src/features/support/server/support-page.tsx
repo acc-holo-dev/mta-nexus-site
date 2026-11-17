@@ -5,12 +5,11 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
-import { supportQuery } from "../../../lib/support-workspace-contract";
-import { supportWorkspaceCopy } from "../support-workspace-copy";
-import { PlatformGuestAuthPanel } from "../../shell/guest-auth";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { SupportCaseThread } from "../thread";
+import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
 import { SupportCenter } from "../center";
+import { supportQuery } from "../support-workspace-contract";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
+import { SupportCaseThread } from "../thread";
 
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;

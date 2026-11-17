@@ -7,12 +7,12 @@ import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { resourceReleaseWatchHistoryCopy } from "../../../../../features/resources/resource-release-watch-history-i18n";
+import { resourceReleaseWatchHistoryQuery } from "../../../../../features/resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../lib/library-collections-query";
-import { resourceReleaseWatchHistoryCopy } from "../../../../../features/resources/resource-release-watch-history-i18n";
-import { resourceReleaseWatchHistoryQuery } from "../../../../../lib/resource-release-watch-history-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
 

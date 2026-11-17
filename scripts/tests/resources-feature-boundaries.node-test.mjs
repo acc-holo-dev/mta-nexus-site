@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -128,6 +128,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-release-watch-history-query",
+    "resource-review-i18n",
+    "resource-requirements-query",
+    "resource-requirements-i18n",
     "resource-commerce-i18n",
     "resource-release-control-query",
     "build-download-selection",
@@ -299,6 +303,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watch-history-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-review-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-requirements-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-requirements-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-commerce-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-release-control-query.ts", "resources-view-isolation"],
     ["features/resources/build-download-selection.ts", "resources-view-isolation"],
@@ -399,6 +407,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-release-watch-history-query.ts",
+    "app/resource-review-i18n.ts",
+    "app/resource-requirements-query.ts",
+    "app/resource-requirements-i18n.ts",
     "app/resource-commerce-i18n.ts",
     "app/resource-release-control-query.ts",
     "app/build-download-selection.ts",
@@ -493,6 +505,10 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-release-watch-history-query.ts",
+    "site/src/features/resources/resource-review-i18n.ts",
+    "site/src/features/resources/resource-requirements-query.ts",
+    "site/src/features/resources/resource-requirements-i18n.ts",
     "site/src/features/resources/resource-commerce-i18n.ts",
     "site/src/features/resources/resource-release-control-query.ts",
     "site/src/features/resources/build-download-selection.ts",
@@ -667,6 +683,10 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-release-watch-history-query.ts");
+  visit("site/src/features/resources/resource-review-i18n.ts");
+  visit("site/src/features/resources/resource-requirements-query.ts");
+  visit("site/src/features/resources/resource-requirements-i18n.ts");
   visit("site/src/features/resources/resource-commerce-i18n.ts");
   visit("site/src/features/resources/resource-release-control-query.ts");
   visit("site/src/features/resources/build-download-selection.ts");

@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   stream: vi.fn(),
   page: vi.fn(),
@@ -25,9 +26,11 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("../../src/lib/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
-import { GET as stream } from "../../src/app/api/discover/stream/route";
+
+import { POST as command, GET as detail } from "../../src/app/api/admin/community/[id]/route";
 import { GET as page } from "../../src/app/api/admin/community/route";
-import { GET as detail, POST as command } from "../../src/app/api/admin/community/[id]/route";
+import { GET as stream } from "../../src/app/api/discover/stream/route";
+
 const actor = { id: "actor", role: "moderator" },
   context = { params: Promise.resolve({ id: "item" }) };
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {

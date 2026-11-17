@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+
 const invalid = () => new AppError("Invalid financial query", 400, "FINANCE_QUERY_INVALID");
 function single(query: URLSearchParams, key: string) {
   if (query.getAll(key).length > 1) throw invalid();

@@ -23,8 +23,8 @@ import PurchasesLoading from "../../src/app/workspace/purchases/loading";
 import ReviewReportDetailLoading from "../../src/app/workspace/review-reports/[id]/loading";
 import ReviewReportsLoading from "../../src/app/workspace/review-reports/loading";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
-import { orderCaseCopy } from "../../src/lib/order-case-i18n";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
+import { orderCaseCopy } from "../../src/features/commerce/order-case-i18n";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -158,9 +158,11 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(history).toContain("orderLoadUnavailableHint");
   expect(history).toContain("emptyPurchasesHint");
   expect(history).toContain("emptyItemsHint");
-  expect(read("site/src/lib/order-case-i18n.ts")).toContain("loading:");
-  expect(read("site/src/lib/order-case-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("site/src/lib/resource-review-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/features/commerce/order-case-i18n.ts")).toContain("loading:");
+  expect(read("site/src/features/commerce/order-case-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/features/resources/resource-review-i18n.ts")).toContain(
+    "loadUnavailableHint",
+  );
   expect(read("site/src/features/commerce/server/order-case-page.tsx")).toContain(
     "loadUnavailableHint",
   );

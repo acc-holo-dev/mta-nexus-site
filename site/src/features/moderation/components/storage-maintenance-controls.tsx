@@ -3,11 +3,11 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
   const response = await fetch(url, {

@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -26,9 +27,11 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("../../src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as page } from "../../src/app/api/workspace/discussions/route";
-import { GET as own, PATCH, DELETE } from "../../src/app/api/workspace/discussions/[id]/route";
+
 import { GET as approvals } from "../../src/app/api/users/[username]/trust/history/route";
+import { DELETE, GET as own, PATCH } from "../../src/app/api/workspace/discussions/[id]/route";
+import { GET as page } from "../../src/app/api/workspace/discussions/route";
+
 const actor = { id: "actor", role: "admin" },
   revision = "a".repeat(64),
   comment = { params: Promise.resolve({ id: "comment" }) },

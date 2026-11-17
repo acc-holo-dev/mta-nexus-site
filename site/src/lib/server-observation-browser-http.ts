@@ -1,14 +1,14 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { authService } from "./services/auth-service";
-import { serverStatisticsService } from "./services/server-statistics-service";
-import { parseServerObservationBrowserQuery } from "./server-observation-browser-contract";
-import { serverObservationBrowserCsv } from "./server-statistics-export";
 import { serverObservationBrowserError } from "../features/servers/server-observation-browser-copy";
-import { getTrustedRequestIp } from "./request-client-ip";
 import { resolveLocale } from "./i18n";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
+import { getTrustedRequestIp } from "./request-client-ip";
+import { parseServerObservationBrowserQuery } from "./server-observation-browser-contract";
+import { serverObservationBrowserCsv } from "./server-statistics-export";
+import { authService } from "./services/auth-service";
+import { serverStatisticsService } from "./services/server-statistics-service";
 export async function serverObservationBrowserHttp(
   request: NextRequest,
   id: string,

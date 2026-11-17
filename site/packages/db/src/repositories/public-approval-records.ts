@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
-import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import type { db } from "../client";
 import { verificationRequests } from "../schema";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type PublicApprovalCursor = { createdAt: string; id: string; context: string };
 export async function publicApprovalRecords(

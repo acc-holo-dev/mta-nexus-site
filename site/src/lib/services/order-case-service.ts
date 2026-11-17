@@ -1,5 +1,4 @@
 import { orderCasesRepository } from "@nexus/db";
-import { generateId } from "@nexus/security";
 import type {
   OrderCaseCreate,
   OrderCaseReview,
@@ -7,6 +6,7 @@ import type {
   SupportCaseStatus,
   User,
 } from "@nexus/domain";
+import { generateId } from "@nexus/security";
 export const orderCaseService = {
   orderDetail(orderId: string, actor: User) {
     return orderCasesRepository.orderDetail(orderId, actor.id);

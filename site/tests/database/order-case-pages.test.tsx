@@ -32,13 +32,13 @@ vi.mock("../../src/features/support/thread", () => ({
 
 import OrderCaseDetailLoading from "../../src/app/admin/commerce/order-cases/[id]/loading";
 import OrderCasesLoading from "../../src/app/admin/commerce/order-cases/loading";
+import { orderCaseCopy } from "../../src/features/commerce/order-case-i18n";
 import {
   OrderCaseCreatePage,
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
 } from "../../src/features/commerce/order-case-server";
-import { orderCaseCopy } from "../../src/lib/order-case-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const evidence = {

@@ -2,11 +2,11 @@ import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { platformReportCopy } from "../../../lib/platform-report-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { platformReportService } from "../../../lib/services/platform-report-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { platformReportCopy } from "../platform-report-i18n";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
   if (status === "resolved") return "success";

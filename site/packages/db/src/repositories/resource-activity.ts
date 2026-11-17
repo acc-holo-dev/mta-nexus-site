@@ -1,10 +1,10 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
 import {
   NotFoundError,
   RESOURCE_ACTIVITY_DAYS,
-  type ResourceActivityDays,
   type ResourceAcquisitionSource,
+  type ResourceActivityDays,
 } from "@nexus/domain";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,

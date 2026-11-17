@@ -1,9 +1,9 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
-import { formatHistoryDate, licenseStatusLabel } from "../../../lib/commerce-history-format";
+import type { licenseControlService } from "../../../lib/services/license-control-service";
+import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
-import type { licenseControlService } from "../../../lib/services/license-control-service";
 
 type Detail = NonNullable<Awaited<ReturnType<typeof licenseControlService.detail>>>;
 export function LicenseDetailView({ license, locale }: { license: Detail; locale: "ru" | "en" }) {

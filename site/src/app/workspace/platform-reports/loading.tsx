@@ -1,4 +1,4 @@
-import { platformReportCopy } from "../../../lib/platform-report-i18n";
+import { platformReportCopy } from "../../../features/moderation/platform-report-i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 export default async function PlatformReportsLoading() {

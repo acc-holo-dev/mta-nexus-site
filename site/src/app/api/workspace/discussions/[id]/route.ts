@@ -2,10 +2,10 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { ownDiscussionError } from "../../../../../features/community/discussion-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { discussionEditSchema } from "../../../../../lib/content-discussion-contract";
-import { ownDiscussionError } from "../../../../../lib/discussion-workspace-copy";
 import { discussionWorkspaceService } from "../../../../../lib/services/discussion-workspace-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 

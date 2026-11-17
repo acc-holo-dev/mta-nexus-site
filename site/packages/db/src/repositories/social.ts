@@ -1,7 +1,7 @@
-import { eq, and, desc } from "drizzle-orm";
+import type { Follow } from "@nexus/domain";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../client";
 import { follows } from "../schema";
-import type { Follow } from "@nexus/domain";
 
 export class SocialRepository {
   async isFollowing(followerId: string, targetType: string, targetId: string): Promise<boolean> {

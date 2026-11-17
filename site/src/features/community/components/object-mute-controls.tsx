@@ -3,10 +3,10 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { FollowTargetType, ObjectMuteDuration } from "../../../lib/follow-workspace-contract";
-import { followCopy, followError } from "../follow-workspace-copy";
 import type { Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
+import { followCopy, followError } from "../follow-workspace-copy";
 
 /**
  * Temporary notice mute for a followable object. Independent of follow/unfollow

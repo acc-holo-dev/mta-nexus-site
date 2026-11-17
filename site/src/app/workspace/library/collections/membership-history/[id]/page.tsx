@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { libraryMembershipHistoryCopy } from "../../../../../../features/library/library-membership-history-i18n";
 import { LibraryMembershipHistoryScreen } from "../../../../../../features/library/membership-history-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { libraryMembershipHistoryCopy } from "../../../../../../features/library/library-membership-history-i18n";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

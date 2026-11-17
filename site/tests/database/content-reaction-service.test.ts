@@ -1,14 +1,17 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ state: vi.fn(), set: vi.fn(), page: vi.fn(), trust: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   contentReactionsRepository: { state: mocks.state, set: mocks.set, page: mocks.page },
   publicUserTrustRepository: { find: mocks.trust },
 }));
+
+import { parseReactionPage } from "../../src/lib/content-reaction-contract";
+import { publicUserTrustSchema } from "../../src/lib/public-user-trust-contract";
 import { contentReactionService as service } from "../../src/lib/services/content-reaction-service";
 import { publicUserTrustService as trust } from "../../src/lib/services/public-user-trust-service";
-import { publicUserTrustSchema } from "../../src/lib/public-user-trust-contract";
-import { parseReactionPage } from "../../src/lib/content-reaction-contract";
+
 const actor = { id: "actor", role: "user" } as User;
 const time = "2026-10-11T00:00:00.123456Z";
 beforeEach(() => {

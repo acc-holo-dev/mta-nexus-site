@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -27,11 +28,13 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { publicationFeedRepository as feed } from "../../packages/db/src/repositories/publication-feed";
+
 import {
-  discussionManagementRepository as management,
   discussionRevision,
+  discussionManagementRepository as management,
 } from "../../packages/db/src/repositories/discussion-management";
+import { publicationFeedRepository as feed } from "../../packages/db/src/repositories/publication-feed";
+
 beforeEach(() => {
   state.queries = [];
   state.rows = [];

@@ -5,8 +5,8 @@ import {
   emptyAuthorVersion,
   hasAuthorVersionDraft,
   parseAuthorResourceDraft,
-  sameAuthorDetails,
   reconcileAuthorDetails,
+  sameAuthorDetails,
 } from "../../src/features/resources/author-resource-draft";
 
 const now = Date.parse("2026-10-05T00:00:00Z");

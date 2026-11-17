@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { getTrustedRequestIp } from "./request-client-ip";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
+import { getTrustedRequestIp } from "./request-client-ip";
 
 export async function commercialPublicRequest(
   request: NextRequest,

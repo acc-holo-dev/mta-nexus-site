@@ -1,14 +1,14 @@
 import {
   AppError,
-  NotFoundError,
   compareLibraryReleases,
   type LibraryReleaseComparisonQuery,
+  NotFoundError,
 } from "@nexus/domain";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, products, users, resourceLibrarySelections as selections } from "../schema";
-import { effectiveUserDownloadSources } from "./user-library";
+import { builds, products, resourceLibrarySelections as selections, users } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
+import { effectiveUserDownloadSources } from "./user-library";
 export async function readLibraryReleaseComparison(
   userId: string,
   productId: string,

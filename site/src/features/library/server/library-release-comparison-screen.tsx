@@ -6,13 +6,13 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
-import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
-import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
+import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
+import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,

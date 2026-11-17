@@ -1,9 +1,9 @@
-import { and, eq, desc } from "drizzle-orm";
-import { db, closeDatabaseConnection } from "../src/client";
-import { users } from "../src/schema";
-import { authChallenges } from "../src/account-recovery-schema";
+import { and, desc, eq } from "drizzle-orm";
 import { accountMailOutbox } from "../src/account-mail-schema";
+import { authChallenges } from "../src/account-recovery-schema";
+import { closeDatabaseConnection, db } from "../src/client";
 import { createAccountMailProducerCipher } from "../src/repositories/account-mail-runtime";
+import { users } from "../src/schema";
 
 if (
   process.env.GITHUB_ACTIONS !== "true" ||

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { platformReportCopy } from "../../../lib/platform-report-i18n";
+import { platformReportCopy } from "../platform-report-i18n";
 
 const state = vi.hoisted(() => ({
   list: vi.fn(),

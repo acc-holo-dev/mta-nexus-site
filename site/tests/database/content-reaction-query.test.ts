@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -36,9 +37,11 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
+import { authorContentRepository } from "../../packages/db/src/repositories/author-content";
 import { contentReactionsRepository as reactions } from "../../packages/db/src/repositories/content-reactions";
 import { publicUserTrustRepository as trust } from "../../packages/db/src/repositories/public-user-trust";
-import { authorContentRepository } from "../../packages/db/src/repositories/author-content";
+
 const command = {
   actorId: "actor",
   currentToken: "actor-token",

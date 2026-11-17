@@ -1,4 +1,4 @@
-import { discoveryCopy } from "../../lib/discovery-copy";
+import { discoveryCopy } from "../../features/discovery/discovery-copy";
 import { getRequestLocale } from "../../lib/i18n-server";
 
 // Honest loading shell for /organizations.

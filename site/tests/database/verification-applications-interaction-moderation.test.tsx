@@ -27,7 +27,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
 import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { flatTreeHasErrorText } from "../helpers/flatten-react-test-tree";
 
 const { moderation, decide, reviewNotes } = createVerificationApplicationsInteractionHelpers(

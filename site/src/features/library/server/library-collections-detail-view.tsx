@@ -1,5 +1,15 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import {
+  collectionHref,
+  collectionPageParams,
+  collectionsQuery,
+} from "../../../lib/library-collections-query";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
+import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { ResourceDownloadButton } from "../../resources/download";
+import { LibraryCollectionBatchForm } from "../collection-batch";
+import { LibraryCollectionCommandForm } from "../collection-command";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
@@ -7,16 +17,7 @@ import { libraryCollectionInventoryCopy } from "../library-collection-inventory-
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
-import {
-  collectionHref,
-  collectionPageParams,
-  collectionsQuery,
-} from "../../../lib/library-collections-query";
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
-import { LibraryCollectionBatchForm } from "../collection-batch";
-import { LibraryCollectionCommandForm } from "../collection-command";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -24,7 +25,6 @@ import {
   libraryCollectionsLinkClass,
   libraryCollectionsSearchFieldClass,
 } from "./library-collections-screen-shared";
-import { ResourceDownloadButton } from "../../resources/download";
 
 export async function LibraryCollectionsDetailView({
   locale,

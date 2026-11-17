@@ -1,17 +1,17 @@
 import { expect, it } from "vitest";
 import {
+  communityReportCopy,
+  communityReportDecisionError,
+  communityReportError,
+  communityReportMutationError,
+} from "../../src/features/community/community-report-copy";
+import {
   communityReportCreateSchema,
   communityReportDecisionSchema,
   communityReportPageQuery,
   confirmsReportDecision,
   parseCommunityReportQuery,
 } from "../../src/lib/community-report-contract";
-import {
-  communityReportCopy,
-  communityReportDecisionError,
-  communityReportError,
-  communityReportMutationError,
-} from "../../src/lib/community-report-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { formatNotification } from "../../src/lib/notification-copy";
 

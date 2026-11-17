@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { publicationCopy } from "../publication-feed-copy";
 
 type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
 

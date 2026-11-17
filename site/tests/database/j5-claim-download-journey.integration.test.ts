@@ -1,13 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
+import { storageService } from "@nexus/storage";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { GET as downloadResource } from "../../src/app/api/products/[id]/download/route";
+import { POST as claimResource } from "../../src/app/api/resources/claim/route";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
-import { storageService } from "@nexus/storage";
-import { POST as claimResource } from "../../src/app/api/resources/claim/route";
-import { GET as downloadResource } from "../../src/app/api/products/[id]/download/route";
 
 describe("J5 free resource claim-to-download journey", () => {
   beforeEach(() => {

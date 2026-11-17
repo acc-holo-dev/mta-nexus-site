@@ -3,13 +3,13 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OwnDiscussionDetail } from "../own-discussion";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/discussion-workspace-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { ownDiscussionCopy } from "../discussion-workspace-copy";
+import { OwnDiscussionDetail } from "../own-discussion";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const linkClass =

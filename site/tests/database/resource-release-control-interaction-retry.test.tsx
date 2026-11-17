@@ -27,7 +27,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { LibraryReleaseSelectionControls } from "../../src/features/library/release-selection";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const { button, click } = createResourceReleaseControlInteractionHelpers(
   harness,

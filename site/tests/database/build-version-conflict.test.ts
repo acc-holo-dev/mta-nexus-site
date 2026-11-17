@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DrizzleQueryError } from "drizzle-orm/errors";
 import {
   normalizeResourceVersionForStorage,
   resourceVersionsConflict,
   type User,
 } from "@nexus/domain";
+import { DrizzleQueryError } from "drizzle-orm/errors";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 const submitForReview = vi.hoisted(() => vi.fn());
 const findExactPendingRetry = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({
@@ -12,6 +13,7 @@ vi.mock("@nexus/db", () => ({
   productRepository: {},
   organizationRepository: {},
 }));
+
 import { ProductService } from "../../src/lib/services/product-service";
 
 const input = {

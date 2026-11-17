@@ -1,5 +1,5 @@
-import { getTableColumns } from "drizzle-orm";
 import type { Build } from "@nexus/domain";
+import { getTableColumns } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { builds } from "../../packages/db/src/schema";
 
@@ -29,6 +29,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { BuildRepository } from "../../packages/db/src/repositories/builds";
 
 const repository = new BuildRepository();

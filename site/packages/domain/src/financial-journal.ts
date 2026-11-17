@@ -1,5 +1,5 @@
-import { AppError } from "./errors";
 import type { LedgerEntry } from "./entities";
+import { AppError } from "./errors";
 export type LedgerPosting = Omit<LedgerEntry, "balanceAfter" | "createdAt">;
 export function validateLedgerPosting(entries: LedgerPosting[]) {
   const invalid = () =>

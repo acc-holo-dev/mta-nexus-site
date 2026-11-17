@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -28,8 +29,10 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
+
 import { resourceCartRepository as cart } from "../../packages/db/src/repositories/resource-cart";
 import { resourceCartReceiptsRepository as receipts } from "../../packages/db/src/repositories/resource-cart-receipts";
+
 const requestId = "11111111-1111-4111-8111-111111111111";
 const row = {
   productId: "prd_a",

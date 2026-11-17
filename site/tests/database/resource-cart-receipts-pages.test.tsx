@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../../src/features/shell/locale";
 import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
+import { LocaleProvider } from "../../src/features/shell/locale";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -33,10 +33,10 @@ vi.mock("../../src/features/resources/download", () => ({
   ),
 }));
 
-import Detail from "../../src/app/workspace/acquisitions/receipts/[id]/page";
 import DetailLoading from "../../src/app/workspace/acquisitions/receipts/[id]/loading";
-import Page, { generateMetadata } from "../../src/app/workspace/acquisitions/receipts/page";
+import Detail from "../../src/app/workspace/acquisitions/receipts/[id]/page";
 import ListLoading from "../../src/app/workspace/acquisitions/receipts/loading";
+import Page, { generateMetadata } from "../../src/app/workspace/acquisitions/receipts/page";
 import { resourceCartReceiptsCopy } from "../../src/features/resources/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";

@@ -4,8 +4,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { organizationContentId } from "../../../lib/organization-content-api";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistoryCopy } from "../../../lib/organization-publication-history-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationContentService } from "../../../lib/services/organization-content-service";
 import { parseEditableContent } from "../../../lib/user-platform-client";
@@ -13,6 +11,8 @@ import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platfo
 import { AuthorContentForm } from "../../community/author-content-form";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { organizationContentCopy } from "../organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";

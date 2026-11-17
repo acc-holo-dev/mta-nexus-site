@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 import {
   db,
   sessionRepository,
+  supportActivityRepository,
   supportCaseRepository,
   supportMessageDiscoveryRepository,
-  supportActivityRepository,
   userRepository,
 } from "@nexus/db";
 import { eq } from "drizzle-orm";

@@ -106,7 +106,7 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/features/resources/resource-commerce-i18n.ts")).toContain(
     "actionFailedDescription",
   );
-  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
     "actionFailedDescription",
   );
   expect(read("site/src/features/resources/resource-media-i18n.ts")).toContain("errorDescription");
@@ -115,7 +115,7 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/features/community/community-moderation-copy.ts")).toContain(
     "decisionFailedDescription",
   );
-  expect(read("site/src/lib/verification-workspace-copy.ts")).toContain(
+  expect(read("site/src/features/trust/verification-workspace-copy.ts")).toContain(
     "decisionFailedDescription",
   );
   expect(read("site/src/features/resources/resource-build-workspace-i18n.ts")).toContain(

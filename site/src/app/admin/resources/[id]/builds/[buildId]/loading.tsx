@@ -1,6 +1,6 @@
+import { getResourceBuildWorkspaceCopy } from "../../../../../../features/resources/resource-build-workspace-i18n";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { getResourceBuildWorkspaceCopy } from "../../../../../../features/resources/resource-build-workspace-i18n";
 
 // Honest loading shell for /admin/resources/[id]/builds/[buildId].
 export default async function Loading() {

@@ -1,6 +1,3 @@
-import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
-import { readResourceReleaseWatchHistory } from "./resource-release-watch-history";
-import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
@@ -8,26 +5,30 @@ import {
   type ResourceReleaseWatchCommand,
   type ResourceReleaseWatchFilter,
 } from "@nexus/domain";
-import {
-  readCollectionReleaseWatches,
-  enableCollectionReleaseWatches,
-  resumeResourceReleaseWatches,
-} from "./collection-release-watches";
-import { disableResourceReleaseWatchBatch } from "./resource-release-watch-batches";
+import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
+import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
-  products,
-  resourceReleaseEvents as events,
-  resourceReleaseWatches as watches,
-  users,
   builds,
+  resourceReleaseEvents as events,
+  products,
+  users,
+  resourceReleaseWatches as watches,
 } from "../schema";
-import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
-import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
+import {
+  enableCollectionReleaseWatches,
+  readCollectionReleaseWatches,
+  resumeResourceReleaseWatches,
+} from "./collection-release-watches";
+import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
 import { lockInitiatingSession } from "./initiating-session";
+import { disableResourceReleaseWatchBatch } from "./resource-release-watch-batches";
+import { readResourceReleaseWatchHistory } from "./resource-release-watch-history";
+import { effectiveUserDownloadSources } from "./user-library";
+
 const fields = {
   productId: watches.productId,
   enabled: watches.enabled,

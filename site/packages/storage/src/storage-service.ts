@@ -1,12 +1,12 @@
 import crypto from "node:crypto";
 import path from "node:path";
-import { getStorageProvider } from "./provider-factory";
-import { generateId } from "@nexus/security";
 import {
+  isAllowedResourceUploadExtension,
   MAX_UPLOAD_FILE_SIZE_BYTES,
   ValidationError,
-  isAllowedResourceUploadExtension,
 } from "@nexus/domain";
+import { generateId } from "@nexus/security";
+import { getStorageProvider } from "./provider-factory";
 import type { StorageObjectMeta } from "./types";
 
 export const MAX_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;

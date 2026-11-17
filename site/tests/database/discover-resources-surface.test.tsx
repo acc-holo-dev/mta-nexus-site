@@ -36,9 +36,9 @@ vi.mock("../../src/lib/i18n-server", () => ({
 
 import DiscoverPage from "../../src/app/discover/page";
 import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { parseDiscoverQuery } from "../../src/lib/discover-query";
-import { discoveryCopy } from "../../src/lib/discovery-copy";
 import { getDictionary } from "../../src/lib/i18n";
 
 function resourceProduct() {

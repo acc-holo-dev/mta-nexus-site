@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { publicationError } from "../../../../features/community/publication-feed-copy";
 import { parsePublicationQuery } from "../../../../lib/publication-feed-contract";
-import { publicationError } from "../../../../lib/publication-feed-copy";
 import { publicationFeedService } from "../../../../lib/services/publication-feed-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {

@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
 
 type ContentReactionRemoveInteractionHarness = {
   slots: unknown[];

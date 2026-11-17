@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { generateSessionToken, getClientIp, MemoryRateLimiter } from "@nexus/security";
+import { describe, expect, it } from "vitest";
 
 describe("Authentication security primitives", () => {
   it("creates high-entropy URL-safe session tokens", () => {

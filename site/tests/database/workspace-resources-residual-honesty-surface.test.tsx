@@ -22,8 +22,8 @@ import MediaLoading from "../../src/app/workspace/resources/[id]/media/loading";
 import RequirementsLoading from "../../src/app/workspace/resources/[id]/requirements/loading";
 import ResourcesLoading from "../../src/app/workspace/resources/loading";
 import NewResourceLoading from "../../src/app/workspace/resources/new/loading";
-import { getDictionary } from "../../src/lib/i18n";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "en";

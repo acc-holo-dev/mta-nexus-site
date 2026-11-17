@@ -1,8 +1,8 @@
 import type { PlanReviewDetail } from "@nexus/domain";
 import Link from "next/link";
-import { formatHistoryAmount, formatHistoryDate } from "../../../lib/commerce-history-format";
-import { planReviewsCopy } from "../plan-reviews-i18n";
+import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
+import { planReviewsCopy } from "../plan-reviews-i18n";
 export function PlanReviewDetailView({
   detail,
   locale,

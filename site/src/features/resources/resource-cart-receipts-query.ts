@@ -1,4 +1,5 @@
 import { AppError, type ResourceCartReceiptQuery } from "@nexus/domain";
+
 const invalid = () => new AppError("Invalid receipt query", 400, "RESOURCE_CART_RECEIPT_INVALID");
 export function resourceCartReceiptId(value: string) {
   // Receipts created by the former API already used UUID request keys.

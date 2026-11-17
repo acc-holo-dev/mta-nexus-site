@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -29,7 +30,9 @@ vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
 vi.mock("../../packages/db/src/repositories/support-requester-notice", () => ({
   supportRequesterNotice: state.notice,
 }));
+
 import { orderCasesRepository as repo } from "../../packages/db/src/repositories/order-cases";
+
 const date = "2026-10-11T00:00:00.000Z",
   nextDate = "2026-10-11T00:00:00.001Z";
 const order = ["ord_a", "NEXUS-1", "completed", 1200, "USD", date];

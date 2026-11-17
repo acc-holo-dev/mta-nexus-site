@@ -1,5 +1,6 @@
 import { collectionCommandItemResults, LIBRARY_COLLECTION_BATCH_LIMIT } from "@nexus/domain";
 import { expect, it } from "vitest";
+import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
 import { confirmedCollectionCommand } from "../../src/features/library/library-collections-confirmation";
 import {
   libraryCollectionError,
@@ -11,7 +12,6 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../../src/lib/library-collections-query";
-import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
 import {
   libraryCollectionsContractCreate as create,
   libraryCollectionsContractCurrent as current,

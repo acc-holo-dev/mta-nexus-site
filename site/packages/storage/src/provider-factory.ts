@@ -1,6 +1,6 @@
 import { config } from "@nexus/config";
-import type { StorageProvider } from "./types";
 import { LocalStorageProvider } from "./local-provider";
+import type { StorageProvider } from "./types";
 
 let instance: StorageProvider | null = null;
 

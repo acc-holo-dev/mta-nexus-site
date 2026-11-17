@@ -4,12 +4,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { formatHistoryDate } from "../../../../../features/commerce/commerce-history-format";
 import {
   resourceCopyCopy,
   resourceCopyError,
 } from "../../../../../features/resources/resource-copy-i18n";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {

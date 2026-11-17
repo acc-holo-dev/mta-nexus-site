@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   confirmsReportBatchCommand,
@@ -15,7 +12,6 @@ import {
   type ReportBatchPreview,
   reportBatchPreviewInput,
 } from "../../../lib/report-batch-contract";
-import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
@@ -23,6 +19,10 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { communityReportCopy } from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
+import { discussionReportsCopy } from "../discussion-reports-copy";
+import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({

@@ -2,14 +2,17 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CreditCard } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CommercialFeeCalculator } from "../../features/commerce/commercial-plans";
-import { formatHistoryAmount, parseHistoryPage } from "../../lib/commerce-history-format";
+import {
+  formatHistoryAmount,
+  parseHistoryPage,
+} from "../../features/commerce/commerce-history-format";
 import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
+import { CommercialFeeCalculator } from "../../features/commerce/commercial-plans";
+import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";
+import { subscriptionsCopy } from "../../features/commerce/subscriptions-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";
 import { commercialPlanService } from "../../lib/services/commercial-plan-service";
-import { subscriptionsCopy } from "../../features/commerce/subscriptions-i18n";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Subscriptions and commissions | MTA NEXUS" };

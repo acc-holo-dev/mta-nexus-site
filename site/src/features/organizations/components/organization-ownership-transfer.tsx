@@ -8,14 +8,14 @@ import {
   type ownershipTransferResultSchema,
   ownershipTransferSchema,
 } from "../../../lib/organization-governance-contract";
+import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { confirmAction } from "../../shell/confirm-action";
 import {
   organizationGovernanceCopy,
   organizationGovernanceMutationError,
 } from "../organization-governance-copy";
-import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../shell/confirm-action";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationOwnershipTransfer({
   data,
   target,

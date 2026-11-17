@@ -1,12 +1,12 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
 import { Readable } from "node:stream";
-import { NextRequest } from "next/server";
 import { ValidationError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
 
 const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), finish: vi.fn(), hash: "" }));
 vi.mock("../../src/lib/services/auth-service", () => ({
@@ -61,8 +61,9 @@ vi.mock("@nexus/db", () => {
     auditRepository: { record: mocks.audit },
   };
 });
-import { GET as publicDownload } from "../../src/app/api/products/[id]/download/route";
+
 import { GET as reviewDownload } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import { GET as publicDownload } from "../../src/app/api/products/[id]/download/route";
 
 describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   const request = (signal?: AbortSignal) => {

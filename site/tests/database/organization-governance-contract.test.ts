@@ -1,15 +1,15 @@
 import { expect, it } from "vitest";
+import {
+  organizationGovernanceCopy,
+  organizationGovernanceError,
+  organizationGovernanceMutationError,
+} from "../../src/features/organizations/organization-governance-copy";
 import { formatNotification } from "../../src/lib/notification-copy";
 import {
   organizationHistoryCursor,
   organizationHistorySchema,
   ownershipTransferSchema,
 } from "../../src/lib/organization-governance-contract";
-import {
-  organizationGovernanceCopy,
-  organizationGovernanceError,
-  organizationGovernanceMutationError,
-} from "../../src/features/organizations/organization-governance-copy";
 
 const transfer = {
   targetId: "target",

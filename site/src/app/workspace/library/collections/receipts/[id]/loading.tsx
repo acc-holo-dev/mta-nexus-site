@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../../../features/library/library-collections-i18n";
+import { getRequestLocale } from "../../../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/library/collections/receipts/[id].
 export default async function Loading() {

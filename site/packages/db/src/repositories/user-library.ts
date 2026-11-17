@@ -1,4 +1,4 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   builds,
@@ -7,7 +7,7 @@ import {
   products,
   resourceLibrarySelections as selections,
 } from "../schema";
-import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
+import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { libraryPageBounds, USER_LIBRARY_PAGE_SIZE } from "./library-page-bounds";
 
 /** The library is a *projection of effective grants*, not a payment ledger. */

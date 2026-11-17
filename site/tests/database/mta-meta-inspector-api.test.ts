@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { metaInspectionLimits } from "../../src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../../packages/security/src/rate-limit-policy";
+import { metaInspectionLimits } from "../../src/lib/mta-meta-inspector";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,

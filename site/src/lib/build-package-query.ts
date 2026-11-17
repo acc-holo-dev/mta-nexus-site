@@ -1,4 +1,5 @@
 import type { BuildPackageFilter } from "@nexus/domain";
+
 const keys = ["page", "baseline", "filter"];
 export function parseBuildPackageQuery(params: URLSearchParams) {
   if ([...params.keys()].some((key) => !keys.includes(key) || params.getAll(key).length !== 1))

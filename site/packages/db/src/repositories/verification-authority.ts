@@ -1,8 +1,9 @@
-import { and, eq } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
+import { and, eq } from "drizzle-orm";
 import type { db } from "../client";
 import { developerProfiles, organizationMembers, organizations, users } from "../schema";
 import { developerExperienceRevision } from "./developer-profile";
+
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export async function verificationTargetAuthority(
   tx: Tx,

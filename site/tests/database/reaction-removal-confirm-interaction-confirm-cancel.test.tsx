@@ -17,8 +17,8 @@ const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
 import { ReactionRemoval } from "../../src/features/community/reaction-removal";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
 
 const { render, removeButton } = createReactionRemovalConfirmInteractionHelpers(
   harness,

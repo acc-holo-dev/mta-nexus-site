@@ -11,18 +11,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../features/community/follow";
-import { ProductCard } from "../../resources/view";
-import { ProfileResourcePagination } from "../../accounts/profile-pagination";
-import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
-import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
+import { ProfileResourcePagination } from "../../accounts/profile-pagination";
+import { ArticleCard } from "../../community/article-view";
+import { FollowButton } from "../../community/follow";
+import { buildFollowInitialState } from "../../community/follow-initial-state";
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { ProductCard } from "../../resources/view";
+import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
 const actionLinkClass =

@@ -1,5 +1,5 @@
-import { communityReportDecisionError } from "../../lib/community-report-copy";
 import type { Locale } from "../../lib/i18n";
+import { communityReportDecisionError } from "./community-report-copy";
 
 const en = {
   title: "Decide selected reports",

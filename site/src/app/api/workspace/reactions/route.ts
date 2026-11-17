@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { reactionError } from "../../../../features/community/content-reaction-copy";
 import { parseReactionPage } from "../../../../lib/content-reaction-contract";
-import { reactionError } from "../../../../lib/content-reaction-copy";
 import { contentReactionService } from "../../../../lib/services/content-reaction-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {

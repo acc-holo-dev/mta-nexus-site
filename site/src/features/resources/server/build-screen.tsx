@@ -4,20 +4,19 @@ import { History } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPackageCopy } from "../build-package-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { resourceBuildWorkspaceService } from "../../../lib/services/resource-build-workspace-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { buildPackageCopy } from "../build-package-i18n";
+import { BuildModerationControls } from "../components/build-moderation-controls";
+import { ResourceBuildControls } from "../components/resource-build-controls";
+import { BuildPackageEvidencePanel, BuildProvenanceDetails } from "../evidence";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceBuildWorkspaceService } from "../../../lib/services/resource-build-workspace-service";
-import { BuildModerationControls } from "../components/build-moderation-controls";
-import { BuildPackageEvidencePanel } from "../evidence";
-import { BuildProvenanceDetails } from "../evidence";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { ResourceBuildControls } from "../components/resource-build-controls";
+import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

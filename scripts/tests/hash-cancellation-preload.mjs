@@ -1,9 +1,9 @@
 // Explicitly injected only into a secondary disposable CI Next.js process.
 // Pause one real file read to make the pre-response hash phase observable.
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import { Server } from "node:http";
-import { randomUUID } from "node:crypto";
 import { join, resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 

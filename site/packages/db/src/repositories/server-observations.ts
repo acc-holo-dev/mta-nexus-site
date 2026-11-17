@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import type { Server, ServerObservation } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
+import { generateId } from "@nexus/security";
 import {
   and,
   asc,
@@ -12,17 +16,13 @@ import {
   lt,
   lte,
   or,
-  sql,
   type SQL,
+  sql,
 } from "drizzle-orm";
-import { createHash } from "node:crypto";
 import { db } from "../client";
 import { serverObservations, servers, users } from "../schema";
-import type { Server, ServerObservation } from "@nexus/domain";
-import { AppError } from "@nexus/domain";
-import { generateId } from "@nexus/security";
-import { managedServerScope } from "./server-management-scope";
 import { containsPattern } from "./search-pattern";
+import { managedServerScope } from "./server-management-scope";
 
 export type ServerStatisticsAccess = { kind: "public" } | { kind: "managed"; actorId: string };
 export type ServerStatisticsTarget = { id: string } | { slug: string };

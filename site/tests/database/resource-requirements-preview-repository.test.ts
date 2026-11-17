@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -24,7 +25,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { ResourceRequirementsRepository } from "../../packages/db/src/repositories/resource-requirements";
+
 const repo = new ResourceRequirementsRepository();
 const date = "2026-10-12T00:00:00.000Z";
 const input = {

@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
-import { expect, it } from "vitest";
 import { recordedResourceReleaseWatchOperation as parse } from "@nexus/domain";
-import { resourceReleaseWatchHistoryQuery as query } from "../../src/lib/resource-release-watch-history-query";
+import { expect, it } from "vitest";
+import { resourceReleaseWatchHistoryQuery as query } from "../../src/features/resources/resource-release-watch-history-query";
+
 it("projects individual and complete batch operations without coercing recorded states", () => {
   expect(
     parse("library.release_watch_changed", "prd_a", {

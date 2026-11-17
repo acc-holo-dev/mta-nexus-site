@@ -1,6 +1,6 @@
 "use client";
 
 export {
-  ResourceReviewEditor,
   ResourceReviewDecisionForm,
+  ResourceReviewEditor,
 } from "./components/resource-review-controls";

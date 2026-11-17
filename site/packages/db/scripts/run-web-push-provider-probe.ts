@@ -9,10 +9,10 @@ import {
   readWebPushVapidConfig,
 } from "@nexus/config";
 import {
-  WebPushPermanentPayloadError,
-  WebPushPermanentSubscriptionError,
   createWebPushHttpSender,
   parseWebPushEndpoint,
+  WebPushPermanentPayloadError,
+  WebPushPermanentSubscriptionError,
 } from "../src/web-push-runtime";
 
 if (process.env.NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK !== "YES") {

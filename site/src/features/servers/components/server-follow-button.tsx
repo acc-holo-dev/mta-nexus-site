@@ -1,6 +1,6 @@
 "use client";
-import type { FollowInitialState } from "../../../lib/follow-initial-state";
-import { FollowButton } from "../../../features/community/follow";
+import { FollowButton } from "../../community/follow";
+import type { FollowInitialState } from "../../community/follow-initial-state";
 export function ServerFollowButton({
   serverId,
   serverName,

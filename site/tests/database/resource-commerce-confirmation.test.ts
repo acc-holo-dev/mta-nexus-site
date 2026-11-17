@@ -1,5 +1,5 @@
-import { expect, it } from "vitest";
 import { canTransitionResource } from "@nexus/domain";
+import { expect, it } from "vitest";
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,

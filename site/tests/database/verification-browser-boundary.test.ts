@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -31,8 +31,8 @@ vi.mock("../../src/lib/services/verification-workspace-service", () => ({
 }));
 
 import { POST as createPublicRequest } from "../../src/app/api/verification/route";
-import { POST as createWorkspaceRequest } from "../../src/app/api/workspace/verification/route";
 import { PATCH as amendRequest } from "../../src/app/api/workspace/verification/[id]/route";
+import { POST as createWorkspaceRequest } from "../../src/app/api/workspace/verification/route";
 
 const context = { params: Promise.resolve({ id: "ver_a" }) };
 const mutations = [

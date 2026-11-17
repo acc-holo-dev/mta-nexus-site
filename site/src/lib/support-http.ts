@@ -1,9 +1,10 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import type { NextRequest } from "next/server";
+import { supportWorkspaceError } from "../features/support/support-workspace-copy";
 import { requireServerJsonContentType } from "./bounded-json";
 import { resolveLocale } from "./i18n";
-import { supportWorkspaceError } from "../features/support/support-workspace-copy";
 import { jsonWithRequestId, logRequestEvent } from "./observability";
+
 type Context = Parameters<typeof jsonWithRequestId>[0];
 export function supportPrivateJson(
   context: Context,

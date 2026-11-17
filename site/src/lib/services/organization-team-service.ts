@@ -3,6 +3,7 @@ import { NotFoundError, type User } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { OrganizationTeamPage, OrganizationTeamQuery } from "../organization-team-contract";
 import { editableOrganization } from "./organization-workspace-service";
+
 class OrganizationTeamService {
   async page(
     id: string,

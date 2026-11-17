@@ -1,5 +1,4 @@
-import type { ProductStatus } from "./entities";
-import type { Entitlement } from "./entities";
+import type { Entitlement, ProductStatus } from "./entities";
 
 /** An existing license is access, never a newly issued permanent grant. */
 export type FreeResourceClaimResult =

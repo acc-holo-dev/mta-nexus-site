@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,

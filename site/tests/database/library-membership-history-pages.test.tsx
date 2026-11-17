@@ -42,8 +42,8 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/membership-history/page";
-import { LibraryMembershipHistoryScreen } from "../../src/features/library/membership-history-server";
 import { libraryMembershipHistoryCopy } from "../../src/features/library/library-membership-history-i18n";
+import { LibraryMembershipHistoryScreen } from "../../src/features/library/membership-history-server";
 import { authService } from "../../src/lib/services/auth-service";
 
 const date = "2026-10-12T00:00:00.000Z",

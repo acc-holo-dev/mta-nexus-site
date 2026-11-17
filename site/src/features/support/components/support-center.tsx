@@ -4,6 +4,10 @@ import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { currentBrowserReturnPath } from "../../shell/auth-return";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { useNexusLocale } from "../../shell/locale";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -14,17 +18,13 @@ import {
   clearSupportRetry,
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
-} from "../../../lib/support-retry";
-import { type SupportQuery, supportHref } from "../../../lib/support-workspace-contract";
+} from "../support-retry";
+import { type SupportQuery, supportHref } from "../support-workspace-contract";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../support-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { currentBrowserReturnPath } from "../../shell/auth-return";
-import { useNexusLocale } from "../../shell/locale";
-import { PlatformSignIn } from "../../shell/guest-auth";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 

@@ -29,10 +29,10 @@ vi.mock("../../src/lib/user-platform-client", () => ({
   parseEditableContent: (value: unknown) => value,
 }));
 
-import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
 import EditPage, {
   generateMetadata as editMetadata,
 } from "../../src/app/workspace/content/[id]/page";
+import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
 import { getDictionary } from "../../src/lib/i18n";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 

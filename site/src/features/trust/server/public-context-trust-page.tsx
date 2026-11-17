@@ -9,9 +9,9 @@ import {
   contextTrustHref,
   parseContextTrustQuery,
 } from "../../../lib/public-context-trust-contract";
-import { contextTrustCopy, contextTrustError } from "../../../lib/public-context-trust-copy";
-import { approvalCopy } from "../public-verification-history-copy";
 import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
+import { contextTrustCopy, contextTrustError } from "../public-context-trust-copy";
+import { approvalCopy } from "../public-verification-history-copy";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

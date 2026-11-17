@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { serverContentCopy } from "../../src/lib/server-content-copy";
+import { serverContentCopy } from "../../src/features/servers/server-content-copy";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({

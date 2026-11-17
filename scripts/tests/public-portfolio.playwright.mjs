@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import "../register-ts-directory-resolve.mjs";
 import { capturePageEvidence, waitForReadyCapture } from "../browser-page-ready.mjs";

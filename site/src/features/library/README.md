@@ -51,6 +51,8 @@ Feature объединяет существующие представления
 | `library-collection-history-i18n.ts`        | util port `library-collection-history-i18n`                   |
 | `library-membership-history-i18n.ts`        | util port `library-membership-history-i18n`                   |
 | `library-collections-i18n.ts`               | util port `library-collections-i18n`                          |
+| `resource-release-control-i18n.ts`          | util port `resource-release-control-i18n`                     |
+| `resource-release-control-confirmation.ts`  | util port `resource-release-control-confirmation`             |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

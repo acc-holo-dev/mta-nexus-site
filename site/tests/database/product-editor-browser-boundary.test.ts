@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -28,11 +28,11 @@ vi.mock("../../src/lib/services/resource-copy-service", () => ({
   resourceCopyService: { create: vi.fn(), preview: vi.fn() },
 }));
 
-import { POST as createResource } from "../../src/app/api/products/route";
-import { PATCH as editResource } from "../../src/app/api/products/[id]/route";
 import { POST as compatibility } from "../../src/app/api/products/[id]/compatibility/route";
-import { POST as variants } from "../../src/app/api/products/[id]/variants/route";
 import { POST as copyResource } from "../../src/app/api/products/[id]/copy/route";
+import { PATCH as editResource } from "../../src/app/api/products/[id]/route";
+import { POST as variants } from "../../src/app/api/products/[id]/variants/route";
+import { POST as createResource } from "../../src/app/api/products/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const mutations = [

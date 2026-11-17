@@ -1,6 +1,7 @@
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { publicationError } from "../../../../../features/community/publication-feed-copy";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -8,7 +9,6 @@ import {
   logRequestEvent,
 } from "../../../../../lib/observability";
 import { parsePublicationQuery } from "../../../../../lib/publication-feed-contract";
-import { publicationError } from "../../../../../lib/publication-feed-copy";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { publicationFeedService } from "../../../../../lib/services/publication-feed-service";
 export const dynamic = "force-dynamic";

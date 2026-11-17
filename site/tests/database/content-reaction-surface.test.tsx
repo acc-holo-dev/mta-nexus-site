@@ -1,11 +1,11 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
 import { ContentReactions } from "../../src/features/community/reactions";
 import { PublicUserTrustPanel } from "../../src/features/trust/public-user-trust";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
-import { getDictionary } from "../../src/lib/i18n";
 import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewTerms } from "../../../../../features/commerce/plan-reviews-workspace";
+import { formatSubscriptionTime } from "../../../../../features/commerce/subscription-time";
 import { subscriptionNavLinkClass } from "../../../../../features/commerce/subscription-workspace";
 import {
   subscriptionError,
@@ -15,7 +16,6 @@ import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../../lib/services/subscriptions-service";
-import { formatSubscriptionTime } from "../../../../../features/commerce/subscription-time";
 import {
   subscriptionAccountHref,
   subscriptionPageParams,

@@ -1,8 +1,8 @@
 import { Buffer } from "node:buffer";
 import { createECDH, createPublicKey, verify as verifySignature } from "node:crypto";
-import { describe, expect, it } from "vitest";
 import type { WebPushVapidConfig } from "@nexus/config";
 import { WebPushPermanentPayloadError, WebPushPermanentSubscriptionError } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 import {
   createVapidAuthorization,
   encryptWebPushMessage,

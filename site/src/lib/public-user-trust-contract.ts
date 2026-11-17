@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 const badge = z
   .object({ verified: z.boolean(), latestRecordedApprovalAt: z.iso.datetime().nullable() })
   .strict();

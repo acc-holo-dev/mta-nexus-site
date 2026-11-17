@@ -1,4 +1,5 @@
 import type { ResourceDeliveryReceipt } from "@nexus/domain";
+
 function cell(value: string) {
   const safe = /^[\s]*[=+\-@]/u.test(value) ? `'${value}` : value;
   return `"${safe.replaceAll('"', '""')}"`;

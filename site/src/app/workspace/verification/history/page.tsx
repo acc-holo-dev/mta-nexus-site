@@ -2,7 +2,12 @@ import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import {
+  verificationApplicationsCopy,
+  verificationApplicationsError,
+} from "../../../../features/moderation/verification-applications-copy";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { verificationCopy } from "../../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -12,12 +17,7 @@ import {
   parseVerificationApplicationsQuery,
   verificationApplicationsHref,
 } from "../../../../lib/verification-applications-contract";
-import {
-  verificationApplicationsCopy,
-  verificationApplicationsError,
-} from "../../../../features/moderation/verification-applications-copy";
 import { VERIFICATION_TYPES } from "../../../../lib/verification-workspace-contract";
-import { verificationCopy } from "../../../../lib/verification-workspace-copy";
 
 export const dynamic = "force-dynamic";
 

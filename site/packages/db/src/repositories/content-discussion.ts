@@ -1,9 +1,10 @@
-import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
+import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
 import { comments, content, users } from "../schema";
 import { containsPattern } from "./search-pattern";
+
 type DiscussionCursor = { createdAt: string; id: string };
 class ContentDiscussionRepository {
   async page(

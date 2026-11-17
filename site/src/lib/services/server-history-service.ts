@@ -1,7 +1,8 @@
 import { serverObservationRepository, serverRepository } from "@nexus/db";
 import type { Server } from "@nexus/domain";
 
-import { serverHistoryWindows, type ServerHistoryWindow } from "../server-history-window";
+import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
+
 export { serverHistoryWindows } from "../server-history-window";
 
 type ServerHistoryListing = Pick<Server, "id" | "slug" | "name" | "visibility">;

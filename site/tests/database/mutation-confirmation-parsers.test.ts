@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { confirmedCommentId } from "../../src/features/community/content-comment-confirmation";
 import {
   confirmedNotificationPreferences,
   parseNotificationPreferences,
-} from "../../src/lib/notification-preferences-confirmation";
-import { confirmedCommentId } from "../../src/features/community/content-comment-confirmation";
+} from "../../src/features/notifications/notification-preferences-confirmation";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,

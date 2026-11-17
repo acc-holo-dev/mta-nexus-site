@@ -1,21 +1,22 @@
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { afterEach, expect, it } from "vitest";
 import {
-  db,
-  discussionWorkspaceRepository as own,
-  discussionManagementRepository as management,
-  discussionRevision,
-  publicVerificationHistoryRepository as history,
-  userRepository,
   auditEvents,
   comments,
   content,
+  db,
+  discussionRevision,
+  publicVerificationHistoryRepository as history,
+  discussionManagementRepository as management,
   notificationPreferences,
   notifications,
+  discussionWorkspaceRepository as own,
+  userRepository,
   users,
   verificationRequests,
 } from "@nexus/db";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+
 const actors: string[] = [];
 afterEach(async () => {
   if (actors.length) {

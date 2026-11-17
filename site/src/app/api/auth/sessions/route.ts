@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
@@ -10,7 +11,6 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

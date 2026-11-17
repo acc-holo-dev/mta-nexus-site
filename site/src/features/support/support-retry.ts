@@ -4,7 +4,7 @@
  * status/timing metadata: never persist subject or message text. Recovery is
  * additionally scoped to the authenticated actor, never to a shared browser tab.
  */
-import { privateApiRequest } from "./private-api-request";
+import { privateApiRequest } from "../../lib/private-api-request";
 
 export type SupportRetryStatus = "open" | "resolved" | "closed";
 export type SupportRetryStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;

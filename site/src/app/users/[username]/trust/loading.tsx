@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../../lib/i18n-server";
 import { trustCopy } from "../../../../features/trust/public-user-trust-copy";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 
 // Honest loading shell for /users/[username]/trust.
 export default async function Loading() {

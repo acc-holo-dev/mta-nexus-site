@@ -1,3 +1,16 @@
+import type {
+  LicenseModerationCommand,
+  LicenseOwnerCommand,
+  LicenseReleaseCheck,
+} from "@nexus/domain";
+import {
+  AppError,
+  canModerateLicense,
+  LICENSE_RUNTIME_LEASE_SECONDS,
+  LICENSE_RUNTIME_TOKEN_DAYS,
+  NotFoundError,
+  UnauthorizedError,
+} from "@nexus/domain";
 import {
   and,
   count,
@@ -12,24 +25,11 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import {
-  AppError,
-  NotFoundError,
-  UnauthorizedError,
-  LICENSE_RUNTIME_TOKEN_DAYS,
-  LICENSE_RUNTIME_LEASE_SECONDS,
-  canModerateLicense,
-} from "@nexus/domain";
-import type {
-  LicenseOwnerCommand,
-  LicenseModerationCommand,
-  LicenseReleaseCheck,
-} from "@nexus/domain";
 import { db } from "../client";
 import {
   auditEvents,
-  builds,
   licenseRuntimeBindings as bindings,
+  builds,
   licenses,
   products,
   serverClaimChallenges,
@@ -37,14 +37,14 @@ import {
   users,
   verificationRequests,
 } from "../schema";
-import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
+import type { ResourceTransaction } from "../transaction";
+import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
-import { managedServerScope } from "./server-management-scope";
-import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
+import { lockInitiatingSession } from "./initiating-session";
 import { assertBuildModerationAuthority } from "./product-mutation-authority";
 import { containsPattern } from "./search-pattern";
-import type { ResourceTransaction } from "../transaction";
-import { lockInitiatingSession } from "./initiating-session";
+import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
+import { managedServerScope } from "./server-management-scope";
 
 const fail = (code: string) =>
   new AppError("License operation is not currently permitted", 409, code);

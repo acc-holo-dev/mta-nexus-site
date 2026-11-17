@@ -1,8 +1,9 @@
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { VerificationWorkspace } from "../../../features/moderation/verification-workspace";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -12,7 +13,6 @@ import {
   verificationPageQuery,
   verificationTargetsSchema,
 } from "../../../lib/verification-workspace-contract";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
 
 export const dynamic = "force-dynamic";
 

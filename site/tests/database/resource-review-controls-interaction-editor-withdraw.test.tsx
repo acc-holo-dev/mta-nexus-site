@@ -21,11 +21,11 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import {
   ResourceReviewDecisionForm,
   ResourceReviewEditor,
 } from "../../src/features/resources/review-controls";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 
 const { renderEditor } = createResourceReviewControlsInteractionHelpers(
   harness,

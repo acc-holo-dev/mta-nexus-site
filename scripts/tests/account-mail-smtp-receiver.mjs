@@ -1,5 +1,5 @@
-import tls from "node:tls";
 import { readFileSync } from "node:fs";
+import tls from "node:tls";
 
 const port = Number(process.env.SMTP_TEST_PORT || 2465);
 const cert = readFileSync(process.env.SMTP_TEST_CERT || "/certs/cert.pem");

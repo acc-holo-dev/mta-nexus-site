@@ -6,6 +6,7 @@ import {
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
+
 function staff(actor: User) {
   if (!["admin", "moderator"].includes(actor.role)) throw new ForbiddenError();
 }

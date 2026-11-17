@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { organizationMembers, users } from "../schema";
 import { organizationWorkspaceAccess } from "./organization-workspace";
 import { containsPattern } from "./search-pattern";
+
 class OrganizationTeamDirectoryRepository {
   async page(
     id: string,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LibraryCollectionsScreen } from "../../../../../../features/library/collections-server";
-import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../../../features/library/library-collections-i18n";
+import { getRequestLocale } from "../../../../../../lib/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { getClientIp } from "@nexus/security";
+import type { NextRequest } from "next/server";
 
 export function getTrustedRequestIp(request: NextRequest): string {
   const secret = process.env.TRUSTED_PROXY_SECRET;

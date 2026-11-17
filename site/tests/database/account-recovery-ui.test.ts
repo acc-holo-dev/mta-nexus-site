@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
 import {
   parseAccountRecoveryLocation,
   recoveryJsonRequest,
@@ -12,6 +11,7 @@ import {
   passwordResetTargetMs,
   waitForPasswordResetFloor,
 } from "../../src/features/accounts/account-recovery-request-policy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const validChallenge = "ach_recovery_fixture";
 const validToken = "A".repeat(43);

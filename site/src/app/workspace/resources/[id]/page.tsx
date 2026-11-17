@@ -7,14 +7,14 @@ import {
   AuthorResourceForms,
   RetireBuildForm,
 } from "../../../../features/resources/author-controls";
-import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { ResourceLifecycleControls } from "../../../../features/resources/lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../../../features/resources/publisher-view";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../features/resources/resource-build-workspace-i18n";
 import { getResourceCommerceCopy } from "../../../../features/resources/resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { getDictionary } from "../../../../lib/i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { resourcePublicationReadinessService } from "../../../../lib/services/resource-publication-readiness-service";

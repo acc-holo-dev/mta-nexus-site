@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { describe, expect, it } from "vitest";
 import { sessionRepository, userRepository, webPushSubscriptionRepository } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 
 describe("Web Push active subscription repository", () => {
   it("excludes expired subscriptions and subscriptions bound to expired sessions", async () => {

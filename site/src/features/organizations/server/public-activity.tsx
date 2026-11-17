@@ -1,6 +1,6 @@
-import { PublicProfileActivity } from "../../accounts/public-profile-activity-server";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { PublicProfileActivity } from "../../accounts/public-profile-activity-server";
+import { publicationCopy } from "../../community/publication-feed-copy";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

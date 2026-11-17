@@ -1,17 +1,17 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../shell/guest-auth";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { organizationReturnPath } from "./organization-return-path";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
+import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { getOrganizationCopy } from "../organization-workspace-copy";
+import { organizationReturnPath } from "./organization-return-path";
+
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

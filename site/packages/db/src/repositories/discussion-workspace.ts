@@ -1,9 +1,10 @@
-import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { comments, content } from "../schema";
-import { containsPattern } from "./search-pattern";
 import { discussionManagementRepository, discussionRevision } from "./discussion-management";
+import { containsPattern } from "./search-pattern";
+
 const own = (actorId: string) =>
   and(eq(comments.authorId, actorId), isNull(comments.productId), isNotNull(comments.contentId));
 const published = () =>

@@ -27,8 +27,8 @@ vi.mock("../../src/lib/services/resource-publisher-service", () => ({
 
 import HistoryPage from "../../src/app/workspace/resources/[id]/history/page";
 import InventoryPage from "../../src/app/workspace/resources/page";
-import { getDictionary } from "../../src/lib/i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const context = {
   params: Promise.resolve({ id: "prd_a" }),

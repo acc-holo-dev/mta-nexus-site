@@ -1,9 +1,9 @@
-import { expect, it } from "vitest";
 import {
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
   serverActivityCursor,
 } from "@nexus/domain";
+import { expect, it } from "vitest";
 import {
   getServerActivityCopy,
   parseServerActivityCursor,

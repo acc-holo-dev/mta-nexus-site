@@ -33,9 +33,9 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { formatNotification } from "../../src/lib/notification-copy";
 import { db } from "../../packages/db/src/client";
 import { discussionModerationNotice } from "../../packages/db/src/repositories/discussion-moderation-notice";
+import { formatNotification } from "../../src/lib/notification-copy";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { auditId: "audit", authorId: "author", commentId: "comment" },

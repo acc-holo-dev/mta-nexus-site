@@ -1,11 +1,11 @@
 import {
-  serverObservationRepository,
   type ServerStatisticsAccess,
   type ServerStatisticsTarget,
+  serverObservationRepository,
 } from "@nexus/db";
 import { serverHistoryWindows } from "../server-history-window";
-import type { ServerStatisticsQuery } from "../server-statistics-contract";
 import type { ServerObservationBrowserQuery } from "../server-observation-browser-contract";
+import type { ServerStatisticsQuery } from "../server-statistics-contract";
 
 function round(value: number) {
   return Math.round(value * 10) / 10;

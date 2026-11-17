@@ -22,7 +22,11 @@ import {
   adSlotRendererEnabled,
   advertisingLifecycleEnabled,
 } from "../../features/accounts/feature-flags";
+import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
+import { getFinancialCopy } from "../../features/commerce/financial-i18n";
+import { moderationCopy } from "../../features/community/community-moderation-copy";
 import { ContentModerationControls } from "../../features/community/content-moderation";
+import { getResourceReleaseControlCopy } from "../../features/library/resource-release-control-i18n";
 import {
   AdminAdPlacementSection,
   AdminBuildsQuarantineSection,
@@ -31,12 +35,8 @@ import {
   AdminVerificationQueueSection,
 } from "../../features/moderation/admin-home";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
-import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
-import { moderationCopy } from "../../features/community/community-moderation-copy";
-import { getFinancialCopy } from "../../features/commerce/financial-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
 import { adminService } from "../../lib/services/admin-service";
 import { authService } from "../../lib/services/auth-service";
 

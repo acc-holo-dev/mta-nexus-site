@@ -31,9 +31,9 @@ vi.mock("../../src/features/organizations/organization-workspace-client", () => 
   organizationRequest: harness.request,
 }));
 
-import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 
 const { clickLeave } = createOrganizationWorkspaceConfirmInteractionHelpers(
   harness,

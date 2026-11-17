@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { spawnSync, spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:https";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { once } from "node:events";
 import { test } from "node:test";
 
 test("production Web Push runtime interoperates with a closed TLS provider", {

@@ -2,11 +2,11 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { DiscussionPage } from "../../../lib/content-discussion-contract";
-import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
-import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
+import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
+import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
 export function DiscussionCommentActions({
   comment,
   own,

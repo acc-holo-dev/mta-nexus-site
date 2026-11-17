@@ -1,8 +1,10 @@
 import { readMtaMasterMirrorUrls } from "@nexus/config";
 import { normalizeMtaAddress } from "@nexus/domain";
+
 export { normalizeMtaAddress } from "@nexus/domain";
-import { MTA_MASTER_FRESH_TTL_MS } from "../../features/servers/model";
+
 import type { MtaMasterServer } from "../../features/servers/model";
+import { MTA_MASTER_FRESH_TTL_MS } from "../../features/servers/model";
 
 export type { MtaMasterServer } from "../../features/servers/model";
 export { mtaLiveStatus } from "../../features/servers/model";

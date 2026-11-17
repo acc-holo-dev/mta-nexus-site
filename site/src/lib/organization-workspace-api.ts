@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import type { User } from "@nexus/domain";
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { userPlatformApi } from "./user-platform-api";
-import { organizationError } from "./organization-workspace-copy";
+import type { NextRequest } from "next/server";
+import { organizationError } from "../features/organizations/organization-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "./bounded-json";
+import { userPlatformApi } from "./user-platform-api";
 export function organizationApi(
   request: NextRequest,
   action: (user: User) => Promise<unknown>,

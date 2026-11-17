@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import type { NextRequest } from "next/server";
 import type { Locale } from "./i18n";
 import { resolveLocale } from "./i18n";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";

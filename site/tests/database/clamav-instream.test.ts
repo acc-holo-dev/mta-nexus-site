@@ -1,9 +1,9 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it } from "vitest";
 import {
+  type ClamAvInstreamSocket,
   clamAvInstreamLimits,
   writeClamAvInstream,
-  type ClamAvInstreamSocket,
 } from "../../src/lib/services/clamav-instream";
 
 class FakeSocket extends EventEmitter {

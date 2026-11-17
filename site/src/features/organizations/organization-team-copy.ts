@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { organizationError } from "../../lib/organization-workspace-copy";
+import { organizationError } from "./organization-workspace-copy";
 
 const en = {
   legacyOwner: "Legacy owner role without ownership rights",

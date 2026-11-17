@@ -2,9 +2,9 @@ import { notificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseNotificationReadTarget } from "../../../../features/notifications/notification-read";
 import { readBoundedText } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { parseNotificationReadTarget } from "../../../../features/notifications/notification-read";
 import {
   createRequestLogContext,
   jsonWithRequestId,

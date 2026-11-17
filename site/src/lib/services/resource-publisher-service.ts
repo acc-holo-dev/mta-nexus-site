@@ -1,5 +1,5 @@
 import { resourcePublisherRepository } from "@nexus/db";
-import type { PublisherResourceQuery, PublisherHistoryKind, User } from "@nexus/domain";
+import type { PublisherHistoryKind, PublisherResourceQuery, User } from "@nexus/domain";
 export const resourcePublisherService = {
   inventory(actor: User, query: PublisherResourceQuery & { page: number }) {
     return resourcePublisherRepository.inventory(actor.id, query, query.page);

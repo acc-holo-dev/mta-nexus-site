@@ -4,19 +4,22 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BuildProvenanceDetails } from "../../../../../features/resources/evidence";
-import { LibraryReleaseSelectionControls } from "../../../../../features/library/release-selection";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { ResourceDownloadButton } from "../../../../../features/resources/download";
-import { ResourceReleaseWatchControl } from "../../../../../features/resources/release-watch";
-import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import {
+  formatHistoryDate,
+  parseHistoryPage,
+} from "../../../../../features/commerce/commerce-history-format";
 import { libraryCollectionsCopy } from "../../../../../features/library/library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../../../../../features/library/library-release-comparison-i18n";
-import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
+import { LibraryReleaseSelectionControls } from "../../../../../features/library/release-selection";
+import { getResourceReleaseControlCopy } from "../../../../../features/library/resource-release-control-i18n";
+import { ResourceDownloadButton } from "../../../../../features/resources/download";
+import { BuildProvenanceDetails } from "../../../../../features/resources/evidence";
+import { ResourceReleaseWatchControl } from "../../../../../features/resources/release-watch";
+import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { getDictionary } from "../../../../../lib/i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
-import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";

@@ -1,6 +1,6 @@
+import type { RecordServerObservationInput } from "@nexus/db";
 import type { Server } from "@nexus/domain";
 import { indexMtaObservations, type MtaMasterDirectory } from "./mta-master-directory-service";
-import type { RecordServerObservationInput } from "@nexus/db";
 import { observationSequenceForEndpoint } from "./server-observation-sequence.mjs";
 
 export function buildMasterObservationCandidates(

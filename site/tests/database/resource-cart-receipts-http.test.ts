@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -18,10 +19,12 @@ vi.mock("../../src/lib/services/resource-cart-receipts-service", () => ({
 vi.mock("../../src/lib/services/commerce-service", () => ({
   commerceService: { reviewResourceCart: state.review },
 }));
-import { GET as page } from "../../src/app/api/resources/cart/receipts/route";
+
 import { GET as detail } from "../../src/app/api/resources/cart/receipts/[id]/route";
 import { GET as csv } from "../../src/app/api/resources/cart/receipts/export/route";
+import { GET as page } from "../../src/app/api/resources/cart/receipts/route";
 import { GET as review } from "../../src/app/api/resources/cart/review/route";
+
 const requestId = "11111111-1111-4111-8111-111111111111",
   context = { params: Promise.resolve({ id: requestId }) };
 const request = (url: string) => new NextRequest(`https://nexus.test/api/resources/cart/${url}`);

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
+
 const active = vi.hoisted(() => ({ db: null as unknown }));
 vi.mock("../../packages/db/src/client", async (importOriginal) => {
   const original = await importOriginal<typeof import("../../packages/db/src/client")>();
@@ -14,7 +15,9 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
+
 import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+
 it("aggregates a full thirty-day history beyond the sample cap on PostgreSQL", async () => {
   const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(
     "../../packages/db/src/client",

@@ -4,15 +4,15 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   parseHistoryPage,
-} from "../../../../../lib/commerce-history-format";
+} from "../../../../../features/commerce/commerce-history-format";
 import { commercialTerms } from "../../../../../features/commerce/commercial-confirmation";
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
+import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";

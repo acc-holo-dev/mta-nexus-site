@@ -15,11 +15,11 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 }));
 
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { SupportCenter } from "../../src/features/support/center";
+import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";
-import { getDictionary } from "../../src/lib/i18n";
 import { supportWorkspaceCopy } from "../../src/features/support/support-workspace-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,

@@ -28,12 +28,12 @@ vi.mock("../../src/lib/services/build-package-service", () => ({
 
 import { buildPackageSummary } from "@nexus/domain";
 import AdminResourceBuildPackageLoading from "../../src/app/admin/resources/[id]/builds/[buildId]/package/loading";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
 } from "../../src/features/resources/evidence";
 import { BuildPackageScreen } from "../../src/features/resources/server/build-package-screen";
-import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private title>" },

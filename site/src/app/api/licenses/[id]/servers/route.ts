@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { parseHistoryPage } from "../../../../../lib/commerce-history-format";
+import { parseHistoryPage } from "../../../../../features/commerce/commerce-history-format";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { licenseControlService } from "../../../../../lib/services/license-control-service";
 

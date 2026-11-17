@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
 import { buildModerationUiState } from "../../src/features/resources/build-moderation-ui";
+import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),

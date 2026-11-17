@@ -1,13 +1,14 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, expect, it } from "vitest";
-import { eq, inArray, sql } from "drizzle-orm";
 import { db, publicationFeedRepository as feed, userRepository } from "@nexus/db";
+import { eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
 import { content, servers, userProfilePreferences, users } from "../../packages/db/src/schema";
-import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
 import {
   parsePublicationQuery,
   publicationPageQuery,
 } from "../../src/lib/publication-feed-contract";
+import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
+
 const actorIds: string[] = [],
   serverIds: string[] = [];
 afterEach(async () => {

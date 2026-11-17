@@ -6,15 +6,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
+  type DiscussionPage,
+  discussionPageSchema,
+} from "../../../lib/content-discussion-contract";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { platformFieldClass } from "../../../lib/user-platform-client";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import {
   ContentCommentSubmitError,
   createCommentIntentKey,
   parseCommentIntentKey,
   submitContentCommentRequest,
 } from "../content-comment-client";
-import {
-  type DiscussionPage,
-  discussionPageSchema,
-} from "../../../lib/content-discussion-contract";
 import {
   discussionError,
   discussionWriteNeedsSignIn,
@@ -25,17 +30,12 @@ import {
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
 } from "../discussion-compose-draft";
-import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
+import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { followCopy } from "../follow-workspace-copy";
-import { getDictionary, type Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-import { GuestAuthLinks } from "../../shell/guest-auth";
 
 const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
 const navLinkClass =

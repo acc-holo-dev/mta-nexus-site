@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -30,6 +31,7 @@ import {
   readLibraryMembershipHistory,
   readLibraryMembershipHistoryDetail,
 } from "../../packages/db/src/repositories/library-membership-history";
+
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
 const command = {

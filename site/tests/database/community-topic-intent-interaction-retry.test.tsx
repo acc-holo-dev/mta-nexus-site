@@ -28,8 +28,8 @@ vi.mock("../../src/features/shell/locale", async () => {
   };
 });
 
-import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
 import { readCommunityTopicIntent } from "../../src/features/community/community-topic-intent";
+import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { render, mount, submit } = createCommunityTopicIntentInteractionHelpers(

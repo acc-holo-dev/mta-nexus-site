@@ -1,8 +1,8 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { getDiscussionCopy } from "../content-discussion-copy";
 import type { Locale } from "../../../lib/i18n";
 import { GuestAuthLinks, platformSignInFocusClass } from "../../shell/guest-auth";
+import { getDiscussionCopy } from "../content-discussion-copy";
 
 export function DiscussionComposeWriteFeedback({
   error,

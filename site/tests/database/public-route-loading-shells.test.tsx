@@ -5,13 +5,13 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => "en" as const,
 }));
 
-import ContextTrustLoading from "../../src/app/organizations/[slug]/trust/loading";
 import ReportGroupsLoading from "../../src/app/admin/reports/targets/loading";
-import LibraryCollectionsLoading from "../../src/app/workspace/library/collections/loading";
+import ContextTrustLoading from "../../src/app/organizations/[slug]/trust/loading";
 import UserTrustHistoryLoading from "../../src/app/users/[username]/trust/history/loading";
-import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
+import LibraryCollectionsLoading from "../../src/app/workspace/library/collections/loading";
 import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 it.each([

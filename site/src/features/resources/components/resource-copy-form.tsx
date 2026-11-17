@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
 import { confirmedResourceCopy } from "../resource-copy-confirmation";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
-import { useNexusLocale } from "../../shell/locale";
 import { ResourceCopyMetadataView } from "./resource-copy-metadata";
 export function ResourceCopyForm({
   preview,

@@ -10,5 +10,8 @@
 | `public-context-trust-page.ts`        | `PublicContextTrustPage`, `contextTrustMetadata`; `/organizations/:slug/trust` и `/servers/:slug/trust` |
 | `public-user-trust-copy.ts`           | util port `public-user-trust-copy`                                                                      |
 | `public-verification-history-copy.ts` | util port `public-verification-history-copy`                                                            |
+| `public-context-trust-copy.ts`        | util port `public-context-trust-copy`                                                                   |
+| `verification-workspace-api.ts`       | util port `verification-workspace-api`                                                                  |
+| `verification-workspace-copy.ts`      | util port `verification-workspace-copy`                                                                 |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser и `scripts/tests/trust-feature-boundaries.node-test.mjs`.

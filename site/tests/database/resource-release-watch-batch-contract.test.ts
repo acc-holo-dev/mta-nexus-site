@@ -1,10 +1,11 @@
-import { expect, it } from "vitest";
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
+import { expect, it } from "vitest";
 import { confirmedResourceReleaseWatchBatch } from "../../src/features/resources/resource-release-watch-batch-confirmation";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
 } from "../../src/features/resources/resource-release-watches-query";
+
 const command = {
   items: [
     { productId: "prd_a", expectedRevision: 1 },

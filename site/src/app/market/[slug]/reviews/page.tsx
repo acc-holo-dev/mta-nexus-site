@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { resourceReviewCopy } from "../../../../features/resources/resource-review-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
 
 export const dynamic = "force-dynamic";
 

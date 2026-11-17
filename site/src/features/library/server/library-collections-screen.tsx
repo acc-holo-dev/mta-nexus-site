@@ -8,6 +8,9 @@ import {
   collectionPageParams,
 } from "../../../lib/library-collections-query";
 import { authService } from "../../../lib/services/auth-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { LibraryCollectionsCopyView } from "./library-collections-copy-view";
 import { LibraryCollectionsDetailView } from "./library-collections-detail-view";
 import { LibraryCollectionsErrorPanel } from "./library-collections-error-panel";
@@ -20,9 +23,6 @@ import {
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { libraryCollectionsCopy } from "../library-collections-i18n";
 
 export async function LibraryCollectionsScreen({
   view = "list",

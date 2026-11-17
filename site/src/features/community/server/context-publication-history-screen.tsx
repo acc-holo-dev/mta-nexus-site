@@ -4,25 +4,25 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
-import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";
+import { authService } from "../../../lib/services/auth-service";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { organizationContentCopy } from "../../organizations/organization-content-copy";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
-} from "../../../lib/organization-publication-history-copy";
-import { serverContentCopy } from "../../../lib/server-content-copy";
-import { serverPublicationHistorySchema } from "../server-publication-history-contract";
+} from "../../organizations/organization-publication-history-copy";
+import { serverContentCopy } from "../../servers/server-content-copy";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,
-} from "../../../lib/server-publication-history-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { publicationSupportHref } from "../../../lib/support-workspace-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-import { AuthorPublicationRestore } from "../author-publication-restore";
+} from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
+import { AuthorPublicationRestore } from "../author-publication-restore";
+import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";
+import { serverPublicationHistorySchema } from "../server-publication-history-contract";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

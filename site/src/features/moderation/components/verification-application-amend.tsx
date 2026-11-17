@@ -9,12 +9,12 @@ import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
 } from "../../../lib/verification-applications-contract";
+import { confirmAction } from "../../shell/confirm-action";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
 } from "../verification-applications-copy";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../shell/confirm-action";
 export function VerificationApplicationAmend({
   id,
   revision,

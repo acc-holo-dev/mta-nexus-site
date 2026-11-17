@@ -1,8 +1,8 @@
-import { and, eq, sql } from "drizzle-orm";
 import { NotFoundError } from "@nexus/domain";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { organizations, servers } from "../schema";
-import { publicApprovalRecords, type PublicApprovalCursor } from "./public-approval-records";
+import { type PublicApprovalCursor, publicApprovalRecords } from "./public-approval-records";
 export type PublicContextKind = "organization" | "server";
 class PublicContextTrustRepository {
   async page(kind: PublicContextKind, slug: string, cursor?: PublicApprovalCursor) {

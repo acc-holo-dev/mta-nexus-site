@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { organizationContentCopy } from "../../src/lib/organization-content-copy";
+import { organizationContentCopy } from "../../src/features/organizations/organization-content-copy";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({

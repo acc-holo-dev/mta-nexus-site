@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import {
-  InMemoryEventBus,
   type BuildSubmittedForReviewEvent,
+  InMemoryEventBus,
   type ServerCreatedEvent,
 } from "@nexus/domain";
+import { describe, expect, it } from "vitest";
 
 describe("domain event lifecycle contracts", () => {
   it("dispatches a submitted-for-review event as its own event type", async () => {

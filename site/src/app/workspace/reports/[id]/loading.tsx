@@ -1,4 +1,4 @@
-import { communityReportCopy } from "../../../../lib/community-report-copy";
+import { communityReportCopy } from "../../../../features/community/community-report-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/reports/[id].

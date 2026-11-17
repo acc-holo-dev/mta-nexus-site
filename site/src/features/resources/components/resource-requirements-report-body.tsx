@@ -1,9 +1,9 @@
 import type { ResourceRequirementsReport, ResourceRequirementsScope } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { AddResourceToCart } from "./resource-cart-controls";
 import { ResourceDownloadButton } from "../download";
+import { resourceRequirementsCopy } from "../resource-requirements-i18n";
+import { AddResourceToCart } from "./resource-cart-controls";
 
 export function ResourceRequirementsReportBody({
   report,

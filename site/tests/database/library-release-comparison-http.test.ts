@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   rate: vi.fn(),
@@ -12,8 +13,10 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
 vi.mock("../../src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
-import { GET } from "../../src/app/api/library/releases/[id]/compare/route";
+
 import { GET as download } from "../../src/app/api/library/releases/[id]/compare/export/route";
+import { GET } from "../../src/app/api/library/releases/[id]/compare/route";
+
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   request = (suffix = "?from=bld_a&to=bld_b&returnPage=2") =>
     new NextRequest(`https://nexus.test/api/library/releases/prd_a/compare${suffix}`);

@@ -1,7 +1,7 @@
-import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
-import { db } from "../client";
-import { adSlots, adPlacements, products, servers, auditEvents } from "../schema";
 import {
+  type AdPlacementPlan,
+  type AdPlacementStatus,
+  type AdSlotPlan,
   adPlacementHoldsCapacity,
   adPlacementIsServeable,
   adSlotCapacityIsRespected,
@@ -9,10 +9,10 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-  type AdPlacementPlan,
-  type AdPlacementStatus,
-  type AdSlotPlan,
 } from "@nexus/domain";
+import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
+import { db } from "../client";
+import { adPlacements, adSlots, auditEvents, products, servers } from "../schema";
 
 /**
  * UX-24 -- managed advertising placement.

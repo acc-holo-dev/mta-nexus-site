@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { WebPushPermanentSubscriptionError } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 import {
   isPublicWebPushAddress,
   parseWebPushEndpoint,

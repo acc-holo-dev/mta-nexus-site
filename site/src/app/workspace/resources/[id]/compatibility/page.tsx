@@ -2,13 +2,13 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { ProductDependencyList } from "../../../../../features/resources/detail-view";
 import { ResourceCompatibilityForm } from "../../../../../features/resources/compatibility-controls";
+import { ProductDependencyList } from "../../../../../features/resources/detail-view";
+import { getResourceManagementCopy } from "../../../../../features/resources/resource-management-i18n";
+import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getResourceManagementCopy } from "../../../../../features/resources/resource-management-i18n";
-import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { productService } from "../../../../../lib/services/product-service";
 

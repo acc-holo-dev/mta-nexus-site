@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -24,7 +25,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { readLibraryReleaseHistory } from "../../packages/db/src/repositories/library-release-history";
+
 const date = "2026-10-12T00:00:00.000Z";
 beforeEach(() => {
   h.rows = [];

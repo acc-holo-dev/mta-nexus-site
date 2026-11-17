@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { platformReportCopy } from "../../../features/moderation/platform-report-i18n";
 import { PlatformReportsScreen } from "../../../features/moderation/reports-server";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { platformReportCopy } from "../../../lib/platform-report-i18n";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

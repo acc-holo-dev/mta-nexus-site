@@ -43,10 +43,10 @@ vi.mock("../../src/features/community/author-publication-restore", () => ({
   }) => <div data-restore={organizationId ?? serverId} />,
 }));
 
-import { DiscussionReportsScreen as Reports } from "../../src/features/community/server/discussion-reports-screen";
-import { OrganizationPublicationHistoryScreen as History } from "../../src/features/organizations/publication-history-server";
 import { discussionReportsCopy } from "../../src/features/community/discussion-reports-copy";
-import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
+import { DiscussionReportsScreen as Reports } from "../../src/features/community/server/discussion-reports-screen";
+import { organizationPublicationHistoryCopy } from "../../src/features/organizations/organization-publication-history-copy";
+import { OrganizationPublicationHistoryScreen as History } from "../../src/features/organizations/publication-history-server";
 
 const time = "2026-10-11T00:00:00.123456Z",
   publication = {
@@ -276,7 +276,7 @@ it.each(["ru", "en"] as const)(
       "../../src/features/servers/server/server-publication-history-screen"
     );
     const { serverPublicationHistoryCopy } = await import(
-      "../../src/lib/server-publication-history-copy"
+      "../../src/features/servers/server-publication-history-copy"
     );
     const html = renderToStaticMarkup(
       await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" }),

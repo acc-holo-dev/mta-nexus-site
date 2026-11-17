@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useNexusLocale } from "../../shell/locale";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
@@ -16,13 +17,12 @@ import {
   clearSupportRetry,
   reserveSupportReplyRetry,
   resolveSupportRetryActorScope,
-} from "../../../lib/support-retry";
+} from "../support-retry";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../support-workspace-copy";
-import { useNexusLocale } from "../../shell/locale";
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";

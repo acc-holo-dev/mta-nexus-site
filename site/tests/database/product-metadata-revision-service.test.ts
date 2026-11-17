@@ -1,12 +1,15 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ updateManagedDetails: vi.fn(), findManaged: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   productRepository: mocks,
   buildRepository: {},
   organizationRepository: {},
 }));
+
 import { ProductService } from "../../src/lib/services/product-service";
+
 const service = new ProductService();
 const actor = { id: "author", role: "developer" } as User;
 const details = {

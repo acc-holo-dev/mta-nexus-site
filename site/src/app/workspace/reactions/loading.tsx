@@ -1,4 +1,4 @@
-import { reactionCopy } from "../../../lib/content-reaction-copy";
+import { reactionCopy } from "../../../features/community/content-reaction-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/reactions.

@@ -1,4 +1,4 @@
-import { licenseModelLabel } from "../../lib/license-model-i18n";
+import { licenseModelLabel } from "./license-model-i18n";
 
 const copies = {
   en: {

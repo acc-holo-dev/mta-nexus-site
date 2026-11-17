@@ -13,6 +13,10 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import {
+  ownDiscussionCopy,
+  ownDiscussionError,
+} from "../../src/features/community/discussion-workspace-copy";
+import {
   approvalCopy,
   approvalError,
 } from "../../src/features/trust/public-verification-history-copy";
@@ -22,7 +26,6 @@ import {
   ownDiscussionSchema,
   parseOwnDiscussionQuery,
 } from "../../src/lib/discussion-workspace-contract";
-import { ownDiscussionCopy, ownDiscussionError } from "../../src/lib/discussion-workspace-copy";
 import {
   approvalPageHref,
   parseApprovalQuery,

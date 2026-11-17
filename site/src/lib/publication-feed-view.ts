@@ -1,5 +1,5 @@
-import { AppError } from "@nexus/domain";
 import type { PublicationScope } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { parsePublicationPageQuery, publicationPageQuery } from "./publication-feed-contract";
 import { publicationFeedService } from "./services/publication-feed-service";
 export async function publicationFeedView(

@@ -23,8 +23,8 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
-import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
 import { resourceReleaseWorkerRepository } from "../../packages/db/src/repositories/resource-release-worker";
+import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
 import archives from "../fixtures/build-packages.json";
 
 // Requires a disposable PostgreSQL database migrated through 0061. No storage writes.

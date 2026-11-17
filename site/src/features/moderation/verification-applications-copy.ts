@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { verificationError } from "../../lib/verification-workspace-copy";
+import { verificationError } from "../trust/verification-workspace-copy";
 
 const en = {
   title: "My verification applications",

@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -77,7 +78,9 @@ vi.mock("../../src/features/shell/locale", async (original) => ({
     },
   }),
 }));
+
 import { NotificationBell } from "../../src/features/notifications/bell";
+
 function flatten(node: ReactNode): ReactElement<Record<string, unknown>>[] {
   if (Array.isArray(node)) return node.flatMap(flatten);
   if (!node || typeof node !== "object" || !("props" in node)) return [];

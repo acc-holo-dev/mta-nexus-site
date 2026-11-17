@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
 
 const mocks = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -32,10 +32,11 @@ vi.mock("../../src/lib/services/product-service", () => ({
   productService: { transitionResource: mocks.transition },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { GET, POST, DELETE } from "../../src/app/api/resources/cart/route";
-import { POST as acquire } from "../../src/app/api/resources/cart/acquire/route";
-import { POST as lifecycle } from "../../src/app/api/products/[id]/lifecycle/route";
+
 import { GET as orderDetails } from "../../src/app/api/orders/[id]/route";
+import { POST as lifecycle } from "../../src/app/api/products/[id]/lifecycle/route";
+import { POST as acquire } from "../../src/app/api/resources/cart/acquire/route";
+import { DELETE, GET, POST } from "../../src/app/api/resources/cart/route";
 
 const requestId = "607177bf-31df-4a67-a7d4-cba38c456d07";
 function request(

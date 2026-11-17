@@ -25,8 +25,8 @@ vi.mock("../../src/features/shell/locale", async () => {
   };
 });
 
-import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { moderationCopy } from "../../src/features/community/community-moderation-copy";
+import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { getDictionary } from "../../src/lib/i18n";
 
 const { click, ready } = createCommunityModerationInteractionHelpers(

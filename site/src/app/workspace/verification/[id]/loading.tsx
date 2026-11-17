@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../../lib/i18n-server";
 import { verificationApplicationsCopy } from "../../../../features/moderation/verification-applications-copy";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 
 export default async function Loading() {
   const copy = verificationApplicationsCopy(await getRequestLocale());

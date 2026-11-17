@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type MouseEvent } from "react";
+import { type MouseEvent, useEffect, useRef } from "react";
 
 /** Native modal behavior supplies focus containment and makes the page inert. */
 export function useModalDialog(isOpen: boolean) {

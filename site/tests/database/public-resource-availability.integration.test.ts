@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, productRepository, userRepository } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("public resource safe-build catalog scope", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

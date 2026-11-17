@@ -1,8 +1,9 @@
-import { describe, it } from "vitest";
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
-import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
+import { describe, it } from "vitest";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
+import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
+
 const fixture = () => {
   const key = randomBytes(32);
   const cipher = new AccountMailCipher("key_a", { key_a: key });

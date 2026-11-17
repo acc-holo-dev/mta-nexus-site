@@ -1,24 +1,24 @@
 import {
   AppError,
-  NotFoundError,
-  LIBRARY_COLLECTION_ITEM_LIMIT,
   LIBRARY_COLLECTION_BATCH_LIMIT,
+  LIBRARY_COLLECTION_ITEM_LIMIT,
   type LibraryCollectionReceiptDetail,
+  NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionIdSchema, libraryCollectionSnapshotSchema } from "@nexus/validation";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
-  users,
-  libraryCollectionReceipts as receipts,
+  builds,
   libraryCollections as collections,
   libraryCollectionItems as members,
   products,
-  builds,
+  libraryCollectionReceipts as receipts,
+  users,
 } from "../schema";
+import { safePublishedBuildCondition } from "./build-safety";
 import { recordedCollectionReceipt } from "./library-collection-receipt-proof";
 import { effectiveUserDownloadSources } from "./user-library";
-import { safePublishedBuildCondition } from "./build-safety";
 export async function readLibraryCollectionReceiptDetail(
   userId: string,
   id: string,

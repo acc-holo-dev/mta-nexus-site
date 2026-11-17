@@ -1,8 +1,8 @@
 import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkLocalReadiness } from "../../../scripts/check-local-readiness.mjs";
 
 const checkDatabaseConnection = vi.hoisted(() => vi.fn());

@@ -1,17 +1,18 @@
-import { and, count, eq, gte, lte, sql, type SQL } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
   LIBRARY_RELEASE_HISTORY_DAYS,
+  NotFoundError,
   RESOURCE_RELEASE_WATCH_HISTORY_SOURCES,
-  recordedResourceReleaseWatchOperation,
   type ResourceReleaseWatchHistoryQuery,
+  recordedResourceReleaseWatchOperation,
 } from "@nexus/domain";
+import { and, count, eq, gte, lte, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, products, builds, resourceReleaseWatches as watches, users } from "../schema";
-import { effectiveUserDownloadSources } from "./user-library";
+import { auditEvents, builds, products, users, resourceReleaseWatches as watches } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
+import { effectiveUserDownloadSources } from "./user-library";
+
 const safeItems = sql`CASE WHEN jsonb_typeof(${auditEvents.details}->'items')='array' THEN CASE WHEN jsonb_array_length(${auditEvents.details}->'items') BETWEEN 1 AND 20 THEN ${auditEvents.details}->'items' ELSE '[]'::jsonb END ELSE '[]'::jsonb END`;
 const boundedNumber = (value: SQL) =>
   sql`CASE WHEN jsonb_typeof(${value})='number' AND length((${value})::text)<=10 THEN ${value} END`;

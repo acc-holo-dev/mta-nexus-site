@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -23,8 +24,10 @@ vi.mock("../../packages/db/src/client", async () => {
 vi.mock("../../packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
+
 import { LicenseMaintenanceRepository } from "../../packages/db/src/repositories/license-maintenance";
 import { LicenseRepository } from "../../packages/db/src/repositories/licenses";
+
 const repo = new LicenseMaintenanceRepository(),
   now = "2026-10-11T04:00:00.000Z",
   past = "2026-10-10T04:00:00.000Z",

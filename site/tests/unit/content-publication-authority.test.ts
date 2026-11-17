@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { createContentSchema } from "@nexus/validation";
+import { describe, expect, it } from "vitest";
 
 describe("content publication validation authority", () => {
   it("defaults omitted publication status to draft", () => {

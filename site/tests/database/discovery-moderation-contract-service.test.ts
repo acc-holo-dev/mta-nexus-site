@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   servers: vi.fn(),
   creators: vi.fn(),
@@ -27,23 +28,25 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
   matchesMtaEndpoint: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ can: mocks.allowed }));
-import { discoveryService as discovery } from "../../src/lib/services/discovery-service";
-import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
+
+import { moderationCopy } from "../../src/features/community/community-moderation-copy";
+import { discoveryStreamCopy } from "../../src/features/discovery/discovery-stream-copy";
 import {
-  parseDiscoveryStreamQuery,
-  discoveryStreamHref,
-} from "../../src/lib/discovery-stream-contract";
-import {
-  parseModerationQuery,
-  parseModerationDetailQuery,
+  confirmsModerationCommand,
   moderationCommandSchema,
-  moderationPageSchema,
   moderationDetailSchema,
   moderationHref,
-  confirmsModerationCommand,
+  moderationPageSchema,
+  parseModerationDetailQuery,
+  parseModerationQuery,
 } from "../../src/lib/community-moderation-contract";
-import { moderationCopy } from "../../src/features/community/community-moderation-copy";
-import { discoveryStreamCopy } from "../../src/lib/discovery-stream-copy";
+import {
+  discoveryStreamHref,
+  parseDiscoveryStreamQuery,
+} from "../../src/lib/discovery-stream-contract";
+import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
+import { discoveryService as discovery } from "../../src/lib/services/discovery-service";
+
 const time = "2026-10-11T00:00:00.123456Z",
   date = new Date(time),
   actor = { id: "actor", role: "moderator" } as User;

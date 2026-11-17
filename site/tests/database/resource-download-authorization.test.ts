@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
+import type { Build } from "@nexus/domain";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Build } from "@nexus/domain";
 import { decideResourceDownloadAccess } from "../../src/features/resources/resource-download-policy";
 
 const state = vi.hoisted(() => ({

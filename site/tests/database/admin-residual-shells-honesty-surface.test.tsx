@@ -19,8 +19,8 @@ import AdminLicenseDetailLoading from "../../src/app/admin/licenses/[id]/loading
 import AdminReportHistoryLoading from "../../src/app/admin/reports/[id]/history/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
-import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 beforeEach(() => {

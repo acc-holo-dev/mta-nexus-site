@@ -4,14 +4,17 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import {
+  formatHistoryDate,
+  parseHistoryPage,
+} from "../../../../../features/commerce/commerce-history-format";
 import {
   getResourceReleaseControlCopy,
   resourceModerationLabel,
-} from "../../../../../lib/resource-release-control-i18n";
+} from "../../../../../features/library/resource-release-control-i18n";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { getDictionary } from "../../../../../lib/i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { productService } from "../../../../../lib/services/product-service";
 import { resourceModerationService } from "../../../../../lib/services/resource-release-control-service";

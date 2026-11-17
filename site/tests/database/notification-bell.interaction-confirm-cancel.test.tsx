@@ -37,8 +37,8 @@ vi.mock("../../src/features/shell/modal-dialog", () => ({
   clickedDialogBackdrop: () => false,
 }));
 
-import { notificationInboxCopy } from "../../src/features/notifications/notification-inbox-copy";
 import { NotificationBell } from "../../src/features/notifications/bell";
+import { notificationInboxCopy } from "../../src/features/notifications/notification-inbox-copy";
 
 const { bellButton, openPopover, markAllButton } = createNotificationBellInteractionHelpers(
   harness,

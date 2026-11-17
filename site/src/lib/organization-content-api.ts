@@ -1,6 +1,6 @@
-import type { NextRequest } from "next/server";
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import { parseContentPage, writerTypes } from "./user-platform-contract";
 export function organizationContentId(id: string) {
   if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Content");

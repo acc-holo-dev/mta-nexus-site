@@ -1,6 +1,7 @@
 import { publicVerificationHistoryRepository } from "@nexus/db";
 import { NotFoundError } from "@nexus/domain";
 import type { ApprovalQuery, PublicApprovalPage } from "../public-verification-history-contract";
+
 class PublicVerificationHistoryService {
   async page(username: string, filters: ApprovalQuery = {}): Promise<PublicApprovalPage> {
     if (!/^[a-zA-Z0-9_-]{1,80}$/u.test(username)) throw new NotFoundError("Profile");

@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -23,10 +24,12 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
+
+import { GET as detail } from "../../src/app/api/admin/commerce/reconciliation/[id]/route";
+import { GET as review } from "../../src/app/api/admin/commerce/reconciliation/route";
 import { GET as statement } from "../../src/app/api/finance/route";
 import { GET as scopes } from "../../src/app/api/finance/scopes/route";
-import { GET as review } from "../../src/app/api/admin/commerce/reconciliation/route";
-import { GET as detail } from "../../src/app/api/admin/commerce/reconciliation/[id]/route";
+
 const get = (path: string) => new NextRequest(`https://nexus.test${path}`),
   context = { params: Promise.resolve({ id: "ord_a" }) };
 beforeEach(() => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { discussionCursorSchema } from "./content-discussion-contract";
 import { parseServerStatisticsQuery } from "./server-statistics-contract";
+
 const cursorSchema = discussionCursorSchema
   .extend({
     createdAt: discussionCursorSchema.shape.createdAt.refine((value) => /\.\d{6}Z$/u.test(value)),

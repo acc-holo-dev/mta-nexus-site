@@ -28,12 +28,12 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
+import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import {
   ServerObservationBrowserLoading,
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
 } from "../../src/features/servers/server/server-observation-browser-page";
-import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {

@@ -1,10 +1,10 @@
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { CommunityTopicForm } from "../topic-form";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
+import { CommunityTopicForm } from "../topic-form";
 
 export default async function NewCommunityTopicPage() {
   const locale = await getRequestLocale();

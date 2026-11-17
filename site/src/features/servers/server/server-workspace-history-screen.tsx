@@ -5,17 +5,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../lib/managed-server-view";
-import { getServerActivityCopy } from "../server-activity-view";
 import {
   parseServerWorkspaceHistoryQuery,
   serverWorkspaceHistoryHref,
   serverWorkspaceHistorySchema,
 } from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { getServerActivityCopy } from "../server-activity-view";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

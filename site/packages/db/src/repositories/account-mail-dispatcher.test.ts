@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
 import { randomBytes } from "node:crypto";
+import { describe, expect, it } from "vitest";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { AccountMailDispatcher } from "./account-mail-dispatcher";
-import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 import type { AccountMailTransportInput, AccountMailTransportResult } from "./account-mail-smtp";
+import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 
 const cipher = new AccountMailCipher("test", { test: randomBytes(32) });
 const lease: MailLease = Object.freeze({

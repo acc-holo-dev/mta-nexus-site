@@ -1,6 +1,3 @@
-import { afterAll, describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   buildRepository,
@@ -11,6 +8,9 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { afterAll, describe, expect, it } from "vitest";
 import { GET as downloadResource } from "../../src/app/api/products/[id]/download/route";
 
 describe("resource download HTTP integration", () => {

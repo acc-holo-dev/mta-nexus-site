@@ -30,7 +30,10 @@ vi.mock("../../src/lib/services/community-report-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
+import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { CommunityReportGroups } from "../../src/features/community/components/community-report-groups";
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 import {
   CommunityReportGroupsPage,
   reportGroupsMetadata,
@@ -40,9 +43,6 @@ import {
   publicationReportsMetadata,
 } from "../../src/features/community/server/publication-reports-page";
 import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
-import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = {

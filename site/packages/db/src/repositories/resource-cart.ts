@@ -1,4 +1,3 @@
-import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   RESOURCE_CART_LIMIT,
@@ -8,6 +7,7 @@ import {
   type ResourceCartReviewItem,
   UnauthorizedError,
 } from "@nexus/domain";
+import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -15,15 +15,15 @@ import {
   entitlements,
   licenses,
   products,
-  resourceCartItems,
   resourceCartAcquisitions,
+  resourceCartItems,
   users,
 } from "../schema";
+import type { ResourceTransaction } from "../transaction";
 import { trustedCleanScanCondition } from "./build-safety";
 import { claimFreeResourcesInTransaction, lockResourceAcquisitionSession } from "./entitlements";
-import type { ResourceTransaction } from "../transaction";
-import { readResourceCartReview } from "./resource-cart-review";
 import { lockInitiatingSession } from "./initiating-session";
+import { readResourceCartReview } from "./resource-cart-review";
 
 async function lockCart(tx: ResourceTransaction, userId: string) {
   await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`resource-cart:${userId}`}))`);

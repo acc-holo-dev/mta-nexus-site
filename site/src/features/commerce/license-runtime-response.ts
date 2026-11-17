@@ -3,6 +3,7 @@ import {
   type LicenseReleaseCheck,
   type LicenseReleaseConfirmation,
 } from "@nexus/domain";
+
 const identifier = (value: unknown): value is string =>
   typeof value === "string" && /^[A-Za-z0-9_-]{1,128}$/u.test(value);
 const hash = (value: unknown): value is string =>

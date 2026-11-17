@@ -1,12 +1,14 @@
-import { eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import type { User } from "@nexus/domain";
-import { auditEvents, products, users } from "../../packages/db/src/schema";
-import { productRepository } from "../../packages/db/src/repositories/products";
-import { ProductService } from "../../src/lib/services/product-service";
+import { eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
 import { db } from "../../packages/db/src/client";
-import { managedProductCondition } from "../../packages/db/src/repositories/products";
+import {
+  managedProductCondition,
+  productRepository,
+} from "../../packages/db/src/repositories/products";
+import { auditEvents, products, users } from "../../packages/db/src/schema";
+import { ProductService } from "../../src/lib/services/product-service";
 
 it("enforces author and organization authority in PostgreSQL, including revocation", async () => {
   await db.transaction(async (tx) => {

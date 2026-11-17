@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
@@ -25,7 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
+
 import { resourceReleaseWatchesRepository as repo } from "../../packages/db/src/repositories/resource-release-watches";
+
 beforeEach(() => {
   state.sessionLive = true;
   state.queries = [];

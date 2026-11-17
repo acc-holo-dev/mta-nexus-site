@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -23,9 +23,9 @@ vi.mock("../../src/lib/services/resource-review-service", () => ({
   },
 }));
 
-import { POST as createReview } from "../../src/app/api/products/[id]/reviews/route";
-import { POST as reportReview } from "../../src/app/api/products/[id]/reviews/[reviewId]/report/route";
 import { POST as editReview } from "../../src/app/api/library/review/[id]/route";
+import { POST as reportReview } from "../../src/app/api/products/[id]/reviews/[reviewId]/report/route";
+import { POST as createReview } from "../../src/app/api/products/[id]/reviews/route";
 
 const context = { params: Promise.resolve({ id: "prd_a", reviewId: "cmt_a" }) };
 const mutations = [

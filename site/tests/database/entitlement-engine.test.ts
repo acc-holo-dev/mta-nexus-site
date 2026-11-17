@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeAll } from "vitest";
 import {
   entitlementRepository,
   licenseRepository,
-  userRepository,
   productRepository,
+  userRepository,
 } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("Entitlement Engine hasEntitlement()", () => {
   const timestamp = Date.now().toString(36);

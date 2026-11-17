@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -27,8 +27,8 @@ vi.mock("../../src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
 
+import { POST as addMessage, PATCH as updateCase } from "../../src/app/api/support/[id]/route";
 import { POST as createCase } from "../../src/app/api/support/route";
-import { PATCH as updateCase, POST as addMessage } from "../../src/app/api/support/[id]/route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const context = { params: Promise.resolve({ id: caseId }) };

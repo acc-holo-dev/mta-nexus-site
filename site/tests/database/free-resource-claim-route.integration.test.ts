@@ -1,9 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
 import {
   buildRepository,
   entitlementRepository,
@@ -11,7 +5,13 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../../src/app/api/resources/claim/route";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 function claimRequest(productId: string, token?: string, requestId = "default") {
   return new NextRequest("http://nexus.test/api/resources/claim", {

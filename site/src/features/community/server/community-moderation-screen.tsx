@@ -13,16 +13,16 @@ import {
   parseModerationDetailQuery,
   parseModerationQuery,
 } from "../../../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../community-moderation-copy";
-import { discoveryCopy } from "../../../lib/discovery-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { ContentModerationControls } from "../content-moderation";
+import { discoveryCopy } from "../../discovery/discovery-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { moderationCopy, moderationError } from "../community-moderation-copy";
+import { ContentModerationControls } from "../content-moderation";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -34,7 +34,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/support/)" },
       to: {
-        path: "^site/src/features/support/(?!(?:center|download-help|messages-server|page-server|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$)",
+        path: "^site/src/features/support/(?!(?:center|download-help|messages-server|page-server|thread|support-message-discovery-copy|support-response|support-workspace-copy|support-retry|support-workspace-contract)\\.ts$)",
       },
     },
     {
@@ -47,17 +47,17 @@ module.exports = {
       name: "support-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$|components/)",
+        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy|support-retry|support-workspace-contract)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!support/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/support/(?:server/|(?:messages-server|page-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:support-response|support-retry|private-api-request|support-workspace-contract|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!support/shell/home-personal-changes-types.ts$|moderation/platform-report-i18n.ts$|community/publication-feed-copy.ts$|community/discussion-workspace-copy.ts$|community/content-reaction-copy.ts$|community/community-report-copy.ts$|moderation/admin-action-confirmation.ts$|community/follow-initial-state.ts$|notifications/notification-preferences-confirmation.ts$|servers/server-statistics-export.ts$|servers/server-publication-history-copy.ts$|servers/server-content-copy.ts$|library/resource-release-control-confirmation.ts$|library/resource-release-control-i18n.ts$|resources/resource-release-watch-history-query.ts$|resources/resource-review-i18n.ts$|resources/resource-requirements-query.ts$|resources/resource-requirements-i18n.ts$|trust/verification-workspace-copy.ts$|trust/verification-workspace-api.ts$|trust/public-context-trust-copy.ts$|organizations/organization-workspace-copy.ts$|organizations/organization-publication-history-copy.ts$|organizations/organization-content-copy.ts$|commerce/order-case-i18n.ts$|commerce/license-model-i18n.ts$|commerce/commerce-history-format.ts$|discovery/discovery-copy.ts$|discovery/discovery-stream-copy.ts$||shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/support/(?:server/|(?:messages-server|page-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:support-response|private-api-request|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "support-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$|components/)",
+        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy|support-retry|support-workspace-contract)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -66,7 +66,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/trust/)" },
       to: {
-        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy)\\.ts$)",
+        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$)",
       },
     },
     {
@@ -79,7 +79,7 @@ module.exports = {
       name: "trust-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:public-user-trust-contract|user-platform-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -89,7 +89,7 @@ module.exports = {
       name: "trust-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -98,7 +98,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/moderation/)" },
       to: {
-        path: "^site/src/features/moderation/(?!(?:object-report|report-controls|reports-server|verification-amend|verification-controls|verification-workspace|admin-home|storage-maintenance|admin-status-labels|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query|verification-moderation)\\.ts$)",
+        path: "^site/src/features/moderation/(?!(?:object-report|report-controls|reports-server|verification-amend|verification-controls|verification-workspace|admin-home|storage-maintenance|admin-status-labels|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query|admin-action-confirmation|platform-report-i18n|verification-moderation)\\.ts$)",
       },
     },
     {
@@ -111,17 +111,17 @@ module.exports = {
       name: "moderation-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query)\\.ts$|components/)",
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query|admin-action-confirmation|platform-report-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!moderation/|community/report-evidence-links\\.ts$|resources/(?:qa-report-actions|quarantine-controls)\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/moderation/(?:server/|(?:reports-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!moderation/|community/report-evidence-links\\.ts$|moderation/platform-report-i18n\\.ts$|moderation/admin-action-confirmation\\.ts$|trust/verification-workspace-copy\\.ts$|community/community-report-copy\\.ts$|community/follow-initial-state\\.ts$|support/support-workspace-contract\\.ts$|support/support-retry\\.ts$|servers/server-content-copy\\.ts$|resources/resource-review-i18n\\.ts$|commerce/order-case-i18n\\.ts$|commerce/license-model-i18n\\.ts$|discovery/discovery-copy\\.ts$|resources/(?:qa-report-actions|quarantine-controls)\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/moderation/(?:server/|(?:reports-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:platform-report-i18n|private-api-request|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "moderation-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query)\\.ts$|components/)",
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n|verification-applications-copy|storage-maintenance-query|admin-action-confirmation|platform-report-i18n)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -146,7 +146,7 @@ module.exports = {
         path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|ad-preference|settings-client-api|feature-flags|profile-privacy-copy|session-revocation|account-recovery-request-policy|account-recovery-browser|session-cookie)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!accounts/community/publication-feed-copy\\.ts$|notifications/notification-preferences-confirmation\\.ts$|trust/verification-workspace-copy\\.ts$|support/support-retry.ts$||notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -162,7 +162,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/shell/)" },
       to: {
-        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|theme-preference|home-personal-preference)\\.ts$)",
+        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|theme-preference|home-personal-preference)\\.ts$)",
       },
     },
     {
@@ -175,17 +175,17 @@ module.exports = {
       name: "shell-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|safe-public-error-reference)\\.ts$|components/)",
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|safe-public-error-reference|home-personal-changes-types)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$)|features/shell/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|private-api-request|resource-release-watches-i18n|home-personal-changes-types)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$|organizations/organization-workspace-copy\\.ts$|trust/verification-workspace-copy\\.ts$|moderation/platform-report-i18n\\.ts$|community/publication-feed-copy\\.ts$|community/discussion-workspace-copy\\.ts$|community/content-reaction-copy\\.ts$|community/community-report-copy\\.ts$)|features/shell/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:managed-server-view|managed-server-copy|organization-batch-copy|user-platform-copy|notification-copy|private-api-request|resource-release-watches-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "shell-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|safe-public-error-reference)\\.ts$|components/)",
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|safe-public-error-reference|home-personal-changes-types)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -193,7 +193,9 @@ module.exports = {
       name: "discovery-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/discovery/)" },
-      to: { path: "^site/src/features/discovery/(?!(?:directory-server)\\.ts$)" },
+      to: {
+        path: "^site/src/features/discovery/(?!(?:discovery-stream-copy|discovery-copy|directory-server)\\.ts$)",
+      },
     },
     {
       name: "discovery-feature-does-not-import-routing",
@@ -206,7 +208,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/library/)" },
       to: {
-        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n|release-comparison-server|release-history-server|collection-releases-server|collection-requirements-server|collections-server|membership-history-server|selection-batch-server|collection-import-page-server|collection-reconcile-page-server|collection-compare-page-server|collection-receipt-page-server|collection-history-page-server|collection-inventory-page-server|resource-collections-page-server)\\.ts$)",
+        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n|resource-release-control-i18n|resource-release-control-confirmation|release-comparison-server|release-history-server|collection-releases-server|collection-requirements-server|collections-server|membership-history-server|selection-batch-server|collection-import-page-server|collection-reconcile-page-server|collection-compare-page-server|collection-receipt-page-server|collection-history-page-server|collection-inventory-page-server|resource-collections-page-server)\\.ts$)",
       },
     },
     {
@@ -219,17 +221,17 @@ module.exports = {
       name: "library-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n|resource-release-control-i18n|resource-release-control-confirmation)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!library/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/library/(?:server/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements|collection-import-page|collection-reconcile-page|collection-compare-page|collection-receipt-page|collection-history-page|collection-inventory-page|resource-collections-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-query|private-api-request|resource-release-control-i18n|resource-release-control-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!library/resources/resource-requirements-i18n\\.ts$||shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/library/(?:server/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements|collection-import-page|collection-reconcile-page|collection-compare-page|collection-receipt-page|collection-history-page|collection-inventory-page|resource-collections-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-query|private-api-request)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "library-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|collection-requirements-i18n|library-collection-receipts-i18n|library-collections-confirmation|library-collection-manifests-i18n|library-collection-comparison-query|library-release-history-i18n|collection-releases-query|library-release-comparison-query|library-collection-history-query|collection-releases-i18n|library-collection-comparison-i18n|library-collection-inventory-i18n|library-release-comparison-i18n|library-collection-inventory-query|library-membership-history-query|library-collection-history-i18n|library-membership-history-i18n|library-collections-i18n|resource-release-control-i18n|resource-release-control-confirmation)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -238,7 +240,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/notifications/)" },
       to: {
-        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling|notification-inbox-copy|notification-read|notification-inbox-export-client)\\.ts$)",
+        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-inbox-export-client)\\.ts$)",
       },
     },
     {
@@ -251,17 +253,17 @@ module.exports = {
       name: "notifications-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!notifications/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|private-api-request|notification-inbox-contract|content-discussion-contract|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!notifications/shell/home-personal-changes-types.ts$|moderation/platform-report-i18n.ts$|community/publication-feed-copy.ts$|community/content-reaction-copy.ts$|community/community-report-copy.ts$|servers/server-statistics-export.ts$|trust/verification-workspace-copy.ts$|trust/verification-workspace-api.ts$|trust/public-context-trust-copy.ts$|commerce/commerce-history-format.ts$|discovery/discovery-stream-copy.ts$||shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|private-api-request|notification-inbox-contract|content-discussion-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "notifications-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -270,7 +272,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/organizations/)" },
       to: {
-        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy|content-editor-server|publication-history-server|directory-page-server|workspace-page-server|team-page-server|activity-page-server|content-page-server|public-directory-server|public-profile-server|public-activity-server|public-trust-server)\\.ts$)",
+        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy|organization-content-copy|organization-publication-history-copy|organization-workspace-copy|content-editor-server|publication-history-server|directory-page-server|workspace-page-server|team-page-server|activity-page-server|content-page-server|public-directory-server|public-profile-server|public-activity-server|public-trust-server)\\.ts$)",
       },
     },
     {
@@ -283,17 +285,17 @@ module.exports = {
       name: "organizations-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy)\\.ts$|components/)",
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy|organization-content-copy|organization-publication-history-copy|organization-workspace-copy)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!organizations/|accounts/change-history\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-workspace-copy|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!organizations/community/author-publication-desk-copy\\.ts$||accounts/change-history\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "organizations-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy)\\.ts$|components/)",
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy|organization-content-copy|organization-publication-history-copy|organization-workspace-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -302,7 +304,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/community/)" },
       to: {
-        path: "^site/src/features/community/(?!(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy|reports-server|report-history-server|report-groups-server|moderation-server|moderated-discussion-server|discussion-reports-server|publication-reports-server|publication-feed-loading-server|context-history-server|community-page-server|new-topic-page-server|articles-page-server|article-page-server|own-discussions-page-server|own-discussion-page-server|author-desk-page-server|author-create-page-server|author-edit-page-server|author-history-page-server|following-feed-page-server)\\.ts$)",
+        path: "^site/src/features/community/(?!(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy|follow-initial-state|community-report-copy|content-reaction-copy|discussion-workspace-copy|publication-feed-copy|reports-server|report-history-server|report-groups-server|moderation-server|moderated-discussion-server|discussion-reports-server|publication-reports-server|publication-feed-loading-server|context-history-server|community-page-server|new-topic-page-server|articles-page-server|article-page-server|own-discussions-page-server|own-discussion-page-server|author-desk-page-server|author-create-page-server|author-edit-page-server|author-history-page-server|following-feed-page-server)\\.ts$)",
       },
     },
     {
@@ -315,17 +317,17 @@ module.exports = {
       name: "community-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy)\\.ts$|components/)",
+        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy|follow-initial-state|community-report-copy|content-reaction-copy|discussion-workspace-copy|publication-feed-copy)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/community/(?:server(?:\\.ts$|/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page|author-create-page|author-edit-page|author-history-page|following-feed-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-contract|discussion-workspace-copy|follow-workspace-contract|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|moderated-discussion-contract|discussion-reports-contract|report-batch-contract|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/community/(?:server(?:\\.ts$|/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page|author-create-page|author-edit-page|author-history-page|following-feed-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:community-report-contract|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-contract|follow-workspace-contract|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|moderated-discussion-contract|discussion-reports-contract|report-batch-contract|discussion-workspace-contract|publication-feed-contract|author-publication-desk-contract|content-reaction-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "community-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy)\\.ts$|components/)",
+        path: "^site/src/features/community/(?:(?:discussion|topic-form|report-form|report-evidence-links|own-discussion|article-view|publication-feed|author-content-form|author-publication-restore|catalog-controls|reactions|reaction-removal|content-moderation|object-mute-controls|follow|discussion-mutation-confirmation|follow-confirmation|server-publication-history-contract|discussion-compose-draft|community-topic-intent|discussion-reports-copy|community-topic-submission|organization-publication-history-contract|content-comment-client|community-report-groups-copy|content-comment-confirmation|report-batch-copy|follow-workspace-copy|community-moderation-copy|moderated-discussion-copy|community-report-history-copy|author-publication-desk-copy|content-discussion-copy|follow-initial-state|community-report-copy|content-reaction-copy|discussion-workspace-copy|publication-feed-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -334,7 +336,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/commerce/)" },
       to: {
-        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n|license-history-server|subscription-controls|subscription-workspace|order-cancellation|order-case-forms|order-terms|order-case-server|commercial-plans|plan-reviews|plan-reviews-workspace|plan-review-detail|seller-sales)\\.ts$)",
+        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n|commerce-history-format|license-model-i18n|order-case-i18n|license-history-server|subscription-controls|subscription-workspace|order-cancellation|order-case-forms|order-terms|order-case-server|commercial-plans|plan-reviews|plan-reviews-workspace|plan-review-detail|seller-sales)\\.ts$)",
       },
     },
     {
@@ -347,17 +349,17 @@ module.exports = {
       name: "commerce-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n|commerce-history-format|license-model-i18n|order-case-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|order-case-i18n|plan-reviews-query|private-api-request|subscriptions-query|support-retry|license-model-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|plan-reviews-query|private-api-request|subscriptions-query|support-retry)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "commerce-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n|commerce-history-format|license-model-i18n|order-case-i18n)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -368,7 +370,7 @@ module.exports = {
         "Other application modules consume Servers only through explicit public entrypoints.",
       from: { path: "^site/src/(?!features/servers/)" },
       to: {
-        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server)\\.ts$)",
+        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy|server-content-copy|server-publication-history-copy|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server)\\.ts$)",
       },
     },
     {
@@ -383,7 +385,7 @@ module.exports = {
       comment:
         "Client components and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy|server-content-copy|server-publication-history-copy)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
         path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|managed-server-copy|server-workspace-contract|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|content-discussion-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -407,7 +409,7 @@ module.exports = {
       name: "servers-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|server-observation-browser-copy|server-content-copy|server-publication-history-copy)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -418,7 +420,7 @@ module.exports = {
         "Other application modules consume the Resources feature through view, server or model entrypoints.",
       from: { path: "^site/src/(?!features/resources/)" },
       to: {
-        path: "^site/src/features/resources/(?!(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n|server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server|model)\\.ts$)",
+        path: "^site/src/features/resources/(?!(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n|resource-requirements-i18n|resource-requirements-query|resource-review-i18n|resource-release-watch-history-query|server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server|model)\\.ts$)",
       },
     },
     {
@@ -433,10 +435,10 @@ module.exports = {
       comment:
         "Shared views and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n|resource-requirements-i18n|resource-requirements-query|resource-review-i18n|resource-release-watch-history-query)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|resource-review-i18n|product-dependency-resolution|reverse-dependency-summary|resource-requirements-i18n|resource-release-control-confirmation|resource-release-control-i18n|user-platform-client|license-model-i18n|resource-release-watches-i18n|community-report-copy|admin-action-confirmation|verification-workspace-copy|private-api-request|mta-meta-inspector|resource-download-client|resource-attachment-filename)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-dependency-resolution|reverse-dependency-summary|user-platform-client|resource-release-watches-i18n|private-api-request|mta-meta-inspector|resource-download-client|resource-attachment-filename)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -457,7 +459,7 @@ module.exports = {
       name: "resources-view-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n|resource-requirements-i18n|resource-requirements-query|resource-review-i18n|resource-release-watch-history-query)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },

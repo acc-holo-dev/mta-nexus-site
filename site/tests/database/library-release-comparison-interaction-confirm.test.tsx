@@ -22,7 +22,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 
 import { LibraryReleaseComparisonSelection } from "../../src/features/library/components/library-release-comparison-selection";
 import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const { button, click, confirm, confirmation, render, setConfirmation, getTarget } =
   createLibraryReleaseComparisonInteractionHelpers(h, LibraryReleaseComparisonSelection);

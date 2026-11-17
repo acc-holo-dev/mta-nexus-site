@@ -4,10 +4,10 @@ import { Button, ErrorState } from "@nexus/ui";
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
-import { communityReportCopy } from "../../../lib/community-report-copy";
+import { communityReportCopy } from "../../community/community-report-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { confirmsAdminAction } from "../admin-action-confirmation";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {
   const router = useRouter();

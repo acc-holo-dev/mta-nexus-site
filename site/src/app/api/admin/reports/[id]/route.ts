@@ -1,13 +1,13 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import {
+  communityReportDecisionError,
+  communityReportError,
+} from "../../../../../features/community/community-report-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { reportId, reportRateLimit } from "../../../../../lib/community-report-api";
 import { communityReportDecisionSchema } from "../../../../../lib/community-report-contract";
-import {
-  communityReportDecisionError,
-  communityReportError,
-} from "../../../../../lib/community-report-copy";
 import { communityReportService } from "../../../../../lib/services/community-report-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 

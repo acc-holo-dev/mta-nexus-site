@@ -2,10 +2,10 @@ import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/doma
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { reactionCopy, reactionError } from "../../../features/community/content-reaction-copy";
 import { ReactionRemoval } from "../../../features/community/reaction-removal";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
-import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";

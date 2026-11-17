@@ -10,7 +10,6 @@ import {
   confirmsServerVisibilityPreview,
   type ServerVisibilityPreview,
 } from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
@@ -18,6 +17,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 export function ManagedServerVisibilityBatch({
   items,
   locale,

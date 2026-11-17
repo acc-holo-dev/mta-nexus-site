@@ -1,21 +1,22 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { RESOURCE_RELEASE_WORKER_LIMIT, type ResourceReleaseWorkerResult } from "@nexus/domain";
+import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
+  resourceReleaseEvents as events,
   notificationPreferences,
   notifications,
   products,
-  resourceReleaseEvents as events,
-  resourceReleaseWatches as watches,
   users,
+  resourceReleaseWatches as watches,
 } from "../schema";
-import { lockUserDownloadAccess } from "./entitlements";
 import { safePublishedBuildCondition } from "./build-safety";
+import { lockUserDownloadAccess } from "./entitlements";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
+
 function pending() {
   return sql`exists (select 1 from ${events} where ${events.productId} = ${watches.productId} and ${events.sequence} > ${watches.lastSequence})`;
 }

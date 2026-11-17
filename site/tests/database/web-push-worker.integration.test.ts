@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   db,
   notificationRepository,
@@ -10,6 +8,8 @@ import {
   webPushSubscriptionRepository,
   webPushWorkerRepository,
 } from "@nexus/db";
+import { eq, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 async function fixture(label: string) {
   const suffix = `${label}_${randomBytes(5).toString("hex")}`;

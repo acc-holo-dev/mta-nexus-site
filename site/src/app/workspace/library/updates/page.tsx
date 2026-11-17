@@ -3,14 +3,14 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { parseHistoryPage } from "../../../../features/commerce/commerce-history-format";
 import { LibraryReleaseFollowLatest } from "../../../../features/library/release-follow";
-import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { getResourceReleaseControlCopy } from "../../../../features/library/resource-release-control-i18n";
 import { ResourceDownloadButton } from "../../../../features/resources/download";
 import { ResourceReleaseWatchControl } from "../../../../features/resources/release-watch";
-import { parseHistoryPage } from "../../../../lib/commerce-history-format";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../lib/services/resource-release-control-service";
 

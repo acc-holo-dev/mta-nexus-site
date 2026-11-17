@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   trust: vi.fn(),
@@ -20,8 +21,10 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("../../src/lib/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
+
 import { GET as trust } from "../../src/app/api/trust/[kind]/[slug]/route";
 import { GET as team } from "../../src/app/api/workspace/organizations/[id]/team/route";
+
 const actor = { id: "actor", role: "admin" },
   organization = { params: Promise.resolve({ id: "org" }) },
   context = (kind = "servers") => ({ params: Promise.resolve({ kind, slug: "server" }) });

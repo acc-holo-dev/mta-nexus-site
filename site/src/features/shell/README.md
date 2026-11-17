@@ -6,3 +6,4 @@
 
 Маршруты остаются в App Router. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
 | `safe-public-error-reference.ts` | util port `safe-public-error-reference` |
+| `home-personal-changes-types.ts` | util port `home-personal-changes-types` |

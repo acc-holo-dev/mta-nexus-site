@@ -7,23 +7,23 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  effectiveLicenseStatus,
+  formatHistoryDate,
+  licenseStatusLabel,
+} from "../../../features/commerce/commerce-history-format";
+import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
 import { LicenseArchiveFilters } from "../../../features/commerce/license-archive";
 import {
   licenseArchiveQuery,
   licenseArchiveUrl,
 } from "../../../features/commerce/license-archive-query";
-import { HistoryShell } from "../../../features/commerce/workspace-history";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import {
-  effectiveLicenseStatus,
-  formatHistoryDate,
-  licenseStatusLabel,
-} from "../../../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../features/commerce/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../features/commerce/license-maintenance-i18n";
+import { HistoryShell } from "../../../features/commerce/workspace-history";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

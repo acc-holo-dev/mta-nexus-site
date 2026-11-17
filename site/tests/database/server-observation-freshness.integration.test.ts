@@ -1,14 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
-import { buildMasterObservationCandidates } from "../../src/lib/services/server-observation-matching";
 import {
   db,
-  servers,
-  serverObservations,
-  serverObservationRepository,
-  serverRepository,
   type RecordServerObservationInput,
+  serverObservationRepository,
+  serverObservations,
+  serverRepository,
+  servers,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
+import { buildMasterObservationCandidates } from "../../src/lib/services/server-observation-matching";
 
 async function withServer(run: (id: string) => Promise<void>) {
   const suffix = `${Date.now().toString(36)}_${process.pid}_${Math.random().toString(36).slice(2, 10)}`;

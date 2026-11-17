@@ -1,4 +1,10 @@
 import { expect, it } from "vitest";
+import {
+  verificationCopy,
+  verificationDecisionError,
+  verificationError,
+  verificationMutationError,
+} from "../../src/features/trust/verification-workspace-copy";
 import { formatNotification } from "../../src/lib/notification-copy";
 import { userPlatformError } from "../../src/lib/user-platform-copy";
 import {
@@ -8,12 +14,6 @@ import {
   verificationApplicationSchema,
   verificationDecisionSchema,
 } from "../../src/lib/verification-workspace-contract";
-import {
-  verificationCopy,
-  verificationDecisionError,
-  verificationError,
-  verificationMutationError,
-} from "../../src/lib/verification-workspace-copy";
 
 const profile = {
   specialties: [" Lua ", "Lua", "TypeScript"],

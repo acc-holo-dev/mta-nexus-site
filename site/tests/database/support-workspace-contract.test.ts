@@ -5,16 +5,16 @@ import {
   parseSupportThread,
 } from "../../src/features/support/support-response";
 import {
-  supportWorkspaceCopy,
-  supportWorkspaceError,
-} from "../../src/features/support/support-workspace-copy";
-import { formatNotification } from "../../src/lib/notification-copy";
-import {
   publicationSupportHref,
   supportActivitySchema,
   supportHref,
   supportQuery,
-} from "../../src/lib/support-workspace-contract";
+} from "../../src/features/support/support-workspace-contract";
+import {
+  supportWorkspaceCopy,
+  supportWorkspaceError,
+} from "../../src/features/support/support-workspace-copy";
+import { formatNotification } from "../../src/lib/notification-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";

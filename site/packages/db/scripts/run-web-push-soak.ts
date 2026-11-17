@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from "node:crypto";
 import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 import { and, count, eq, gt, isNull, like, lt, lte, or, sql } from "drizzle-orm";
 import {
   db,
@@ -15,9 +15,9 @@ import {
   webPushSubscriptionRepository,
   webPushWorkerRepository,
 } from "../src/index";
+import type { WebPushDispatchSummary } from "../src/repositories/web-push-dispatcher";
 import { WebPushDispatcher } from "../src/repositories/web-push-dispatcher";
 import { evaluateWebPushSoak, readWebPushSoakConfig } from "../src/repositories/web-push-soak";
-import type { WebPushDispatchSummary } from "../src/repositories/web-push-dispatcher";
 import type { WebPushNotificationPayload, WebPushSender } from "../src/web-push-runtime";
 
 if (process.env.NEXUS_WEB_PUSH_SOAK_ACK !== "YES") {

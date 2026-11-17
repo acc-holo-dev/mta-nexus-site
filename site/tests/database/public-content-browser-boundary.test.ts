@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -36,13 +36,13 @@ vi.mock("../../src/lib/services/discussion-follow-notification-service", () => (
   notifyDiscussionReplies: vi.fn(),
 }));
 
-import { POST as createContent } from "../../src/app/api/content/route";
-import { POST as createComment } from "../../src/app/api/content/[slug]/comments/route";
 import {
   DELETE as deleteComment,
   PATCH as editComment,
 } from "../../src/app/api/content/[slug]/comments/[id]/route";
+import { POST as createComment } from "../../src/app/api/content/[slug]/comments/route";
 import { PUT as setReaction } from "../../src/app/api/content/[slug]/reactions/route";
+import { POST as createContent } from "../../src/app/api/content/route";
 
 const context = { params: Promise.resolve({ slug: "article", id: "cmt_a" }) };
 const mutations = [

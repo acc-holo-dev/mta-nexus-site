@@ -3,11 +3,11 @@ vi.mock("server-only", () => ({}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 import {
   type PublicationPage,
   publicationPageQuery,
 } from "../../src/lib/publication-feed-contract";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),

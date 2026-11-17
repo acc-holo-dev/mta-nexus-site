@@ -1,4 +1,4 @@
-import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 
@@ -16,8 +16,9 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
-import { ProductRepository } from "../../packages/db/src/repositories/products";
+
 import { ContentRepository } from "../../packages/db/src/repositories/content";
+import { ProductRepository } from "../../packages/db/src/repositories/products";
 
 it("executes deep scoped portfolios on PostgreSQL and measures plans before/after additive indexes", async () => {
   const { db } = await vi.importActual<typeof import("../../packages/db/src/client")>(

@@ -1,11 +1,11 @@
 import {
   licenseControlsRepository,
-  licenseRepository,
   licenseMaintenanceRepository,
+  licenseRepository,
 } from "@nexus/db";
+import { ForbiddenError, type LicenseArchiveFilter, type User } from "@nexus/domain";
 import { can, createLicenseRuntimeToken, generateId } from "@nexus/security";
-import { ForbiddenError, type User, type LicenseArchiveFilter } from "@nexus/domain";
-import type { LicenseOwnerCommand, LicenseModerationCommand } from "@nexus/validation";
+import type { LicenseModerationCommand, LicenseOwnerCommand } from "@nexus/validation";
 
 export const licenseControlService = {
   archive: (user: User, query: LicenseArchiveFilter & { page: number }) =>

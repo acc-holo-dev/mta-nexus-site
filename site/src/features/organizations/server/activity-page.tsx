@@ -1,20 +1,20 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
-import { OrganizationHistoryView } from "../history-view";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { organizationReturnPath } from "./organization-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationChangeHistorySchema,
   parseOrganizationChangeHistoryQuery,
 } from "../../../lib/organization-governance-contract";
+import { authService } from "../../../lib/services/auth-service";
+import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { OrganizationHistoryView } from "../history-view";
 import {
   organizationGovernanceCopy,
   organizationGovernanceError,
 } from "../organization-governance-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
+import { organizationReturnPath } from "./organization-return-path";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

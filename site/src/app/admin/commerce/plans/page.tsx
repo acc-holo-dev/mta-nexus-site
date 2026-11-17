@@ -5,9 +5,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { formatHistoryAmount, parseHistoryPage } from "../../../../lib/commerce-history-format";
+import {
+  formatHistoryAmount,
+  parseHistoryPage,
+} from "../../../../features/commerce/commerce-history-format";
 import { getCommercialCopy } from "../../../../features/commerce/commercial-i18n";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";

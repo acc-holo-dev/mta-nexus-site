@@ -1,5 +1,5 @@
-import { moderationError } from "./community-moderation-copy";
 import type { Locale } from "../../lib/i18n";
+import { moderationError } from "./community-moderation-copy";
 
 const en = {
   title: "Discussion moderation",

@@ -96,6 +96,10 @@ Services и repositories не дублируются и не переносят�
 | `build-download-selection.ts`                  | util port `build-download-selection`                                                                        |
 | `resource-release-control-query.ts`            | util port `resource-release-control-query`                                                                  |
 | `resource-commerce-i18n.ts`                    | util port `resource-commerce-i18n`                                                                          |
+| `resource-requirements-i18n.ts`                | util port `resource-requirements-i18n`                                                                      |
+| `resource-requirements-query.ts`               | util port `resource-requirements-query`                                                                     |
+| `resource-review-i18n.ts`                      | util port `resource-review-i18n`                                                                            |
+| `resource-release-watch-history-query.ts`      | util port `resource-release-watch-history-query`                                                            |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

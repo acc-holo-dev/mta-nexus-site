@@ -27,8 +27,8 @@ import VerificationPage, { generateMetadata } from "../../src/app/workspace/veri
 import { DeveloperExperience } from "../../src/features/accounts/developer-experience";
 import { DeveloperProfileEditor } from "../../src/features/accounts/profile";
 import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import type { VerificationOverview } from "../../src/lib/verification-workspace-contract";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const filters = { page: 2, view: "history" as const, type: "developer", query: "" };
 const overview: VerificationOverview = {

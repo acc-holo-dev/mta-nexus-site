@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import {
   createSupportCaseSchema,
   createSupportMessageSchema,
-  updateSupportCaseStatusSchema,
   supportStaffQueueFiltersSchema,
+  updateSupportCaseStatusSchema,
 } from "@nexus/validation";
+import { describe, expect, it } from "vitest";
 
 describe("support validation", () => {
   it("accepts bounded cases and rejects unverified related entity context", () => {

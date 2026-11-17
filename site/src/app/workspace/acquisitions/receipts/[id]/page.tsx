@@ -4,14 +4,14 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { formatHistoryDate } from "../../../../../features/commerce/commerce-history-format";
 import { ResourceCartReviewEvidence } from "../../../../../features/resources/cart-view";
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
-import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../../features/resources/resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../../../../../features/resources/resource-cart-receipts-query";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { getDictionary } from "../../../../../lib/i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
 

@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   rate: vi.fn(),
@@ -45,9 +46,11 @@ vi.mock("@nexus/db", () => ({
   reportRepository: {},
   verificationRepository: {},
 }));
-import { GET, PATCH } from "../../src/app/api/products/[id]/builds/[buildId]/route";
-import { GET as staffGet } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/route";
+
 import { POST as moderate } from "../../src/app/api/admin/actions/route";
+import { GET as staffGet } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/route";
+import { GET, PATCH } from "../../src/app/api/products/[id]/builds/[buildId]/route";
+
 const actor = { id: "usr_a", role: "developer" },
   params = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const command = { action: "withdraw", expectedRevision: 3, reason: " Fix notes " };

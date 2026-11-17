@@ -2,19 +2,20 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { OrganizationTeamDirectory } from "../team";
-import { PlatformSignIn } from "../../shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
 } from "../../../lib/organization-team-contract";
-import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
+import { getOrganizationCopy } from "../organization-workspace-copy";
+import { OrganizationTeamDirectory } from "../team";
+
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -3,11 +3,11 @@ import { Readable } from "node:stream";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import images from "../fixtures/resource-images.json";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import images from "../fixtures/resource-images.json";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,

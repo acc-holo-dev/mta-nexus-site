@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -24,7 +25,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { readResourceReleaseWatchHistory as history } from "../../packages/db/src/repositories/resource-release-watch-history";
+
 const date = "2026-10-12T00:00:00.000Z",
   query = { page: 1, days: 30 as const, source: "all" as const };
 const event = (extra = {}) => ({

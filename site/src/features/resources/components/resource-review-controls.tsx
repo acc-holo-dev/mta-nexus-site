@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { confirmAction } from "../../shell/confirm-action";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -15,8 +16,7 @@ import {
   resourceReviewEligibilityCopy,
   resourceReviewError,
   resourceReviewState,
-} from "../../../lib/resource-review-i18n";
-import { confirmAction } from "../../shell/confirm-action";
+} from "../resource-review-i18n";
 
 const nativeFieldClass =
   "rounded border border-base bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

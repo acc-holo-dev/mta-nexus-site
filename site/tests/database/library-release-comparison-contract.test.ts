@@ -1,10 +1,11 @@
 import { expect, it } from "vitest";
 import {
-  compareLibraryReleases,
   comparablePackageSummary,
+  compareLibraryReleases,
   type LibraryComparableRelease,
 } from "../../packages/domain/src/library-release-comparison";
 import { libraryReleaseComparisonQuery } from "../../src/features/library/library-release-comparison-query";
+
 const release = (id = "bld_a", hash = "a".repeat(64), size = 100): LibraryComparableRelease => ({
   id,
   version: "1.0.0",

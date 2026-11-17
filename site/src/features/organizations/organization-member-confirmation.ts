@@ -1,6 +1,6 @@
 import {
-  editableOrganizationSchema,
   type EditableOrganization,
+  editableOrganizationSchema,
 } from "../../lib/organization-workspace-contract";
 export function confirmsOrganizationMemberMutation(
   result: unknown,

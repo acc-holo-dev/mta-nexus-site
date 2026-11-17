@@ -2,14 +2,8 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { organizationReturnPath } from "./organization-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { organizationContentId } from "../../../lib/organization-content-api";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistoryCopy } from "../../../lib/organization-publication-history-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationContentService } from "../../../lib/services/organization-content-service";
 import {
@@ -18,6 +12,13 @@ import {
   writerTypes,
 } from "../../../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { organizationContentCopy } from "../organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
+import { organizationReturnPath } from "./organization-return-path";
+
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

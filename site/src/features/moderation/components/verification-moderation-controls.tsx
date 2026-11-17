@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { platformRequest } from "../../../lib/user-platform-client";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import {
+  verificationCopy,
+  verificationDecisionError,
+} from "../../trust/verification-workspace-copy";
 import {
   buildVerificationDecisionPayload,
   normalizeVerificationReviewNotes,
 } from "../verification-moderation";
-import {
-  verificationCopy,
-  verificationDecisionError,
-} from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../shell/confirm-action";
-import { useNexusLocale } from "../../shell/locale";
 
 export function VerificationModerationControls({
   requestId,

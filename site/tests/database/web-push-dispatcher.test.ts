@@ -8,9 +8,9 @@ import type {
   WebPushLease,
 } from "../../packages/db/src/repositories/web-push-worker";
 import {
+  parseWebPushEndpoint,
   WebPushPermanentPayloadError,
   WebPushPermanentSubscriptionError,
-  parseWebPushEndpoint,
 } from "../../packages/db/src/web-push-runtime";
 
 function lease(id: string): WebPushLease {

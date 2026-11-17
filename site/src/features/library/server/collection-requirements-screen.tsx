@@ -3,17 +3,17 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { collectionId, collectionPageParams } from "../../../lib/library-collections-query";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
+import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
+import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
+import { resourceRequirementsQuery } from "../../resources/resource-requirements-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
-import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
+import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

@@ -8,8 +8,8 @@ import { libraryCollectionManifestsCopy } from "../../src/features/library/libra
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { libraryMembershipBatchesCopy } from "../../src/features/library/library-membership-batches-i18n";
 import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 import { LibraryCollectionsErrorPanel } from "../../src/features/library/server/library-collections-error-panel";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
@@ -58,7 +58,9 @@ it("keeps additive action-error copy for library form locales", () => {
   expect(read("site/src/features/library/library-selection-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain("actionErrorDescription");
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
+    "actionErrorDescription",
+  );
 });
 
 it("renders collections error panel with ErrorState description and touch recovery", () => {

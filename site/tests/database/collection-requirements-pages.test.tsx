@@ -40,8 +40,8 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
   ),
 }));
 
-import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
 import { collectionRequirementsCopy } from "../../src/features/library/collection-requirements-i18n";
+import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
 

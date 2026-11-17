@@ -21,7 +21,7 @@ import ContentDetailLoading from "../../src/app/workspace/organizations/[id]/con
 import ContentLoading from "../../src/app/workspace/organizations/[id]/content/loading";
 import ContentNewLoading from "../../src/app/workspace/organizations/[id]/content/new/loading";
 import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
-import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
+import { organizationPublicationHistoryCopy } from "../../src/features/organizations/organization-publication-history-copy";
 
 beforeEach(() => {
   state.locale = "en";
@@ -122,10 +122,12 @@ it("locks organization content honesty chrome through shared surfaces and additi
   expect(
     read("site/src/features/community/server/context-publication-history-screen.tsx"),
   ).toContain("historyEmptyHint");
-  expect(read("site/src/lib/organization-publication-history-copy.ts")).toContain(
-    "historyEmptyHint",
-  );
-  expect(read("site/src/lib/organization-publication-history-copy.ts")).toContain("loading:");
+  expect(
+    read("site/src/features/organizations/organization-publication-history-copy.ts"),
+  ).toContain("historyEmptyHint");
+  expect(
+    read("site/src/features/organizations/organization-publication-history-copy.ts"),
+  ).toContain("loading:");
   expect(organizationPublicationHistoryCopy("en").historyEmptyHint.length).toBeGreaterThan(0);
   expect(organizationPublicationHistoryCopy("ru").historyEmptyHint.length).toBeGreaterThan(0);
   expect(organizationPublicationHistoryCopy("en").loading.length).toBeGreaterThan(0);

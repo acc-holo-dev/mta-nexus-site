@@ -2,7 +2,7 @@ import type { ResourceReviewView } from "@nexus/domain";
 import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
 
 const actionLinkClass =

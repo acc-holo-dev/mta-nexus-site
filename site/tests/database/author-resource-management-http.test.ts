@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   getManagedProduct: vi.fn(),
@@ -16,7 +17,9 @@ vi.mock("../../src/lib/services/auth-service", () => ({
 }));
 vi.mock("../../src/lib/services/product-service", () => ({ productService: mocks }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.consumeRateLimit }));
+
 import { PATCH } from "../../src/app/api/products/[id]/route";
+
 const input = {
   title: "My resource",
   shortDescription: "Summary",

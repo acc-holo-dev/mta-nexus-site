@@ -1,6 +1,7 @@
-import { expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
 import { db, ledgerEntries, ledgerPostingBatches } from "@nexus/db";
+import { eq, sql } from "drizzle-orm";
+import { expect, it } from "vitest";
+
 it("enforces exact balances, immutability and per-currency deferred balance in PostgreSQL", async () => {
   const suffix = `${Date.now()}_${process.pid}`,
     rollback = new Error("fixture rollback");

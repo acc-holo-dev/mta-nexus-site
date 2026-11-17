@@ -1,6 +1,6 @@
 import { EmptyState, ErrorState, SectionHeader } from "@nexus/ui";
 import Link from "next/link";
-import type { PersonalChangesSummary } from "../../../lib/home-personal-changes-types";
+import type { PersonalChangesSummary } from "../home-personal-changes-types";
 import type { HomePersonalPreference } from "../home-personal-preference";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
 

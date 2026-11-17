@@ -1,8 +1,9 @@
-import { and, desc, eq, sql, type SQL } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
+import { and, desc, eq, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents } from "../schema";
 import { assertSupportReadSession, supportAccess } from "./support-access";
+
 class SupportActivityRepository {
   async history(id: string, actorId: string, before?: string, currentToken?: string) {
     if (before && !/^[a-zA-Z0-9_-]{1,128}$/u.test(before))

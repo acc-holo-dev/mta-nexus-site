@@ -8,23 +8,23 @@ import {
   confirmedNotificationPreferences,
   type NotificationPreferences,
   parseNotificationPreferences,
-} from "../../../lib/notification-preferences-confirmation";
-import { profilePrivacyCopy } from "../profile-privacy-copy";
+} from "../../notifications/notification-preferences-confirmation";
+import { SettingsNotificationPreferencesSection } from "../../notifications/preferences";
+import { confirmAction } from "../../shell/confirm-action";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { useNexusLocale } from "../../shell/locale";
+import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
+import { PublicProfileForm } from "../profile";
+import { profilePrivacyCopy } from "../profile-privacy-copy";
 import {
   type SettingsRecoveryEmail,
   SettingsRequestError,
   type SettingsSession,
   settingsClientRequest,
 } from "../settings-client-api";
-import { confirmAction } from "../../shell/confirm-action";
 import { ContextSwitcher } from "./context-switcher";
-import { useNexusLocale } from "../../shell/locale";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { ProfileChangeHistoryLink } from "../change-history";
-import { PublicProfileForm } from "../profile";
 import { SettingsActiveSessions } from "./settings-active-sessions";
-import { SettingsNotificationPreferencesSection } from "../../notifications/preferences";
 import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";

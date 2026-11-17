@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => ({ id: "usr_owner", role: "user" })),
@@ -30,9 +30,9 @@ vi.mock("../../src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService,
 }));
 
-import { GET as profileGet, PATCH as profilePatch } from "../../src/app/api/account/profile/route";
-import { GET as privacyGet, PATCH as privacyPatch } from "../../src/app/api/account/privacy/route";
 import { PATCH as developerPatch } from "../../src/app/api/account/developer/route";
+import { GET as privacyGet, PATCH as privacyPatch } from "../../src/app/api/account/privacy/route";
+import { GET as profileGet, PATCH as profilePatch } from "../../src/app/api/account/profile/route";
 
 const profileBody = {
   displayName: "Owner",

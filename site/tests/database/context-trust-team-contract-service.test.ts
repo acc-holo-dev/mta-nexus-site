@@ -1,27 +1,30 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ trust: vi.fn(), team: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   publicContextTrustRepository: { page: mocks.trust },
   organizationTeamDirectoryRepository: { page: mocks.team },
   organizationWorkspaceRepository: {},
 }));
-import { publicContextTrustService as trust } from "../../src/lib/services/public-context-trust-service";
-import { organizationTeamService as team } from "../../src/lib/services/organization-team-service";
-import {
-  parseContextKind,
-  parseContextTrustQuery,
-  contextTrustHref,
-  publicContextTrustSchema,
-} from "../../src/lib/public-context-trust-contract";
+
+import { confirmsOrganizationMemberMutation } from "../../src/features/organizations/organization-member-confirmation";
+import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
 } from "../../src/lib/organization-team-contract";
-import { confirmsOrganizationMemberMutation } from "../../src/features/organizations/organization-member-confirmation";
-import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
+import {
+  contextTrustHref,
+  parseContextKind,
+  parseContextTrustQuery,
+  publicContextTrustSchema,
+} from "../../src/lib/public-context-trust-contract";
+import { organizationTeamService as team } from "../../src/lib/services/organization-team-service";
+import { publicContextTrustService as trust } from "../../src/lib/services/public-context-trust-service";
+
 const time = "2026-10-11T00:00:00.123456Z",
   actor = { id: "actor", role: "admin" } as User;
 const organization = {

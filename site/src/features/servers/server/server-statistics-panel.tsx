@@ -2,14 +2,14 @@ import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { serverHistoryBarPercent } from "../server-history-presentation";
-import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../server-statistics-copy";
 import { serverStatisticsIntervals } from "../../../lib/server-statistics-export";
 import type { ServerStatisticsResult } from "../../../lib/services/server-statistics-service";
-import { ServerObservationPeriodControls } from "../statistics-view";
+import { serverHistoryBarPercent } from "../server-history-presentation";
+import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
+import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
+import { ServerObservationPeriodControls } from "../statistics-view";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

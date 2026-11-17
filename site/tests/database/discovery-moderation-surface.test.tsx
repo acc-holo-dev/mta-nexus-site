@@ -67,10 +67,10 @@ vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null
 import { generateMetadata as moderationMetadata } from "../../src/app/admin/community/page";
 import StreamLoading from "../../src/app/discover/stream/loading";
 import StreamPage, { generateMetadata as streamMetadata } from "../../src/app/discover/stream/page";
-import { CommunityModerationScreen } from "../../src/features/community/server/community-moderation-screen";
-import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { moderationCopy } from "../../src/features/community/community-moderation-copy";
-import { discoveryStreamCopy } from "../../src/lib/discovery-stream-copy";
+import { ContentModerationControls } from "../../src/features/community/content-moderation";
+import { CommunityModerationScreen } from "../../src/features/community/server/community-moderation-screen";
+import { discoveryStreamCopy } from "../../src/features/discovery/discovery-stream-copy";
 import { getDictionary } from "../../src/lib/i18n";
 
 const time = "2026-10-11T00:00:00.000Z",

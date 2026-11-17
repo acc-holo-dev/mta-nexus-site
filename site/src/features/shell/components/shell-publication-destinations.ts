@@ -1,11 +1,11 @@
 import { Code2, MessageSquare, ShieldAlert, ShieldCheck } from "lucide-react";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reactionCopy } from "../../../lib/content-reaction-copy";
-import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
 import type { Locale } from "../../../lib/i18n";
-import { platformReportCopy } from "../../../lib/platform-report-i18n";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { communityReportCopy } from "../../community/community-report-copy";
+import { reactionCopy } from "../../community/content-reaction-copy";
+import { ownDiscussionCopy } from "../../community/discussion-workspace-copy";
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { platformReportCopy } from "../../moderation/platform-report-i18n";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 /** Shared member destinations: the mobile and desktop shell expose the same tools. */
 export function publicationDestinations(locale: Locale) {

@@ -3,10 +3,10 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
 import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
-import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
+import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({

@@ -3,11 +3,11 @@ import { COMMERCIAL_CURRENCIES, type CommercialCurrency } from "@nexus/domain";
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { formatHistoryAmount } from "../../../lib/commerce-history-format";
-import { commercialError, getCommercialCopy } from "../commercial-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
+import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
 type Plan = { id: string; title: string; revision: number; commissionBps: number };
 export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {

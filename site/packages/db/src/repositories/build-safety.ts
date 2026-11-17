@@ -1,4 +1,4 @@
-import { type SQL, and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, type SQL, sql } from "drizzle-orm";
 import { builds } from "../schema";
 
 export function trustedCleanScanCondition() {

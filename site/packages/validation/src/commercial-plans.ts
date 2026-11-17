@@ -1,6 +1,6 @@
 import {
-  COMMERCIAL_CURRENCIES,
   BASE_COMMISSION_BPS,
+  COMMERCIAL_CURRENCIES,
   type CommercialPlanTerms,
 } from "@nexus/domain";
 import { z } from "zod";

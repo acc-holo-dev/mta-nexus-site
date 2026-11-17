@@ -5,6 +5,7 @@ import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   preview: vi.fn(),
@@ -23,10 +24,12 @@ vi.mock("../../src/lib/services/library-selection-batches-service", () => ({
     history: state.history,
   },
 }));
-import { POST as apply } from "../../src/app/api/library/collections/[id]/versions/route";
-import { POST as review } from "../../src/app/api/library/collections/[id]/versions/preview/route";
-import { GET as history } from "../../src/app/api/library/collections/[id]/versions/history/route";
+
 import { GET as download } from "../../src/app/api/library/collections/[id]/versions/history/export/route";
+import { GET as history } from "../../src/app/api/library/collections/[id]/versions/history/route";
+import { POST as review } from "../../src/app/api/library/collections/[id]/versions/preview/route";
+import { POST as apply } from "../../src/app/api/library/collections/[id]/versions/route";
+
 const context = { params: Promise.resolve({ id: "lcol_a" }) },
   body = { mode: "fixed", productIds: ["prd_a"] };
 function request(section = "", method = "POST", headers: Record<string, string> = {}, query = "") {

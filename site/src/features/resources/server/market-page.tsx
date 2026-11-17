@@ -2,12 +2,12 @@ import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { ProductCard } from "../view";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { productService } from "../../../lib/services/product-service";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
-import { productService } from "../../../lib/services/product-service";
+import { ProductCard } from "../view";
 
 const CATEGORIES = [
   { id: "all", key: "all" },

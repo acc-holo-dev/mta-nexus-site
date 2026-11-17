@@ -65,6 +65,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-publication-history-copy",
+    "server-content-copy",
     "server-observation-browser-copy",
     "server-statistics-copy",
     "server-follow-notifications",
@@ -160,6 +162,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-publication-history-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-content-copy.ts", "servers-client-isolation"],
     ["features/servers/server-observation-browser-copy.ts", "servers-client-isolation"],
     ["features/servers/server-statistics-copy.ts", "servers-client-isolation"],
     ["features/servers/server-follow-notifications.ts", "servers-client-isolation"],
@@ -217,6 +221,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-publication-history-copy.ts",
+    "app/server-content-copy.ts",
     "app/server-observation-browser-copy.ts",
     "app/server-statistics-copy.ts",
     "app/server-follow-notifications.ts",
@@ -256,6 +262,8 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-publication-history-copy.ts",
+    "site/src/features/servers/server-content-copy.ts",
     "site/src/features/servers/server-observation-browser-copy.ts",
     "site/src/features/servers/server-statistics-copy.ts",
     "site/src/features/servers/server-follow-notifications.ts",
@@ -326,6 +334,8 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-publication-history-copy.ts");
+  visit("site/src/features/servers/server-content-copy.ts");
   visit("site/src/features/servers/server-observation-browser-copy.ts");
   visit("site/src/features/servers/server-statistics-copy.ts");
   visit("site/src/features/servers/server-follow-notifications.ts");

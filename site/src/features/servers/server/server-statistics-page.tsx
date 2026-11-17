@@ -10,13 +10,13 @@ import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
 } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerStatisticsResult,
   serverStatisticsService,
 } from "../../../lib/services/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";

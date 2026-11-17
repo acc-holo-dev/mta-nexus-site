@@ -5,6 +5,7 @@ import {
   type LibraryCollectionHistoryQuery,
 } from "@nexus/domain";
 import { libraryCollectionIdSchema } from "@nexus/validation";
+
 const invalid = () => new AppError("Invalid collection history query", 400, "COLLECTION_INVALID");
 export function libraryCollectionHistoryQuery(
   params: URLSearchParams,

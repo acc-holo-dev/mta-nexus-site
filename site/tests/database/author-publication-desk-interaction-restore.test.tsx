@@ -20,8 +20,8 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
-import { AuthorPublicationRestore } from "../../src/features/community/author-publication-restore";
 import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
+import { AuthorPublicationRestore } from "../../src/features/community/author-publication-restore";
 
 const { render, button, click } = createAuthorPublicationDeskInteractionHelpers(
   harness,

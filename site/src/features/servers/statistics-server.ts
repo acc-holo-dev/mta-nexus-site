@@ -1,7 +1,7 @@
 import "server-only";
 
 export {
-  ServerStatisticsPage,
   ServerStatisticsLoading,
+  ServerStatisticsPage,
   serverStatisticsMetadata,
 } from "./server/server-statistics-page";

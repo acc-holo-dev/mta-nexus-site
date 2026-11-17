@@ -113,8 +113,8 @@ vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null })
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 
-import DevelopersPage from "../../src/app/developers/page";
 import { UserRepository } from "../../packages/db/src/repositories/users";
+import DevelopersPage from "../../src/app/developers/page";
 
 describe("creator directory trust behavior", () => {
   beforeEach(() => {

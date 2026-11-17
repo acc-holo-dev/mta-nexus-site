@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import type { db as Database } from "../../packages/db/src/client";
-import { users, products, builds, auditEvents } from "../../packages/db/src/schema";
+import { auditEvents, builds, products, users } from "../../packages/db/src/schema";
 import { createSeedData } from "../../packages/db/src/seed-data";
 
 type Transaction = Parameters<Parameters<typeof Database.transaction>[0]>[0];
@@ -14,6 +14,7 @@ vi.mock("../../packages/db/src/client", () => ({
     },
   },
 }));
+
 import { seedBaseline } from "../../packages/db/src/seed-baseline";
 
 it("repeats and repairs the seed within isolated PostgreSQL tables", async () => {

@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, expect, vi, type Mock } from "vitest";
+import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
+import { serverWorkspaceCopy } from "../../src/features/servers/server-workspace-copy";
 import {
+  type FlatTestElement,
   findTestButton,
   flattenReactTestTree,
-  type FlatTestElement,
 } from "./flatten-react-test-tree";
-import { serverWorkspaceCopy } from "../../src/features/servers/server-workspace-copy";
 
 export type ManagedServerVisibilityHarness = {
   slots: unknown[];

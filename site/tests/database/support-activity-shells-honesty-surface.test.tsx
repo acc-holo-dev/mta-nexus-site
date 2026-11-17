@@ -20,7 +20,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 import OrganizationActivityLoading from "../../src/app/organizations/[slug]/activity/loading";
 import ServerUpdatesLoading from "../../src/app/servers/[slug]/updates/loading";
 import UserActivityLoading from "../../src/app/users/[username]/activity/loading";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 beforeEach(() => {
   state.locale = "en";

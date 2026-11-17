@@ -14,7 +14,7 @@ vi.mock("../../features/discovery/directory-server", () => ({
   DirectoryResults: mocks.directory,
 }));
 
-import { discoveryCopy } from "../../lib/discovery-copy";
+import { discoveryCopy } from "../../features/discovery/discovery-copy";
 import OrganizationsLoading from "./loading";
 import OrganizationsPage from "./page";
 

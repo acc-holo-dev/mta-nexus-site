@@ -1,7 +1,7 @@
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ShieldCheck } from "lucide-react";
 import type { Locale } from "../../../lib/i18n";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
 export function DeveloperExperience({
   profile,
   locale,

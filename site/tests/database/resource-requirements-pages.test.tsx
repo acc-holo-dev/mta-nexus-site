@@ -39,8 +39,8 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
 }));
 
 import AdminResourceRequirementsLoading from "../../src/app/admin/resources/[id]/requirements/loading";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
 import { ResourceRequirementsScreen as screen } from "../../src/features/resources/server/resource-requirements-screen";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",

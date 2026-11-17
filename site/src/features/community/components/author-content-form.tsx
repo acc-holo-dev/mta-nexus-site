@@ -3,14 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import type { Locale } from "../../../lib/i18n";
-import {
-  organizationContentCopy,
-  organizationContentMutationError,
-} from "../../../lib/organization-content-copy";
-import { serverContentCopy, serverContentMutationError } from "../../../lib/server-content-copy";
-import { publicationSupportHref } from "../../../lib/support-workspace-contract";
 import {
   type EditableContent,
   parseEditableContent,
@@ -23,7 +16,14 @@ import {
   writerTypes,
 } from "../../../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import {
+  organizationContentCopy,
+  organizationContentMutationError,
+} from "../../organizations/organization-content-copy";
+import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 
 export function AuthorContentForm({
   locale,

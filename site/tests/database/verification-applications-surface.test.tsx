@@ -31,7 +31,7 @@ import History, {
   generateMetadata as historyMetadata,
 } from "../../src/app/workspace/verification/history/page";
 import { verificationApplicationsCopy } from "../../src/features/moderation/verification-applications-copy";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   params = { params: Promise.resolve({ id: "request" }) },

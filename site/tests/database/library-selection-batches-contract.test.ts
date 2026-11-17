@@ -1,13 +1,14 @@
-import { nextLibrarySelection, type LibrarySelectionBatchPreview } from "@nexus/domain";
+import { type LibrarySelectionBatchPreview, nextLibrarySelection } from "@nexus/domain";
 import {
   librarySelectionBatchChoiceSchema,
   librarySelectionBatchCommandSchema,
 } from "@nexus/validation";
+import { expect, it } from "vitest";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
 } from "../../src/features/library/library-selection-batches-confirmation";
-import { expect, it } from "vitest";
+
 const choice = { mode: "fixed" as const, productIds: ["prd_a"] };
 const previous = { revision: 0, mode: "latest" as const, buildId: null };
 const preview: LibrarySelectionBatchPreview = {

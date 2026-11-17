@@ -1,12 +1,12 @@
 import { parseAccountMailAppUrl } from "./account-mail-app-url";
 import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
-import { accountMailWorkerRepository } from "./account-mail-worker";
-import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 import type {
   AccountMailTransportInput,
   AccountMailTransportResult,
   AccountMailTransportStage,
 } from "./account-mail-smtp";
+import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
+import { accountMailWorkerRepository } from "./account-mail-worker";
 
 type Worker = Readonly<{
   candidates(limit?: number): Promise<string[]>;

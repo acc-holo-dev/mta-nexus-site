@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { parseHomePersonalPreference } from "../../src/features/shell/home-personal-preference";
 import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
 } from "../../src/features/shell/session";
-import { parseHomePersonalPreference } from "../../src/features/shell/home-personal-preference";
 
 describe("home personal preference", () => {
   it("defaults to show and only hides on the explicit cookie value", () => {

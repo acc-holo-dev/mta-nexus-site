@@ -4,16 +4,17 @@ Feature объединяет существующие колокольчик, in
 Сессия, actor identity, серверная авторизация, сервисы доставки, outbox и workers
 остаются прежними.
 
-| Entry                                 | Контракт                                                            |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `bell.ts`                             | `NotificationBell`; клиентский колокольчик                          |
-| `preferences.ts`                      | `SettingsNotificationPreferencesSection`; клиентские настройки      |
-| `notification-inbox-events.ts`        | `announceNotificationInboxChange`, `observeNotificationInboxChange` |
-| `visible-polling.ts`                  | `startVisiblePolling` (visibility-aware poll helper)                |
-| `notification-inbox-export-client.ts` | Inbox page export fetch/validate (`fetchNotificationInboxExport`)   |
-| `center-server.ts`                    | Страница inbox и metadata; server-only                              |
-| `notification-inbox-copy.ts`          | util port `notification-inbox-copy`                                 |
-| `notification-read.ts`                | util port `notification-read`                                       |
+| Entry                                      | Контракт                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| `bell.ts`                                  | `NotificationBell`; клиентский колокольчик                          |
+| `preferences.ts`                           | `SettingsNotificationPreferencesSection`; клиентские настройки      |
+| `notification-inbox-events.ts`             | `announceNotificationInboxChange`, `observeNotificationInboxChange` |
+| `visible-polling.ts`                       | `startVisiblePolling` (visibility-aware poll helper)                |
+| `notification-inbox-export-client.ts`      | Inbox page export fetch/validate (`fetchNotificationInboxExport`)   |
+| `center-server.ts`                         | Страница inbox и metadata; server-only                              |
+| `notification-inbox-copy.ts`               | util port `notification-inbox-copy`                                 |
+| `notification-read.ts`                     | util port `notification-read`                                       |
+| `notification-preferences-confirmation.ts` | util port `notification-preferences-confirmation`                   |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
 production-код использует публичные входы; маршруты не импортируются feature.

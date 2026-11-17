@@ -3,9 +3,9 @@ import { consumeRateLimit } from "@nexus/security";
 import { createProductSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
+import { parseMarketQuery } from "../../../features/resources/model";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { parseMarketQuery } from "../../../features/resources/model";
 import {
   createRequestLogContext,
   jsonWithRequestId,

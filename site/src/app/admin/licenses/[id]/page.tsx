@@ -4,12 +4,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLicenseControlCopy } from "../../../../features/commerce/license-control-i18n";
 import { LicenseControlPanel } from "../../../../features/commerce/license-controls";
 import { LicenseDetailView } from "../../../../features/commerce/license-detail";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getLicenseControlCopy } from "../../../../features/commerce/license-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { licenseControlService } from "../../../../lib/services/license-control-service";
 

@@ -14,6 +14,9 @@ const utilPorts = [
   "organization-team-copy",
   "organization-governance-copy",
   "organization-batch-copy",
+  "organization-content-copy",
+  "organization-publication-history-copy",
+  "organization-workspace-copy",
 ];
 const clientPorts = ["workspace", "team", "profile", "history-view"];
 const serverPorts = [
@@ -30,7 +33,7 @@ const serverPorts = [
   "public-trust",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-workspace-copy|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract|organization-content-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

@@ -1,5 +1,5 @@
+import { getResourceReleaseControlCopy } from "../../../features/library/resource-release-control-i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 
 // Honest loading shell for /admin/resources.
 export default async function Loading() {

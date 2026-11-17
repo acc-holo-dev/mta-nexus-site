@@ -56,13 +56,13 @@ import QueuePage from "../../src/app/admin/licenses/page";
 import WorkspaceLicenseHistoryLoading from "../../src/app/workspace/licenses/[id]/history/loading";
 import OwnerLicenseLoading from "../../src/app/workspace/licenses/[id]/loading";
 import OwnerPage, { metadata } from "../../src/app/workspace/licenses/[id]/page";
+import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
 } from "../../src/features/commerce/license-history-server";
-import { getDictionary } from "../../src/lib/i18n";
-import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {

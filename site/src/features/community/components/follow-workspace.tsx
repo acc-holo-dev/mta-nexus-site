@@ -3,20 +3,20 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { confirmsFollowMutation } from "../follow-confirmation";
 import {
   FOLLOW_TYPES,
   type FollowPage,
   type FollowTargetType,
   followPageSchema,
 } from "../../../lib/follow-workspace-contract";
-import { followCopy, followError } from "../follow-workspace-copy";
 import type { Locale } from "../../../lib/i18n";
 import { publicationHref } from "../../../lib/publication-feed-contract";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
+import { confirmsFollowMutation } from "../follow-confirmation";
+import { followCopy, followError } from "../follow-workspace-copy";
 import { ObjectMuteControls } from "../object-mute-controls";
+import { publicationCopy } from "../publication-feed-copy";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -4,28 +4,31 @@ Feature объединяет существующие экраны управл�
 профилем, историей и публикациями. Session, роли, серверные проверки прав,
 сервисы и транзакции остаются прежними.
 
-| Entry                                 | Контракт                                                               |
-| ------------------------------------- | ---------------------------------------------------------------------- |
-| `workspace.ts`                        | `OrganizationWorkspacePanel`; клиентский workspace                     |
-| `team.ts`                             | `OrganizationTeamDirectory`; клиентский каталог команды                |
-| `profile.ts`                          | `OrganizationProfileForm`; клиентский профиль                          |
-| `history-view.ts`                     | `OrganizationHistoryView`; представление истории                       |
-| `public-directory-server.ts`          | Публичный каталог организаций                                          |
-| `public-profile-server.ts`            | Публичный профиль организации и metadata                               |
-| `public-activity-server.ts`           | Публичная активность организации                                       |
-| `public-trust-server.ts`              | Публичная страница доверия организации                                 |
-| `directory-page-server.ts`            | Серверная композиция списка организаций                                |
-| `workspace-page-server.ts`            | Серверная композиция workspace организации                             |
-| `team-page-server.ts`                 | Серверная композиция команды                                           |
-| `activity-page-server.ts`             | Серверная композиция истории активности                                |
-| `content-page-server.ts`              | Серверная композиция публикаций организации                            |
-| `content-editor-server.ts`            | `OrganizationContentEditorPage`; server-only редактор публикации       |
-| `publication-history-server.ts`       | `OrganizationPublicationHistoryScreen`; server-only история публикации |
-| `organization-member-confirmation.ts` | util port `organization-member-confirmation`                           |
-| `organization-workspace-client.ts`    | util port `organization-workspace-client`                              |
-| `organization-team-copy.ts`           | util port `organization-team-copy`                                     |
-| `organization-governance-copy.ts`     | util port `organization-governance-copy`                               |
-| `organization-batch-copy.ts`          | util port `organization-batch-copy`                                    |
+| Entry                                      | Контракт                                                               |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
+| `workspace.ts`                             | `OrganizationWorkspacePanel`; клиентский workspace                     |
+| `team.ts`                                  | `OrganizationTeamDirectory`; клиентский каталог команды                |
+| `profile.ts`                               | `OrganizationProfileForm`; клиентский профиль                          |
+| `history-view.ts`                          | `OrganizationHistoryView`; представление истории                       |
+| `public-directory-server.ts`               | Публичный каталог организаций                                          |
+| `public-profile-server.ts`                 | Публичный профиль организации и metadata                               |
+| `public-activity-server.ts`                | Публичная активность организации                                       |
+| `public-trust-server.ts`                   | Публичная страница доверия организации                                 |
+| `directory-page-server.ts`                 | Серверная композиция списка организаций                                |
+| `workspace-page-server.ts`                 | Серверная композиция workspace организации                             |
+| `team-page-server.ts`                      | Серверная композиция команды                                           |
+| `activity-page-server.ts`                  | Серверная композиция истории активности                                |
+| `content-page-server.ts`                   | Серверная композиция публикаций организации                            |
+| `content-editor-server.ts`                 | `OrganizationContentEditorPage`; server-only редактор публикации       |
+| `publication-history-server.ts`            | `OrganizationPublicationHistoryScreen`; server-only история публикации |
+| `organization-member-confirmation.ts`      | util port `organization-member-confirmation`                           |
+| `organization-workspace-client.ts`         | util port `organization-workspace-client`                              |
+| `organization-team-copy.ts`                | util port `organization-team-copy`                                     |
+| `organization-governance-copy.ts`          | util port `organization-governance-copy`                               |
+| `organization-batch-copy.ts`               | util port `organization-batch-copy`                                    |
+| `organization-content-copy.ts`             | util port `organization-content-copy`                                  |
+| `organization-publication-history-copy.ts` | util port `organization-publication-history-copy`                      |
+| `organization-workspace-copy.ts`           | util port `organization-workspace-copy`                                |
 
 Редактор участника, пакетные действия и передача владения — внутренние клиентские
 компоненты. Публичные входы используются внешним production-кодом; прямые и

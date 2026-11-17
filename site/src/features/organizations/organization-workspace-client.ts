@@ -1,7 +1,7 @@
 import type { Locale } from "../../lib/i18n";
-import { organizationGovernanceMutationError } from "./organization-governance-copy";
-import { organizationError } from "../../lib/organization-workspace-copy";
 import { platformRequest } from "../../lib/user-platform-client";
+import { organizationGovernanceMutationError } from "./organization-governance-copy";
+import { organizationError } from "./organization-workspace-copy";
 export function organizationRequest(
   path: string,
   locale: Locale,

@@ -11,12 +11,7 @@ import {
   type ServerObservationBrowserQuery,
   serverObservationBrowserHref,
 } from "../../../lib/server-observation-browser-contract";
-import {
-  serverObservationBrowserCopy,
-  serverObservationBrowserError,
-} from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../server-statistics-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerObservationBrowserResult,
@@ -24,8 +19,13 @@ import {
 } from "../../../lib/services/server-statistics-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { ServerObservationPeriodControls } from "../statistics-view";
+import {
+  serverObservationBrowserCopy,
+  serverObservationBrowserError,
+} from "../server-observation-browser-copy";
+import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
+import { ServerObservationPeriodControls } from "../statistics-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

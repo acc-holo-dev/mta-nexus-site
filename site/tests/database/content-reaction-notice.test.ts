@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -31,9 +32,11 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
+
 import { db } from "../../packages/db/src/client";
 import { contentReactionNotice } from "../../packages/db/src/repositories/content-reaction-notice";
 import { formatNotification } from "../../src/lib/notification-copy";
+
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { id: "content", slug: "guide", title: "Guide", authorId: "author" },
   insert = () => state.queries.find((q) => q.sql.startsWith("insert")),

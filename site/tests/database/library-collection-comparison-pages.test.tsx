@@ -65,9 +65,9 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/compare/page";
+import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
 
 const source = {
     id: "lcol_a",

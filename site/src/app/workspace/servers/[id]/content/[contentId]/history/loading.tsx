@@ -1,5 +1,5 @@
+import { serverPublicationHistoryCopy } from "../../../../../../../features/servers/server-publication-history-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
-import { serverPublicationHistoryCopy } from "../../../../../../../lib/server-publication-history-copy";
 
 export default async function Loading() {
   const copy = serverPublicationHistoryCopy(await getRequestLocale());

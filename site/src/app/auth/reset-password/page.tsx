@@ -4,12 +4,12 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
-import { useNexusLocale } from "../../../features/shell/locale";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
 } from "../../../features/accounts/account-recovery-browser";
+import { useNexusLocale } from "../../../features/shell/locale";
 
 type Proof = AccountRecoveryProof;
 type State =

@@ -1,14 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
-import {
-  INTEGRATION_STAFF_PASSWORD,
-  assignIntegrationStaffPassword,
-} from "../helpers/integration-staff-password";
-import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   buildRepository,
@@ -18,8 +7,19 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { GET as downloadReviewerArtifact } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as moderate } from "../../src/app/api/admin/actions/route";
+import { GET as downloadReviewerArtifact } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
+import {
+  assignIntegrationStaffPassword,
+  INTEGRATION_STAFF_PASSWORD,
+} from "../helpers/integration-staff-password";
 
 function getRequest(token: string, buildId: string) {
   return new NextRequest(`http://nexus.test/api/admin/builds/${buildId}/download`, {

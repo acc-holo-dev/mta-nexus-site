@@ -1,5 +1,5 @@
+import { getOrganizationCopy } from "../../../../features/organizations/organization-workspace-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getOrganizationCopy } from "../../../../lib/organization-workspace-copy";
 
 // Honest loading shell for /workspace/organizations/[id].
 export default async function Loading() {

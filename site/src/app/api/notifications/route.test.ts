@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import { UnauthorizedError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,

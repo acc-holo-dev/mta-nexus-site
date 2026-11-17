@@ -12,16 +12,16 @@ import {
   confirmsOrganizationBatchPreview,
   type OrganizationBatchPreview,
 } from "../../../lib/organization-batch-contract";
-import { organizationBatchCopy } from "../organization-batch-copy";
 import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
-import { organizationRequest } from "../organization-workspace-client";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { organizationBatchCopy } from "../organization-batch-copy";
+import { organizationRequest } from "../organization-workspace-client";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationTeamBatch({
   data,
   actorId,

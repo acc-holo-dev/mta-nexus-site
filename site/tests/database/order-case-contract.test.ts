@@ -1,11 +1,12 @@
-import { expect, it } from "vitest";
 import { orderCaseCreateSchema, orderCaseReviewSchema } from "@nexus/validation";
-import { orderCaseQuery, orderCasePageQuery } from "../../src/features/commerce/order-case-query";
+import { expect, it } from "vitest";
+import { orderCasePageQuery, orderCaseQuery } from "../../src/features/commerce/order-case-query";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
 } from "../../src/features/commerce/order-case-response";
+
 const requestId = "00000000-0000-4000-8000-000000000000",
   caseId = `sup_${"a".repeat(24)}`;
 const draft = {

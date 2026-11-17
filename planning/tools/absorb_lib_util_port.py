@@ -32,6 +32,7 @@ def insert_alt(ports: str, name: str, feature: str) -> str:
         "support": ["|center-server|"],
         "shell": ["|theme-preference|", "|home-personal-preference|", "|confirm-action|"],
         "trust": ["|center|"],
+        "discovery": ["|directory-server|"],
     }
     wrapped = f"|{ports}|"
     for anchor in anchors.get(feature, []):
@@ -56,21 +57,31 @@ def rewrite_relative_lib_imports(dst: Path) -> None:
 
 
 def rewrite_imports(name: str, feat: str) -> None:
+    import os
+
     try:
-        files = sh(["rg", "-l", name, "site"]).splitlines()
+        files = sh(["rg", "-l", name, "site", "scripts"]).splitlines()
     except subprocess.CalledProcessError:
         files = []
     dst = ROOT / f"site/src/features/{feat}/{name}.ts"
-    feat_root = ROOT / f"site/src/features/{feat}"
     for rel in files:
         path = ROOT / rel
         if not path.is_file() or path.resolve() == dst.resolve():
             continue
         text = path.read_text()
         orig = text
+        # Prefer a correct relative path from the importer to the new feature port.
+        rel_imp = Path(os.path.relpath(dst.with_suffix(""), path.parent)).as_posix()
+        if not rel_imp.startswith("."):
+            rel_imp = "./" + rel_imp
         text = re.sub(
-            rf'(from ["\'])((?:\.\./)+)lib/{re.escape(name)}(["\'])',
-            rf"\1\2features/{feat}/{name}\3",
+            rf'from ["\'](?:\.\./)*lib/{re.escape(name)}["\']',
+            f'from "{rel_imp}"',
+            text,
+        )
+        text = re.sub(
+            rf'from ["\'](?:\.\./)*features/{re.escape(feat)}/{re.escape(name)}["\']',
+            f'from "{rel_imp}"',
             text,
         )
         text = re.sub(
@@ -83,22 +94,11 @@ def rewrite_imports(name: str, feat: str) -> None:
             rf"\1../../src/features/{feat}/{name}\2",
             text,
         )
-        try:
-            path.relative_to(feat_root)
-            in_feat = True
-        except ValueError:
-            in_feat = False
-        if in_feat:
-            import os
-
-            rel_imp = Path(os.path.relpath(dst.with_suffix(""), path.parent)).as_posix()
-            if not rel_imp.startswith("."):
-                rel_imp = "./" + rel_imp
-            text = re.sub(
-                rf'from ["\'](?:\.\./)*features/{re.escape(feat)}/{re.escape(name)}["\']',
-                f'from "{rel_imp}"',
-                text,
-            )
+        text = re.sub(
+            rf'(["\'])\.\./\.\./site/src/lib/{re.escape(name)}',
+            rf"\1../../site/src/features/{feat}/{name}",
+            text,
+        )
         if text != orig:
             path.write_text(text)
 
@@ -163,7 +163,80 @@ def patch_depcruise(feat: str, name: str, isolation: str) -> None:
             block = block[: to_m.start(1)] + to_path2 + block[to_m.end(1) :]
             text = text[:ridx] + block + text[nxt:]
 
+    text = patch_consumer_isolations(text, feat, name)
     path.write_text(text)
+
+
+def patch_consumer_isolations(text: str, feat: str, name: str) -> str:
+    """When a util leaves lib, rewrite other features' isolation allowlists.
+
+    - Drop stale `lib/...|name` allowlist entries.
+    - Allow the new public port `features/<feat>/<name>.ts` from those consumers.
+    """
+    port_exc = f"{feat}/{name}\\\\.ts$"
+    # Walk every isolation rule block.
+    for m in re.finditer(r'name: "([^"]+-(?:client|view)-isolation)"', text):
+        rule = m.group(1)
+        if rule.startswith(f"{feat}-"):
+            continue
+        ridx = m.start()
+        nxt = text.find('name: "', ridx + len(rule) + 10)
+        if nxt < 0:
+            nxt = len(text)
+        block = text[ridx:nxt]
+        to_m = re.search(r'to:\s*\{\s*path:\s*"([^"]+)"', block)
+        if not to_m:
+            continue
+        to_path = to_m.group(1)
+        changed = False
+        # Remove lib allowlist token for this name.
+        if re.search(rf"(?:^|[|(])(?:{re.escape(name)})(?:\||\\\\\.ts\$|\))", to_path):
+            to_path2 = re.sub(rf"\|{re.escape(name)}(?=\||\))", "", to_path)
+            to_path2 = re.sub(rf"\|{re.escape(name)}\\\\.ts\$", "", to_path2)
+            if to_path2 != to_path:
+                to_path = to_path2
+                changed = True
+        # Allow the new feature public port from this consumer.
+        if "features/(?!" in to_path and port_exc not in to_path:
+            # Prefer inserting beside existing file-level exceptions (accounts/controls, …).
+            inserted = False
+            for anchor in (
+                "notifications/bell\\\\.ts$",
+                "accounts/controls\\\\.ts$",
+                "community/report-evidence-links\\\\.ts$",
+            ):
+                if anchor in to_path:
+                    to_path = to_path.replace(anchor, f"{anchor}|{port_exc}", 1)
+                    inserted = True
+                    break
+            if not inserted:
+                # Insert after features/(?!<own>/ 
+                to_path_new, nsub = re.subn(
+                    rf"(features/\(\?!{re.escape(rule.split('-')[0])}/)",
+                    rf"\1{port_exc}|",
+                    to_path,
+                    count=1,
+                )
+                if nsub:
+                    to_path = to_path_new
+                    inserted = True
+            if not inserted:
+                # Fallback: after first features/(?!
+                to_path_new, nsub = re.subn(
+                    r"(features/\(\?!)",
+                    rf"\1{port_exc}|",
+                    to_path,
+                    count=1,
+                )
+                if nsub:
+                    to_path = to_path_new
+                    inserted = True
+            if inserted:
+                changed = True
+        if changed:
+            block = block[: to_m.start(1)] + to_path + block[to_m.end(1) :]
+            text = text[:ridx] + block + text[nxt:]
+    return text
 
 
 def ensure_util_ports_array(text: str) -> str:
@@ -427,6 +500,8 @@ def main() -> int:
         patch_remaining_feature("support", name)
     elif feat == "shell":
         patch_remaining_feature("shell", name)
+    elif feat == "discovery":
+        patch_remaining_feature("discovery", name)
     elif feat == "moderation":
         patch_standard_boundary(feat, name)
         patch_remaining_feature("moderation", name)
@@ -434,6 +509,12 @@ def main() -> int:
         patch_standard_boundary(feat, name)
     else:
         patch_standard_boundary(feat, name)
+    # Move colocated unit tests that lived beside the lib module.
+    test_src = ROOT / f"site/src/lib/{name}.test.ts"
+    test_dst = ROOT / f"site/src/features/{feat}/{name}.test.ts"
+    if test_src.exists() and not test_dst.exists():
+        sh(["git", "mv", str(test_src.relative_to(ROOT)), str(test_dst.relative_to(ROOT))])
+        rewrite_relative_lib_imports(test_dst)
     patch_readme(feat, name)
     print(f"OK {name} → {feat}")
     return 0

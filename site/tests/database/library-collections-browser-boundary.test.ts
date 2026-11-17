@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -33,14 +33,14 @@ vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
   },
 }));
 
-import { POST as createCollection } from "../../src/app/api/library/collections/route";
-import { POST as commandCollection } from "../../src/app/api/library/collections/[id]/route";
 import { POST as membershipBatch } from "../../src/app/api/library/[id]/collections/route";
 import { POST as importPreview } from "../../src/app/api/library/collections/[id]/import-preview/route";
 import { POST as reconcilePreview } from "../../src/app/api/library/collections/[id]/reconcile-preview/route";
-import { POST as applyVersions } from "../../src/app/api/library/collections/[id]/versions/route";
+import { POST as commandCollection } from "../../src/app/api/library/collections/[id]/route";
 import { POST as previewVersions } from "../../src/app/api/library/collections/[id]/versions/preview/route";
+import { POST as applyVersions } from "../../src/app/api/library/collections/[id]/versions/route";
 import { POST as enableWatches } from "../../src/app/api/library/collections/[id]/watches/route";
+import { POST as createCollection } from "../../src/app/api/library/collections/route";
 
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 const mutations = [

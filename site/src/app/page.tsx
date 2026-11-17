@@ -2,15 +2,15 @@ import { buttonClassName, ErrorState, Rise, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { HomePersonalChangesPanel } from "../features/shell/home-personal";
 import { ArticleCard } from "../features/community/article-view";
 import { ProductCard } from "../features/resources/view";
 import { HomeNetworkServerCard } from "../features/servers/client";
-import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
+import { HomePersonalChangesPanel } from "../features/shell/home-personal";
 import {
   HOME_PERSONAL_COOKIE,
   parseHomePersonalPreference,
 } from "../features/shell/home-personal-preference";
+import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";

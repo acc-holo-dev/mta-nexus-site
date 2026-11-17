@@ -1,5 +1,5 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { Circle } from "lucide-react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { StatCard, TrustBadge } from "../../packages/ui/src/platform";
 

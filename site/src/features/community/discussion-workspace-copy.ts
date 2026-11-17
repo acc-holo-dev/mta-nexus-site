@@ -1,5 +1,5 @@
-import { discussionMutationError } from "../features/community/content-discussion-copy";
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
+import { discussionMutationError } from "./content-discussion-copy";
 
 const en = {
   title: "My comments",

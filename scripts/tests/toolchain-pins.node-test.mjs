@@ -4,13 +4,6 @@ import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
-  DOCKER_NODE_MAJOR_IMAGE,
-  evaluateToolchainPolicy,
-  nodeMajorFromEngines,
-  readExactNodePin,
-  readPinnedPnpm,
-} from "../toolchain-policy.mjs";
-import {
   DOCKERFILE_NODE_STAGES,
   evaluateDockerfileNodePolicy,
   evaluateInfraImagePins,
@@ -20,6 +13,13 @@ import {
   POSTGRES_VOLUME_PATH,
   readInfraImagePins,
 } from "../infra-image-policy.mjs";
+import {
+  DOCKER_NODE_MAJOR_IMAGE,
+  evaluateToolchainPolicy,
+  nodeMajorFromEngines,
+  readExactNodePin,
+  readPinnedPnpm,
+} from "../toolchain-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");

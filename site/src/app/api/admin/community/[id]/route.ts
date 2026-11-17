@@ -1,12 +1,12 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { moderationError } from "../../../../../features/community/community-moderation-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   moderationCommandSchema,
   parseModerationDetailQuery,
 } from "../../../../../lib/community-moderation-contract";
-import { moderationError } from "../../../../../features/community/community-moderation-copy";
 import { reportRateLimit } from "../../../../../lib/community-report-api";
 import { communityModerationService } from "../../../../../lib/services/community-moderation-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";

@@ -12,8 +12,8 @@
  * See docs/OPERATIONS.md ("Forward-only migration authoring").
  */
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const custom = process.argv.includes("--custom");

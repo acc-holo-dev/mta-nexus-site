@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../features/discovery/directory-server";
+import { discoveryStreamCopy } from "../../features/discovery/discovery-stream-copy";
 import {
   DISCOVER_TYPES,
   type DiscoverType,
@@ -16,7 +17,6 @@ import {
   parseDiscoverQuery,
 } from "../../lib/discover-query";
 import { discoveryStreamHref } from "../../lib/discovery-stream-contract";
-import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 

@@ -17,12 +17,12 @@ vi.mock("../../src/lib/i18n-server", () => ({
 
 import ServerTrustLoading from "../../src/app/servers/[slug]/trust/loading";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
+import { serverContentCopy } from "../../src/features/servers/server-content-copy";
 import { serverObservationBrowserCopy } from "../../src/features/servers/server-observation-browser-copy";
+import { serverPublicationHistoryCopy } from "../../src/features/servers/server-publication-history-copy";
 import { serverStatisticsCopy } from "../../src/features/servers/server-statistics-copy";
 import { serverWorkspaceCopy } from "../../src/features/servers/server-workspace-copy";
-import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { serverContentCopy } from "../../src/lib/server-content-copy";
-import { serverPublicationHistoryCopy } from "../../src/lib/server-publication-history-copy";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 
 beforeEach(() => {
   state.locale = "en";
@@ -161,9 +161,11 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(read("site/src/features/servers/server-observation-browser-copy.ts")).toContain(
     "unavailableHint",
   );
-  expect(read("site/src/lib/server-publication-history-copy.ts")).toContain("unavailableHint");
-  expect(read("site/src/lib/server-content-copy.ts")).toContain("loadUnavailableHint");
-  expect(read("site/src/lib/public-context-trust-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/features/servers/server-publication-history-copy.ts")).toContain(
+    "unavailableHint",
+  );
+  expect(read("site/src/features/servers/server-content-copy.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/features/trust/public-context-trust-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain(
     "loadUnavailableHint",
   );

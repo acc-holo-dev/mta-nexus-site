@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 import { NewResourceForm } from "../../../../features/resources/create-controls";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
-import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getDictionary } from "../../../../lib/i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 

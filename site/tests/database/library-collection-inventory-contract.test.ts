@@ -3,6 +3,7 @@ import {
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
 } from "../../src/features/library/library-collection-inventory-query";
+
 it("defaults to all own references and round-trips exact filters and literal search", () => {
   expect(libraryCollectionInventoryQuery(new URLSearchParams())).toEqual({
     page: 1,

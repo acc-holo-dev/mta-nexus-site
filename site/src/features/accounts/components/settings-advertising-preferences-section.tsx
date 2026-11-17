@@ -2,8 +2,8 @@
 
 import { BellOff } from "lucide-react";
 import { useCallback, useState } from "react";
-import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 import { useNexusLocale } from "../../shell/locale";
+import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 
 /**
  * UX-26 -- advertising opt-out preference on /settings.

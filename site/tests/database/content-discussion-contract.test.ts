@@ -1,15 +1,15 @@
 import { expect, it, vi } from "vitest";
 import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 import {
-  discussionCommentSchema,
-  encodeDiscussionCursor,
-  parseDiscussionCursor,
-} from "../../src/lib/content-discussion-contract";
-import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
 } from "../../src/features/community/content-discussion-copy";
+import {
+  discussionCommentSchema,
+  encodeDiscussionCursor,
+  parseDiscussionCursor,
+} from "../../src/lib/content-discussion-contract";
 import { getDictionary } from "../../src/lib/i18n";
 import { formatNotification } from "../../src/lib/notification-copy";
 

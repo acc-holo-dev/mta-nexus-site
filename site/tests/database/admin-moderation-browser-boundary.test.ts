@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -41,12 +41,12 @@ vi.mock("../../src/lib/services/verification-workspace-service", () => ({
 }));
 
 import { POST as adminAction } from "../../src/app/api/admin/actions/route";
-import { POST as communityCommand } from "../../src/app/api/admin/community/[id]/route";
-import { POST as removeDiscussion } from "../../src/app/api/admin/community/[id]/discussion/[commentId]/route";
 import { POST as discussionPreview } from "../../src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route";
 import { POST as discussionBatch } from "../../src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route";
+import { POST as removeDiscussion } from "../../src/app/api/admin/community/[id]/discussion/[commentId]/route";
 import { POST as publicationPreview } from "../../src/app/api/admin/community/[id]/reports/batch/preview/route";
 import { POST as publicationBatch } from "../../src/app/api/admin/community/[id]/reports/batch/route";
+import { POST as communityCommand } from "../../src/app/api/admin/community/[id]/route";
 import { POST as licenseModerate } from "../../src/app/api/admin/licenses/[id]/route";
 import { PATCH as reportDecision } from "../../src/app/api/admin/reports/[id]/route";
 import { POST as resourceModerate } from "../../src/app/api/admin/resources/[id]/route";

@@ -1,7 +1,7 @@
 import {
-  resourceBuildTargetStatus,
   type ResourceBuildCommand,
   type ResourceBuildView,
+  resourceBuildTargetStatus,
 } from "@nexus/domain";
 export function confirmedBuildCommand(
   status: number,

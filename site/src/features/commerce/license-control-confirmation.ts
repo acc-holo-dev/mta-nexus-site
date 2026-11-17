@@ -1,6 +1,6 @@
 import {
-  LICENSE_RUNTIME_TOKEN_PATTERN,
   LICENSE_RUNTIME_TOKEN_DAYS,
+  LICENSE_RUNTIME_TOKEN_PATTERN,
   type LicenseControlConfirmation,
 } from "@nexus/domain";
 

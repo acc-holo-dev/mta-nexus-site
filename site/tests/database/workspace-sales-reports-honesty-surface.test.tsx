@@ -18,8 +18,8 @@ vi.mock("../../src/lib/i18n-server", () => ({
 import ReportsLoading from "../../src/app/workspace/reports/loading";
 import SalesLoading from "../../src/app/workspace/sales/loading";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
 import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
 
 beforeEach(() => {
   state.locale = "en";

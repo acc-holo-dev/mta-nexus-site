@@ -13,7 +13,7 @@ import {
   verificationCopy,
   verificationError,
   verificationMutationError,
-} from "../../../lib/verification-workspace-copy";
+} from "../../trust/verification-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

@@ -18,8 +18,8 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/guide" }));
 vi.mock("next/link", () => ({ default: "a" }));
 
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
 import { ContentReactions } from "../../src/features/community/reactions";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
 
 const { render, removeButton } = createContentReactionRemoveInteractionHelpers(
   harness,

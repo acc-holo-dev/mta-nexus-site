@@ -1,5 +1,5 @@
 import type { LicenseModel } from "@nexus/domain";
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
 
 /** Catalog licenseModel values: scope/term only — not Open/Closed Source or DRM. */
 export const LICENSE_MODEL_VALUES = [

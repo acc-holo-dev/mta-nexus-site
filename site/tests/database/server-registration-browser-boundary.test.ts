@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -21,8 +21,8 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
   mtaLiveStatus: vi.fn(),
 }));
 
-import { POST as registerServer } from "../../src/app/api/servers/route";
 import { PATCH as updateServer } from "../../src/app/api/servers/[id]/route";
+import { POST as registerServer } from "../../src/app/api/servers/route";
 
 const context = { params: Promise.resolve({ id: "srv_a" }) };
 const mutations = [

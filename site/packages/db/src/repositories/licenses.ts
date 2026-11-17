@@ -1,8 +1,8 @@
+import { LICENSE_EXPIRING_DAYS, type License, type LicenseArchiveFilter } from "@nexus/domain";
 import { and, asc, count, desc, eq, gt, ilike, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { licenses, products, licenseRuntimeBindings } from "../schema";
+import { licenseRuntimeBindings, licenses, products } from "../schema";
 import { historyPageBounds } from "./history-pagination";
-import { LICENSE_EXPIRING_DAYS, type License, type LicenseArchiveFilter } from "@nexus/domain";
 import { containsPattern } from "./search-pattern";
 
 export class LicenseRepository {

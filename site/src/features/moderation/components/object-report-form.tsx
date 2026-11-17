@@ -4,9 +4,9 @@ import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { platformReportCopy, platformReportError } from "../../../lib/platform-report-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
 type ObjectReportTarget = "product" | "server" | "user";

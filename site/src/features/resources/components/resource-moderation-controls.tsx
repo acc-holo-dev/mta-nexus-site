@@ -11,11 +11,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedResourceModeration } from "../../../lib/resource-release-control-confirmation";
+import { confirmedResourceModeration } from "../../library/resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
-} from "../../../lib/resource-release-control-i18n";
+} from "../../library/resource-release-control-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";

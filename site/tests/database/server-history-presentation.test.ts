@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   formatHistoryIntervalUtc,
-  serverHistoryChartSlots,
   serverHistoryBarPercent,
+  serverHistoryChartSlots,
 } from "../../src/features/servers/server-history-presentation";
 
 describe("complete-window history chart", () => {

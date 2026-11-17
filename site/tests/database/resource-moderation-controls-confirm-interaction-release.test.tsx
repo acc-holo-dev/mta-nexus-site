@@ -29,8 +29,8 @@ vi.mock("../../src/features/shell/locale", async () => {
   };
 });
 
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 import { ResourceModerationControls } from "../../src/features/resources/components/resource-moderation-controls";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 const { render, submit, seedRelease } = createResourceModerationControlsConfirmInteractionHelpers(
   harness,

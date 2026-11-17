@@ -57,8 +57,8 @@ import CatalogLoading from "../../src/app/subscriptions/loading";
 import Catalog from "../../src/app/subscriptions/page";
 import OperationsLoading from "../../src/app/workspace/purchases/[id]/operations/loading";
 import Operations, { metadata } from "../../src/app/workspace/purchases/[id]/operations/page";
-import { LocaleProvider } from "../../src/features/shell/locale";
 import { getCommercialCopy } from "../../src/features/commerce/commercial-i18n";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 
 const now = new Date("2026-10-10T12:00:00Z"),

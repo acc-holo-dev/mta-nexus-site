@@ -62,8 +62,8 @@ vi.mock("../../src/lib/services/mta-master-directory-service", async (importOrig
   };
 });
 
-import { discoveryCopy } from "../../src/lib/discovery-copy";
 import DiscoverPage from "../../src/app/discover/page";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 
 async function loadResults(query = "") {
   const shell = await DiscoverPage({

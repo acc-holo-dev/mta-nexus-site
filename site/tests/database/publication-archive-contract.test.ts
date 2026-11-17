@@ -5,6 +5,7 @@ import {
   publicationHref,
   publicationPageSchema,
 } from "../../src/lib/publication-feed-contract";
+
 const cursor = {
   version: 1,
   createdAt: "2026-10-11T00:00:00.123456Z",

@@ -12,20 +12,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
-  orderCaseActionLabel,
-  orderCaseCopy,
-  orderCaseKindLabel,
-} from "../../../lib/order-case-i18n";
+  clearSupportRetry,
+  reserveSupportCaseRetry,
+  resolveSupportRetryActorScope,
+} from "../../support/support-retry";
+import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../order-case-i18n";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
 } from "../order-case-response";
-import {
-  clearSupportRetry,
-  reserveSupportCaseRetry,
-  resolveSupportRetryActorScope,
-} from "../../../lib/support-retry";
 
 export function OrderCaseCreateForm({
   orderId,

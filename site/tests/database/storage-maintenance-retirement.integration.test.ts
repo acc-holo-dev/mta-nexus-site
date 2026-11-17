@@ -4,8 +4,8 @@ import {
   auditEvents,
   db,
   storageMaintenanceObjects as objects,
-  sessionRepository,
   storageMaintenanceRepository as repo,
+  sessionRepository,
   userRepository,
   users,
 } from "@nexus/db";

@@ -2,11 +2,11 @@ import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { ResourceCartControls } from "../../../features/resources/cart-controls";
+import { getResourceCommerceCopy } from "../../../features/resources/resource-commerce-i18n";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceCommerceCopy } from "../../../features/resources/resource-commerce-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 

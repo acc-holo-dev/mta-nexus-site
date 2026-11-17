@@ -1,6 +1,6 @@
+import { organizationPublicationHistoryCopy } from "../../../../../../../features/organizations/organization-publication-history-copy";
 import { OrganizationPublicationHistoryScreen } from "../../../../../../../features/organizations/publication-history-server";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
-import { organizationPublicationHistoryCopy } from "../../../../../../../lib/organization-publication-history-copy";
 
 export const dynamic = "force-dynamic";
 

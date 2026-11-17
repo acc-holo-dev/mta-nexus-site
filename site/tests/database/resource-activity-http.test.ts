@@ -1,16 +1,16 @@
 import { Readable } from "node:stream";
-import { NextRequest } from "next/server";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
-import { resourceActivityCsv } from "../../src/lib/resource-activity-csv";
 import {
   parseAcquisitionHistoryQuery,
   parseResourceActivityQuery,
 } from "../../src/features/resources/resource-activity-query";
+import { resourceActivityCsv } from "../../src/lib/resource-activity-csv";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },
@@ -59,9 +59,10 @@ vi.mock("@nexus/db", () => ({
   buildRepository: { findLatestPublishedByProduct: async () => build },
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
+
 import { GET as history } from "../../src/app/api/acquisitions/route";
-import { GET as report } from "../../src/app/api/products/[id]/activity/route";
 import { GET as csv } from "../../src/app/api/products/[id]/activity/export/route";
+import { GET as report } from "../../src/app/api/products/[id]/activity/route";
 import { GET as download } from "../../src/app/api/products/[id]/download/route";
 import { POST as claim } from "../../src/app/api/resources/claim/route";
 

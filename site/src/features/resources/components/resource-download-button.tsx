@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
   type DownloadFailure,
   fetchResourceDownload,
@@ -15,6 +14,7 @@ import {
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 
 export function ResourceDownloadButton({
   productId,

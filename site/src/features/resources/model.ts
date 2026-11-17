@@ -1,3 +1,4 @@
+export { formatProvenanceTimestamp, getBuildProvenance } from "./model/build-provenance";
 export {
   MARKET_PAGE_SIZE,
   MAX_MARKET_PAGE,
@@ -6,4 +7,3 @@ export {
   parseMarketQuery,
 } from "./model/market-query";
 export { shouldOpenGalleryLightbox, stepGalleryIndex } from "./model/resource-gallery-interaction";
-export { formatProvenanceTimestamp, getBuildProvenance } from "./model/build-provenance";

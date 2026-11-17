@@ -1,6 +1,6 @@
+import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 
 // Honest loading shell for /admin/resources/[id]/requirements.
 export default async function Loading() {

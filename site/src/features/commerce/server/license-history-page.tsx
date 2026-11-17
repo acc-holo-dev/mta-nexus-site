@@ -4,15 +4,15 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
-import { licenseRuntimePage } from "../license-runtime-query";
 import { authService } from "../../../lib/services/auth-service";
 import { licenseControlService } from "../../../lib/services/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { formatHistoryDate } from "../commerce-history-format";
+import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
+import { licenseRuntimePage } from "../license-runtime-query";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

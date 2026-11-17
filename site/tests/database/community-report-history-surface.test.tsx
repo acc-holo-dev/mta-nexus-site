@@ -21,13 +21,13 @@ vi.mock("../../src/lib/services/community-report-history-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 import { CommunityReportHistory } from "../../src/features/community/components/community-report-history";
 import {
   CommunityReportHistoryPage,
   reportHistoryMetadata,
 } from "../../src/features/community/server/community-report-history-page";
 import type { ReportHistoryPage } from "../../src/lib/community-report-history-contract";
-import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = { period: "all" as const, group: "all" as const, query: "" };

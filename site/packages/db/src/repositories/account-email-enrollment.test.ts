@@ -1,13 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
-import { auditEvents, db } from "../client";
+import { generateId } from "@nexus/security";
+import { and, eq } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { authService } from "../../../../src/lib/services/auth-service";
 import { accountMailOutbox } from "../account-mail-schema";
 import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
+import { auditEvents, db } from "../client";
 import { AccountMailCipher } from "./account-mail-crypto";
-import { authService } from "../../../../src/lib/services/auth-service";
 import { userRepository } from "./users";
-import { generateId } from "@nexus/security";
 
 const password = "Synthetic-D3-current-password!";
 const envBackup = { ...process.env };

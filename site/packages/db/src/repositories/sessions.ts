@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
+import type { User } from "@nexus/domain";
 import { and, desc, eq, gt, ne } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
-import type { User } from "@nexus/domain";
 import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
 
 export interface SessionRecord {

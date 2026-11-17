@@ -5,11 +5,11 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewDetailView } from "../../../../../features/commerce/plan-review-detail";
+import { planReviewsCopy } from "../../../../../features/commerce/plan-reviews-i18n";
 import { planReviewNavLinkClass } from "../../../../../features/commerce/plan-reviews-workspace";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { planReviewsCopy } from "../../../../../features/commerce/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewsPageParams,

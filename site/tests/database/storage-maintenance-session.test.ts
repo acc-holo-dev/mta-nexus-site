@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { StorageObjectIdentity } from "@nexus/domain";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],

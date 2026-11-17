@@ -1,13 +1,17 @@
-import { expect, it } from "vitest";
 import { canChangeOrganizationMember, withServerManagementPermission } from "@nexus/domain";
+import { expect, it } from "vitest";
 import {
-  organizationCreateSchema,
-  organizationUpdateSchema,
+  getOrganizationCopy,
+  organizationError,
+} from "../../src/features/organizations/organization-workspace-copy";
+import {
   memberAddSchema,
   memberUpdateSchema,
+  organizationCreateSchema,
+  organizationUpdateSchema,
   parseOrganizationPage,
 } from "../../src/lib/organization-workspace-contract";
-import { getOrganizationCopy, organizationError } from "../../src/lib/organization-workspace-copy";
+
 const fields = { name: "Team", description: "", logoUrl: "", websiteUrl: "" };
 it.each(["owner", "admin", "developer", "member"])("protects ownership for actor %s", (actor) => {
   expect(canChangeOrganizationMember(actor, "owner", null, false, true)).toBe(false);

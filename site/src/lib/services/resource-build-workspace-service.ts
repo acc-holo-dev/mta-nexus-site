@@ -1,6 +1,6 @@
 import { resourceBuildWorkspaceRepository } from "@nexus/db";
-import { generateId } from "@nexus/security";
 import type { ResourceBuildCommand, User } from "@nexus/domain";
+import { generateId } from "@nexus/security";
 export const resourceBuildWorkspaceService = {
   detail(productId: string, buildId: string, actor: User, staff = false) {
     return resourceBuildWorkspaceRepository.detail(productId, buildId, actor.id, staff);

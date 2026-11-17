@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
-import { confirmedCollectionCommand } from "../../src/features/library/library-collections-confirmation";
 import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
+import { confirmedCollectionCommand } from "../../src/features/library/library-collections-confirmation";
 import {
   libraryCollectionsContractCurrent as current,
   libraryCollectionsContractRequestId as requestId,

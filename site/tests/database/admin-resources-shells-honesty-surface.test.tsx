@@ -23,14 +23,14 @@ import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/
 import AdminResourceRequirementsLoading from "../../src/app/admin/resources/[id]/requirements/loading";
 import AdminResourcesLoading from "../../src/app/admin/resources/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
-import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
-import { getDictionary } from "../../src/lib/i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
 import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "en";

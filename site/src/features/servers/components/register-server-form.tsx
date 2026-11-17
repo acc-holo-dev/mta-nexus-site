@@ -4,13 +4,13 @@ import { normalizeMtaAddress } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
   parseServerOrganizations,
   type ServerOrganizationOption,
 } from "../server-organization-options";
-import { useNexusLocale } from "../../shell/locale";
 
 const nativeLabelClass = "block font-label uppercase text-secondary";
 

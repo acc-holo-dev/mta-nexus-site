@@ -1,7 +1,7 @@
 import {
-  serverActivityCursor,
   type ServerActivityAction,
   type ServerActivityField,
+  serverActivityCursor,
 } from "@nexus/domain";
 import type { Locale } from "../../lib/i18n";
 

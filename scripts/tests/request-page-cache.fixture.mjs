@@ -31,15 +31,13 @@ const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
   resolve(sourceRoot, "features/organizations/public-profile-server.ts"),
   resolve(sourceRoot, "features/organizations/server/public-profile.tsx"),
-  ...[
-    "i18n.ts",
-    "i18n-server.ts",
-    "profile-pagination.ts",
-    "public-context-trust-copy.ts",
-    "publication-feed-copy.ts",
-    "verification-workspace-copy.ts",
-  ].map((file) => resolve(sourceRoot, "lib", file)),
+  ...["i18n.ts", "i18n-server.ts", "profile-pagination.ts"].map((file) =>
+    resolve(sourceRoot, "lib", file),
+  ),
   resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
+  resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
+  resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
+  resolve(sourceRoot, "features/trust/verification-workspace-copy.ts"),
   resolve(sourceRoot, "features/servers/server-statistics-copy.ts"),
   ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
 ]);

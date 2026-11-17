@@ -1,5 +1,5 @@
+import { contextTrustCopy } from "../../../../features/trust/public-context-trust-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { contextTrustCopy } from "../../../../lib/public-context-trust-copy";
 
 // Honest loading shell for /organizations/[slug]/trust and /servers/[slug]/trust.
 export default async function Loading() {

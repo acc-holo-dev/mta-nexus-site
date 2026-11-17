@@ -7,7 +7,7 @@ import {
   licenseStatusLabel,
   orderStatusLabel,
   parseHistoryPage,
-} from "../../src/lib/commerce-history-format";
+} from "../../src/features/commerce/commerce-history-format";
 import { commerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 
 describe("bounded private commerce history", () => {

@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "developer" } as { id: string; role: "developer" } | null,
   rate: vi.fn(),
@@ -14,8 +15,10 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/db", () => ({
   resourcePublisherRepository: { inventory: state.inventory, history: state.history },
 }));
-import { GET as inventory } from "../../src/app/api/workspace/resources/route";
+
 import { GET as history } from "../../src/app/api/products/[id]/history/route";
+import { GET as inventory } from "../../src/app/api/workspace/resources/route";
+
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 beforeEach(() => {
   vi.clearAllMocks();

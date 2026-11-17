@@ -5,6 +5,7 @@ import type {
   ContextTrustQuery,
   PublicContextTrust,
 } from "../public-context-trust-contract";
+
 class PublicContextTrustService {
   async page(
     kind: ContextKind,

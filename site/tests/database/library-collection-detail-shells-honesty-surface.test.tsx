@@ -30,9 +30,9 @@ import CollectionReleasesLoading from "../../src/app/workspace/library/collectio
 import CollectionRequirementsLoading from "../../src/app/workspace/library/collections/[id]/requirements/loading";
 import CollectionVersionsHistoryLoading from "../../src/app/workspace/library/collections/[id]/versions/history/loading";
 import CollectionVersionsLoading from "../../src/app/workspace/library/collections/[id]/versions/loading";
-import { getDictionary } from "../../src/lib/i18n";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "en";

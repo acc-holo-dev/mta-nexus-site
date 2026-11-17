@@ -7,9 +7,9 @@ import {
   sessionRepository as supportSessions,
   userRepository,
 } from "@nexus/db";
+import { createSupportCaseSchema } from "@nexus/validation";
 import { describe, expect, it } from "vitest";
 import { supportMutationFingerprint } from "../../src/lib/support-idempotency";
-import { createSupportCaseSchema } from "@nexus/validation";
 
 describe("durable support mutation idempotency", () => {
   it("serializes two concurrent case creations and isolates a reused key by actor", async () => {

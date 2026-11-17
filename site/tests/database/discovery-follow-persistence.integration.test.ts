@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, expect, it } from "vitest";
-import { and, eq, inArray, sql } from "drizzle-orm";
 import {
   db,
-  followWorkspaceRepository as repository,
   publicDirectoryRepository,
+  followWorkspaceRepository as repository,
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
 import {
   follows,
   notifications,
@@ -15,6 +15,7 @@ import {
   servers,
   users,
 } from "../../packages/db/src/schema";
+
 const actorIds: string[] = [],
   orgIds: string[] = [],
   serverIds: string[] = [];

@@ -12,6 +12,7 @@ import {
   BuildArtifactMismatchError,
 } from "../../../../../features/resources/build-download-metadata";
 import { parseDownloadBuildSelection } from "../../../../../features/resources/build-download-selection";
+import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -21,7 +22,6 @@ import {
 } from "../../../../../lib/observability";
 import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
 import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
-import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productService } from "../../../../../lib/services/product-service";

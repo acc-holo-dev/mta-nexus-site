@@ -1,13 +1,16 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ session: vi.fn(), rate: vi.fn(), history: vi.fn() }));
 vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("@nexus/db", () => ({ supportActivityRepository: { history: mocks.history } }));
+
 import { GET } from "../../src/app/api/support/[id]/activity/route";
+
 const id = `sup_${"a".repeat(24)}`,
   context = { params: Promise.resolve({ id }) };
 function request(query = "") {

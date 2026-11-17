@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../features/commerce/plan-reviews-i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/subscriptions/reviews/new.
 export default async function Loading() {

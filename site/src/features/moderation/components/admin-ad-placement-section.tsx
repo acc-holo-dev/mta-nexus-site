@@ -1,5 +1,5 @@
-import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { AdSlotPlan } from "@nexus/domain";
+import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { Locale } from "../../../lib/i18n";
 
 /**

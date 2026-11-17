@@ -1,6 +1,6 @@
 import type { ResourceDeliveryReceipt } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
-import { formatHistoryDate } from "../../../lib/commerce-history-format";
+import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 /** Server-only evidence projection; never serialize account/storage context. */
 export function ResourceDeliveryEvidence({

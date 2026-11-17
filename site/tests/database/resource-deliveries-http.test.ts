@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: "user" } | null,
   rate: vi.fn(),
@@ -19,10 +20,12 @@ vi.mock("@nexus/db", () => ({
     publisher: state.publisher,
   },
 }));
-import { GET as page } from "../../src/app/api/library/downloads/route";
+
 import { GET as detail } from "../../src/app/api/library/downloads/[id]/route";
 import { GET as csv } from "../../src/app/api/library/downloads/export/route";
+import { GET as page } from "../../src/app/api/library/downloads/route";
 import { GET as publisher } from "../../src/app/api/products/[id]/deliveries/route";
+
 const request = (path = "/api/library/downloads") => new NextRequest(`https://nexus.test${path}`);
 beforeEach(() => {
   vi.clearAllMocks();

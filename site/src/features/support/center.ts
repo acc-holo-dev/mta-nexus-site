@@ -2,7 +2,7 @@
 
 export {
   SupportCenter,
+  type SupportFormObjectContext,
   stashSupportObjectContext,
   supportObjectContextHref,
-  type SupportFormObjectContext,
 } from "./components/support-center";

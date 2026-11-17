@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
+import { Library, Star, Tag } from "lucide-react";
+import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";

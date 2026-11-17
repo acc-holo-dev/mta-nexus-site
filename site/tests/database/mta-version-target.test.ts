@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import {
   compareResourceVersions,
   isValidResourceVersion,
   resourceVersionsConflict,
 } from "@nexus/domain";
 import { MTA_VERSION_PATTERN } from "@nexus/validation";
+import { describe, expect, it } from "vitest";
 import { getMtaVersionTargetSuggestion } from "../../src/features/resources/mta-version-target";
 
 describe("MTA minimum version suggestions", () => {

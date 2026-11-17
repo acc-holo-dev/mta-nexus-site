@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import {
-  PRODUCTION_UPLOAD_ENVELOPE_BYTES,
+  assertInternalIssuer,
+  assertIsolatedProduction,
   assertProductionOfflineCacheVary,
   assertProductionUploadBodyLimit,
   localCertificateConfig,
-  assertIsolatedProduction,
-  assertInternalIssuer,
+  PRODUCTION_UPLOAD_ENVELOPE_BYTES,
 } from "../production-smoke-contract.mjs";
+
 const project = "nexus-prod-ci-11111111-1111-1111-1111-111111111111";
 const fixture = () => ({
   name: project,

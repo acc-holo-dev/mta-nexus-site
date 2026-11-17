@@ -1,6 +1,5 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
@@ -8,6 +7,7 @@ import {
 } from "../../../lib/library-collections-query";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,

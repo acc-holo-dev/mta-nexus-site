@@ -1,10 +1,8 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { MessageSquare, Plus } from "lucide-react";
 import Link from "next/link";
-import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { contentService } from "../../../lib/services/content-service";
 import {
   communityTypes,
@@ -12,6 +10,8 @@ import {
   parseContentPage,
 } from "../../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
+import { publicationCopy } from "../publication-feed-copy";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;

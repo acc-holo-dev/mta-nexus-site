@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,
 } from "../../src/features/servers/server-claim-confirmation";
+import { getDictionary } from "../../src/lib/i18n";
 
 describe("server experience behavior", () => {
   it("accepts only a challenge bound to the requested server", () => {

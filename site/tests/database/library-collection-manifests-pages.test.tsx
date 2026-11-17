@@ -51,9 +51,9 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/import/page";
+import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
 
 const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
 const screen = async (query: Record<string, string | string[] | undefined> = {}, id = "lcol_a") =>

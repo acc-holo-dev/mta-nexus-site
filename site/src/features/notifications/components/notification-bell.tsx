@@ -6,16 +6,16 @@ import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatNotification } from "../../../lib/notification-copy";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
 } from "../notification-inbox-events";
-import { privateApiRequest } from "../../../lib/private-api-request";
 import { startVisiblePolling } from "../visible-polling";
-import { confirmAction } from "../../shell/confirm-action";
-import { useNexusLocale } from "../../shell/locale";
-import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();

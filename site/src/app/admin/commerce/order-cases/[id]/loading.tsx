@@ -1,6 +1,6 @@
 import { getCommerceHistoryCopy } from "../../../../../features/commerce/commerce-history-i18n";
+import { orderCaseCopy } from "../../../../../features/commerce/order-case-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { orderCaseCopy } from "../../../../../lib/order-case-i18n";
 
 // Honest loading shell for /admin/commerce/order-cases/[id].
 export default async function Loading() {

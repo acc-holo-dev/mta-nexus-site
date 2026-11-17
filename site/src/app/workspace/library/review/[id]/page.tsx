@@ -4,11 +4,11 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { resourceReviewCopy } from "../../../../../features/resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../../../../features/resources/review-controls";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { resourceReviewCopy } from "../../../../../lib/resource-review-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
 

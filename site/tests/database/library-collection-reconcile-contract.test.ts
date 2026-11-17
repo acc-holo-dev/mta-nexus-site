@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { libraryCollectionReconcilePreviewSchema } from "../../packages/validation/src/library-collections";
+
 const report = {
   schemaVersion: 1,
   generatedAt: "2026-10-13T00:00:00.000Z",

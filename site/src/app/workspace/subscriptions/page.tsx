@@ -10,6 +10,7 @@ import {
   SubscriptionFeeEstimator,
   SubscriptionRecovery,
 } from "../../../features/commerce/subscription-controls";
+import { formatSubscriptionTime } from "../../../features/commerce/subscription-time";
 import { subscriptionNavLinkClass } from "../../../features/commerce/subscription-workspace";
 import {
   subscriptionError,
@@ -20,7 +21,6 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../lib/services/subscriptions-service";
-import { formatSubscriptionTime } from "../../../features/commerce/subscription-time";
 import {
   subscriptionAccountHref,
   subscriptionPageParams,

@@ -1,19 +1,19 @@
 import { randomBytes } from "node:crypto";
-import { eq } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
-  db,
-  sessionRepository,
-  userRepository,
+  auditEvents,
   buildRepository,
   builds,
-  products,
-  users,
-  auditEvents,
   buildPackageComparisonRepository as comparison,
+  db,
+  products,
+  sessionRepository,
+  userRepository,
+  users,
 } from "@nexus/db";
-import fixtures from "../fixtures/build-packages.json";
+import { eq } from "drizzle-orm";
+import { expect, it } from "vitest";
 import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
+import fixtures from "../fixtures/build-packages.json";
 
 // Requires a disposable PostgreSQL database migrated through 0059; no payment or entitlement mutation.
 async function fixture() {

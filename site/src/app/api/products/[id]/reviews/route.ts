@@ -2,6 +2,7 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { resourceReviewCreateSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceReviewQuery } from "../../../../../features/resources/resource-review-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
@@ -11,7 +12,6 @@ import {
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceReviewQuery } from "../../../../../features/resources/resource-review-query";
 import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);

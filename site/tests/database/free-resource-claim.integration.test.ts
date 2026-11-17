@@ -1,4 +1,3 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import {
   buildRepository,
   entitlementRepository,
@@ -6,6 +5,7 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("free resource claim idempotency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

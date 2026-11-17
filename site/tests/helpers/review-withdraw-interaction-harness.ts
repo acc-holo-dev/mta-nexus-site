@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { findTestButton, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type ReviewWithdrawInteractionHarness = {

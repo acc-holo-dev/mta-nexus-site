@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { ObjectReportForm } from "../../src/features/moderation/object-report";
-import { platformReportCopy } from "../../src/lib/platform-report-i18n";
+import { platformReportCopy } from "../../src/features/moderation/platform-report-i18n";
 
 vi.mock("@nexus/ui", async () => {
   const React = await import("react");

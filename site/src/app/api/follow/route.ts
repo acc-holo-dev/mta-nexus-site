@@ -2,10 +2,10 @@ import { followWorkspaceRepository, socialRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { followError } from "../../../features/community/follow-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { followCommandSchema } from "../../../lib/follow-workspace-contract";
-import { followError } from "../../../features/community/follow-workspace-copy";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,

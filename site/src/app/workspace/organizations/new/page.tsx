@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getOrganizationCopy } from "../../../../features/organizations/organization-workspace-copy";
 import { OrganizationProfileForm } from "../../../../features/organizations/profile";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getOrganizationCopy } from "../../../../lib/organization-workspace-copy";
 import { authService } from "../../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-5 overflow-x-clip py-8";

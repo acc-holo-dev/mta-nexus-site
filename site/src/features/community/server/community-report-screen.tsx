@@ -9,16 +9,16 @@ import {
   communityReportPageQuery,
   communityReportPageSchema,
 } from "../../../lib/community-report-contract";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../community-report-groups-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportService } from "../../../lib/services/community-report-service";
-import { CommunityReportDetailView } from "../components/community-report-detail";
-import { CommunityReportList } from "../components/community-report-list";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { communityReportCopy } from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
+import { CommunityReportDetailView } from "../components/community-report-detail";
+import { CommunityReportList } from "../components/community-report-list";
 export async function CommunityReportScreen({
   staff = false,
   id,

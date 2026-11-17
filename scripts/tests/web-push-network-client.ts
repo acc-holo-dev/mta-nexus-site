@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { createECDH } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { createECDH } from "node:crypto";
 import {
   createWebPushHttpSender,
   sendWebPushHttpsRequest,

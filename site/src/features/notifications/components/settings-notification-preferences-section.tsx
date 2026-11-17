@@ -2,7 +2,7 @@
 
 import { Bell } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
-import type { NotificationPreferences } from "../../../lib/notification-preferences-confirmation";
+import type { NotificationPreferences } from "../notification-preferences-confirmation";
 import { type PushIdentity, WebPushSettings } from "./web-push-settings";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];

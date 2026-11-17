@@ -50,7 +50,7 @@ vi.mock("../../src/features/resources/moderation-controls", () => ({
 import StaffDetail from "../../src/app/admin/resources/[id]/page";
 import Staff from "../../src/app/admin/resources/page";
 import Publisher from "../../src/app/workspace/resources/[id]/moderation/page";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const input = {
   params: Promise.resolve({ id: "prd_a" }),

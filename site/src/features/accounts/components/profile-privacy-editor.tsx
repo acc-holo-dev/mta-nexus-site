@@ -9,13 +9,13 @@ import {
   type EditablePrivacy,
   parseEditablePrivacy,
 } from "../../../lib/profile-privacy-contract";
+import { PlatformRequestError, platformRequest } from "../../../lib/user-platform-client";
+import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../profile-privacy-copy";
-import { PlatformRequestError, platformRequest } from "../../../lib/user-platform-client";
-import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

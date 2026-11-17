@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Build, Product, User } from "@nexus/domain";
 import { eventBus } from "@nexus/domain";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findBuild: vi.fn(),

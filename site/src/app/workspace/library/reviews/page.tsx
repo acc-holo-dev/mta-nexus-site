@@ -2,12 +2,15 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import {
+  resourceReviewCopy,
+  resourceReviewState,
+} from "../../../../features/resources/resource-review-i18n";
+import { resourceReviewPageQuery } from "../../../../features/resources/resource-review-query";
 import { ResourceReviewPager } from "../../../../features/resources/reviews-view";
+import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceReviewCopy, resourceReviewState } from "../../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../../features/resources/resource-review-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../lib/services/resource-review-service";
 

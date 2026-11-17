@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /settings/privacy.
 export default async function Loading() {

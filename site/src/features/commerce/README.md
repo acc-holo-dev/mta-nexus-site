@@ -46,6 +46,9 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `commercial-i18n.ts`              | util port `commercial-i18n`                                                            |
 | `commerce-history-i18n.ts`        | util port `commerce-history-i18n`                                                      |
 | `license-maintenance-i18n.ts`     | util port `license-maintenance-i18n`                                                   |
+| `commerce-history-format.ts`      | util port `commerce-history-format`                                                    |
+| `license-model-i18n.ts`           | util port `license-model-i18n`                                                         |
+| `order-case-i18n.ts`              | util port `order-case-i18n`                                                            |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

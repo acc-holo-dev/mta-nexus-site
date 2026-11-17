@@ -1,10 +1,10 @@
-import { expect, it } from "vitest";
 import { commercialFeeEstimate, commercialPlanTransition } from "@nexus/domain";
 import {
   commercialPlanCommandSchema,
   commercialPlanTermsSchema,
   orderCancellationCommandSchema,
 } from "@nexus/validation";
+import { expect, it } from "vitest";
 import {
   confirmedCommercialEstimate,
   confirmedCommercialPlan,

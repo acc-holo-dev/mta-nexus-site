@@ -1,8 +1,8 @@
 "use client";
 
 import { ConfirmDialog, type ConfirmDialogProps } from "@nexus/ui";
-import { createRoot, type Root } from "react-dom/client";
 import { createElement } from "react";
+import { createRoot, type Root } from "react-dom/client";
 
 export type ConfirmActionRequest = Pick<
   ConfirmDialogProps,

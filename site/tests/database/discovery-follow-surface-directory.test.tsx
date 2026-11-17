@@ -47,11 +47,11 @@ vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null })
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 
+import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { parseDiscoverQuery } from "../../src/lib/discover-query";
-import { discoveryCopy } from "../../src/lib/discovery-copy";
-import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 
 setupDiscoveryFollowSurface();
 

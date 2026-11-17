@@ -25,8 +25,8 @@ vi.mock("../../src/lib/user-platform-client", async (original) => {
   };
 });
 
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
 import { CommunityReportDetailView } from "../../src/features/community/components/community-report-detail";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
 
 const { render, clickCancel } = createCommunityReportDetailConfirmInteractionHelpers(
   harness,

@@ -37,7 +37,9 @@ vi.mock("../../packages/db/src/client", () => ({
     }),
   },
 }));
+
 import { ProductRepository } from "../../packages/db/src/repositories/products";
+
 const repository = new ProductRepository();
 const dialect = new PgDialect();
 beforeEach(() => {

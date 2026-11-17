@@ -2,6 +2,7 @@ vi.mock("server-only", () => ({}));
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en",
@@ -32,10 +33,12 @@ vi.mock("../../src/features/library/components/library-selection-batch-controls"
     <p data-batch={items.map((i) => i.productId).join(",")}>Batch controls</p>
   ),
 }));
-import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+
 import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
+import { getDictionary } from "../../src/lib/i18n";
+import { authService } from "../../src/lib/services/auth-service";
+
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
 beforeEach(() => {

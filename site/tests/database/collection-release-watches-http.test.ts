@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -18,7 +19,9 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => 
 vi.mock("@nexus/db", () => ({
   resourceReleaseWatchesRepository: { collectionPage: h.page, enableCollectionBatch: h.enable },
 }));
+
 import { GET, POST } from "../../src/app/api/library/collections/[id]/watches/route";
+
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 const command = {
   expectedCollectionRevision: 3,

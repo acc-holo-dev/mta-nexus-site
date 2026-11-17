@@ -5,7 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { getManagedServerCopy } from "../../../lib/managed-server-view";
 import { type MtaMasterServer, mtaLiveStatus } from "../model";
 import { getServerActivityCopy } from "../server-activity-view";
-import { serverContentCopy } from "../../../lib/server-content-copy";
+import { serverContentCopy } from "../server-content-copy";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 
 export function ManagedServerCard({

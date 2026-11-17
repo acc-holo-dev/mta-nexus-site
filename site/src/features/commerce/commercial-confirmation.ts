@@ -1,10 +1,11 @@
-import { commercialPlanTermsSchema } from "@nexus/validation";
 import {
-  commercialFeeEstimate,
-  commercialPlanTransition,
   type CommercialPlan,
   type CommercialPlanCommand,
+  commercialFeeEstimate,
+  commercialPlanTransition,
 } from "@nexus/domain";
+import { commercialPlanTermsSchema } from "@nexus/validation";
+
 function record(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }

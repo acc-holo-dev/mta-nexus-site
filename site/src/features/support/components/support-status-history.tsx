@@ -3,9 +3,9 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
-import { supportActivitySchema } from "../../../lib/support-workspace-contract";
-import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 import { useNexusLocale } from "../../shell/locale";
+import { supportActivitySchema } from "../support-workspace-contract";
+import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

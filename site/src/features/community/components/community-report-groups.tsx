@@ -3,16 +3,16 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
 import { REPORT_TYPES } from "../../../lib/community-report-contract";
-import { communityReportCopy } from "../../../lib/community-report-copy";
 import {
   type ReportGroupsPage,
   reportGroupsHref,
 } from "../../../lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
+import { communityReportCopy } from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 export function CommunityReportGroups({
   page,
   filters,

@@ -3,6 +3,7 @@ import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
 } from "../../src/features/library/library-membership-history-query";
+
 it("defaults to bounded thirty-day group history and round-trips all selectors", () => {
   expect(libraryMembershipHistoryQuery(new URLSearchParams())).toEqual({
     page: 1,

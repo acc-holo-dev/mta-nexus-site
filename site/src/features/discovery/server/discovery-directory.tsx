@@ -10,12 +10,10 @@ import {
   type DiscoverQuery,
   discoverHref,
 } from "../../../lib/discover-query";
-import { discoveryCopy } from "../../../lib/discovery-copy";
 import {
   type DiscoveryStreamQuery,
   discoveryStreamHref,
 } from "../../../lib/discovery-stream-contract";
-import { discoveryStreamCopy, discoveryStreamError } from "../../../lib/discovery-stream-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
 import { authService } from "../../../lib/services/auth-service";
@@ -27,9 +25,11 @@ import {
 } from "../../../lib/services/mta-master-directory-service";
 import { productService } from "../../../lib/services/product-service";
 import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../features/community/follow";
+import { FollowButton } from "../../community/follow";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
+import { discoveryCopy } from "../discovery-copy";
+import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
 
 const observationLookupForSnapshot = cache((servers: readonly MtaMasterServer[]) =>
   indexMtaObservations(servers),

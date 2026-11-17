@@ -91,7 +91,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 
 import Versions from "../../src/app/workspace/library/[id]/versions/page";
 import Updates, { metadata } from "../../src/app/workspace/library/updates/page";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const input = {
   params: Promise.resolve({ id: "prd_a" }),

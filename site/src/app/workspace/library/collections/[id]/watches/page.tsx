@@ -3,20 +3,20 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
-import { ResourceReleaseWatchBatchControls } from "../../../../../../features/resources/release-watch-batch";
-import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
 import { collectionReleasesCopy } from "../../../../../../features/library/collection-releases-i18n";
+import { getResourceReleaseControlCopy } from "../../../../../../features/library/resource-release-control-i18n";
+import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
+import { ResourceReleaseWatchBatchControls } from "../../../../../../features/resources/release-watch-batch";
+import { resourceReleaseWatchHistoryCopy } from "../../../../../../features/resources/resource-release-watch-history-i18n";
+import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
+import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import {
   collectionHref,
   collectionPageParams,
 } from "../../../../../../lib/library-collections-query";
-import { getResourceReleaseControlCopy } from "../../../../../../lib/resource-release-control-i18n";
-import { resourceReleaseWatchHistoryCopy } from "../../../../../../features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
-import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
 

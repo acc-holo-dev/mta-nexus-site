@@ -16,6 +16,7 @@ vi.mock("../../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
+
 import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
 
 it("measures inbox indexes on PostgreSQL and preserves recipient isolation and equal-time ordering", async () => {

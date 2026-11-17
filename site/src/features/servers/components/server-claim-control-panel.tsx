@@ -7,15 +7,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
+import { authEntryHref } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { useNexusLocale } from "../../shell/locale";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
   parseIssuedServerClaimChallenge,
 } from "../server-claim-confirmation";
 import { serverClaimErrorMessage } from "../server-claim-status-view";
-import { authEntryHref } from "../../shell/auth-return";
-import { GuestAuthLinks } from "../../shell/guest-auth";
-import { useNexusLocale } from "../../shell/locale";
 
 function claimMarkerKey(serverId: string, actor: string) {
   return `nexus:server-claim:v1:${encodeURIComponent(actor)}:${encodeURIComponent(serverId)}`;

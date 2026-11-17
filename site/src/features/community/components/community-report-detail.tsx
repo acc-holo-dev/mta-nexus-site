@@ -9,16 +9,16 @@ import {
   communityReportDetailSchema,
   confirmsReportDecision,
 } from "../../../lib/community-report-contract";
+import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
-} from "../../../lib/community-report-copy";
+} from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { reportHistoryCopy } from "../community-report-history-copy";
 import { discussionReportsCopy } from "../discussion-reports-copy";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { ReportEvidenceLinks } from "../report-evidence-links";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;

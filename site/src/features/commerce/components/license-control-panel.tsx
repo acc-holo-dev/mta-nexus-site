@@ -10,14 +10,14 @@ import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexu
 import { Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { useNexusLocale } from "../../shell/locale";
 import { confirmedLicenseControl } from "../license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../license-control-i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { useNexusLocale } from "../../shell/locale";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
 
 type ServerPage = { servers: { id: string; name: string }[]; page: number; totalPages: number };

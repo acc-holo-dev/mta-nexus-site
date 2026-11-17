@@ -1,21 +1,21 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { ordinaryRecoveryEligible } from "@nexus/security";
 import { and, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
-import { db } from "../client";
-import { auditEvents, sessions, users } from "../schema";
-import {
-  accountAuthState,
-  accountRecoveryBindings,
-  authChallenges,
-} from "../account-recovery-schema";
 import {
   accountMailDeliveryEvents,
   accountMailOutbox,
   accountMailQueueGate,
 } from "../account-mail-schema";
-import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
-import type { MailContext, MailPayload } from "./account-mail-crypto";
+import {
+  accountAuthState,
+  accountRecoveryBindings,
+  authChallenges,
+} from "../account-recovery-schema";
+import { db } from "../client";
+import { auditEvents, sessions, users } from "../schema";
 import { digestAccountChallenge } from "./account-challenges";
+import type { MailContext, MailPayload } from "./account-mail-crypto";
+import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { AccountMailTransportStage } from "./account-mail-smtp";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

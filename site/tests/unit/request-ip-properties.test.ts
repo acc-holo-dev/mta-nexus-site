@@ -1,7 +1,7 @@
 import { isIP } from "node:net";
-import { describe, expect, it } from "vitest";
-import fc from "fast-check";
 import { getClientIp } from "@nexus/security";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 const secret = "trusted-proxy-secret-0123456789abcdef";
 const seed = Number(process.env.FC_SEED ?? 20261009);

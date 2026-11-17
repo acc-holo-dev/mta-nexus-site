@@ -1,5 +1,5 @@
 import type { CommercialPlanTerms } from "@nexus/domain";
-import { formatHistoryAmount } from "../../../lib/commerce-history-format";
+import { formatHistoryAmount } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 export function PlanReviewTerms({
   terms,

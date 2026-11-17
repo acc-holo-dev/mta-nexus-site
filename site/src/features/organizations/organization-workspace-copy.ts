@@ -1,6 +1,6 @@
-import type { Locale } from "./i18n";
-import { organizationBatchCopy } from "../features/organizations/organization-batch-copy";
-import { userPlatformError } from "./user-platform-copy";
+import type { Locale } from "../../lib/i18n";
+import { userPlatformError } from "../../lib/user-platform-copy";
+import { organizationBatchCopy } from "./organization-batch-copy";
 
 const en = {
   leave: "Leave organization",

@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateSessionToken, hashPassword } from "@nexus/security";
-import { db } from "../../packages/db/src/client";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-schema";
+import { db } from "../../packages/db/src/client";
 import { authRepository } from "../../packages/db/src/repositories/auth";
 import { userRepository } from "../../packages/db/src/repositories/users";
 import { authService } from "../../src/lib/services/auth-service";

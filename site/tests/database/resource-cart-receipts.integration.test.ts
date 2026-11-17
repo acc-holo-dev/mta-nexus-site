@@ -1,14 +1,14 @@
 import { randomBytes, randomUUID } from "node:crypto";
+import {
+  buildRepository,
+  resourceCartRepository as cart,
+  db,
+  resourceCartReceiptsRepository as receipts,
+  sessionRepository,
+  userRepository,
+} from "@nexus/db";
 import { and, count, eq, or } from "drizzle-orm";
 import { expect, it } from "vitest";
-import {
-  db,
-  userRepository,
-  resourceCartRepository as cart,
-  resourceCartReceiptsRepository as receipts,
-  buildRepository,
-  sessionRepository,
-} from "@nexus/db";
 import {
   auditEvents,
   builds,
@@ -18,6 +18,7 @@ import {
   resourceCartAcquisitions,
   users,
 } from "../../packages/db/src/schema";
+
 // Disposable isolated PostgreSQL migrated through 0058; these tests never
 // create completed payments, license terms, subscriptions or file deliveries.
 async function fixture() {

@@ -2,13 +2,13 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { Activity, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import type { ServerHistoryResult } from "../../../lib/services/server-history-service";
 import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
   serverHistoryChartSlots,
 } from "../server-history-presentation";
 import { serverStatisticsCopy } from "../server-statistics-copy";
-import type { ServerHistoryResult } from "../../../lib/services/server-history-service";
 
 function metric(value: number | null) {
   return value == null ? "—" : String(value);

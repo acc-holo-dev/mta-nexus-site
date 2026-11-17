@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { ProfileChangeHistoryLink } from "../../../features/accounts/change-history";
 import { ProfilePrivacyEditor } from "../../../features/accounts/profile";
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { editablePrivacySchema } from "../../../lib/profile-privacy-contract";
-import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 export const dynamic = "force-dynamic";

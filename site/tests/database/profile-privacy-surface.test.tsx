@@ -35,8 +35,8 @@ import PrivacyPage, { generateMetadata } from "../../src/app/settings/privacy/pa
 import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../../src/app/users/[username]/activity/page";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
 
 const saved = {
   id: "actor",

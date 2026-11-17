@@ -3,19 +3,19 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { AuthorPublicationRestore } from "../author-publication-restore";
-import { PlatformSignIn } from "../../shell/guest-auth";
 import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
-import {
-  authorPublicationDeskCopy,
-  authorPublicationDeskError,
-} from "../author-publication-desk-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { authorContentService } from "../../../lib/services/author-content-service";
-import { publicationSupportHref } from "../../../lib/support-workspace-contract";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { publicationSupportHref } from "../../support/support-workspace-contract";
+import {
+  authorPublicationDeskCopy,
+  authorPublicationDeskError,
+} from "../author-publication-desk-copy";
+import { AuthorPublicationRestore } from "../author-publication-restore";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const navLinkClass =

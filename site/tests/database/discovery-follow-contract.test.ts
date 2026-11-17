@@ -1,16 +1,16 @@
 import { expect, it } from "vitest";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 import {
   discoverHref,
   parseDiscoverApiQuery,
   parseDiscoverQuery,
 } from "../../src/lib/discover-query";
-import { discoveryCopy } from "../../src/lib/discovery-copy";
 import {
   followCommandSchema,
   followPageSchema,
   parseFollowQuery,
 } from "../../src/lib/follow-workspace-contract";
-import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import { formatNotification } from "../../src/lib/notification-copy";
 
 it("preserves all active server filters across canonical page links", () => {

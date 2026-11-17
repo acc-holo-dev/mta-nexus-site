@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  MetaInspectionInputError,
   inspectMtaMetaXml,
+  MetaInspectionInputError,
   metaInspectionLimits,
 } from "../../src/lib/mta-meta-inspector";
 

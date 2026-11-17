@@ -1,6 +1,6 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit, digestLicenseRuntimeToken } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "./bounded-json";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
 import { getTrustedRequestIp } from "./request-client-ip";

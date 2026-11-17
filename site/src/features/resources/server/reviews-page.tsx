@@ -3,16 +3,16 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../shell/auth-return";
-import { GuestAuthLinks } from "../../shell/guest-auth";
-import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../resource-review-query";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
+import { authEntryHref } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
+import { resourceReviewCopy } from "../resource-review-i18n";
+import { resourceReviewPageQuery } from "../resource-review-query";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
 const actionLinkClass =

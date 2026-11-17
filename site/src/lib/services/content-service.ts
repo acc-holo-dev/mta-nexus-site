@@ -1,21 +1,23 @@
 import {
-  contentRepository,
+  authorContentRepository,
   contentCommentsRepository,
   contentDiscussionRepository,
-  authorContentRepository,
+  contentRepository,
+  discussionManagementRepository,
+  discussionRevision,
   productRepository,
   serverRepository,
-  discussionRevision,
-  discussionManagementRepository,
 } from "@nexus/db";
+import type { Comment, Content, Product, Server, User } from "@nexus/domain";
+import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
-import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
-import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../content-discussion-contract";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
+
 type DiscussionCursor = { createdAt: string; id: string };
-import { editorialTypes, communityTypes, type parseContentPage } from "../user-platform-contract";
+
+import { communityTypes, editorialTypes, type parseContentPage } from "../user-platform-contract";
 
 export class ContentService {
   async manageComment(

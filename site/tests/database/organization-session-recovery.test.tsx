@@ -23,10 +23,10 @@ vi.mock("../../src/lib/services/organization-workspace-service", () => ({
   organizationWorkspaceService: { list: state.list, get: state.get },
 }));
 
+import NewOrganization from "../../src/app/workspace/organizations/new/page";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import Directory from "../../src/features/organizations/server/directory-page";
 import Workspace from "../../src/features/organizations/server/workspace-page";
-import NewOrganization from "../../src/app/workspace/organizations/new/page";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 beforeEach(() => {
   vi.resetAllMocks();

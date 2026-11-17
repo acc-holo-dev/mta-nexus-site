@@ -1,11 +1,11 @@
 import { resourceReleaseWatchesRepository } from "@nexus/db";
 import type {
   ResourceReleaseWatchCommand,
-  ResourceReleaseWatchHistoryQuery,
   ResourceReleaseWatchDisableCommand,
-  ResourceReleaseWatchResumeCommand,
   ResourceReleaseWatchEnableCommand,
   ResourceReleaseWatchFilter,
+  ResourceReleaseWatchHistoryQuery,
+  ResourceReleaseWatchResumeCommand,
   User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";

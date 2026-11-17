@@ -2,6 +2,7 @@ import { supportCaseRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { supportQuery } from "../../../features/support/support-workspace-contract";
 import { parseBoundedJson } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext } from "../../../lib/observability";
@@ -15,7 +16,6 @@ import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../lib/support-idempotency";
-import { supportQuery } from "../../../lib/support-workspace-contract";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);

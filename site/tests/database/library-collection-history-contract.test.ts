@@ -1,9 +1,10 @@
 import { expect, it } from "vitest";
+import { libraryCollectionReceiptSchema } from "../../packages/validation/src/library-collections";
 import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,
 } from "../../src/features/library/library-collection-history-query";
-import { libraryCollectionReceiptSchema } from "../../packages/validation/src/library-collections";
+
 it("defaults to a bounded thirty-day own history and preserves all filters in links", () => {
   expect(libraryCollectionHistoryQuery(new URLSearchParams())).toEqual({
     page: 1,

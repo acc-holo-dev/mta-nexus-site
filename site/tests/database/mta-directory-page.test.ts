@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 import { selectMtaDirectoryPage } from "../../src/features/servers/model";
 import type { MtaMasterServer } from "../../src/lib/services/mta-master-directory-service";
 

@@ -5,8 +5,8 @@ const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 
 import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
-import { getDictionary } from "../../src/lib/i18n";
 import { supportWorkspaceCopy } from "../../src/features/support/support-workspace-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,

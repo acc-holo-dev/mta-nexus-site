@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 const revision = z.number().int().min(0).max(2_147_483_646);
 export const libraryReleaseCommandSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("latest"), expectedRevision: revision }).strict(),

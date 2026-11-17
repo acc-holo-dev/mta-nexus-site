@@ -4,11 +4,11 @@ import { fileURLToPath } from "node:url";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
 import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 let root = dirname(fileURLToPath(import.meta.url));
@@ -124,8 +124,8 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 import { PublicProfileForm } from "../../src/features/accounts/profile";
+import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../../src/features/resources/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";

@@ -1,16 +1,16 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { and, eq } from "drizzle-orm";
-import { db, auditEvents, users } from "../src/client";
-import { accountMailOutbox } from "../src/account-mail-schema";
-import { AccountMailCipher } from "../src/repositories/account-mail-crypto";
-import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
-import { AccountMailDispatcher } from "../src/repositories/account-mail-dispatcher";
-import { AccountMailSmtpTransport } from "../src/repositories/account-mail-smtp";
 import { authService } from "../../../src/lib/services/auth-service";
-import { userRepository } from "../src/repositories/users";
 import { generateId } from "../../security/src/index";
+import { accountMailOutbox } from "../src/account-mail-schema";
+import { auditEvents, db, users } from "../src/client";
+import { AccountMailCipher } from "../src/repositories/account-mail-crypto";
+import { AccountMailDispatcher } from "../src/repositories/account-mail-dispatcher";
+import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
+import { AccountMailSmtpTransport } from "../src/repositories/account-mail-smtp";
+import { userRepository } from "../src/repositories/users";
 
 const port = Number(process.env.SMTP_TEST_PORT || 2465);
 const caFile = process.env.SMTP_TEST_CA_FILE;

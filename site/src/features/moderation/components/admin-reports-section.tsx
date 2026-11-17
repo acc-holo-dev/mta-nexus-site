@@ -1,15 +1,15 @@
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
+import type { getDictionary, Locale } from "../../../lib/i18n";
+import { orderCaseCopy } from "../../commerce/order-case-i18n";
+import { communityReportCopy } from "../../community/community-report-copy";
 import { ReportEvidenceLinks } from "../../community/report-evidence-links";
 import { AdminResourceQaReportActions } from "../../resources/qa-report-actions";
+import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import type { getDictionary, Locale } from "../../../lib/i18n";
-import { orderCaseCopy } from "../../../lib/order-case-i18n";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { ReportModerationControls } from "../report-controls";
+import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 

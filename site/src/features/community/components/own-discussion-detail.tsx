@@ -3,8 +3,8 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { OwnDiscussion } from "../../../lib/discussion-workspace-contract";
-import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
 import type { Locale } from "../../../lib/i18n";
+import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 const linkClass =

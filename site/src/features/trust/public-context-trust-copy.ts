@@ -1,5 +1,5 @@
-import type { Locale } from "./i18n";
-import { approvalError } from "../features/trust/public-verification-history-copy";
+import type { Locale } from "../../lib/i18n";
+import { approvalError } from "./public-verification-history-copy";
 
 const en = {
   title: "Verification and public activity",

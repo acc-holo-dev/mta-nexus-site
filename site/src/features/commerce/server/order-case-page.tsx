@@ -5,23 +5,23 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatHistoryAmount, formatHistoryDate } from "../../../lib/commerce-history-format";
-import { financialOrderLabel, financialPaymentLabel } from "../financial-i18n";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { orderCaseService } from "../../../lib/services/order-case-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { SupportCaseThread } from "../../support/thread";
+import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
+import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
+import { financialOrderLabel, financialPaymentLabel } from "../financial-i18n";
 import {
   orderCaseCopy,
   orderCaseKindLabel,
   orderCaseStatusLabel,
   orderCaseThreadLabel,
-} from "../../../lib/order-case-i18n";
+} from "../order-case-i18n";
 import { orderCasePageQuery } from "../order-case-query";
-import { authService } from "../../../lib/services/auth-service";
-import { orderCaseService } from "../../../lib/services/order-case-service";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { SupportCaseThread } from "../../support/thread";
-import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
 
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());

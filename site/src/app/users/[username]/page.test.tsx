@@ -109,8 +109,8 @@ vi.mock("../../../lib/services/auth-service", () => ({
   },
 }));
 
-import { getDictionary } from "../../../lib/i18n";
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
+import { getDictionary } from "../../../lib/i18n";
 import Page, { generateMetadata } from "./page";
 
 const input = (page?: string | string[]) => ({
