@@ -8,6 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
+const utilPorts = [
+  "organization-member-confirmation",
+];
 const clientPorts = ["workspace", "team", "profile", "history-view"];
 const serverPorts = [
   "content-editor",
@@ -23,7 +26,7 @@ const serverPorts = [
   "public-trust",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -54,7 +57,7 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/organizations/components/private.ts", "export const value = 1;");
   write("site/src/features/organizations/server/page.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(`site/src/features/organizations/${port}.ts`, 'export { value } from "./server/page";');
     write(`site/src/app/${port}.ts`, `export { value } from "../features/organizations/${port}";`);
   }
@@ -100,7 +103,7 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(
       rules(`features/organizations/${port}.ts`).includes("organizations-client-isolation"),
       port,
@@ -127,7 +130,7 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
 });
 
 test("Organizations client graphs exclude server dependencies transitively", () => {
-  const entries = clientPorts.map((port) => `site/src/features/organizations/${port}.ts`);
+  const entries = [...clientPorts, ...utilPorts].map((port) => `site/src/features/organizations/${port}.ts`);
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
   const graph = JSON.parse(result.stdout);
@@ -155,7 +158,9 @@ test("Organizations client graphs exclude server dependencies transitively", () 
   }
   for (const entry of entries) {
     if (!entry.endsWith("/history-view.ts"))
-      assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+      const portName = entry.split("/").pop().replace(/\.ts$/u, "");
+      if (!(typeof utilPorts !== "undefined" && utilPorts.includes(portName)))
+        assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
     visit(entry);
   }
   for (const child of [

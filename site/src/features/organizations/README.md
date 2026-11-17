@@ -21,6 +21,7 @@ Feature объединяет существующие экраны управл�
 | `content-page-server.ts`        | Серверная композиция публикаций организации                            |
 | `content-editor-server.ts`      | `OrganizationContentEditorPage`; server-only редактор публикации       |
 | `publication-history-server.ts` | `OrganizationPublicationHistoryScreen`; server-only история публикации |
+| `organization-member-confirmation.ts` | util port `organization-member-confirmation` |
 
 Редактор участника, пакетные действия и передача владения — внутренние клиентские
 компоненты. Публичные входы используются внешним production-кодом; прямые и

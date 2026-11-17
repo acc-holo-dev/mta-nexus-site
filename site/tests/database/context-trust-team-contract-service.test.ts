@@ -19,7 +19,7 @@ import {
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
 } from "../../src/lib/organization-team-contract";
-import { confirmsOrganizationMemberMutation } from "../../src/lib/organization-member-confirmation";
+import { confirmsOrganizationMemberMutation } from "../../src/features/organizations/organization-member-confirmation";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
 import { organizationTeamCopy } from "../../src/lib/organization-team-copy";
 const time = "2026-10-11T00:00:00.123456Z",

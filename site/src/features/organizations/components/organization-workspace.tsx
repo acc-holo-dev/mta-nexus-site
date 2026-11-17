@@ -12,7 +12,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { organizationContentCopy } from "../../../lib/organization-content-copy";
 import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
-import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
+import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import { organizationTeamCopy } from "../../../lib/organization-team-copy";
 import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
 import {

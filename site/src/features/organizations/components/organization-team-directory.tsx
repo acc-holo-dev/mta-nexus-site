@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
-import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
+import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
   type OrganizationTeamPage,
   type OrganizationTeamQuery,
