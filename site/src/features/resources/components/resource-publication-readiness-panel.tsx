@@ -6,7 +6,7 @@ import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
   publicationReadinessOverview,
-} from "../../../lib/resource-publication-readiness-i18n";
+} from "../resource-publication-readiness-i18n";
 import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
 
 const stateTone: Partial<

@@ -131,7 +131,7 @@ import { ResourceCopyForm } from "../../src/features/resources/components/resour
 import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
 import { ResourcePublisherFilters } from "../../src/features/resources/components/resource-publisher-filters";
-import { getResourcePublicationReadinessCopy } from "../../src/lib/resource-publication-readiness-i18n";
+import { getResourcePublicationReadinessCopy } from "../../src/features/resources/resource-publication-readiness-i18n";
 
 describe("workspace and resource UI surface", () => {
   it.each(["en", "ru"] as const)(
