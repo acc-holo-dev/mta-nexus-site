@@ -7,7 +7,7 @@ import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../features/accounts/session-cookie";
 import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
 
 const privateHeaders = {

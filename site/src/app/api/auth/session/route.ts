@@ -10,7 +10,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../features/accounts/session-cookie";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

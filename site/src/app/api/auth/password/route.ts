@@ -6,7 +6,7 @@ import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../features/accounts/session-cookie";
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {

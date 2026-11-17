@@ -11,3 +11,4 @@
 | `session-revocation.ts` | util port `session-revocation` |
 | `account-recovery-request-policy.ts` | util port `account-recovery-request-policy` |
 | `account-recovery-browser.ts` | util port `account-recovery-browser` |
+| `session-cookie.ts` | util port `session-cookie` |

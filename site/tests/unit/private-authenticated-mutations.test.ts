@@ -20,7 +20,7 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps login and registration session cookies hardened", () => {
-    const cookiePolicy = read("site/src/lib/session-cookie.ts");
+    const cookiePolicy = read("site/src/features/accounts/session-cookie.ts");
     expect(cookiePolicy).toContain("httpOnly: true");
     expect(cookiePolicy).toContain('secure: process.env.NODE_ENV === "production"');
     expect(cookiePolicy).toContain('sameSite: "lax"');
