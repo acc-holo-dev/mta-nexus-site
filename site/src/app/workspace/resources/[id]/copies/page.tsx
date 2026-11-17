@@ -15,6 +15,8 @@ import {
   resourceCopyId,
 } from "../../../../../features/resources/resource-copy-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -53,7 +55,20 @@ export default async function ResourceCopiesPage({
   const basePath = `/workspace/resources/${encodeURIComponent(id)}/copies`;
   const returnQuery = returnParams.toString();
   const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     const query = resourceCopiesQuery(resourceCopiesPageParams(raw), true);
