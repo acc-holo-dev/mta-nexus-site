@@ -35,6 +35,8 @@ import {
   AdminVerificationQueueSection,
 } from "../../features/moderation/admin-home";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../features/shell/session-error";
+
 import { getDictionary } from "../../lib/platform/i18n";
 import { getRequestLocale } from "../../lib/platform/i18n-server";
 import { authService } from "../../lib/services/accounts/auth-service";
@@ -99,7 +101,19 @@ export default async function AdminPage({
 
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
-  const currentUser = await authService.getSession(token);
+  let currentUser: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    currentUser = await authService.getSession(token);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/admin"}
+      />
+    );
+  }
 
   if (!currentUser) {
     return <PlatformSignIn locale={locale} returnPath="/admin" />;
