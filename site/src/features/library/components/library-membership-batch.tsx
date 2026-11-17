@@ -15,7 +15,7 @@ import {
 } from "../../../lib/library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
-import { libraryMembershipBatchesCopy } from "../../../lib/library-membership-batches-i18n";
+import { libraryMembershipBatchesCopy } from "../library-membership-batches-i18n";
 import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
 import { privateApiRequest } from "../../../lib/private-api-request";

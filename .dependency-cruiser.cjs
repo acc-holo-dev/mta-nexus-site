@@ -206,7 +206,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/library/)" },
       to: {
-        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|release-comparison-server|release-history-server|collection-releases-server|collection-requirements-server|collections-server|membership-history-server|selection-batch-server|collection-import-page-server|collection-reconcile-page-server|collection-compare-page-server|collection-receipt-page-server|collection-history-page-server|collection-inventory-page-server|resource-collections-page-server)\\.ts$)",
+        path: "^site/src/features/library/(?!(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n|release-comparison-server|release-history-server|collection-releases-server|collection-requirements-server|collections-server|membership-history-server|selection-batch-server|collection-import-page-server|collection-reconcile-page-server|collection-compare-page-server|collection-receipt-page-server|collection-history-page-server|collection-inventory-page-server|resource-collections-page-server)\\.ts$)",
       },
     },
     {
@@ -219,17 +219,17 @@ module.exports = {
       name: "library-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!library/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/library/(?:server/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements|collection-import-page|collection-reconcile-page|collection-compare-page|collection-receipt-page|collection-history-page|collection-inventory-page|resource-collections-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!library/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/library/(?:server/|(?:collections|membership-history|selection-batch|release-comparison|release-history|collection-releases|collection-requirements|collection-import-page|collection-reconcile-page|collection-compare-page|collection-receipt-page|collection-history-page|collection-inventory-page|resource-collections-page)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-history-i18n|library-membership-history-query|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "library-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation)\\.ts$|components/)",
+        path: "^site/src/features/library/(?:(?:collection-command|collection-batch|collection-item-copy|collection-import|collection-restore|membership-batch|release-follow|release-selection|library-release-request|library-membership-batch-confirmation|library-selection-batches-confirmation|library-membership-batches-i18n|library-selection-batches-i18n)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

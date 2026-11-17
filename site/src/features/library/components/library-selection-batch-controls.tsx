@@ -7,7 +7,7 @@ import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
 } from "../library-selection-batches-confirmation";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,

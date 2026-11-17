@@ -7,8 +7,8 @@ import { expect, it } from "vitest";
 import { LibraryCollectionsErrorPanel } from "../../src/features/library/server/library-collections-error-panel";
 import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { libraryMembershipBatchesCopy } from "../../src/lib/library-membership-batches-i18n";
-import { librarySelectionBatchesCopy } from "../../src/lib/library-selection-batches-i18n";
+import { libraryMembershipBatchesCopy } from "../../src/features/library/library-membership-batches-i18n";
+import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
@@ -50,10 +50,10 @@ it("keeps additive action-error copy for library form locales", () => {
   expect(read("site/src/lib/library-collection-manifests-i18n.ts")).toContain(
     "previewErrorDescription",
   );
-  expect(read("site/src/lib/library-membership-batches-i18n.ts")).toContain(
+  expect(read("site/src/features/library/library-membership-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("site/src/lib/library-selection-batches-i18n.ts")).toContain(
+  expect(read("site/src/features/library/library-selection-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
   expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain("actionErrorDescription");

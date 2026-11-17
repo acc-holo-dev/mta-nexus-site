@@ -34,7 +34,7 @@ vi.mock("../../src/features/library/components/library-selection-batch-controls"
 }));
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { librarySelectionBatchesCopy } from "../../src/lib/library-selection-batches-i18n";
+import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
@@ -128,7 +128,7 @@ it("rejects duplicate pagination before fetching private metadata", async () => 
 it("shows an honest recovery state when batch metadata fails to load", async () => {
   state.detail.mockRejectedValueOnce(new Error("batch detail unavailable"));
   const { librarySelectionBatchesCopy } = await import(
-    "../../src/lib/library-selection-batches-i18n"
+    "../../src/features/library/library-selection-batches-i18n"
   );
   const copy = librarySelectionBatchesCopy("en");
   const html = renderToStaticMarkup(await screen(props));

@@ -20,6 +20,8 @@ Feature объединяет существующие представления
 | `library-release-request.ts`                | `freezeLibraryReleaseRequest`, `matchesLibraryReleaseRequest` |
 | `library-membership-batch-confirmation.ts`  | `confirmedMembershipBatch`                                    |
 | `library-selection-batches-confirmation.ts` | Selection batch confirm helpers                               |
+| `library-membership-batches-i18n.ts`        | `libraryMembershipBatchesCopy`                                |
+| `library-selection-batches-i18n.ts`         | `librarySelectionBatchesCopy`                                 |
 | `collection-import-page-server.ts`          | Серверная страница импорта                                    |
 | `collection-reconcile-page-server.ts`       | Серверная страница сверки                                     |
 | `collection-compare-page-server.ts`         | Серверное сравнение коллекций                                 |

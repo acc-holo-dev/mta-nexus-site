@@ -11,7 +11,7 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../../../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";

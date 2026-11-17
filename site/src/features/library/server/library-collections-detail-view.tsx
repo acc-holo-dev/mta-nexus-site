@@ -12,7 +12,7 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../../../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { LibraryCollectionBatchForm } from "../collection-batch";
