@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
@@ -14,8 +16,20 @@ export const metadata: Metadata = {
 };
 export default async function NewCommercialPlan() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
-  const user = await authService.getSession(store.get("nexus_session")?.value),
-    copy = getCommercialCopy(locale);
+  const copy = getCommercialCopy(locale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/commerce/plans/new"}
+      />
+    );
+  }
   if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/commerce/plans/new" />;
   if (user.role !== "admin") notFound();
   return (
