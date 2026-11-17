@@ -70,6 +70,8 @@ const copy = {
     recoverySaveFailed: "Could not save recovery state. The request was not sent.",
     previousResultUnknown:
       "The previous operation result is unknown. Check the list and history before clearing this warning.",
+    previousRequestUnconfirmed:
+      "The previous request was not confirmed. Retry only the saved request.",
     paymentOperations: "Payment history and cancellation",
     attempts: "Recorded payment attempts",
     noAttempts: "No recorded payment attempts.",
@@ -188,6 +190,8 @@ const copy = {
     recoverySaveFailed: "Не удалось сохранить состояние восстановления. Запрос не отправлен.",
     previousResultUnknown:
       "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки.",
+    previousRequestUnconfirmed:
+      "Результат предыдущего запроса не подтверждён. Повторите только сохранённый запрос.",
     paymentOperations: "История платежей и отмена",
     attempts: "Записанные платёжные попытки",
     noAttempts: "Платёжных попыток не зафиксировано.",

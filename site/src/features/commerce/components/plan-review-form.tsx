@@ -98,12 +98,7 @@ export function PlanReviewForm({
         }
         if (alive) setReadyScope(renderScope);
       } catch {
-        if (alive)
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить выбор. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify the session or restore the selection. Refresh and sign in to the original account.",
-          );
+        if (alive) setError(planReviewsCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -149,11 +144,7 @@ export function PlanReviewForm({
         sessionStorage.setItem(storageKey, raw);
         if (sessionStorage.getItem(storageKey) !== raw) throw new Error("storage");
       } catch {
-        setError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Обзор не отправлен."
-            : "Could not save recovery data. The review was not submitted.",
-        );
+        setError(c.recoverySaveFailed);
         return;
       }
       request.current = parsed.data;

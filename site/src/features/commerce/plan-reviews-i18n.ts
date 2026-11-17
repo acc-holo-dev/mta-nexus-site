@@ -68,6 +68,9 @@ const copy = {
       "After an uncertain result, the original selection is saved in this tab and only that request can be retried.",
     formErrorHint:
       "No plan review was recorded. Retry the same selection or reload before changing details.",
+    restoreFailed:
+      "Could not verify the session or restore the selection. Refresh and sign in to the original account.",
+    recoverySaveFailed: "Could not save recovery data. The review was not submitted.",
   },
   ru: {
     title: "Сохранённые обзоры тарифов",
@@ -134,6 +137,9 @@ const copy = {
       "После неопределённого результата исходный выбор сохранён в этой вкладке; повторить можно только исходный запрос.",
     formErrorHint:
       "Обзор тарифа не сохранён. Повторите тот же выбор или обновите страницу перед изменением деталей.",
+    restoreFailed:
+      "Не удалось проверить сессию или восстановить выбор. Обновите страницу и войдите в исходный аккаунт.",
+    recoverySaveFailed: "Не удалось сохранить данные восстановления. Обзор не отправлен.",
   },
 };
 export const planReviewsCopy = (locale: Locale) => copy[locale];

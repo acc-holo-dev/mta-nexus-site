@@ -82,6 +82,9 @@ const en = {
   recoverTitle: "Recover subscription operation",
   recoverDescription:
     "The previous request was not confirmed. Retry the original request or check history.",
+  restoreFailed:
+    "Could not verify the session or restore the request. Check subscription history and sign in to the original account.",
+  recoverySaveFailed: "Could not save recovery data. The request was not submitted.",
   actions: { activate: "Free plan activated", cancel: "Subscription ended" },
   statuses: { active: "Active", expired: "Expired", cancelled: "Ended" },
 };
@@ -166,6 +169,9 @@ const ru: typeof en = {
   recoverTitle: "Восстановление операции подписки",
   recoverDescription:
     "Результат предыдущего запроса не подтверждён. Повторите исходный запрос или проверьте историю.",
+  restoreFailed:
+    "Не удалось проверить сессию или восстановить запрос. Откройте историю подписки и войдите в исходный аккаунт.",
+  recoverySaveFailed: "Не удалось сохранить данные восстановления. Запрос не отправлен.",
   actions: { activate: "Бесплатный тариф подключён", cancel: "Подписка прекращена" },
   statuses: { active: "Действует", expired: "Истекла", cancelled: "Прекращена" },
 };

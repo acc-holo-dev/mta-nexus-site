@@ -124,12 +124,7 @@ export function SubscriptionControls(props: Props) {
         }
         if (active) setReady(scope);
       } catch {
-        if (active)
-          setError(
-            locale === "ru"
-              ? "Не удалось проверить сессию или восстановить запрос. Откройте историю подписки и войдите в исходный аккаунт."
-              : "Could not verify the session or restore the request. Check subscription history and sign in to the original account.",
-          );
+        if (active) setError(c.restoreFailed);
       }
     }
     void restore();
@@ -191,11 +186,7 @@ export function SubscriptionControls(props: Props) {
         sessionStorage.setItem(storageKey, raw);
         if (sessionStorage.getItem(storageKey) !== raw) throw new Error("storage");
       } catch {
-        setError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Запрос не отправлен."
-            : "Could not save recovery data. The request was not submitted.",
-        );
+        setError(c.recoverySaveFailed);
         return;
       }
       request.current = parsed.data;

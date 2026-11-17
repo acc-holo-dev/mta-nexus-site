@@ -80,12 +80,7 @@ export function OrderCancellationForm({
         }
         if (active) setReady(scope);
       } catch {
-        if (active)
-          setError(
-            locale === "ru"
-              ? "Не удалось проверить аккаунт или восстановить запрос. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify the account or restore the request. Refresh and sign in to the original account.",
-          );
+        if (active) setError(copy.restoreFailed);
       }
     }
     void restore();
@@ -119,11 +114,7 @@ export function OrderCancellationForm({
         sessionStorage.setItem(key, raw);
         if (sessionStorage.getItem(key) !== raw) throw new Error("storage");
       } catch {
-        setError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Запрос не отправлен."
-            : "Could not save recovery data. The request was not sent.",
-        );
+        setError(copy.recoverySaveFailed);
         return;
       }
       pending.current = parsed.data;
@@ -194,14 +185,7 @@ export function OrderCancellationForm({
     <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
       {ready === scope && retry ? (
-        <ErrorState
-          id="order-cancellation-unconfirmed"
-          title={
-            locale === "ru"
-              ? "Результат предыдущего запроса не подтверждён. Повторите только сохранённый запрос."
-              : "The previous request was not confirmed. Retry only the saved request."
-          }
-        />
+        <ErrorState id="order-cancellation-unconfirmed" title={copy.previousRequestUnconfirmed} />
       ) : null}
       <fieldset disabled={busy || retry || saved || ready !== scope} className="space-y-4">
         <label htmlFor={`${field}-reason`} className="block space-y-2">
