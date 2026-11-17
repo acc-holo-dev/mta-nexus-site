@@ -3,7 +3,7 @@ import {
   confirmedNotificationPreferences,
   parseNotificationPreferences,
 } from "../../src/lib/notification-preferences-confirmation";
-import { confirmedCommentId } from "../../src/lib/content-comment-confirmation";
+import { confirmedCommentId } from "../../src/features/community/content-comment-confirmation";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,
