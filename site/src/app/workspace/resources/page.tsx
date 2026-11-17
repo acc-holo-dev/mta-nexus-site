@@ -15,7 +15,7 @@ import {
   publisherSearchParams,
   resourcePublisherQuery,
   resourcePublisherUrl,
-} from "../../../lib/resource-publisher-query";
+} from "../../../features/resources/resource-publisher-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourcePublisherService } from "../../../lib/services/resource-publisher-service";
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
-import { resourcePublisherUrl } from "../../../lib/resource-publisher-query";
+import { resourcePublisherUrl } from "../resource-publisher-query";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

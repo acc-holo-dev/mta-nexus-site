@@ -12,7 +12,7 @@ import { getResourcePublisherCopy } from "../../../../../lib/resource-publisher-
 import {
   publisherSearchParams,
   resourcePublisherHistoryQuery,
-} from "../../../../../lib/resource-publisher-query";
+} from "../../../../../features/resources/resource-publisher-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
 
