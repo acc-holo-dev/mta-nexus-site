@@ -64,6 +64,7 @@ export function ContentDiscussion({
   initialQuery = "",
   initialFocus,
   initialError = "",
+  identityUnavailable = false,
 }: {
   slug: string;
   title?: string;
@@ -72,6 +73,8 @@ export function ContentDiscussion({
   count: number;
   initial: DiscussionPage | null;
   viewer?: { id: string; canModerate: boolean } | null;
+  /** Session probe failed — not a guest. Keep discussion readable; block guest-lie CTAs. */
+  identityUnavailable?: boolean;
   /** SSR/API-hydrated follow+mute so controls do not flash unmuted after Save. */
   followInitial?: {
     authenticated: boolean;
@@ -304,6 +307,11 @@ export function ContentDiscussion({
       setWriteError(copy.invalid);
       return;
     }
+    if (identityUnavailable) {
+      setWriteError(copy.identityUnavailable);
+      setWriteNeedsSignIn(false);
+      return;
+    }
     if (!actorId) {
       persistComposeDraft(normalized, reply);
       setWriteError(copy.signIn);
@@ -514,7 +522,7 @@ export function ContentDiscussion({
             type="submit"
             isLoading={submitting}
             className="min-h-11"
-            disabled={text.trim().length < 2 || loading || !!managingId}
+            disabled={identityUnavailable || text.trim().length < 2 || loading || !!managingId}
           >
             {submitting
               ? viewer && draftRestoreNotice
@@ -525,7 +533,18 @@ export function ContentDiscussion({
                 : copy.publish}
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
-          {!viewer && (
+          {identityUnavailable ? (
+            <ErrorState
+              id="discussion-identity-unavailable"
+              title={copy.identityUnavailable}
+              description={copy.identityUnavailableDescription}
+              action={
+                <Link href={`#discussion`} className={navLinkClass}>
+                  {copy.retry}
+                </Link>
+              }
+            />
+          ) : !viewer ? (
             <GuestAuthLinks
               loginHref={loginHref}
               registerHref={registerHref}
@@ -535,7 +554,7 @@ export function ContentDiscussion({
               onLoginClick={() => persistComposeDraft()}
               onRegisterClick={() => persistComposeDraft()}
             />
-          )}
+          ) : null}
         </div>
         <DiscussionComposeWriteFeedback
           error={writeError}
@@ -623,14 +642,20 @@ export function ContentDiscussion({
             >
               {copy.permalink}
             </Link>
-            {viewer?.id !== comment.author?.id && (
+            {identityUnavailable ? (
+              <ErrorState
+                id={`discussion-comment-identity-${comment.id}`}
+                title={copy.identityUnavailable}
+                description={copy.identityUnavailableDescription}
+              />
+            ) : viewer?.id !== comment.author?.id ? (
               <CommunityReportForm
                 targetType="comment"
                 targetId={comment.id}
                 locale={locale}
                 actorId={viewer?.id ?? null}
               />
-            )}
+            ) : null}
             <Button
               className={ghostActionClass}
               variant="ghost"
