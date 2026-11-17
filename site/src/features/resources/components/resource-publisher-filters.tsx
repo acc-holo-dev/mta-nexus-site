@@ -3,7 +3,7 @@ import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
 const filterNavLinkClass =

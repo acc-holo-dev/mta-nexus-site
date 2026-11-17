@@ -14,7 +14,7 @@ import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../lib/resource-build-workspace-i18n";
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
-import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { resourcePublicationReadinessService } from "../../../../lib/services/resource-publication-readiness-service";

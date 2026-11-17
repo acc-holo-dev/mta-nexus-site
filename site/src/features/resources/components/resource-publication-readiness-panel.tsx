@@ -7,7 +7,7 @@ import {
   publicationReadinessDetail,
   publicationReadinessOverview,
 } from "../resource-publication-readiness-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const stateTone: Partial<
   Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>

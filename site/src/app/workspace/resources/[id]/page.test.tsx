@@ -51,7 +51,7 @@ vi.mock("../../../../features/resources/lifecycle-controls", () => ({
   ResourceLifecycleControls: () => null,
 }));
 
-import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
 import Page, { metadata } from "./page";
 
 const input = {

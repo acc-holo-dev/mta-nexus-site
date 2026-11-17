@@ -9,7 +9,7 @@ import { ResourcePublisherFilters } from "../../../features/resources/publisher-
 import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../../../features/resources/resource-publisher-i18n";
 import {
   publisherInventoryTotal,
   publisherSearchParams,

@@ -10,7 +10,7 @@ import {
   getResourceManagementCopy,
   resourceManagementError,
 } from "../../../lib/resource-management-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { parseEditableProfile } from "../../../lib/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 
