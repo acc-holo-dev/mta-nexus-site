@@ -66,7 +66,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/trust/)" },
       to: {
-        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$)",
+        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy)\\.ts$)",
       },
     },
     {
@@ -79,7 +79,7 @@ module.exports = {
       name: "trust-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:public-user-trust-contract|user-platform-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -89,7 +89,7 @@ module.exports = {
       name: "trust-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-api|verification-workspace-copy)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
@@ -352,7 +352,7 @@ module.exports = {
         path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n|plan-reviews-i18n|subscriptions-i18n|license-control-i18n|financial-i18n|license-archive-csv|subscription-time|seller-sales-csv|commercial-plan-query|financial-query|commercial-i18n|commerce-history-i18n|license-maintenance-i18n|commerce-history-format|license-model-i18n|order-case-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|plan-reviews-query|private-api-request|subscriptions-query|support-retry)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!commerce/|support/support-retry\\.ts$||shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|plan-reviews-query|private-api-request|subscriptions-query)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -438,7 +438,7 @@ module.exports = {
         path: "^site/src/features/resources/(?:(?:view|detail-view|reviews-view|review-controls|compatibility-controls|variant-controls|publisher-view|publisher-navigation|create-controls|copy-controls|copy-view|author-controls|lifecycle-controls|moderation-controls|requirements-view|quarantine-controls|qa-report-actions|release-watch-batch|cart-controls|cart-view|download|release-watch|client|evidence|resource-submission-intent|mta-version-target|build-moderation-ui|new-resource-response|pending-resource-draft|resource-build-workspace-response|resource-copy-confirmation|resource-review-confirmation|author-resource-response|resource-management-confirmation|resource-publication-readiness-i18n|resource-release-watch-batch-confirmation|publishing-error-message|resource-publisher-nav-i18n|author-resource-requests|resource-cart-review-confirmation|mta-meta-inspector-messages|resource-image-url|private-request|author-resource-draft|build-file-validation|resource-commerce-confirmation|public-release-history|resource-cart-receipts-query|resource-publisher-query|resource-review-query|product-type-labels|resource-deliveries-i18n|resource-qa-i18n|resource-cart-receipts-i18n|build-package-i18n|resource-copy-i18n|resource-publisher-i18n|resource-build-workspace-i18n|resource-qa-query|resource-cart-receipts-csv|build-download-metadata|resource-deliveries-csv|resource-download-policy|resource-activity-view|resource-activity-query|resource-release-watch-history-i18n|resource-activity-i18n|resource-release-watches-query|resource-deliveries-query|resource-media-i18n|resource-management-i18n|resource-download-sha256|build-download-selection|resource-release-control-query|resource-commerce-i18n|resource-requirements-i18n|resource-requirements-query|resource-review-i18n|resource-release-watch-history-query)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-dependency-resolution|reverse-dependency-summary|user-platform-client|resource-release-watches-i18n|private-api-request|mta-meta-inspector|resource-download-client|resource-attachment-filename)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/resources/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\\.ts$|/)|lib/(?!(?:i18n|public-resource-attribution|product-dependency-resolution|reverse-dependency-summary|user-platform-client|resource-release-watches-i18n|library-release-history-query|private-api-request|mta-meta-inspector|resource-download-client|resource-attachment-filename)\\.ts$))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

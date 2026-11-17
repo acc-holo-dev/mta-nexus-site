@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { verificationApplicationsError } from "../../../../../features/moderation/verification-applications-copy";
-import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
+import { verificationRate } from "../../../../../lib/verification-workspace-api";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { parseVerificationApplicationsQuery } from "../../../../../lib/verification-applications-contract";

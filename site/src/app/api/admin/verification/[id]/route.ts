@@ -1,6 +1,6 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
+import { verificationRate } from "../../../../../lib/verification-workspace-api";
 import { verificationDecisionError } from "../../../../../features/trust/verification-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";

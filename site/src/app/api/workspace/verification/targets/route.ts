@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import {
   verificationFilters,
   verificationRate,
-} from "../../../../../features/trust/verification-workspace-api";
+} from "../../../../../lib/verification-workspace-api";
 import { verificationError } from "../../../../../features/trust/verification-workspace-copy";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";

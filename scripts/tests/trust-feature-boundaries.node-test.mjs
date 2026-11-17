@@ -12,7 +12,6 @@ const utilPorts = [
   "public-user-trust-copy",
   "public-verification-history-copy",
   "public-context-trust-copy",
-  "verification-workspace-api",
   "verification-workspace-copy",
 ];
 const clientPorts = ["public-user-trust"];
