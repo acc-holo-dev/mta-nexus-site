@@ -1,4 +1,4 @@
-import { followCopy } from "../../../lib/follow-workspace-copy";
+import { followCopy } from "../../../features/community/follow-workspace-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/saved.

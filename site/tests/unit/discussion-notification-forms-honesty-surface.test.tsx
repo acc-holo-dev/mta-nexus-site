@@ -84,7 +84,7 @@ it("keeps additive formErrorHint / errorHint copy for discussion and notificatio
   expect(read("site/src/features/notifications/notification-inbox-copy.ts")).toContain(
     "formErrorHint:",
   );
-  expect(read("site/src/lib/follow-workspace-copy.ts")).toContain(
+  expect(read("site/src/features/community/follow-workspace-copy.ts")).toContain(
     "Retry reloads the saved follow state.",
   );
   expect(read("site/src/lib/community-report-copy.ts")).toContain("formErrorHint:");

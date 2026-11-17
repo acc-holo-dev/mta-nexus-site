@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { ObjectMuteDuration } from "../../../lib/follow-workspace-contract";
-import { followCopy, followError } from "../../../lib/follow-workspace-copy";
+import { followCopy, followError } from "../follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";

@@ -26,7 +26,7 @@ import {
   writeDiscussionComposeDraft,
 } from "../discussion-compose-draft";
 import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
-import { followCopy } from "../../../lib/follow-workspace-copy";
+import { followCopy } from "../follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { platformFieldClass } from "../../../lib/user-platform-client";

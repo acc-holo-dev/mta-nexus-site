@@ -26,7 +26,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { ContentFollowControls } from "../../src/features/community/components/content-follow-controls";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 
 const { render, saveToggle } = createContentFollowControlsInteractionHelpers(
   harness,

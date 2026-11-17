@@ -23,7 +23,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 
 import { FollowButton } from "../../src/features/community/follow";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import { flattenReactTestTree } from "../helpers/flatten-react-test-tree";
 
 const { render, toggle } = createDiscussionWatchInteractionHelpers(

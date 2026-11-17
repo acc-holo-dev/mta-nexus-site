@@ -10,7 +10,7 @@ import {
   followPageSchema,
   parseFollowQuery,
 } from "../../src/lib/follow-workspace-contract";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import { formatNotification } from "../../src/lib/notification-copy";
 
 it("preserves all active server filters across canonical page links", () => {

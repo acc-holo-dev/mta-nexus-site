@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { objectMuteCommandSchema } from "../../../lib/follow-workspace-contract";
-import { followError } from "../../../lib/follow-workspace-copy";
+import { followError } from "../../../features/community/follow-workspace-copy";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,

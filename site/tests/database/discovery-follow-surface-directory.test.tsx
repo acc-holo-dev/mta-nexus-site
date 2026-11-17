@@ -51,7 +51,7 @@ import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { parseDiscoverQuery } from "../../src/lib/discover-query";
 import { discoveryCopy } from "../../src/lib/discovery-copy";
-import { followActionCopy, followCopy } from "../../src/lib/follow-workspace-copy";
+import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 
 setupDiscoveryFollowSurface();
 

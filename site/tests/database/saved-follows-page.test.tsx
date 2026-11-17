@@ -42,7 +42,7 @@ vi.mock("../../src/features/community/follow", () => ({
 
 import SavedLoading from "../../src/app/workspace/saved/loading";
 import SavedPage, { generateMetadata } from "../../src/app/workspace/saved/page";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();

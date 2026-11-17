@@ -10,7 +10,7 @@ import {
   type FollowTargetType,
   followPageSchema,
 } from "../../../lib/follow-workspace-contract";
-import { followCopy, followError } from "../../../lib/follow-workspace-copy";
+import { followCopy, followError } from "../follow-workspace-copy";
 import type { Locale } from "../../../lib/i18n";
 import { publicationHref } from "../../../lib/publication-feed-contract";
 import { publicationCopy } from "../../../lib/publication-feed-copy";

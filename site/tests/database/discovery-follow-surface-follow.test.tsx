@@ -5,7 +5,7 @@ import { FollowButton } from "../../src/features/community/follow";
 import { FollowWorkspace } from "../../src/features/community/follow";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import type { FollowPage } from "../../src/lib/follow-workspace-contract";
-import { followActionCopy, followCopy } from "../../src/lib/follow-workspace-copy";
+import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { followWorkspaceItemBase } from "../helpers/discovery-follow-surface-harness";
 

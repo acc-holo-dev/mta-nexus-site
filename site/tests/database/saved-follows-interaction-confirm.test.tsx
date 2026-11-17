@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import {
   ack,
   createSavedFollowsInteractionHelpers,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FollowWorkspace } from "../../../features/community/follow";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { FOLLOW_TYPES, type FollowTargetType } from "../../../lib/follow-workspace-contract";
-import { followCopy } from "../../../lib/follow-workspace-copy";
+import { followCopy } from "../../../features/community/follow-workspace-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
