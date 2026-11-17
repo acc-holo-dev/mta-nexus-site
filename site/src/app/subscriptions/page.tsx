@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CommercialFeeCalculator } from "../../features/commerce/commercial-plans";
 import { formatHistoryAmount, parseHistoryPage } from "../../lib/commerce-history-format";
-import { getCommercialCopy } from "../../lib/commercial-i18n";
+import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";

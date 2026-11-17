@@ -29,6 +29,7 @@ const utilPorts = [
   "seller-sales-csv",
   "commercial-plan-query",
   "financial-query",
+  "commercial-i18n",
 ];
 const clientPorts = [
   "workspace-history",
@@ -40,7 +41,7 @@ const clientPorts = [
   "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-i18n|order-case-i18n|plan-reviews-query|private-api-request|subscriptions-query|support-retry)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|order-case-i18n|plan-reviews-query|private-api-request|subscriptions-query|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(

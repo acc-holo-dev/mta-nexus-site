@@ -47,7 +47,7 @@ it("keeps additive formErrorHint / errorHint copy for commerce and account hones
   expect(read("site/src/lib/i18n/en/chrome.ts")).toContain("errorHint:");
   expect(read("site/src/lib/i18n/ru/chrome.ts")).toContain("errorHint:");
   expect(read("site/src/features/commerce/subscriptions-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/commercial-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/commercial-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/features/commerce/plan-reviews-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("formErrorHint:");

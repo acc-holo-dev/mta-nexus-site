@@ -31,7 +31,7 @@ import {
   AdminVerificationQueueSection,
 } from "../../features/moderation/admin-home";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
-import { getCommercialCopy } from "../../lib/commercial-i18n";
+import { getCommercialCopy } from "../../features/commerce/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";
 import { getFinancialCopy } from "../../features/commerce/financial-i18n";
 import { getDictionary } from "../../lib/i18n";

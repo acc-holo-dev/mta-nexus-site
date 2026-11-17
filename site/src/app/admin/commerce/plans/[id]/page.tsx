@@ -12,7 +12,7 @@ import {
   parseHistoryPage,
 } from "../../../../../lib/commerce-history-format";
 import { commercialTerms } from "../../../../../features/commerce/commercial-confirmation";
-import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
+import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";

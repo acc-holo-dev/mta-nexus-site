@@ -1,4 +1,4 @@
-import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
+import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 // Honest loading shell for /admin/commerce/plans/[id].

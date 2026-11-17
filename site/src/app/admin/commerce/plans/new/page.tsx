@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
+import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
