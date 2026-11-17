@@ -7,7 +7,7 @@ import {
   parseAuthorResourceDraft,
   sameAuthorDetails,
   reconcileAuthorDetails,
-} from "../../src/lib/author-resource-draft";
+} from "../../src/features/resources/author-resource-draft";
 
 const now = Date.parse("2026-10-05T00:00:00Z");
 const scope = { actorId: "usr_author", productId: "prd_resource" };

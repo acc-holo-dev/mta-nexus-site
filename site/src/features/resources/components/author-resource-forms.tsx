@@ -13,7 +13,7 @@ import {
   parseAuthorResourceDraft,
   reconcileAuthorDetails,
   sameAuthorDetails,
-} from "../../../lib/author-resource-draft";
+} from "../author-resource-draft";
 import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,

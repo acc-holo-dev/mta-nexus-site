@@ -1,4 +1,4 @@
-import type { AuthorDetailsDraft } from "../../lib/author-resource-draft";
+import type { AuthorDetailsDraft } from "./author-resource-draft";
 import { privateRequest } from "./private-request";
 
 export function authorDetailsMutationRequest(
