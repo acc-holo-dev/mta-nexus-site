@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
-import { organizationTeamCopy } from "../../../lib/organization-team-copy";
+import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";

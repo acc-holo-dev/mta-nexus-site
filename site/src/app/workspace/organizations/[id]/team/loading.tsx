@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { organizationTeamCopy } from "../../../../../lib/organization-team-copy";
+import { organizationTeamCopy } from "../../../../../features/organizations/organization-team-copy";
 
 export default async function Loading() {
   const copy = organizationTeamCopy(await getRequestLocale());

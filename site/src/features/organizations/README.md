@@ -23,6 +23,7 @@ Feature объединяет существующие экраны управл�
 | `publication-history-server.ts`       | `OrganizationPublicationHistoryScreen`; server-only история публикации |
 | `organization-member-confirmation.ts` | util port `organization-member-confirmation`                           |
 | `organization-workspace-client.ts` | util port `organization-workspace-client` |
+| `organization-team-copy.ts` | util port `organization-team-copy` |
 
 Редактор участника, пакетные действия и передача владения — внутренние клиентские
 компоненты. Публичные входы используются внешним production-кодом; прямые и

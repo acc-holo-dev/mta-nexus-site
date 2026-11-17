@@ -10,7 +10,7 @@ import {
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
 } from "../../../lib/organization-team-contract";
-import { organizationTeamCopy, organizationTeamError } from "../../../lib/organization-team-copy";
+import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../lib/services/organization-team-service";

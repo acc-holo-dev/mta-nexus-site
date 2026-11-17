@@ -21,7 +21,7 @@ import {
 } from "../../src/lib/organization-team-contract";
 import { confirmsOrganizationMemberMutation } from "../../src/features/organizations/organization-member-confirmation";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { organizationTeamCopy } from "../../src/lib/organization-team-copy";
+import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
 const time = "2026-10-11T00:00:00.123456Z",
   actor = { id: "actor", role: "admin" } as User;
 const organization = {
