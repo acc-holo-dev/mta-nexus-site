@@ -3,7 +3,7 @@ import { getDictionary } from "../../src/lib/i18n";
 import {
   parseAccountRecoveryLocation,
   recoveryJsonRequest,
-} from "../../src/lib/account-recovery-browser";
+} from "../../src/features/accounts/account-recovery-browser";
 import {
   PASSWORD_RESET_NEUTRAL_RESPONSE,
   PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,

@@ -9,7 +9,7 @@ import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
-} from "../../../lib/account-recovery-browser";
+} from "../../../features/accounts/account-recovery-browser";
 
 type Proof = AccountRecoveryProof;
 type State =
