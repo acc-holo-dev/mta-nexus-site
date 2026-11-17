@@ -10,6 +10,8 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
@@ -70,7 +72,20 @@ export async function LicenseHistoryPage({
 }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]),
     copy = getLicenseControlCopy(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/licenses"}
+      />
+    );
+  }
+
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (Array.isArray(value)) for (const item of value) params.append(key, item);
