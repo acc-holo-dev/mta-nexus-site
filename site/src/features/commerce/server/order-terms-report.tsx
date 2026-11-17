@@ -4,7 +4,7 @@ import { ScrollText } from "lucide-react";
 import Link from "next/link";
 import { formatFinancialMinor } from "../../../lib/financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
-import { sellerSalesTime } from "../../../lib/seller-sales-i18n";
+import { sellerSalesTime } from "../seller-sales-i18n";
 
 // Honesty residual: consistency flags via ErrorState.
 const ORDER_TERMS_FLAG_IDS = {

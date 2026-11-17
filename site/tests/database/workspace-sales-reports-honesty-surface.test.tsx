@@ -19,7 +19,7 @@ import ReportsLoading from "../../src/app/workspace/reports/loading";
 import SalesLoading from "../../src/app/workspace/sales/loading";
 import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
 import { communityReportCopy } from "../../src/lib/community-report-copy";
-import { sellerSalesCopy } from "../../src/lib/seller-sales-i18n";
+import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -118,7 +118,7 @@ it("locks seller sales report filter panel as a localized search landmark with t
 });
 
 it("locks additive seller sales honesty copy for report recovery", () => {
-  const i18n = read("site/src/lib/seller-sales-i18n.ts");
+  const i18n = read("site/src/features/commerce/seller-sales-i18n.ts");
   expect(i18n).toContain("loadUnavailableHint");
   expect(i18n).toContain("invalidDescription");
   expect(i18n).toContain("filters:");

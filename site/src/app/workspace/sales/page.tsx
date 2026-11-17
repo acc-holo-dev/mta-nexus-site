@@ -15,7 +15,7 @@ import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
 import { getFinancialCopy } from "../../../lib/financial-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { sellerSalesCopy } from "../../../lib/seller-sales-i18n";
+import { sellerSalesCopy } from "../../../features/commerce/seller-sales-i18n";
 import { authService } from "../../../lib/services/auth-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";

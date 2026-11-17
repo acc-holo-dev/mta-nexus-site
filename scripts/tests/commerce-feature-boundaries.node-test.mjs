@@ -21,6 +21,8 @@ const utilPorts = [
   "commercial-confirmation",
 ,
   "order-terms-i18n",
+,
+  "seller-sales-i18n",
 ];
 const clientPorts = [
   "workspace-history",

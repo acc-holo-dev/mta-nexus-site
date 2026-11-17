@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { sellerSalesCopy } from "../../../../../lib/seller-sales-i18n";
+import { sellerSalesCopy } from "../../../../../features/commerce/seller-sales-i18n";
 
 // Honest loading shell for /workspace/sales/report/[id].
 export default async function Loading() {

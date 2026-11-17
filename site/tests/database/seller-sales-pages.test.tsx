@@ -38,7 +38,7 @@ import DetailLoading from "../../src/app/workspace/sales/report/[id]/loading";
 import Detail from "../../src/app/workspace/sales/report/[id]/page";
 import ReportLoading from "../../src/app/workspace/sales/report/loading";
 import Page, { metadata } from "../../src/app/workspace/sales/report/page";
-import { sellerSalesCopy } from "../../src/lib/seller-sales-i18n";
+import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   sale = {

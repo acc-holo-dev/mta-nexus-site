@@ -4,7 +4,7 @@ import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { formatFinancialMinor } from "../../../lib/financial-i18n";
 import type { Locale } from "../../../lib/i18n";
-import { sellerSalesCopy, sellerSalesTime } from "../../../lib/seller-sales-i18n";
+import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../../../lib/seller-sales-query";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };

@@ -8,7 +8,7 @@ import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { SellerSalesReportView } from "../../../../features/commerce/seller-sales";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
+import { sellerSalesCopy } from "../../../../features/commerce/seller-sales-i18n";
 import { sellerSalesPageQuery } from "../../../../lib/seller-sales-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
