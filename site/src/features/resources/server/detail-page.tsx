@@ -106,10 +106,14 @@ export async function ProductDetailPage({
     searchParams ?? Promise.resolve({} as { qa?: string | string[] }),
   ]);
   const initialQaThreadId = readQaThreadId(query.qa);
+  let sessionFailed = false;
   const [locale, user] = await Promise.all([
     getRequestLocale(),
     cookies().then((cookieStore) =>
-      authService.getSession(cookieStore.get("nexus_session")?.value),
+      authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
+        sessionFailed = true;
+        return null;
+      }),
     ),
   ]);
   const dictionary = getDictionary(locale);
@@ -119,6 +123,8 @@ export async function ProductDetailPage({
   const reviewCopy = resourceReviewCopy(locale);
   let detail: Awaited<ReturnType<typeof productService.getProductDetailAccessBySlug>>;
   try {
+    // Session probe failure must not invent a guest for access checks — treat as anonymous
+    // for entitlement only, then surface identity ErrorState on interactive controls below.
     detail = await productService.getProductDetailAccessBySlug(slug, user);
   } catch {
     return (
@@ -196,13 +202,20 @@ export async function ProductDetailPage({
       : Promise.resolve(null),
   ]);
   const hasAccess = isPublic && (canManageProduct || isLicensed || isAdmin);
-  const saveInitial = {
-    authenticated: Boolean(user),
-    actorId: user?.id ?? null,
-    following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
-    error: savedFollowIds === null,
-    ...(productMute ? { muted: productMute.muted, mutedUntil: productMute.mutedUntil } : {}),
-  };
+  const saveInitial = sessionFailed
+    ? {
+        authenticated: false,
+        actorId: null,
+        following: false,
+        error: true,
+      }
+    : {
+        authenticated: Boolean(user),
+        actorId: user?.id ?? null,
+        following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
+        error: savedFollowIds === null,
+        ...(productMute ? { muted: productMute.muted, mutedUntil: productMute.mutedUntil } : {}),
+      };
   // Download aside only shows provenance for the published current version; never invent clean.
   const downloadBuild = hasAccess
     ? (builds.find(
@@ -318,7 +331,8 @@ export async function ProductDetailPage({
                     targetType="product"
                     targetId={product.id}
                     locale={locale}
-                    authenticated={Boolean(user)}
+                    authenticated={sessionFailed ? null : Boolean(user)}
+                    retryHref={detailReturnPath}
                     loginHref={authEntryHref("login", detailReturnPath)}
                     registerHref={authEntryHref("register", detailReturnPath)}
                   />
@@ -667,7 +681,7 @@ export async function ProductDetailPage({
               <ResourceQaPanel
                 productId={product.id}
                 locale={locale}
-                authenticated={Boolean(user)}
+                authenticated={sessionFailed ? null : Boolean(user)}
                 canManage={canManageProduct || isAdmin}
                 initial={qaPage}
                 initialThreadId={initialQaThreadId}

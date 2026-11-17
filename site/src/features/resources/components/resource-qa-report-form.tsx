@@ -19,7 +19,8 @@ export function ResourceQaReportForm({
 }: {
   threadId: string;
   locale: Locale;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   loginHref: string;
   registerHref: string;
 }) {
@@ -92,6 +93,16 @@ export function ResourceQaReportForm({
       writing.current = false;
       setPending(false);
     }
+  }
+
+  if (authenticated === null) {
+    return (
+      <ErrorState
+        id="resource-qa-report-identity-unavailable"
+        title={copy.identityUnavailable}
+        description={copy.identityUnavailableDescription}
+      />
+    );
   }
 
   if (!authenticated) {

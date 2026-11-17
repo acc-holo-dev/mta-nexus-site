@@ -55,7 +55,8 @@ export function ResourceQaPanel({
 }: {
   productId: string;
   locale: Locale;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   canManage: boolean;
   initial: PagePayload | null;
   builds: BuildOption[];
@@ -467,7 +468,7 @@ export function ResourceQaPanel({
             </p>
           </article>
 
-          {authenticated ? (
+          {authenticated === true ? (
             <div className="space-y-1">
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -598,7 +599,13 @@ export function ResourceQaPanel({
         </div>
       ) : (
         <div className="min-w-0 space-y-4 overflow-x-clip">
-          {!authenticated ? (
+          {authenticated === null ? (
+            <ErrorState
+              id="resource-qa-identity-unavailable"
+              title={copy.identityUnavailable}
+              description={copy.identityUnavailableDescription}
+            />
+          ) : !authenticated ? (
             <div className="space-y-2">
               <p className="text-xs text-muted">{copy.publicRead}</p>
               <GuestAuthLinks
