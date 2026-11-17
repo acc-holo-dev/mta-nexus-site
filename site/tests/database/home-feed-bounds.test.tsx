@@ -79,7 +79,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../../src/features/shell/home-personal-changes", () => ({
+vi.mock("../../src/lib/home-personal-changes", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 
