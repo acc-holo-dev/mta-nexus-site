@@ -11,7 +11,7 @@ import {
   acquisitionHistoryHref,
   acquisitionPage,
   acquisitionSource,
-} from "../../../lib/resource-activity-view";
+} from "../../../features/resources/resource-activity-view";
 import { resourceCartReceiptsCopy } from "../../../features/resources/resource-cart-receipts-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceActivityService } from "../../../lib/services/resource-activity-service";

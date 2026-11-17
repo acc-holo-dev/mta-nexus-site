@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-activity-view",
     "resource-download-policy",
     "resource-deliveries-csv",
     "build-download-metadata",
@@ -287,6 +288,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-activity-view.ts", "resources-view-isolation"],
     ["features/resources/resource-download-policy.ts", "resources-view-isolation"],
     ["features/resources/resource-deliveries-csv.ts", "resources-view-isolation"],
     ["features/resources/build-download-metadata.ts", "resources-view-isolation"],
@@ -375,6 +377,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-activity-view.ts",
     "app/resource-download-policy.ts",
     "app/resource-deliveries-csv.ts",
     "app/build-download-metadata.ts",
@@ -457,6 +460,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-activity-view.ts",
     "site/src/features/resources/resource-download-policy.ts",
     "site/src/features/resources/resource-deliveries-csv.ts",
     "site/src/features/resources/build-download-metadata.ts",
@@ -619,6 +623,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-activity-view.ts");
   visit("site/src/features/resources/resource-download-policy.ts");
   visit("site/src/features/resources/resource-deliveries-csv.ts");
   visit("site/src/features/resources/build-download-metadata.ts");

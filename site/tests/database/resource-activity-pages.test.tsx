@@ -50,7 +50,7 @@ import {
   acquisitionPage,
   acquisitionSource,
   resourceActivityDays,
-} from "../../src/lib/resource-activity-view";
+} from "../../src/features/resources/resource-activity-view";
 
 const now = new Date("2026-10-10T12:00:00Z");
 beforeEach(() => {
