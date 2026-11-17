@@ -82,6 +82,8 @@ const en = {
   draftChanged: "The saved review changed. Compare it with your draft before continuing.",
   latestReview: "Latest saved review",
   noLatestReview: "There is no saved review now.",
+  noLatestReviewHint:
+    "Missing latest review text is a confirmed saved state, not a load failure. Keep editing your draft or discard the stale comparison.",
   useLatest: "Use this version as the basis for my draft",
   retainedDraft: "Your draft is kept below for copying; publishing is currently unavailable.",
   denied: "You no longer have permission or acquired access.",
@@ -178,6 +180,8 @@ const ru: typeof en = {
   draftChanged: "Сохранённый отзыв изменился. Сравните его с черновиком перед продолжением.",
   latestReview: "Последний сохранённый отзыв",
   noLatestReview: "Сейчас сохранённого отзыва нет.",
+  noLatestReviewHint:
+    "Отсутствие последнего сохранённого отзыва — подтверждённое состояние, а не сбой загрузки. Продолжайте править черновик или отмените устаревшее сравнение.",
   useLatest: "Использовать эту версию как основу черновика",
   retainedDraft: "Ваш черновик сохранён ниже для копирования; публикация сейчас недоступна.",
   denied: "Полномочия или доступ к ресурсу больше не действуют.",

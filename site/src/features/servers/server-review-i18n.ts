@@ -41,6 +41,8 @@ const en = {
   checkLatest: "Check latest review",
   latestReview: "Latest saved review",
   noLatestReview: "There is no saved review now.",
+  noLatestReviewHint:
+    "Missing latest review text is a confirmed saved state, not a load failure. Keep editing your draft or discard the stale comparison.",
   useLatest: "Use this version as the basis for my draft",
   latestUnavailable: "Could not check the latest review. Try again.",
   latestNotEditable: "This review cannot currently be published from this account.",
@@ -94,6 +96,8 @@ const ru: typeof en = {
   checkLatest: "Проверить последнюю версию",
   latestReview: "Последний сохранённый отзыв",
   noLatestReview: "Сейчас сохранённого отзыва нет.",
+  noLatestReviewHint:
+    "Отсутствие последнего сохранённого отзыва — подтверждённое состояние, а не сбой загрузки. Продолжайте править черновик или отмените устаревшее сравнение.",
   useLatest: "Использовать эту версию как основу черновика",
   latestUnavailable: "Не удалось проверить последнюю версию. Попробуйте снова.",
   latestNotEditable: "Сейчас этот аккаунт не может опубликовать отзыв.",

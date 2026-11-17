@@ -1,5 +1,5 @@
 "use client";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -237,7 +237,7 @@ export function ResourceReviewEditor({
               {copy.rating}: {review.rating ?? "—"}/5 · {review.text}
             </p>
           ) : (
-            <p>{copy.noLatestReview}</p>
+            <EmptyState title={copy.noLatestReview} description={copy.noLatestReviewHint} />
           )}
           {canReview && !confirmed && (
             <Button

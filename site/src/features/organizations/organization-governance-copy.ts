@@ -20,6 +20,8 @@ const en = {
   transferred: "Ownership transferred. Your team role has been updated.",
   noSelection:
     "Choose a member from the team list below. Search and pagination can find other current members.",
+  noSelectionHint:
+    "No selected member is a confirmed form state, not a team load failure. Pick a current teammate before confirming ownership transfer.",
   cancel: "Cancel selection",
   invalid: "Check the selected member, public address, password and profile version.",
   reauthRequired: "Current password is incorrect. Re-enter it and try again.",
@@ -81,6 +83,8 @@ const ru: typeof en = {
   transferred: "Владение передано. Ваша роль в команде обновлена.",
   noSelection:
     "Выберите участника в списке команды ниже. Используйте поиск и страницы для остальных участников.",
+  noSelectionHint:
+    "Отсутствие выбранного участника — подтверждённое состояние формы, а не сбой загрузки команды. Выберите текущего участника перед подтверждением передачи владения.",
   cancel: "Отменить выбор",
   invalid: "Проверьте выбранного участника, публичный адрес, пароль и версию профиля.",
   reauthRequired: "Неверный текущий пароль. Введите его снова и повторите попытку.",

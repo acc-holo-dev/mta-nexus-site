@@ -1,5 +1,5 @@
 "use client";
-import { Button, ErrorState, Input } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/platform/i18n";
@@ -114,7 +114,7 @@ export function OrganizationOwnershipTransfer({
       <p className="text-sm text-muted">{copy.description}</p>
       <p className="text-sm text-secondary">{copy.consequence}</p>
       {!target ? (
-        <p className="text-sm text-muted">{copy.noSelection}</p>
+        <EmptyState title={copy.noSelection} description={copy.noSelectionHint} />
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <p className="break-words text-sm font-semibold text-primary">

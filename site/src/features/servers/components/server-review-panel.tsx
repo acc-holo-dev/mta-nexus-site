@@ -519,7 +519,7 @@ export function ServerReviewPanel({
                     {copy.rating}: {latest.review.rating}/5 · {latest.review.text}
                   </p>
                 ) : (
-                  <p>{copy.noLatestReview}</p>
+                  <EmptyState title={copy.noLatestReview} description={copy.noLatestReviewHint} />
                 )}
                 {latest.canReview && (
                   <Button

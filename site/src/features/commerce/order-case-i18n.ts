@@ -58,6 +58,8 @@ const en = {
   history: "Review history",
   empty: "No purchase cases match these filters.",
   noPayments: "No payment records.",
+  noPaymentsHint:
+    "An empty payment list is a confirmed result for this case snapshot, not a load failure. Records appear here after payment attempts are retained.",
   filters: "Filters",
   all: "All",
   apply: "Apply",
@@ -130,6 +132,8 @@ const ru: typeof en = {
   history: "История разбора",
   empty: "Нет обращений по указанным фильтрам.",
   noPayments: "Нет записей платежей.",
+  noPaymentsHint:
+    "Пустой список платежей — подтверждённый результат этого снимка обращения, а не сбой загрузки. Записи появятся здесь после сохранения попыток оплаты.",
   filters: "Фильтры",
   all: "Все",
   apply: "Применить",

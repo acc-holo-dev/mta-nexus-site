@@ -111,7 +111,7 @@ function Evidence({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-secondary">{copy.noPayments}</p>
+        <EmptyState title={copy.noPayments} description={copy.noPaymentsHint} />
       )}
       {data.paymentCount > data.payments.length && (
         <p className="text-xs text-muted">
