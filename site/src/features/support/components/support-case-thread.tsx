@@ -11,7 +11,7 @@ import {
   parseSupportThread,
   type SupportCaseData,
   type SupportMessageData,
-} from "../../../lib/support-response";
+} from "../support-response";
 import {
   clearSupportRetry,
   reserveSupportReplyRetry,

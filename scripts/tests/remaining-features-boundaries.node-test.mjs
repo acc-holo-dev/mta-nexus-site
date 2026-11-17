@@ -12,13 +12,13 @@ const features = [
   {
     name: "support",
     clients: ["center", "thread", "download-help"],
-    clientUtilPorts: ["support-message-discovery-copy"],
+    clientUtilPorts: ["support-message-discovery-copy", "support-response"],
     privateClients: ["support-case-actions", "support-status-history", "support-message-browser"],
     servers: [
       ["page-server", "support-page.tsx"],
       ["messages-server", "support-message-page.tsx"],
     ],
-    safe: "support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency",
+    safe: "support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency",
   },
   {
     name: "moderation",

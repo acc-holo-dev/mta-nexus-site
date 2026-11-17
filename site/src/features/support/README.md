@@ -9,3 +9,4 @@
 Focused localization suite for `SupportCenter` (staff filters, attached context) lives in
 [`site/tests/database/support-center.test.tsx`](../../../tests/database/support-center.test.tsx), not in `components/`.
 | `support-message-discovery-copy.ts` | util port `support-message-discovery-copy` |
+| `support-response.ts` | util port `support-response` |

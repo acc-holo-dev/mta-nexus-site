@@ -1,7 +1,7 @@
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
 import { formatNotification } from "../../src/lib/notification-copy";
-import { confirmSupportStatusChanged, parseSupportThread } from "../../src/lib/support-response";
+import { confirmSupportStatusChanged, parseSupportThread } from "../../src/features/support/support-response";
 import {
   publicationSupportHref,
   supportActivitySchema,

@@ -9,7 +9,7 @@ import {
   parseSupportCasePage,
   type SupportCaseStatus,
   type SupportCaseSummary,
-} from "../../../lib/support-response";
+} from "../support-response";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
