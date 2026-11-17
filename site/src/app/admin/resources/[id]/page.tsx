@@ -10,7 +10,7 @@ import { ResourceModerationControls } from "../../../../features/resources/moder
 import { formatHistoryDate, parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../../../features/resources/resource-media-i18n";
 import {
   getResourceReleaseControlCopy,
   resourceModerationLabel,

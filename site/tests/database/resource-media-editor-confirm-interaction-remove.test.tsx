@@ -16,7 +16,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
 import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 
 const { render, removeButton } = createResourceMediaEditorConfirmInteractionHelpers(
   harness,

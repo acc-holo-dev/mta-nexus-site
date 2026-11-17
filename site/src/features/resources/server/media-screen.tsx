@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceMediaService } from "../../../lib/services/resource-media-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

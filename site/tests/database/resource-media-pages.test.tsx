@@ -29,7 +29,7 @@ vi.mock("../../src/lib/services/resource-media-service", () => ({
 import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/loading";
 import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";
 import { ResourceMediaScreen } from "../../src/features/resources/media-server";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 
 const initial: ManagedResourceMedia = {
   product: {

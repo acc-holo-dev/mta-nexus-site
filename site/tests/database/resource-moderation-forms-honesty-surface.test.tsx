@@ -105,7 +105,7 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
     "actionFailedDescription",
   );
-  expect(read("site/src/lib/resource-media-i18n.ts")).toContain("errorDescription");
+  expect(read("site/src/features/resources/resource-media-i18n.ts")).toContain("errorDescription");
   expect(read("site/src/features/resources/resource-copy-i18n.ts")).toContain("errorDescription");
   expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain("failedDescription");
   expect(read("site/src/lib/community-moderation-copy.ts")).toContain("decisionFailedDescription");

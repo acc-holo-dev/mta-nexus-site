@@ -5,7 +5,7 @@ import { Button, buttonClassName } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { safeResourceImageUrl } from "../resource-image-url";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { stepGalleryIndex } from "../model/resource-gallery-interaction";
 import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 

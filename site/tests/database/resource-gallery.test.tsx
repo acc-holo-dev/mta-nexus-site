@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ResourceGallery } from "../../src/features/resources/client";
 import { ResourceGalleryLightbox } from "../../src/features/resources/components/resource-gallery-lightbox";
 import { shouldOpenGalleryLightbox, stepGalleryIndex } from "../../src/features/resources/model";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 import { clickedDialogBackdrop } from "../../src/features/shell/modal-dialog";
 
 vi.mock("../../src/features/shell/modal-dialog", async (importOriginal) => {

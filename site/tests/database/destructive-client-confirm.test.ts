@@ -3,7 +3,7 @@ import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
 import { reactionCopy } from "../../src/lib/content-reaction-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 
 const locales = ["en", "ru"] as const;
 

@@ -8,7 +8,7 @@ import { buildPackageCopy } from "../build-package-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
 import { authService } from "../../../lib/services/auth-service";

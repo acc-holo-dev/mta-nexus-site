@@ -6,7 +6,7 @@ import {
 } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { ResourcePreview } from "./resource-preview";
 

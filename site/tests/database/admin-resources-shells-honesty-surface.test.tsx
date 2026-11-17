@@ -27,7 +27,7 @@ import { buildPackageCopy } from "../../src/features/resources/build-package-i18
 import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
