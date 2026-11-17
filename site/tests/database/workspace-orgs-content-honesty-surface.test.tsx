@@ -20,7 +20,7 @@ import ContentHistoryLoading from "../../src/app/workspace/organizations/[id]/co
 import ContentDetailLoading from "../../src/app/workspace/organizations/[id]/content/[contentId]/loading";
 import ContentLoading from "../../src/app/workspace/organizations/[id]/content/loading";
 import ContentNewLoading from "../../src/app/workspace/organizations/[id]/content/new/loading";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
 
 beforeEach(() => {

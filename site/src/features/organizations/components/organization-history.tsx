@@ -7,7 +7,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import type { OrganizationHistory } from "../../../lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { changeHistoryHref } from "../../../lib/private-change-history-query";

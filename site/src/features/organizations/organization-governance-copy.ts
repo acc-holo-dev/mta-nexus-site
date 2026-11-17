@@ -1,6 +1,6 @@
-import type { Locale } from "./i18n";
-import { organizationError } from "./organization-workspace-copy";
-import { privateChangeHistoryError } from "./private-change-history-copy";
+import type { Locale } from "../../lib/i18n";
+import { organizationError } from "../../lib/organization-workspace-copy";
+import { privateChangeHistoryError } from "../../lib/private-change-history-copy";
 
 const en = {
   transfer: "Transfer ownership",

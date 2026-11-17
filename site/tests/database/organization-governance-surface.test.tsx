@@ -35,7 +35,7 @@ import {
   type OrganizationHistory,
   ownershipTransferSchema,
 } from "../../src/lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 
 const time = "2026-10-11T00:00:00.000Z",

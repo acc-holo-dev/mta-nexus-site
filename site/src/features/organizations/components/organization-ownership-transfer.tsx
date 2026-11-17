@@ -11,7 +11,7 @@ import {
 import {
   organizationGovernanceCopy,
   organizationGovernanceMutationError,
-} from "../../../lib/organization-governance-copy";
+} from "../organization-governance-copy";
 import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";

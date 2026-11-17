@@ -32,7 +32,7 @@ vi.mock("../../src/features/organizations/organization-workspace-client", () => 
 }));
 
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 const { clickLeave } = createOrganizationWorkspaceConfirmInteractionHelpers(

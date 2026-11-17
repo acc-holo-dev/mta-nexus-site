@@ -29,7 +29,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => {
 });
 
 import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 
 const { render, submit } = createOrganizationOwnershipTransferConfirmInteractionHelpers(
   harness,

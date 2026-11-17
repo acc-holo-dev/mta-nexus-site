@@ -34,7 +34,7 @@ vi.mock("../../src/lib/services/organization-governance-service", () => ({
 import ProfilePage, { generateMetadata } from "../../src/app/settings/history/page";
 import OrganizationPage from "../../src/app/workspace/organizations/[id]/activity/page";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 import { ProfileChangeHistoryView } from "../../src/features/accounts/profile-change-history";
 import { privateChangeHistoryCopy } from "../../src/lib/private-change-history-copy";
 import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";

@@ -9,7 +9,7 @@ import {
   organizationGovernanceCopy,
   organizationGovernanceError,
   organizationGovernanceMutationError,
-} from "../../src/lib/organization-governance-copy";
+} from "../../src/features/organizations/organization-governance-copy";
 
 const transfer = {
   targetId: "target",

@@ -12,7 +12,7 @@ import {
 import {
   organizationGovernanceCopy,
   organizationGovernanceError,
-} from "../../../lib/organization-governance-copy";
+} from "../organization-governance-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
 

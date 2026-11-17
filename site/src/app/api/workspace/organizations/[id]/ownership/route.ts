@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { organizationGovernanceMutationError } from "../../../../../../lib/organization-governance-copy";
+import { organizationGovernanceMutationError } from "../../../../../../features/organizations/organization-governance-copy";
 import {
   organizationId,
   organizationInput,

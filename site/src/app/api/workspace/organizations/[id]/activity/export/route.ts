@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { resolveLocale } from "../../../../../../../lib/i18n";
-import { organizationGovernanceCopy } from "../../../../../../../lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../../../../../../features/organizations/organization-governance-copy";
 import { privateChangeHistoryDownload } from "../../../../../../../lib/private-change-history-download";
 import { GET as read } from "../route";
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {

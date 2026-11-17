@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import { organizationTeamCopy } from "../organization-team-copy";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";

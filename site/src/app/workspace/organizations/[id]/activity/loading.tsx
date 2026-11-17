@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { organizationGovernanceCopy } from "../../../../../lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../../../../features/organizations/organization-governance-copy";
 
 export default async function Loading() {
   const copy = organizationGovernanceCopy(await getRequestLocale());
