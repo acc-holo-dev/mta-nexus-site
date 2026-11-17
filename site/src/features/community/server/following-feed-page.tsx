@@ -1,18 +1,16 @@
 import type { User } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { PublicationFeed } from "../publication-feed";
 import { publicationCopy } from "../publication-feed-copy";
 import { publicationFeedView } from "../publication-feed-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const retryLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function generateMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
@@ -41,20 +39,12 @@ export default async function FollowingFeedPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className={pageShellClass}>
-        <header>
-          <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
-        </header>
-        <ErrorState
-          title={copy.error}
-          action={
-            <Link href={returnPath} className={retryLinkClass}>
-              {copy.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.error}
+        retryHref={"/workspace/feed"}
+      />
     );
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
