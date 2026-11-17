@@ -78,7 +78,7 @@ vi.mock("../../src/features/servers/components/server-claim-control-panel", asyn
 
 import ServerWorkspaceLayout from "../../src/app/workspace/servers/[id]/layout";
 import ServerManagementPage from "../../src/app/workspace/servers/[id]/page";
-import { getServerWorkspaceNavCopy } from "../../src/lib/server-workspace-nav-i18n";
+import { getServerWorkspaceNavCopy } from "../../src/features/servers/server-workspace-nav-i18n";
 
 async function renderManagedServer(id = "srv_managed") {
   const params = Promise.resolve({ id });

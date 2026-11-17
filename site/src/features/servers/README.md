@@ -38,6 +38,7 @@ repositories и collectors остаются в прежних модулях и 
 | `server-mutation-confirmation.ts` | util port `server-mutation-confirmation`                                                          |
 | `server-review-confirmation.ts`   | util port `server-review-confirmation`                                                            |
 | `server-statistics-download.ts` | util port `server-statistics-download` |
+| `server-workspace-nav-i18n.ts` | util port `server-workspace-nav-i18n` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
