@@ -5,7 +5,7 @@ import {
   AD_OPT_OUT_COOKIE,
   adPreferenceCookie,
   parseAdPreference,
-} from "../../src/lib/ad-preference";
+} from "../../src/features/accounts/ad-preference";
 
 describe("ad-preference (UX-26 opt-out)", () => {
   it("unknown or missing cookie value resolves to opt-in default", () => {

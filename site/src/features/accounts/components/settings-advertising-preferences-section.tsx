@@ -2,11 +2,7 @@
 
 import { BellOff } from "lucide-react";
 import { useCallback, useState } from "react";
-import {
-  type AdPreference,
-  adPreferenceCookie,
-  parseAdPreference,
-} from "../../../lib/ad-preference";
+import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 import { useNexusLocale } from "../../shell/locale";
 
 /**
