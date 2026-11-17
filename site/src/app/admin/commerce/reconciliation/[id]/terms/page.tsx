@@ -8,7 +8,7 @@ import { OrderTermsReportView } from "../../../../../../features/commerce/order-
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { orderTermsCopy } from "../../../../../../lib/order-terms-i18n";
+import { orderTermsCopy } from "../../../../../../features/commerce/order-terms-i18n";
 import { orderTermsPageQuery } from "../../../../../../lib/order-terms-query";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { orderTermsService } from "../../../../../../lib/services/order-terms-service";

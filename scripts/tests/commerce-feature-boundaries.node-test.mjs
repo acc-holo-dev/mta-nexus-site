@@ -19,6 +19,8 @@ const utilPorts = [
   "license-runtime-query",
 ,
   "commercial-confirmation",
+,
+  "order-terms-i18n",
 ];
 const clientPorts = [
   "workspace-history",

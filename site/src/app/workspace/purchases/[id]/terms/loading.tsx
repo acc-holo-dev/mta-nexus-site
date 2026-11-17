@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
+import { orderTermsCopy } from "../../../../../features/commerce/order-terms-i18n";
 
 // Honest loading shell for /workspace/purchases/[id]/terms.
 export default async function Loading() {

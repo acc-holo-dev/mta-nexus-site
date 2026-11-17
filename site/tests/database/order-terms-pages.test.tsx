@@ -36,7 +36,7 @@ import TermsLoading from "../../src/app/admin/commerce/reconciliation/[id]/terms
 import Admin from "../../src/app/admin/commerce/reconciliation/[id]/terms/page";
 import BuyerTermsLoading from "../../src/app/workspace/purchases/[id]/terms/loading";
 import Buyer, { metadata } from "../../src/app/workspace/purchases/[id]/terms/page";
-import { orderTermsCopy } from "../../src/lib/order-terms-i18n";
+import { orderTermsCopy } from "../../src/features/commerce/order-terms-i18n";
 
 const input = {
     params: Promise.resolve({ id: "ord_a" }),
