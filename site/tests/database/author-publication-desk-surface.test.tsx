@@ -254,10 +254,12 @@ it.each(["en", "ru"] as const)(
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
   const desk = renderToStaticMarkup(await Desk({}));
-  expect(desk).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
+  expect(desk).toContain('role="alert"');
+  expect(desk).toContain(authorPublicationDeskCopy("en").unavailable);
+  expect(desk).toContain('href="/workspace/content"');
+  expect(desk).not.toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
   expect(desk).not.toContain("PRIVATE_AUTH_DETAILS");
   expect(desk).not.toContain(authorPublicationDeskCopy("en").empty);
-  expect(desk).not.toContain(authorPublicationDeskCopy("en").title);
   state.history.mockRejectedValueOnce(new AppError("PRIVATE_TITLE", 404, "NOT_FOUND"));
   const history = renderToStaticMarkup(
     await History({ params: Promise.resolve({ id: "article" }) }),

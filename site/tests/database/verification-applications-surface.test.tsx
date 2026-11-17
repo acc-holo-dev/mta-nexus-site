@@ -198,12 +198,13 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
 it("distinguishes safe auth and target errors from an empty history", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const history = renderToStaticMarkup(await History({}));
-  expect(history).toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
-  expect(history).toContain('href="/auth/register?next=%2Fworkspace%2Fverification%2Fhistory"');
+  expect(history).toContain('role="alert"');
+  expect(history).toContain(verificationCopy("en").unavailable);
+  expect(history).toContain('href="/workspace/verification/history"');
+  expect(history).not.toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
   expect(history).not.toContain("PRIVATE_AUTH");
   expect(history).not.toContain(verificationApplicationsCopy("en").emptyNever);
   expect(history).not.toContain(verificationApplicationsCopy("en").emptyFiltered);
-  expect(history).not.toContain(verificationApplicationsCopy("en").title);
   state.application.mockRejectedValueOnce(new AppError("PRIVATE_TARGET", 404, "NOT_FOUND"));
   const detail = renderToStaticMarkup(await Detail(params));
   expect(detail).toContain('role="alert"');

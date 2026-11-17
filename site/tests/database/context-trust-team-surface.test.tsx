@@ -242,9 +242,11 @@ it("does not load private team data for guests and separates session failures fr
   expect(mocks.team).not.toHaveBeenCalled();
   mocks.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await TeamPage(teamParams));
-  expect(failed).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"');
+  expect(failed).toContain('role="alert"');
+  expect(failed).toContain(organizationTeamCopy("en").unavailable);
+  expect(failed).toContain('href="/workspace/organizations/org/team"');
+  expect(failed).not.toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"');
   expect(failed).not.toContain("private session");
-  expect(failed).not.toContain(organizationTeamCopy("en").title);
 });
 it.each(["constructor", "toString", "__proto__"])(
   "renders unsupported legacy role %s as text without granting controls",
