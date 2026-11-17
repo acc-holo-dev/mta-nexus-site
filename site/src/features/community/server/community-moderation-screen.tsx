@@ -5,6 +5,7 @@ import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
@@ -18,6 +19,7 @@ import {
   parseModerationQuery,
 } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
@@ -37,27 +39,18 @@ export async function CommunityModerationScreen({
   const locale = await getRequestLocale(),
     copy = moderationCopy(locale),
     types = discoveryCopy(locale);
-  let authError = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      authError = true;
-      return null;
-    });
   const returnPath = id ? moderationDetailHref(id) : "/admin/community";
-  if (authError) {
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <a href={returnPath} className={focusLink}>
-              {copy.reload}
-            </a>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
     );
   }
   if (!actor) {
