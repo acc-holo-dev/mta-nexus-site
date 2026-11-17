@@ -111,7 +111,6 @@ const features = [
       "legal-document",
       "theme-preference",
       "home-personal-preference",
-      "offline-cache-policy",
       "safe-public-error-reference",
     ],
     privateClients: ["shell-session-unavailable"],
