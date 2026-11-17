@@ -1,4 +1,4 @@
-import type { CommunityTopicSubmission } from "./community-topic-submission";
+import type { CommunityTopicSubmission } from "../../lib/community-topic-submission";
 
 type CommunityTopicDraft = {
   title: string;

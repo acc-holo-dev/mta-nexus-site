@@ -9,7 +9,7 @@ import {
   clearCommunityTopicIntent,
   readCommunityTopicIntent,
   writeCommunityTopicIntent,
-} from "../../../lib/community-topic-intent";
+} from "../community-topic-intent";
 import {
   buildCommunityTopicSubmission,
   type CommunityTopicSubmission,

@@ -45,6 +45,7 @@ Feature объединяет клиентское обсуждение публ�
 | `follow-confirmation.ts`              | util port `follow-confirmation`                                               |
 | `server-publication-history-contract.ts` | util port `server-publication-history-contract` |
 | `discussion-compose-draft.ts` | util port `discussion-compose-draft` |
+| `community-topic-intent.ts` | util port `community-topic-intent` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую
