@@ -14,7 +14,7 @@ import {
   collectionPageParams,
 } from "../../../../../../lib/library-collections-query";
 import { getResourceReleaseControlCopy } from "../../../../../../lib/resource-release-control-i18n";
-import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
+import { resourceReleaseWatchHistoryCopy } from "../../../../../../features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
 import { authService } from "../../../../../../lib/services/auth-service";

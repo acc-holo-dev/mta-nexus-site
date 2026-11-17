@@ -9,7 +9,7 @@ import { ResourceReleaseWatchControl } from "../../../../features/resources/rele
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceReleaseWatchHistoryCopy } from "../../../../lib/resource-release-watch-history-i18n";
+import { resourceReleaseWatchHistoryCopy } from "../../../../features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../lib/resource-release-watches-i18n";
 import {
   resourceReleaseWatchesQuery,

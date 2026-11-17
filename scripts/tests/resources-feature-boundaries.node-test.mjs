@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-release-watch-history-i18n",
     "resource-activity-query",
     "resource-attachment-filename",
     "resource-activity-view",
@@ -290,6 +291,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watch-history-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-activity-query.ts", "resources-view-isolation"],
     ["features/resources/resource-attachment-filename.ts", "resources-view-isolation"],
     ["features/resources/resource-activity-view.ts", "resources-view-isolation"],
@@ -381,6 +383,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-release-watch-history-i18n.ts",
     "app/resource-activity-query.ts",
     "app/resource-attachment-filename.ts",
     "app/resource-activity-view.ts",
@@ -466,6 +469,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-release-watch-history-i18n.ts",
     "site/src/features/resources/resource-activity-query.ts",
     "site/src/features/resources/resource-attachment-filename.ts",
     "site/src/features/resources/resource-activity-view.ts",
@@ -631,6 +635,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-release-watch-history-i18n.ts");
   visit("site/src/features/resources/resource-activity-query.ts");
   visit("site/src/features/resources/resource-attachment-filename.ts");
   visit("site/src/features/resources/resource-activity-view.ts");

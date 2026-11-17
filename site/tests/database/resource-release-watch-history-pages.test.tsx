@@ -106,7 +106,7 @@ it("requires sign-in and rejects duplicate filters before reading audit records"
 });
 it("offers to clear filters when a filtered watch history view is empty", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../../src/lib/resource-release-watch-history-i18n"
+    "../../src/features/resources/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockResolvedValue({
@@ -130,7 +130,7 @@ it("offers to clear filters when a filtered watch history view is empty", async 
 
 it("shows an honest recovery state when release watch history fails to load", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../../src/lib/resource-release-watch-history-i18n"
+    "../../src/features/resources/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockRejectedValue(new Error("history unavailable"));

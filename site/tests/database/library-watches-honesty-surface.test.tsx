@@ -25,7 +25,7 @@ import ReviewsLoading from "../../src/app/workspace/library/reviews/loading";
 import WatchHistoryLoading from "../../src/app/workspace/library/watches/history/loading";
 import WatchesLoading from "../../src/app/workspace/library/watches/loading";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
-import { resourceReleaseWatchHistoryCopy } from "../../src/lib/resource-release-watch-history-i18n";
+import { resourceReleaseWatchHistoryCopy } from "../../src/features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../src/lib/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
@@ -106,7 +106,7 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
   expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain(
     "loadUnavailableDescription",
   );
-  expect(read("site/src/lib/resource-release-watch-history-i18n.ts")).toContain("emptyHint");
+  expect(read("site/src/features/resources/resource-release-watch-history-i18n.ts")).toContain("emptyHint");
   expect(read("site/src/lib/resource-review-i18n.ts")).toContain("ownEmptyHint");
   expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
     "versionsLoadUnavailable",
