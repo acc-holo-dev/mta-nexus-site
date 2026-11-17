@@ -8,6 +8,7 @@ import {
   publicationPageQuery,
 } from "../../src/features/community/publication-feed-contract";
 import { publicationCopy } from "../../src/features/community/publication-feed-copy";
+import { getDictionary } from "../../src/lib/platform/i18n";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -86,14 +87,16 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.title);
     expect(html).toContain(copy.error);
-    expect(html).toContain(copy.retry);
+    expect(html).toContain(getDictionary(locale).errors.retry);
     expect(html).toContain("overflow-x-clip");
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/feed?source=server&amp;q=MTA"');
     expect(html).not.toContain("session-secret");
     expect(html).not.toContain(copy.emptyFollowing);
     expect(html).not.toContain(copy.loadUnavailable);
+    expect(html).not.toContain("/auth/login");
   },
 );
 

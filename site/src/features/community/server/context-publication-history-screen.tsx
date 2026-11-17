@@ -3,7 +3,6 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationContentCopy } from "../../organizations/organization-content-copy";
@@ -66,7 +65,7 @@ export async function ContextPublicationHistoryScreen({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.title}
         message={copy.unavailable}
         retryHref={path}
       />

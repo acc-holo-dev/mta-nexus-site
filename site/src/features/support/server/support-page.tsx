@@ -46,9 +46,9 @@ export async function SupportPageSurface({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={support.title}
         message={copy.unavailable}
-        retryHref={id === undefined ? base : casePath}
+        retryHref={id === undefined ? listReturnPath : casePath}
       />
     );
   }

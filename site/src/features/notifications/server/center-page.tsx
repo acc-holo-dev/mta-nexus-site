@@ -47,9 +47,9 @@ export default async function NotificationCenterPage({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.title}
         message={copy.unavailable}
-        retryHref={"/notifications"}
+        retryHref={returnPath}
       />
     );
   }

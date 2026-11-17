@@ -3,7 +3,6 @@ import { consumeRateLimit } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { supportMessageDiscoveryService } from "../../../lib/services/support/support-message-discovery-service";
@@ -41,6 +40,7 @@ export async function SupportMessagePage({
     if (Array.isArray(value)) for (const item of value) query.append(key, item);
     else if (value !== undefined) query.append(key, value);
   }
+  const returnPath = validId && query.size ? `${path}?${query}` : path;
   let token: string | undefined;
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -50,13 +50,13 @@ export async function SupportMessagePage({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.title}
         message={copy.unavailable}
-        retryHref={path}
+        retryHref={returnPath}
       />
     );
   }
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     if (!validId) throw new AppError("Support case not found", 404, "NOT_FOUND");
     const filters = parseSupportMessageQuery(query);

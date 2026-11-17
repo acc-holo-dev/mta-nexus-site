@@ -42,9 +42,9 @@ export async function ServerWorkspaceHistoryScreen({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={history.title}
         message={copy.historyUnavailable}
-        retryHref={`/workspace/servers/${encodeURIComponent(id)}/history`}
+        retryHref={`/workspace/servers/${encodeURIComponent(id)}/activity`}
       />
     );
   }
@@ -52,7 +52,7 @@ export async function ServerWorkspaceHistoryScreen({
     return (
       <PlatformSignIn
         locale={locale}
-        returnPath={`/workspace/servers/${encodeURIComponent(id)}/history`}
+        returnPath={`/workspace/servers/${encodeURIComponent(id)}/activity`}
       />
     );
   }

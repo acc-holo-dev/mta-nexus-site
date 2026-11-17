@@ -276,13 +276,17 @@ it.each(["session", "page"] as const)(
   async (dependency) => {
     state[dependency].mockRejectedValue(new Error("PRIVATE_SQL"));
     const html = await render({ state: "unread" });
+    const copy = notificationInboxCopy("en");
     expect(html).toContain("temporarily unavailable");
     expect(html).toContain('role="alert"');
-    expect(html).toContain(`>${notificationInboxCopy("en").title}</h1>`);
-    expect(html).toContain("Try again");
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toContain('href="/notifications?state=unread"');
     expect(html).toContain("overflow-x-clip");
     expect(html).not.toContain("PRIVATE_SQL");
     expect(html).not.toContain("No notifications yet");
+    if (dependency === "session") {
+      expect(html).not.toContain("/auth/login");
+    }
   },
 );

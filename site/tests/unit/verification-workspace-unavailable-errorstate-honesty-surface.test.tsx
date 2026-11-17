@@ -11,7 +11,7 @@ const workspace = readFileSync(
 );
 const page = readFileSync(join(root, "site/src/app/workspace/verification/page.tsx"), "utf8");
 
-/** Honesty lock: verification workspace unavailable fallback → ErrorState with stable id. */
+/** Honesty lock: verification load/session failures stay ErrorState, not guest sign-in. */
 it("locks verification workspace unavailable notices to ErrorState with stable id", () => {
   expect(workspace).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(workspace).toContain('id="verification-workspace-unavailable"');
@@ -21,9 +21,10 @@ it("locks verification workspace unavailable notices to ErrorState with stable i
   expect(workspace).toMatch(
     /readError \? \(\s*<ErrorState\s+id="verification-workspace-unavailable"\s+title=\{readError\}/u,
   );
-  expect(page).toContain('import { ErrorState } from "@nexus/ui"');
-  expect(page).toContain('id="verification-workspace-unavailable"');
+  expect(page).toContain("PlatformSessionError");
   expect(page).toMatch(
-    /<ErrorState\s+id="verification-workspace-unavailable"\s+title=\{copy\.unavailable\}/u,
+    /try \{\s*actor = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
   );
+  expect(page).toContain("message={copy.unavailable}");
+  expect(page).toContain("return <PlatformSignIn locale={locale} returnPath={returnPath} />");
 });

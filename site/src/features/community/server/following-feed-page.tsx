@@ -1,7 +1,6 @@
 import type { User } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -41,9 +40,9 @@ export default async function FollowingFeedPage({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.title}
         message={copy.error}
-        retryHref={"/workspace/feed"}
+        retryHref={returnPath}
       />
     );
   }

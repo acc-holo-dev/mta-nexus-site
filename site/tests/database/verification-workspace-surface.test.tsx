@@ -192,11 +192,12 @@ it("recovers with ErrorState when verification session probing fails", async () 
   mocks.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const html = renderToStaticMarkup(await VerificationPage({}));
   expect(html).toContain('role="alert"');
-  expect(html).toContain('id="verification-workspace-unavailable"');
+  expect(html).toContain(verificationCopy("en").title);
   expect(html).toContain(verificationCopy("en").unavailable);
   expect(html).toContain('href="/workspace/verification"');
   expect(html).toContain("overflow-x-clip");
   expect(html).not.toContain("PRIVATE_AUTH");
+  expect(html).not.toContain("/auth/login");
 });
 it("publishes a genuine experience badge only when that flag is verified; suppresses unsafe legacy contact links", () => {
   const profile = {

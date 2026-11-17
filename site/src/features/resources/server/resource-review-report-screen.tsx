@@ -89,9 +89,9 @@ export async function ResourceReviewReportScreen({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.reports}
         message={copy.loadUnavailable}
-        retryHref={id ? `${base}/${encodeURIComponent(id)}` : base}
+        retryHref={loginReturn}
       />
     );
   }

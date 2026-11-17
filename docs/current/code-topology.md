@@ -31,21 +31,21 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `c154e77c` |
-| -------------------------- | -----------------: |
-| `features/*` domains       |                 13 |
-| `components/` tree files   |                  0 |
-| `components/` root files   |                  0 |
-| `lib/` tree files          |                129 |
-| `lib/` root files          |                  0 |
+| Область                    |             Факт на `c154e77c` |
+| -------------------------- | -----------------------------: |
+| `features/*` domains       |                             13 |
+| `components/` tree files   |                              0 |
+| `components/` root files   |                              0 |
+| `lib/` tree files          |                            129 |
+| `lib/` root files          |                              0 |
 | `lib/` root dirs           | http, i18n, platform, services |
-| `lib/services/` root files |                  0 |
-| `lib/**/*-i18n.ts`         |                  0 |
-| `app/**/route.ts`          |                282 |
-| `site/tests` files         |               1452 |
-| `@nexus/ui` src files      |                 20 |
-| `@nexus/domain` src files  |                 54 |
-| `@nexus/db` src files      |                201 |
+| `lib/services/` root files |                              0 |
+| `lib/**/*-i18n.ts`         |                              0 |
+| `app/**/route.ts`          |                            282 |
+| `site/tests` files         |                           1452 |
+| `@nexus/ui` src files      |                             20 |
+| `@nexus/domain` src files  |                             54 |
+| `@nexus/db` src files      |                            201 |
 
 ### Features
 

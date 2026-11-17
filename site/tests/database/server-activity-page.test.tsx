@@ -93,10 +93,11 @@ it("does not read server activity for an anonymous visitor", async () => {
   expect(await render()).toContain("Sign in");
   expect(state.page).not.toHaveBeenCalled();
 });
-it("routes session lookup failures to sign-in instead of an orphan error panel", async () => {
+it("routes session lookup failures to an honest recovery panel instead of guest sign-in", async () => {
   state.session.mockRejectedValueOnce(new Error("private session"));
   const html = await render();
-  expect(html).toContain("Sign in");
+  expect(html).toContain('role="alert"');
+  expect(html).not.toContain("Sign in");
   expect(html).not.toContain("private session");
   expect(state.page).not.toHaveBeenCalled();
 });

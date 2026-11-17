@@ -96,7 +96,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "c154e77c38b7cd7e2259f1e1bba2a7767e48e701",
+  "source_sha": "acfad86c6d65a7afb39e4f373fb5e97b0bd92ad2",
   "tests": {
     "site_tests_files": 1549
   }

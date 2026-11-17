@@ -180,9 +180,10 @@ it("does not read private reports for ordinary users or history for anonymous se
   expect(state.history).not.toHaveBeenCalled();
   state.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await History({ id: "org", contentId: "post" }));
-  expect(failed).toContain("/auth/login");
+  expect(failed).toContain('role="alert"');
+  expect(failed).toContain(organizationPublicationHistoryCopy("en").unavailable);
+  expect(failed).not.toContain("/auth/login");
   expect(failed).not.toContain("private session");
-  expect(failed).not.toContain(organizationPublicationHistoryCopy("en").title);
   expect(state.history).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(

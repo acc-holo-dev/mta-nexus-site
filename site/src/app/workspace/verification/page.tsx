@@ -8,7 +8,6 @@ import {
   verificationTargetsSchema,
 } from "../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
-import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
@@ -38,7 +37,7 @@ export default async function VerificationPage({
     return (
       <PlatformSessionError
         locale={locale}
-        title={getDictionary(locale).errors.title}
+        title={copy.title}
         message={copy.unavailable}
         retryHref={"/workspace/verification"}
       />
