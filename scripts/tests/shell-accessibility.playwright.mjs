@@ -13,7 +13,7 @@ assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 const { getDictionary } = await import("../../site/src/lib/i18n.ts");
 const { discoveryCopy } = await import("../../site/src/lib/discovery-copy.ts");
-const { notificationInboxCopy } = await import("../../site/src/lib/notification-inbox-copy.ts");
+const { notificationInboxCopy } = await import("../../site/src/features/notifications/notification-inbox-copy.ts");
 const { platformReportCopy } = await import("../../site/src/lib/platform-report-i18n.ts");
 // Strip-types cannot execute notification-inbox-contract (zod/@nexus graph); keep the
 // category list synced by reading the exported INBOX_CATEGORIES source of truth.

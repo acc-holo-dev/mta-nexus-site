@@ -341,7 +341,7 @@ def patch_remaining_feature(feat: str, name: str, *, util_key: str = "clientUtil
             if arr.strip() == "[]":
                 narr = f'["{name}"]'
             else:
-                narr = re.sub(r"\]\s*$", f', "{name}"]', arr.rstrip())
+                narr = re.sub(r",?\s*\]\s*$", f', "{name}"]', arr.rstrip())
             block = block[: um.start(1)] + narr + block[um.end(1) :]
     else:
         inserted = False

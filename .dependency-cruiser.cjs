@@ -350,7 +350,7 @@ module.exports = {
         path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews|license-runtime-response|order-case-response|plan-review-confirmation|license-control-confirmation|subscription-confirmation|license-archive-query|order-case-query|license-runtime-query|commercial-confirmation|order-terms-i18n|seller-sales-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|commerce-history-i18n|commercial-i18n|license-control-i18n|order-case-i18n|plan-reviews-i18n|plan-reviews-query|private-api-request|subscriptions-i18n|subscriptions-query|support-retry)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale|confirm-action|action-confirm-checkbox)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|commerce-history-i18n|commercial-i18n|license-control-i18n|order-case-i18n|plan-reviews-i18n|plan-reviews-query|private-api-request|subscriptions-i18n|subscriptions-query|support-retry|license-model-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {

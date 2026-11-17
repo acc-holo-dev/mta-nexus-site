@@ -67,7 +67,6 @@ const features = [
       "developer-experience",
       "ad-preference",
       "settings-client-api",
-      ,
       "feature-flags",
       "profile-privacy-copy",
     ],
