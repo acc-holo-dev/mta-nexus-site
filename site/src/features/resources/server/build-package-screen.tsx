@@ -8,6 +8,8 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { buildPackageService } from "../../../lib/services/resources/build-package-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
@@ -61,7 +63,20 @@ export async function BuildPackageScreen({
 }) {
   const locale = await getRequestLocale(),
     copy = buildPackageCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/"}
+      />
+    );
+  }
+
   const rawSearchParams = await searchParams;
   const returnQuery = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
