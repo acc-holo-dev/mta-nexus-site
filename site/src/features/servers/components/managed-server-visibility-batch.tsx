@@ -10,7 +10,7 @@ import {
   confirmsServerVisibilityPreview,
   type ServerVisibilityPreview,
 } from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../../lib/server-workspace-copy";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {

@@ -11,7 +11,7 @@ import {
   serverWorkspaceHistoryHref,
   serverWorkspaceHistorySchema,
 } from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../../lib/server-workspace-copy";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";

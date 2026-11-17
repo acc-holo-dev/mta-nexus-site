@@ -16,7 +16,7 @@ import {
   serverVisibilityInput,
   serverWorkspaceHistoryHref,
 } from "../../src/lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../src/lib/server-workspace-copy";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../../src/features/servers/server-workspace-copy";
 import { serverService } from "../../src/lib/services/server-service";
 import { serverWorkspaceHistoryService } from "../../src/lib/services/server-workspace-history-service";
 

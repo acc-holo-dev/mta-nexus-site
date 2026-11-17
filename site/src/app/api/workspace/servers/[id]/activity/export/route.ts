@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { serverContentRate } from "../../../../../../../lib/server-content-api";
 import { parseServerWorkspaceHistoryQuery } from "../../../../../../../lib/server-workspace-contract";
-import { serverWorkspaceError } from "../../../../../../../lib/server-workspace-copy";
+import { serverWorkspaceError } from "../../../../../../../features/servers/server-workspace-copy";
 import { serverWorkspaceHistoryService } from "../../../../../../../lib/services/server-workspace-history-service";
 import { userPlatformApi } from "../../../../../../../lib/user-platform-api";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
