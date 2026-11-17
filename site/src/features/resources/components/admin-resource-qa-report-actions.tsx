@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { communityReportCopy } from "../../../lib/community-report-copy";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
+import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 

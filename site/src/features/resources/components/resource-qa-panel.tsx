@@ -12,7 +12,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
+import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
