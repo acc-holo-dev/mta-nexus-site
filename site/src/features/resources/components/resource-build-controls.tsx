@@ -3,7 +3,7 @@ import type { ResourceBuildCommand, ResourceBuildView } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateRequest } from "../../../lib/private-request";
+import { privateRequest } from "../private-request";
 import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
 import { confirmedBuildCommand } from "../resource-build-workspace-response";
 import { confirmAction } from "../../shell/confirm-action";
