@@ -126,13 +126,7 @@ export function ResourceModerationControls({
         <p role="note" className="text-sm text-secondary">
           {copy.moderationNote}
         </p>
-        <ErrorState
-          title={
-            locale === "ru"
-              ? "Для текущего статуса нет разрешённого moderation-перехода."
-              : "No moderation transition is allowed for the current status."
-          }
-        />
+        <ErrorState title={copy.noTransitionAllowed} />
       </div>
     );
   }
@@ -144,34 +138,21 @@ export function ResourceModerationControls({
       </p>
       <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Статус ресурса" : "Resource status"}
-          </dt>
+          <dt className="font-label uppercase text-muted">{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Разрешённое действие" : "Allowed action"}
-          </dt>
+          <dt className="font-label uppercase text-muted">{copy.allowedAction}</dt>
           <dd className="text-primary">{release ? copy.release : copy.suspend}</dd>
         </div>
       </dl>
       {release ? (
-        <ErrorState
-          id="resource-moderation-release-draft"
-          title={
-            locale === "ru"
-              ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."
-              : "Release returns a draft and requires a new review. Nothing is auto-published."
-          }
-        />
+        <ErrorState id="resource-moderation-release-draft" title={copy.releaseDraftWarning} />
       ) : null}
       {selectedBuild && selectedBuild.status !== "published" ? (
         <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
           <p>
-            {locale === "ru"
-              ? `Сборка ${selectedBuild.version ?? selectedBuild.id} сейчас ${selectedBuild.status}.`
-              : `Build ${selectedBuild.version ?? selectedBuild.id} is currently ${selectedBuild.status}.`}
+            {copy.buildStatusLine(selectedBuild.version ?? selectedBuild.id, selectedBuild.status)}
           </p>
           <Link
             href={unavailableBuildSupportHref()}
@@ -180,7 +161,7 @@ export function ResourceModerationControls({
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
           >
-            {locale === "ru" ? "Контекст для поддержки" : "Support context"}
+            {copy.supportContext}
           </Link>
         </div>
       ) : null}
@@ -205,11 +186,7 @@ export function ResourceModerationControls({
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.saved}
-          {release
-            ? locale === "ru"
-              ? " Следующий шаг автора — отправка черновика на проверку."
-              : " Next author step: submit the draft for review."
-            : ""}
+          {release ? copy.releaseNextAuthorStep : ""}
         </p>
       ) : null}
       <Button type="submit" isLoading={busy} disabled={saved} className="min-h-11">

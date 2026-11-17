@@ -44,6 +44,7 @@ export const admin = {
     scan: "Проверка",
     scanProvenance: "Источник и время проверки",
     noBuilds: "Сборок, ожидающих проверки, нет.",
+    versionDecisionHistory: "Версия и история решений",
     quarantineQueue: "Карантин сборок",
     quarantinePages: "Страницы карантина сборок",
     buildsQuarantined: "сборок сейчас в карантине",

@@ -15,7 +15,7 @@ import {
 const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function RegisterServerForm({ actorId }: { actorId: string }) {
-  const { locale, dictionary } = useNexusLocale();
+  const { dictionary } = useNexusLocale();
   const copy = dictionary.serverRegistration;
   const [organizationsLoading, setOrganizationsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -384,7 +384,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="language"
           label={copy.language}
           maxLength={64}
-          defaultValue={locale === "ru" ? "Русский" : "English"}
+          defaultValue={copy.languageDefault}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -394,7 +394,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="region"
           label={copy.region}
           maxLength={64}
-          placeholder={locale === "ru" ? "Европа" : "Europe"}
+          placeholder={copy.regionPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />

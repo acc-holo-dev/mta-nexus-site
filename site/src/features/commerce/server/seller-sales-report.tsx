@@ -100,7 +100,7 @@ export function SellerSalesReportView({
               <option value="all">{c.allTime}</option>
               {[7, 30, 90, 365].map((days) => (
                 <option key={days} value={days}>
-                  {days} {locale === "ru" ? "дней" : "days"}
+                  {days} {c.dayUnit}
                 </option>
               ))}
             </select>

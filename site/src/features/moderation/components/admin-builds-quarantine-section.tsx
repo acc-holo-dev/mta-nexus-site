@@ -147,7 +147,7 @@ export function AdminBuildsQuarantineSection({
                     href={`/admin/resources/${build.productId}/builds/${build.id}`}
                     className={`${touchLinkClass} text-xs`}
                   >
-                    {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
+                    {copy.versionDecisionHistory}
                   </Link>
                 </div>
               </div>

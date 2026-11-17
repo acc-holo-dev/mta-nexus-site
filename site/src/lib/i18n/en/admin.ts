@@ -43,6 +43,7 @@ export const admin = {
     scan: "Scan",
     scanProvenance: "Scan source and time",
     noBuilds: "No resource builds are waiting for review.",
+    versionDecisionHistory: "Version and decision history",
     quarantineQueue: "Build quarantine",
     quarantinePages: "Build quarantine pages",
     buildsQuarantined: "builds currently quarantined",

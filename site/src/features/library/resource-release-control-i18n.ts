@@ -79,6 +79,15 @@ const copy = {
     saved: "Moderation decision confirmed.",
     actionFailedDescription:
       "A failed moderation action is not a changed resource state. Reload before retrying.",
+    resourceStatus: "Resource status",
+    allowedAction: "Allowed action",
+    noTransitionAllowed: "No moderation transition is allowed for the current status.",
+    releaseDraftWarning:
+      "Release returns a draft and requires a new review. Nothing is auto-published.",
+    buildStatusLine: (version: string, status: string) =>
+      `Build ${version} is currently ${status}.`,
+    supportContext: "Support context",
+    releaseNextAuthorStep: " Next author step: submit the draft for review.",
     open: "Open resource",
     compare: "Compare selected and latest",
     manage: "Manage versions",
@@ -183,6 +192,14 @@ const copy = {
     saved: "Решение модерации подтверждено.",
     actionFailedDescription:
       "Неуспешное действие модерации не меняет состояние ресурса. Обновите страницу перед повтором.",
+    resourceStatus: "Статус ресурса",
+    allowedAction: "Разрешённое действие",
+    noTransitionAllowed: "Для текущего статуса нет разрешённого moderation-перехода.",
+    releaseDraftWarning:
+      "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет.",
+    buildStatusLine: (version: string, status: string) => `Сборка ${version} сейчас ${status}.`,
+    supportContext: "Контекст для поддержки",
+    releaseNextAuthorStep: " Следующий шаг автора — отправка черновика на проверку.",
     open: "Открыть ресурс",
     compare: "Сравнить выбранную и последнюю",
     manage: "Управлять версиями",
