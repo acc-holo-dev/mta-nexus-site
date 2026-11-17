@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
@@ -86,12 +87,11 @@ export async function ResourceReviewReportScreen({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ResourceReviewLoadError
+      <PlatformSessionError
         locale={locale}
-        backHref={id ? base : listBackHref}
-        backLabel={copy.back}
-        retryHref={loginReturn}
-        staff={staff}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={id ? `${base}/${encodeURIComponent(id)}` : base}
       />
     );
   }
