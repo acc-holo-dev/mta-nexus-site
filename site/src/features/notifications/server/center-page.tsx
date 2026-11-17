@@ -17,7 +17,7 @@ import {
 import {
   notificationInboxCopy,
   notificationInboxError,
-} from "../../../lib/notification-inbox-copy";
+} from "../notification-inbox-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { notificationInboxService } from "../../../lib/services/notification-inbox-service";
 export async function generateMetadata() {

@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../lib/i18n-server";
-import { notificationInboxCopy } from "../../lib/notification-inbox-copy";
+import { notificationInboxCopy } from "../../features/notifications/notification-inbox-copy";
 
 // Honest loading shell for /notifications.
 export default async function NotificationInboxLoading() {

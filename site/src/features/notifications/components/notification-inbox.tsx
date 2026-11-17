@@ -13,7 +13,7 @@ import {
 import {
   notificationInboxCopy,
   notificationInboxError,
-} from "../../../lib/notification-inbox-copy";
+} from "../notification-inbox-copy";
 import { announceNotificationInboxChange } from "../notification-inbox-events";
 import {
   fetchNotificationInboxExport,

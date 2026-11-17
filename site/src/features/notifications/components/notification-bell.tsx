@@ -6,7 +6,7 @@ import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatNotification } from "../../../lib/notification-copy";
-import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
+import { notificationInboxCopy } from "../notification-inbox-copy";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
