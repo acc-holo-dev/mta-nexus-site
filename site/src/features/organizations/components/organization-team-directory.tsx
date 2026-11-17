@@ -8,7 +8,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
+import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
   type OrganizationTeamPage,

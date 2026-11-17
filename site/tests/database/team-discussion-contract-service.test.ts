@@ -29,7 +29,7 @@ import {
   organizationBatchCommandInput,
   organizationBatchPreviewInput,
 } from "../../src/lib/organization-batch-contract";
-import { organizationBatchCopy } from "../../src/lib/organization-batch-copy";
+import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { organizationWorkspaceService as teams } from "../../src/lib/services/organization-workspace-service";
 

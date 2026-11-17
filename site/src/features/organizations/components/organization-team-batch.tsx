@@ -12,7 +12,7 @@ import {
   confirmsOrganizationBatchPreview,
   type OrganizationBatchPreview,
 } from "../../../lib/organization-batch-contract";
-import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
+import { organizationBatchCopy } from "../organization-batch-copy";
 import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";

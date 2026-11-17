@@ -28,7 +28,7 @@ vi.mock("../../src/features/organizations/organization-workspace-client", () => 
 }));
 
 import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
-import { organizationBatchCopy } from "../../src/lib/organization-batch-copy";
+import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 const { render, memberEditor } = createOrganizationTeamDirectoryConfirmInteractionHelpers(

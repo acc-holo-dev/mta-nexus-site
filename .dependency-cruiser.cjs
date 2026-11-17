@@ -270,7 +270,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/organizations/)" },
       to: {
-        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|content-editor-server|publication-history-server|directory-page-server|workspace-page-server|team-page-server|activity-page-server|content-page-server|public-directory-server|public-profile-server|public-activity-server|public-trust-server)\\.ts$)",
+        path: "^site/src/features/organizations/(?!(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy|content-editor-server|publication-history-server|directory-page-server|workspace-page-server|team-page-server|activity-page-server|content-page-server|public-directory-server|public-profile-server|public-activity-server|public-trust-server)\\.ts$)",
       },
     },
     {
@@ -283,17 +283,17 @@ module.exports = {
       name: "organizations-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy)\\.ts$|components/)",
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!organizations/|accounts/change-history\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!organizations/|accounts/change-history\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/organizations/(?:server/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-workspace-copy|user-platform-copy|private-change-history-copy|user-platform-client|private-api-request|organization-team-contract|content-discussion-contract|organization-batch-contract|organization-content-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "organizations-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy)\\.ts$|components/)",
+        path: "^site/src/features/organizations/(?:(?:workspace|team|profile|history-view|organization-member-confirmation|organization-workspace-client|organization-team-copy|organization-governance-copy|organization-batch-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
