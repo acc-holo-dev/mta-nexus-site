@@ -3,7 +3,7 @@ import { orderCaseReviewSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { orderCaseQuery } from "../../../../../../lib/order-case-query";
+import { orderCaseQuery } from "../../../../../../features/commerce/order-case-query";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { orderCaseService } from "../../../../../../lib/services/order-case-service";
 

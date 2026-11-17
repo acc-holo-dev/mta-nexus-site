@@ -15,6 +15,7 @@ const utilPorts = [
   "license-control-confirmation",
   "subscription-confirmation",
   "license-archive-query",
+  "order-case-query",
 ];
 const clientPorts = [
   "workspace-history",

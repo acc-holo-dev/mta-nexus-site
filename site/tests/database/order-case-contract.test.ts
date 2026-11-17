@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { orderCaseCreateSchema, orderCaseReviewSchema } from "@nexus/validation";
-import { orderCaseQuery, orderCasePageQuery } from "../../src/lib/order-case-query";
+import { orderCaseQuery, orderCasePageQuery } from "../../src/features/commerce/order-case-query";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,

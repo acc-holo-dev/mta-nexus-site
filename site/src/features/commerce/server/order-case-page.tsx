@@ -16,7 +16,7 @@ import {
   orderCaseStatusLabel,
   orderCaseThreadLabel,
 } from "../../../lib/order-case-i18n";
-import { orderCasePageQuery } from "../../../lib/order-case-query";
+import { orderCasePageQuery } from "../order-case-query";
 import { authService } from "../../../lib/services/auth-service";
 import { orderCaseService } from "../../../lib/services/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
