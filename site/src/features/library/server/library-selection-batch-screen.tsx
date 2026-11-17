@@ -62,6 +62,7 @@ export async function LibrarySelectionBatchScreen({
       <h1 className="font-display">{history ? c.history : c.title}</h1>
       <ErrorState
         title={c.loadUnavailable}
+        description={c.loadUnavailableDescription}
         action={
           <Link
             href={retryHref}

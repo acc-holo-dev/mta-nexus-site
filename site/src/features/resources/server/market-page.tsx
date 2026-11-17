@@ -166,6 +166,7 @@ export async function MarketPage({
       {!catalog ? (
         <ErrorState
           title={dictionary.market.loadUnavailable}
+          description={dictionary.market.loadUnavailableHint}
           action={
             <Link href={catalogHref} className={actionLinkClass}>
               {dictionary.errors.retry}

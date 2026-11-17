@@ -41,6 +41,8 @@ const en = {
     "The comment or publication is unavailable. Return to the discussion or reload current data.",
   loadUnavailable:
     "Discussion moderation is temporarily unavailable. This does not mean there are no comments.",
+  loadUnavailableHint:
+    "Retry reloads this moderation view only. A temporary load failure is not an empty discussion.",
   formErrorHint: "The removal was not saved. Reload the current comment before trying again.",
 };
 const ru: Record<keyof typeof en, string> = {
@@ -82,6 +84,8 @@ const ru: Record<keyof typeof en, string> = {
     "Комментарий или публикация недоступны. Вернитесь к обсуждению или загрузите актуальные данные.",
   loadUnavailable:
     "Модерация обсуждения временно недоступна. Это не означает, что комментариев нет.",
+  loadUnavailableHint:
+    "Повтор обновляет только этот экран модерации. Временный сбой загрузки — не пустое обсуждение.",
   formErrorHint:
     "Удаление не сохранено. Загрузите актуальный комментарий перед повторной попыткой.",
 };

@@ -2,6 +2,8 @@ const en = {
   title: "Resources across my collections",
   loadUnavailable:
     "Resources across your collections are temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty inventory. Retry to fetch the latest private collection references.",
   note: "Find resources and version changes across all private collections. Each result retains every collection containing it. Availability means a safe published release exists under current access; a missing pinned version never falls back to the latest release. Downloads recheck access and the exact build.",
   search: "Search accessible names or recorded resource IDs",
   status: "Collection status",
@@ -55,6 +57,8 @@ const en = {
 const ru: typeof en = {
   title: "Ресурсы во всех моих коллекциях",
   loadUnavailable: "Ресурсы во всех коллекциях временно недоступны. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Сбой загрузки — не пустой инвентарь. Повторите, чтобы получить актуальные ссылки из приватных коллекций.",
   note: "Поиск ресурсов и изменений версий во всех приватных коллекциях. Результат показывает все коллекции с каждой ссылкой. Доступность означает наличие безопасной публикации при текущих правах; недоступная закреплённая версия не заменяется последней. Загрузка заново проверяет права и точную сборку.",
   search: "Поиск по доступным названиям или записанным ID ресурсов",
   status: "Состояние коллекций",

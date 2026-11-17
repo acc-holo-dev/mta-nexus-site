@@ -86,6 +86,7 @@ export async function CollectionRequirementsScreen({
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
             <Link href={`${requirementsBase}${retrySuffix}`} className={navLinkClass}>
               {dictionary.errors.retry}

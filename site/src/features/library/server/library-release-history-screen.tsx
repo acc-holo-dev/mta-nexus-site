@@ -72,6 +72,7 @@ export async function LibraryReleaseHistoryScreen({
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
             <Link
               href={retryHref}

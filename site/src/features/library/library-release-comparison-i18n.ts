@@ -1,5 +1,7 @@
 const en = {
   loadUnavailable: "Release comparison is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty comparison. Retry to fetch the selected and latest safe builds.",
   title: "Compare releases",
   chooseCompared: "Fix the compared release for downloads",
   alreadySelected: "This release is already your fixed download choice.",
@@ -51,6 +53,8 @@ const en = {
 };
 const ru: typeof en = {
   loadUnavailable: "Сравнение выпусков временно недоступно. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Сбой загрузки — не пустое сравнение. Повторите, чтобы получить выбранные и последние безопасные сборки.",
   title: "Сравнить выпуски",
   chooseCompared: "Закрепить сравниваемый выпуск для скачивания",
   alreadySelected: "Этот выпуск уже закреплён для скачивания.",

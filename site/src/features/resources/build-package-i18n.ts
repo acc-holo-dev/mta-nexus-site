@@ -2,6 +2,8 @@ const copy = {
   en: {
     busy: "Package inspection is busy. No build was saved; retry in a few seconds.",
     loadUnavailable: "Package inventory is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this package inventory only. A temporary load failure is not an empty file list.",
     inventory: "Package files and version comparison",
     back: "Back to version",
     all: "All",
@@ -68,6 +70,8 @@ const copy = {
   ru: {
     busy: "Проверка пакетов занята. Сборка не сохранена; повторите через несколько секунд.",
     loadUnavailable: "Перечень файлов пакета временно недоступен. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот перечень файлов пакета. Временный сбой загрузки — не пустой список файлов.",
     inventory: "Файлы пакета и сравнение версий",
     back: "Вернуться к версии",
     all: "Все",

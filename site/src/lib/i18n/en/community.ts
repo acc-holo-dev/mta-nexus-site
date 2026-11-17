@@ -106,6 +106,8 @@ export const community = {
     loading: "Loading organization…",
     loadUnavailable:
       "This organization is temporarily unavailable. This does not mean the team has no public work.",
+    loadUnavailableHint:
+      "Retry reloads this organization profile only. A temporary load failure is not an empty portfolio.",
     fallback: "MTA community, creator collective, or resource publisher.",
     releases: "Releases",
     marketplaceReleases: "Marketplace releases",

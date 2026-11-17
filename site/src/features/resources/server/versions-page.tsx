@@ -62,6 +62,7 @@ export async function PublicResourceVersionsPage({
         </header>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={releaseHistoryHref(slug, requestedPage)} className={actionLinkClass}>
               {dictionary.errors.retry}
@@ -99,6 +100,7 @@ export async function PublicResourceVersionsPage({
         </header>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={releaseHistoryHref(product.slug, requestedPage)}
@@ -249,7 +251,9 @@ export async function PublicResourceVersionsPage({
         <div className="text-sm text-secondary">
           {sessionFailed ? (
             <ErrorState
-              title={copy.loadUnavailable}
+              id="resource-versions-session-unavailable"
+              title={copy.sessionUnavailable}
+              description={copy.sessionUnavailableDescription}
               action={
                 <Link href={returnPath} className={actionLinkClass}>
                   {dictionary.errors.retry}

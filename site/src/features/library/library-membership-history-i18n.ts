@@ -1,5 +1,7 @@
 const en = {
   loadUnavailable: "Collection membership history is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty membership history. Retry to fetch the latest retained operations.",
   title: "Collection membership history",
   loading: "Loading membership history…",
   note: "Inspect whole resource membership operations. Recorded names, revisions and changes remain unchanged; current collection membership and resource access are shown separately. Filters select whole groups, including every recorded collection.",
@@ -20,6 +22,8 @@ const en = {
 };
 const ru: typeof en = {
   loadUnavailable: "История состава коллекций временно недоступна. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Сбой загрузки — не пустая история состава. Повторите, чтобы получить последние сохранённые операции.",
   title: "История состава коллекций",
   loading: "Загрузка истории состава…",
   note: "Операции с одним ресурсом показаны целиком. Записанные названия, ревизии и изменения сохраняются; текущий состав коллекций и доступ к ресурсу показаны отдельно. Фильтры выбирают группы со всеми записанными коллекциями.",

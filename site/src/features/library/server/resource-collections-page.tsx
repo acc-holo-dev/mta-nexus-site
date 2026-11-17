@@ -71,6 +71,7 @@ export default async function ResourceCollectionsPage({
           <h1 className="font-display">{c.resourceCollections}</h1>
           <ErrorState
             title={c.loadUnavailable}
+            description={c.loadUnavailableDescription}
             action={
               <Link
                 href={`/workspace/library/${encodeURIComponent(id)}/collections`}

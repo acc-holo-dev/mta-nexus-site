@@ -38,6 +38,7 @@ export async function PublicProfileActivity({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={activityPath} className={linkClass}>
               {dictionary.errors.retry}

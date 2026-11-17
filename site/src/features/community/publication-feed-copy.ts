@@ -41,6 +41,8 @@ const en = {
   loading: "Loading…",
   loadUnavailable:
     "Public activity is temporarily unavailable. This does not mean there are no publications.",
+  loadUnavailableHint:
+    "Retry reloads this activity feed only. A temporary load failure is not an empty publication list.",
   error: "Unable to load publications. Try again.",
   empty: "No publications here yet.",
   emptyHint: "New public publications will appear here when authors publish them.",
@@ -95,6 +97,8 @@ const ru: Record<keyof typeof en, string> = {
   next: "Старые публикации",
   loading: "Загрузка…",
   loadUnavailable: "Публичная активность временно недоступна. Это не означает, что публикаций нет.",
+  loadUnavailableHint:
+    "Повтор обновляет только эту ленту активности. Временный сбой загрузки — не пустой список публикаций.",
   error: "Не удалось загрузить публикации. Попробуйте ещё раз.",
   empty: "Публикаций пока нет.",
   emptyHint: "Новые публичные публикации появятся здесь, когда авторы их опубликуют.",

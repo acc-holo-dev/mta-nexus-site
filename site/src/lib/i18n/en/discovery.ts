@@ -91,6 +91,8 @@ export const discovery = {
       "This is an empty result for the current URL, not a catalog outage. Adjust search, category, or sort and try again.",
     loadUnavailable:
       "The free resource catalog is temporarily unavailable. This does not mean there are no resources.",
+    loadUnavailableHint:
+      "Retry reloads this catalog page only. A temporary load failure is not an empty Market result.",
     activeFilters: "Active filters",
     clear: "Clear all filters",
     clearQuery: "Clear search only",

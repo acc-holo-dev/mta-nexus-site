@@ -89,6 +89,7 @@ export async function LibraryMembershipHistoryScreen({
             <h1 className="font-display">{m.detail}</h1>
             <ErrorState
               title={m.loadUnavailable}
+              description={m.loadUnavailableDescription}
               action={
                 <Link
                   href={membershipHistoryHref(receiptId)}
@@ -132,6 +133,7 @@ export async function LibraryMembershipHistoryScreen({
           <h1 className="font-display">{m.title}</h1>
           <ErrorState
             title={m.loadUnavailable}
+            description={m.loadUnavailableDescription}
             action={
               <Link
                 href={retryHref}
@@ -298,6 +300,7 @@ export async function LibraryMembershipHistoryScreen({
         <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
           <ErrorState
             title={m.loadUnavailable}
+            description={m.loadUnavailableDescription}
             action={
               <Link
                 href={membershipHistoryHref()}

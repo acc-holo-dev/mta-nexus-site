@@ -2,6 +2,8 @@ const copy = {
   en: {
     title: "Resource version",
     loadUnavailable: "Resource version details are temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this version workspace only. A temporary load failure is not a missing version.",
     back: "Back to resource",
     reviewBack: "Back to moderation",
     manage: "Manage version",
@@ -74,6 +76,8 @@ const copy = {
   ru: {
     title: "Версия ресурса",
     loadUnavailable: "Сведения о версии ресурса временно недоступны. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту рабочую область версии. Временный сбой загрузки — не отсутствие версии.",
     back: "К ресурсу",
     reviewBack: "К модерации",
     manage: "Управлять версией",

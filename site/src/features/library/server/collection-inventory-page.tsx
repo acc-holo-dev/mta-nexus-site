@@ -82,6 +82,7 @@ export default async function Page({
           </Link>
           <ErrorState
             title={v.loadUnavailable}
+            description={v.loadUnavailableDescription}
             action={
               <Link
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix(query)}`}

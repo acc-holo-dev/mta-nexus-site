@@ -2,6 +2,8 @@ export function librarySelectionBatchesCopy(locale: string) {
   return locale === "ru"
     ? {
         loadUnavailable: "Групповой выбор версий временно недоступен. Попробуйте ещё раз.",
+        loadUnavailableDescription:
+          "Сбой загрузки — не пустой групповой выбор. Повторите после восстановления сервиса.",
         title: "Версии группы ресурсов",
         history: "История выбора версий",
         back: "К коллекции",
@@ -42,6 +44,8 @@ export function librarySelectionBatchesCopy(locale: string) {
       }
     : {
         loadUnavailable: "Resource version batch is temporarily unavailable. Please try again.",
+        loadUnavailableDescription:
+          "A load failure is not an empty batch view. Retry after the service recovers.",
         title: "Resource version batch",
         history: "Version selection history",
         back: "Back to collection",

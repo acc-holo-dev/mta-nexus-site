@@ -22,6 +22,11 @@ export const releaseHistoryCopy = {
       "Empty history is not a catalog outage. Published, safely scanned builds will appear here when available.",
     loadUnavailable:
       "Release history is temporarily unavailable. This does not mean there are no builds.",
+    loadUnavailableHint:
+      "Retry reloads this release history only. A temporary load failure is not an empty build list.",
+    sessionUnavailable: "Could not verify your session for downloads.",
+    sessionUnavailableDescription:
+      "This is not a signed-out state. Retry after the session service recovers; guest acquire links stay hidden.",
     version: "Version",
     released: "Released",
     size: "Size",
@@ -53,6 +58,11 @@ export const releaseHistoryCopy = {
     noBuildsHint:
       "Пустая история — не сбой каталога. Опубликованные сборки с безопасной проверкой появятся здесь, когда будут доступны.",
     loadUnavailable: "История версий временно недоступна. Это не означает, что сборок нет.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту историю версий. Временный сбой загрузки — не пустой список сборок.",
+    sessionUnavailable: "Не удалось проверить сессию для скачивания.",
+    sessionUnavailableDescription:
+      "Это не состояние выхода из аккаунта. Повторите после восстановления сервиса сессии; гостевые ссылки на получение остаются скрытыми.",
     version: "Версия",
     released: "Опубликована",
     size: "Размер",

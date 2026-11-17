@@ -2,6 +2,8 @@ const copies = {
   en: {
     title: "Resource gallery",
     loadUnavailable: "Resource gallery is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this gallery only. A temporary load failure is not an empty media list.",
     back: "Back to resource",
     signIn: "Sign in",
     signInRequired: "Sign in to view the gallery",
@@ -59,6 +61,8 @@ const copies = {
   ru: {
     title: "Галерея ресурса",
     loadUnavailable: "Галерея ресурса временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту галерею. Временный сбой загрузки — не пустой список медиа.",
     back: "Назад к ресурсу",
     signIn: "Войти",
     signInRequired: "Войдите для просмотра галереи",

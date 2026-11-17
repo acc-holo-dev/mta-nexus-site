@@ -46,6 +46,7 @@ export async function LibraryCollectionsListView({
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
             <Link
               href={retryHref}

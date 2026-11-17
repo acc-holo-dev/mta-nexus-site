@@ -17,5 +17,8 @@ it("locks public versions session probe failure away from guest auth links", () 
     /try \{\s*user = await authService\.getSession\([\s\S]*?\}\s*catch \{\s*sessionFailed = true;/u,
   );
   expect(source).toMatch(/sessionFailed \?\s*\([\s\S]*?<ErrorState/u);
+  expect(source).toContain('id="resource-versions-session-unavailable"');
+  expect(source).toContain("copy.sessionUnavailable");
+  expect(source).not.toMatch(/sessionFailed \?\s*\([\s\S]*?title=\{copy\.loadUnavailable\}/u);
   expect(source).not.toMatch(/getSession\([^)]*\)\s*\.catch\(\s*\(\)\s*=>\s*null\s*\)/u);
 });

@@ -24,6 +24,8 @@ const en = {
   unavailable: "Report context could not be loaded. Reload the comment or report.",
   loadUnavailable:
     "Comment reports are temporarily unavailable. This does not mean there are no reports.",
+  loadUnavailableHint:
+    "Retry reloads this comment report queue only. A temporary load failure is not an empty report list.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Жалобы на этот комментарий",
@@ -49,5 +51,7 @@ const ru: Record<keyof typeof en, string> = {
   link: "Открыть контекст модерации",
   unavailable: "Не удалось загрузить контекст жалобы. Загрузите комментарий или жалобу.",
   loadUnavailable: "Жалобы на комментарий временно недоступны. Это не означает, что жалоб нет.",
+  loadUnavailableHint:
+    "Повтор обновляет только эту очередь жалоб на комментарий. Временный сбой загрузки — не пустой список жалоб.",
 };
 export const discussionReportsCopy = (locale: Locale) => (locale === "ru" ? ru : en);

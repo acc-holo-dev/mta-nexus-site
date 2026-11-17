@@ -43,6 +43,7 @@ function ModeratedDiscussionLoadError({
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
           <Link href={retryHref} className={navLinkClass}>
             {dictionary.errors.retry}

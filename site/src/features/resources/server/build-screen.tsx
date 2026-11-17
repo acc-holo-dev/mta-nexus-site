@@ -49,6 +49,7 @@ function ResourceBuildLoadError({
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
           <Link href={retryHref} className={navLinkClass}>
             {dictionary.errors.retry}

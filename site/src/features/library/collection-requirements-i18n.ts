@@ -2,6 +2,8 @@ export function collectionRequirementsCopy(locale: string) {
   return locale === "ru"
     ? {
         loadUnavailable: "Проверка готовности коллекции временно недоступна. Попробуйте ещё раз.",
+        loadUnavailableDescription:
+          "Сбой загрузки — не пустой отчёт готовности. Повторите проверку после восстановления сервиса.",
         title: "Готовность коллекции",
         back: "К коллекции",
         revision: "Ревизия",
@@ -17,6 +19,8 @@ export function collectionRequirementsCopy(locale: string) {
       }
     : {
         loadUnavailable: "Collection readiness check is temporarily unavailable. Please try again.",
+        loadUnavailableDescription:
+          "A load failure is not an empty readiness report. Retry the check after the service recovers.",
         title: "Collection readiness",
         back: "Back to collection",
         revision: "Revision",
