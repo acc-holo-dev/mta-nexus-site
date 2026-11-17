@@ -51,7 +51,7 @@ import Purchases, { metadata as purchasesMeta } from "../../src/app/workspace/pu
 import Sales, { metadata as salesMeta } from "../../src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });

@@ -17,7 +17,7 @@ import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-hist
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../features/commerce/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
+import { getLicenseMaintenanceCopy } from "../../../features/commerce/license-maintenance-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { licenseControlService } from "../../../lib/services/license-control-service";
 

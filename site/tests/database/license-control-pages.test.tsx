@@ -62,7 +62,7 @@ import {
 } from "../../src/features/commerce/license-history-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {

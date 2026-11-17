@@ -2,7 +2,7 @@ import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined, push: () => undefined }),

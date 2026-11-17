@@ -5,7 +5,7 @@ import {
   licenseArchiveUrl,
 } from "../../src/features/commerce/license-archive-query";
 import { licenseArchiveCsv } from "../../src/features/commerce/license-archive-csv";
-import { licenseTermNotification } from "../../src/lib/license-maintenance-i18n";
+import { licenseTermNotification } from "../../src/features/commerce/license-maintenance-i18n";
 import { formatNotification } from "../../src/lib/notification-copy";
 
 it("strictly bounds buyer queries and preserves every active filter in navigation", () => {

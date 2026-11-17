@@ -10,7 +10,7 @@ import { formatHistoryDate, licenseStatusLabel } from "../../../../lib/commerce-
 import { getCommerceHistoryCopy } from "../../../../features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getLicenseMaintenanceCopy } from "../../../../lib/license-maintenance-i18n";
+import { getLicenseMaintenanceCopy } from "../../../../features/commerce/license-maintenance-i18n";
 import { licenseRuntimePage } from "../../../../features/commerce/license-runtime-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { licenseControlService } from "../../../../lib/services/license-control-service";

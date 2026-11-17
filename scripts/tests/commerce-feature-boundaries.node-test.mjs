@@ -31,6 +31,7 @@ const utilPorts = [
   "financial-query",
   "commercial-i18n",
   "commerce-history-i18n",
+  "license-maintenance-i18n",
 ];
 const clientPorts = [
   "workspace-history",
