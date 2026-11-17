@@ -18,6 +18,7 @@ const clientPorts = [
   "release-follow",
   "release-selection",
 ];
+const utilPorts = ["library-release-request"];
 const serverPorts = [
   "collections",
   "membership-history",
@@ -35,7 +36,7 @@ const serverPorts = [
   "resource-collections-page",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|library-release-request|resource-release-control-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -66,7 +67,7 @@ test("Library rejects private, routing, server and infrastructure edges", (t) =>
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/library/components/private.ts", "export const value = 1;");
   write("site/src/features/library/server/page.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(`site/src/features/library/${port}.ts`, 'export { value } from "./server/page";');
     write(`site/src/app/${port}.ts`, `export { value } from "../features/library/${port}";`);
   }
@@ -100,7 +101,7 @@ test("Library rejects private, routing, server and infrastructure edges", (t) =>
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(rules(`features/library/${port}.ts`).includes("library-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }
@@ -122,7 +123,9 @@ test("Library rejects private, routing, server and infrastructure edges", (t) =>
 });
 
 test("Library client graphs exclude server dependencies transitively", () => {
-  const entries = clientPorts.map((port) => `site/src/features/library/${port}.ts`);
+  const entries = [...clientPorts, ...utilPorts].map(
+    (port) => `site/src/features/library/${port}.ts`,
+  );
   entries.push(
     "site/src/features/library/components/library-selection-batch-controls.tsx",
     "site/src/features/library/components/library-release-comparison-selection.tsx",
@@ -153,9 +156,13 @@ test("Library client graphs exclude server dependencies transitively", () => {
       visit(edge.resolved);
     }
   }
+  const utilPortSet = new Set(utilPorts);
   for (const entry of entries) {
-    if (!entry.includes("/components/"))
-      assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    if (!entry.includes("/components/")) {
+      const portName = entry.split("/").pop().replace(/\.ts$/u, "");
+      if (!utilPortSet.has(portName))
+        assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    }
     visit(entry);
   }
   for (const child of [

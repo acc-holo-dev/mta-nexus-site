@@ -4,30 +4,31 @@ Feature объединяет существующие представления
 команд, пакетных действий и переноса элементов. Session, actor/revision,
 серверная авторизация, сервисы и repository locks сохраняются.
 
-| Entry                                 | Контракт                                                |
-| ------------------------------------- | ------------------------------------------------------- |
-| `membership-history-server.ts`        | Серверный экран истории членства                        |
-| `selection-batch-server.ts`           | Серверный экран пакетного выбора версий                 |
-| `collection-import.ts`                | Клиентский импорт и сверка коллекции                    |
-| `collection-restore.ts`               | Клиентское восстановление коллекции                     |
-| `membership-batch.ts`                 | Клиентское пакетное управление членством                |
-| `release-comparison-server.ts`        | Серверное сравнение версий ресурса                      |
-| `release-history-server.ts`           | Серверная история выбора версий                         |
-| `collection-releases-server.ts`       | Серверный экран версий коллекции                        |
-| `collection-requirements-server.ts`   | Серверный экран требований коллекции                    |
-| `release-follow.ts`                   | Клиентский переход на актуальную версию                 |
-| `release-selection.ts`                | Клиентский выбор версии                                 |
-| `collection-import-page-server.ts`    | Серверная страница импорта                              |
-| `collection-reconcile-page-server.ts` | Серверная страница сверки                               |
-| `collection-compare-page-server.ts`   | Серверное сравнение коллекций                           |
-| `collection-receipt-page-server.ts`   | Серверная квитанция команды                             |
-| `collection-history-page-server.ts`   | Серверная история команд                                |
-| `collection-inventory-page-server.ts` | Серверный инвентарь коллекций                           |
-| `resource-collections-page-server.ts` | Серверные коллекции ресурса                             |
-| `collections-server.ts`               | `LibraryCollectionsScreen`; server-only экран коллекций |
-| `collection-command.ts`               | Клиентская форма команды коллекции                      |
-| `collection-batch.ts`                 | Клиентская форма пакетной команды                       |
-| `collection-item-copy.ts`             | Клиентская форма копирования и переноса элементов       |
+| Entry                                 | Контракт                                                      |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `membership-history-server.ts`        | Серверный экран истории членства                              |
+| `selection-batch-server.ts`           | Серверный экран пакетного выбора версий                       |
+| `collection-import.ts`                | Клиентский импорт и сверка коллекции                          |
+| `collection-restore.ts`               | Клиентское восстановление коллекции                           |
+| `membership-batch.ts`                 | Клиентское пакетное управление членством                      |
+| `release-comparison-server.ts`        | Серверное сравнение версий ресурса                            |
+| `release-history-server.ts`           | Серверная история выбора версий                               |
+| `collection-releases-server.ts`       | Серверный экран версий коллекции                              |
+| `collection-requirements-server.ts`   | Серверный экран требований коллекции                          |
+| `release-follow.ts`                   | Клиентский переход на актуальную версию                       |
+| `release-selection.ts`                | Клиентский выбор версии                                       |
+| `library-release-request.ts`          | `freezeLibraryReleaseRequest`, `matchesLibraryReleaseRequest` |
+| `collection-import-page-server.ts`    | Серверная страница импорта                                    |
+| `collection-reconcile-page-server.ts` | Серверная страница сверки                                     |
+| `collection-compare-page-server.ts`   | Серверное сравнение коллекций                                 |
+| `collection-receipt-page-server.ts`   | Серверная квитанция команды                                   |
+| `collection-history-page-server.ts`   | Серверная история команд                                      |
+| `collection-inventory-page-server.ts` | Серверный инвентарь коллекций                                 |
+| `resource-collections-page-server.ts` | Серверные коллекции ресурса                                   |
+| `collections-server.ts`               | `LibraryCollectionsScreen`; server-only экран коллекций       |
+| `collection-command.ts`               | Клиентская форма команды коллекции                            |
+| `collection-batch.ts`                 | Клиентская форма пакетной команды                             |
+| `collection-item-copy.ts`             | Клиентская форма копирования и переноса элементов             |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

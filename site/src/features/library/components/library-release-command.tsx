@@ -9,7 +9,7 @@ import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
   matchesLibraryReleaseRequest,
-} from "../../../lib/library-release-request";
+} from "../library-release-request";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedLibraryRelease } from "../../../lib/resource-release-control-confirmation";
 import {
