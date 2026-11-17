@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { licenseArchiveCsv } from "../../../../lib/license-archive-csv";
+import { licenseArchiveCsv } from "../../../../features/commerce/license-archive-csv";
 import { licenseArchiveQuery } from "../../../../features/commerce/license-archive-query";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { licenseControlService } from "../../../../lib/services/license-control-service";
