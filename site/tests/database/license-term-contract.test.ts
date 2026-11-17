@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { licenseArchiveQuery, licenseArchiveUrl } from "../../src/lib/license-archive-query";
+import { licenseArchiveQuery, licenseArchiveUrl } from "../../src/features/commerce/license-archive-query";
 import { licenseArchiveCsv } from "../../src/lib/license-archive-csv";
 import { licenseTermNotification } from "../../src/lib/license-maintenance-i18n";
 import { formatNotification } from "../../src/lib/notification-copy";

@@ -1,7 +1,7 @@
 import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
-import { licenseArchiveUrl } from "../../../lib/license-archive-query";
+import { licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 
 const filterLinkClass =
