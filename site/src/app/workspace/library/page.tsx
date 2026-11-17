@@ -17,7 +17,7 @@ import {
   parseLibraryFilter,
   parseLibraryPage,
 } from "../../../lib/library-view";
-import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../features/resources/public-release-history";
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";

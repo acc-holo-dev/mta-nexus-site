@@ -15,7 +15,7 @@ import {
   getReleaseHistoryCopy,
   parseReleaseHistoryPage,
   releaseHistoryHref,
-} from "../../../lib/public-release-history";
+} from "../public-release-history";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { productService } from "../../../lib/services/product-service";

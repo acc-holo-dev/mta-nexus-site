@@ -9,7 +9,7 @@ import {
   parseReleaseHistoryPage,
   releaseHistoryCopy,
   releaseHistoryHref,
-} from "../../src/lib/public-release-history";
+} from "../../src/features/resources/public-release-history";
 
 describe("bounded published build archive", () => {
   it("clamps excessive pages and never allows unbounded page sizes", () => {

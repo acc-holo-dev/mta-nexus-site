@@ -88,7 +88,7 @@ vi.mock("../../src/features/resources/components/resource-download-button", asyn
 
 import ReleasePage, { metadata } from "../../src/app/market/[slug]/versions/page";
 import { getDictionary } from "../../src/lib/i18n";
-import { getReleaseHistoryCopy } from "../../src/lib/public-release-history";
+import { getReleaseHistoryCopy } from "../../src/features/resources/public-release-history";
 
 const release = {
   id: "bld_clean_1",

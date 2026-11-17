@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getReleaseHistoryCopy } from "../../../../lib/public-release-history";
+import { getReleaseHistoryCopy } from "../../../../features/resources/public-release-history";
 
 // Honest loading shell for /market/[slug]/versions.
 export default async function Loading() {

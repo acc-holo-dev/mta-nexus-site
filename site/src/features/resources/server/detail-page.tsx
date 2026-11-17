@@ -28,7 +28,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { licenseModelLabel } from "../../../lib/license-model-i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
-import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../public-release-history";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
