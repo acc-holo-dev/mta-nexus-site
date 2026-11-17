@@ -65,6 +65,9 @@ const copy = {
     } as Record<string, string>,
     publicRead: "Questions stay public. Sign in only to ask or follow a thread.",
     signIn: "Sign in to ask a question",
+    identityUnavailable: "Could not verify your session for questions.",
+    identityUnavailableDescription:
+      "A session check failure is not a signed-out guest. Retry before signing in or asking.",
     accessRequired: "Add this resource to your library before asking.",
     buildContext: "About version",
     buildUnavailable: "Version context kept; that build is no longer a public download.",
@@ -156,6 +159,9 @@ const copy = {
     } as Record<string, string>,
     publicRead: "Вопросы остаются публичными. Вход нужен, чтобы спросить или следить за веткой.",
     signIn: "Войдите, чтобы задать вопрос",
+    identityUnavailable: "Не удалось проверить сессию для вопросов.",
+    identityUnavailableDescription:
+      "Сбой проверки сессии — это не гостевой вход. Повторите проверку до входа или вопроса.",
     accessRequired: "Сначала добавьте ресурс в библиотеку.",
     buildContext: "Про версию",
     buildUnavailable: "Контекст версии сохранён; эта сборка больше не публичная загрузка.",

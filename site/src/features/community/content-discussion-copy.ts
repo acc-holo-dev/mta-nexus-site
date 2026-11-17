@@ -69,6 +69,9 @@ const en = {
   invalidParent: "The comment you are replying to is no longer available.",
   invalidCursor: "This comment page is invalid. Reload the discussion.",
   signIn: "Sign in to join the discussion",
+  identityUnavailable: "Could not verify your session for this discussion.",
+  identityUnavailableDescription:
+    "A session check failure is not a signed-out guest. Retry before signing in or publishing.",
   latest: "Show latest comments",
   searchKeepsDraft: "Search does not clear your draft comment.",
   formErrorHint: "The result could not be confirmed. Check the saved comment before trying again.",
@@ -142,6 +145,9 @@ const ru: Record<keyof typeof en, string> = {
   invalidParent: "Комментарий, на который вы отвечаете, больше недоступен.",
   invalidCursor: "Некорректная страница комментариев. Перезагрузите обсуждение.",
   signIn: "Войдите, чтобы участвовать в обсуждении",
+  identityUnavailable: "Не удалось проверить сессию для этого обсуждения.",
+  identityUnavailableDescription:
+    "Сбой проверки сессии — это не гостевой вход. Повторите проверку до входа или публикации.",
   latest: "Показать новые комментарии",
   searchKeepsDraft: "Поиск не очищает черновик комментария.",
   formErrorHint:
