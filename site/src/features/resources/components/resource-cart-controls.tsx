@@ -11,7 +11,7 @@ import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import {
   getResourceCommerceCopy,
   resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
+} from "../resource-commerce-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";

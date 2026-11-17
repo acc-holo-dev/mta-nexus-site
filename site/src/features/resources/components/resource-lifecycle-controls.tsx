@@ -18,7 +18,7 @@ import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   getResourceCommerceCopy,
   resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
+} from "../resource-commerce-i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";

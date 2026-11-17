@@ -6,7 +6,7 @@ import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { ResourceCartControls } from "../../../features/resources/cart-controls";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../../features/resources/resource-commerce-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 

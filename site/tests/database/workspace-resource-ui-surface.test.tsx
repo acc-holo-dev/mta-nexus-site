@@ -5,7 +5,7 @@ import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";

@@ -5,7 +5,7 @@ import {
   confirmedResourceCart,
   confirmedResourceClaim,
 } from "../../src/features/resources/resource-commerce-confirmation";
-import { resourceCommerceError } from "../../src/lib/resource-commerce-i18n";
+import { resourceCommerceError } from "../../src/features/resources/resource-commerce-i18n";
 
 it("accepts only a confirmed acquisition of the exact selected resources", () => {
   const result = {

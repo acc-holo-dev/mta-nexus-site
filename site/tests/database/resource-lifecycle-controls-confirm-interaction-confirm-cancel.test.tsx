@@ -25,7 +25,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 });
 
 import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 
 const { render, submit, seedControls } = createResourceLifecycleControlsConfirmInteractionHelpers(
   harness,

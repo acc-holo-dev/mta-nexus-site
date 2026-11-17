@@ -26,7 +26,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 
 const { render, removeButton } = createResourceCartControlsConfirmInteractionHelpers(
   harness,

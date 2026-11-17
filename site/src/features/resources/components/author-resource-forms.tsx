@@ -34,7 +34,7 @@ import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {
   getResourceCommerceCopy,
   resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
+} from "../resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";

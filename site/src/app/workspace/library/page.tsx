@@ -24,7 +24,7 @@ import {
   parseLibraryPage,
 } from "../../../lib/library-view";
 import { getResourceActivityCopy } from "../../../features/resources/resource-activity-i18n";
-import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../../features/resources/resource-commerce-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";

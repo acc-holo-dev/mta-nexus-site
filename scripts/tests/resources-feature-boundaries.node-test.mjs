@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-commerce-i18n",
     "resource-release-control-query",
     "build-download-selection",
     "resource-download-sha256",
@@ -298,6 +299,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-commerce-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-release-control-query.ts", "resources-view-isolation"],
     ["features/resources/build-download-selection.ts", "resources-view-isolation"],
     ["features/resources/resource-download-sha256.ts", "resources-view-isolation"],
@@ -397,6 +399,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-commerce-i18n.ts",
     "app/resource-release-control-query.ts",
     "app/build-download-selection.ts",
     "app/resource-download-sha256.ts",
@@ -490,6 +493,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-commerce-i18n.ts",
     "site/src/features/resources/resource-release-control-query.ts",
     "site/src/features/resources/build-download-selection.ts",
     "site/src/features/resources/resource-download-sha256.ts",
@@ -663,6 +667,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-commerce-i18n.ts");
   visit("site/src/features/resources/resource-release-control-query.ts");
   visit("site/src/features/resources/build-download-selection.ts");
   visit("site/src/features/resources/resource-download-sha256.ts");

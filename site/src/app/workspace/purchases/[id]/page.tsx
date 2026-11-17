@@ -17,7 +17,7 @@ import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { orderCaseCopy } from "../../../../lib/order-case-i18n";
 import { orderTermsCopy } from "../../../../features/commerce/order-terms-i18n";
-import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../../../features/resources/resource-commerce-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { commerceService } from "../../../../lib/services/commerce-service";
 
