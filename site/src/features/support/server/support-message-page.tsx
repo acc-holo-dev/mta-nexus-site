@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { supportMessageDiscoveryService } from "../../../lib/services/support/support-message-discovery-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
@@ -47,20 +48,12 @@ export async function SupportMessagePage({
     actor = await authService.getSession(token);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={validId && query.size ? `${path}?${query}` : path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {getDictionary(locale).errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
     );
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
