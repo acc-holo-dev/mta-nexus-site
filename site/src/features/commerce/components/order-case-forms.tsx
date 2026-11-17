@@ -20,7 +20,7 @@ import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
-} from "../../../lib/order-case-response";
+} from "../order-case-response";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,

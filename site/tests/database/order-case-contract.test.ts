@@ -5,7 +5,7 @@ import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
-} from "../../src/lib/order-case-response";
+} from "../../src/features/commerce/order-case-response";
 const requestId = "00000000-0000-4000-8000-000000000000",
   caseId = `sup_${"a".repeat(24)}`;
 const draft = {

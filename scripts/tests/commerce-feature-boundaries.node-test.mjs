@@ -10,6 +10,7 @@ const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cr
 const config = resolve(root, ".dependency-cruiser.cjs");
 const utilPorts = [
   "license-runtime-response",
+  "order-case-response",
 ];
 const clientPorts = [
   "workspace-history",
@@ -21,7 +22,7 @@ const clientPorts = [
   "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|order-case-i18n|order-case-response|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|order-case-i18n|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(

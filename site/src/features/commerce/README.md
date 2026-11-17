@@ -24,6 +24,7 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `plan-review-detail.ts`     | `PlanReviewDetailView`; workspace plan review detail                                   |
 | `seller-sales.ts`           | `SellerSalesReportView`; workspace seller sales report                                 |
 | `license-runtime-response.ts` | util port `license-runtime-response` |
+| `order-case-response.ts` | util port `order-case-response` |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.
