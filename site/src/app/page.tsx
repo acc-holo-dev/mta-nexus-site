@@ -6,11 +6,11 @@ import { ArticleCard } from "../features/community/article-view";
 import { ProductCard } from "../features/resources/view";
 import { HomeNetworkServerCard } from "../features/servers/client";
 import { HomePersonalChangesPanel } from "../features/shell/home-personal";
-import { loadPersonalChangesSummary } from "../features/shell/home-personal-changes";
 import {
   HOME_PERSONAL_COOKIE,
   parseHomePersonalPreference,
 } from "../features/shell/home-personal-preference";
+import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";

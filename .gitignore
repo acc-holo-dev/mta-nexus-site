@@ -43,3 +43,4 @@ scripts/_agent_*
 # Post site/ migration leftovers — not workspace members (canonical: site/, site/packages/*)
 /packages/
 /apps/
+**/__pycache__/

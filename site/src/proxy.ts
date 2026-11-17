@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { rejectUnsafeBrowserRequest } from "./lib/browser-request-guard";
+import { isLicenseRuntimeRequest } from "./lib/browser-request-policy";
 import {
   appendVaryHeader,
   isOfflineCacheablePublicPath,
   PUBLIC_OFFLINE_CACHE_HEADER,
   PUBLIC_OFFLINE_CACHE_MARKER,
-} from "./features/shell/offline-cache-policy";
-import { rejectUnsafeBrowserRequest } from "./lib/browser-request-guard";
-import { isLicenseRuntimeRequest } from "./lib/browser-request-policy";
+} from "./lib/offline-cache-policy";
 
 export function proxy(request: NextRequest) {
   if (
