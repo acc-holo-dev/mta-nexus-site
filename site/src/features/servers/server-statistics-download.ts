@@ -1,6 +1,6 @@
 import type { Locale } from "../../lib/i18n";
 import { privateApiRequest } from "../../lib/private-api-request";
-import { serverStatisticsError } from "../../lib/server-statistics-copy";
+import { serverStatisticsError } from "./server-statistics-copy";
 
 export async function fetchServerStatisticsCsv(url: string, locale: Locale, signal?: AbortSignal) {
   try {

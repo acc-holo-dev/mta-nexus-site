@@ -19,7 +19,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
 import { parseServerHistoryWindow } from "../../../lib/server-history-window";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { serverStatisticsCopy } from "../../../features/servers/server-statistics-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { contentService } from "../../../lib/services/content-service";
 import {

@@ -15,7 +15,7 @@ import {
   serverStatisticsCsv,
   serverStatisticsIntervals,
 } from "../../src/lib/server-statistics-export";
-import { serverStatisticsCopy, serverStatisticsError } from "../../src/lib/server-statistics-copy";
+import { serverStatisticsCopy, serverStatisticsError } from "../../src/features/servers/server-statistics-copy";
 const summary = {
   observationCount: 100,
   knownPlayerCount: 90,

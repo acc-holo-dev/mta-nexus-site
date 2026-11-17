@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-statistics-copy",
     "server-follow-notifications",
     "server-review-query",
     "server-workspace-copy",
@@ -158,6 +159,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-statistics-copy.ts", "servers-client-isolation"],
     ["features/servers/server-follow-notifications.ts", "servers-client-isolation"],
     ["features/servers/server-review-query.ts", "servers-client-isolation"],
     ["features/servers/server-workspace-copy.ts", "servers-client-isolation"],
@@ -213,6 +215,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-statistics-copy.ts",
     "app/server-follow-notifications.ts",
     "app/server-review-query.ts",
     "app/server-workspace-copy.ts",
@@ -250,6 +253,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-statistics-copy.ts",
     "site/src/features/servers/server-follow-notifications.ts",
     "site/src/features/servers/server-review-query.ts",
     "site/src/features/servers/server-workspace-copy.ts",
@@ -279,7 +283,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|managed-server-copy|server-workspace-contract|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|managed-server-copy|server-workspace-contract|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -318,6 +322,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-statistics-copy.ts");
   visit("site/src/features/servers/server-follow-notifications.ts");
   visit("site/src/features/servers/server-review-query.ts");
   visit("site/src/features/servers/server-workspace-copy.ts");

@@ -368,7 +368,7 @@ module.exports = {
         "Other application modules consume Servers only through explicit public entrypoints.",
       from: { path: "^site/src/(?!features/servers/)" },
       to: {
-        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server)\\.ts$)",
+        path: "^site/src/features/servers/(?!(?:client|server|model|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy|statistics-server|observations-server|history-server|claim-status-server|managed-card-server|content-editor-server|activity-server|publication-history-server|updates-server)\\.ts$)",
       },
     },
     {
@@ -383,10 +383,10 @@ module.exports = {
       comment:
         "Client components and pure models cannot reach server entrypoints, services, request locale or infrastructure packages.",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: {
-        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|managed-server-copy|server-workspace-contract|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|content-discussion-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/servers/(?:server(?:\\.ts$|/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:private-api-request|server-history-window|server-statistics-contract|managed-server-copy|server-workspace-contract|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|content-discussion-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -407,7 +407,7 @@ module.exports = {
       name: "servers-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications)\\.ts$|components/|model(?:\\.ts$|/))",
+        path: "^site/src/features/servers/(?:(?:client|connect|statistics-export|statistics-view|registration|claim-controls|details-controls|review-controls|follow|visibility-batch|workspace-navigation|server-organization-options|server-claim-confirmation|server-history-presentation|server-mutation-confirmation|server-review-confirmation|server-statistics-download|server-workspace-nav-i18n|server-claim-status-view|server-activity-view|server-review-i18n|server-mutation-errors|server-workspace-copy|server-review-query|server-follow-notifications|server-statistics-copy)\\.ts$|components/|model(?:\\.ts$|/))",
       },
       to: { dependencyTypes: ["core"] },
     },

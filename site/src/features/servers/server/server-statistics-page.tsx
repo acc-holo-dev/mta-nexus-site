@@ -10,7 +10,7 @@ import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
 } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy, serverStatisticsError } from "../../../lib/server-statistics-copy";
+import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerStatisticsResult,

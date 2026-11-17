@@ -35,7 +35,7 @@ import {
 } from "../../src/features/servers/server/server-statistics-page";
 import { ServerStatisticsPanel } from "../../src/features/servers/server/server-statistics-panel";
 import { getDictionary } from "../../src/lib/i18n";
-import { serverStatisticsCopy } from "../../src/lib/server-statistics-copy";
+import { serverStatisticsCopy } from "../../src/features/servers/server-statistics-copy";
 
 beforeEach(() => {
   state.locale = "ru";

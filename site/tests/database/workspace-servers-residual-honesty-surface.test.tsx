@@ -22,7 +22,7 @@ import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
 import { serverContentCopy } from "../../src/lib/server-content-copy";
 import { serverObservationBrowserCopy } from "../../src/lib/server-observation-browser-copy";
 import { serverPublicationHistoryCopy } from "../../src/lib/server-publication-history-copy";
-import { serverStatisticsCopy } from "../../src/lib/server-statistics-copy";
+import { serverStatisticsCopy } from "../../src/features/servers/server-statistics-copy";
 
 beforeEach(() => {
   state.locale = "en";
@@ -157,7 +157,7 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(read("site/src/features/servers/server-workspace-copy.ts")).toContain(
     "historyUnavailableHint",
   );
-  expect(read("site/src/lib/server-statistics-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/lib/server-observation-browser-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/lib/server-publication-history-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/lib/server-content-copy.ts")).toContain("loadUnavailableHint");

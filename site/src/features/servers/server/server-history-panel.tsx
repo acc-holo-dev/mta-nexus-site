@@ -7,7 +7,7 @@ import {
   serverHistoryBarPercent,
   serverHistoryChartSlots,
 } from "../server-history-presentation";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { serverStatisticsCopy } from "../server-statistics-copy";
 import type { ServerHistoryResult } from "../../../lib/services/server-history-service";
 
 function metric(value: number | null) {
