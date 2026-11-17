@@ -23,7 +23,7 @@ import {
   type ResourceSubmissionIntent,
   resourceFileHash,
   resourceIntentKey,
-} from "../../../lib/resource-submission-intent";
+} from "../resource-submission-intent";
 import { useNexusLocale } from "../../shell/locale";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";

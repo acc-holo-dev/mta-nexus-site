@@ -8,43 +8,44 @@ Services и repositories не дублируются и не переносят�
 
 ## Публичные entrypoints
 
-| Entry                       | Контракт                                                                                                    |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `detail-view.ts`            | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
-| `compatibility-controls.ts` | `ResourceCompatibilityForm`; клиентская форма совместимости workspace                                       |
-| `variant-controls.ts`       | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
-| `publisher-view.ts`         | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
-| `publisher-navigation.ts`   | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
-| `create-controls.ts`        | `NewResourceForm`; клиентская форма создания                                                                |
-| `copy-controls.ts`          | `ResourceCopyForm`; клиентская форма копирования                                                            |
-| `copy-view.ts`              | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
-| `author-controls.ts`        | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
-| `lifecycle-controls.ts`     | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
-| `moderation-controls.ts`    | `ResourceModerationControls`; staff moderation UI                                                           |
-| `requirements-view.ts`      | `ResourceRequirementsReportBody`; общее представление отчёта                                                |
-| `quarantine-controls.ts`    | `BuildQuarantineControls`; client UI карантина                                                              |
-| `package-server.ts`         | `BuildPackageScreen`; server-only экран состава сборки                                                      |
-| `requirements-server.ts`    | `ResourceRequirementsScreen`; server-only экран требований                                                  |
-| `review-report-server.ts`   | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
-| `qa-report-actions.ts`      | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
-| `release-watch-batch.ts`    | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
-| `cart-controls.ts`          | `ResourceCartControls`; client UI корзины                                                                   |
-| `cart-view.ts`              | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
-| `delivery-server.ts`        | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
-| `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
-| `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
-| `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
-| `download.ts`               | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
-| `client.ts`                 | `ResourceGallery`, `ResourceQaPanel`; client components                                                     |
-| `evidence.ts`               | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
-| `view.ts`                   | `ProductCard`, совместимая с RSC и Discovery                                                                |
-| `server.ts`                 | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
-| `build-server.ts`           | `ResourceBuildScreen`; server-only composition авторской и staff страниц сборки                             |
-| `media-server.ts`           | `ResourceMediaScreen`; server-only composition авторской и staff страниц медиа                              |
-| `detail-server.ts`          | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
-| `versions-server.ts`        | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
-| `reviews-server.ts`         | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
-| `model.ts`                  | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
+| Entry                           | Контракт                                                                                                    |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `detail-view.ts`                | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
+| `compatibility-controls.ts`     | `ResourceCompatibilityForm`; клиентская форма совместимости workspace                                       |
+| `variant-controls.ts`           | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
+| `publisher-view.ts`             | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
+| `publisher-navigation.ts`       | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
+| `create-controls.ts`            | `NewResourceForm`; клиентская форма создания                                                                |
+| `resource-submission-intent.ts` | `parseResourceIntent`, `resourceIntentKey` (create-form draft intent)                                       |
+| `copy-controls.ts`              | `ResourceCopyForm`; клиентская форма копирования                                                            |
+| `copy-view.ts`                  | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
+| `author-controls.ts`            | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
+| `lifecycle-controls.ts`         | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
+| `moderation-controls.ts`        | `ResourceModerationControls`; staff moderation UI                                                           |
+| `requirements-view.ts`          | `ResourceRequirementsReportBody`; общее представление отчёта                                                |
+| `quarantine-controls.ts`        | `BuildQuarantineControls`; client UI карантина                                                              |
+| `package-server.ts`             | `BuildPackageScreen`; server-only экран состава сборки                                                      |
+| `requirements-server.ts`        | `ResourceRequirementsScreen`; server-only экран требований                                                  |
+| `review-report-server.ts`       | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
+| `qa-report-actions.ts`          | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
+| `release-watch-batch.ts`        | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
+| `cart-controls.ts`              | `ResourceCartControls`; client UI корзины                                                                   |
+| `cart-view.ts`                  | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
+| `delivery-server.ts`            | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
+| `review-controls.ts`            | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
+| `reviews-view.ts`               | `ResourceReviewPager`; общая пагинация для workspace                                                        |
+| `release-watch.ts`              | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
+| `download.ts`                   | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
+| `client.ts`                     | `ResourceGallery`, `ResourceQaPanel`; client components                                                     |
+| `evidence.ts`                   | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
+| `view.ts`                       | `ProductCard`, совместимая с RSC и Discovery                                                                |
+| `server.ts`                     | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
+| `build-server.ts`               | `ResourceBuildScreen`; server-only composition авторской и staff страниц сборки                             |
+| `media-server.ts`               | `ResourceMediaScreen`; server-only composition авторской и staff страниц медиа                              |
+| `detail-server.ts`              | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
+| `versions-server.ts`            | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
+| `reviews-server.ts`             | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
+| `model.ts`                      | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
