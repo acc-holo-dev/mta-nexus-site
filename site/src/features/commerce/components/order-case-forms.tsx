@@ -11,17 +11,21 @@ import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../lib/order-case-i18n";
+import {
+  orderCaseActionLabel,
+  orderCaseCopy,
+  orderCaseKindLabel,
+} from "../../../lib/order-case-i18n";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
   parseOrderCaseAmount,
-} from "../lib/order-case-response";
+} from "../../../lib/order-case-response";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
-} from "../lib/support-retry";
+} from "../../../lib/support-retry";
 
 export function OrderCaseCreateForm({
   orderId,

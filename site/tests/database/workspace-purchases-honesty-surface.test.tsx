@@ -161,14 +161,16 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("loading:");
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/lib/resource-review-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("site/src/components/order-case-page.tsx")).toContain("loadUnavailableHint");
+  expect(read("site/src/features/commerce/server/order-case-page.tsx")).toContain(
+    "loadUnavailableHint",
+  );
   expect(read("site/src/features/resources/server/resource-review-report-screen.tsx")).toContain(
     "loadUnavailableHint",
   );
 });
 
 it("locks order-case filter apply and selects to touch targets", () => {
-  const source = read("site/src/components/order-case-page.tsx");
+  const source = read("site/src/features/commerce/server/order-case-page.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
   expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");

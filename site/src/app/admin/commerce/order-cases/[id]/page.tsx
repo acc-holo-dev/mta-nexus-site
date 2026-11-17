@@ -1,4 +1,7 @@
-import { OrderCaseDetailPage, orderCaseMetadata } from "../../../../../components/order-case-page";
+import {
+  OrderCaseDetailPage,
+  orderCaseMetadata,
+} from "../../../../../features/commerce/order-case-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

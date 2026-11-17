@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OrderCancellationForm } from "../../../../../components/order-cancellation-form";
+import { OrderCancellationForm } from "../../../../../features/commerce/order-cancellation";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import {
   formatHistoryAmount,

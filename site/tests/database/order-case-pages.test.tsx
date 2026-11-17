@@ -37,7 +37,7 @@ import {
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
-} from "../../src/components/order-case-page";
+} from "../../src/features/commerce/order-case-server";
 import { orderCaseCopy } from "../../src/lib/order-case-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");

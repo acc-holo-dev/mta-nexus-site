@@ -11,7 +11,7 @@ const exclusive = [
   "site/src/components/seller-sales-report.tsx",
   "site/src/features/resources/components/resource-review-controls.tsx",
   "site/src/features/support/components/support-center.tsx",
-  "site/src/components/order-case-page.tsx",
+  "site/src/features/commerce/server/order-case-page.tsx",
   "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;
 
@@ -31,7 +31,7 @@ it("locks resource-review primary submit CTAs to size=touch", () => {
 });
 
 it("locks order-case filter selects to min-h-11 field chrome", () => {
-  const source = read("site/src/components/order-case-page.tsx");
+  const source = read("site/src/features/commerce/server/order-case-page.tsx");
   expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
   expect(source).toContain('size="touch"');
 });

@@ -5,15 +5,19 @@ tabs and pagination chrome. License workspace/admin detail, archive filters, con
 panel and runtime probe live here too. Services, repositories, routes and
 `commerce-history-*` / `license-*` helpers stay in existing layers.
 
-| Entry                       | Контракт                                                                            |
-| --------------------------- | ----------------------------------------------------------------------------------- |
-| `workspace-history.ts`      | `HistoryShell`, `HistoryPagination`; `/workspace/{purchases,licenses,sales}` lists  |
-| `license-controls.ts`       | `LicenseControlPanel`, `LicenseRuntimeProbe` (client)                               |
-| `license-detail.ts`         | `LicenseDetailView`; workspace/admin license detail                                 |
-| `license-archive.ts`        | `LicenseArchiveFilters`; workspace license list filters                             |
-| `license-history-server.ts` | `LicenseHistoryPage`, `licenseHistoryMetadata`; workspace/admin license activity    |
-| `subscription-controls.ts`  | `SubscriptionControls`, `SubscriptionFeeEstimator`, `SubscriptionRecovery` (client) |
-| `subscription-workspace.ts` | `subscriptionNavLinkClass`; subscription workspace nav chrome (RSC-safe)            |
+| Entry                       | Контракт                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| `workspace-history.ts`      | `HistoryShell`, `HistoryPagination`; `/workspace/{purchases,licenses,sales}` lists     |
+| `license-controls.ts`       | `LicenseControlPanel`, `LicenseRuntimeProbe` (client)                                  |
+| `license-detail.ts`         | `LicenseDetailView`; workspace/admin license detail                                    |
+| `license-archive.ts`        | `LicenseArchiveFilters`; workspace license list filters                                |
+| `license-history-server.ts` | `LicenseHistoryPage`, `licenseHistoryMetadata`; workspace/admin license activity       |
+| `subscription-controls.ts`  | `SubscriptionControls`, `SubscriptionFeeEstimator`, `SubscriptionRecovery` (client)    |
+| `subscription-workspace.ts` | `subscriptionNavLinkClass`; subscription workspace nav chrome (RSC-safe)               |
+| `order-cancellation.ts`     | `OrderCancellationForm` (client); workspace purchase cancel                            |
+| `order-case-forms.ts`       | `OrderCaseReviewForm` (client); create form composed via `order-case-server`           |
+| `order-terms.ts`            | `OrderTermsReportView`; buyer/admin order terms report (RSC-safe)                      |
+| `order-case-server.ts`      | `OrderCaseListPage`, `OrderCaseDetailPage`, `OrderCaseCreatePage`, `orderCaseMetadata` |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

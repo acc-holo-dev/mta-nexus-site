@@ -4,11 +4,11 @@ import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { orderCancellationCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { confirmedOrderCancellation } from "../lib/commercial-confirmation";
-import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
-import { useNexusLocale } from "../features/shell/locale";
+import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+import { confirmedOrderCancellation } from "../../../lib/commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../../../lib/commercial-i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
 
 export function OrderCancellationForm({
   actorId,

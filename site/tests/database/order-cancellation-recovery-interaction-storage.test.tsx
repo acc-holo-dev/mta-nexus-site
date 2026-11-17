@@ -20,7 +20,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { OrderCancellationForm } from "../../src/components/order-cancellation-form";
+import { OrderCancellationForm } from "../../src/features/commerce/order-cancellation";
 
 const { render, mount, prepare, submit, cancelPosts } =
   createOrderCancellationRecoveryInteractionHelpers(h, OrderCancellationForm);

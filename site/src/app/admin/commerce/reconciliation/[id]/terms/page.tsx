@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OrderTermsReportView } from "../../../../../../components/order-terms-report";
+import { OrderTermsReportView } from "../../../../../../features/commerce/order-terms";
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";

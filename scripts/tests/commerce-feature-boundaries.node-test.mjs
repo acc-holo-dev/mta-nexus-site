@@ -8,9 +8,15 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const clientPorts = ["workspace-history", "license-controls", "subscription-controls"];
+const clientPorts = [
+  "workspace-history",
+  "license-controls",
+  "subscription-controls",
+  "order-cancellation",
+  "order-case-forms",
+];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|license-control-i18n|license-control-confirmation|license-runtime-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -129,5 +135,19 @@ test("real Commerce subscription-controls graphs have no transitive server depen
     "site/src/features/commerce/components/subscription-controls.tsx",
     "site/src/features/commerce/components/subscription-fee-estimator.tsx",
     "site/src/features/commerce/components/subscription-recovery.tsx",
+  ]);
+});
+
+test("real Commerce order-cancellation graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/order-cancellation.ts",
+    "site/src/features/commerce/components/order-cancellation-form.tsx",
+  ]);
+});
+
+test("real Commerce order-case-forms graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/order-case-forms.ts",
+    "site/src/features/commerce/components/order-case-forms.tsx",
   ]);
 });
