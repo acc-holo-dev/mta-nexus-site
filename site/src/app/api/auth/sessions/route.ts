@@ -10,7 +10,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { parseSessionRevocation } from "../../../../lib/session-revocation";
+import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

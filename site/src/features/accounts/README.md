@@ -8,3 +8,4 @@
 | `settings-client-api.ts` | util port `settings-client-api` |
 | `feature-flags.ts` | util port `feature-flags` |
 | `profile-privacy-copy.ts` | util port `profile-privacy-copy` |
+| `session-revocation.ts` | util port `session-revocation` |

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { parseSessionRevocation } from "../../../../lib/session-revocation";
+import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_owner" } as { id: string } | null,

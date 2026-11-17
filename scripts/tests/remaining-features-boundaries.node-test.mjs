@@ -69,8 +69,7 @@ const features = [
       "ad-preference",
       "settings-client-api",
       "feature-flags",
-      "profile-privacy-copy",
-    ],
+      "profile-privacy-copy", "session-revocation"],
     safe: "notification-preferences-confirmation|notification-inbox-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
   },
   {
