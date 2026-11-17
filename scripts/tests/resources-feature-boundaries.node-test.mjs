@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "build-moderation-ui",
     "mta-version-target",
   ]) {
     write(
@@ -250,6 +251,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/build-moderation-ui.ts", "resources-view-isolation"],
     ["features/resources/mta-version-target.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
@@ -301,6 +303,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/build-moderation-ui.ts",
     "app/mta-version-target.ts",
     "app/reviews-view.ts",
     "app/build-route.ts",
@@ -346,6 +349,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/build-moderation-ui.ts",
     "site/src/features/resources/mta-version-target.ts",
     "site/src/features/resources/release-watch.ts",
     "site/src/features/resources/compatibility-controls.ts",
@@ -471,6 +475,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/build-moderation-ui.ts");
   visit("site/src/features/resources/mta-version-target.ts");
   visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");

@@ -47,6 +47,7 @@ Services и repositories не дублируются и не переносят�
 | `reviews-server.ts`             | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
 | `model.ts`                      | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
 | `mta-version-target.ts` | util port `mta-version-target` |
+| `build-moderation-ui.ts` | util port `build-moderation-ui` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
