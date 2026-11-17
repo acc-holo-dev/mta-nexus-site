@@ -5,7 +5,7 @@ import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
-import { serverMutationErrorMessage } from "../../../lib/server-mutation-errors";
+import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
   parseServerOrganizations,
   type ServerOrganizationOption,

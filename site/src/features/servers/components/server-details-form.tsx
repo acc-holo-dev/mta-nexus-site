@@ -7,7 +7,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedUpdatedServer } from "../server-mutation-confirmation";
-import { serverMutationErrorMessage } from "../../../lib/server-mutation-errors";
+import { serverMutationErrorMessage } from "../server-mutation-errors";
 import { useNexusLocale } from "../../shell/locale";
 
 type EditableServer = {

@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { serverMutationErrorMessage } from "../../lib/server-mutation-errors";
+import { serverMutationErrorMessage } from "./server-mutation-errors";
 
 const en = {
   title: "Server verification",
