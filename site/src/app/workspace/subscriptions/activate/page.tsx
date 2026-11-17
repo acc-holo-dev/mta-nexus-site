@@ -16,6 +16,8 @@ import {
   subscriptionPageParams,
 } from "../../../../features/commerce/subscriptions-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -34,8 +36,21 @@ export default async function SubscriptionActivationPage({
 }) {
   const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = subscriptionsCopy(locale),
-    dictionary = getDictionary(locale),
+    dictionary = getDictionary(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={"/workspace/subscriptions/activate"}
+      />
+    );
+  }
+
   if (!actor) {
     const params = subscriptionPageParams(raw);
     return (
