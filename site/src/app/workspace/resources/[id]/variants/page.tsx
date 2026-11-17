@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { getResourceManagementCopy } from "../../../../../features/resources/resource-management-i18n";
 import { ResourceVariantsForm } from "../../../../../features/resources/variant-controls";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -26,14 +27,23 @@ export default async function ResourceVariantsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [locale, actor, { id }] = await Promise.all([
-    getRequestLocale(),
-    cookies().then((store) => authService.getSession(store.get("nexus_session")?.value)),
-    params,
-  ]);
+  const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
   const copy = getResourceManagementCopy(locale);
   const dictionary = getDictionary(locale);
   const returnPath = `/workspace/resources/${encodeURIComponent(id)}/variants`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
