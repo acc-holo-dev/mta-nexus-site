@@ -1,6 +1,6 @@
 import { resourceCopyCommandSchema, resourceCopyMetadataSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedResourceCopy } from "../../src/lib/resource-copy-confirmation";
+import { confirmedResourceCopy } from "../../src/features/resources/resource-copy-confirmation";
 import { resourceCopyCopy, resourceCopyError } from "../../src/lib/resource-copy-i18n";
 import {
   resourceCopiesPageParams,

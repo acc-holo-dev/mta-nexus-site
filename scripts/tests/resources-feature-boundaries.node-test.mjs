@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-copy-confirmation",
     "resource-build-workspace-response",
     "pending-resource-draft",
     "new-resource-response",
@@ -254,6 +255,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-copy-confirmation.ts", "resources-view-isolation"],
     ["features/resources/resource-build-workspace-response.ts", "resources-view-isolation"],
     ["features/resources/pending-resource-draft.ts", "resources-view-isolation"],
     ["features/resources/new-resource-response.ts", "resources-view-isolation"],
@@ -309,6 +311,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-copy-confirmation.ts",
     "app/resource-build-workspace-response.ts",
     "app/pending-resource-draft.ts",
     "app/new-resource-response.ts",
@@ -358,6 +361,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-copy-confirmation.ts",
     "site/src/features/resources/resource-build-workspace-response.ts",
     "site/src/features/resources/pending-resource-draft.ts",
     "site/src/features/resources/new-resource-response.ts",
@@ -487,6 +491,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-copy-confirmation.ts");
   visit("site/src/features/resources/resource-build-workspace-response.ts");
   visit("site/src/features/resources/pending-resource-draft.ts");
   visit("site/src/features/resources/new-resource-response.ts");
