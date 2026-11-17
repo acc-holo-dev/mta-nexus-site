@@ -12,7 +12,7 @@ import {
   type IssuedServerClaimChallenge,
   parseIssuedServerClaimChallenge,
 } from "../server-claim-confirmation";
-import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
+import { serverClaimErrorMessage } from "../server-claim-status-view";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";

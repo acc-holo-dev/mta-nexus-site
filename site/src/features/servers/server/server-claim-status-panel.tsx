@@ -2,7 +2,7 @@ import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { getServerClaimStatusCopy } from "../../../lib/server-claim-status-view";
+import { getServerClaimStatusCopy } from "../server-claim-status-view";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 
 export function ServerClaimStatusPanel({

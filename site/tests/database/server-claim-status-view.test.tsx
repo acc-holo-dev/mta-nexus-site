@@ -13,7 +13,7 @@ import { ServerClaimStatusPanel } from "../../src/features/servers/server/server
 import {
   getServerClaimStatusCopy,
   serverClaimErrorMessage,
-} from "../../src/lib/server-claim-status-view";
+} from "../../src/features/servers/server-claim-status-view";
 
 const render = (status: ManagedServerClaimStatus, locale: "en" | "ru" = "en") =>
   renderToStaticMarkup(
