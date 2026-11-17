@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { approvalCopy } from "../../../../../lib/public-verification-history-copy";
+import { approvalCopy } from "../../../../../features/trust/public-verification-history-copy";
 
 // Honest loading shell for /users/[username]/trust/history.
 export default async function Loading() {

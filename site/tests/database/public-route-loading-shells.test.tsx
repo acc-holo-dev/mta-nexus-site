@@ -12,7 +12,7 @@ import UserTrustHistoryLoading from "../../src/app/users/[username]/trust/histor
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
 import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
-import { approvalCopy } from "../../src/lib/public-verification-history-copy";
+import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 it.each([
   ["context trust", ContextTrustLoading, contextTrustCopy("en"), "context-trust-loading-heading"],

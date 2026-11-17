@@ -10,7 +10,7 @@ import {
   parseContextTrustQuery,
 } from "../../../lib/public-context-trust-contract";
 import { contextTrustCopy, contextTrustError } from "../../../lib/public-context-trust-copy";
-import { approvalCopy } from "../../../lib/public-verification-history-copy";
+import { approvalCopy } from "../public-verification-history-copy";
 import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;

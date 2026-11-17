@@ -10,11 +10,12 @@ const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cr
 const config = resolve(root, ".dependency-cruiser.cjs");
 const utilPorts = [
   "public-user-trust-copy",
+  "public-verification-history-copy",
 ];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|public-verification-history-copy|user-platform-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

@@ -3,7 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { publicPlatformApi } from "../../../../../../lib/public-platform-api";
 import { parseApprovalQuery } from "../../../../../../lib/public-verification-history-contract";
-import { approvalError } from "../../../../../../lib/public-verification-history-copy";
+import { approvalError } from "../../../../../../features/trust/public-verification-history-copy";
 import { getTrustedRequestIp } from "../../../../../../lib/request-client-ip";
 import { publicVerificationHistoryService } from "../../../../../../lib/services/public-verification-history-service";
 export async function GET(

@@ -7,7 +7,7 @@ import { OrganizationTeamDirectory } from "../../src/features/organizations/team
 import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { approvalCopy } from "../../src/lib/public-verification-history-copy";
+import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

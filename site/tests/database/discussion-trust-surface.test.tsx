@@ -6,7 +6,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { OwnDiscussionDetail } from "../../src/features/community/components/own-discussion-detail";
 import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
 import { ownDiscussionCopy } from "../../src/lib/discussion-workspace-copy";
-import { approvalCopy } from "../../src/lib/public-verification-history-copy";
+import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
