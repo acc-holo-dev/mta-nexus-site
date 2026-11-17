@@ -112,7 +112,7 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/lib/verification-workspace-copy.ts")).toContain(
     "decisionFailedDescription",
   );
-  expect(read("site/src/lib/resource-build-workspace-i18n.ts")).toContain("failedDescription");
+  expect(read("site/src/features/resources/resource-build-workspace-i18n.ts")).toContain("failedDescription");
   expect(read("site/src/lib/i18n/en/admin.ts")).toContain("quarantineBuildFailedDescription");
   expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("reportDecisionFailedDescription");
 });

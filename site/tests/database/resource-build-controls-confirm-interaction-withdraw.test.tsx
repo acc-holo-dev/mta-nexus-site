@@ -23,7 +23,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { ResourceBuildControls } from "../../src/features/resources/components/resource-build-controls";
-import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
+import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
 
 const { render, control, reason } = createResourceBuildControlsConfirmInteractionHelpers(
   harness,

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { buildModerationUiState } from "../build-moderation-ui";
-import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
+import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";

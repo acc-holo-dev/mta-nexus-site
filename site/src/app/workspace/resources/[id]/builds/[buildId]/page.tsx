@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ResourceBuildScreen } from "../../../../../../features/resources/build-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { getResourceBuildWorkspaceCopy } from "../../../../../../lib/resource-build-workspace-i18n";
+import { getResourceBuildWorkspaceCopy } from "../../../../../../features/resources/resource-build-workspace-i18n";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
