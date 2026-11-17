@@ -37,6 +37,7 @@ Feature объединяет существующие представления
 | `library-collection-receipts-i18n.ts`       | util port `library-collection-receipts-i18n`                  |
 | `library-collections-confirmation.ts`       | util port `library-collections-confirmation`                  |
 | `library-collection-manifests-i18n.ts`      | util port `library-collection-manifests-i18n`                 |
+| `library-collection-comparison-query.ts` | util port `library-collection-comparison-query` |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

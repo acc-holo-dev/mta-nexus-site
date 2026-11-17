@@ -13,7 +13,7 @@ import { libraryCollectionComparisonCopy } from "../../../lib/library-collection
 import {
   libraryCollectionComparisonQuery,
   libraryCollectionComparisonSuffix,
-} from "../../../lib/library-collection-comparison-query";
+} from "../library-collection-comparison-query";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

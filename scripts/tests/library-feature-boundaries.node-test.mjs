@@ -28,6 +28,7 @@ const utilPorts = [
   "library-collection-receipts-i18n",
   "library-collections-confirmation",
   "library-collection-manifests-i18n",
+  "library-collection-comparison-query",
 ];
 const serverPorts = [
   "collections",
