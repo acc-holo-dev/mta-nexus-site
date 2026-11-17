@@ -9,7 +9,7 @@ import {
   validateBuildFileSelection,
 } from "../../../lib/build-file-validation";
 import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { confirmedCreatedResource } from "../../../lib/new-resource-response";
+import { confirmedCreatedResource } from "../new-resource-response";
 import {
   createPendingResourceDraft,
   PENDING_RESOURCE_DRAFT_KEY,
