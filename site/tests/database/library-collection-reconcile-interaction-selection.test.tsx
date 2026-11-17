@@ -44,7 +44,10 @@ it("caps combined selected changes at twenty and makes archived previews read on
   check(0, false);
   expect(render().filter((n) => n.type === "input")[20]?.props.disabled).toBe(false);
   state.report = { ...state.report, collection: { ...collection, status: "archived" }, items: [] };
+  const copy = libraryCollectionManifestsCopy("en");
   expect(
-    render().some((n) => n.props.children === libraryCollectionManifestsCopy("en").noChanges),
+    render().some(
+      (n) => n.props.title === copy.noChanges && n.props.description === copy.noChangesHint,
+    ),
   ).toBe(true);
 });
