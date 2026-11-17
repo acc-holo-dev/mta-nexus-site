@@ -14,7 +14,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
-import { confirmedLicenseControl } from "../../../lib/license-control-confirmation";
+import { confirmedLicenseControl } from "../license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../../../lib/license-control-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
