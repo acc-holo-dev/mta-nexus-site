@@ -14,7 +14,7 @@ import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   confirmedSubscriptionReceipt,
   expectedSubscriptionReceiptId,
-} from "../../../lib/subscription-confirmation";
+} from "../subscription-confirmation";
 import { subscriptionError, subscriptionsCopy } from "../../../lib/subscriptions-i18n";
 import { subscriptionAccountHref, subscriptionReceiptHref } from "../../../lib/subscriptions-query";
 import { useNexusLocale } from "../../shell/locale";

@@ -27,6 +27,7 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `order-case-response.ts` | util port `order-case-response` |
 | `plan-review-confirmation.ts` | util port `plan-review-confirmation` |
 | `license-control-confirmation.ts` | util port `license-control-confirmation` |
+| `subscription-confirmation.ts` | util port `subscription-confirmation` |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

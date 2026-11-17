@@ -10,7 +10,7 @@ import {
   expectedSubscriptionReceiptId,
   confirmedSubscriptionEstimate,
   confirmedSubscriptionReceipt,
-} from "../../src/lib/subscription-confirmation";
+} from "../../src/features/commerce/subscription-confirmation";
 import { subscriptionError, subscriptionsCopy } from "../../src/lib/subscriptions-i18n";
 import {
   subscriptionActivationQuery,
