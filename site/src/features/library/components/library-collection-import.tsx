@@ -5,7 +5,7 @@ import {
   type LibraryCollectionReconcilePreview,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import {
   libraryCollectionImportPreviewSchema,
   libraryCollectionManifestSchema,
@@ -214,7 +214,7 @@ export function LibraryCollectionImport({
           <p>
             <time dateTime={preview.generatedAt}>{preview.generatedAt}</time>
           </p>
-          {!preview.items.length && <p>{m.empty}</p>}
+          {!preview.items.length ? <EmptyState title={m.empty} description={m.emptyHint} /> : null}
           <ul className="space-y-2">
             {preview.items.map((item) => (
               <li key={item.productId} className="break-words border-t border-base pt-2">

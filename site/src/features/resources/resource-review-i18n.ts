@@ -36,6 +36,9 @@ const en = {
     "Resource reviews are temporarily unavailable. This does not mean there are no reviews.",
   pageUnavailableDescription:
     "A load failure is not an empty review list. Retry to fetch the latest saved reviews.",
+  sessionUnavailable: "Could not verify your session for reviews.",
+  sessionUnavailableDescription:
+    "This is not a signed-out state. Retry after the session service recovers; guest review links stay hidden.",
   access:
     "Current library access and a safe published version are required to publish. Access is not proof of install or gameplay. Publishers and managers cannot review their own resources.",
   ownerConflict:
@@ -129,6 +132,9 @@ const ru: typeof en = {
   pageUnavailable: "Отзывы о ресурсе временно недоступны. Это не означает, что отзывов нет.",
   pageUnavailableDescription:
     "Ошибка загрузки — это не пустой список отзывов. Повторите запрос, чтобы получить сохранённые отзывы.",
+  sessionUnavailable: "Не удалось проверить сессию для отзывов.",
+  sessionUnavailableDescription:
+    "Это не состояние выхода из аккаунта. Повторите после восстановления сервиса сессии; гостевые ссылки на отзыв остаются скрытыми.",
   access:
     "Для публикации нужен действующий доступ в библиотеке и безопасная опубликованная версия. Доступ не доказывает установку или игру. Издатели и управляющие не могут оценивать свои ресурсы.",
   ownerConflict:

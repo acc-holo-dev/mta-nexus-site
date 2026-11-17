@@ -23,6 +23,8 @@ const en = {
   invalid: "Use a valid collection JSON file no larger than 64 KiB.",
   note: "Export stores the collection snapshot and up to 200 resource IDs. Import adds selected references to this collection; current account access is checked again when saving. Existing entries keep their dates. Review at most 20 additions at once within the available space.",
   empty: "The file contains no resource references.",
+  emptyHint:
+    "An empty import preview is a confirmed file result, not a load failure. Choose another JSON export that includes resource IDs.",
   present: "Already included",
   blocked: "Cannot add with current access or collection state",
   eligible: "Can be added",
@@ -58,6 +60,8 @@ const ru: typeof en = {
   invalid: "Нужен корректный JSON-файл коллекции размером не более 64 КиБ.",
   note: "Экспорт хранит снимок коллекции и до 200 ID ресурсов. Импорт добавляет выбранные ссылки в эту коллекцию; при сохранении доступ аккаунта проверяется повторно. Даты существующих записей сохраняются. За один раз можно проверить до 20 добавлений в пределах свободного места.",
   empty: "В файле нет ссылок на ресурсы.",
+  emptyHint:
+    "Пустой предпросмотр импорта — подтверждённый результат файла, а не сбой загрузки. Выберите другой JSON-экспорт со ссылками на ресурсы.",
   present: "Уже включён",
   blocked: "Добавление недоступно при текущем доступе или состоянии коллекции",
   eligible: "Можно добавить",

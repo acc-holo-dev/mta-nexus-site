@@ -17,5 +17,8 @@ it("locks public reviews session probe failure away from guest auth links", () =
     /try \{\s*actor = await authService\.getSession\([\s\S]*?\}\s*catch \{\s*sessionFailed = true;/u,
   );
   expect(source).toMatch(/sessionFailed \?\s*\([\s\S]*?<ErrorState/u);
+  expect(source).toContain('id="resource-reviews-session-unavailable"');
+  expect(source).toContain("copy.sessionUnavailable");
+  expect(source).not.toMatch(/sessionFailed \?\s*\([\s\S]*?title=\{copy\.pageUnavailable\}/u);
   expect(source).not.toMatch(/getSession\([^)]*\)\s*\.catch\(\s*\(\)\s*=>\s*null\s*\)/u);
 });

@@ -1,7 +1,7 @@
 "use client";
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
 import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -165,7 +165,9 @@ export function LibraryCollectionItemCopyForm({
     );
   if (!destinations.length && !pending.current)
     return <ErrorState id="library-collection-no-destination" title={c.noDestination} />;
-  if (!items.length && !pending.current) return <p>{c.emptyItems}</p>;
+  if (!items.length && !pending.current) {
+    return <EmptyState title={c.emptyItems} description={c.emptyItemsHint} />;
+  }
   const shownMove = pending.current ? pending.current.command.action === "move-items" : move;
   const shownItems = pending.current
     ? pending.current.command.productIds.map(

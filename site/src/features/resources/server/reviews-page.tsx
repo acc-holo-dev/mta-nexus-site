@@ -45,6 +45,7 @@ export async function PublicResourceReviewsPage({
         <h1 className="font-display">{copy.title}</h1>
         <ErrorState
           title={copy.pageUnavailable}
+          description={copy.pageUnavailableDescription}
           action={
             <Link
               href={`/market/${encodeURIComponent(target.slug)}/reviews`}
@@ -89,6 +90,7 @@ export async function PublicResourceReviewsPage({
         <p className="text-sm text-secondary">{copy.subtitle}</p>
         <ErrorState
           title={copy.pageUnavailable}
+          description={copy.pageUnavailableDescription}
           action={
             <Link href={reviewsPath} className={actionLinkClass}>
               {dictionary.errors.retry}
@@ -110,7 +112,9 @@ export async function PublicResourceReviewsPage({
       <p className="text-sm text-secondary">{copy.subtitle}</p>
       {sessionFailed ? (
         <ErrorState
-          title={copy.pageUnavailable}
+          id="resource-reviews-session-unavailable"
+          title={copy.sessionUnavailable}
+          description={copy.sessionUnavailableDescription}
           action={
             <Link href={reviewsPath} className={actionLinkClass}>
               {dictionary.errors.retry}
