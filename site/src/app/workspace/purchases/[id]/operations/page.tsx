@@ -12,6 +12,8 @@ import {
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { OrderCancellationForm } from "../../../../../features/commerce/order-cancellation";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -39,8 +41,21 @@ export default async function OrderOperationsPage({
     searchParams,
   ]);
   const copy = getCommercialCopy(locale),
-    dictionary = getDictionary(locale),
+    dictionary = getDictionary(locale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/purchases/"}
+      />
+    );
+  }
+
   if (!user)
     return (
       <PlatformSignIn
