@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
 import {
@@ -44,20 +45,12 @@ export default async function NotificationCenterPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={returnPath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/notifications"}
+      />
     );
   }
   if (!actor) {
