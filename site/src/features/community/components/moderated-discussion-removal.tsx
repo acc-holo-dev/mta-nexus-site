@@ -2,19 +2,16 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { moderationCopy } from "../community-moderation-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   confirmsModeratedDiscussionRemoval,
   moderatedDiscussionHref,
   moderatedDiscussionRemoveSchema,
 } from "../../../lib/moderated-discussion-contract";
-import {
-  moderatedDiscussionCopy,
-  moderatedDiscussionError,
-} from "../moderated-discussion-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
+import { moderationCopy } from "../community-moderation-copy";
+import { moderatedDiscussionCopy, moderatedDiscussionError } from "../moderated-discussion-copy";
 export function ModeratedDiscussionRemoval({
   contentId,
   commentId,

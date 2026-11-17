@@ -6,18 +6,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
-import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
-import {
-  getResourceCommerceCopy,
-  resourceCommerceError,
-} from "../resource-commerce-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
+import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
 import { confirmedCartAcquisition, confirmedResourceCart } from "../resource-commerce-confirmation";
+import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =

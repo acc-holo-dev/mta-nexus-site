@@ -1,12 +1,14 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({ readStatistics: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   serverObservationRepository: { readStatistics: state.readStatistics },
 }));
+
 import {
-  serverStatisticsService,
-  type ServerStatisticsResult,
-} from "../../src/lib/services/server-statistics-service";
+  serverStatisticsCopy,
+  serverStatisticsError,
+} from "../../src/features/servers/server-statistics-copy";
 import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
@@ -15,7 +17,11 @@ import {
   serverStatisticsCsv,
   serverStatisticsIntervals,
 } from "../../src/lib/server-statistics-export";
-import { serverStatisticsCopy, serverStatisticsError } from "../../src/features/servers/server-statistics-copy";
+import {
+  type ServerStatisticsResult,
+  serverStatisticsService,
+} from "../../src/lib/services/server-statistics-service";
+
 const summary = {
   observationCount: 100,
   knownPlayerCount: 90,

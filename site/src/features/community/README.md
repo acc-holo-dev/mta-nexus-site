@@ -54,11 +54,11 @@ Feature объединяет клиентское обсуждение публ�
 | `content-comment-confirmation.ts`              | util port `content-comment-confirmation`                                      |
 | `report-batch-copy.ts`                         | util port `report-batch-copy`                                                 |
 | `follow-workspace-copy.ts`                     | util port `follow-workspace-copy`                                             |
-| `community-moderation-copy.ts` | util port `community-moderation-copy` |
-| `moderated-discussion-copy.ts` | util port `moderated-discussion-copy` |
-| `community-report-history-copy.ts` | util port `community-report-history-copy` |
-| `author-publication-desk-copy.ts` | util port `author-publication-desk-copy` |
-| `content-discussion-copy.ts` | util port `content-discussion-copy` |
+| `community-moderation-copy.ts`                 | util port `community-moderation-copy`                                         |
+| `moderated-discussion-copy.ts`                 | util port `moderated-discussion-copy`                                         |
+| `community-report-history-copy.ts`             | util port `community-report-history-copy`                                     |
+| `author-publication-desk-copy.ts`              | util port `author-publication-desk-copy`                                      |
+| `content-discussion-copy.ts`                   | util port `content-discussion-copy`                                           |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

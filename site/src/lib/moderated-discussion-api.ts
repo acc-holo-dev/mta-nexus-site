@@ -4,7 +4,7 @@ import { readBoundedJson, requireServerJsonContentType } from "./bounded-json";
 import { parseModerationDetailQuery } from "./community-moderation-contract";
 import { reportRateLimit } from "./community-report-api";
 import { parseModeratedDiscussionQuery } from "./moderated-discussion-contract";
-import { moderatedDiscussionError } from "./moderated-discussion-copy";
+import { moderatedDiscussionError } from "../features/community/moderated-discussion-copy";
 import { communityModerationService } from "./services/community-moderation-service";
 import { userPlatformApi } from "./user-platform-api";
 export function getModeratedDiscussion(

@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   find: vi.fn(),
@@ -10,21 +11,26 @@ vi.mock("@nexus/db", () => ({
   discussionWorkspaceRepository: { page: mocks.page, find: mocks.find, mutate: mocks.mutate },
   publicVerificationHistoryRepository: { page: mocks.approvals },
 }));
-import { discussionWorkspaceService as own } from "../../src/lib/services/discussion-workspace-service";
-import { publicVerificationHistoryService as approvals } from "../../src/lib/services/public-verification-history-service";
+
+import {
+  approvalCopy,
+  approvalError,
+} from "../../src/features/trust/public-verification-history-copy";
 import {
   ownDiscussionHref,
   ownDiscussionPageSchema,
   ownDiscussionSchema,
   parseOwnDiscussionQuery,
 } from "../../src/lib/discussion-workspace-contract";
+import { ownDiscussionCopy, ownDiscussionError } from "../../src/lib/discussion-workspace-copy";
 import {
   approvalPageHref,
   parseApprovalQuery,
   publicApprovalPageSchema,
 } from "../../src/lib/public-verification-history-contract";
-import { ownDiscussionCopy, ownDiscussionError } from "../../src/lib/discussion-workspace-copy";
-import { approvalCopy, approvalError } from "../../src/features/trust/public-verification-history-copy";
+import { discussionWorkspaceService as own } from "../../src/lib/services/discussion-workspace-service";
+import { publicVerificationHistoryService as approvals } from "../../src/lib/services/public-verification-history-service";
+
 const actor = { id: "actor", role: "user" } as User,
   time = "2026-10-11T00:00:00.123456Z";
 const row = {

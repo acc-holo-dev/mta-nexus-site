@@ -8,14 +8,10 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const utilPorts = [
-  "public-user-trust-copy",
-  "public-verification-history-copy",
-];
+const utilPorts = ["public-user-trust-copy", "public-verification-history-copy"];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];
-const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
+const safeLib = /^(?:i18n(?:\.ts$|\/)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

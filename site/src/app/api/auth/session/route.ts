@@ -1,6 +1,10 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import {
+  SESSION_COOKIE_NAME,
+  sessionCookieOptions,
+} from "../../../../features/accounts/session-cookie";
 import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
@@ -10,7 +14,6 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../features/accounts/session-cookie";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

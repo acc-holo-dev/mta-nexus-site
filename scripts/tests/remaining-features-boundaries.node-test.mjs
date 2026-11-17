@@ -12,7 +12,11 @@ const features = [
   {
     name: "support",
     clients: ["center", "thread", "download-help"],
-    clientUtilPorts: ["support-message-discovery-copy", "support-response", "support-workspace-copy"],
+    clientUtilPorts: [
+      "support-message-discovery-copy",
+      "support-response",
+      "support-workspace-copy",
+    ],
     privateClients: ["support-case-actions", "support-status-history", "support-message-browser"],
     servers: [
       ["page-server", "support-page.tsx"],
@@ -69,7 +73,12 @@ const features = [
       "ad-preference",
       "settings-client-api",
       "feature-flags",
-      "profile-privacy-copy", "session-revocation", "account-recovery-request-policy", "account-recovery-browser", "session-cookie"],
+      "profile-privacy-copy",
+      "session-revocation",
+      "account-recovery-request-policy",
+      "account-recovery-browser",
+      "session-cookie",
+    ],
     safe: "notification-preferences-confirmation|notification-inbox-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
   },
   {
@@ -101,7 +110,10 @@ const features = [
       "home-personal",
       "legal-document",
       "theme-preference",
-      "home-personal-preference", "offline-cache-policy", "safe-public-error-reference"],
+      "home-personal-preference",
+      "offline-cache-policy",
+      "safe-public-error-reference",
+    ],
     privateClients: ["shell-session-unavailable"],
     servers: [],
     safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|private-api-request|resource-release-watches-i18n|home-personal-changes-types",

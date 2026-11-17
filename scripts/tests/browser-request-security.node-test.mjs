@@ -4,7 +4,7 @@ import {
   browserRequestDecision,
   isLicenseRuntimeRequest,
 } from "../../site/src/lib/browser-request-policy.ts";
-import { sessionCookieOptions } from "../../site/src/lib/session-cookie.ts";
+import { sessionCookieOptions } from "../../site/src/features/accounts/session-cookie.ts";
 import { SESSION_LIFETIME_SECONDS } from "../../site/src/lib/session-policy.ts";
 
 const env = { NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "https://nexus.test" };

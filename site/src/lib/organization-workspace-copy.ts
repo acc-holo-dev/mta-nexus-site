@@ -1,5 +1,5 @@
 import type { Locale } from "./i18n";
-import { organizationBatchCopy } from "./organization-batch-copy";
+import { organizationBatchCopy } from "../features/organizations/organization-batch-copy";
 import { userPlatformError } from "./user-platform-copy";
 
 const en = {

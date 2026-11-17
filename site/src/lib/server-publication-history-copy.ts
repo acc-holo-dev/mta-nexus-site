@@ -1,4 +1,4 @@
-import { authorPublicationDeskError } from "./author-publication-desk-copy";
+import { authorPublicationDeskError } from "../features/community/author-publication-desk-copy";
 import type { Locale } from "./i18n";
 
 const en = {

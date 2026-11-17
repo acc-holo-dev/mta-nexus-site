@@ -3,7 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { parseServerStatisticsQuery } from "./server-statistics-contract";
 import { serverStatisticsCsv } from "./server-statistics-export";
-import { serverStatisticsError } from "./server-statistics-copy";
+import { serverStatisticsError } from "../features/servers/server-statistics-copy";
 import { serverStatisticsService } from "./services/server-statistics-service";
 import { authService } from "./services/auth-service";
 import { getTrustedRequestIp } from "./request-client-ip";

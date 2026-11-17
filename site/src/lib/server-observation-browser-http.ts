@@ -5,7 +5,7 @@ import { authService } from "./services/auth-service";
 import { serverStatisticsService } from "./services/server-statistics-service";
 import { parseServerObservationBrowserQuery } from "./server-observation-browser-contract";
 import { serverObservationBrowserCsv } from "./server-statistics-export";
-import { serverObservationBrowserError } from "./server-observation-browser-copy";
+import { serverObservationBrowserError } from "../features/servers/server-observation-browser-copy";
 import { getTrustedRequestIp } from "./request-client-ip";
 import { resolveLocale } from "./i18n";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";

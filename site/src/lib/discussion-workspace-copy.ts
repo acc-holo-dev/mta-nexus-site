@@ -1,4 +1,4 @@
-import { discussionMutationError } from "./content-discussion-copy";
+import { discussionMutationError } from "../features/community/content-discussion-copy";
 import type { Locale } from "./i18n";
 
 const en = {

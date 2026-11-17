@@ -15,14 +15,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import {
-  getResourceCommerceCopy,
-  resourceCommerceError,
-} from "../resource-commerce-i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";
+import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 
 const controlClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

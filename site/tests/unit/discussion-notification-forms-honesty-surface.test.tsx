@@ -88,8 +88,12 @@ it("keeps additive formErrorHint / errorHint copy for discussion and notificatio
     "Retry reloads the saved follow state.",
   );
   expect(read("site/src/lib/community-report-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/features/community/content-discussion-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/community/content-discussion-copy.ts")).toContain(
+    "formErrorHint:",
+  );
   expect(read("site/src/features/community/report-batch-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/features/community/moderated-discussion-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/community/moderated-discussion-copy.ts")).toContain(
+    "formErrorHint:",
+  );
   expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("exportErrorHint:");
 });
