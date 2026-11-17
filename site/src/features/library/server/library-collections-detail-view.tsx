@@ -1,6 +1,6 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { collectionReleasesCopy } from "../../../lib/collection-releases-i18n";
+import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
 import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";

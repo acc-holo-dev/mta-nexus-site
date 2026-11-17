@@ -3,7 +3,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { collectionReleasesCopy } from "../../../lib/collection-releases-i18n";
+import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

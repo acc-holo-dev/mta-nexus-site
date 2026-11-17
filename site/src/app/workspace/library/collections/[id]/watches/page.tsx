@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../features/resources/release-watch-batch";
 import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
-import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";
+import { collectionReleasesCopy } from "../../../../../../features/library/collection-releases-i18n";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import {
