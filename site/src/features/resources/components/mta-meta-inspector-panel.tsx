@@ -3,7 +3,7 @@
 import { Button, ErrorState, withOccurrenceKeys } from "@nexus/ui";
 import { FileSearch } from "lucide-react";
 import { useState } from "react";
-import { getMtaMetaInspectorIssueMessage } from "../../../lib/mta-meta-inspector-messages";
+import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 import { useNexusLocale } from "../../shell/locale";
 

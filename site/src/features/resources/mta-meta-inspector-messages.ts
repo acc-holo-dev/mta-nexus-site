@@ -1,5 +1,5 @@
-import type { MetaInspectionIssue } from "./mta-meta-inspector";
-import type { getDictionary } from "./i18n";
+import type { MetaInspectionIssue } from "../../lib/mta-meta-inspector";
+import type { getDictionary } from "../../lib/i18n";
 
 type StructuralIssueMessages = ReturnType<
   typeof getDictionary
