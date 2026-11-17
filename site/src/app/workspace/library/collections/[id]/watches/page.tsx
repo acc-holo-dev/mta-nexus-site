@@ -15,6 +15,8 @@ import { resourceReleaseWatchHistoryCopy } from "../../../../../../features/reso
 import { resourceReleaseWatchesCopy } from "../../../../../../features/resources/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
@@ -39,7 +41,20 @@ export default async function Page({
     params,
     searchParams,
   ]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/workspace/library/collections/"}
+      />
+    );
+  }
+
   const copy = resourceReleaseWatchesCopy(locale);
   const dictionary = getDictionary(locale);
   const base = `/workspace/library/collections/${encodeURIComponent(path.id)}/watches`;
