@@ -62,6 +62,8 @@ const en = {
   recoverySaveFailed: "Could not save recovery data. The application was not sent.",
   submissionUnconfirmed:
     "The submission result is unconfirmed. Only an exact retry of the original application is available.",
+  pendingExists:
+    "An application already exists for this target. Its author and contents are unconfirmed.",
   changed: "The profile changed. Reload before saving again.",
   authorityChanged: "Your current role or organization rights do not allow this application.",
   profileChanged:
@@ -156,6 +158,7 @@ const ru: Record<keyof typeof en, string> = {
   recoverySaveFailed: "Не удалось сохранить данные восстановления. Заявка не отправлена.",
   submissionUnconfirmed:
     "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки.",
+  pendingExists: "Для этой цели уже есть заявка. Её автор и содержание не подтверждены.",
   changed: "Профиль изменился. Загрузите актуальное состояние перед сохранением.",
   authorityChanged: "Текущая роль или права в организации не позволяют подать эту заявку.",
   profileChanged:

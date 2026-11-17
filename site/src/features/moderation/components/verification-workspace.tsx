@@ -331,11 +331,7 @@ export function VerificationWorkspace({
         }
       }
       if (caught instanceof PlatformRequestError && caught.code === "VERIFICATION_PENDING") {
-        setWriteError(
-          locale === "ru"
-            ? "Для этой цели уже есть заявка. Её автор и содержание не подтверждены."
-            : "An application already exists for this target. Its author and contents are unconfirmed.",
-        );
+        setWriteError(copy.pendingExists);
         return;
       }
       setWriteError(caught instanceof Error ? caught.message : copy.mutationUnavailable);

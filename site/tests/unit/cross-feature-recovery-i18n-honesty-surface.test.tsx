@@ -48,8 +48,13 @@ it("locks verification-workspace recovery strings to verification-workspace-copy
   expect(copy).toContain("restoreFailed:");
   expect(copy).toContain("recoverySaveFailed:");
   expect(copy).toContain("submissionUnconfirmed:");
+  expect(copy).toContain("pendingExists:");
   expect(source).toContain(".restoreFailed");
   expect(source).toContain("copy.recoverySaveFailed");
   expect(source).toContain("copy.submissionUnconfirmed");
+  expect(source).toContain("copy.pendingExists");
   expect(source).not.toContain("Could not verify the account or restore the application.");
+  expect(source).not.toContain(
+    "An application already exists for this target. Its author and contents are unconfirmed.",
+  );
 });
