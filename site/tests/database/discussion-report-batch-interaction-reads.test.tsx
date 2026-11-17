@@ -23,7 +23,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 }));
 
 import { DiscussionReportBatch } from "../../src/features/community/components/discussion-report-batch";
-import { reportBatchCopy } from "../../src/lib/report-batch-copy";
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 
 const { render, click, commitBatch, select, review } =
   createDiscussionReportBatchInteractionHelpers(harness, DiscussionReportBatch);

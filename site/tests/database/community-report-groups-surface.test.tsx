@@ -42,7 +42,7 @@ import {
 import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
 import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { communityReportCopy } from "../../src/lib/community-report-copy";
-import { reportBatchCopy } from "../../src/lib/report-batch-copy";
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = {

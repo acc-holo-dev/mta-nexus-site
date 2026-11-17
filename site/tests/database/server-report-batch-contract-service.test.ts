@@ -21,7 +21,7 @@ import {
   reportBatchCommandInput,
   reportBatchPreviewInput,
 } from "../../src/lib/report-batch-contract";
-import { reportBatchCopy } from "../../src/lib/report-batch-copy";
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 import {
   confirmedServerPublicationRestore,
   serverPublicationHistorySchema,

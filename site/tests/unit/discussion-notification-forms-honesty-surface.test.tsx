@@ -89,7 +89,7 @@ it("keeps additive formErrorHint / errorHint copy for discussion and notificatio
   );
   expect(read("site/src/lib/community-report-copy.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/content-discussion-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/report-batch-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/community/report-batch-copy.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/moderated-discussion-copy.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/server-statistics-copy.ts")).toContain("exportErrorHint:");
 });

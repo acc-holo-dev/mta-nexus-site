@@ -6,7 +6,7 @@ import {
 } from "../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
 import { reportRateLimit } from "../../../../../../../lib/community-report-api";
-import { reportBatchError } from "../../../../../../../lib/report-batch-copy";
+import { reportBatchError } from "../../../../../../../features/community/report-batch-copy";
 import { communityReportService } from "../../../../../../../lib/services/community-report-service";
 import { userPlatformApi } from "../../../../../../../lib/user-platform-api";
 export const POST = withBrowserMutation(

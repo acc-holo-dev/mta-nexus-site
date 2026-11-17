@@ -52,6 +52,7 @@ Feature объединяет клиентское обсуждение публ�
 | `content-comment-client.ts`                    | util port `content-comment-client`                                            |
 | `community-report-groups-copy.ts`              | util port `community-report-groups-copy`                                      |
 | `content-comment-confirmation.ts` | util port `content-comment-confirmation` |
+| `report-batch-copy.ts` | util port `report-batch-copy` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

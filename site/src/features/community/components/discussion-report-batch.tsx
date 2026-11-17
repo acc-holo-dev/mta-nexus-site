@@ -15,7 +15,7 @@ import {
   type ReportBatchPreview,
   reportBatchPreviewInput,
 } from "../../../lib/report-batch-contract";
-import { reportBatchCopy, reportBatchError } from "../../../lib/report-batch-copy";
+import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
