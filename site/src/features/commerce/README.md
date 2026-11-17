@@ -34,10 +34,10 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `commercial-confirmation.ts`      | util port `commercial-confirmation`                                                    |
 | `order-terms-i18n.ts`             | util port `order-terms-i18n`                                                           |
 | `seller-sales-i18n.ts`            | util port `seller-sales-i18n`                                                          |
-| `plan-reviews-i18n.ts` | util port `plan-reviews-i18n` |
-| `subscriptions-i18n.ts` | util port `subscriptions-i18n` |
-| `license-control-i18n.ts` | util port `license-control-i18n` |
-| `financial-i18n.ts` | util port `financial-i18n` |
+| `plan-reviews-i18n.ts`            | util port `plan-reviews-i18n`                                                          |
+| `subscriptions-i18n.ts`           | util port `subscriptions-i18n`                                                         |
+| `license-control-i18n.ts`         | util port `license-control-i18n`                                                       |
+| `financial-i18n.ts`               | util port `financial-i18n`                                                             |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

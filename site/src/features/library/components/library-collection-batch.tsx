@@ -9,21 +9,18 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../library-collection-receipts-i18n";
-import { confirmedCollectionCommand } from "../library-collections-confirmation";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 
 export function LibraryCollectionBatchForm({
   locale,

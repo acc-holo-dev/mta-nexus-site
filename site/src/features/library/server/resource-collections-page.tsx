@@ -4,22 +4,19 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionCommandForm } from "../collection-command";
-import { LibraryMembershipBatchForm } from "../membership-batch";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
-import { membershipHistoryHref } from "../library-membership-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { LibraryCollectionCommandForm } from "../collection-command";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
+import { membershipHistoryHref } from "../library-membership-history-query";
+import { LibraryMembershipBatchForm } from "../membership-batch";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

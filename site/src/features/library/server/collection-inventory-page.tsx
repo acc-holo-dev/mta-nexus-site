@@ -8,27 +8,24 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryReleaseFollowLatest } from "../release-follow";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { ResourceDownloadButton } from "../../resources/download";
-import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
+import { authService } from "../../../lib/services/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { ResourceDownloadButton } from "../../resources/download";
+import { ResourceReleaseWatchControl } from "../../resources/release-watch";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
   collectionInventoryHref,
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
 } from "../library-collection-inventory-query";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { LibraryReleaseFollowLatest } from "../release-follow";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

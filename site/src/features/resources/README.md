@@ -67,18 +67,18 @@ Services и repositories не дублируются и не переносят�
 | `author-resource-draft.ts`                     | util port `author-resource-draft`                                                                           |
 | `build-file-validation.ts`                     | util port `build-file-validation`                                                                           |
 | `resource-commerce-confirmation.ts`            | util port `resource-commerce-confirmation`                                                                  |
-| `public-release-history.ts` | util port `public-release-history` |
-| `resource-cart-receipts-query.ts` | util port `resource-cart-receipts-query` |
-| `resource-publisher-query.ts` | util port `resource-publisher-query` |
-| `resource-review-query.ts` | util port `resource-review-query` |
-| `product-type-labels.ts` | util port `product-type-labels` |
-| `resource-deliveries-i18n.ts` | util port `resource-deliveries-i18n` |
-| `resource-qa-i18n.ts` | util port `resource-qa-i18n` |
-| `resource-cart-receipts-i18n.ts` | util port `resource-cart-receipts-i18n` |
-| `build-package-i18n.ts` | util port `build-package-i18n` |
-| `resource-copy-i18n.ts` | util port `resource-copy-i18n` |
-| `resource-publisher-i18n.ts` | util port `resource-publisher-i18n` |
-| `resource-build-workspace-i18n.ts` | util port `resource-build-workspace-i18n` |
+| `public-release-history.ts`                    | util port `public-release-history`                                                                          |
+| `resource-cart-receipts-query.ts`              | util port `resource-cart-receipts-query`                                                                    |
+| `resource-publisher-query.ts`                  | util port `resource-publisher-query`                                                                        |
+| `resource-review-query.ts`                     | util port `resource-review-query`                                                                           |
+| `product-type-labels.ts`                       | util port `product-type-labels`                                                                             |
+| `resource-deliveries-i18n.ts`                  | util port `resource-deliveries-i18n`                                                                        |
+| `resource-qa-i18n.ts`                          | util port `resource-qa-i18n`                                                                                |
+| `resource-cart-receipts-i18n.ts`               | util port `resource-cart-receipts-i18n`                                                                     |
+| `build-package-i18n.ts`                        | util port `build-package-i18n`                                                                              |
+| `resource-copy-i18n.ts`                        | util port `resource-copy-i18n`                                                                              |
+| `resource-publisher-i18n.ts`                   | util port `resource-publisher-i18n`                                                                         |
+| `resource-build-workspace-i18n.ts`             | util port `resource-build-workspace-i18n`                                                                   |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

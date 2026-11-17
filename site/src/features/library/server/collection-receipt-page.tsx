@@ -4,22 +4,19 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionRestoreControls } from "../collection-restore";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
+import { authService } from "../../../lib/services/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
 } from "../library-collection-receipts-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

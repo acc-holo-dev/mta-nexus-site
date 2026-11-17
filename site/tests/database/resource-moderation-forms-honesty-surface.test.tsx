@@ -20,10 +20,10 @@ vi.mock("../../src/features/shell/locale", () => ({
   }),
 }));
 
+import { ReportModerationControls } from "../../src/features/moderation/report-controls";
 import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
 import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
-import { ReportModerationControls } from "../../src/features/moderation/report-controls";
 
 const exclusive = [
   "site/src/features/resources/components/new-resource-form.tsx",
@@ -112,7 +112,9 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/lib/verification-workspace-copy.ts")).toContain(
     "decisionFailedDescription",
   );
-  expect(read("site/src/features/resources/resource-build-workspace-i18n.ts")).toContain("failedDescription");
+  expect(read("site/src/features/resources/resource-build-workspace-i18n.ts")).toContain(
+    "failedDescription",
+  );
   expect(read("site/src/lib/i18n/en/admin.ts")).toContain("quarantineBuildFailedDescription");
   expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("reportDecisionFailedDescription");
 });

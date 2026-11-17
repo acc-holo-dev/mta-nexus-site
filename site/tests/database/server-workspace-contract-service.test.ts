@@ -9,6 +9,10 @@ vi.mock("@nexus/db", () => ({
 
 import type { User } from "@nexus/domain";
 import {
+  serverWorkspaceCopy,
+  serverWorkspaceError,
+} from "../../src/features/servers/server-workspace-copy";
+import {
   confirmsServerVisibilityCommand,
   confirmsServerVisibilityPreview,
   parseServerWorkspaceHistoryQuery,
@@ -16,7 +20,6 @@ import {
   serverVisibilityInput,
   serverWorkspaceHistoryHref,
 } from "../../src/lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../src/features/servers/server-workspace-copy";
 import { serverService } from "../../src/lib/services/server-service";
 import { serverWorkspaceHistoryService } from "../../src/lib/services/server-workspace-history-service";
 

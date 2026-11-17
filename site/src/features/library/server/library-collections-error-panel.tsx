@@ -1,10 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { libraryCollectionsLinkClass } from "./library-collections-screen-shared";
 
 const recoveryLinkClass = `${libraryCollectionsLinkClass} inline-flex min-h-11 items-center`;

@@ -3,25 +3,28 @@ import { EmptyState, ErrorState, StatusBadge } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { ResourceDownloadButton } from "../../../features/resources/download";
-import { formatHistoryDate } from "../../../lib/commerce-history-format";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../features/library/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../features/library/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../features/library/library-collections-i18n";
+import { ResourceDownloadButton } from "../../../features/resources/download";
+import {
+  getReleaseHistoryCopy,
+  releaseHistoryHref,
+} from "../../../features/resources/public-release-history";
+import { resourceCartReceiptsCopy } from "../../../features/resources/resource-cart-receipts-i18n";
+import { resourceDeliveriesCopy } from "../../../features/resources/resource-deliveries-i18n";
+import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { formatHistoryDate } from "../../../lib/commerce-history-format";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getLibraryCopy,
   libraryHref,
   parseLibraryFilter,
   parseLibraryPage,
 } from "../../../lib/library-view";
-import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../features/resources/public-release-history";
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
-import { resourceCartReceiptsCopy } from "../../../features/resources/resource-cart-receipts-i18n";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
-import { resourceDeliveriesCopy } from "../../../features/resources/resource-deliveries-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";

@@ -1,16 +1,20 @@
-import { expect, it } from "vitest";
 import {
-  resourceReviewCreateSchema,
   resourceReviewCommandSchema,
+  resourceReviewCreateSchema,
   resourceReviewDecisionSchema,
   resourceReviewReportSchema,
 } from "@nexus/validation";
-import { resourceReviewQuery, resourceReviewPageQuery } from "../../src/features/resources/resource-review-query";
+import { expect, it } from "vitest";
 import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
 } from "../../src/features/resources/resource-review-confirmation";
+import {
+  resourceReviewPageQuery,
+  resourceReviewQuery,
+} from "../../src/features/resources/resource-review-query";
+
 it.each([0, 6, 1.5, NaN, "5"])("rejects invalid rating %s", (rating) => {
   expect(resourceReviewCreateSchema.safeParse({ text: "Useful map", rating }).success).toBe(false);
 });
