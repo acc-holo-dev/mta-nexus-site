@@ -8,7 +8,7 @@ import {
 } from "../../../../../features/community/catalog-controls";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { serverContentId } from "../../../../../lib/server-content-api";
+import { serverContentId } from "../../../../../features/servers/server-content-api";
 import { serverContentCopy } from "../../../../../lib/server-content-copy";
 import { serverPublicationHistoryCopy } from "../../../../../lib/server-publication-history-copy";
 import { authService } from "../../../../../lib/services/auth-service";

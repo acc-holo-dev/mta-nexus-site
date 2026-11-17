@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-content-api",
     "server-mutation-errors",
     "server-review-i18n",
     "server-activity-view",
@@ -155,6 +156,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-content-api.ts", "servers-client-isolation"],
     ["features/servers/server-mutation-errors.ts", "servers-client-isolation"],
     ["features/servers/server-review-i18n.ts", "servers-client-isolation"],
     ["features/servers/server-activity-view.ts", "servers-client-isolation"],
@@ -207,6 +209,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-content-api.ts",
     "app/server-mutation-errors.ts",
     "app/server-review-i18n.ts",
     "app/server-activity-view.ts",
@@ -241,6 +244,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-content-api.ts",
     "site/src/features/servers/server-mutation-errors.ts",
     "site/src/features/servers/server-review-i18n.ts",
     "site/src/features/servers/server-activity-view.ts",
@@ -306,6 +310,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-content-api.ts");
   visit("site/src/features/servers/server-mutation-errors.ts");
   visit("site/src/features/servers/server-review-i18n.ts");
   visit("site/src/features/servers/server-activity-view.ts");
