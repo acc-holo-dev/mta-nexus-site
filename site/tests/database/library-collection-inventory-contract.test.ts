@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
-} from "../../src/lib/library-collection-inventory-query";
+} from "../../src/features/library/library-collection-inventory-query";
 it("defaults to all own references and round-trips exact filters and literal search", () => {
   expect(libraryCollectionInventoryQuery(new URLSearchParams())).toEqual({
     page: 1,

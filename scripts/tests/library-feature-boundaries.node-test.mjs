@@ -41,6 +41,8 @@ const utilPorts = [
   "library-collection-inventory-i18n",
 ,
   "library-release-comparison-i18n",
+,
+  "library-collection-inventory-query",
 ];
 const serverPorts = [
   "collections",

@@ -20,7 +20,7 @@ import {
   collectionInventoryHref,
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
-} from "../../../lib/library-collection-inventory-query";
+} from "../library-collection-inventory-query";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

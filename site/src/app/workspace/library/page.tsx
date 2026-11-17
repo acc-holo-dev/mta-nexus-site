@@ -9,7 +9,7 @@ import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../features/library/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
+import { collectionInventoryHref } from "../../../features/library/library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   getLibraryCopy,
