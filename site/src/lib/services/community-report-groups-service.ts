@@ -9,7 +9,7 @@ import { can } from "@nexus/security";
 import {
   parseReportGroupsQuery,
   reportGroupsPageSchema,
-} from "../community-report-groups-contract";
+} from "../../features/community/community-report-groups-contract";
 import { encodeChangeHistoryCursor } from "../private-change-history-query";
 export const communityReportGroupsService = {
   async page(actor: User, filters: CommunityReportGroupFilters) {

@@ -49,9 +49,17 @@ const utilPorts = [
   "content-reaction-copy",
   "discussion-workspace-copy",
   "publication-feed-copy",
+  "author-publication-desk-contract",
+  "community-report-groups-contract",
+  "content-reaction-contract",
+  "discussion-reports-contract",
+  "discussion-workspace-contract",
+  "follow-workspace-contract",
+  "community-report-history-contract",
+  "moderated-discussion-contract",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-contract|follow-workspace-contract|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|moderated-discussion-contract|discussion-reports-contract|report-batch-contract|discussion-workspace-contract|publication-feed-contract|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation|content-reaction-contract)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|report-batch-contract|publication-feed-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

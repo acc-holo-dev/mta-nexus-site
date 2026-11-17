@@ -9,7 +9,7 @@ import {
   reactions,
   users,
 } from "../../packages/db/src/schema";
-import { parseReactionPage } from "../../src/lib/content-reaction-contract";
+import { parseReactionPage } from "../../src/features/community/content-reaction-contract";
 import { contentReactionService } from "../../src/lib/services/content-reaction-service";
 import {
   actor,

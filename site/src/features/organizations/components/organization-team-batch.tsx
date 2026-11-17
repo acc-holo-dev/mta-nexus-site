@@ -7,19 +7,19 @@ import {
 import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import {
-  confirmsOrganizationBatchCommand,
-  confirmsOrganizationBatchPreview,
-  type OrganizationBatchPreview,
-} from "../../../lib/organization-batch-contract";
-import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import {
+  confirmsOrganizationBatchCommand,
+  confirmsOrganizationBatchPreview,
+  type OrganizationBatchPreview,
+} from "../organization-batch-contract";
 import { organizationBatchCopy } from "../organization-batch-copy";
+import type { OrganizationTeamPage } from "../organization-team-contract";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationTeamBatch({

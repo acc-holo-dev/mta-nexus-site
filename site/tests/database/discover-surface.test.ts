@@ -49,9 +49,13 @@ vi.mock("../../src/features/notifications/bell", async () => {
 });
 
 import ExplorePage from "../../src/app/explore/page";
+import {
+  DISCOVER_TYPES,
+  discoverHref,
+  parseDiscoverQuery,
+} from "../../src/features/discovery/discover-query";
 import { Navbar } from "../../src/features/shell/navbar";
 import { Sidebar } from "../../src/features/shell/sidebar";
-import { DISCOVER_TYPES, discoverHref, parseDiscoverQuery } from "../../src/lib/discover-query";
 
 describe("discover surface behavior", () => {
   beforeEach(() => {

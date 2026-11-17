@@ -15,21 +15,21 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
 
-import { moderatedDiscussionCopy } from "../../src/features/community/moderated-discussion-copy";
-import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
 import {
   confirmsModeratedDiscussionRemoval,
   moderatedDiscussionDetailSchema,
   moderatedDiscussionHref,
   moderatedDiscussionRemoveSchema,
   parseModeratedDiscussionQuery,
-} from "../../src/lib/moderated-discussion-contract";
+} from "../../src/features/community/moderated-discussion-contract";
+import { moderatedDiscussionCopy } from "../../src/features/community/moderated-discussion-copy";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
   organizationBatchCommandInput,
   organizationBatchPreviewInput,
-} from "../../src/lib/organization-batch-contract";
+} from "../../src/features/organizations/organization-batch-contract";
+import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { organizationWorkspaceService as teams } from "../../src/lib/services/organization-workspace-service";
 

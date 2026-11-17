@@ -1,9 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import {
-  type NotificationInboxQuery,
-  notificationInboxHref,
-} from "../../../lib/notification-inbox-contract";
+import { type NotificationInboxQuery, notificationInboxHref } from "../notification-inbox-contract";
 
 const STATES = ["all", "unread", "read"] as const;
 

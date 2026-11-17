@@ -7,11 +7,11 @@ import {
   type User,
 } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { reportId } from "../community-report-api";
 import {
   parseReportHistoryQuery,
   reportHistoryPageSchema,
-} from "../community-report-history-contract";
+} from "../../features/community/community-report-history-contract";
+import { reportId } from "../community-report-api";
 import { encodeChangeHistoryCursor } from "../private-change-history-query";
 export const communityReportHistoryService = {
   async page(

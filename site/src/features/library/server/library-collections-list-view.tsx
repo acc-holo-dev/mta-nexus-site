@@ -1,17 +1,17 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
-import {
-  collectionHref,
-  collectionPageParams,
-  collectionsQuery,
-} from "../../../lib/library-collections-query";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import {
+  collectionHref,
+  collectionPageParams,
+  collectionsQuery,
+} from "../library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
 import {

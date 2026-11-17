@@ -2,11 +2,11 @@ import { expect, it } from "vitest";
 import {
   parseReportGroupsQuery,
   reportGroupsHref,
-} from "../../src/lib/community-report-groups-contract";
+} from "../../src/features/community/community-report-groups-contract";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
-} from "../../src/lib/report-batch-contract";
+} from "../../src/features/moderation/report-batch-contract";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   input = {

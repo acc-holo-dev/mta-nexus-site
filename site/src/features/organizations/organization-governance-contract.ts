@@ -1,8 +1,11 @@
 import { CHANGE_HISTORY_PERIODS, ORGANIZATION_CHANGE_GROUPS } from "@nexus/domain";
 import { z } from "zod";
+import {
+  changeHistoryTimeSchema,
+  parseChangeHistoryQuery,
+} from "../../lib/private-change-history-query";
 import type { EditableOrganization } from "./organization-workspace-contract";
 import { editableOrganizationSchema } from "./organization-workspace-contract";
-import { changeHistoryTimeSchema, parseChangeHistoryQuery } from "./private-change-history-query";
 
 const identifier = z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/u);
 export const ownershipTransferSchema = z

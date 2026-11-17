@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { parseFollowQuery } from "../../../../features/community/follow-workspace-contract";
 import { followError } from "../../../../features/community/follow-workspace-copy";
-import { parseFollowQuery } from "../../../../lib/follow-workspace-contract";
 import { followWorkspaceService } from "../../../../lib/services/follow-workspace-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 export function GET(request: NextRequest) {

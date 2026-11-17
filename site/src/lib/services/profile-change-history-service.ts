@@ -1,7 +1,7 @@
 import { profileChangeHistoryRepository } from "@nexus/db";
 import { AppError, type ChangeHistoryFilters, type ProfileChangeGroup } from "@nexus/domain";
+import { profileChangeHistorySchema } from "../../features/accounts/profile-change-history-contract";
 import { encodeChangeHistoryCursor } from "../private-change-history-query";
-import { profileChangeHistorySchema } from "../profile-change-history-contract";
 export const profileChangeHistoryService = {
   async page(actorId: string, filters: ChangeHistoryFilters<ProfileChangeGroup>) {
     const result = await profileChangeHistoryRepository.page(actorId, filters);

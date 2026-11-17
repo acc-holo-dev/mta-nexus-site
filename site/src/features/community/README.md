@@ -64,6 +64,14 @@ Feature объединяет клиентское обсуждение публ�
 | `content-reaction-copy.ts`                     | util port `content-reaction-copy`                                             |
 | `discussion-workspace-copy.ts`                 | util port `discussion-workspace-copy`                                         |
 | `publication-feed-copy.ts`                     | util port `publication-feed-copy`                                             |
+| `author-publication-desk-contract.ts`          | util port `author-publication-desk-contract`                                  |
+| `community-report-groups-contract.ts`          | util port `community-report-groups-contract`                                  |
+| `content-reaction-contract.ts`                 | util port `content-reaction-contract`                                         |
+| `discussion-reports-contract.ts`               | util port `discussion-reports-contract`                                       |
+| `discussion-workspace-contract.ts`             | util port `discussion-workspace-contract`                                     |
+| `follow-workspace-contract.ts`                 | util port `follow-workspace-contract`                                         |
+| `community-report-history-contract.ts`         | util port `community-report-history-contract`                                 |
+| `moderated-discussion-contract.ts`             | util port `moderated-discussion-contract`                                     |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

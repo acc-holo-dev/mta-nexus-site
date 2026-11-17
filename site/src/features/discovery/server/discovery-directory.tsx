@@ -5,15 +5,6 @@ import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { cache } from "react";
-import {
-  DISCOVER_CONTENT_TYPES,
-  type DiscoverQuery,
-  discoverHref,
-} from "../../../lib/discover-query";
-import {
-  type DiscoveryStreamQuery,
-  discoveryStreamHref,
-} from "../../../lib/discovery-stream-contract";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
 import { authService } from "../../../lib/services/auth-service";
@@ -28,7 +19,9 @@ import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
+import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
+import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
 
 const observationLookupForSnapshot = cache((servers: readonly MtaMasterServer[]) =>

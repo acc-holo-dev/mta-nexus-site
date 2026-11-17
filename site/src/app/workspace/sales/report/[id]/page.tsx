@@ -9,10 +9,13 @@ import {
   sellerSalesCopy,
   sellerSalesTime,
 } from "../../../../../features/commerce/seller-sales-i18n";
+import {
+  sellerSalesDetailQuery,
+  sellerSalesUrl,
+} from "../../../../../features/commerce/seller-sales-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { sellerSalesDetailQuery, sellerSalesUrl } from "../../../../../lib/seller-sales-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../../lib/services/seller-sales-service";
 

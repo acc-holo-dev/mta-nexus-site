@@ -24,7 +24,7 @@ const { platformReportCopy } = await import(
 const inboxCategoriesMatch = readFileSync(
   join(
     dirname(fileURLToPath(import.meta.url)),
-    "../../site/src/lib/notification-inbox-contract.ts",
+    "../../site/src/features/notifications/notification-inbox-contract.ts",
   ),
   "utf8",
 ).match(/export const INBOX_CATEGORIES = \[([^\]]*)\] as const;/u);

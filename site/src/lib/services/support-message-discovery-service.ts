@@ -1,6 +1,6 @@
 import { supportMessageDiscoveryRepository } from "@nexus/db";
 import { AppError, type SupportMessageFilters } from "@nexus/domain";
-import { supportMessagePageSchema } from "../support-message-discovery-contract";
+import { supportMessagePageSchema } from "../../features/support/support-message-discovery-contract";
 export const supportMessageDiscoveryService = {
   async page(
     caseId: string,

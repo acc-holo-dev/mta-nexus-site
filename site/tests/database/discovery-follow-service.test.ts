@@ -22,7 +22,7 @@ vi.mock("../../src/lib/services/product-service", () => ({
 }));
 vi.mock("../../src/lib/services/mta-master-directory-service", () => ({}));
 
-import { parseDiscoverQuery } from "../../src/lib/discover-query";
+import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
 import { discoveryService } from "../../src/lib/services/discovery-service";
 import { followWorkspaceService } from "../../src/lib/services/follow-workspace-service";
 

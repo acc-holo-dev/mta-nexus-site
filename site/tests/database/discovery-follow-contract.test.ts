@@ -1,17 +1,17 @@
 import { expect, it } from "vitest";
-import { followCopy } from "../../src/features/community/follow-workspace-copy";
-import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
-import {
-  discoverHref,
-  parseDiscoverApiQuery,
-  parseDiscoverQuery,
-} from "../../src/lib/discover-query";
 import {
   followCommandSchema,
   followPageSchema,
   parseFollowQuery,
-} from "../../src/lib/follow-workspace-contract";
-import { formatNotification } from "../../src/lib/notification-copy";
+} from "../../src/features/community/follow-workspace-contract";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
+import {
+  discoverHref,
+  parseDiscoverApiQuery,
+  parseDiscoverQuery,
+} from "../../src/features/discovery/discover-query";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 it("preserves all active server filters across canonical page links", () => {
   const state = parseDiscoverQuery({

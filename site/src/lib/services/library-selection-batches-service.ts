@@ -5,7 +5,7 @@ import {
   librarySelectionBatchChoiceSchema,
   librarySelectionBatchCommandSchema,
 } from "@nexus/validation";
-import { collectionId } from "../library-collections-query";
+import { collectionId } from "../../features/library/library-collections-query";
 export const librarySelectionBatchesService = {
   preview(actor: User, id: string, input: unknown) {
     const parsed = librarySelectionBatchChoiceSchema.safeParse(input);

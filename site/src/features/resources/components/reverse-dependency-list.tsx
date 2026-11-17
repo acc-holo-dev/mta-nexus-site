@@ -2,7 +2,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import type { ReverseDependencySummary } from "../../../lib/reverse-dependency-summary";
+import type { ReverseDependencySummary } from "../reverse-dependency-summary";
 
 export function ReverseDependencyList({
   summary,

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { collectionHref } from "../../../lib/library-collections-query";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 import {
   type LibraryCollectionsActor,
   libraryCollectionsLinkClass,

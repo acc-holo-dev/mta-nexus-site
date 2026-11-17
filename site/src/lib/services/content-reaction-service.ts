@@ -8,7 +8,11 @@ import {
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import type { ReactionPage, ReactionPageQuery, ReactionState } from "../content-reaction-contract";
+import type {
+  ReactionPage,
+  ReactionPageQuery,
+  ReactionState,
+} from "../../features/community/content-reaction-contract";
 
 const validSlug = (slug: string) => /^[a-z0-9-]{1,200}$/u.test(slug);
 class ContentReactionService {

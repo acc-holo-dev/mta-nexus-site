@@ -1,11 +1,11 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { parseReportHistoryQuery } from "../features/community/community-report-history-contract";
 import {
   reportHistoryCopy,
   reportHistoryError,
 } from "../features/community/community-report-history-copy";
 import { reportId, reportRateLimit } from "./community-report-api";
-import { parseReportHistoryQuery } from "./community-report-history-contract";
 import { resolveLocale } from "./i18n";
 import { privateChangeHistoryDownload } from "./private-change-history-download";
 import { communityReportHistoryService } from "./services/community-report-history-service";

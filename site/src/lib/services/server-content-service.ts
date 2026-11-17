@@ -16,7 +16,7 @@ class ServerContentService {
     id: string,
     filters: NonNullable<
       ReturnType<
-        typeof import("../author-publication-desk-contract").parseAuthorPublicationHistoryQuery
+        typeof import("../../features/community/author-publication-desk-contract").parseAuthorPublicationHistoryQuery
       >
     >,
   ) {

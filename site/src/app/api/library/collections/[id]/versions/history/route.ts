@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { collectionsQuery } from "../../../../../../../lib/library-collections-query";
+import { collectionsQuery } from "../../../../../../../features/library/library-collections-query";
 import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
 import { librarySelectionBatchesService as service } from "../../../../../../../lib/services/library-selection-batches-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

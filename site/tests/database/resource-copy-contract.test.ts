@@ -9,7 +9,7 @@ import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
   resourceCopyId,
-} from "../../src/lib/resource-copy-query";
+} from "../../src/features/resources/resource-copy-query";
 import { command, metadata, receipt, sourceId, targetId } from "../helpers/resource-copy-fixtures";
 
 it("normalizes editable fields and refuses ownership, price, status and artifact injection", () => {

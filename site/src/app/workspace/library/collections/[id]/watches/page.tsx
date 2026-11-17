@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { collectionReleasesCopy } from "../../../../../../features/library/collection-releases-i18n";
+import {
+  collectionHref,
+  collectionPageParams,
+} from "../../../../../../features/library/library-collections-query";
 import { getResourceReleaseControlCopy } from "../../../../../../features/library/resource-release-control-i18n";
 import { ResourceReleaseWatchControl } from "../../../../../../features/resources/release-watch";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../features/resources/release-watch-batch";
@@ -12,10 +16,6 @@ import { resourceReleaseWatchesQuery } from "../../../../../../features/resource
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import {
-  collectionHref,
-  collectionPageParams,
-} from "../../../../../../lib/library-collections-query";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";

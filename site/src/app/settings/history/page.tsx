@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { ProfileChangeHistoryView } from "../../../features/accounts/profile-change-history";
+import { parseProfileChangeHistoryQuery } from "../../../features/accounts/profile-change-history-contract";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
@@ -8,7 +9,6 @@ import {
   privateChangeHistoryError,
 } from "../../../lib/private-change-history-copy";
 import { changeHistoryHref } from "../../../lib/private-change-history-query";
-import { parseProfileChangeHistoryQuery } from "../../../lib/profile-change-history-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/profile-change-history-service";
 

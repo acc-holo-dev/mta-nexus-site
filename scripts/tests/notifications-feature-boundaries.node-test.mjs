@@ -16,10 +16,12 @@ const utilPorts = [
   "notification-inbox-copy",
   "notification-read",
   "notification-preferences-confirmation",
+  "notification-copy",
+  "notification-inbox-contract",
 ];
 const serverPorts = ["center"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|private-api-request|notification-inbox-contract|content-discussion-contract)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|private-api-request|content-discussion-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

@@ -7,8 +7,8 @@ vi.mock("@nexus/db", () => ({
   publicUserTrustRepository: { find: mocks.trust },
 }));
 
-import { parseReactionPage } from "../../src/lib/content-reaction-contract";
-import { publicUserTrustSchema } from "../../src/lib/public-user-trust-contract";
+import { parseReactionPage } from "../../src/features/community/content-reaction-contract";
+import { publicUserTrustSchema } from "../../src/features/trust/public-user-trust-contract";
 import { contentReactionService as service } from "../../src/lib/services/content-reaction-service";
 import { publicUserTrustService as trust } from "../../src/lib/services/public-user-trust-service";
 

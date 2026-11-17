@@ -1,15 +1,15 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  organizationChangeHistorySchema,
-  parseOrganizationChangeHistoryQuery,
-} from "../../../lib/organization-governance-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrganizationHistoryView } from "../history-view";
+import {
+  organizationChangeHistorySchema,
+  parseOrganizationChangeHistoryQuery,
+} from "../organization-governance-contract";
 import {
   organizationGovernanceCopy,
   organizationGovernanceError,

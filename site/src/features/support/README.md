@@ -13,3 +13,4 @@ Focused localization suite for `SupportCenter` (staff filters, attached context)
 | `support-workspace-copy.ts` | util port `support-workspace-copy` |
 | `support-retry.ts` | util port `support-retry` |
 | `support-workspace-contract.ts` | util port `support-workspace-contract` |
+| `support-message-discovery-contract.ts` | util port `support-message-discovery-contract` |

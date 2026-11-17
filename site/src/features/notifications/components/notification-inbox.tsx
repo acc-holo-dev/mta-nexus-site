@@ -3,19 +3,19 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import {
   confirmedNotificationInboxCommand,
   NOTIFICATION_INBOX_SELECTION_LIMIT,
   type NotificationInboxPage,
   type NotificationInboxQuery,
   notificationInboxHref,
   notificationInboxPageSchema,
-} from "../../../lib/notification-inbox-contract";
-import {
-  ActionConfirmCheckbox,
-  actionConfirmCheckboxFocusClass,
-} from "../../shell/action-confirm-checkbox";
-import { confirmAction } from "../../shell/confirm-action";
-import { useNexusLocale } from "../../shell/locale";
+} from "../notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
 import { announceNotificationInboxChange } from "../notification-inbox-events";
 import {

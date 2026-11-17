@@ -6,12 +6,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  parseServerObservationBrowserQuery,
-  type ServerObservationBrowserQuery,
-  serverObservationBrowserHref,
-} from "../../../lib/server-observation-browser-contract";
-import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
 import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerObservationBrowserResult,
@@ -20,9 +14,15 @@ import {
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
+  parseServerObservationBrowserQuery,
+  type ServerObservationBrowserQuery,
+  serverObservationBrowserHref,
+} from "../server-observation-browser-contract";
+import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
 } from "../server-observation-browser-copy";
+import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";

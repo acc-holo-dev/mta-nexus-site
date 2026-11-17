@@ -1,7 +1,7 @@
 import { commercialPlanRepository, planReviewsRepository, sellerSalesRepository } from "@nexus/db";
 import { AppError, type User } from "@nexus/domain";
 import { planReviewCommandSchema } from "@nexus/validation";
-import { planReviewId } from "../plan-reviews-query";
+import { planReviewId } from "../../features/commerce/plan-reviews-query";
 export const planReviewsService = {
   plan: (id: string) => commercialPlanRepository.published(planReviewId(id)),
   save(actor: User, input: unknown, currentToken: string) {

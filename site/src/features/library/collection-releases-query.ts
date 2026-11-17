@@ -1,6 +1,6 @@
 import type { LibraryReleaseFilter } from "@nexus/domain";
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
-import { collectionsQuery } from "../../lib/library-collections-query";
+import { collectionsQuery } from "./library-collections-query";
 export function collectionReleasesQuery(params: URLSearchParams) {
   for (const key of params.keys())
     if (!["page", "q", "filter"].includes(key) || params.getAll(key).length !== 1)

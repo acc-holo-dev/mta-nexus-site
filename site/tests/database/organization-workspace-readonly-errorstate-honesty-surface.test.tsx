@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import type { OrganizationWorkspace } from "../../src/features/organizations/organization-workspace-contract";
 import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
-import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (

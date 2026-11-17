@@ -6,13 +6,13 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import {
+  parseServerStatisticsQuery,
+  serverStatisticsHref,
+} from "../../src/features/servers/server-statistics-contract";
+import {
   serverStatisticsCopy,
   serverStatisticsError,
 } from "../../src/features/servers/server-statistics-copy";
-import {
-  parseServerStatisticsQuery,
-  serverStatisticsHref,
-} from "../../src/lib/server-statistics-contract";
 import {
   serverStatisticsCsv,
   serverStatisticsIntervals,

@@ -1,5 +1,5 @@
 import { beforeEach, vi } from "vitest";
-import type { FollowPage } from "../../src/lib/follow-workspace-contract";
+import type { FollowPage } from "../../src/features/community/follow-workspace-contract";
 
 /** Shared discovery/follow service mocks for discovery-follow-surface suites. */
 export const discoveryFollowSurfaceMocks = {

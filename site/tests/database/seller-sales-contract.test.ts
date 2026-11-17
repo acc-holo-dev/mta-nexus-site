@@ -5,7 +5,7 @@ import {
   sellerSalesPageQuery,
   sellerSalesQuery,
   sellerSalesUrl,
-} from "../../src/lib/seller-sales-query";
+} from "../../src/features/commerce/seller-sales-query";
 
 const base = {
   orderAmount: 100,

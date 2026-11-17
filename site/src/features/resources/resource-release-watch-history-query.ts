@@ -3,7 +3,7 @@ import {
   RESOURCE_RELEASE_WATCH_HISTORY_SOURCES,
   type ResourceReleaseWatchHistoryQuery,
 } from "@nexus/domain";
-import { libraryReleaseHistoryQuery } from "../../lib/library-release-history-query";
+import { libraryReleaseHistoryQuery } from "../library/library-release-history-query";
 export function resourceReleaseWatchHistoryQuery(
   params: URLSearchParams,
 ): ResourceReleaseWatchHistoryQuery {

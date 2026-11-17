@@ -1,11 +1,11 @@
 import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
 import { resourceReleaseWorkerOptions } from "../../packages/db/src/resource-release-worker-config";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
 } from "../../src/features/resources/resource-release-watches-query";
-import { formatNotification } from "../../src/lib/notification-copy";
 import { resourceReleaseNotification } from "../../src/lib/resource-release-watches-i18n";
 
 it("accepts only explicit revision-scoped opt-in commands without worker or account selectors", () => {

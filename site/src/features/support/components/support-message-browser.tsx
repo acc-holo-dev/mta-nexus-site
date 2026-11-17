@@ -2,10 +2,7 @@ import type { SupportMessageFilters } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import {
-  type SupportMessagePage,
-  supportMessageHref,
-} from "../../../lib/support-message-discovery-contract";
+import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 
 export function SupportMessageBrowser({

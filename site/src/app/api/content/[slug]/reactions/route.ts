@@ -1,10 +1,10 @@
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { reactionCommandSchema } from "../../../../../features/community/content-reaction-contract";
 import { reactionError } from "../../../../../features/community/content-reaction-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { reactionCommandSchema } from "../../../../../lib/content-reaction-contract";
 import { publicPlatformApi } from "../../../../../lib/public-platform-api";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { authService } from "../../../../../lib/services/auth-service";

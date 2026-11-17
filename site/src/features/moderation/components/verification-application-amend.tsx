@@ -5,11 +5,11 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
-} from "../../../lib/verification-applications-contract";
-import { confirmAction } from "../../shell/confirm-action";
+} from "../../trust/verification-applications-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import {
   verificationApplicationsCopy,

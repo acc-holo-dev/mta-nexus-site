@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "./content-discussion-contract";
+import { discussionCursorSchema } from "../../lib/content-discussion-contract";
 import { parseDiscoverApiQuery } from "./discover-query";
 export const STREAM_TYPES = ["servers", "creators", "organizations"] as const;
 const cursorSchema = discussionCursorSchema

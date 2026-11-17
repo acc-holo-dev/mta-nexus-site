@@ -3,7 +3,7 @@ import { AppError } from "@nexus/domain";
 import {
   type parseServerWorkspaceHistoryQuery,
   serverWorkspaceHistorySchema,
-} from "../server-workspace-contract";
+} from "../../features/servers/server-workspace-contract";
 export const serverWorkspaceHistoryService = {
   async page(
     actorId: string,

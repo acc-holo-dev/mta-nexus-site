@@ -1,19 +1,19 @@
 import { expect, it } from "vitest";
-import {
-  verificationCopy,
-  verificationDecisionError,
-  verificationError,
-  verificationMutationError,
-} from "../../src/features/trust/verification-workspace-copy";
-import { formatNotification } from "../../src/lib/notification-copy";
-import { userPlatformError } from "../../src/lib/user-platform-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   developerProfileUpdateSchema,
   editableDeveloperSchema,
   parseVerificationQuery,
   verificationApplicationSchema,
   verificationDecisionSchema,
-} from "../../src/lib/verification-workspace-contract";
+} from "../../src/features/trust/verification-workspace-contract";
+import {
+  verificationCopy,
+  verificationDecisionError,
+  verificationError,
+  verificationMutationError,
+} from "../../src/features/trust/verification-workspace-copy";
+import { userPlatformError } from "../../src/lib/user-platform-copy";
 
 const profile = {
   specialties: [" Lua ", "Lua", "TypeScript"],

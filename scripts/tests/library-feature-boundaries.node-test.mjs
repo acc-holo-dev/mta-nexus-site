@@ -44,6 +44,8 @@ const utilPorts = [
   "library-collections-i18n",
   "resource-release-control-i18n",
   "resource-release-control-confirmation",
+  "library-collections-query",
+  "library-release-history-query",
 ];
 const serverPorts = [
   "collections",
@@ -62,7 +64,7 @@ const serverPorts = [
   "resource-collections-page",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-query|private-api-request)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|private-api-request)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

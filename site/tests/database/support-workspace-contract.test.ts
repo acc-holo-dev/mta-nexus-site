@@ -1,5 +1,6 @@
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   confirmSupportStatusChanged,
   parseSupportThread,
@@ -14,7 +15,6 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../../src/features/support/support-workspace-copy";
-import { formatNotification } from "../../src/lib/notification-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";

@@ -1,6 +1,6 @@
-import { parseDiscoverQuery } from "../../../lib/discover-query";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { DirectoryFilters, DirectoryResults } from "../../discovery/directory-server";
+import { parseDiscoverQuery } from "../../discovery/discover-query";
 import { discoveryCopy } from "../../discovery/discovery-copy";
 export async function generateMetadata() {
   const copy = discoveryCopy(await getRequestLocale());

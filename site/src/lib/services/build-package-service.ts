@@ -1,6 +1,6 @@
 import { buildPackageComparisonRepository } from "@nexus/db";
 import type { User } from "@nexus/domain";
-import type { parseBuildPackageQuery } from "../build-package-query";
+import type { parseBuildPackageQuery } from "../../features/resources/build-package-query";
 export const buildPackageService = {
   page(
     actor: User,

@@ -1,6 +1,6 @@
 import type { User } from "@nexus/domain";
 import { beforeEach, expect, it, vi } from "vitest";
-import { parseAuthorPublicationDeskQuery } from "../../src/lib/author-publication-desk-contract";
+import { parseAuthorPublicationDeskQuery } from "../../src/features/community/author-publication-desk-contract";
 
 const state = vi.hoisted(() => ({
   desk: vi.fn(),

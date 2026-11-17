@@ -3,12 +3,12 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { parseOrganizationPage } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
 

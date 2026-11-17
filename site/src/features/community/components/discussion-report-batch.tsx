@@ -4,16 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
-import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
 import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
   type ReportBatchPreview,
   reportBatchPreviewInput,
-} from "../../../lib/report-batch-contract";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+} from "../../moderation/report-batch-contract";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
@@ -21,6 +20,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
+import type { discussionReportsPageSchema } from "../discussion-reports-contract";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
 

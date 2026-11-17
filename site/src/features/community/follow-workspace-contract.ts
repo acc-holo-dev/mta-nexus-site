@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { parseDiscussionCursor } from "./content-discussion-contract";
+import { parseDiscussionCursor } from "../../lib/content-discussion-contract";
 export const FOLLOW_TYPES = ["server", "user", "organization", "product", "content"] as const;
 const OBJECT_MUTE_DURATIONS = ["24h", "7d", "30d"] as const;
 export const followCommandSchema = z

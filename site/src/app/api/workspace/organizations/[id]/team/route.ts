@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseOrganizationTeamQuery } from "../../../../../../features/organizations/organization-team-contract";
 import { organizationTeamError } from "../../../../../../features/organizations/organization-team-copy";
-import { parseOrganizationTeamQuery } from "../../../../../../lib/organization-team-contract";
 import { organizationCheckReadActor } from "../../../../../../lib/organization-workspace-api";
 import { organizationTeamService } from "../../../../../../lib/services/organization-team-service";
 import { userPlatformApi } from "../../../../../../lib/user-platform-api";

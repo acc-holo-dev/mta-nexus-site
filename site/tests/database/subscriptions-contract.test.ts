@@ -21,7 +21,7 @@ import {
   subscriptionId,
   subscriptionPageParams,
   subscriptionsQuery,
-} from "../../src/lib/subscriptions-query";
+} from "../../src/features/commerce/subscriptions-query";
 import {
   activation,
   cancellation,

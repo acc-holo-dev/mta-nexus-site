@@ -5,7 +5,7 @@ import {
 } from "@nexus/db";
 import { AppError, type User } from "@nexus/domain";
 import { subscriptionCommandSchema } from "@nexus/validation";
-import { subscriptionId } from "../subscriptions-query";
+import { subscriptionId } from "../../features/commerce/subscriptions-query";
 export const subscriptionsService = {
   plan: (id: string) => commercialPlanRepository.published(subscriptionId(id)),
   scopes: (actor: User, page = 1) => financialStatementsRepository.scopes(actor.id, page),

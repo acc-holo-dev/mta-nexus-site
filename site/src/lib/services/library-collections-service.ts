@@ -24,7 +24,7 @@ import {
   libraryCollectionCommandSchema,
   libraryMembershipBatchCommandSchema,
 } from "@nexus/validation";
-import { collectionId } from "../library-collections-query";
+import { collectionId } from "../../features/library/library-collections-query";
 export const libraryCollectionsService = {
   inventory: (actor: User, query: LibraryCollectionInventoryQuery) =>
     readLibraryCollectionInventory(actor.id, query),

@@ -4,12 +4,15 @@ import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
+import {
+  reportBatchCommandInput,
+  reportBatchPreviewInput,
+} from "../../features/moderation/report-batch-contract";
 import type {
   CommunityReportQuery,
   communityReportCreateSchema,
   communityReportDecisionSchema,
 } from "../community-report-contract";
-import { reportBatchCommandInput, reportBatchPreviewInput } from "../report-batch-contract";
 
 function summary(
   row: Awaited<ReturnType<typeof communityReportsRepository.page>>["items"][number],

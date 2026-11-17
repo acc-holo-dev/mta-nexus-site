@@ -2,7 +2,7 @@ import { resourceCopiesRepository } from "@nexus/db";
 import { AppError, eventBus, type User } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { resourceCopyCommandSchema } from "@nexus/validation";
-import { resourceCopyId } from "../resource-copy-query";
+import { resourceCopyId } from "../../features/resources/resource-copy-query";
 export const resourceCopyService = {
   preview: (actor: User, sourceId: string) =>
     resourceCopiesRepository.preview(actor.id, resourceCopyId(sourceId)),

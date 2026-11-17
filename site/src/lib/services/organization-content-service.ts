@@ -1,6 +1,6 @@
 import { organizationContentRepository } from "@nexus/db";
 import type { Content, User } from "@nexus/domain";
-import type { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
+import type { parseAuthorPublicationHistoryQuery } from "../../features/community/author-publication-desk-contract";
 import type { parseContentPage } from "../user-platform-contract";
 import { authorContentService } from "./author-content-service";
 import { editablePublication as editable } from "./publication-editor-record";

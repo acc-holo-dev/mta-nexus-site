@@ -1,7 +1,10 @@
 import { organizationTeamDirectoryRepository } from "@nexus/db";
 import { NotFoundError, type User } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
-import type { OrganizationTeamPage, OrganizationTeamQuery } from "../organization-team-contract";
+import type {
+  OrganizationTeamPage,
+  OrganizationTeamQuery,
+} from "../../features/organizations/organization-team-contract";
 import { editableOrganization } from "./organization-workspace-service";
 
 class OrganizationTeamService {

@@ -36,7 +36,7 @@ vi.mock("../../packages/db/src/client", async () => {
 
 import { db } from "../../packages/db/src/client";
 import { publicationNotice } from "../../packages/db/src/repositories/publication-notice";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = {

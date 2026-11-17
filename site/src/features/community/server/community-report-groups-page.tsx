@@ -3,12 +3,12 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../../../lib/community-report-api";
-import { parseReportGroupsQuery } from "../../../lib/community-report-groups-contract";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportGroupsService } from "../../../lib/services/community-report-groups-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { parseReportGroupsQuery } from "../community-report-groups-contract";
 import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
 import { CommunityReportGroups } from "../components/community-report-groups";
 export async function reportGroupsMetadata() {

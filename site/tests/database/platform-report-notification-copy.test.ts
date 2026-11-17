@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 

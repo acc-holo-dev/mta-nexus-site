@@ -5,6 +5,7 @@ import {
   communityReportError,
   communityReportMutationError,
 } from "../../src/features/community/community-report-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   communityReportCreateSchema,
   communityReportDecisionSchema,
@@ -13,7 +14,6 @@ import {
   parseCommunityReportQuery,
 } from "../../src/lib/community-report-contract";
 import { getDictionary } from "../../src/lib/i18n";
-import { formatNotification } from "../../src/lib/notification-copy";
 
 const report = {
   targetType: "comment",

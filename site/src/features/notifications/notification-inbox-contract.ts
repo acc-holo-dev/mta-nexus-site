@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "./content-discussion-contract";
+import { discussionCursorSchema } from "../../lib/content-discussion-contract";
 export const INBOX_CATEGORIES = [
   "follow",
   "content",

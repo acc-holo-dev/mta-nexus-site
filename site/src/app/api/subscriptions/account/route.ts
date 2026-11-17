@@ -1,10 +1,10 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { subscriptionsQuery } from "../../../../features/commerce/subscriptions-query";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
-import { subscriptionsQuery } from "../../../../lib/subscriptions-query";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) =>
     subscriptionsService.dashboard(

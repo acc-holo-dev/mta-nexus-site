@@ -3,17 +3,17 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  FOLLOW_TYPES,
-  type FollowPage,
-  type FollowTargetType,
-  followPageSchema,
-} from "../../../lib/follow-workspace-contract";
 import type { Locale } from "../../../lib/i18n";
 import { publicationHref } from "../../../lib/publication-feed-contract";
 import { platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 import { confirmsFollowMutation } from "../follow-confirmation";
+import {
+  FOLLOW_TYPES,
+  type FollowPage,
+  type FollowTargetType,
+  followPageSchema,
+} from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
 import { ObjectMuteControls } from "../object-mute-controls";
 import { publicationCopy } from "../publication-feed-copy";

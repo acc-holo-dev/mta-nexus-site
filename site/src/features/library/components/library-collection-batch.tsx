@@ -9,7 +9,6 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { collectionHref } from "../../../lib/library-collections-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,
@@ -21,6 +20,7 @@ import {
 } from "../library-collection-receipts-i18n";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 
 export function LibraryCollectionBatchForm({
   locale,

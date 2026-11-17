@@ -6,7 +6,7 @@ import {
   type NotificationInboxQuery,
   notificationInboxHref,
   notificationInboxPageSchema,
-} from "../../lib/notification-inbox-contract";
+} from "./notification-inbox-contract";
 
 export const INBOX_EXPORT_MAX_BYTES = 1024 * 1024;
 export const INBOX_EXPORT_FILE_NAME = "nexus-notification-page.json";

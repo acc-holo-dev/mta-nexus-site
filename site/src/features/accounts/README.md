@@ -12,3 +12,5 @@
 | `account-recovery-request-policy.ts` | util port `account-recovery-request-policy` |
 | `account-recovery-browser.ts` | util port `account-recovery-browser` |
 | `session-cookie.ts` | util port `session-cookie` |
+| `profile-change-history-contract.ts` | util port `profile-change-history-contract` |
+| `profile-privacy-contract.ts` | util port `profile-privacy-contract` |

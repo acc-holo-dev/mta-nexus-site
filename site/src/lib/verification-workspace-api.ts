@@ -1,6 +1,6 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { parseVerificationQuery } from "./verification-workspace-contract";
+import { parseVerificationQuery } from "../features/trust/verification-workspace-contract";
 export function verificationFilters(params: URLSearchParams, targets = false) {
   const filters = parseVerificationQuery(params, targets);
   if (!filters) throw new AppError("Invalid filters", 400, "VALIDATION_ERROR");

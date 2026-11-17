@@ -2,15 +2,11 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  collectionHref,
-  collectionId,
-  collectionPageParams,
-} from "../../../lib/library-collections-query";
 import { authService } from "../../../lib/services/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionId, collectionPageParams } from "../library-collections-query";
 import { LibraryCollectionsCopyView } from "./library-collections-copy-view";
 import { LibraryCollectionsDetailView } from "./library-collections-detail-view";
 import { LibraryCollectionsErrorPanel } from "./library-collections-error-panel";

@@ -6,12 +6,12 @@ import { AppError, ForbiddenError, NotFoundError, type User } from "@nexus/domai
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
-import type { ModerationQuery, moderationCommandSchema } from "../community-moderation-contract";
-import type { DiscussionReportsQuery } from "../discussion-reports-contract";
+import type { DiscussionReportsQuery } from "../../features/community/discussion-reports-contract";
 import {
   type ModeratedDiscussionQuery,
   moderatedDiscussionRemoveSchema,
-} from "../moderated-discussion-contract";
+} from "../../features/community/moderated-discussion-contract";
+import type { ModerationQuery, moderationCommandSchema } from "../community-moderation-contract";
 import { contentService } from "./content-service";
 
 function authority(actor: User, id?: string) {

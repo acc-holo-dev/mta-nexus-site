@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { parseAuthorPublicationHistoryQuery } from "../../../../../../../../features/community/author-publication-desk-contract";
 import { organizationPublicationHistoryError } from "../../../../../../../../features/organizations/organization-publication-history-copy";
-import { parseAuthorPublicationHistoryQuery } from "../../../../../../../../lib/author-publication-desk-contract";
 import {
   organizationContentId,
   organizationContentRate,

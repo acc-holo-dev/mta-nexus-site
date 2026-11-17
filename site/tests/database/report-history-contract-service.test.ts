@@ -18,17 +18,17 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
 
+import {
+  discussionReportsHref,
+  discussionReportsPageSchema,
+  parseDiscussionReportsQuery,
+} from "../../src/features/community/discussion-reports-contract";
 import { discussionReportsCopy } from "../../src/features/community/discussion-reports-copy";
 import {
   confirmedOrganizationPublicationRestore,
   organizationPublicationHistorySchema,
 } from "../../src/features/community/organization-publication-history-contract";
 import { organizationPublicationHistoryCopy } from "../../src/features/organizations/organization-publication-history-copy";
-import {
-  discussionReportsHref,
-  discussionReportsPageSchema,
-  parseDiscussionReportsQuery,
-} from "../../src/lib/discussion-reports-contract";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { communityReportService as reports } from "../../src/lib/services/community-report-service";
 import { organizationContentService as organizations } from "../../src/lib/services/organization-content-service";

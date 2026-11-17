@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
+import type { OrganizationWorkspace } from "../../src/features/organizations/organization-workspace-contract";
 import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
-import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 import {
   type FlatTestElement,
   findTestButton,

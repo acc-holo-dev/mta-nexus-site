@@ -16,16 +16,16 @@ import {
   normalizeResourceVersionForStorage,
 } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
+import { buildProductDependencyResolution } from "../../features/resources/product-dependency-resolution";
+import {
+  buildReverseDependencySummary,
+  reverseDependencyLimits,
+} from "../../features/resources/reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
-import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import {
   mapPublicResourceAttribution,
   type PublicResourceAttribution,
 } from "../public-resource-attribution";
-import {
-  buildReverseDependencySummary,
-  reverseDependencyLimits,
-} from "../reverse-dependency-summary";
 
 export type { PublicResourceAttribution };
 

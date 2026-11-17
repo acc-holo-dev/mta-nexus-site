@@ -1,8 +1,8 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { parseOrganizationPage } from "../../../../features/organizations/organization-workspace-contract";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { organizationApi, organizationInput } from "../../../../lib/organization-workspace-api";
-import { parseOrganizationPage } from "../../../../lib/organization-workspace-contract";
 import { organizationWorkspaceService } from "../../../../lib/services/organization-workspace-service";
 export function GET(request: NextRequest) {
   return organizationApi(request, async (user) => {

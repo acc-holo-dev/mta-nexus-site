@@ -1,11 +1,11 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseServerStatisticsQuery } from "../features/servers/server-statistics-contract";
 import { serverStatisticsError } from "../features/servers/server-statistics-copy";
 import { resolveLocale } from "./i18n";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
 import { getTrustedRequestIp } from "./request-client-ip";
-import { parseServerStatisticsQuery } from "./server-statistics-contract";
 import { serverStatisticsCsv } from "./server-statistics-export";
 import { authService } from "./services/auth-service";
 import { serverStatisticsService } from "./services/server-statistics-service";

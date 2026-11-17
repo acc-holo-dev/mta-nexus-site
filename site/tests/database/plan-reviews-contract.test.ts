@@ -10,7 +10,7 @@ import {
   planReviewHref,
   planReviewNewQuery,
   planReviewsQuery,
-} from "../../src/lib/plan-reviews-query";
+} from "../../src/features/commerce/plan-reviews-query";
 
 const terms = {
   titleRu: "Тариф",

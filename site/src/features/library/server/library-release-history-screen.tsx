@@ -5,13 +5,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
+import { libraryReleaseHistoryQuery } from "../library-release-history-query";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {

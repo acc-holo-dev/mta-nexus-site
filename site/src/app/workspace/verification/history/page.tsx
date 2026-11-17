@@ -7,17 +7,17 @@ import {
   verificationApplicationsError,
 } from "../../../../features/moderation/verification-applications-copy";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import {
+  parseVerificationApplicationsQuery,
+  verificationApplicationsHref,
+} from "../../../../features/trust/verification-applications-contract";
+import { VERIFICATION_TYPES } from "../../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
 import { platformFieldClass } from "../../../../lib/user-platform-client";
-import {
-  parseVerificationApplicationsQuery,
-  verificationApplicationsHref,
-} from "../../../../lib/verification-applications-contract";
-import { VERIFICATION_TYPES } from "../../../../lib/verification-workspace-contract";
 
 export const dynamic = "force-dynamic";
 

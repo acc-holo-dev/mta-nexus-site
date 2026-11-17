@@ -2,16 +2,16 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../../features/discovery/directory-server";
-import {
-  discoveryStreamCopy,
-  discoveryStreamError,
-} from "../../../features/discovery/discovery-stream-copy";
-import { discoverHref } from "../../../lib/discover-query";
+import { discoverHref } from "../../../features/discovery/discover-query";
 import {
   discoveryStreamHref,
   parseDiscoveryStreamQuery,
   STREAM_TYPES,
-} from "../../../lib/discovery-stream-contract";
+} from "../../../features/discovery/discovery-stream-contract";
+import {
+  discoveryStreamCopy,
+  discoveryStreamError,
+} from "../../../features/discovery/discovery-stream-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 export const dynamic = "force-dynamic";

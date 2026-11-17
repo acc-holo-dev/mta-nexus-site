@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 import { inflateRaw } from "node:zlib";
 import { AppError, type BuildPackageEvidence, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
-import { inspectMtaMetaXml, MetaInspectionInputError } from "../mta-meta-inspector";
+import {
+  inspectMtaMetaXml,
+  MetaInspectionInputError,
+} from "../../features/resources/mta-meta-inspector";
 
 const packageInspectionLimits = Object.freeze({
   entries: 1000,

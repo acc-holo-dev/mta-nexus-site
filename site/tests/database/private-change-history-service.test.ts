@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mock = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({ profileChangeHistoryRepository: { page: mock } }));
 
-import { parseProfileChangeHistoryQuery } from "../../src/lib/profile-change-history-contract";
+import { parseProfileChangeHistoryQuery } from "../../src/features/accounts/profile-change-history-contract";
 import { profileChangeHistoryService as service } from "../../src/lib/services/profile-change-history-service";
 
 const stamp = "2026-10-12T00:00:00.123456Z",

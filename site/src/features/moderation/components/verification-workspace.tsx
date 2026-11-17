@@ -19,7 +19,7 @@ import {
   verificationApplicationSchema,
   verificationOverviewSchema,
   verificationTargetsSchema,
-} from "../../../lib/verification-workspace-contract";
+} from "../../trust/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,

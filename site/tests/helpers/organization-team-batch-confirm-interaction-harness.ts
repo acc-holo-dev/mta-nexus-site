@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
-import type { OrganizationTeamPage } from "../../src/lib/organization-team-contract";
+import type { OrganizationTeamPage } from "../../src/features/organizations/organization-team-contract";
 import {
   type FlatTestElement,
   findTestButton,

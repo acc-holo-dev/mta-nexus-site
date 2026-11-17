@@ -11,7 +11,7 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import {
   organizationChangeHistorySchema,
   ownershipTransferSchema,
-} from "../organization-governance-contract";
+} from "../../features/organizations/organization-governance-contract";
 import { encodeChangeHistoryCursor } from "../private-change-history-query";
 import { editableOrganization } from "./organization-workspace-service";
 

@@ -1,5 +1,5 @@
 import { DirectoryFilters, DirectoryResults } from "../../features/discovery/directory-server";
-import { parseDiscoverQuery } from "../../lib/discover-query";
+import { parseDiscoverQuery } from "../../features/discovery/discover-query";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 export const dynamic = "force-dynamic";

@@ -1,12 +1,12 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { safeExternalWebUrl } from "@nexus/validation";
-import { encodeDiscussionCursor } from "../content-discussion-contract";
 import type {
   FollowPage,
   FollowTargetType,
   ObjectMuteDuration,
   parseFollowQuery,
-} from "../follow-workspace-contract";
+} from "../../features/community/follow-workspace-contract";
+import { encodeDiscussionCursor } from "../content-discussion-contract";
 
 const paths = {
   user: "/users",

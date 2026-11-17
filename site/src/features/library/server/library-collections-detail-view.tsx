@@ -1,10 +1,5 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import {
-  collectionHref,
-  collectionPageParams,
-  collectionsQuery,
-} from "../../../lib/library-collections-query";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { ResourceDownloadButton } from "../../resources/download";
@@ -17,6 +12,11 @@ import { libraryCollectionInventoryCopy } from "../library-collection-inventory-
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import {
+  collectionHref,
+  collectionPageParams,
+  collectionsQuery,
+} from "../library-collections-query";
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import {
   type LibraryCollectionsActor,

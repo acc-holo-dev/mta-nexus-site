@@ -1,8 +1,8 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { planReviewsQuery } from "../../../../features/commerce/plan-reviews-query";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { planReviewsQuery } from "../../../../lib/plan-reviews-query";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
 export function GET(request: NextRequest) {

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
 import {
   type ContextKind,
   contextTrustHref,
   parseContextTrustQuery,
-} from "../../../lib/public-context-trust-contract";
-import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
+} from "../public-context-trust-contract";
 import { contextTrustCopy, contextTrustError } from "../public-context-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
 export type ContextTrustPageProps = {

@@ -6,7 +6,7 @@ vi.mock("@nexus/db", () => ({
   serverRepository: {},
 }));
 
-import { parseServerHistoryWindow } from "../../src/lib/server-history-window";
+import { parseServerHistoryWindow } from "../../src/features/servers/server-history-window";
 import { serverHistoryService } from "../../src/lib/services/server-history-service";
 
 const listing = { id: "server", name: "Server", slug: "server", visibility: "public" as const };

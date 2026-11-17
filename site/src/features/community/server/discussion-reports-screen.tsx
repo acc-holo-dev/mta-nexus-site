@@ -5,15 +5,9 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { REPORT_TYPES } from "../../../lib/community-report-contract";
-import {
-  discussionReportsHref,
-  discussionReportsPageSchema,
-  parseDiscussionReportsQuery,
-} from "../../../lib/discussion-reports-contract";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { moderatedDiscussionHref } from "../../../lib/moderated-discussion-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
@@ -21,7 +15,13 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { moderationCopy } from "../community-moderation-copy";
 import { communityReportCopy } from "../community-report-copy";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
+import {
+  discussionReportsHref,
+  discussionReportsPageSchema,
+  parseDiscussionReportsQuery,
+} from "../discussion-reports-contract";
 import { discussionReportsCopy } from "../discussion-reports-copy";
+import { moderatedDiscussionHref } from "../moderated-discussion-contract";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =

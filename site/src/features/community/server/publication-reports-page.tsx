@@ -4,10 +4,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../../../lib/community-report-api";
 import { REPORT_TYPES } from "../../../lib/community-report-contract";
-import {
-  publicationReportPageQuery,
-  publicationReportsPageSchema,
-} from "../../../lib/community-report-groups-contract";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportService } from "../../../lib/services/community-report-service";
@@ -15,6 +11,10 @@ import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { communityReportCopy, communityReportError } from "../community-report-copy";
+import {
+  publicationReportPageQuery,
+  publicationReportsPageSchema,
+} from "../community-report-groups-contract";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 export async function publicationReportsMetadata() {

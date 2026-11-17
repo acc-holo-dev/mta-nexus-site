@@ -13,13 +13,13 @@ import { ServerConnectControls } from "../../../features/servers/connect";
 import { ServerFollowButton } from "../../../features/servers/follow";
 import { ServerHistoryPanel } from "../../../features/servers/history-server";
 import { ServerReviewPanel } from "../../../features/servers/review-controls";
+import { parseServerHistoryWindow } from "../../../features/servers/server-history-window";
 import { serverStatisticsCopy } from "../../../features/servers/server-statistics-copy";
 import { ServerUpdatesPanel } from "../../../features/servers/updates-server";
 import { authEntryHref } from "../../../features/shell/auth-return";
 import { contextTrustCopy } from "../../../features/trust/public-context-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
-import { parseServerHistoryWindow } from "../../../lib/server-history-window";
 import { authService } from "../../../lib/services/auth-service";
 import { contentService } from "../../../lib/services/content-service";
 import {

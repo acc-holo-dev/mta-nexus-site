@@ -10,9 +10,9 @@ import {
 } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
-import type { DiscoverQuery } from "../discover-query";
-import { DISCOVER_CONTENT_TYPES } from "../discover-query";
-import type { DiscoveryStreamQuery } from "../discovery-stream-contract";
+import type { DiscoverQuery } from "../../features/discovery/discover-query";
+import { DISCOVER_CONTENT_TYPES } from "../../features/discovery/discover-query";
+import type { DiscoveryStreamQuery } from "../../features/discovery/discovery-stream-contract";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,

@@ -29,6 +29,10 @@ Feature объединяет существующие экраны управл�
 | `organization-content-copy.ts`             | util port `organization-content-copy`                                  |
 | `organization-publication-history-copy.ts` | util port `organization-publication-history-copy`                      |
 | `organization-workspace-copy.ts`           | util port `organization-workspace-copy`                                |
+| `organization-batch-contract.ts`           | util port `organization-batch-contract`                                |
+| `organization-governance-contract.ts`      | util port `organization-governance-contract`                           |
+| `organization-team-contract.ts`            | util port `organization-team-contract`                                 |
+| `organization-workspace-contract.ts`       | util port `organization-workspace-contract`                            |
 
 Редактор участника, пакетные действия и передача владения — внутренние клиентские
 компоненты. Публичные входы используются внешним production-кодом; прямые и

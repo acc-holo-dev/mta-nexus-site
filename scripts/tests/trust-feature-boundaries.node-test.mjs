@@ -13,6 +13,11 @@ const utilPorts = [
   "public-verification-history-copy",
   "public-context-trust-copy",
   "verification-workspace-copy",
+  "public-context-trust-contract",
+  "public-user-trust-contract",
+  "verification-applications-contract",
+  "public-verification-history-contract",
+  "verification-workspace-contract",
 ];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];

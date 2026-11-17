@@ -3,8 +3,8 @@ import type { User } from "@nexus/domain";
 import { AppError, NotFoundError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import type { z } from "zod";
+import type { profilePrivacyUpdateSchema } from "../../features/accounts/profile-privacy-contract";
 import { isPostgresDeadlock } from "../postgres-error";
-import type { profilePrivacyUpdateSchema } from "../profile-privacy-contract";
 
 const editable = (row: Awaited<ReturnType<typeof profilePrivacyRepository.own>>) => ({
   id: row.id,

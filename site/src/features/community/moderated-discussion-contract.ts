@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { parseModerationQuery } from "./community-moderation-contract";
-import { PUBLICATION_TYPES } from "./publication-feed-contract";
+import { parseModerationQuery } from "../../lib/community-moderation-contract";
+import { PUBLICATION_TYPES } from "../../lib/publication-feed-contract";
 export function parseModeratedDiscussionQuery(params: URLSearchParams) {
   if ([...params.keys()].some((key) => !["q", "author", "cursor"].includes(key))) return null;
   const copy = new URLSearchParams(params);

@@ -5,11 +5,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  collectionHref,
-  collectionId,
-  collectionPageParams,
-} from "../../../lib/library-collections-query";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
@@ -22,6 +17,7 @@ import { collectionReleasesQuery } from "../collection-releases-query";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionId, collectionPageParams } from "../library-collections-query";
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";

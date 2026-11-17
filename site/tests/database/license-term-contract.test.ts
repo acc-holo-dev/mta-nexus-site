@@ -6,7 +6,7 @@ import {
   licenseArchiveUrl,
 } from "../../src/features/commerce/license-archive-query";
 import { licenseTermNotification } from "../../src/features/commerce/license-maintenance-i18n";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 it("strictly bounds buyer queries and preserves every active filter in navigation", () => {
   const query = licenseArchiveQuery(

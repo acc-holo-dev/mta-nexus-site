@@ -4,16 +4,16 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import {
-  confirmedReactionMutation,
-  type ReactionState,
-  reactionStateSchema,
-} from "../../../lib/content-reaction-contract";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import {
+  confirmedReactionMutation,
+  type ReactionState,
+  reactionStateSchema,
+} from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 export function ContentReactions({
   slug,

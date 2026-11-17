@@ -100,6 +100,11 @@ Services и repositories не дублируются и не переносят�
 | `resource-requirements-query.ts`               | util port `resource-requirements-query`                                                                     |
 | `resource-review-i18n.ts`                      | util port `resource-review-i18n`                                                                            |
 | `resource-release-watch-history-query.ts`      | util port `resource-release-watch-history-query`                                                            |
+| `product-dependency-resolution.ts`             | util port `product-dependency-resolution`                                                                   |
+| `resource-copy-query.ts`                       | util port `resource-copy-query`                                                                             |
+| `reverse-dependency-summary.ts`                | util port `reverse-dependency-summary`                                                                      |
+| `build-package-query.ts`                       | util port `build-package-query`                                                                             |
+| `mta-meta-inspector.ts`                        | util port `mta-meta-inspector`                                                                              |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

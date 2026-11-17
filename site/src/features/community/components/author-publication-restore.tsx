@@ -3,7 +3,6 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmedAuthorPublicationRestore } from "../../../lib/author-publication-desk-contract";
 import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
@@ -16,6 +15,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,

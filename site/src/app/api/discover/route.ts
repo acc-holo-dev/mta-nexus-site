@@ -1,7 +1,7 @@
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseDiscoverApiQuery } from "../../../features/discovery/discover-query";
 import { discoveryCopy } from "../../../features/discovery/discovery-copy";
-import { parseDiscoverApiQuery } from "../../../lib/discover-query";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,

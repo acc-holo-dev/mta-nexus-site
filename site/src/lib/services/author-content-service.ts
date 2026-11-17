@@ -12,7 +12,7 @@ import {
   type AuthorPublicationDeskQuery,
   authorPublicationRestoreSchema,
   type parseAuthorPublicationHistoryQuery,
-} from "../author-publication-desk-contract";
+} from "../../features/community/author-publication-desk-contract";
 import { isPostgresDeadlock } from "../postgres-error";
 import {
   writerArchiveSchema,

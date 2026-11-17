@@ -29,14 +29,14 @@ import HistoryPage, {
 } from "../../src/app/workspace/organizations/[id]/activity/page";
 import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
-import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
-import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 import {
   confirmOwnershipTransfer,
   type OrganizationHistory,
   ownershipTransferSchema,
-} from "../../src/lib/organization-governance-contract";
-import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
+} from "../../src/features/organizations/organization-governance-contract";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
+import type { OrganizationWorkspace } from "../../src/features/organizations/organization-workspace-contract";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:01.000Z";

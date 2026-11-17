@@ -4,7 +4,7 @@ import {
   type SupportMessageFilters,
 } from "@nexus/domain";
 import { z } from "zod";
-import { changeHistoryTimeSchema } from "./private-change-history-query";
+import { changeHistoryTimeSchema } from "../../lib/private-change-history-query";
 
 const messageId = z.string().regex(/^spm_[a-f0-9]{24}$/u);
 const cursorSchema = z

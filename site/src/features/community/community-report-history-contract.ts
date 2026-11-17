@@ -4,8 +4,11 @@ import {
   REPORT_HISTORY_GROUPS,
 } from "@nexus/domain";
 import { z } from "zod";
-import { REPORT_TYPES } from "./community-report-contract";
-import { changeHistoryTimeSchema, parseChangeHistoryQuery } from "./private-change-history-query";
+import { REPORT_TYPES } from "../../lib/community-report-contract";
+import {
+  changeHistoryTimeSchema,
+  parseChangeHistoryQuery,
+} from "../../lib/private-change-history-query";
 export const parseReportHistoryQuery = (params: URLSearchParams) =>
   parseChangeHistoryQuery(params, REPORT_HISTORY_GROUPS);
 const id = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/u);

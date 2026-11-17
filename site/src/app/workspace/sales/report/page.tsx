@@ -6,10 +6,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SellerSalesReportView } from "../../../../features/commerce/seller-sales";
 import { sellerSalesCopy } from "../../../../features/commerce/seller-sales-i18n";
+import { sellerSalesPageQuery } from "../../../../features/commerce/seller-sales-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { sellerSalesPageQuery } from "../../../../lib/seller-sales-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
 

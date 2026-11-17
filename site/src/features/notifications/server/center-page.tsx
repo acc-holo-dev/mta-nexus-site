@@ -5,17 +5,17 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  INBOX_CATEGORIES,
-  INBOX_PERIODS,
-  notificationInboxHref,
-  parseNotificationInboxQuery,
-} from "../../../lib/notification-inbox-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { notificationInboxService } from "../../../lib/services/notification-inbox-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
+import {
+  INBOX_CATEGORIES,
+  INBOX_PERIODS,
+  notificationInboxHref,
+  parseNotificationInboxQuery,
+} from "../notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
 export async function generateMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());

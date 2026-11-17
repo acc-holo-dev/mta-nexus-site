@@ -1,10 +1,5 @@
 import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
-import {
-  collectionHref,
-  collectionPageParams,
-  collectionsQuery,
-} from "../../../lib/library-collections-query";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -12,6 +7,11 @@ import {
   libraryCollectionReceiptsCopy,
 } from "../library-collection-receipts-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import {
+  collectionHref,
+  collectionPageParams,
+  collectionsQuery,
+} from "../library-collections-query";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,

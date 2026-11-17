@@ -5,13 +5,13 @@ import {
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
 } from "../../src/features/community/content-discussion-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   discussionCommentSchema,
   encodeDiscussionCursor,
   parseDiscussionCursor,
 } from "../../src/lib/content-discussion-contract";
 import { getDictionary } from "../../src/lib/i18n";
-import { formatNotification } from "../../src/lib/notification-copy";
 
 it("round trips exact microsecond cursors through URL query encoding", () => {
   const cursor = { createdAt: "2026-10-10T12:00:00.000123Z", id: "id/with spaces" };

@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { planReviewsQuery } from "../../../../../../lib/plan-reviews-query";
+import { planReviewsQuery } from "../../../../../../features/commerce/plan-reviews-query";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { planReviewsService } from "../../../../../../lib/services/plan-reviews-service";
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {

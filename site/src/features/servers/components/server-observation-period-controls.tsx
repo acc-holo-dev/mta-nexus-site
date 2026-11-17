@@ -1,8 +1,8 @@
 import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { type ServerHistoryWindow, serverHistoryWindows } from "../../../lib/server-history-window";
-import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
+import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
+import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 
 const filterNavLinkClass =

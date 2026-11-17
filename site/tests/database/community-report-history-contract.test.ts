@@ -1,12 +1,12 @@
 import { expect, it } from "vitest";
 import {
+  parseReportHistoryQuery,
+  reportHistoryPageSchema,
+} from "../../src/features/community/community-report-history-contract";
+import {
   communityReportPageQuery,
   parseCommunityReportQuery,
 } from "../../src/lib/community-report-contract";
-import {
-  parseReportHistoryQuery,
-  reportHistoryPageSchema,
-} from "../../src/lib/community-report-history-contract";
 import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
 
 it("accepts canonical exact-time filtered cursors and rejects ambiguous history queries", () => {

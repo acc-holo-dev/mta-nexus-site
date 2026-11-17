@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "./content-discussion-contract";
+import { discussionCursorSchema } from "../../lib/content-discussion-contract";
 
 const cursorSchema = discussionCursorSchema
   .extend({ context: z.string().regex(/^[a-f0-9]{64}$/u), version: z.literal(1) })

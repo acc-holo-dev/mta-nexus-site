@@ -3,9 +3,9 @@ import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { sellerSalesUrl, sellerSaleUrl } from "../../../lib/seller-sales-query";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
+import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({

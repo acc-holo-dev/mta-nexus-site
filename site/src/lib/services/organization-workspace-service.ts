@@ -7,14 +7,14 @@ import type { z } from "zod";
 import {
   organizationBatchCommandInput,
   organizationBatchPreviewInput,
-} from "../organization-batch-contract";
+} from "../../features/organizations/organization-batch-contract";
 import {
   memberAddSchema,
   memberRemoveSchema,
   memberUpdateSchema,
   organizationCreateSchema,
   organizationUpdateSchema,
-} from "../organization-workspace-contract";
+} from "../../features/organizations/organization-workspace-contract";
 
 type StoredOrganization = Awaited<ReturnType<typeof organizationWorkspaceRepository.create>>;
 export function editableOrganization(value: StoredOrganization) {

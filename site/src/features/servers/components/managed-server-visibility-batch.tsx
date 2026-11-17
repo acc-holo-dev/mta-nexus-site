@@ -5,11 +5,6 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { getManagedServerCopy } from "../../../lib/managed-server-copy";
-import {
-  confirmsServerVisibilityCommand,
-  confirmsServerVisibilityPreview,
-  type ServerVisibilityPreview,
-} from "../../../lib/server-workspace-contract";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
@@ -17,6 +12,11 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import {
+  confirmsServerVisibilityCommand,
+  confirmsServerVisibilityPreview,
+  type ServerVisibilityPreview,
+} from "../server-workspace-contract";
 import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 export function ManagedServerVisibilityBatch({
   items,

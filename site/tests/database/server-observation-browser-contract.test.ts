@@ -6,14 +6,14 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import {
+  parseServerObservationBrowserQuery,
+  serverObservationBrowserHref,
+} from "../../src/features/servers/server-observation-browser-contract";
+import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
 } from "../../src/features/servers/server-observation-browser-copy";
-import {
-  parseServerObservationBrowserQuery,
-  serverObservationBrowserHref,
-} from "../../src/lib/server-observation-browser-contract";
-import { parseServerStatisticsQuery } from "../../src/lib/server-statistics-contract";
+import { parseServerStatisticsQuery } from "../../src/features/servers/server-statistics-contract";
 import { serverObservationBrowserCsv } from "../../src/lib/server-statistics-export";
 import { serverStatisticsService } from "../../src/lib/services/server-statistics-service";
 

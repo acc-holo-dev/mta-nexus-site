@@ -3,15 +3,15 @@ import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  approvalPageHref,
+  parseApprovalQuery,
+} from "../../../../../features/trust/public-verification-history-contract";
+import {
   approvalCopy,
   approvalError,
 } from "../../../../../features/trust/public-verification-history-copy";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import {
-  approvalPageHref,
-  parseApprovalQuery,
-} from "../../../../../lib/public-verification-history-contract";
 import { publicVerificationHistoryService } from "../../../../../lib/services/public-verification-history-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";

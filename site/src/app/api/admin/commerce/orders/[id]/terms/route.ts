@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { orderTermsPageQuery } from "../../../../../../../lib/order-terms-query";
+import { orderTermsPageQuery } from "../../../../../../../features/commerce/order-terms-query";
 import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
 import { orderTermsService } from "../../../../../../../lib/services/order-terms-service";
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {

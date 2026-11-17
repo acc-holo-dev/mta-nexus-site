@@ -1,8 +1,8 @@
 import { AppError, LIBRARY_COLLECTION_COMMAND_BYTES } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { collectionsQuery } from "../../../../../features/library/library-collections-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { collectionsQuery } from "../../../../../lib/library-collections-query";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

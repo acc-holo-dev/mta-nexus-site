@@ -1,13 +1,13 @@
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedText } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   inspectMtaMetaXml,
   MetaInspectionInputError,
   metaInspectionLimits,
-} from "../../../../lib/mta-meta-inspector";
+} from "../../../../features/resources/mta-meta-inspector";
+import { readBoundedText } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,

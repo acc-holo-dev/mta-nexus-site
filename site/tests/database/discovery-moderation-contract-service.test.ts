@@ -30,6 +30,10 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
 vi.mock("@nexus/security", () => ({ can: mocks.allowed }));
 
 import { moderationCopy } from "../../src/features/community/community-moderation-copy";
+import {
+  discoveryStreamHref,
+  parseDiscoveryStreamQuery,
+} from "../../src/features/discovery/discovery-stream-contract";
 import { discoveryStreamCopy } from "../../src/features/discovery/discovery-stream-copy";
 import {
   confirmsModerationCommand,
@@ -40,10 +44,6 @@ import {
   parseModerationDetailQuery,
   parseModerationQuery,
 } from "../../src/lib/community-moderation-contract";
-import {
-  discoveryStreamHref,
-  parseDiscoveryStreamQuery,
-} from "../../src/lib/discovery-stream-contract";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { discoveryService as discovery } from "../../src/lib/services/discovery-service";
 

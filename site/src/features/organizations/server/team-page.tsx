@@ -3,15 +3,15 @@ import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  organizationTeamHref,
-  organizationTeamPageSchema,
-  parseOrganizationTeamQuery,
-} from "../../../lib/organization-team-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import {
+  organizationTeamHref,
+  organizationTeamPageSchema,
+  parseOrganizationTeamQuery,
+} from "../organization-team-contract";
 import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../team";

@@ -9,14 +9,14 @@ import {
   resourceCopyCopy,
   resourceCopyError,
 } from "../../../../../features/resources/resource-copy-i18n";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getDictionary } from "../../../../../lib/i18n";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
   resourceCopyId,
-} from "../../../../../lib/resource-copy-query";
+} from "../../../../../features/resources/resource-copy-query";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { getDictionary } from "../../../../../lib/i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceCopyService } from "../../../../../lib/services/resource-copy-service";
 

@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseOwnDiscussionQuery } from "../../../../features/community/discussion-workspace-contract";
 import { ownDiscussionError } from "../../../../features/community/discussion-workspace-copy";
-import { parseOwnDiscussionQuery } from "../../../../lib/discussion-workspace-contract";
 import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {

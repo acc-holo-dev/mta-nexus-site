@@ -3,7 +3,6 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -11,6 +10,7 @@ import { authorContentService } from "../../../lib/services/author-content-servi
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,

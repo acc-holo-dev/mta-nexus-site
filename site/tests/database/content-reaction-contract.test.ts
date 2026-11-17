@@ -1,6 +1,4 @@
 import { expect, it } from "vitest";
-import { reactionCopy } from "../../src/features/community/content-reaction-copy";
-import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
 import {
   confirmedReactionMutation,
   confirmedReactionRemoval,
@@ -9,7 +7,9 @@ import {
   reactionPageHref,
   reactionPageSchema,
   reactionStateSchema,
-} from "../../src/lib/content-reaction-contract";
+} from "../../src/features/community/content-reaction-contract";
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
+import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
 
 const mutation = {
   contentId: "content",

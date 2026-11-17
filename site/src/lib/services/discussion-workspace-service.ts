@@ -6,7 +6,7 @@ import type {
   OwnDiscussion,
   OwnDiscussionPage,
   OwnDiscussionQuery,
-} from "../discussion-workspace-contract";
+} from "../../features/community/discussion-workspace-contract";
 
 const checkId = (id: string) => {
   if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Comment");

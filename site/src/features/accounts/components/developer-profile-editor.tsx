@@ -8,7 +8,7 @@ import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
   editableDeveloperSchema,
-} from "../../../lib/verification-workspace-contract";
+} from "../../trust/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,

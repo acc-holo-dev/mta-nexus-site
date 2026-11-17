@@ -8,13 +8,13 @@ import {
   normalizeMtaAddress,
 } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
-import { isUniqueConstraintViolation } from "../postgres-error";
 import {
   serverVisibilityCommand,
   serverVisibilityInput,
   serverVisibilityPreviewSchema,
   serverVisibilityResultSchema,
-} from "../server-workspace-contract";
+} from "../../features/servers/server-workspace-contract";
+import { isUniqueConstraintViolation } from "../postgres-error";
 
 function throwServerMutationConflict(error: unknown): never {
   if (isUniqueConstraintViolation(error, ["servers_slug_idx", "servers_slug_unique"])) {

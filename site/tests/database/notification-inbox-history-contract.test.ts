@@ -7,7 +7,7 @@ import {
   notificationInboxHref,
   notificationInboxPageSchema,
   parseNotificationInboxQuery,
-} from "../../src/lib/notification-inbox-contract";
+} from "../../src/features/notifications/notification-inbox-contract";
 
 const point = {
   id: "notification",

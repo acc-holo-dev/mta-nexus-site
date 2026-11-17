@@ -3,7 +3,6 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
@@ -19,6 +18,7 @@ import {
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import { AuthorPublicationRestore } from "../author-publication-restore";
 import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";

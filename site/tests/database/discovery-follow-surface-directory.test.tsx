@@ -49,9 +49,9 @@ vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () =>
 
 import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
+import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
 import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { parseDiscoverQuery } from "../../src/lib/discover-query";
 
 setupDiscoveryFollowSurface();
 

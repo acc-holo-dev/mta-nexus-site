@@ -1,7 +1,7 @@
 import {
   type EditableOrganization,
   editableOrganizationSchema,
-} from "../../lib/organization-workspace-contract";
+} from "./organization-workspace-contract";
 export function confirmsOrganizationMemberMutation(
   result: unknown,
   previous: Pick<EditableOrganization, "id" | "ownerId" | "slug" | "updatedAt">,

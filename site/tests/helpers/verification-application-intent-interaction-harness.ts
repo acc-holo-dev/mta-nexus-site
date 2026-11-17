@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
-import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import type {
   VerificationOverview,
   VerificationQuery,
   VerificationTargets,
-} from "../../src/lib/verification-workspace-contract";
+} from "../../src/features/trust/verification-workspace-contract";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { findTestButton, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type VerificationApplicationIntentInteractionHarness = {

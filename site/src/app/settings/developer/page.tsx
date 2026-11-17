@@ -5,11 +5,11 @@ import { ProfileChangeHistoryLink } from "../../../features/accounts/change-hist
 import { DeveloperProfileEditor } from "../../../features/accounts/profile";
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { editableDeveloperSchema } from "../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import { editableDeveloperSchema } from "../../../lib/verification-workspace-contract";
 export const dynamic = "force-dynamic";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";

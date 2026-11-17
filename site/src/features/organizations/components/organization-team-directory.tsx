@@ -8,15 +8,15 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { confirmAction } from "../../shell/confirm-action";
+import { organizationBatchCopy } from "../organization-batch-copy";
+import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
   type OrganizationTeamPage,
   type OrganizationTeamQuery,
   organizationTeamHref,
   organizationTeamPageSchema,
-} from "../../../lib/organization-team-contract";
-import { confirmAction } from "../../shell/confirm-action";
-import { organizationBatchCopy } from "../organization-batch-copy";
-import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
+} from "../organization-team-contract";
 import { organizationTeamCopy } from "../organization-team-copy";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";

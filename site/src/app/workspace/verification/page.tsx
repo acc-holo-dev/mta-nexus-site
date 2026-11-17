@@ -3,16 +3,16 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { VerificationWorkspace } from "../../../features/moderation/verification-workspace";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import {
+  verificationOverviewSchema,
+  verificationPageQuery,
+  verificationTargetsSchema,
+} from "../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import {
-  verificationOverviewSchema,
-  verificationPageQuery,
-  verificationTargetsSchema,
-} from "../../../lib/verification-workspace-contract";
 
 export const dynamic = "force-dynamic";
 

@@ -2,14 +2,14 @@ import { notificationRepository } from "@nexus/db";
 import { AppError, type Notification } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
-import { getDictionary, type Locale } from "../i18n";
-import { formatNotification } from "../notification-copy";
+import { formatNotification } from "../../features/notifications/notification-copy";
 import {
   INBOX_CATEGORIES,
   type NotificationInboxQuery,
   notificationInboxCommandSchema,
   notificationInboxPageSchema,
-} from "../notification-inbox-contract";
+} from "../../features/notifications/notification-inbox-contract";
+import { getDictionary, type Locale } from "../i18n";
 
 function safeLink(value: string | null) {
   if (

@@ -1,6 +1,9 @@
 import { publicVerificationHistoryRepository } from "@nexus/db";
 import { NotFoundError } from "@nexus/domain";
-import type { ApprovalQuery, PublicApprovalPage } from "../public-verification-history-contract";
+import type {
+  ApprovalQuery,
+  PublicApprovalPage,
+} from "../../features/trust/public-verification-history-contract";
 
 class PublicVerificationHistoryService {
   async page(username: string, filters: ApprovalQuery = {}): Promise<PublicApprovalPage> {

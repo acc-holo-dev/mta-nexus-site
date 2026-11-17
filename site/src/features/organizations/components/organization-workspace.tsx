@@ -10,12 +10,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import {
-  editableOrganizationSchema,
-  memberAddSchema,
-  type OrganizationWorkspace,
-  organizationWorkspaceSchema,
-} from "../../../lib/organization-workspace-contract";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 import { organizationContentCopy } from "../organization-content-copy";
@@ -23,6 +17,12 @@ import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import { organizationTeamCopy } from "../organization-team-copy";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
+import {
+  editableOrganizationSchema,
+  memberAddSchema,
+  type OrganizationWorkspace,
+  organizationWorkspaceSchema,
+} from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";

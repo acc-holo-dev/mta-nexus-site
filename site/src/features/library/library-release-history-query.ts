@@ -3,7 +3,7 @@ import {
   LIBRARY_RELEASE_HISTORY_DAYS,
   type LibraryReleaseHistoryDays,
 } from "@nexus/domain";
-import { resourceControlPageQuery } from "../features/resources/resource-release-control-query";
+import { resourceControlPageQuery } from "../resources/resource-release-control-query";
 export function libraryReleaseHistoryQuery(params: URLSearchParams) {
   for (const key of params.keys())
     if (!["page", "days", "productId"].includes(key) || params.getAll(key).length !== 1)

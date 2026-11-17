@@ -11,7 +11,7 @@ import {
   collectionId,
   collectionPageParams,
   collectionsQuery,
-} from "../../src/lib/library-collections-query";
+} from "../../src/features/library/library-collections-query";
 import {
   libraryCollectionsContractCreate as create,
   libraryCollectionsContractCurrent as current,

@@ -4,7 +4,7 @@ import {
   discoverHref,
   parseDiscoverApiQuery,
   parseDiscoverQuery,
-} from "../../src/lib/discover-query";
+} from "../../src/features/discovery/discover-query";
 import {
   setupDiscoverySearchBehavior,
   sources,

@@ -53,6 +53,8 @@ Feature объединяет существующие представления
 | `library-collections-i18n.ts`               | util port `library-collections-i18n`                          |
 | `resource-release-control-i18n.ts`          | util port `resource-release-control-i18n`                     |
 | `resource-release-control-confirmation.ts`  | util port `resource-release-control-confirmation`             |
+| `library-collections-query.ts`              | util port `library-collections-query`                         |
+| `library-release-history-query.ts`          | util port `library-release-history-query`                     |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

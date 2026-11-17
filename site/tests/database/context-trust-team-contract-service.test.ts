@@ -9,19 +9,19 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import { confirmsOrganizationMemberMutation } from "../../src/features/organizations/organization-member-confirmation";
-import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
-import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
-} from "../../src/lib/organization-team-contract";
+} from "../../src/features/organizations/organization-team-contract";
+import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
 import {
   contextTrustHref,
   parseContextKind,
   parseContextTrustQuery,
   publicContextTrustSchema,
-} from "../../src/lib/public-context-trust-contract";
+} from "../../src/features/trust/public-context-trust-contract";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
 import { organizationTeamService as team } from "../../src/lib/services/organization-team-service";
 import { publicContextTrustService as trust } from "../../src/lib/services/public-context-trust-service";
 

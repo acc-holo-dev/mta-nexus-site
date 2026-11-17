@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { authorPublicationRestoreSchema } from "../../lib/author-publication-desk-contract";
+import { authorPublicationRestoreSchema } from "./author-publication-desk-contract";
 
 const revision = authorPublicationRestoreSchema.shape.expectedRevision;
 const state = z.enum(["draft", "published", "archived"]);

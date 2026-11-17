@@ -35,6 +35,10 @@ const utilPorts = [
   "commerce-history-format",
   "license-model-i18n",
   "order-case-i18n",
+  "order-terms-query",
+  "plan-reviews-query",
+  "seller-sales-query",
+  "subscriptions-query",
 ];
 const clientPorts = [
   "workspace-history",
@@ -46,7 +50,7 @@ const clientPorts = [
   "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|plan-reviews-query|private-api-request|subscriptions-query|support-retry)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|private-api-request|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(

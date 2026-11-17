@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { subscriptionAccountHref, subscriptionReceiptHref } from "../../../lib/subscriptions-query";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
@@ -18,6 +17,7 @@ import {
   expectedSubscriptionReceiptId,
 } from "../subscription-confirmation";
 import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
+import { subscriptionAccountHref, subscriptionReceiptHref } from "../subscriptions-query";
 
 type Props = {
   actorId: string;

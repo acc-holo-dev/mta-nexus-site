@@ -1,14 +1,14 @@
 import { expect, it } from "vitest";
 import {
+  confirmedPrivacyUpdate,
+  parseEditablePrivacy,
+  profilePrivacyUpdateSchema,
+} from "../../src/features/accounts/profile-privacy-contract";
+import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../../src/features/accounts/profile-privacy-copy";
-import {
-  confirmedPrivacyUpdate,
-  parseEditablePrivacy,
-  profilePrivacyUpdateSchema,
-} from "../../src/lib/profile-privacy-contract";
 
 const previous = {
   id: "user",

@@ -7,13 +7,13 @@ import {
 import { Button, EmptyState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import Link from "next/link";
-import type { ReportHistoryPage } from "../../../lib/community-report-history-contract";
 import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { communityReportCopy } from "../community-report-copy";
+import type { ReportHistoryPage } from "../community-report-history-contract";
 import { reportHistoryCopy } from "../community-report-history-copy";
 export function CommunityReportHistory({
   page,

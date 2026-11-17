@@ -6,16 +6,13 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  parseServerStatisticsQuery,
-  serverStatisticsHref,
-} from "../../../lib/server-statistics-contract";
 import { authService } from "../../../lib/services/auth-service";
 import {
   type ServerStatisticsResult,
   serverStatisticsService,
 } from "../../../lib/services/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 

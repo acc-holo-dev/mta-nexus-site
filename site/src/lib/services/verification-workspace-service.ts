@@ -8,17 +8,17 @@ import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
-import { isPostgresDeadlock } from "../postgres-error";
 import {
   type VerificationApplicationsQuery,
   verificationApplicationAmendSchema,
-} from "../verification-applications-contract";
+} from "../../features/trust/verification-applications-contract";
 import type {
   developerProfileUpdateSchema,
   VerificationQuery,
   verificationApplicationSchema,
   verificationDecisionSchema,
-} from "../verification-workspace-contract";
+} from "../../features/trust/verification-workspace-contract";
+import { isPostgresDeadlock } from "../postgres-error";
 
 const editable = (row: Awaited<ReturnType<typeof developerProfileRepository.own>>) => ({
   id: row.id,

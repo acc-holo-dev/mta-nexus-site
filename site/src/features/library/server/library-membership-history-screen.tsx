@@ -9,13 +9,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import {
   libraryMembershipHistoryQuery,

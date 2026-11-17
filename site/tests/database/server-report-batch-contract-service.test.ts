@@ -20,13 +20,13 @@ import {
   confirmedServerPublicationRestore,
   serverPublicationHistorySchema,
 } from "../../src/features/community/server-publication-history-contract";
-import { serverPublicationHistoryCopy } from "../../src/features/servers/server-publication-history-copy";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
   reportBatchCommandInput,
   reportBatchPreviewInput,
-} from "../../src/lib/report-batch-contract";
+} from "../../src/features/moderation/report-batch-contract";
+import { serverPublicationHistoryCopy } from "../../src/features/servers/server-publication-history-copy";
 import { communityReportService as reports } from "../../src/lib/services/community-report-service";
 import { serverContentService as servers } from "../../src/lib/services/server-content-service";
 
