@@ -16,6 +16,8 @@ import { orderCaseCopy } from "../../../../features/commerce/order-case-i18n";
 import { orderTermsCopy } from "../../../../features/commerce/order-terms-i18n";
 import { getResourceCommerceCopy } from "../../../../features/resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -47,7 +49,20 @@ export default async function OrderDetailsPage({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   const dictionary = getDictionary(typedLocale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={getDictionary(typedLocale).errors.message}
+        retryHref={"/workspace/purchases/"}
+      />
+    );
+  }
+
   if (!actor)
     return (
       <PlatformSignIn
