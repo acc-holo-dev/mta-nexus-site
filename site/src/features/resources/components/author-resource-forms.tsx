@@ -28,7 +28,7 @@ import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
-} from "../../../lib/build-file-validation";
+} from "../build-file-validation";
 import { buildPackageCopy } from "../../../lib/build-package-i18n";
 import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {

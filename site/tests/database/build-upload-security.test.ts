@@ -7,7 +7,7 @@ import {
   validateBuildFileSelection,
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
-} from "../../src/lib/build-file-validation";
+} from "../../src/features/resources/build-file-validation";
 import { MAX_BUILD_MULTIPART_OVERHEAD_BYTES, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 
 const bytes = (...values: number[]) => new Uint8Array(values);

@@ -13,7 +13,7 @@ import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   getSupportedBuildExtension,
   hasExpectedBuildFileFormat,
-} from "../../../../../lib/build-file-validation";
+} from "../../../../../features/resources/build-file-validation";
 import {
   createRequestLogContext,
   jsonWithRequestId,

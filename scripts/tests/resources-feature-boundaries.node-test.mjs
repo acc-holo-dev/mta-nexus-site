@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "build-file-validation",
     "author-resource-draft",
     "private-request",
     "resource-image-url",
@@ -268,6 +269,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/build-file-validation.ts", "resources-view-isolation"],
     ["features/resources/author-resource-draft.ts", "resources-view-isolation"],
     ["features/resources/private-request.ts", "resources-view-isolation"],
     ["features/resources/resource-image-url.ts", "resources-view-isolation"],
@@ -337,6 +339,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/build-file-validation.ts",
     "app/author-resource-draft.ts",
     "app/private-request.ts",
     "app/resource-image-url.ts",
@@ -400,6 +403,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/build-file-validation.ts",
     "site/src/features/resources/author-resource-draft.ts",
     "site/src/features/resources/private-request.ts",
     "site/src/features/resources/resource-image-url.ts",
@@ -543,6 +547,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/build-file-validation.ts");
   visit("site/src/features/resources/author-resource-draft.ts");
   visit("site/src/features/resources/private-request.ts");
   visit("site/src/features/resources/resource-image-url.ts");

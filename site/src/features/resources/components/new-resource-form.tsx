@@ -7,7 +7,7 @@ import { confirmedAuthorBuild } from "../author-resource-response";
 import {
   MAX_BUILD_FILE_SIZE_BYTES,
   validateBuildFileSelection,
-} from "../../../lib/build-file-validation";
+} from "../build-file-validation";
 import { buildPackageCopy } from "../../../lib/build-package-i18n";
 import { confirmedCreatedResource } from "../new-resource-response";
 import {
