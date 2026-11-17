@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "mta-version-target",
   ]) {
     write(
       `site/src/features/resources/${port}.ts`,
@@ -249,6 +250,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/mta-version-target.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/release-watch.ts", "resources-view-isolation"],
@@ -299,6 +301,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/mta-version-target.ts",
     "app/reviews-view.ts",
     "app/build-route.ts",
     "app/media-route.ts",
@@ -343,6 +346,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/mta-version-target.ts",
     "site/src/features/resources/release-watch.ts",
     "site/src/features/resources/compatibility-controls.ts",
     "site/src/features/resources/variant-controls.ts",
@@ -467,6 +471,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/mta-version-target.ts");
   visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");
