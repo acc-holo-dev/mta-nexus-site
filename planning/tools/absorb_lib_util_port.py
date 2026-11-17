@@ -30,6 +30,8 @@ def insert_alt(ports: str, name: str, feature: str) -> str:
         "moderation": ["|verification-moderation|", "|admin-status-labels|"],
         "notifications": ["|notification-inbox-export-client|", "|visible-polling|", "|preferences|"],
         "support": ["|center-server|"],
+        "shell": ["|theme-preference|", "|home-personal-preference|", "|confirm-action|"],
+        "trust": ["|center|"],
     }
     wrapped = f"|{ports}|"
     for anchor in anchors.get(feature, []):
@@ -237,6 +239,7 @@ def patch_standard_boundary(feat: str, name: str) -> None:
         "organizations": "scripts/tests/organizations-feature-boundaries.node-test.mjs",
         "notifications": "scripts/tests/notifications-feature-boundaries.node-test.mjs",
         "moderation": "scripts/tests/moderation-feature-boundaries.node-test.mjs",
+        "trust": "scripts/tests/trust-feature-boundaries.node-test.mjs",
     }
     rel = files.get(feat)
     if not rel:
@@ -422,9 +425,13 @@ def main() -> int:
         patch_accounts(name)
     elif feat == "support":
         patch_remaining_feature("support", name)
+    elif feat == "shell":
+        patch_remaining_feature("shell", name)
     elif feat == "moderation":
         patch_standard_boundary(feat, name)
         patch_remaining_feature("moderation", name)
+    elif feat == "trust":
+        patch_standard_boundary(feat, name)
     else:
         patch_standard_boundary(feat, name)
     patch_readme(feat, name)
