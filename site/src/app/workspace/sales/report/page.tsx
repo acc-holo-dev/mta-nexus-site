@@ -8,6 +8,8 @@ import { SellerSalesReportView } from "../../../../features/commerce/seller-sale
 import { sellerSalesCopy } from "../../../../features/commerce/seller-sales-i18n";
 import { sellerSalesPageQuery } from "../../../../features/commerce/seller-sales-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -30,7 +32,20 @@ export default async function SellerSalesPage({
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = sellerSalesCopy(locale);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={"/workspace/sales/report"}
+      />
+    );
+  }
+
   const pageParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (typeof value === "string") pageParams.set(key, value);
