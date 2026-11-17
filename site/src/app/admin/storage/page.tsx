@@ -11,7 +11,7 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { storageMaintenanceService } from "../../../lib/services/storage-maintenance-service";
 import { storageMaintenanceCopy } from "../../../features/moderation/storage-maintenance-i18n";
-import { storageQuery } from "../../../lib/storage-maintenance-query";
+import { storageQuery } from "../../../features/moderation/storage-maintenance-query";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 const linkClass =

@@ -4,7 +4,7 @@ import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { storageMaintenanceService } from "../../../../../lib/services/storage-maintenance-service";
-import { storageDiscoverySchema, storageParse } from "../../../../../lib/storage-maintenance-query";
+import { storageDiscoverySchema, storageParse } from "../../../../../features/moderation/storage-maintenance-query";
 export const POST = withBrowserMutation((request: NextRequest) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     const token = request.cookies.get("nexus_session")?.value;

@@ -9,7 +9,9 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const serverPorts = ["admin-home"];
-const utilPorts = ["storage-maintenance-i18n", "verification-applications-copy"];
+const utilPorts = ["storage-maintenance-i18n", "verification-applications-copy",
+  "storage-maintenance-query",
+];
 const clientPorts = ["storage-maintenance"];
 const safeLib =
   /^(?:i18n(?:\.ts$|\/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy)\.ts$)/u;

@@ -7,7 +7,7 @@ import { storageMaintenanceService } from "../../../../../../../lib/services/sto
 import {
   storageCleanupSchema,
   storageParse,
-} from "../../../../../../../lib/storage-maintenance-query";
+} from "../../../../../../../features/moderation/storage-maintenance-query";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {
