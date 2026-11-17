@@ -5,7 +5,7 @@ import {
   serverReviewModerationSchema,
 } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedServerReview } from "../../src/lib/server-review-confirmation";
+import { confirmedServerReview } from "../../src/features/servers/server-review-confirmation";
 import { serverReviewQuery } from "../../src/lib/server-review-query";
 
 it("requires follow evidence and blocks owner or moderated authors", () => {

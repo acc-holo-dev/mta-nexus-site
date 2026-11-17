@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { confirmedServerReview } from "../../src/lib/server-review-confirmation";
+import { confirmedServerReview } from "../../src/features/servers/server-review-confirmation";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,

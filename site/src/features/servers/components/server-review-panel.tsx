@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { confirmedServerReview } from "../../../lib/server-review-confirmation";
+import { confirmedServerReview } from "../server-review-confirmation";
 import {
   serverReviewCopy,
   serverReviewError,
