@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "product-type-labels",
     "resource-review-query",
     "resource-publisher-query",
     "resource-cart-receipts-query",
@@ -274,6 +275,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/product-type-labels.ts", "resources-view-isolation"],
     ["features/resources/resource-review-query.ts", "resources-view-isolation"],
     ["features/resources/resource-publisher-query.ts", "resources-view-isolation"],
     ["features/resources/resource-cart-receipts-query.ts", "resources-view-isolation"],
@@ -349,6 +351,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/product-type-labels.ts",
     "app/resource-review-query.ts",
     "app/resource-publisher-query.ts",
     "app/resource-cart-receipts-query.ts",
@@ -418,6 +421,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/product-type-labels.ts",
     "site/src/features/resources/resource-review-query.ts",
     "site/src/features/resources/resource-publisher-query.ts",
     "site/src/features/resources/resource-cart-receipts-query.ts",
@@ -567,6 +571,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/product-type-labels.ts");
   visit("site/src/features/resources/resource-review-query.ts");
   visit("site/src/features/resources/resource-publisher-query.ts");
   visit("site/src/features/resources/resource-cart-receipts-query.ts");

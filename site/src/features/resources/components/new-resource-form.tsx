@@ -4,7 +4,7 @@ import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { useNexusLocale } from "../../shell/locale";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";

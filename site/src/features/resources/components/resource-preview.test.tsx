@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
 import { PRODUCT_TYPES, type Product } from "@nexus/domain";
 import { getDictionary } from "../../../lib/i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { ResourcePreview } from "./resource-preview";
 import { ProductCard } from "../view";
 

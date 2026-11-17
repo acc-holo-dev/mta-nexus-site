@@ -6,7 +6,7 @@ import { ProductCard } from "../view";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
-import { PRODUCT_CATEGORY_KEYS } from "../../../lib/product-type-labels";
+import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { productService } from "../../../lib/services/product-service";
 
 const CATEGORIES = [

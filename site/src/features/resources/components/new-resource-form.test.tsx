@@ -5,7 +5,7 @@ import { PRODUCT_TYPES } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { getDictionary } from "../../../lib/i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("../../shell/locale", () => ({
