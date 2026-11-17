@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { resourceReviewCopy } from "../../../../../features/resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../../../../features/resources/review-controls";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -28,8 +30,21 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const [locale, cookieStore, target] = await Promise.all([getRequestLocale(), cookies(), params]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = resourceReviewCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
+    dictionary = getDictionary(typedLocale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/library/reviews"}
+      />
+    );
+  }
+
   const returnPath = `/workspace/library/review/${encodeURIComponent(target.id)}`;
   if (!actor) return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
   const detail = await resourceReviewService.ownDetail(actor, target.id).catch((error) => {
