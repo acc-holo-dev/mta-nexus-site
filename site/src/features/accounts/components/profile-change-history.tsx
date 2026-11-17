@@ -57,6 +57,7 @@ export function ProfileChangeHistoryView({
       {!data ? (
         <ErrorState
           title={error ?? copy.unavailable}
+          description={copy.unavailableHint}
           action={
             <Link href={changeHistoryHref(path, filters, { fresh: true })} className={navLinkClass}>
               {copy.reload}

@@ -36,6 +36,8 @@ const en = {
   listLoading: "Loading organizations…",
   loading: "Loading organization…",
   unavailable: "Unable to load the organization. Please try again.",
+  unavailableHint:
+    "Retry reloads this organization list only. A temporary load failure is not an empty organization directory.",
   invalid: "Check the fields and URL format.",
   team: "Team",
   username: "Username",
@@ -120,6 +122,8 @@ const ru: Record<keyof typeof en, string> = {
   listLoading: "Загрузка организаций…",
   loading: "Загрузка организации…",
   unavailable: "Не удалось загрузить организацию. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот список организаций. Временный сбой загрузки — не пустой каталог организаций.",
   invalid: "Проверьте поля и формат URL.",
   team: "Команда",
   username: "Username",

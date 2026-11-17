@@ -61,6 +61,7 @@ export default async function ArticlesPage({
       {!result ? (
         <ErrorState
           title={platformCopy.unavailable}
+          description={platformCopy.unavailableHint}
           action={
             <Link
               href={contentPageHref("/articles", filters, filters.page)}

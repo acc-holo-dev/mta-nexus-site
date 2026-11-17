@@ -28,6 +28,8 @@ const en = {
   targetInvalid: "The selected account is no longer an eligible team member. Reload the team.",
   ownerRequired: "Only the current organization owner can perform this action.",
   unavailable: "Unable to load organization activity. Try again.",
+  unavailableHint:
+    "Retry reloads this organization activity journal only. A temporary load failure is not an empty history.",
   mutationUnavailable:
     "The saved result could not be confirmed. Reload the organization before trying again.",
   refreshFailed: "The change was saved, but the team could not be refreshed. Reload current data.",
@@ -91,6 +93,8 @@ const ru: typeof en = {
   targetInvalid: "Выбранный аккаунт больше не подходит для передачи. Загрузите актуальную команду.",
   ownerRequired: "Это действие доступно только текущему владельцу организации.",
   unavailable: "Не удалось загрузить историю организации. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот журнал активности организации. Временный сбой загрузки — не пустая история.",
   mutationUnavailable:
     "Сохранённый результат не удалось подтвердить. Загрузите организацию перед повторным действием.",
   refreshFailed: "Изменение сохранено, но команда не обновилась. Загрузите актуальные данные.",

@@ -75,6 +75,8 @@ const en = {
   preview: "Preview text",
   editText: "Edit text",
   unavailable: "This section is temporarily unavailable. Please try again.",
+  unavailableHint:
+    "Retry reloads this catalog only. A temporary load failure is not an empty articles or community list.",
   UNAUTHORIZED: "Sign in again to continue.",
   ACCOUNT_CHANGED: "The signed-in account changed. Reload the profile before editing.",
   FORBIDDEN: "You no longer have permission to edit this publication.",
@@ -166,6 +168,8 @@ const ru: typeof en = {
   preview: "Предпросмотр текста",
   editText: "Редактировать текст",
   unavailable: "Раздел временно недоступен. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот каталог. Временный сбой загрузки — не пустой список статей или обсуждений.",
   UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
   ACCOUNT_CHANGED: "Аккаунт изменился. Загрузите профиль заново перед редактированием.",
   FORBIDDEN: "У вас больше нет прав на редактирование этой публикации.",

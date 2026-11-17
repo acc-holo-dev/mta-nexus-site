@@ -71,6 +71,7 @@ export default async function CommunityPage({
       {!result ? (
         <ErrorState
           title={platformCopy.unavailable}
+          description={platformCopy.unavailableHint}
           action={
             <Link
               href={contentPageHref("/community", filters, filters.page)}

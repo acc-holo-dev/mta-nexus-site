@@ -88,6 +88,7 @@ export default async function OrganizationsPage({
       {!result ? (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             <Link href={href(filters.page)} className={navLinkClass}>
               {dictionary.errors.retry}

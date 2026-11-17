@@ -132,4 +132,6 @@ it("locks organization content honesty chrome through shared surfaces and additi
   expect(organizationPublicationHistoryCopy("ru").historyEmptyHint.length).toBeGreaterThan(0);
   expect(organizationPublicationHistoryCopy("en").loading.length).toBeGreaterThan(0);
   expect(organizationGovernanceCopy("en").emptyHint.length).toBeGreaterThan(0);
+  expect(organizationGovernanceCopy("en").unavailableHint.length).toBeGreaterThan(0);
+  expect(organizationGovernanceCopy("ru").unavailableHint.length).toBeGreaterThan(0);
 });

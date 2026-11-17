@@ -10,6 +10,8 @@ const en = {
   recorded:
     "Records describe saved edit operations; they do not prove that every listed field had a different value.",
   unavailable: "Unable to load saved changes. Try again.",
+  unavailableHint:
+    "Retry reloads this change journal only. A temporary load failure is not an empty history.",
   signIn: "Sign in to view your history.",
   rateLimited: "Too many requests. Try again later.",
   invalid: "Check the period, event group, search and history link.",
@@ -79,6 +81,8 @@ const ru: typeof en = {
   recorded:
     "Записи описывают сохранённые операции редактирования и не доказывают, что каждое перечисленное поле изменило значение.",
   unavailable: "Не удалось загрузить сохранённые изменения. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот журнал изменений. Временный сбой загрузки — не пустая история.",
   signIn: "Войдите, чтобы просматривать свою историю.",
   rateLimited: "Слишком много запросов. Попробуйте позже.",
   invalid: "Проверьте период, группу событий, поиск и ссылку истории.",
