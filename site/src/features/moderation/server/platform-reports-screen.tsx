@@ -2,10 +2,14 @@ import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
+
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { platformReportCopy } from "../platform-report-i18n";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
@@ -27,7 +31,20 @@ export async function PlatformReportsScreen({
   const copy = platformReportCopy(typedLocale);
   const dateLocale = typedLocale === "ru" ? "ru-RU" : "en-US";
   const token = (await cookies()).get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(token);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/platform-reports"}
+      />
+    );
+  }
+
   if (!user) {
     return (
       <PlatformSignIn
