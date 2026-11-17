@@ -19,7 +19,10 @@ import { serverContentId } from "../../../../../features/servers/server-content-
 import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
 import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
+
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { serverContentService } from "../../../../../lib/services/servers/server-content-service";
 export const dynamic = "force-dynamic";
@@ -42,7 +45,20 @@ export default async function ServerPublications({
   const locale = await getRequestLocale(),
     copy = getUserPlatformCopy(locale),
     team = serverContentCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/servers/"}
+      />
+    );
+  }
+
   const { id } = await params;
   const path = `/workspace/servers/${encodeURIComponent(id)}/content`;
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
