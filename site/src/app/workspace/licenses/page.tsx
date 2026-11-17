@@ -22,6 +22,8 @@ import { getLicenseControlCopy } from "../../../features/commerce/license-contro
 import { getLicenseMaintenanceCopy } from "../../../features/commerce/license-maintenance-i18n";
 import { HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -55,7 +57,20 @@ export default async function LicensesHistoryPage({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommerceHistoryCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/licenses"}
+      />
+    );
+  }
+
   if (!user) {
     const returnParams = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
