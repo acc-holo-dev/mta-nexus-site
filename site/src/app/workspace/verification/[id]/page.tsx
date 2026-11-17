@@ -8,6 +8,7 @@ import {
   verificationApplicationsError,
 } from "../../../../features/moderation/verification-applications-copy";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { verificationCopy } from "../../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
@@ -38,32 +39,17 @@ export default async function VerificationApplicationPage({
     dictionary = getDictionary(locale),
     { id } = await params;
   const returnPath = `/workspace/verification/${encodeURIComponent(id)}`;
-  let actor: Awaited<ReturnType<typeof authService.getSession>> | null = null;
-  let authFailed = false;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
-    authFailed = true;
-  }
-  if (authFailed) {
     return (
-      <div className={pageShellClass}>
-        <header>
-          <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
-        </header>
-        <Link href="/workspace/verification/history" className={navLinkClass}>
-          {copy.title}
-        </Link>
-        <ErrorState
-          title={labels.unavailable}
-          action={
-            <Link href={returnPath} className={navLinkClass}>
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={labels.unavailable}
+        retryHref={returnPath}
+      />
     );
   }
   if (!actor) {
