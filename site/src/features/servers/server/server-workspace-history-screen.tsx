@@ -3,11 +3,13 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/servers/server-workspace-history-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
 import {
@@ -33,12 +35,19 @@ export async function ServerWorkspaceHistoryScreen({
     history = getServerActivityCopy(locale),
     labels = getManagedServerCopy(locale);
   let failure = "";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      failure = copy.historyUnavailable;
-      return null;
-    });
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.historyUnavailable}
+        retryHref={`/workspace/servers/${encodeURIComponent(id)}/history`}
+      />
+    );
+  }
   if (!actor) {
     return (
       <PlatformSignIn
