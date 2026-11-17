@@ -16,7 +16,7 @@ import { GET as staffExport } from "../../src/app/api/admin/reports/[id]/history
 import { GET as staff } from "../../src/app/api/admin/reports/[id]/history/route";
 import { GET as ownExport } from "../../src/app/api/workspace/reports/[id]/history/export/route";
 import { GET as own } from "../../src/app/api/workspace/reports/[id]/history/route";
-import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   actor = { id: "owner", role: "user" },

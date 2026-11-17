@@ -15,7 +15,7 @@ import {
   communityReportError,
 } from "../../../lib/community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
-import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
+import { reportHistoryCopy } from "../community-report-history-copy";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
