@@ -15,6 +15,7 @@ import {
   getFinancialCopy,
 } from "../../../features/commerce/financial-i18n";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -42,14 +43,26 @@ export default async function FinancialStatements({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getFinancialCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  const returnQuery = new URLSearchParams();
+  for (const key of ["page", "currency", "organizationId", "scopePage"] as const) {
+    const value = query[key];
+    if (typeof value === "string") returnQuery.set(key, value);
+  }
+  const returnPath = `/workspace/finance${returnQuery.size ? `?${returnQuery}` : ""}`;
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.statementsLoadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!user) {
-    const returnQuery = new URLSearchParams();
-    for (const key of ["page", "currency", "organizationId", "scopePage"] as const) {
-      const value = query[key];
-      if (typeof value === "string") returnQuery.set(key, value);
-    }
-    const returnPath = `/workspace/finance${returnQuery.size ? `?${returnQuery}` : ""}`;
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const currency = ["USD", "EUR", "RUB"].find((value) => value === query.currency),

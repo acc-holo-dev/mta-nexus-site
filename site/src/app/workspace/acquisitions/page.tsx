@@ -11,6 +11,7 @@ import {
 } from "../../../features/resources/resource-activity-view";
 import { resourceCartReceiptsCopy } from "../../../features/resources/resource-cart-receipts-i18n";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -43,14 +44,26 @@ export default async function AcquisitionHistoryPage({
   const page = acquisitionPage(query.page);
   const source = acquisitionSource(query.source);
   const retryHref = acquisitionHistoryHref(source, page);
-  const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  const returnQuery = new URLSearchParams();
+  for (const key of ["page", "source"] as const) {
+    const value = query[key];
+    if (typeof value === "string") returnQuery.set(key, value);
+  }
+  const returnPath = `/workspace/acquisitions${returnQuery.size ? `?${returnQuery}` : ""}`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.history}
+        message={copy.historyLoadUnavailable}
+        retryHref={retryHref}
+      />
+    );
+  }
   if (!actor) {
-    const returnQuery = new URLSearchParams();
-    for (const key of ["page", "source"] as const) {
-      const value = query[key];
-      if (typeof value === "string") returnQuery.set(key, value);
-    }
-    const returnPath = `/workspace/acquisitions${returnQuery.size ? `?${returnQuery}` : ""}`;
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const result = await resourceActivityService.buyerHistory(actor, page, source).catch(() => null);

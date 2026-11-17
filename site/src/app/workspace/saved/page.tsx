@@ -8,6 +8,7 @@ import {
 } from "../../../features/community/follow-workspace-contract";
 import { followCopy } from "../../../features/community/follow-workspace-copy";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -42,9 +43,19 @@ export default async function SavedPage({
   if (requestedType) returnParams.set("type", requestedType);
   if (requestedQuery) returnParams.set("q", requestedQuery);
   const returnPath = returnParams.size ? `/workspace/saved?${returnParams}` : "/workspace/saved";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.pageError}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const requested = first(params?.type);
   const type = FOLLOW_TYPES.includes(requested as FollowTargetType)

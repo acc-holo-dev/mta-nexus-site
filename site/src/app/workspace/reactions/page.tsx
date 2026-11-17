@@ -9,6 +9,7 @@ import {
 import { reactionCopy, reactionError } from "../../../features/community/content-reaction-copy";
 import { ReactionRemoval } from "../../../features/community/reaction-removal";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -42,9 +43,19 @@ export default async function ReactionsPage({
   const returnPath = returnParams.size
     ? `/workspace/reactions?${returnParams}`
     : "/workspace/reactions";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.my}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {

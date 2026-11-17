@@ -12,6 +12,7 @@ import { getLibraryCopy } from "../../features/library/library-view";
 import { ManagedServerCard } from "../../features/servers/managed-card-server";
 import { getManagedServerCopy } from "../../features/servers/managed-server-view";
 import { PlatformSignIn, platformSignInFocusClass } from "../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../features/shell/session-error";
 import { getDictionary } from "../../lib/platform/i18n";
 import { getRequestLocale } from "../../lib/platform/i18n-server";
 import { authService } from "../../lib/services/accounts/auth-service";
@@ -44,8 +45,19 @@ export default async function WorkspacePage() {
   const historyCopy = getCommerceHistoryCopy(locale);
   const libraryCopy = getLibraryCopy(locale);
   const serverCopy = getManagedServerCopy(locale);
-  const token = (await cookies()).get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={dictionary.workspace.title}
+        message={dictionary.workspace.libraryUnavailable}
+        retryHref="/workspace"
+      />
+    );
+  }
 
   if (!user) return <PlatformSignIn locale={locale} returnPath="/workspace" />;
 

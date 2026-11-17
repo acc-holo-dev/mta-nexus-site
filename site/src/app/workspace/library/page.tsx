@@ -26,6 +26,7 @@ import { resourceDeliveriesCopy } from "../../../features/resources/resource-del
 import { resourceReleaseWatchesCopy } from "../../../features/resources/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../features/resources/resource-review-i18n";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -52,9 +53,21 @@ export default async function ResourceLibraryPage({
   const copy = getLibraryCopy(locale);
   const dictionary = getDictionary(locale);
   const releaseCopy = getReleaseHistoryCopy(locale);
-  const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
   const filter = parseLibraryFilter(query.filter);
   const page = parseLibraryPage(query.page);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.loadUnavailable}
+        retryHref={libraryHref(filter, page)}
+      />
+    );
+  }
   if (!user) return <PlatformSignIn locale={locale} returnPath={libraryHref(filter, page)} />;
 
   const result = await userLibraryRepository.pageByUser(user.id, page, filter).catch(() => null);
