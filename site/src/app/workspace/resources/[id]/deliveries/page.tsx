@@ -8,7 +8,7 @@ import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../../../../features/resources/resource-deliveries-i18n";
 import {
   deliverySearchParams,
   publisherDeliveriesQuery,

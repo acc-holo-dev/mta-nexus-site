@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
   type DownloadFailure,
   fetchResourceDownload,

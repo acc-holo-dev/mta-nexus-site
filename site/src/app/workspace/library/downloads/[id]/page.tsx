@@ -10,7 +10,7 @@ import { ResourceDownloadButton } from "../../../../../features/resources/downlo
 import { SupportDownloadHelpLink } from "../../../../../features/support/download-help";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../../../../features/resources/resource-deliveries-i18n";
 import {
   resourceDeliveriesUrl,
   resourceDeliveryId,

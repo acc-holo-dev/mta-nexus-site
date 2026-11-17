@@ -21,7 +21,7 @@ import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../features/res
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
-import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../../features/resources/resource-deliveries-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";

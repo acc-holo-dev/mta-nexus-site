@@ -8,7 +8,7 @@ import { ResourceDeliveryEvidence } from "../../../../features/resources/deliver
 import { ResourceDownloadButton } from "../../../../features/resources/download";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceDeliveriesCopy } from "../../../../lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../../../features/resources/resource-deliveries-i18n";
 import {
   deliverySearchParams,
   resourceDeliveriesQuery,

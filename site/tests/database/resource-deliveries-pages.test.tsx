@@ -38,7 +38,7 @@ vi.mock("../../src/features/resources/download", () => ({
 import Detail from "../../src/app/workspace/library/downloads/[id]/page";
 import Page from "../../src/app/workspace/library/downloads/page";
 import Publisher from "../../src/app/workspace/resources/[id]/deliveries/page";
-import { resourceDeliveriesCopy } from "../../src/lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../src/features/resources/resource-deliveries-i18n";
 
 const context = { params: Promise.resolve({ id: "dlv_a" }) };
 beforeEach(() => {
