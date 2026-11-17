@@ -11,7 +11,7 @@ import LibraryCollectionsLoading from "../../src/app/workspace/library/collectio
 import UserTrustHistoryLoading from "../../src/app/users/[username]/trust/history/loading";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
 import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { approvalCopy } from "../../src/lib/public-verification-history-copy";
 
 it.each([

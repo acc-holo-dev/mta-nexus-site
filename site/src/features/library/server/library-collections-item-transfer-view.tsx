@@ -1,6 +1,6 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,

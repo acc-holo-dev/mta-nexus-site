@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { libraryCollectionsCopy } from "../../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../../../features/library/library-collections-i18n";
 export default async function NotFound() {
   const c = libraryCollectionsCopy(await getRequestLocale());
   return (

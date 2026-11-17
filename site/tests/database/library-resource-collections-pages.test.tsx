@@ -66,7 +66,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/[id]/collections/page";
 import { getDictionary } from "../../src/lib/i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { authService } from "../../src/lib/services/auth-service";
 
 const collection = {

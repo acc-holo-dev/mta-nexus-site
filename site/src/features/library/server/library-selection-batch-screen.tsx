@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionId,
   collectionPageParams,

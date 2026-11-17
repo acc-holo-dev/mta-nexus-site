@@ -2,7 +2,7 @@ import type { LibraryMembershipHistoryItem } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";

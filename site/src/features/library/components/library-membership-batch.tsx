@@ -12,7 +12,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
 import { libraryMembershipBatchesCopy } from "../library-membership-batches-i18n";

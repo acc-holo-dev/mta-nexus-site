@@ -48,7 +48,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 
 import { CollectionReleasesScreen } from "../../src/features/library/collection-releases-server";
 import { collectionReleasesCopy } from "../../src/features/library/collection-releases-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { authService } from "../../src/lib/services/auth-service";
 
 const item = {

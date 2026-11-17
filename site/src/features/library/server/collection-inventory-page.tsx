@@ -24,7 +24,7 @@ import {
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { authService } from "../../../lib/services/auth-service";

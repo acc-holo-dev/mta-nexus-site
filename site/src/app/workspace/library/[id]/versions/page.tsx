@@ -12,7 +12,7 @@ import { ResourceReleaseWatchControl } from "../../../../../features/resources/r
 import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { libraryCollectionsCopy } from "../../../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../../../../features/library/library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../../../../../features/library/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";

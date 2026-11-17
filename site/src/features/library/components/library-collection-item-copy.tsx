@@ -9,7 +9,7 @@ import { confirmedCollectionCommand } from "../library-collections-confirmation"
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";

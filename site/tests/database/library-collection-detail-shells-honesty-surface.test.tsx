@@ -31,7 +31,7 @@ import CollectionRequirementsLoading from "../../src/app/workspace/library/colle
 import CollectionVersionsHistoryLoading from "../../src/app/workspace/library/collections/[id]/versions/history/loading";
 import CollectionVersionsLoading from "../../src/app/workspace/library/collections/[id]/versions/loading";
 import { getDictionary } from "../../src/lib/i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 
 beforeEach(() => {

@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
 import { LibraryCollectionsErrorPanel } from "../../src/features/library/server/library-collections-error-panel";
 import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { libraryMembershipBatchesCopy } from "../../src/features/library/library-membership-batches-i18n";
 import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
@@ -46,7 +46,7 @@ it("keeps additive action-error copy for library form locales", () => {
   expect(getResourceReleaseControlCopy("en").errors.actionErrorDescription.length).toBeGreaterThan(
     20,
   );
-  expect(read("site/src/lib/library-collections-i18n.ts")).toContain("actionErrorDescription");
+  expect(read("site/src/features/library/library-collections-i18n.ts")).toContain("actionErrorDescription");
   expect(read("site/src/features/library/library-collection-manifests-i18n.ts")).toContain(
     "previewErrorDescription",
   );

@@ -69,7 +69,7 @@ vi.mock("../../src/features/resources/download", () => ({
 
 import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { authService } from "../../src/lib/services/auth-service";
 
 const date = new Date("2026-10-11T00:00:00Z"),

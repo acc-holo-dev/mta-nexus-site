@@ -10,7 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../features/library/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../features/library/library-collection-inventory-query";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../../../features/library/library-collections-i18n";
 import {
   getLibraryCopy,
   libraryHref,

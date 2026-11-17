@@ -22,7 +22,7 @@ import {
 } from "./library-collections-screen-shared";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 
 export async function LibraryCollectionsScreen({
   view = "list",

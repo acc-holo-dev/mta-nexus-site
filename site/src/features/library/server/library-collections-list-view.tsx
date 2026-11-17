@@ -4,7 +4,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,

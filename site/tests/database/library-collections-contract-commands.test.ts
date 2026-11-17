@@ -4,7 +4,7 @@ import { confirmedCollectionCommand } from "../../src/features/library/library-c
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../src/lib/library-collections-i18n";
+} from "../../src/features/library/library-collections-i18n";
 import {
   collectionHref,
   collectionId,

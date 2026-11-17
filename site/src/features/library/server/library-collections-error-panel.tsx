@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { libraryCollectionsLinkClass } from "./library-collections-screen-shared";
 

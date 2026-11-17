@@ -17,7 +17,7 @@ import {
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collections-i18n";
 import {
   collectionHref,
   collectionId as parseCollectionId,

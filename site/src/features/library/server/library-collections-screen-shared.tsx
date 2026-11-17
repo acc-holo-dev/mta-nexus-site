@@ -1,6 +1,6 @@
 import type { User } from "@nexus/domain";
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
 
 /** Authenticated session user passed from `authService.getSession`. */
