@@ -7,7 +7,7 @@ import { confirmedCommentId } from "../../src/lib/content-comment-confirmation";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,
-} from "../../src/lib/server-claim-confirmation";
+} from "../../src/features/servers/server-claim-confirmation";
 
 const preferences = {
   followsEnabled: true,

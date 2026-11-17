@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-claim-confirmation",
     "server-organization-options",
     "details-controls",
     "workspace-navigation",
@@ -145,6 +146,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-claim-confirmation.ts", "servers-client-isolation"],
     ["features/servers/server-organization-options.ts", "servers-client-isolation"],
     ["features/servers/details-controls.ts", "servers-client-isolation"],
     ["features/servers/connect.ts", "servers-client-isolation"],
@@ -187,6 +189,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-claim-confirmation.ts",
     "app/server-organization-options.ts",
     "app/details-controls.ts",
     "app/connect.ts",
@@ -211,6 +214,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-claim-confirmation.ts",
     "site/src/features/servers/server-organization-options.ts",
     "site/src/features/servers/details-controls.ts",
     "site/src/features/servers/connect.ts",
@@ -227,7 +231,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-workspace-nav-i18n|managed-server-copy|server-workspace-contract|server-workspace-copy|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract|server-review-confirmation|server-review-i18n)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-workspace-nav-i18n|managed-server-copy|server-workspace-contract|server-workspace-copy|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract|server-review-confirmation|server-review-i18n)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -266,6 +270,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-claim-confirmation.ts");
   visit("site/src/features/servers/server-organization-options.ts");
   visit("site/src/features/servers/details-controls.ts");
   visit("site/src/features/servers/connect.ts");

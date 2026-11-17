@@ -11,7 +11,7 @@ import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
   parseIssuedServerClaimChallenge,
-} from "../../../lib/server-claim-confirmation";
+} from "../server-claim-confirmation";
 import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";

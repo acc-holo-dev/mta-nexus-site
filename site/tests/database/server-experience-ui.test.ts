@@ -3,7 +3,7 @@ import { getDictionary } from "../../src/lib/i18n";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,
-} from "../../src/lib/server-claim-confirmation";
+} from "../../src/features/servers/server-claim-confirmation";
 
 describe("server experience behavior", () => {
   it("accepts only a challenge bound to the requested server", () => {
