@@ -52,6 +52,7 @@ Services и repositories не дублируются и не переносят�
 | `pending-resource-draft.ts` | util port `pending-resource-draft` |
 | `resource-build-workspace-response.ts` | util port `resource-build-workspace-response` |
 | `resource-copy-confirmation.ts` | util port `resource-copy-confirmation` |
+| `resource-review-confirmation.ts` | util port `resource-review-confirmation` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

@@ -8,7 +8,7 @@ import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
-} from "../../../lib/resource-review-confirmation";
+} from "../resource-review-confirmation";
 import {
   type ResourceReviewEligibilityReason,
   resourceReviewCopy,

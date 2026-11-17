@@ -10,7 +10,7 @@ import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
-} from "../../src/lib/resource-review-confirmation";
+} from "../../src/features/resources/resource-review-confirmation";
 it.each([0, 6, 1.5, NaN, "5"])("rejects invalid rating %s", (rating) => {
   expect(resourceReviewCreateSchema.safeParse({ text: "Useful map", rating }).success).toBe(false);
 });
