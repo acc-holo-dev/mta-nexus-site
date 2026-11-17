@@ -5,7 +5,7 @@ import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useNexusLocale } from "../features/shell/locale";
-import { readSafePublicErrorReference } from "../lib/safe-public-error-reference";
+import { readSafePublicErrorReference } from "../features/shell/safe-public-error-reference";
 
 export default function ErrorPage({
   error,

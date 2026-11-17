@@ -21,7 +21,7 @@ import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error
 import ErrorPage from "../../src/app/error";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
-import { readSafePublicErrorReference } from "../../src/lib/safe-public-error-reference";
+import { readSafePublicErrorReference } from "../../src/features/shell/safe-public-error-reference";
 
 const SECRET = "super-secret-token-do-not-leak";
 const STACK_LINE = "    at boom (/app/secret.ts:1:1)";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { readSafePublicErrorReference } from "../lib/safe-public-error-reference";
+import { readSafePublicErrorReference } from "../features/shell/safe-public-error-reference";
 
 type Locale = "en" | "ru";
 

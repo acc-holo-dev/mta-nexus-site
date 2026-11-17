@@ -6,3 +6,4 @@
 
 Маршруты остаются в App Router. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
 | `offline-cache-policy.ts` | util port `offline-cache-policy` |
+| `safe-public-error-reference.ts` | util port `safe-public-error-reference` |
