@@ -19,7 +19,7 @@ import {
   formatHistoryDate,
   licenseStatusLabel,
 } from "../../../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../features/commerce/license-control-i18n";

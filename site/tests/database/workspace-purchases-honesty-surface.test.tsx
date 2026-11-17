@@ -22,7 +22,7 @@ import PurchaseSupportLoading from "../../src/app/workspace/purchases/[id]/suppo
 import PurchasesLoading from "../../src/app/workspace/purchases/loading";
 import ReviewReportDetailLoading from "../../src/app/workspace/review-reports/[id]/loading";
 import ReviewReportsLoading from "../../src/app/workspace/review-reports/loading";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { orderCaseCopy } from "../../src/lib/order-case-i18n";
 import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 
@@ -151,7 +151,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).toContain('"en" | "ru"');
   }
 
-  const history = read("site/src/lib/commerce-history-i18n.ts");
+  const history = read("site/src/features/commerce/commerce-history-i18n.ts");
   expect(history).toContain("purchasesLoadUnavailable");
   expect(history).toContain("purchasesLoadUnavailableHint");
   expect(history).toContain("orderLoadUnavailable");

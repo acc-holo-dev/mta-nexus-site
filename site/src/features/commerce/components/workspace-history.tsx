@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-import type { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;

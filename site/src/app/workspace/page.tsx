@@ -8,7 +8,7 @@ import { platformSignInFocusClass } from "../../features/shell/guest-auth";
 import { ManagedServerCard } from "../../features/servers/managed-card-server";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../features/commerce/commerce-history-i18n";
 import { reactionCopy } from "../../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../../lib/discussion-workspace-copy";
 import { getDictionary } from "../../lib/i18n";

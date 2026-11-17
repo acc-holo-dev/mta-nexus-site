@@ -17,7 +17,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 
 import ReportsLoading from "../../src/app/workspace/reports/loading";
 import SalesLoading from "../../src/app/workspace/sales/loading";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { communityReportCopy } from "../../src/lib/community-report-copy";
 import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
 
@@ -153,7 +153,7 @@ it("keeps colocated sales and reports loadings clipped", () => {
 });
 
 it("locks additive sales honesty copy in commerce history i18n", () => {
-  const history = read("site/src/lib/commerce-history-i18n.ts");
+  const history = read("site/src/features/commerce/commerce-history-i18n.ts");
   expect(history).toContain("salesLoadUnavailable");
   expect(history).toContain("salesLoadUnavailableHint");
   expect(history).toContain("emptySalesHint");

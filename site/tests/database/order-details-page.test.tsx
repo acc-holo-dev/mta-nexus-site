@@ -25,7 +25,7 @@ vi.mock("../../src/lib/services/commerce-service", () => ({
 
 import PurchaseDetailLoading from "../../src/app/workspace/purchases/[id]/loading";
 import Page from "../../src/app/workspace/purchases/[id]/page";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 
 const input = {

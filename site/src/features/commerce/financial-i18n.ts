@@ -1,4 +1,4 @@
-import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "./commerce-history-i18n";
 import { getCommercialCopy } from "./commercial-i18n";
 import type { Locale } from "../../lib/i18n";
 

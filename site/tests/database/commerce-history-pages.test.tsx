@@ -49,7 +49,7 @@ import Licenses, { metadata as licensesMeta } from "../../src/app/workspace/lice
 import PurchasesLoading from "../../src/app/workspace/purchases/loading";
 import Purchases, { metadata as purchasesMeta } from "../../src/app/workspace/purchases/page";
 import Sales, { metadata as salesMeta } from "../../src/app/workspace/sales/page";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
 
