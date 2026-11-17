@@ -12,6 +12,7 @@ import {
 import { serverWorkspaceCopy } from "../../../features/servers/server-workspace-copy";
 import { ManagedServerVisibilityBatch } from "../../../features/servers/visibility-batch";
 import { PlatformSignIn, platformSignInFocusClass } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -44,26 +45,19 @@ export default async function ManagedServersPage({
     searchParams,
   ]);
   const copy = getManagedServerCopy(locale);
-  const dictionary = getDictionary(locale);
   const workspace = serverWorkspaceCopy(locale);
   const { filters, page } = parseManagedServerQuery(query);
-  let sessionFailed = false;
-  const user = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
-    sessionFailed = true;
-    return null;
-  });
-  if (sessionFailed) {
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
     return (
-      <div className={pageShellClass}>
-        <ErrorState
-          title={workspace.unavailable}
-          action={
-            <Link href={managedServerHref(filters, page)} className={navLinkClass}>
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={workspace.unavailable}
+        retryHref={"/workspace/servers"}
+      />
     );
   }
   if (!user) {
