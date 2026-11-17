@@ -11,6 +11,8 @@ import { collectionPageParams } from "../../../../../features/library/library-co
 import { resourceReleaseWatchHistoryCopy } from "../../../../../features/resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../../../../features/resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -33,7 +35,20 @@ export default async function Page({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const dictionary = getDictionary(typedLocale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={getDictionary(typedLocale).errors.message}
+        retryHref={"/workspace/library/watches/history"}
+      />
+    );
+  }
+
   if (!actor) {
     let returnPath = "/workspace/library/watches/history";
     try {
