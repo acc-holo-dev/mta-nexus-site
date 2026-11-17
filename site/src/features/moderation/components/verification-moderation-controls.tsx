@@ -9,7 +9,7 @@ import { platformRequest } from "../../../lib/user-platform-client";
 import {
   buildVerificationDecisionPayload,
   normalizeVerificationReviewNotes,
-} from "../../../lib/verification-moderation";
+} from "../verification-moderation";
 import {
   verificationCopy,
   verificationDecisionError,

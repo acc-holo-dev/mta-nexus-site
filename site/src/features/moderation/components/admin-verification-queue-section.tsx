@@ -2,7 +2,7 @@ import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
-import { adminStatusLabel, adminStatusTone } from "../../../lib/admin-status-labels";
+import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { verificationApplicationsCopy } from "../../../lib/verification-applications-copy";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";

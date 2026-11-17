@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `49347168` (`dev`, slice 36 — confirm-action → `features/shell`).
+**source_sha:** `e12d91d4` (`dev`, slice 37 — moderation lib helpers).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,13 +29,13 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 36 |
+| Область                    | Факт на slice 37 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
 | `components/` tree files   |                0 |
 | `components/` root files   |                0 |
-| `lib/` tree files          |              410 |
-| `lib/` root files          |              298 |
+| `lib/` tree files          |              409 |
+| `lib/` root files          |              296 |
 | `lib/services/` root files |               86 |
 | `lib/**/*-i18n.ts`         |               46 |
 | `app/**/route.ts`          |              282 |
@@ -53,7 +53,7 @@ site/
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
-| moderation    |    22 | 115011 |
+| moderation    |    24 | 118043 |
 | notifications |    10 |  66691 |
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
@@ -144,6 +144,8 @@ site/
 **Slice 35 done:** `developer-experience` → [`features/accounts/developer-experience.ts`](../../site/src/features/accounts/developer-experience.ts) (`DeveloperExperience`); владение **Accounts** (публичная карточка verified developer на user/developer profile pages, рядом с `DeveloperProfileEditor`); RSC port в `clientUtilPorts` (без `"use client"`); depcruise `accounts-feature-*` + boundary tests; потребители — `app/users/[username]/page.tsx`, `app/developers/[username]/page.tsx`; корень `components/` −1 production file.
 
 **Slice 36 done:** `confirm-action` + `action-confirm-checkbox` → [`features/shell`](../../site/src/features/shell/README.md): client ports [`confirm-action.ts`](../../site/src/features/shell/confirm-action.ts) (`confirmAction`), [`action-confirm-checkbox.ts`](../../site/src/features/shell/action-confirm-checkbox.ts) (`ActionConfirmCheckbox`, `actionConfirmCheckboxFocusClass`); владение **Shell** (shared destructive confirm UX); depcruise public API + cross-feature client isolation (как `modal-dialog`, plus commerce shell allowlist); порты с `"use client"`; потребители — accounts/commerce/community/library/moderation/notifications/organizations/resources/servers/support; корень `components/` опустеет (0 production files).
+
+**Slice 37 done:** first `lib/` root absorb → [`features/moderation`](../../site/src/features/moderation/README.md): util ports [`admin-status-labels.ts`](../../site/src/features/moderation/admin-status-labels.ts) (`adminStatusLabel`, `adminStatusTone`), [`verification-moderation.ts`](../../site/src/features/moderation/verification-moderation.ts) (`buildVerificationDecisionPayload`, `normalizeVerificationReviewNotes`); владение **Moderation**; depcruise public API + `clientUtilPorts`; корень `lib/` −2 files.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 36 — `confirm-action` / `action-confirm-checkbox`).
 

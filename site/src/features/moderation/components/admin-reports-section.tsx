@@ -3,7 +3,7 @@ import { Flag } from "lucide-react";
 import Link from "next/link";
 import { ReportEvidenceLinks } from "../../community/report-evidence-links";
 import { AdminResourceQaReportActions } from "../../resources/qa-report-actions";
-import { adminStatusLabel, adminStatusTone } from "../../../lib/admin-status-labels";
+import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { communityReportCopy } from "../../../lib/community-report-copy";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { orderCaseCopy } from "../../../lib/order-case-i18n";
