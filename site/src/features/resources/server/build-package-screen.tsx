@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -213,22 +213,25 @@ export async function BuildPackageScreen({
         ))}
       </ol>
       {detail.files.length === 0 && detail.build.hasInventory && (
-        <div className="space-y-2">
-          <p className="text-muted">{copy.noFiles}</p>
-          {detail.filter !== "all" && (
-            <Link
-              href={buildPackageQueryHref(pageBase, {
-                ...query,
-                baselineId: detail.baseline?.id,
-                filter: "all",
-                page: 1,
-              })}
-              className={navLinkClass}
-            >
-              {copy.reset}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={copy.noFiles}
+          description={copy.noFilesHint}
+          action={
+            detail.filter !== "all" ? (
+              <Link
+                href={buildPackageQueryHref(pageBase, {
+                  ...query,
+                  baselineId: detail.baseline?.id,
+                  filter: "all",
+                  page: 1,
+                })}
+                className={navLinkClass}
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {detail.totalPages > 1 && (
         <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>

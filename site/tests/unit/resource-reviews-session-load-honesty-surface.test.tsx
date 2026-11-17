@@ -23,3 +23,11 @@ it("locks review session and pageUnavailable copy keys in both locales", () => {
   expect(source).toContain("sessionUnavailableDescription:");
   expect(source).toContain("pageUnavailableDescription:");
 });
+
+it("locks public reviews list authenticated=null on session probe failure", () => {
+  const page = read("site/src/features/resources/server/reviews-page.tsx");
+  const list = read("site/src/features/resources/components/resource-review-list.tsx");
+  expect(page).toContain("authenticated={sessionFailed ? null : Boolean(actor)}");
+  expect(list).toContain("authenticated: boolean | null");
+  expect(list).toContain("`null` = session probe failed (not a guest).");
+});

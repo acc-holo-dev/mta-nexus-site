@@ -15,6 +15,8 @@ const en = {
     "I confirm the selected additions and removals and the reviewed collection revision.",
   planned: "Reference count after selected changes",
   noChanges: "No selectable differences for this collection.",
+  noChangesHint:
+    "An empty reconcile selection is a confirmed comparison result, not a load failure. Export another snapshot or reload after membership changes.",
   export: "Export collection JSON",
   choose: "Choose a collection JSON file",
   paste: "Or paste collection JSON",
@@ -52,6 +54,8 @@ const ru: typeof en = {
   reconcileConfirm: "Подтверждаю выбранные добавления и удаления и проверенную ревизию коллекции.",
   planned: "Ссылок после выбранных изменений",
   noChanges: "Для этой коллекции нет доступных различий.",
+  noChangesHint:
+    "Пустой выбор сверки — подтверждённый результат сравнения, а не сбой загрузки. Экспортируйте другой снимок или обновите страницу после изменения состава.",
   export: "Экспорт коллекции JSON",
   choose: "Выберите JSON-файл коллекции",
   paste: "Или вставьте JSON коллекции",

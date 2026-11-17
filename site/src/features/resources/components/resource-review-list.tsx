@@ -16,7 +16,8 @@ export function ResourceReviewList({
 }: {
   reviews: ResourceReviewView[];
   productId: string;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   locale: Locale;
 }) {
   const copy = resourceReviewCopy(locale);

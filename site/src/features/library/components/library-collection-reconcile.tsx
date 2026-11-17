@@ -1,6 +1,6 @@
 "use client";
 import type { LibraryCollectionChangesPreview, LibraryCollectionCommand } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -153,7 +153,9 @@ export function LibraryCollectionReconcileForm({
       if (controller.current === abort) controller.current = null;
     }
   }
-  if (!choices.length && !pending.current) return <p>{m.noChanges}</p>;
+  if (!choices.length && !pending.current) {
+    return <EmptyState title={m.noChanges} description={m.noChangesHint} />;
+  }
   const shownIds = pending.current ? [...adds, ...removes] : selected;
   return (
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5">

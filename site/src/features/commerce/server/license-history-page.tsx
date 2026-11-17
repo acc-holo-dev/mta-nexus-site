@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -153,7 +153,7 @@ export async function LicenseHistoryPage({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{copy.noHistory}</p>
+        <EmptyState title={copy.noHistory} description={copy.noHistoryHint} />
       )}
       {result.totalPages > 1 && (
         <nav aria-label={copy.fullHistory} className="flex gap-4 text-sm">

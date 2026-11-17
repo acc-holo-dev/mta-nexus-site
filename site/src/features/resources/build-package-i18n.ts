@@ -22,6 +22,8 @@ const copy = {
     previous: "Previous",
     next: "Next",
     noFiles: "No files match this filter.",
+    noFilesHint:
+      "An empty filtered package list is a confirmed inventory result, not a load failure. Reset the filter to see all recorded files.",
     noBaseline:
       "Both versions need recorded inventories for comparison. Only selected-version files are shown; earlier changes are unknown.",
     comparisonNote:
@@ -90,6 +92,8 @@ const copy = {
     previous: "Назад",
     next: "Далее",
     noFiles: "Нет файлов для этого фильтра.",
+    noFilesHint:
+      "Пустой отфильтрованный список файлов пакета — подтверждённый результат инвентаря, а не сбой загрузки. Сбросьте фильтр, чтобы увидеть все записанные файлы.",
     noBaseline:
       "Для сравнения нужны записанные перечни обеих версий. Показаны только файлы выбранной версии; прежние изменения неизвестны.",
     comparisonNote:

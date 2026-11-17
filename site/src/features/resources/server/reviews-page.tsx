@@ -139,7 +139,7 @@ export async function PublicResourceReviewsPage({
       <ResourceReviewList
         reviews={result.reviews}
         productId={product.id}
-        authenticated={!!actor}
+        authenticated={sessionFailed ? null : Boolean(actor)}
         locale={locale}
       />
       <ResourceReviewPager
