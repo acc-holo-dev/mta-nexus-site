@@ -14,6 +14,8 @@ import {
   resourcePublisherUrl,
 } from "../../../features/resources/resource-publisher-query";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -49,7 +51,20 @@ export default async function AuthorResourcesPage({
   const returnPath = returnParams.size
     ? `/workspace/resources?${returnParams}`
     : "/workspace/resources";
-  const user = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+
   if (!user) {
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
