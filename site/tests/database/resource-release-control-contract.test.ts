@@ -8,7 +8,7 @@ import {
 import {
   libraryReleaseQuery,
   resourceModerationQuery,
-} from "../../src/lib/resource-release-control-query";
+} from "../../src/features/resources/resource-release-control-query";
 const revision = "2026-10-10T12:00:00.000Z";
 it("always releases a suspension into a draft requiring a new review", () => {
   expect(resourceModerationTarget("suspended", "release")).toBe("draft");
