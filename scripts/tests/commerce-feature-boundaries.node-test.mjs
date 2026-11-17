@@ -28,6 +28,7 @@ const utilPorts = [
   "subscription-time",
   "seller-sales-csv",
   "commercial-plan-query",
+  "financial-query",
 ];
 const clientPorts = [
   "workspace-history",
