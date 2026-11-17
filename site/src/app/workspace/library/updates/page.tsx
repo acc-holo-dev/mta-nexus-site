@@ -9,6 +9,8 @@ import { getResourceReleaseControlCopy } from "../../../../features/library/reso
 import { ResourceDownloadButton } from "../../../../features/resources/download";
 import { ResourceReleaseWatchControl } from "../../../../features/resources/release-watch";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -32,8 +34,21 @@ export default async function LibraryUpdatesPage({
 }) {
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getResourceReleaseControlCopy(locale),
-    dictionary = getDictionary(locale),
+    dictionary = getDictionary(locale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/workspace/library/updates?"}
+      />
+    );
+  }
+
   const filter = LIBRARY_RELEASE_FILTERS.find((value) => value === query.filter) ?? "all";
   const page = Math.min(parseHistoryPage(query.page), 1000);
   const returnPath = `/workspace/library/updates?${new URLSearchParams({ filter, page: String(page) })}`;
