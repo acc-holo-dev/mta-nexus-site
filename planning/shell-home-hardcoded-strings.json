@@ -70,14 +70,14 @@
     {
       "allowlist_id": "home.unknown-stat-dash",
       "kind": "unknown-marker",
-      "line": 80,
+      "line": 83,
       "path": "site/src/app/page.tsx",
       "text": "—"
     },
     {
       "allowlist_id": "home.unknown-stat-dash",
       "kind": "unknown-marker",
-      "line": 86,
+      "line": 89,
       "path": "site/src/app/page.tsx",
       "text": "—"
     }
@@ -89,12 +89,12 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature, home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "a1103348affd909439d826eaeb0e68fcd55a69a3",
+  "source_sha": "3a39b829692f4282a20cfc515d04419aae436acf",
   "summary": {
     "allowlisted": 7,
     "findings": 7,
     "locale_copy_ternaries": 0,
-    "scanned_files": 50,
+    "scanned_files": 51,
     "unallowlisted": 0
   }
 }

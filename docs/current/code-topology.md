@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `5ebd31e2` (`dev`, slice 38 — theme-preference → shell).
+**source_sha:** `3a39b829` (`dev`, slice 39 — home-personal-preference → shell).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,13 +29,13 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 38 |
+| Область                    | Факт на slice 39 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
 | `components/` tree files   |                0 |
 | `components/` root files   |                0 |
-| `lib/` tree files          |              408 |
-| `lib/` root files          |              295 |
+| `lib/` tree files          |              407 |
+| `lib/` root files          |              294 |
 | `lib/services/` root files |               86 |
 | `lib/**/*-i18n.ts`         |               46 |
 | `app/**/route.ts`          |              282 |
@@ -58,7 +58,7 @@ site/
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
 | servers       |    54 | 218716 |
-| shell         |    55 |  96174 |
+| shell         |    56 |  97058 |
 | support       |    14 |  72088 |
 | trust         |     5 |  14574 |
 
@@ -148,6 +148,8 @@ site/
 **Slice 37 done:** first `lib/` root absorb → [`features/moderation`](../../site/src/features/moderation/README.md): util ports [`admin-status-labels.ts`](../../site/src/features/moderation/admin-status-labels.ts) (`adminStatusLabel`, `adminStatusTone`), [`verification-moderation.ts`](../../site/src/features/moderation/verification-moderation.ts) (`buildVerificationDecisionPayload`, `normalizeVerificationReviewNotes`); владение **Moderation**; depcruise public API + `clientUtilPorts`; корень `lib/` −2 files.
 
 **Slice 38 done:** `theme-preference` → [`features/shell/theme-preference.ts`](../../site/src/features/shell/theme-preference.ts) (`parseThemePreference`, `resolveThemePreference`, `nextThemePreference`, `colorSchemeForTheme`, `SYSTEM_THEME_QUERY`); владение **Shell**; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
+
+**Slice 39 done:** `home-personal-preference` → [`features/shell/home-personal-preference.ts`](../../site/src/features/shell/home-personal-preference.ts) (`parseHomePersonalPreference`, `HOME_PERSONAL_COOKIE`, …); владение **Shell**; `home-personal-changes-types` / server loader remain in `lib/` until a shell server port; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 36 — `confirm-action` / `action-confirm-checkbox`).
 

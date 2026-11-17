@@ -7,7 +7,7 @@ import {
   HOME_PERSONAL_SHOW,
   type HomePersonalPreference,
   homePersonalPreferenceCookie,
-} from "../../../lib/home-personal-preference";
+} from "../home-personal-preference";
 
 export function HomePersonalOptOut({
   preference,

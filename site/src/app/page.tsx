@@ -7,7 +7,10 @@ import { ArticleCard } from "../features/community/article-view";
 import { ProductCard } from "../features/resources/view";
 import { HomeNetworkServerCard } from "../features/servers/client";
 import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
-import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../lib/home-personal-preference";
+import {
+  HOME_PERSONAL_COOKIE,
+  parseHomePersonalPreference,
+} from "../features/shell/home-personal-preference";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
