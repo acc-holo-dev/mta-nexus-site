@@ -24,6 +24,7 @@ export const servers = {
     runtimeDescription:
       "Живой статус основан на последнем публичном наблюдении каталога MTA. Описание сервера управляется отдельно.",
     serverFallback: "Сервер MTA",
+    claimSessionUnavailable: "Не удалось проверить сессию для подтверждения сервера.",
   },
   serverManagement: {
     signInRequired: "Требуется вход",

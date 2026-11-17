@@ -24,6 +24,7 @@ export const servers = {
     runtimeDescription:
       "Live status is based on the latest public MTA directory observation. Editorial server details are managed separately.",
     serverFallback: "MTA server",
+    claimSessionUnavailable: "Could not check the session for server verification.",
   },
   serverManagement: {
     signInRequired: "Sign in required",
