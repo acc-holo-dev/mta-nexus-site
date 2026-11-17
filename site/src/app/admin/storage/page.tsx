@@ -8,6 +8,8 @@ import { StorageDiscoveryControls } from "../../../features/moderation/storage-m
 import { storageMaintenanceCopy } from "../../../features/moderation/storage-maintenance-i18n";
 import { storageQuery } from "../../../features/moderation/storage-maintenance-query";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -24,7 +26,20 @@ export default async function Page({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = storageMaintenanceCopy(locale);
   const dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/storage"}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/admin/storage" />;
   if (actor.role !== "admin") notFound();
   const params = new URLSearchParams();
