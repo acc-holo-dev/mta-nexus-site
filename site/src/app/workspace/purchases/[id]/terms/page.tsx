@@ -8,6 +8,8 @@ import { OrderTermsReportView } from "../../../../../features/commerce/order-ter
 import { orderTermsCopy } from "../../../../../features/commerce/order-terms-i18n";
 import { orderTermsPageQuery } from "../../../../../features/commerce/order-terms-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -35,7 +37,20 @@ export default async function TermsPage({
     ]),
     c = orderTermsCopy(locale),
     dictionary = getDictionary(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={"/workspace/purchases/"}
+      />
+    );
+  }
+
   if (!actor)
     return (
       <PlatformSignIn
