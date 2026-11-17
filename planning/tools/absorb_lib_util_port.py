@@ -238,6 +238,8 @@ def patch_standard_boundary(feat: str, name: str) -> None:
         "community": "scripts/tests/community-feature-boundaries.node-test.mjs",
         "commerce": "scripts/tests/commerce-feature-boundaries.node-test.mjs",
         "organizations": "scripts/tests/organizations-feature-boundaries.node-test.mjs",
+        "notifications": "scripts/tests/notifications-feature-boundaries.node-test.mjs",
+        "moderation": "scripts/tests/moderation-feature-boundaries.node-test.mjs",
     }
     rel = files.get(feat)
     if not rel:
@@ -323,18 +325,51 @@ def patch_servers(name: str) -> None:
     path.write_text(text)
 
 
-def patch_accounts(name: str) -> None:
+def patch_remaining_feature(feat: str, name: str, *, util_key: str = "clientUtilPorts") -> None:
     path = ROOT / "scripts/tests/remaining-features-boundaries.node-test.mjs"
     text = path.read_text()
-    text = text.replace(
-        'clientUtilPorts: ["profile-pagination", "developer-experience", "ad-preference"]',
-        f'clientUtilPorts: ["profile-pagination", "developer-experience", "ad-preference", "{name}"]',
+    mfeat = re.search(
+        rf'name: "{re.escape(feat)}",.*?(?=\n  \{{|\n\];)',
+        text,
+        re.S,
     )
-    m = re.search(r'name: "accounts",.*?safe: "([^"]+)"', text, re.S)
-    if m and name in m.group(1).split("|"):
-        parts = [p for p in m.group(1).split("|") if p != name]
-        text = text[: m.start(1)] + "|".join(parts) + text[m.end(1) :]
+    if not mfeat:
+        raise SystemExit(f"remaining feature block missing: {feat}")
+    block = mfeat.group(0)
+    orig = block
+    um = re.search(rf"{util_key}: (\[[^\]]*\])", block, re.S)
+    if um:
+        arr = um.group(1)
+        if f'"{name}"' not in arr:
+            if arr.strip() == "[]":
+                narr = f'["{name}"]'
+            else:
+                narr = re.sub(r"\]\s*$", f', "{name}"]', arr.rstrip())
+            block = block[: um.start(1)] + narr + block[um.end(1) :]
+    else:
+        inserted = False
+        for key in ("clients", "clientPorts", "privateClients"):
+            km = re.search(rf"{key}: (\[[^\]]*\],)", block, re.S)
+            if not km:
+                continue
+            insert = f'\n    {util_key}: ["{name}"],'
+            block = block[: km.end(0)] + insert + block[km.end(0) :]
+            inserted = True
+            break
+        if not inserted:
+            raise SystemExit(f"cannot insert {util_key} for {feat}")
+    sm = re.search(r'safe: "([^"]+)"', block)
+    if sm and name in sm.group(1).split("|"):
+        parts = [p for p in sm.group(1).split("|") if p != name]
+        block = block[: sm.start(1)] + "|".join(parts) + block[sm.end(1) :]
+    if block == orig and f'"{name}"' not in block:
+        raise SystemExit(f"failed to patch remaining {feat}/{name}")
+    text = text[: mfeat.start()] + block + text[mfeat.end() :]
     path.write_text(text)
+
+
+def patch_accounts(name: str) -> None:
+    patch_remaining_feature("accounts", name)
 
 
 def patch_readme(feat: str, name: str) -> None:
@@ -388,6 +423,11 @@ def main() -> int:
         patch_servers(name)
     elif feat == "accounts":
         patch_accounts(name)
+    elif feat == "support":
+        patch_remaining_feature("support", name)
+    elif feat == "moderation":
+        patch_standard_boundary(feat, name)
+        patch_remaining_feature("moderation", name)
     else:
         patch_standard_boundary(feat, name)
     patch_readme(feat, name)
