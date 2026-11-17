@@ -12,6 +12,8 @@ import {
 } from "../../../../../features/commerce/plan-reviews-query";
 import { planReviewNavLinkClass } from "../../../../../features/commerce/plan-reviews-workspace";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -30,8 +32,21 @@ export default async function NewPlanReview({
 }) {
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = planReviewsCopy(locale),
-    dictionary = getDictionary(locale),
+    dictionary = getDictionary(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={"/workspace/subscriptions/reviews/new"}
+      />
+    );
+  }
+
   if (!actor) {
     const query = planReviewsPageParams(params);
     return (
