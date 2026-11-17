@@ -8,6 +8,8 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceMediaService } from "../../../lib/services/resources/resource-media-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourceMediaEditor } from "../components/resource-media-editor";
 import { resourceMediaCopy } from "../resource-media-i18n";
@@ -64,7 +66,20 @@ export async function ResourceMediaScreen({
 }) {
   const locale = await getRequestLocale(),
     copy = resourceMediaCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/resources/"}
+      />
+    );
+  }
+
   const returnPath = staff
     ? `/admin/resources/${encodeURIComponent(productId)}/media`
     : `/workspace/resources/${encodeURIComponent(productId)}/media`;
