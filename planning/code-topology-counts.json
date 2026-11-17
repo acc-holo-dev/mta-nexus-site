@@ -10,52 +10,52 @@
   },
   "features": {
     "accounts": {
-      "bytes": 106444,
-      "files": 30
+      "bytes": 116217,
+      "files": 31
     },
     "commerce": {
-      "bytes": 191639,
-      "files": 46
+      "bytes": 210969,
+      "files": 49
     },
     "community": {
-      "bytes": 410453,
-      "files": 91
+      "bytes": 424024,
+      "files": 95
     },
     "discovery": {
       "bytes": 20343,
       "files": 3
     },
     "library": {
-      "bytes": 320885,
-      "files": 71
+      "bytes": 342286,
+      "files": 76
     },
     "moderation": {
-      "bytes": 118043,
-      "files": 24
+      "bytes": 133016,
+      "files": 26
     },
     "notifications": {
-      "bytes": 81354,
-      "files": 14
+      "bytes": 92476,
+      "files": 15
     },
     "organizations": {
       "bytes": 133691,
       "files": 38
     },
     "resources": {
-      "bytes": 484360,
-      "files": 111
+      "bytes": 494752,
+      "files": 115
     },
     "servers": {
-      "bytes": 248356,
-      "files": 64
+      "bytes": 249310,
+      "files": 65
     },
     "shell": {
       "bytes": 97058,
       "files": 56
     },
     "support": {
-      "bytes": 72080,
-      "files": 14
+      "bytes": 76748,
+      "files": 15
     },
     "trust": {
       "bytes": 14574,
@@ -78,62 +78,62 @@
     "workspace_members": ["site", "site/packages/*"]
   },
   "lib": {
-    "i18n_modules": 36,
+    "i18n_modules": 29,
     "root_dirs": ["i18n", "services"],
-    "root_files": 228,
+    "root_files": 206,
     "root_prefix_hotspots": [
       {
-        "files": 40,
+        "files": 39,
         "prefix": "resource"
       },
       {
-        "files": 16,
+        "files": 15,
         "prefix": "server"
       },
       {
-        "files": 12,
+        "files": 11,
         "prefix": "organization"
       },
       {
-        "files": 11,
+        "files": 9,
         "prefix": "community"
-      },
-      {
-        "files": 11,
-        "prefix": "library"
       },
       {
         "files": 9,
         "prefix": "public"
       },
       {
-        "files": 9,
+        "files": 8,
         "prefix": "support"
       },
       {
         "files": 7,
-        "prefix": "build"
+        "prefix": "library"
       },
       {
         "files": 6,
-        "prefix": "content"
+        "prefix": "build"
       },
       {
         "files": 6,
         "prefix": "license"
       },
       {
-        "files": 6,
+        "files": 5,
+        "prefix": "content"
+      },
+      {
+        "files": 5,
         "prefix": "notification"
       },
       {
         "files": 5,
-        "prefix": "private"
+        "prefix": "user"
       }
     ],
     "services_root_files": 86,
-    "tree_bytes": 1447015,
-    "tree_files": 341
+    "tree_bytes": 1343386,
+    "tree_files": 319
   },
   "packages_src_files": {
     "config": 1,
@@ -145,7 +145,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "6575849b7ac352171ba40ce89a976914c1b98064",
+  "source_sha": "2848e222740537418456cebd2a1829d96ab9d6a2",
   "tests": {
     "site_tests_files": 1451
   }
