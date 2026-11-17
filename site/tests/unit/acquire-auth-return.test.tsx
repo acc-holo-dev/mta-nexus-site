@@ -39,4 +39,14 @@ describe("acquire guest auth return (FLOW-01)", () => {
     expect(loading).toContain("overflow-x-clip");
     expect(loading).toContain("min-w-0");
   });
+
+  it("keeps productNotFound EmptyState distinct from loadFailed ErrorState", () => {
+    const page = read("site/src/app/acquire/page.tsx");
+    expect(page).toContain("copy.productNotFound");
+    expect(page).toContain("copy.loadFailed");
+    expect(page).toMatch(
+      /const notFound = productError === copy\.productNotFound;[\s\S]*?notFound \? \([\s\S]*?<EmptyState[\s\S]*?\) : \([\s\S]*?<ErrorState/u,
+    );
+    expect(page).toContain("setLoadRevision");
+  });
 });
