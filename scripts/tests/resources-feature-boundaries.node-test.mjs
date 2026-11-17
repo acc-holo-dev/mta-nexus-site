@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "pending-resource-draft",
     "new-resource-response",
     "build-moderation-ui",
     "mta-version-target",
@@ -252,6 +253,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/pending-resource-draft.ts", "resources-view-isolation"],
     ["features/resources/new-resource-response.ts", "resources-view-isolation"],
     ["features/resources/build-moderation-ui.ts", "resources-view-isolation"],
     ["features/resources/mta-version-target.ts", "resources-view-isolation"],
@@ -305,6 +307,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/pending-resource-draft.ts",
     "app/new-resource-response.ts",
     "app/build-moderation-ui.ts",
     "app/mta-version-target.ts",
@@ -352,6 +355,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/pending-resource-draft.ts",
     "site/src/features/resources/new-resource-response.ts",
     "site/src/features/resources/build-moderation-ui.ts",
     "site/src/features/resources/mta-version-target.ts",
@@ -479,6 +483,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/pending-resource-draft.ts");
   visit("site/src/features/resources/new-resource-response.ts");
   visit("site/src/features/resources/build-moderation-ui.ts");
   visit("site/src/features/resources/mta-version-target.ts");

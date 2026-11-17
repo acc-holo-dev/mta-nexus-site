@@ -49,6 +49,7 @@ Services и repositories не дублируются и не переносят�
 | `mta-version-target.ts` | util port `mta-version-target` |
 | `build-moderation-ui.ts` | util port `build-moderation-ui` |
 | `new-resource-response.ts` | util port `new-resource-response` |
+| `pending-resource-draft.ts` | util port `pending-resource-draft` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
