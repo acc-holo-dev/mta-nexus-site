@@ -8,7 +8,7 @@ import {
   supportHref,
   supportQuery,
 } from "../../src/lib/support-workspace-contract";
-import { supportWorkspaceCopy, supportWorkspaceError } from "../../src/lib/support-workspace-copy";
+import { supportWorkspaceCopy, supportWorkspaceError } from "../../src/features/support/support-workspace-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";

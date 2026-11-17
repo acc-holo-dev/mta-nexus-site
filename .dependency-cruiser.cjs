@@ -34,7 +34,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/support/)" },
       to: {
-        path: "^site/src/features/support/(?!(?:center|download-help|messages-server|page-server|thread|support-message-discovery-copy|support-response)\\.ts$)",
+        path: "^site/src/features/support/(?!(?:center|download-help|messages-server|page-server|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$)",
       },
     },
     {
@@ -47,17 +47,17 @@ module.exports = {
       name: "support-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response)\\.ts$|components/)",
+        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!support/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/support/(?:server/|(?:messages-server|page-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!support/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/support/(?:server/|(?:messages-server|page-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:support-response|support-retry|private-api-request|support-workspace-contract|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-contract|private-change-history-query|support-idempotency)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "support-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response)\\.ts$|components/)",
+        path: "^site/src/features/support/(?:(?:center|download-help|thread|support-message-discovery-copy|support-response|support-workspace-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

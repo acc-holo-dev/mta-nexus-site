@@ -4,7 +4,7 @@ import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { supportActivitySchema } from "../../../lib/support-workspace-contract";
-import { supportWorkspaceCopy, supportWorkspaceError } from "../../../lib/support-workspace-copy";
+import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 import { useNexusLocale } from "../../shell/locale";
 
 const ghostActionClass =

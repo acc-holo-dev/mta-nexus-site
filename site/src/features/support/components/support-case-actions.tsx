@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import type { SupportCaseData, SupportCaseStatus } from "../support-response";
-import { supportWorkspaceCopy } from "../../../lib/support-workspace-copy";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
 import { confirmAction } from "../../shell/confirm-action";
 export function SupportCaseActions({
   supportCase,

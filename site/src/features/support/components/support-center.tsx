@@ -20,7 +20,7 @@ import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
-} from "../../../lib/support-workspace-copy";
+} from "../support-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { useNexusLocale } from "../../shell/locale";

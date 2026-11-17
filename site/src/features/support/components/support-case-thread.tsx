@@ -21,7 +21,7 @@ import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
-} from "../../../lib/support-workspace-copy";
+} from "../support-workspace-copy";
 import { useNexusLocale } from "../../shell/locale";
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";

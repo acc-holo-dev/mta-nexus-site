@@ -1,4 +1,4 @@
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
 export class SupportClientFailure extends Error {}
 export function supportWorkspaceCopy(locale: Locale) {
   return locale === "ru"

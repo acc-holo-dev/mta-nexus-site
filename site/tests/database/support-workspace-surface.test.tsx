@@ -19,7 +19,7 @@ import { SupportCaseActions } from "../../src/features/support/components/suppor
 import { SupportCenter } from "../../src/features/support/center";
 import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { supportWorkspaceCopy } from "../../src/lib/support-workspace-copy";
+import { supportWorkspaceCopy } from "../../src/features/support/support-workspace-copy";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,
