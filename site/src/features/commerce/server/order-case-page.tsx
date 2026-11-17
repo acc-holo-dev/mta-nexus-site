@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryAmount, formatHistoryDate } from "../../../lib/commerce-history-format";
-import { financialOrderLabel, financialPaymentLabel } from "../../../lib/financial-i18n";
+import { financialOrderLabel, financialPaymentLabel } from "../financial-i18n";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

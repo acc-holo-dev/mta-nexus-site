@@ -23,6 +23,7 @@ const utilPorts = [
   "plan-reviews-i18n",
   "subscriptions-i18n",
   "license-control-i18n",
+  "financial-i18n",
 ];
 const clientPorts = [
   "workspace-history",

@@ -13,7 +13,7 @@ import {
   financialPaymentLabel,
   formatFinancialMinor,
   getFinancialCopy,
-} from "../../../../../lib/financial-i18n";
+} from "../../../../../features/commerce/financial-i18n";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../features/commerce/order-terms-i18n";

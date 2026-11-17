@@ -2,7 +2,7 @@ import type { OrderTermsReport } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
-import { formatFinancialMinor } from "../../../lib/financial-i18n";
+import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
 

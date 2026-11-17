@@ -2,7 +2,7 @@ import type { SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
 import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { formatFinancialMinor } from "../../../lib/financial-i18n";
+import { formatFinancialMinor } from "../financial-i18n";
 import type { Locale } from "../../../lib/i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../../../lib/seller-sales-query";

@@ -9,7 +9,7 @@ import {
   sellerSalesTime,
 } from "../../../../../features/commerce/seller-sales-i18n";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { formatFinancialMinor } from "../../../../../lib/financial-i18n";
+import { formatFinancialMinor } from "../../../../../features/commerce/financial-i18n";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../../../../../lib/seller-sales-query";

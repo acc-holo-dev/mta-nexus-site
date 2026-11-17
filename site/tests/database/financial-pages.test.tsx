@@ -42,7 +42,7 @@ import ReviewLoading from "../../src/app/admin/commerce/reconciliation/loading";
 import Review from "../../src/app/admin/commerce/reconciliation/page";
 import FinanceLoading from "../../src/app/workspace/finance/loading";
 import Statement, { metadata } from "../../src/app/workspace/finance/page";
-import { getFinancialCopy } from "../../src/lib/financial-i18n";
+import { getFinancialCopy } from "../../src/features/commerce/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
