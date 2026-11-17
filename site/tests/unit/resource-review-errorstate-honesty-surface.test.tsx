@@ -11,7 +11,7 @@ const source = readFileSync(
 );
 
 it("locks resource review fail/unknown to ErrorState and keeps success as status", () => {
-  expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
+  expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('<ErrorState id="resource-review-editor-error" title={notice.text} />');
   expect(source).toContain('<ErrorState id="resource-review-report-error" title={notice.text} />');
   expect(source).toContain(
