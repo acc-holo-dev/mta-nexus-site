@@ -66,6 +66,7 @@ Services и repositories не дублируются и не переносят�
 | `private-request.ts` | util port `private-request` |
 | `author-resource-draft.ts` | util port `author-resource-draft` |
 | `build-file-validation.ts` | util port `build-file-validation` |
+| `resource-commerce-confirmation.ts` | util port `resource-commerce-confirmation` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

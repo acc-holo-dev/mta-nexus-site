@@ -12,7 +12,7 @@ import { confirmedResourceCartReview } from "../resource-cart-review-confirmatio
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,
-} from "../../../lib/resource-commerce-confirmation";
+} from "../resource-commerce-confirmation";
 import {
   getResourceCommerceCopy,
   resourceCommerceError,

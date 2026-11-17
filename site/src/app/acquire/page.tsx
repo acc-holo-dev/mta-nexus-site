@@ -10,7 +10,7 @@ import { authEntryHref } from "../../features/shell/auth-return";
 import { useNexusLocale } from "../../features/shell/locale";
 import { licenseModelLabel } from "../../lib/license-model-i18n";
 import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
-import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
+import { confirmedResourceClaim } from "../../features/resources/resource-commerce-confirmation";
 
 interface ProductInfo {
   id: string;
