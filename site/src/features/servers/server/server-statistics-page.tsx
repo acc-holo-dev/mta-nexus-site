@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import {
@@ -12,6 +13,7 @@ import {
   serverStatisticsService,
 } from "../../../lib/services/servers/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
@@ -53,17 +55,12 @@ export async function ServerStatisticsPage({
       : null;
   } catch {
     return (
-      <div className={pageShellClass}>
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <a href={path} className={navLinkClass}>
-              {copy.retry}
-            </a>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
     );
   }
   if (managed && !user) {
