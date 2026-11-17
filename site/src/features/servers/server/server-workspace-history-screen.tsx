@@ -3,7 +3,6 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/servers/server-workspace-history-service";

@@ -16,7 +16,7 @@ it("locks session probe failure to PlatformSessionError without guest-lie", () =
   expect(source).toMatch(
     /try \{\s*actor = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
   );
-  expect(source).toContain("title={getDictionary(locale).errors.title}");
+  expect(source).toContain("title={support.title}");
   expect(source).toContain("message={copy.unavailable}");
   expect(source).toContain("PlatformSignIn");
 });
