@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../../../features/accounts/user-platform-api";
+import { reportRateLimit } from "../../../../../../../../features/community/community-report-api";
 import { parseDiscussionReportsQuery } from "../../../../../../../../features/community/discussion-reports-contract";
 import { moderatedDiscussionError } from "../../../../../../../../features/community/moderated-discussion-copy";
-import { reportRateLimit } from "../../../../../../../../lib/community-report-api";
 import { communityModerationService } from "../../../../../../../../lib/services/community-moderation-service";
-import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; commentId: string }> },

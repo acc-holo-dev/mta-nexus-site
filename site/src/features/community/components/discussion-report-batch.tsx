@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
@@ -23,6 +21,8 @@ import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../discussion-reports-contract";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({

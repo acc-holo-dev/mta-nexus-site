@@ -1,11 +1,11 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { parseNotificationInboxQuery } from "../../../../../features/notifications/notification-inbox-contract";
 import { notificationInboxError } from "../../../../../features/notifications/notification-inbox-copy";
 import { resolveLocale } from "../../../../../lib/i18n";
 import { notificationInboxService } from "../../../../../lib/services/notification-inbox-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 
 export async function GET(request: NextRequest) {
   const response = await userPlatformApi(

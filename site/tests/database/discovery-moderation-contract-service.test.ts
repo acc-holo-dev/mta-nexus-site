@@ -43,7 +43,7 @@ import {
   moderationPageSchema,
   parseModerationDetailQuery,
   parseModerationQuery,
-} from "../../src/lib/community-moderation-contract";
+} from "../../src/features/moderation/community-moderation-contract";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { discoveryService as discovery } from "../../src/lib/services/discovery-service";
 

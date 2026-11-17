@@ -4,11 +4,11 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../lib/managed-server-view";
 import { authService } from "../../../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/server-workspace-history-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
 import {
   parseServerWorkspaceHistoryQuery,

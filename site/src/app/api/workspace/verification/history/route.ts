@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { verificationApplicationsError } from "../../../../../features/moderation/verification-applications-copy";
 import { parseVerificationApplicationsQuery } from "../../../../../features/trust/verification-applications-contract";
+import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { verificationRate } from "../../../../../lib/verification-workspace-api";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

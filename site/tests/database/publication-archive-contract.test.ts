@@ -4,7 +4,7 @@ import {
   parsePublicationQuery,
   publicationHref,
   publicationPageSchema,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
 
 const cursor = {
   version: 1,

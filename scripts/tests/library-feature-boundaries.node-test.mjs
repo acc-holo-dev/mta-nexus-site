@@ -46,6 +46,7 @@ const utilPorts = [
   "resource-release-control-confirmation",
   "library-collections-query",
   "library-release-history-query",
+  "user-library",
 ];
 const serverPorts = [
   "collections",

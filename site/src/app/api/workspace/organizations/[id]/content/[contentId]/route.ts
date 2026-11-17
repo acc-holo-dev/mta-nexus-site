@@ -1,16 +1,16 @@
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../../features/accounts/user-platform-api";
+import {
+  organizationContentFilters,
+  organizationContentId,
+  organizationContentRate,
+} from "../../../../../../../features/organizations/organization-content-api";
 import {
   readBoundedJson,
   requireServerJsonContentType,
 } from "../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
-import {
-  organizationContentFilters,
-  organizationContentId,
-  organizationContentRate,
-} from "../../../../../../../lib/organization-content-api";
 import { organizationContentService } from "../../../../../../../lib/services/organization-content-service";
-import { userPlatformApi } from "../../../../../../../lib/user-platform-api";
 
 type Context = { params: Promise<{ id: string; contentId: string }> };
 export function GET(request: NextRequest, context: Context) {

@@ -4,6 +4,7 @@ import { webPushSubscriptionRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parseWebPushSubscription } from "../../../../features/notifications/web-push-subscription";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
@@ -14,7 +15,6 @@ import {
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
-import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

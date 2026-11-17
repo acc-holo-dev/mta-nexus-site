@@ -11,7 +11,10 @@ import {
   type ModeratedDiscussionQuery,
   moderatedDiscussionRemoveSchema,
 } from "../../features/community/moderated-discussion-contract";
-import type { ModerationQuery, moderationCommandSchema } from "../community-moderation-contract";
+import type {
+  ModerationQuery,
+  moderationCommandSchema,
+} from "../../features/moderation/community-moderation-contract";
 import { contentService } from "./content-service";
 
 function authority(actor: User, id?: string) {

@@ -12,12 +12,16 @@ import type { Comment, Content, Product, Server, User } from "@nexus/domain";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
-import { encodeDiscussionCursor } from "../content-discussion-contract";
-import { PUBLICATION_TYPES } from "../publication-feed-contract";
+import { encodeDiscussionCursor } from "../../features/community/content-discussion-contract";
+import { PUBLICATION_TYPES } from "../../features/community/publication-feed-contract";
 
 type DiscussionCursor = { createdAt: string; id: string };
 
-import { communityTypes, editorialTypes, type parseContentPage } from "../user-platform-contract";
+import {
+  communityTypes,
+  editorialTypes,
+  type parseContentPage,
+} from "../../features/community/user-platform-contract";
 
 export class ContentService {
   async manageComment(

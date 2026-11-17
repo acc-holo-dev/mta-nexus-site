@@ -1,11 +1,11 @@
 import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus/domain";
 import { z } from "zod";
-import { communityReportPageQuery, REPORT_TYPES } from "../../lib/community-report-contract";
 import {
   changeHistoryHref,
   changeHistoryTimeSchema,
   parseChangeHistoryQuery,
-} from "../../lib/private-change-history-query";
+} from "../accounts/private-change-history-query";
+import { communityReportPageQuery, REPORT_TYPES } from "./community-report-contract";
 export function parseReportGroupsQuery(
   params: URLSearchParams,
 ): CommunityReportGroupFilters | null {

@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { resourceModerationQuery } from "../../../../features/resources/resource-release-control-query";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) => {

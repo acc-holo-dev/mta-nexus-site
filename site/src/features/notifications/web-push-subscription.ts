@@ -1,5 +1,5 @@
 import { isValidWebPushAuthSecret, isValidWebPushP256PublicKey } from "@nexus/config";
-import { parseWebPushEndpoint } from "./services/web-push-endpoint-policy";
+import { parseWebPushEndpoint } from "../../lib/services/web-push-endpoint-policy";
 
 export type ParsedWebPushSubscription = {
   endpoint: string;

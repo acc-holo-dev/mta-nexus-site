@@ -8,6 +8,7 @@ import {
   passwordResetTargetMs,
   waitForPasswordResetFloor,
 } from "../../../../features/accounts/account-recovery-request-policy";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
 import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
@@ -16,7 +17,6 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 import { authService } from "../../../../lib/services/auth-service";
 
 const headers = {

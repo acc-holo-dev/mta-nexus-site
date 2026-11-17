@@ -8,10 +8,10 @@ import {
   type PublicationQuery,
   publicationHref,
   SERVER_PUBLICATION_TYPES,
-} from "../../../lib/publication-feed-contract";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+} from "../publication-feed-contract";
 import { publicationCopy, publicationError } from "../publication-feed-copy";
+import { platformFieldClass } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

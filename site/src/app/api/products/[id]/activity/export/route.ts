@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
+import { resourceActivityCsv } from "../../../../../../features/resources/resource-activity-csv";
 import { parseResourceActivityQuery } from "../../../../../../features/resources/resource-activity-query";
-import { resourceActivityCsv } from "../../../../../../lib/resource-activity-csv";
-import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
 import { resourceActivityService } from "../../../../../../lib/services/resource-activity-service";
 
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

@@ -6,9 +6,13 @@ import { consumeRateLimit } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { resourceMediaIdSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
-import { getTrustedRequestIp } from "./request-client-ip";
-import { authService } from "./services/auth-service";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../lib/observability";
+import { authService } from "../../lib/services/auth-service";
+import { getTrustedRequestIp } from "../shell/request-client-ip";
 
 let activeReads = 0;
 export async function resourceMediaImage(request: NextRequest, mediaId: string) {

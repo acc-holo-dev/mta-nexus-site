@@ -26,9 +26,9 @@ import WatchHistoryLoading from "../../src/app/workspace/library/watches/history
 import WatchesLoading from "../../src/app/workspace/library/watches/loading";
 import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 import { resourceReleaseWatchHistoryCopy } from "../../src/features/resources/resource-release-watch-history-i18n";
+import { resourceReleaseWatchesCopy } from "../../src/features/resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
 import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
-import { resourceReleaseWatchesCopy } from "../../src/lib/resource-release-watches-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -103,7 +103,7 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     expect(read(loading)).toContain("overflow-x-clip");
     expect(read(loading)).toContain("min-w-0");
   }
-  expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain(
+  expect(read("site/src/features/resources/resource-release-watches-i18n.ts")).toContain(
     "loadUnavailableDescription",
   );
   expect(read("site/src/features/resources/resource-release-watch-history-i18n.ts")).toContain(

@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { platformFieldClass } from "../../../../features/community/user-platform-client";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
@@ -17,7 +18,6 @@ import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
-import { platformFieldClass } from "../../../../lib/user-platform-client";
 
 export const dynamic = "force-dynamic";
 

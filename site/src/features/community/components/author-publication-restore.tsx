@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
@@ -22,6 +20,8 @@ import {
 } from "../author-publication-desk-copy";
 import { confirmedOrganizationPublicationRestore } from "../organization-publication-history-contract";
 import { confirmedServerPublicationRestore } from "../server-publication-history-contract";
+import { platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function AuthorPublicationRestore({
   id,
   revision,

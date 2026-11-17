@@ -68,7 +68,7 @@ vi.mock("../../src/lib/services/discovery-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: vi.fn(() => "203.0.113.10"),
 }));
 

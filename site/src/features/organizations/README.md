@@ -33,6 +33,8 @@ Feature объединяет существующие экраны управл�
 | `organization-governance-contract.ts`      | util port `organization-governance-contract`                           |
 | `organization-team-contract.ts`            | util port `organization-team-contract`                                 |
 | `organization-workspace-contract.ts`       | util port `organization-workspace-contract`                            |
+| `organization-content-api.ts`              | util port `organization-content-api`                                   |
+| `organization-workspace-api.ts`            | util port `organization-workspace-api`                                 |
 
 Редактор участника, пакетные действия и передача владения — внутренние клиентские
 компоненты. Публичные входы используются внешним production-кодом; прямые и

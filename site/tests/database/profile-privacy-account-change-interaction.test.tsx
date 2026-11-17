@@ -23,13 +23,13 @@ vi.mock("react", async (original) => ({
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/lib/user-platform-client", async (original) => ({
-  ...(await original<typeof import("../../src/lib/user-platform-client")>()),
+vi.mock("../../src/features/community/user-platform-client", async (original) => ({
+  ...(await original<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
 import { ProfilePrivacyEditor } from "../../src/features/accounts/profile";
-import { PlatformRequestError } from "../../src/lib/user-platform-client";
+import { PlatformRequestError } from "../../src/features/community/user-platform-client";
 
 const initial = {
   id: "usr_a",

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { DiscussionPage } from "../../src/lib/content-discussion-contract";
+import type { DiscussionPage } from "../../src/features/community/content-discussion-contract";
 import {
   type FlatTestElement,
   findTestButton,

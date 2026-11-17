@@ -33,12 +33,12 @@ vi.mock("../../src/lib/services/organization-governance-service", () => ({
 
 import ProfilePage, { generateMetadata } from "../../src/app/settings/history/page";
 import OrganizationPage from "../../src/app/workspace/organizations/[id]/activity/page";
+import { privateChangeHistoryCopy } from "../../src/features/accounts/private-change-history-copy";
+import { encodeChangeHistoryCursor } from "../../src/features/accounts/private-change-history-query";
 import { ProfileChangeHistoryView } from "../../src/features/accounts/profile-change-history";
 import type { ProfileChangeHistory } from "../../src/features/accounts/profile-change-history-contract";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
 import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
-import { privateChangeHistoryCopy } from "../../src/lib/private-change-history-copy";
-import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   cursor = encodeChangeHistoryCursor({

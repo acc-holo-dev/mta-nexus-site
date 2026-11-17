@@ -3,20 +3,20 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseCommentIntentKey } from "../../../../../features/community/content-comment-client";
-import { discussionError } from "../../../../../features/community/content-discussion-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   discussionCommentSchema,
   parseDiscussionQuery,
-} from "../../../../../lib/content-discussion-contract";
+} from "../../../../../features/community/content-discussion-contract";
+import { discussionError } from "../../../../../features/community/content-discussion-copy";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentService } from "../../../../../lib/services/content-service";
 

@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { userPlatformError } from "../../lib/user-platform-copy";
+import { userPlatformError } from "./user-platform-copy";
 
 const en = {
   forbidden: "Your current organization or server rights do not allow restoration.",

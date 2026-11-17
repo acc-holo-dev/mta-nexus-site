@@ -1,10 +1,13 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../../../features/accounts/user-platform-api";
 import { parseAuthorPublicationHistoryQuery } from "../../../../../../../../features/community/author-publication-desk-contract";
+import {
+  serverContentId,
+  serverContentRate,
+} from "../../../../../../../../features/servers/server-content-api";
 import { serverPublicationHistoryError } from "../../../../../../../../features/servers/server-publication-history-copy";
-import { serverContentId, serverContentRate } from "../../../../../../../../lib/server-content-api";
 import { serverContentService } from "../../../../../../../../lib/services/server-content-service";
-import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; contentId: string }> },

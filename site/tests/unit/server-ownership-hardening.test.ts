@@ -15,7 +15,9 @@ describe("server ownership hardening surface", () => {
 
   it("uses trusted request IP for server registration", () => {
     const route = read("site/src/app/api/servers/route.ts");
-    expect(route).toContain('import { getTrustedRequestIp } from "../../../lib/request-client-ip"');
+    expect(route).toContain(
+      'import { getTrustedRequestIp } from "../../../features/shell/request-client-ip"',
+    );
     expect(route).toContain("getTrustedRequestIp(request)");
     expect(route).not.toContain("getClientIp(request.headers)");
   });

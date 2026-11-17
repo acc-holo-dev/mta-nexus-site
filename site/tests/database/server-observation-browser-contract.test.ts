@@ -14,7 +14,7 @@ import {
   serverObservationBrowserError,
 } from "../../src/features/servers/server-observation-browser-copy";
 import { parseServerStatisticsQuery } from "../../src/features/servers/server-statistics-contract";
-import { serverObservationBrowserCsv } from "../../src/lib/server-statistics-export";
+import { serverObservationBrowserCsv } from "../../src/features/servers/server-statistics-export";
 import { serverStatisticsService } from "../../src/lib/services/server-statistics-service";
 
 const end = "2026-10-11T00:00:00.000Z",

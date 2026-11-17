@@ -1,7 +1,7 @@
 import { getClientIp } from "@nexus/security";
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getTrustedRequestIp } from "../../src/lib/request-client-ip";
+import { getTrustedRequestIp } from "../../src/features/shell/request-client-ip";
 
 const secret = "trusted-proxy-secret-0123456789abcdef";
 

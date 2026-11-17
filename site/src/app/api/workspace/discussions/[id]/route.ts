@@ -2,12 +2,12 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
+import { discussionEditSchema } from "../../../../../features/community/content-discussion-contract";
 import { ownDiscussionError } from "../../../../../features/community/discussion-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { discussionEditSchema } from "../../../../../lib/content-discussion-contract";
 import { discussionWorkspaceService } from "../../../../../lib/services/discussion-workspace-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 
 type Context = { params: Promise<{ id: string }> };
 const removal = z.object({ expectedRevision: z.string().regex(/^[a-f0-9]{64}$/u) }).strict();

@@ -1,5 +1,8 @@
 import { expect, it } from "vitest";
-import { managedServerHref, parseManagedServerQuery } from "../../src/lib/managed-server-view";
+import {
+  managedServerHref,
+  parseManagedServerQuery,
+} from "../../src/features/servers/managed-server-view";
 
 it("parses supported independent filters and bounds text search", () => {
   expect(

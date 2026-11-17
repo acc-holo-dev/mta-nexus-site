@@ -7,9 +7,9 @@ import {
   PlatformRequestError,
   parseEditableProfile,
   platformRequest,
-} from "../../../lib/user-platform-client";
-import type { EditableProfile } from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+} from "../../community/user-platform-client";
+import type { EditableProfile } from "../../community/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
 import { useNexusLocale } from "../../shell/locale";
 
 const textareaClass =

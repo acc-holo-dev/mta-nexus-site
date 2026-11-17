@@ -6,10 +6,10 @@ import {
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../../../../features/accounts/profile-privacy-copy";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
 
 export const dynamic = "force-dynamic";
 const validQuery = (request: NextRequest) => {

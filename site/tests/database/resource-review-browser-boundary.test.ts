@@ -5,7 +5,7 @@ const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
 vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 vi.mock("@nexus/security", () => ({

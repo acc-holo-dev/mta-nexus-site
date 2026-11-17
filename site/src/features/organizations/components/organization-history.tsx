@@ -6,12 +6,12 @@ import {
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
-import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
 } from "../../accounts/change-history";
+import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";

@@ -7,7 +7,8 @@ import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../../features/resources/build-download-metadata";
-import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
+import { toDownloadWebStream } from "../../../../../../features/resources/download-web-stream";
+import { reviewerAttachmentFileName } from "../../../../../../features/resources/resource-attachment-filename";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -15,7 +16,6 @@ import {
   REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../../lib/observability";
-import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
 import { authService } from "../../../../../../lib/services/auth-service";
 
 const privateHeaders = {

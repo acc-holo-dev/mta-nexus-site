@@ -6,11 +6,11 @@ import {
   type User,
 } from "@nexus/domain";
 import { can } from "@nexus/security";
+import { encodeChangeHistoryCursor } from "../../features/accounts/private-change-history-query";
 import {
   parseReportGroupsQuery,
   reportGroupsPageSchema,
 } from "../../features/community/community-report-groups-contract";
-import { encodeChangeHistoryCursor } from "../private-change-history-query";
 export const communityReportGroupsService = {
   async page(actor: User, filters: CommunityReportGroupFilters) {
     if (!can(actor, "admin.moderation")) throw new ForbiddenError();

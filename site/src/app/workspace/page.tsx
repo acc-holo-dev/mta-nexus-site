@@ -8,12 +8,12 @@ import { formatHistoryDate } from "../../features/commerce/commerce-history-form
 import { getCommerceHistoryCopy } from "../../features/commerce/commerce-history-i18n";
 import { reactionCopy } from "../../features/community/content-reaction-copy";
 import { ownDiscussionCopy } from "../../features/community/discussion-workspace-copy";
+import { getLibraryCopy } from "../../features/library/library-view";
 import { ManagedServerCard } from "../../features/servers/managed-card-server";
+import { getManagedServerCopy } from "../../features/servers/managed-server-view";
 import { PlatformSignIn, platformSignInFocusClass } from "../../features/shell/guest-auth";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { getLibraryCopy } from "../../lib/library-view";
-import { getManagedServerCopy } from "../../lib/managed-server-view";
 import { authService } from "../../lib/services/auth-service";
 import {
   indexMtaObservations,

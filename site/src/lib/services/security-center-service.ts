@@ -3,7 +3,7 @@ import {
   SECURITY_ACTIVITY_ACTIONS,
   type SecurityActivityItem,
   toSecurityActivityItem,
-} from "../security-activity";
+} from "../../features/accounts/security-activity";
 
 export class SecurityCenterService {
   async listActivity(userId: string, limit = 30): Promise<SecurityActivityItem[]> {

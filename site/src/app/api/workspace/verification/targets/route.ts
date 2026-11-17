@@ -1,12 +1,12 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { verificationError } from "../../../../../features/trust/verification-workspace-copy";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import {
   verificationFilters,
   verificationRate,
-} from "../../../../../lib/verification-workspace-api";
+} from "../../../../../features/trust/verification-workspace-api";
+import { verificationError } from "../../../../../features/trust/verification-workspace-copy";
+import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

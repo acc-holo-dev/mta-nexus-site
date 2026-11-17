@@ -9,7 +9,7 @@ import {
   type PublicationQuery,
   parsePublicationQuery,
   publicationPageQuery,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
 import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
 
 const scope = { kind: "server" as const, id: "server" };

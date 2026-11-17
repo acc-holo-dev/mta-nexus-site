@@ -3,19 +3,19 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { parseBoundedJson } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
 import {
   supportFailure,
   supportMutationGuard,
   supportPrivateJson,
-} from "../../../../lib/support-http";
+} from "../../../../features/support/support-http";
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
-} from "../../../../lib/support-idempotency";
+} from "../../../../features/support/support-idempotency";
+import { parseBoundedJson } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { createRequestLogContext } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
 
 async function loadAuthorizedCase(currentToken: string | undefined, id: string) {
   const user = currentToken ? await authService.getSession(currentToken) : null;

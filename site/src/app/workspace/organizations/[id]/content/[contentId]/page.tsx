@@ -1,6 +1,6 @@
+import { getUserPlatformCopy } from "../../../../../../features/community/user-platform-copy";
 import { OrganizationContentEditorPage } from "../../../../../../features/organizations/content-editor-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
 

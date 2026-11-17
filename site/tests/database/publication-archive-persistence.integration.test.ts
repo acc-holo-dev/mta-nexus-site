@@ -6,7 +6,7 @@ import { content, servers, userProfilePreferences, users } from "../../packages/
 import {
   parsePublicationQuery,
   publicationPageQuery,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
 import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
 
 const actorIds: string[] = [],

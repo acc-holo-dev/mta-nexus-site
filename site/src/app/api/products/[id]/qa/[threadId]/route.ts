@@ -1,12 +1,12 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { getTrustedRequestIp } from "../../../../../../features/shell/request-client-ip";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../../../lib/request-client-ip";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { resourceQaService } from "../../../../../../lib/services/resource-qa-service";
 

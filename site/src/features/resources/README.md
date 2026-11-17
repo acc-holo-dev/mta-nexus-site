@@ -105,6 +105,18 @@ Services и repositories не дублируются и не переносят�
 | `reverse-dependency-summary.ts`                | util port `reverse-dependency-summary`                                                                      |
 | `build-package-query.ts`                       | util port `build-package-query`                                                                             |
 | `mta-meta-inspector.ts`                        | util port `mta-meta-inspector`                                                                              |
+| `public-resource-attribution.ts`               | util port `public-resource-attribution`                                                                     |
+| `resource-release-watches-i18n.ts`             | util port `resource-release-watches-i18n`                                                                   |
+| `build-package-files-http.ts`                  | util port `build-package-files-http`                                                                        |
+| `build-package-report-http.ts`                 | util port `build-package-report-http`                                                                       |
+| `resource-commerce-http.ts`                    | util port `resource-commerce-http`                                                                          |
+| `resource-media-image-http.ts`                 | util port `resource-media-image-http`                                                                       |
+| `resource-media-upload-http.ts`                | util port `resource-media-upload-http`                                                                      |
+| `resource-activity-csv.ts`                     | util port `resource-activity-csv`                                                                           |
+| `resource-delivery-stream.ts`                  | util port `resource-delivery-stream`                                                                        |
+| `download-web-stream.ts`                       | util port `download-web-stream`                                                                             |
+| `resource-download-client.ts`                  | util port `resource-download-client`                                                                        |
+| `resource-attachment-filename.ts`              | util port `resource-attachment-filename`                                                                    |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

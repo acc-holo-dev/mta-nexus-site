@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "../../lib/content-discussion-contract";
+import { discussionCursorSchema } from "../community/content-discussion-contract";
 import { organizationWorkspaceSchema } from "./organization-workspace-contract";
 
 const cursorSchema = discussionCursorSchema

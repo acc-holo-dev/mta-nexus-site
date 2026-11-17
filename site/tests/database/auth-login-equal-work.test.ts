@@ -21,7 +21,7 @@ vi.mock("@nexus/security", async (original) => ({
   verifyPassword: mocks.verifyPassword,
   consumeRateLimit: mocks.consumeRateLimit,
 }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "127.0.0.1",
 }));
 

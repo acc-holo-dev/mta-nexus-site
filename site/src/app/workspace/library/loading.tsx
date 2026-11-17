@@ -1,5 +1,5 @@
+import { getLibraryCopy } from "../../../features/library/library-view";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getLibraryCopy } from "../../../lib/library-view";
 
 // Honest loading shell for /workspace/library.
 export default async function Loading() {

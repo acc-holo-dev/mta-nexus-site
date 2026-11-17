@@ -5,6 +5,10 @@ import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { communityModerationService } from "../../../lib/services/community-moderation-service";
+import { discoveryCopy } from "../../discovery/discovery-copy";
 import {
   moderationDetailHref,
   moderationDetailSchema,
@@ -12,17 +16,13 @@ import {
   moderationPageSchema,
   parseModerationDetailQuery,
   parseModerationQuery,
-} from "../../../lib/community-moderation-contract";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
-import { authService } from "../../../lib/services/auth-service";
-import { communityModerationService } from "../../../lib/services/community-moderation-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { discoveryCopy } from "../../discovery/discovery-copy";
+} from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
+import { PUBLICATION_TYPES } from "../publication-feed-contract";
+import { platformFieldClass } from "../user-platform-client";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

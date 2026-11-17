@@ -1,10 +1,10 @@
 import { AppError, ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { resourceModerationCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { resourceControlPageQuery } from "../../../../../features/resources/resource-release-control-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceModerationService } from "../../../../../lib/services/resource-release-control-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>

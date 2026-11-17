@@ -1,11 +1,11 @@
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import { discoveryService, type SearchResultType } from "../../../lib/services/discovery-service";
 
 const MAX_QUERY_LENGTH = 100;

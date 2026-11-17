@@ -11,7 +11,7 @@ import {
   type ServerObservationBrowserResult,
   serverStatisticsService,
 } from "../../../lib/services/server-statistics-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
   parseServerObservationBrowserQuery,

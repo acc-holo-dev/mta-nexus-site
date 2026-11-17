@@ -1,6 +1,7 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../features/accounts/user-platform-api";
 import { objectMuteCommandSchema } from "../../../features/community/follow-workspace-contract";
 import { followError } from "../../../features/community/follow-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
@@ -13,7 +14,6 @@ import {
 } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
 import { followWorkspaceService } from "../../../lib/services/follow-workspace-service";
-import { userPlatformApi } from "../../../lib/user-platform-api";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 

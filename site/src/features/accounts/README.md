@@ -14,3 +14,9 @@
 | `session-cookie.ts` | util port `session-cookie` |
 | `profile-change-history-contract.ts` | util port `profile-change-history-contract` |
 | `profile-privacy-contract.ts` | util port `profile-privacy-contract` |
+| `private-change-history-query.ts` | util port `private-change-history-query` |
+| `private-change-history-copy.ts` | util port `private-change-history-copy` |
+| `retention-activation-windows.ts` | util port `retention-activation-windows` |
+| `security-activity.ts` | util port `security-activity` |
+| `private-change-history-download.ts` | util port `private-change-history-download` |
+| `user-platform-api.ts` | util port `user-platform-api` |

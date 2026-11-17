@@ -112,7 +112,7 @@ def patch_depcruise(feat: str, name: str, isolation: str) -> None:
     idx = text.find(pub)
     if idx < 0:
         raise SystemExit(f"missing {pub}")
-    m = re.search(r"\(\?\!\(\?:(.+?)\)\\\\\.ts\$", text[idx : idx + 2500], re.S)
+    m = re.search(r"\(\?\!\(\?:(.+?)\)\\\\\.ts\$", text[idx : idx + 12000], re.S)
     if not m:
         raise SystemExit(f"public alt missing for {feat}")
     ports = insert_alt(m.group(1), name, feat)
@@ -469,11 +469,34 @@ def patch_readme(feat: str, name: str) -> None:
     path.write_text("".join(out) if inserted else text + row)
 
 
+def patch_public_api_only(feat: str, name: str) -> None:
+    """Allow external imports without placing the module on a client-isolation from-path."""
+    path = ROOT / ".dependency-cruiser.cjs"
+    text = path.read_text()
+    pub = f'name: "{feat}-feature-public-api"'
+    idx = text.find(pub)
+    if idx < 0:
+        raise SystemExit(f"missing {pub}")
+    m = re.search(r"\(\?\!\(\?:(.+?)\)\\\\\.ts\$", text[idx : idx + 12000], re.S)
+    if not m:
+        raise SystemExit(f"public alt missing for {feat}")
+    ports = insert_alt(m.group(1), name, feat)
+    text = text[: idx + m.start(1)] + ports + text[idx + m.end(1) :]
+    text = patch_consumer_isolations(text, feat, name)
+    path.write_text(text)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", required=True)
     ap.add_argument("--feature", required=True)
     ap.add_argument("--isolation", default="")
+    ap.add_argument(
+        "--mode",
+        choices=("util", "public-only"),
+        default="util",
+        help="util: client isolation + boundary utilPorts; public-only: public API only (HTTP/API adapters)",
+    )
     args = ap.parse_args()
     name, feat = args.name, args.feature
     isolation = args.isolation or (
@@ -489,26 +512,29 @@ def main() -> int:
         raise SystemExit(f"missing {src}")
     rewrite_imports(name, feat)
     rewrite_relative_lib_imports(dst)
-    patch_depcruise(feat, name, isolation)
-    if feat == "resources":
-        patch_resources(name)
-    elif feat == "servers":
-        patch_servers(name)
-    elif feat == "accounts":
-        patch_accounts(name)
-    elif feat == "support":
-        patch_remaining_feature("support", name)
-    elif feat == "shell":
-        patch_remaining_feature("shell", name)
-    elif feat == "discovery":
-        patch_remaining_feature("discovery", name)
-    elif feat == "moderation":
-        patch_standard_boundary(feat, name)
-        patch_remaining_feature("moderation", name)
-    elif feat == "trust":
-        patch_standard_boundary(feat, name)
+    if args.mode == "public-only":
+        patch_public_api_only(feat, name)
     else:
-        patch_standard_boundary(feat, name)
+        patch_depcruise(feat, name, isolation)
+        if feat == "resources":
+            patch_resources(name)
+        elif feat == "servers":
+            patch_servers(name)
+        elif feat == "accounts":
+            patch_accounts(name)
+        elif feat == "support":
+            patch_remaining_feature("support", name)
+        elif feat == "shell":
+            patch_remaining_feature("shell", name)
+        elif feat == "discovery":
+            patch_remaining_feature("discovery", name)
+        elif feat == "moderation":
+            patch_standard_boundary(feat, name)
+            patch_remaining_feature("moderation", name)
+        elif feat == "trust":
+            patch_standard_boundary(feat, name)
+        else:
+            patch_standard_boundary(feat, name)
     # Move colocated unit tests that lived beside the lib module.
     test_src = ROOT / f"site/src/lib/{name}.test.ts"
     test_dst = ROOT / f"site/src/features/{feat}/{name}.test.ts"
@@ -516,7 +542,8 @@ def main() -> int:
         sh(["git", "mv", str(test_src.relative_to(ROOT)), str(test_dst.relative_to(ROOT))])
         rewrite_relative_lib_imports(test_dst)
     patch_readme(feat, name)
-    print(f"OK {name} → {feat}")
+    suffix = " (public-only)" if args.mode == "public-only" else ""
+    print(f"OK {name} → {feat}{suffix}")
     return 0
 
 

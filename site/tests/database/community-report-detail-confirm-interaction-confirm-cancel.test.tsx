@@ -17,8 +17,9 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../../src/lib/user-platform-client", async (original) => {
-  const actual = await original<typeof import("../../src/lib/user-platform-client")>();
+vi.mock("../../src/features/community/user-platform-client", async (original) => {
+  const actual =
+    await original<typeof import("../../src/features/community/user-platform-client")>();
   return {
     ...actual,
     platformRequest: harness.request,

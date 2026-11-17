@@ -1,5 +1,10 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
+import {
+  verificationFilters,
+  verificationRate,
+} from "../../../../features/trust/verification-workspace-api";
 import { verificationApplicationSchema } from "../../../../features/trust/verification-workspace-contract";
 import {
   verificationError,
@@ -8,8 +13,6 @@ import {
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
-import { verificationFilters, verificationRate } from "../../../../lib/verification-workspace-api";
 
 export async function GET(request: NextRequest) {
   return userPlatformApi(

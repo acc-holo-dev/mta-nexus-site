@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
 import { resourceCopiesQuery } from "../../../../../../../features/resources/resource-copy-query";
-import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
 import { resourceCopyService } from "../../../../../../../lib/services/resource-copy-service";
 export function GET(
   request: NextRequest,

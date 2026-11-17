@@ -1,9 +1,6 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
-import { resourceDownloadUrl } from "../features/resources/build-download-selection";
-import {
-  isValidDownloadSha256Header,
-  matchesDownloadedSha256,
-} from "../features/resources/resource-download-sha256";
+import { resourceDownloadUrl } from "./build-download-selection";
+import { isValidDownloadSha256Header, matchesDownloadedSha256 } from "./resource-download-sha256";
 
 export type DownloadFailure =
   | "signIn"

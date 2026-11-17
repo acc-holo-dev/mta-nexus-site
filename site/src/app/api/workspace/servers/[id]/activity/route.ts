@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
+import { serverContentRate } from "../../../../../../features/servers/server-content-api";
 import { parseServerWorkspaceHistoryQuery } from "../../../../../../features/servers/server-workspace-contract";
 import { serverWorkspaceError } from "../../../../../../features/servers/server-workspace-copy";
-import { serverContentRate } from "../../../../../../lib/server-content-api";
 import { serverWorkspaceHistoryService } from "../../../../../../lib/services/server-workspace-history-service";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const response = await userPlatformApi(
     request,

@@ -6,10 +6,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ServerClaimStatusPanel } from "../../../../features/servers/claim-status-server";
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
+import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../../lib/managed-server-view";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 

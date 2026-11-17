@@ -25,7 +25,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
+vi.mock("../../src/features/shell/request-client-ip", () => ({ getTrustedRequestIp: mocks.ip }));
 
 import { POST as command, GET as detail } from "../../src/app/api/admin/community/[id]/route";
 import { GET as page } from "../../src/app/api/admin/community/route";

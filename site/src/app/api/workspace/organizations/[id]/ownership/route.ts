@@ -1,13 +1,13 @@
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
 import { organizationGovernanceMutationError } from "../../../../../../features/organizations/organization-governance-copy";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import {
   organizationId,
   organizationInput,
   organizationMutationToken,
-} from "../../../../../../lib/organization-workspace-api";
+} from "../../../../../../features/organizations/organization-workspace-api";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { organizationGovernanceService } from "../../../../../../lib/services/organization-governance-service";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
     return userPlatformApi(

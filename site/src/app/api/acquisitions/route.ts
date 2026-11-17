@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { parseAcquisitionHistoryQuery } from "../../../features/resources/resource-activity-query";
-import { resourceCommerceRequest } from "../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../features/resources/resource-commerce-http";
 import { resourceActivityService } from "../../../lib/services/resource-activity-service";
 
 export function GET(request: NextRequest) {

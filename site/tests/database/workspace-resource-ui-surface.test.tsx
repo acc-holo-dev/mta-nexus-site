@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);

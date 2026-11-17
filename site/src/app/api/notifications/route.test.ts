@@ -74,7 +74,7 @@ vi.mock("@nexus/config", () => ({
   })),
 }));
 
-vi.mock("../../../lib/web-push-subscription", () => ({
+vi.mock("../../../features/notifications/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(() => ({
     endpoint: "https://push.example.net/subscription",
     p256dh: "p256dh",

@@ -1,14 +1,14 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
+import {
+  privateChangeHistoryCopy,
+  privateChangeHistoryError,
+} from "../../../features/accounts/private-change-history-copy";
+import { changeHistoryHref } from "../../../features/accounts/private-change-history-query";
 import { ProfileChangeHistoryView } from "../../../features/accounts/profile-change-history";
 import { parseProfileChangeHistoryQuery } from "../../../features/accounts/profile-change-history-contract";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  privateChangeHistoryCopy,
-  privateChangeHistoryError,
-} from "../../../lib/private-change-history-copy";
-import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/profile-change-history-service";
 

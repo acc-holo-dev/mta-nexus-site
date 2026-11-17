@@ -23,7 +23,7 @@ vi.mock("../../src/lib/services/server-service", () => ({
 vi.mock("../../src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.history },
 }));
-vi.mock("../../src/lib/server-content-api", () => ({
+vi.mock("../../src/features/servers/server-content-api", () => ({
   serverContentRate: state.browseRate,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));

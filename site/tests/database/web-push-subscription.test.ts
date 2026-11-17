@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseWebPushSubscription,
   parseWebPushVapidPublicKey,
-} from "../../src/lib/web-push-subscription";
+} from "../../src/features/notifications/web-push-subscription";
 
 function base64Url(bytes: Uint8Array) {
   return Buffer.from(bytes).toString("base64url");

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "./content-discussion-contract";
-import { PUBLICATION_TYPES } from "./publication-feed-contract";
+import { discussionCursorSchema } from "../community/content-discussion-contract";
+import { PUBLICATION_TYPES } from "../community/publication-feed-contract";
 
 const cursorSchema = discussionCursorSchema
   .extend({ context: z.string().regex(/^[a-f0-9]{64}$/u), version: z.literal(1) })

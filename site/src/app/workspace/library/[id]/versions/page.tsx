@@ -15,11 +15,11 @@ import { getResourceReleaseControlCopy } from "../../../../../features/library/r
 import { ResourceDownloadButton } from "../../../../../features/resources/download";
 import { BuildProvenanceDetails } from "../../../../../features/resources/evidence";
 import { ResourceReleaseWatchControl } from "../../../../../features/resources/release-watch";
+import { resourceReleaseWatchesCopy } from "../../../../../features/resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";

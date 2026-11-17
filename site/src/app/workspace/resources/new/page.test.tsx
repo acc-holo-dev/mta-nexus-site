@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
 import { getDictionary } from "../../../../lib/i18n";
 import { authService } from "../../../../lib/services/auth-service";
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

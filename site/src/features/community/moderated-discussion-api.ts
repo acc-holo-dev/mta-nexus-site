@@ -1,12 +1,12 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { parseModeratedDiscussionQuery } from "../features/community/moderated-discussion-contract";
-import { moderatedDiscussionError } from "../features/community/moderated-discussion-copy";
-import { readBoundedJson, requireServerJsonContentType } from "./bounded-json";
-import { parseModerationDetailQuery } from "./community-moderation-contract";
+import { readBoundedJson, requireServerJsonContentType } from "../../lib/bounded-json";
+import { communityModerationService } from "../../lib/services/community-moderation-service";
+import { userPlatformApi } from "../accounts/user-platform-api";
+import { parseModerationDetailQuery } from "../moderation/community-moderation-contract";
 import { reportRateLimit } from "./community-report-api";
-import { communityModerationService } from "./services/community-moderation-service";
-import { userPlatformApi } from "./user-platform-api";
+import { parseModeratedDiscussionQuery } from "./moderated-discussion-contract";
+import { moderatedDiscussionError } from "./moderated-discussion-copy";
 export function getModeratedDiscussion(
   request: NextRequest,
   params: Promise<{ id: string; commentId?: string }>,

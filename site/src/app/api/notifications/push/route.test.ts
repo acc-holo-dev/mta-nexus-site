@@ -48,7 +48,7 @@ vi.mock("../../../../lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../../../lib/web-push-subscription", () => ({
+vi.mock("../../../../features/notifications/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(),
 }));
 
@@ -59,7 +59,7 @@ vi.mock("../../../../lib/services/web-push-endpoint-policy", () => ({
 import { webPushSubscriptionRepository } from "@nexus/db";
 import { UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
+import { parseWebPushSubscription } from "../../../../features/notifications/web-push-subscription";
 import { DELETE, GET, POST } from "./route";
 
 function fingerprint(endpoint: string) {

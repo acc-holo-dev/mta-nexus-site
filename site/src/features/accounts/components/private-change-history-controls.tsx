@@ -2,7 +2,7 @@ import { CHANGE_HISTORY_PERIODS, type ChangeHistoryFilters } from "@nexus/domain
 import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
+import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

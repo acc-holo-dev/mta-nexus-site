@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { PlatformRequestError, platformRequest } from "../../../lib/user-platform-client";
+import { PlatformRequestError, platformRequest } from "../../community/user-platform-client";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import {
   confirmedPrivacyUpdate,

@@ -1,18 +1,18 @@
 import { expect, it } from "vitest";
 import {
+  communityReportCreateSchema,
+  communityReportDecisionSchema,
+  communityReportPageQuery,
+  confirmsReportDecision,
+  parseCommunityReportQuery,
+} from "../../src/features/community/community-report-contract";
+import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
   communityReportMutationError,
 } from "../../src/features/community/community-report-copy";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
-import {
-  communityReportCreateSchema,
-  communityReportDecisionSchema,
-  communityReportPageQuery,
-  confirmsReportDecision,
-  parseCommunityReportQuery,
-} from "../../src/lib/community-report-contract";
 import { getDictionary } from "../../src/lib/i18n";
 
 const report = {

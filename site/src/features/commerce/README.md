@@ -53,6 +53,8 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `plan-reviews-query.ts`           | util port `plan-reviews-query`                                                         |
 | `seller-sales-query.ts`           | util port `seller-sales-query`                                                         |
 | `subscriptions-query.ts`          | util port `subscriptions-query`                                                        |
+| `commercial-public-http.ts`       | util port `commercial-public-http`                                                     |
+| `license-runtime-http.ts`         | util port `license-runtime-http`                                                       |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

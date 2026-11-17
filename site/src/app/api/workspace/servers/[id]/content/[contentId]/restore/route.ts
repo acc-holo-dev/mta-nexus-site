@@ -1,14 +1,17 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../../../../features/accounts/user-platform-api";
+import {
+  serverContentId,
+  serverContentRate,
+} from "../../../../../../../../features/servers/server-content-api";
 import { serverPublicationHistoryError } from "../../../../../../../../features/servers/server-publication-history-copy";
 import {
   readBoundedJson,
   requireServerJsonContentType,
 } from "../../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
-import { serverContentId, serverContentRate } from "../../../../../../../../lib/server-content-api";
 import { serverContentService } from "../../../../../../../../lib/services/server-content-service";
-import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; contentId: string }> }) => {
     return userPlatformApi(

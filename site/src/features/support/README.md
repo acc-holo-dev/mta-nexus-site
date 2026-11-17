@@ -14,3 +14,5 @@ Focused localization suite for `SupportCenter` (staff filters, attached context)
 | `support-retry.ts` | util port `support-retry` |
 | `support-workspace-contract.ts` | util port `support-workspace-contract` |
 | `support-message-discovery-contract.ts` | util port `support-message-discovery-contract` |
+| `support-http.ts` | util port `support-http` |
+| `support-idempotency.ts` | util port `support-idempotency` |

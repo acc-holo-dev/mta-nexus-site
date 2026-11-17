@@ -4,11 +4,11 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationFeedView } from "../../../lib/publication-feed-view";
 import { authService } from "../../../lib/services/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PublicationFeed } from "../publication-feed";
 import { publicationCopy } from "../publication-feed-copy";
+import { publicationFeedView } from "../publication-feed-view";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const retryLinkClass =

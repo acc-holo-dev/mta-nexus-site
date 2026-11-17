@@ -1,10 +1,14 @@
 import type { User } from "@nexus/domain";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { type Locale, resolveLocale } from "./i18n";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
-import { authService } from "./services/auth-service";
-import { userPlatformError } from "./user-platform-copy";
+import { type Locale, resolveLocale } from "../../lib/i18n";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../lib/observability";
+import { authService } from "../../lib/services/auth-service";
+import { userPlatformError } from "../community/user-platform-copy";
 
 export async function userPlatformApi(
   request: NextRequest,

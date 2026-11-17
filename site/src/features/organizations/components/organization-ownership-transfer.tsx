@@ -3,7 +3,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 import {
   confirmOwnershipTransfer,

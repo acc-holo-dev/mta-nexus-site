@@ -13,12 +13,12 @@ import {
   authorPublicationRestoreSchema,
   type parseAuthorPublicationHistoryQuery,
 } from "../../features/community/author-publication-desk-contract";
-import { isPostgresDeadlock } from "../postgres-error";
 import {
   writerArchiveSchema,
   writerCreateSchema,
   writerUpdateSchema,
-} from "../user-platform-contract";
+} from "../../features/community/user-platform-contract";
+import { isPostgresDeadlock } from "../postgres-error";
 
 class AuthorContentService {
   async desk(actor: User, filters: AuthorPublicationDeskQuery) {

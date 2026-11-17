@@ -1,13 +1,13 @@
 import type { NextRequest } from "next/server";
-import { parseOrganizationPage } from "../../../../../features/organizations/organization-workspace-contract";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
   organizationCheckReadActor,
   organizationId,
   organizationInput,
   organizationMutationToken,
-} from "../../../../../lib/organization-workspace-api";
+} from "../../../../../features/organizations/organization-workspace-api";
+import { parseOrganizationPage } from "../../../../../features/organizations/organization-workspace-contract";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };

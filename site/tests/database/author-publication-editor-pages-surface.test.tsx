@@ -25,7 +25,7 @@ vi.mock("../../src/features/community/author-content-form", () => ({
 vi.mock("../../src/features/shell/guest-auth", () => ({
   PlatformSignIn: ({ returnPath }: { returnPath: string }) => <div data-return-path={returnPath} />,
 }));
-vi.mock("../../src/lib/user-platform-client", () => ({
+vi.mock("../../src/features/community/user-platform-client", () => ({
   parseEditableContent: (value: unknown) => value,
 }));
 
@@ -33,8 +33,8 @@ import EditPage, {
   generateMetadata as editMetadata,
 } from "../../src/app/workspace/content/[id]/page";
 import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();

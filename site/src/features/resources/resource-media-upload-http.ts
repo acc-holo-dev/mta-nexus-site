@@ -2,10 +2,17 @@ import { AppError, RESOURCE_MEDIA_INPUT_BYTES, RESOURCE_MEDIA_LIMIT } from "@nex
 import { consumeRateLimit } from "@nexus/security";
 import { resourceMediaCaptionSchema, resourceMediaRevisionSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { MultipartBodyTooLargeError, parseMultipartFormDataWithLimit } from "./bounded-multipart";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
-import { authService } from "./services/auth-service";
-import { resourceMediaService } from "./services/resource-media-service";
+import {
+  MultipartBodyTooLargeError,
+  parseMultipartFormDataWithLimit,
+} from "../../lib/bounded-multipart";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../lib/observability";
+import { authService } from "../../lib/services/auth-service";
+import { resourceMediaService } from "../../lib/services/resource-media-service";
 export async function resourceMediaUpload(request: NextRequest, productId: string) {
   const context = createRequestLogContext(request);
   const respond = (body: unknown, status = 200) =>

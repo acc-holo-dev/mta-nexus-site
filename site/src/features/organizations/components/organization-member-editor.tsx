@@ -4,7 +4,7 @@ import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";

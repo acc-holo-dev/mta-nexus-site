@@ -1,7 +1,7 @@
 import { fieldClassBlock } from "@nexus/ui";
 import { z } from "zod";
-import type { Locale } from "./i18n";
-import { privateApiRequest } from "./private-api-request";
+import type { Locale } from "../../lib/i18n";
+import { privateApiRequest } from "../../lib/private-api-request";
 import { contentFieldsSchema, profileUpdateSchema } from "./user-platform-contract";
 import { userPlatformError } from "./user-platform-copy";
 

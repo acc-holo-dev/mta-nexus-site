@@ -1,10 +1,10 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { privateChangeHistoryError } from "../../../../../features/accounts/private-change-history-copy";
 import { parseProfileChangeHistoryQuery } from "../../../../../features/accounts/profile-change-history-contract";
-import { privateChangeHistoryError } from "../../../../../lib/private-change-history-copy";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { profileChangeHistoryService } from "../../../../../lib/services/profile-change-history-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

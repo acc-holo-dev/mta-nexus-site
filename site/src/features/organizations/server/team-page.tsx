@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../lib/services/organization-team-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
   organizationTeamHref,

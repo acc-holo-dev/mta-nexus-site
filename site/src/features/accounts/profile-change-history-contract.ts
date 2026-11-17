@@ -5,10 +5,7 @@ import {
   PROFILE_CHANGE_GROUPS,
 } from "@nexus/domain";
 import { z } from "zod";
-import {
-  changeHistoryTimeSchema,
-  parseChangeHistoryQuery,
-} from "../../lib/private-change-history-query";
+import { changeHistoryTimeSchema, parseChangeHistoryQuery } from "./private-change-history-query";
 export const parseProfileChangeHistoryQuery = (params: URLSearchParams) =>
   parseChangeHistoryQuery(params, PROFILE_CHANGE_GROUPS);
 export const profileChangeHistorySchema = z

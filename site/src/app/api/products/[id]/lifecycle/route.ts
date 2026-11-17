@@ -1,9 +1,9 @@
 import { AppError } from "@nexus/domain";
 import { resourceLifecycleSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { productService } from "../../../../../lib/services/product-service";
 
 export const POST = withBrowserMutation(

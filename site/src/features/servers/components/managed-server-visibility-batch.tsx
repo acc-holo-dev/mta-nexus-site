@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { getManagedServerCopy } from "../../../lib/managed-server-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
   confirmsServerVisibilityPreview,

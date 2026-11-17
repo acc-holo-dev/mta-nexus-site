@@ -1,5 +1,5 @@
+import { privateChangeHistoryCopy } from "../../../features/accounts/private-change-history-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 
 export default async function Loading() {
   const copy = privateChangeHistoryCopy(await getRequestLocale());

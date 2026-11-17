@@ -7,8 +7,8 @@ import {
   contentPageHref,
   type parseContentPage,
   type writerTypes,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+} from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Filters = ReturnType<typeof parseContentPage>;
 

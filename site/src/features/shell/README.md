@@ -7,3 +7,8 @@
 Маршруты остаются в App Router. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
 | `safe-public-error-reference.ts` | util port `safe-public-error-reference` |
 | `home-personal-changes-types.ts` | util port `home-personal-changes-types` |
+| `session-policy.ts` | util port `session-policy` |
+| `public-platform-api.ts` | util port `public-platform-api` |
+| `request-client-ip.ts` | util port `request-client-ip` |
+| `home-personal-changes.ts` | util port `home-personal-changes` |
+| `offline-cache-policy.ts` | util port `offline-cache-policy` |

@@ -21,7 +21,7 @@ const state = vi.hoisted(() => ({
 vi.mock("../../src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => state.ip,
 }));
 vi.mock("@nexus/security", () => ({

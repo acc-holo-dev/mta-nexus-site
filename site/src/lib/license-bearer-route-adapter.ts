@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { licenseRuntimeRequest } from "./license-runtime-http";
+import { licenseRuntimeRequest } from "../features/commerce/license-runtime-http";
 
 /** Stable marker for contract/inventory scans — machine/bearer license boundary. */
 export const LICENSE_BEARER_ROUTE_ADAPTER = "license-bearer-v1" as const;

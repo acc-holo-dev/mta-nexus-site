@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
 import { NewResourceForm } from "../../../../features/resources/create-controls";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

@@ -7,7 +7,7 @@ import {
   type PublicationPage,
   type PublicationQuery,
   SERVER_PUBLICATION_TYPES,
-} from "../publication-feed-contract";
+} from "../../features/community/publication-feed-contract";
 
 class PublicationFeedService {
   async resolve(kind: "user" | "organization" | "server", handle: string) {

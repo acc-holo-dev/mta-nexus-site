@@ -28,7 +28,9 @@ const { render, mount, fillFields, submit } = createOrganizationCreateRecoveryIn
 );
 
 it("unlocks a first request rejected before creation", async () => {
-  const { PlatformRequestError } = await import("../../src/lib/user-platform-client");
+  const { PlatformRequestError } = await import(
+    "../../src/features/community/user-platform-client"
+  );
   await mount();
   fillFields();
   h.request.mockRejectedValueOnce(

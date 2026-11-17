@@ -3,14 +3,13 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
+import type { Locale } from "../../../lib/i18n";
 import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
   communityReportDetailSchema,
   confirmsReportDecision,
-} from "../../../lib/community-report-contract";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+} from "../community-report-contract";
 import {
   communityReportCopy,
   communityReportDecisionError,
@@ -20,6 +19,7 @@ import { reportGroupsCopy } from "../community-report-groups-copy";
 import { reportHistoryCopy } from "../community-report-history-copy";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import { ReportEvidenceLinks } from "../report-evidence-links";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({

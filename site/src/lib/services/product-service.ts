@@ -18,14 +18,14 @@ import {
 import { can, generateId } from "@nexus/security";
 import { buildProductDependencyResolution } from "../../features/resources/product-dependency-resolution";
 import {
+  mapPublicResourceAttribution,
+  type PublicResourceAttribution,
+} from "../../features/resources/public-resource-attribution";
+import {
   buildReverseDependencySummary,
   reverseDependencyLimits,
 } from "../../features/resources/reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
-import {
-  mapPublicResourceAttribution,
-  type PublicResourceAttribution,
-} from "../public-resource-attribution";
 
 export type { PublicResourceAttribution };
 

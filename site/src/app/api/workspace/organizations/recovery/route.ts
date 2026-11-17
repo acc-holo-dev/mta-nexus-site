@@ -1,7 +1,7 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { organizationApi } from "../../../../../lib/organization-workspace-api";
+import { organizationApi } from "../../../../../features/organizations/organization-workspace-api";
 import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
 
 export function GET(request: NextRequest) {

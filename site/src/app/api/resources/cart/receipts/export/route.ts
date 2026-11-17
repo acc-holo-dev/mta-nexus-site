@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { resourceCartReceiptsCsv } from "../../../../../../features/resources/resource-cart-receipts-csv";
 import { resourceCartReceiptQuery } from "../../../../../../features/resources/resource-cart-receipts-query";
-import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
 import { resourceCartReceiptsService } from "../../../../../../lib/services/resource-cart-receipts-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {

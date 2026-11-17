@@ -9,7 +9,7 @@ import {
 } from "@nexus/db";
 import { createSupportCaseSchema } from "@nexus/validation";
 import { describe, expect, it } from "vitest";
-import { supportMutationFingerprint } from "../../src/lib/support-idempotency";
+import { supportMutationFingerprint } from "../../src/features/support/support-idempotency";
 
 describe("durable support mutation idempotency", () => {
   it("serializes two concurrent case creations and isolates a reused key by actor", async () => {

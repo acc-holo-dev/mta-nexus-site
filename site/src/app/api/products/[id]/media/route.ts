@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { resourceMediaCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { resourceMediaUpload } from "../../../../../features/resources/resource-media-upload-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceMediaUpload } from "../../../../../lib/resource-media-upload-http";
 import { resourceMediaService } from "../../../../../lib/services/resource-media-service";
 
 type Context = { params: Promise<{ id: string }> };

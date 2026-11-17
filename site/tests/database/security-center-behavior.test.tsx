@@ -62,7 +62,7 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import SecurityPage from "../../src/app/security/page";
-import { SECURITY_ACTIVITY_ACTIONS } from "../../src/lib/security-activity";
+import { SECURITY_ACTIVITY_ACTIONS } from "../../src/features/accounts/security-activity";
 import { SecurityCenterService } from "../../src/lib/services/security-center-service";
 
 describe("Security Center behavior", () => {

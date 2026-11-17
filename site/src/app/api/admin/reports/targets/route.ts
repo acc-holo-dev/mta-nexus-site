@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
+import { reportRateLimit } from "../../../../../features/community/community-report-api";
 import { parseReportGroupsQuery } from "../../../../../features/community/community-report-groups-contract";
 import { reportGroupsError } from "../../../../../features/community/community-report-groups-copy";
-import { reportRateLimit } from "../../../../../lib/community-report-api";
 import { communityReportGroupsService } from "../../../../../lib/services/community-report-groups-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

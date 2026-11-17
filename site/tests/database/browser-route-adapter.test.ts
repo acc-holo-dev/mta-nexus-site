@@ -13,7 +13,7 @@ const licenseRuntimeRequest = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../../src/lib/license-runtime-http", () => ({
+vi.mock("../../src/features/commerce/license-runtime-http", () => ({
   licenseRuntimeRequest,
 }));
 

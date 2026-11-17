@@ -1,11 +1,11 @@
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
   organizationId,
   organizationInput,
   organizationMutationToken,
-} from "../../../../../../lib/organization-workspace-api";
+} from "../../../../../../features/organizations/organization-workspace-api";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { organizationWorkspaceService } from "../../../../../../lib/services/organization-workspace-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {

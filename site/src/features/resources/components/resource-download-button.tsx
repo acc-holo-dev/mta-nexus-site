@@ -6,15 +6,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import {
-  type DownloadFailure,
-  fetchResourceDownload,
-  ResourceDownloadError,
-} from "../../../lib/resource-download-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
+import {
+  type DownloadFailure,
+  fetchResourceDownload,
+  ResourceDownloadError,
+} from "../resource-download-client";
 
 export function ResourceDownloadButton({
   productId,

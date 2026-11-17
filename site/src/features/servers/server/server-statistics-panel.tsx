@@ -2,12 +2,12 @@ import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { serverStatisticsIntervals } from "../../../lib/server-statistics-export";
 import type { ServerStatisticsResult } from "../../../lib/services/server-statistics-service";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
+import { serverStatisticsIntervals } from "../server-statistics-export";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
 

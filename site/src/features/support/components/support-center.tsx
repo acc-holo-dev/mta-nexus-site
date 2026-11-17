@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";

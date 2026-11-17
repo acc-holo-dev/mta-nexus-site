@@ -2,11 +2,11 @@ import { authorContentRepository } from "@nexus/db";
 import { RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
+import { parseContentPage } from "../../../../features/community/user-platform-contract";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { authorContentService } from "../../../../lib/services/author-content-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
-import { parseContentPage } from "../../../../lib/user-platform-contract";
 
 export function GET(request: NextRequest) {
   return userPlatformApi(request, (user) =>

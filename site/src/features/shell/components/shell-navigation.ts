@@ -17,9 +17,9 @@ import {
   Users,
 } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { getManagedServerCopy } from "../../../lib/managed-server-copy";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { getOrganizationCopy } from "../../organizations/organization-workspace-copy";
+import { getManagedServerCopy } from "../../servers/managed-server-copy";
 import { publicationDestinations } from "./shell-publication-destinations";
 
 /** A single source for shared destinations; layouts retain their own labels and ordering. */

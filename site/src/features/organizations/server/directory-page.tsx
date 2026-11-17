@@ -5,7 +5,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseOrganizationPage } from "../organization-workspace-contract";

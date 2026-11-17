@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { userPlatformError } from "../../lib/user-platform-copy";
+import { userPlatformError } from "./user-platform-copy";
 
 const en = {
   countUnavailable: "Comment total unavailable until refresh.",

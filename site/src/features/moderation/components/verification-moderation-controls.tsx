@@ -5,7 +5,7 @@ import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { platformRequest } from "../../../lib/user-platform-client";
+import { platformRequest } from "../../community/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {

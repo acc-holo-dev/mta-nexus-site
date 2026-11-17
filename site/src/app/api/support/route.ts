@@ -2,20 +2,20 @@ import { supportCaseRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import {
+  supportFailure,
+  supportMutationGuard,
+  supportPrivateJson,
+} from "../../../features/support/support-http";
+import {
+  parseSupportIdempotencyKey,
+  supportMutationFingerprint,
+} from "../../../features/support/support-idempotency";
 import { supportQuery } from "../../../features/support/support-workspace-contract";
 import { parseBoundedJson } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import {
-  supportFailure,
-  supportMutationGuard,
-  supportPrivateJson,
-} from "../../../lib/support-http";
-import {
-  parseSupportIdempotencyKey,
-  supportMutationFingerprint,
-} from "../../../lib/support-idempotency";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);

@@ -1,7 +1,7 @@
 import { NotFoundError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { parseHistoryPage } from "../../../../features/commerce/commerce-history-format";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { commerceService } from "../../../../lib/services/commerce-service";
 
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

@@ -1,7 +1,7 @@
 import { organizationTeamRoles } from "@nexus/domain";
 import { externalWebUrlSchema } from "@nexus/validation";
 import { z } from "zod";
-import { parseContentPage } from "../../lib/user-platform-contract";
+import { parseContentPage } from "../community/user-platform-contract";
 
 const organizationFieldsSchema = z.object({
   name: z.string().trim().min(2).max(100),

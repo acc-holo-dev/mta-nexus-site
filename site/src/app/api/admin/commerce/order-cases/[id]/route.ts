@@ -2,9 +2,9 @@ import { AppError, UnauthorizedError } from "@nexus/domain";
 import { orderCaseReviewSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { orderCaseQuery } from "../../../../../../features/commerce/order-case-query";
+import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { orderCaseService } from "../../../../../../lib/services/order-case-service";
 
 type Context = { params: Promise<{ id: string }> };

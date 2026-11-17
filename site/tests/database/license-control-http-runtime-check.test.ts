@@ -20,7 +20,7 @@ vi.mock("../../src/lib/services/auth-service", async () => {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 

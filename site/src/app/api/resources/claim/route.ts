@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { claimResourceSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
@@ -10,7 +11,6 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 import { authService } from "../../../../lib/services/auth-service";
 import { commerceService } from "../../../../lib/services/commerce-service";
 

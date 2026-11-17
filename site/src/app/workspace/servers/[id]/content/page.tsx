@@ -6,19 +6,22 @@ import {
   ContentCatalogControls,
   ContentPageNavigation,
 } from "../../../../../features/community/catalog-controls";
-import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
-import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { serverContentId } from "../../../../../lib/server-content-api";
-import { authService } from "../../../../../lib/services/auth-service";
-import { serverContentService } from "../../../../../lib/services/server-content-service";
 import {
   contentPageFiltered,
   parseContentPage,
   writerTypes,
-} from "../../../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
+} from "../../../../../features/community/user-platform-contract";
+import {
+  getUserPlatformCopy,
+  userPlatformError,
+} from "../../../../../features/community/user-platform-copy";
+import { serverContentId } from "../../../../../features/servers/server-content-api";
+import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
+import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
+import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { authService } from "../../../../../lib/services/auth-service";
+import { serverContentService } from "../../../../../lib/services/server-content-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

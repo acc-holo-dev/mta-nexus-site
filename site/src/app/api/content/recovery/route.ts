@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import { communityTopicRecoveryService } from "../../../../lib/services/community-topic-recovery-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
 
 export function GET(request: NextRequest) {
   return userPlatformApi(request, async (actor) => {

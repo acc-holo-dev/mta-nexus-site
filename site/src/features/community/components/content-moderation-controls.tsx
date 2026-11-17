@@ -4,11 +4,11 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import {
   confirmsModerationCommand,
   moderationDetailHref,
-} from "../../../lib/community-moderation-contract";
-import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
+} from "../../moderation/community-moderation-contract";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { moderationCopy, moderationError } from "../community-moderation-copy";

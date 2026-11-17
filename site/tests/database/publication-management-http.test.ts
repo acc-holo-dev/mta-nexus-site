@@ -23,7 +23,7 @@ vi.mock("../../src/lib/services/content-service", () => ({
   contentService: { manageComment: mocks.manage },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
 

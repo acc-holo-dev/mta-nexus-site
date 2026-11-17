@@ -7,6 +7,7 @@ import { formatHistoryDate } from "../../../../features/commerce/commerce-histor
 import { ResourceReleaseWatchControl } from "../../../../features/resources/release-watch";
 import { ResourceReleaseWatchBatchControls } from "../../../../features/resources/release-watch-batch";
 import { resourceReleaseWatchHistoryCopy } from "../../../../features/resources/resource-release-watch-history-i18n";
+import { resourceReleaseWatchesCopy } from "../../../../features/resources/resource-release-watches-i18n";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
@@ -14,7 +15,6 @@ import {
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceReleaseWatchesCopy } from "../../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../lib/services/resource-release-watches-service";
 

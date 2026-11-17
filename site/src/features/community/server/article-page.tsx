@@ -8,17 +8,17 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { contentReactionService } from "../../../lib/services/content-reaction-service";
 import { contentService } from "../../../lib/services/content-service";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
 import { ContentReactions } from "../reactions";
 import { CommunityReportForm } from "../report-form";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 export async function generateMetadata({
   params,

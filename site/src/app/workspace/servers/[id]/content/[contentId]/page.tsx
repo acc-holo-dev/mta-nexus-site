@@ -1,6 +1,6 @@
+import { getUserPlatformCopy } from "../../../../../../features/community/user-platform-copy";
 import { ServerContentEditorPage } from "../../../../../../features/servers/content-editor-server";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

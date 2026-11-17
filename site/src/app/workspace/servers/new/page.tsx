@@ -1,11 +1,11 @@
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
 import { RegisterServerForm } from "../../../../features/servers/registration";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../../lib/managed-server-view";
 import { authService } from "../../../../lib/services/auth-service";
 
 export const dynamic = "force-dynamic";

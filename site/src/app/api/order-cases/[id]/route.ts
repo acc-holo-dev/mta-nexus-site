@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { orderCaseQuery } from "../../../../features/commerce/order-case-query";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { orderCaseService } from "../../../../lib/services/order-case-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>

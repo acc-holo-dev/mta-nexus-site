@@ -3,13 +3,13 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { serverContentId } from "../../../lib/server-content-api";
 import { authService } from "../../../lib/services/auth-service";
 import { serverContentService } from "../../../lib/services/server-content-service";
-import { parseEditableContent } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
 import { AuthorContentForm } from "../../community/author-content-form";
+import { parseEditableContent } from "../../community/user-platform-client";
+import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 

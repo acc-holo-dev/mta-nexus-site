@@ -128,6 +128,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-release-watches-i18n",
+    "public-resource-attribution",
     "mta-meta-inspector",
     "build-package-query",
     "reverse-dependency-summary",
@@ -308,6 +310,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watches-i18n.ts", "resources-view-isolation"],
+    ["features/resources/public-resource-attribution.ts", "resources-view-isolation"],
     ["features/resources/mta-meta-inspector.ts", "resources-view-isolation"],
     ["features/resources/build-package-query.ts", "resources-view-isolation"],
     ["features/resources/reverse-dependency-summary.ts", "resources-view-isolation"],
@@ -417,6 +421,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-release-watches-i18n.ts",
+    "app/public-resource-attribution.ts",
     "app/mta-meta-inspector.ts",
     "app/build-package-query.ts",
     "app/reverse-dependency-summary.ts",
@@ -520,6 +526,8 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-release-watches-i18n.ts",
+    "site/src/features/resources/public-resource-attribution.ts",
     "site/src/features/resources/mta-meta-inspector.ts",
     "site/src/features/resources/build-package-query.ts",
     "site/src/features/resources/reverse-dependency-summary.ts",
@@ -703,6 +711,8 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-release-watches-i18n.ts");
+  visit("site/src/features/resources/public-resource-attribution.ts");
   visit("site/src/features/resources/mta-meta-inspector.ts");
   visit("site/src/features/resources/build-package-query.ts");
   visit("site/src/features/resources/reverse-dependency-summary.ts");

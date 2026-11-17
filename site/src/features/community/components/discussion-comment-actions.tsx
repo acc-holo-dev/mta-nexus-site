@@ -1,12 +1,12 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { DiscussionPage } from "../../../lib/content-discussion-contract";
 import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
+import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
 export function DiscussionCommentActions({
   comment,
   own,

@@ -1,4 +1,5 @@
 import { expect, it } from "vitest";
+import { userPlatformError } from "../../src/features/community/user-platform-copy";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   developerProfileUpdateSchema,
@@ -13,7 +14,6 @@ import {
   verificationError,
   verificationMutationError,
 } from "../../src/features/trust/verification-workspace-copy";
-import { userPlatformError } from "../../src/lib/user-platform-copy";
 
 const profile = {
   specialties: [" Lua ", "Lua", "TypeScript"],

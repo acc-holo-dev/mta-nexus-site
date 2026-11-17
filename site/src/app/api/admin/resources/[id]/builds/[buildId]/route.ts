@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
 import { resourceBuildWorkspaceService } from "../../../../../../../lib/services/resource-build-workspace-service";
 export function GET(
   request: NextRequest,

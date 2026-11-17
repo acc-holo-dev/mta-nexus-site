@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { ResourceDownloadError } from "../../src/features/resources/resource-download-client";
 import { getDictionary } from "../../src/lib/i18n";
-import { ResourceDownloadError } from "../../src/lib/resource-download-client";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -84,8 +84,9 @@ vi.mock("@nexus/ui", async () => {
       ),
   };
 });
-vi.mock("../../src/lib/resource-download-client", async (original) => {
-  const actual = await original<typeof import("../../src/lib/resource-download-client")>();
+vi.mock("../../src/features/resources/resource-download-client", async (original) => {
+  const actual =
+    await original<typeof import("../../src/features/resources/resource-download-client")>();
   return {
     ...actual,
     fetchResourceDownload: vi.fn(),
@@ -93,7 +94,7 @@ vi.mock("../../src/lib/resource-download-client", async (original) => {
 });
 
 import { ResourceDownloadButton } from "../../src/features/resources/download";
-import { fetchResourceDownload } from "../../src/lib/resource-download-client";
+import { fetchResourceDownload } from "../../src/features/resources/resource-download-client";
 
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {

@@ -2,10 +2,10 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { securityActivityLabelKey } from "../../features/accounts/security-activity";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { securityActivityLabelKey } from "../../lib/security-activity";
 import { authService } from "../../lib/services/auth-service";
 import { securityCenterService } from "../../lib/services/security-center-service";
 

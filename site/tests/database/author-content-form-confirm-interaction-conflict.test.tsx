@@ -29,7 +29,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { AuthorContentForm } from "../../src/features/community/author-content-form";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 
 const { render, seedForm } = createAuthorContentFormConfirmInteractionHelpers(
   harness,

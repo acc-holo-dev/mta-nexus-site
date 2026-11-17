@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { REPORT_TYPES } from "../../lib/community-report-contract";
+import { REPORT_TYPES } from "../community/community-report-contract";
 
 const id = z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/u),
   pending = z.enum(["open", "under_review"]);

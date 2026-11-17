@@ -24,7 +24,7 @@ vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
 }));
 
 import Page, { generateMetadata } from "../../src/app/workspace/library/watches/page";
-import { resourceReleaseWatchesCopy } from "../../src/lib/resource-release-watches-i18n";
+import { resourceReleaseWatchesCopy } from "../../src/features/resources/resource-release-watches-i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

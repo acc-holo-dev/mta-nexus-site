@@ -2,6 +2,7 @@ import { followWorkspaceRepository, socialRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../features/accounts/user-platform-api";
 import { followCommandSchema } from "../../../features/community/follow-workspace-contract";
 import { followError } from "../../../features/community/follow-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
@@ -13,7 +14,6 @@ import {
   logRequestEvent,
 } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import { userPlatformApi } from "../../../lib/user-platform-api";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request: NextRequest) {

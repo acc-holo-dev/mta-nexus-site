@@ -7,9 +7,6 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { authorContentService } from "../../../lib/services/author-content-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { writerTypes } from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import {
   authorPublicationDeskHref,
@@ -19,6 +16,9 @@ import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
 } from "../author-publication-desk-copy";
+import { platformFieldClass } from "../user-platform-client";
+import { writerTypes } from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =

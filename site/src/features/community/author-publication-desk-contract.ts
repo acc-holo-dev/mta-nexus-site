@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { discussionCursorSchema } from "../../lib/content-discussion-contract";
-import { writerTypes } from "../../lib/user-platform-contract";
+import { discussionCursorSchema } from "./content-discussion-contract";
+import { writerTypes } from "./user-platform-contract";
 
 const exactTime = discussionCursorSchema.shape.createdAt.refine((value) =>
   /\.\d{6}Z$/u.test(value),

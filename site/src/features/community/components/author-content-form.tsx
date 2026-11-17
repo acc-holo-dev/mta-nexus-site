@@ -5,18 +5,6 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import {
-  type EditableContent,
-  parseEditableContent,
-  platformFieldClass,
-  platformRequest,
-} from "../../../lib/user-platform-client";
-import {
-  contentFieldsSchema,
-  editorialTypes,
-  writerTypes,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-import {
   organizationContentCopy,
   organizationContentMutationError,
 } from "../../organizations/organization-content-copy";
@@ -24,6 +12,14 @@ import { serverContentCopy, serverContentMutationError } from "../../servers/ser
 import { confirmAction } from "../../shell/confirm-action";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
+import {
+  type EditableContent,
+  parseEditableContent,
+  platformFieldClass,
+  platformRequest,
+} from "../user-platform-client";
+import { contentFieldsSchema, editorialTypes, writerTypes } from "../user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../user-platform-copy";
 
 export function AuthorContentForm({
   locale,

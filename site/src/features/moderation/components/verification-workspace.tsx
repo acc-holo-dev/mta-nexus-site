@@ -10,7 +10,7 @@ import {
   PlatformRequestError,
   platformFieldClass,
   platformRequest,
-} from "../../../lib/user-platform-client";
+} from "../../community/user-platform-client";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,

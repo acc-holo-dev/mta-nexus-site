@@ -55,6 +55,8 @@ Feature объединяет существующие представления
 | `resource-release-control-confirmation.ts`  | util port `resource-release-control-confirmation`             |
 | `library-collections-query.ts`              | util port `library-collections-query`                         |
 | `library-release-history-query.ts`          | util port `library-release-history-query`                     |
+| `user-library.ts`                           | util port `user-library`                                      |
+| `library-view.ts`                           | util port `library-view`                                      |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

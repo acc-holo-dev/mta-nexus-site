@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { parseModerationDetailQuery } from "../../lib/community-moderation-contract";
-import { REPORT_TYPES } from "../../lib/community-report-contract";
+import { parseModerationDetailQuery } from "../moderation/community-moderation-contract";
+import { REPORT_TYPES } from "./community-report-contract";
 import { moderatedDiscussionPageSchema } from "./moderated-discussion-contract";
 export function parseDiscussionReportsQuery(params: URLSearchParams) {
   if (

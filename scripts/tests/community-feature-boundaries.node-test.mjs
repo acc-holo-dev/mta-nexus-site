@@ -57,9 +57,15 @@ const utilPorts = [
   "follow-workspace-contract",
   "community-report-history-contract",
   "moderated-discussion-contract",
+  "content-discussion-contract",
+  "publication-feed-contract",
+  "community-report-contract",
+  "user-platform-copy",
+  "user-platform-contract",
+  "user-platform-client",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|content-discussion-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|report-batch-contract|publication-feed-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|private-api-request|private-change-history-query|private-change-history-copy|community-moderation-contract|report-batch-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-copy|server-publication-history-copy|admin-action-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

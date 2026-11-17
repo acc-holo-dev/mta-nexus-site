@@ -2,14 +2,14 @@ import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
-import { REPORT_TYPES } from "../../../lib/community-report-contract";
 import type { Locale } from "../../../lib/i18n";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
+import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
 import { type ReportGroupsPage, reportGroupsHref } from "../community-report-groups-contract";
 import { reportGroupsCopy } from "../community-report-groups-copy";
+import { platformFieldClass } from "../user-platform-client";
 export function CommunityReportGroups({
   page,
   filters,

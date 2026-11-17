@@ -3,8 +3,8 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { parseDiscoveryStreamQuery } from "../../../../features/discovery/discovery-stream-contract";
 import { discoveryStreamError } from "../../../../features/discovery/discovery-stream-copy";
-import { publicPlatformApi } from "../../../../lib/public-platform-api";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
+import { publicPlatformApi } from "../../../../features/shell/public-platform-api";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
 import { discoveryService } from "../../../../lib/services/discovery-service";
 export async function GET(request: NextRequest) {
   return publicPlatformApi(

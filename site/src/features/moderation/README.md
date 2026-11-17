@@ -18,6 +18,7 @@
 | `admin-action-confirmation.ts`                                                   | util port `admin-action-confirmation`                                     |
 | `platform-report-i18n.ts`                                                        | util port `platform-report-i18n`                                          |
 | `report-batch-contract.ts`                                                       | util port `report-batch-contract`                                         |
+| `community-moderation-contract.ts`                                               | util port `community-moderation-contract`                                 |
 
 Внутренние `components/` не являются публичным API. Границы — dependency-cruiser и
 `scripts/tests/moderation-feature-boundaries.node-test.mjs`.

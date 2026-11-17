@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { communityReportCreateSchema, REPORT_TYPES } from "../../../lib/community-report-contract";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { platformFieldClass } from "../../../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
+import { platformFieldClass } from "../user-platform-client";
 export function CommunityReportForm({
   targetType,
   targetId,

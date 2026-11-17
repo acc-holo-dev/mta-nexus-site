@@ -4,13 +4,12 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { parseModerationDetailQuery } from "../../../lib/community-moderation-contract";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -23,6 +22,7 @@ import {
   parseModeratedDiscussionQuery,
 } from "../moderated-discussion-contract";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
+import { platformFieldClass } from "../user-platform-client";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =

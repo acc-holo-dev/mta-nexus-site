@@ -2,8 +2,8 @@ vi.mock("server-only", () => ({}));
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { getDictionary, type Locale } from "../../src/lib/i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

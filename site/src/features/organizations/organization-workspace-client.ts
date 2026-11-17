@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { platformRequest } from "../../lib/user-platform-client";
+import { platformRequest } from "../community/user-platform-client";
 import { organizationGovernanceMutationError } from "./organization-governance-copy";
 import { organizationError } from "./organization-workspace-copy";
 export function organizationRequest(

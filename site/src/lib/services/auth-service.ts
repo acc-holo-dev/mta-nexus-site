@@ -25,7 +25,7 @@ import {
   normalizeEmailForAbuse,
   verifyPassword,
 } from "@nexus/security";
-import { SESSION_LIFETIME_SECONDS } from "../session-policy";
+import { SESSION_LIFETIME_SECONDS } from "../../features/shell/session-policy";
 
 // Public fixed fixture, using the same scrypt parameters as real password hashes.
 // It is not an account credential; its result is never accepted for authentication.

@@ -1,6 +1,6 @@
 import { authorPublicationDeskCopy } from "../../../../features/community/author-publication-desk-copy";
+import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 
 // Honest loading shell for /workspace/content/[id].
 export default async function Loading() {

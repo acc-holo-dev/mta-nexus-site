@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   changeHistoryTimeSchema,
   parseChangeHistoryQuery,
-} from "../../lib/private-change-history-query";
+} from "../accounts/private-change-history-query";
 import type { EditableOrganization } from "./organization-workspace-contract";
 import { editableOrganizationSchema } from "./organization-workspace-contract";
 

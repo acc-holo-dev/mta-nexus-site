@@ -4,11 +4,11 @@ import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 import {
   type PublicationPage,
   publicationPageQuery,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 const state = vi.hoisted(() => ({ locale: "en" as "ru" | "en", resolve: vi.fn(), page: vi.fn() }));
 vi.mock("../../src/lib/i18n-server", () => ({

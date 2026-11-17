@@ -4,14 +4,10 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { contentService } from "../../../lib/services/content-service";
-import {
-  communityTypes,
-  contentPageHref,
-  parseContentPage,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { publicationCopy } from "../publication-feed-copy";
+import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;

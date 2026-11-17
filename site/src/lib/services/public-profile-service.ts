@@ -3,7 +3,7 @@ import type { User } from "@nexus/domain";
 import { AppError, ValidationError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
-import { profileUpdateSchema } from "../user-platform-contract";
+import { profileUpdateSchema } from "../../features/community/user-platform-contract";
 export function editableProfile(user: User) {
   return {
     id: user.id,

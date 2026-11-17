@@ -1,15 +1,15 @@
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { reactionCommandSchema } from "../../../../../features/community/content-reaction-contract";
 import { reactionError } from "../../../../../features/community/content-reaction-copy";
+import { publicPlatformApi } from "../../../../../features/shell/public-platform-api";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 
 const validQuery = (request: NextRequest) => {
   if (request.nextUrl.searchParams.size)

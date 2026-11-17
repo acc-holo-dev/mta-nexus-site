@@ -8,11 +8,11 @@ import {
 } from "@nexus/domain";
 import { freshAuthProofAccepted, generateId, verifyPassword } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
+import { encodeChangeHistoryCursor } from "../../features/accounts/private-change-history-query";
 import {
   organizationChangeHistorySchema,
   ownershipTransferSchema,
 } from "../../features/organizations/organization-governance-contract";
-import { encodeChangeHistoryCursor } from "../private-change-history-query";
 import { editableOrganization } from "./organization-workspace-service";
 
 class OrganizationGovernanceService {

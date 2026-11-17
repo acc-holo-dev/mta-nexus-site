@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { privateChangeHistoryError } from "../../lib/private-change-history-copy";
+import { privateChangeHistoryError } from "../accounts/private-change-history-copy";
 import { organizationError } from "./organization-workspace-copy";
 
 const en = {

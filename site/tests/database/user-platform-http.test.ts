@@ -36,7 +36,7 @@ import {
   PATCH as update,
 } from "../../src/app/api/workspace/content/[id]/route";
 import { POST as create, GET as list } from "../../src/app/api/workspace/content/route";
-import { userPlatformError } from "../../src/lib/user-platform-copy";
+import { userPlatformError } from "../../src/features/community/user-platform-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,

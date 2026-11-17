@@ -1,13 +1,13 @@
 import { RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   editableProfile,
   publicProfileService,
 } from "../../../../lib/services/public-profile-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
 export function GET(request: NextRequest) {
   return userPlatformApi(request, async (user) => ({ profile: editableProfile(user) }));
 }

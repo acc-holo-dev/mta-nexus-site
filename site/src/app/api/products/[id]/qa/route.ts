@@ -2,7 +2,9 @@ import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { resourceQaAskSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { resourceQaQuery } from "../../../../../features/resources/resource-qa-query";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
@@ -10,8 +12,6 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceQaService } from "../../../../../lib/services/resource-qa-service";
 

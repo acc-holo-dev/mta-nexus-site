@@ -2,11 +2,11 @@ import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/doma
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { reactionError } from "../../../../../features/community/content-reaction-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 
 const command = z.object({}).strict();
 export const DELETE = withBrowserMutation(

@@ -1,15 +1,12 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { parseReportHistoryQuery } from "../features/community/community-report-history-contract";
-import {
-  reportHistoryCopy,
-  reportHistoryError,
-} from "../features/community/community-report-history-copy";
+import { resolveLocale } from "../../lib/i18n";
+import { communityReportHistoryService } from "../../lib/services/community-report-history-service";
+import { privateChangeHistoryDownload } from "../accounts/private-change-history-download";
+import { userPlatformApi } from "../accounts/user-platform-api";
 import { reportId, reportRateLimit } from "./community-report-api";
-import { resolveLocale } from "./i18n";
-import { privateChangeHistoryDownload } from "./private-change-history-download";
-import { communityReportHistoryService } from "./services/community-report-history-service";
-import { userPlatformApi } from "./user-platform-api";
+import { parseReportHistoryQuery } from "./community-report-history-contract";
+import { reportHistoryCopy, reportHistoryError } from "./community-report-history-copy";
 export async function reportHistoryRead(
   request: NextRequest,
   params: Promise<{ id: string }>,

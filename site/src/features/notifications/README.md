@@ -17,6 +17,7 @@ Feature объединяет существующие колокольчик, in
 | `notification-preferences-confirmation.ts` | util port `notification-preferences-confirmation`                   |
 | `notification-copy.ts`                     | util port `notification-copy`                                       |
 | `notification-inbox-contract.ts`           | util port `notification-inbox-contract`                             |
+| `web-push-subscription.ts`                 | util port `web-push-subscription`                                   |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
 production-код использует публичные входы; маршруты не импортируются feature.

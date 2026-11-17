@@ -1,10 +1,10 @@
 import { NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { authorContentService } from "../../../../../lib/services/author-content-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
 
 type Context = { params: Promise<{ id: string }> };
 async function target(context: Context) {

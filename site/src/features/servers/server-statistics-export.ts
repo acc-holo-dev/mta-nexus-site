@@ -1,7 +1,7 @@
 import type {
   ServerObservationBrowserResult,
   ServerStatisticsResult,
-} from "./services/server-statistics-service";
+} from "../../lib/services/server-statistics-service";
 
 export function serverStatisticsIntervals(report: ServerStatisticsResult) {
   const start = new Date(report.windowStart).getTime(),

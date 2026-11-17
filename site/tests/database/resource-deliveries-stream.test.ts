@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 import { expect, it, vi } from "vitest";
-import { resourceDeliveryStream } from "../../src/lib/resource-delivery-stream";
+import { resourceDeliveryStream } from "../../src/features/resources/resource-delivery-stream";
 
 const sha = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 function fixture(

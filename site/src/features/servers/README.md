@@ -54,6 +54,12 @@ repositories и collectors остаются в прежних модулях и 
 | `server-history-window.ts`               | util port `server-history-window`                                                                 |
 | `server-statistics-contract.ts`          | util port `server-statistics-contract`                                                            |
 | `server-observation-browser-contract.ts` | util port `server-observation-browser-contract`                                                   |
+| `managed-server-copy.ts`                 | util port `managed-server-copy`                                                                   |
+| `server-observation-browser-http.ts`     | util port `server-observation-browser-http`                                                       |
+| `server-statistics-http.ts`              | util port `server-statistics-http`                                                                |
+| `server-statistics-export.ts`            | util port `server-statistics-export`                                                              |
+| `server-content-api.ts`                  | util port `server-content-api`                                                                    |
+| `managed-server-view.ts`                 | util port `managed-server-view`                                                                   |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

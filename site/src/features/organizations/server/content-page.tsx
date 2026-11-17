@@ -3,18 +3,18 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { organizationContentId } from "../../../lib/organization-content-api";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationContentService } from "../../../lib/services/organization-content-service";
+import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
 import {
   contentPageFiltered,
   parseContentPage,
   writerTypes,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
+} from "../../community/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { organizationContentId } from "../organization-content-api";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";

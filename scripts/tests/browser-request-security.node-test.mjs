@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { sessionCookieOptions } from "../../site/src/features/accounts/session-cookie.ts";
+import { SESSION_LIFETIME_SECONDS } from "../../site/src/features/shell/session-policy.ts";
 import {
   browserRequestDecision,
   isLicenseRuntimeRequest,
 } from "../../site/src/lib/browser-request-policy.ts";
-import { SESSION_LIFETIME_SECONDS } from "../../site/src/lib/session-policy.ts";
 
 const env = { NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "https://nexus.test" };
 const decide = (headers = {}, method = "POST", overrides = {}) =>

@@ -8,11 +8,11 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { authorContentService } from "../../../lib/services/author-content-service";
-import { parseEditableContent } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { AuthorContentForm } from "../author-content-form";
+import { parseEditableContent } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip";
 const navLinkClass =

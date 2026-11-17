@@ -25,12 +25,12 @@ vi.mock("../../src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
 }));
 
+import type { CommunityReportDetail } from "../../src/features/community/community-report-contract";
 import { communityReportCopy } from "../../src/features/community/community-report-copy";
 import { CommunityReportDetailView } from "../../src/features/community/components/community-report-detail";
 import { CommunityReportForm } from "../../src/features/community/components/community-report-form";
 import { CommunityReportList } from "../../src/features/community/components/community-report-list";
 import { CommunityReportScreen } from "../../src/features/community/server/community-report-screen";
-import type { CommunityReportDetail } from "../../src/lib/community-report-contract";
 
 const row: CommunityReportDetail = {
   id: "report",

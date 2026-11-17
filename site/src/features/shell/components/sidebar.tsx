@@ -6,8 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { getManagedServerCopy } from "../../../lib/managed-server-copy";
 import { publicationCopy } from "../../community/publication-feed-copy";
+import { getManagedServerCopy } from "../../servers/managed-server-copy";
 import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
 import { useAuthSession } from "../auth-session";
 import {

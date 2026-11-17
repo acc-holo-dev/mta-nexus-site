@@ -64,7 +64,7 @@ vi.mock("../../src/features/resources/download", async () => {
 
 import LibraryLoading from "../../src/app/workspace/library/loading";
 import LibraryPage, { metadata } from "../../src/app/workspace/library/page";
-import { getLibraryCopy } from "../../src/lib/library-view";
+import { getLibraryCopy } from "../../src/features/library/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
 const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({

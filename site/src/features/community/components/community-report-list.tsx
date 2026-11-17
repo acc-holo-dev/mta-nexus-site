@@ -3,15 +3,15 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import type { Locale } from "../../../lib/i18n";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
   communityReportPageSchema,
   REPORT_TYPES,
-} from "../../../lib/community-report-contract";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
+} from "../community-report-contract";
 import { communityReportCopy, communityReportError } from "../community-report-copy";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

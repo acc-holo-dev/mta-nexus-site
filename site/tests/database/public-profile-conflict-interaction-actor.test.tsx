@@ -20,14 +20,14 @@ vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: harness.locale }),
 }));
-vi.mock("../../src/lib/user-platform-client", async (originalModule) => ({
-  ...(await originalModule<typeof import("../../src/lib/user-platform-client")>()),
+vi.mock("../../src/features/community/user-platform-client", async (originalModule) => ({
+  ...(await originalModule<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
 import { PublicProfileForm } from "../../src/features/accounts/profile";
-import { PlatformRequestError } from "../../src/lib/user-platform-client";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
+import { PlatformRequestError } from "../../src/features/community/user-platform-client";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 
 const { render, load, save } = createPublicProfileConflictInteractionHelpers(
   harness,

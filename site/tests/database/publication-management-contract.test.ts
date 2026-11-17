@@ -1,20 +1,20 @@
 import { expect, it } from "vitest";
 import {
+  discussionEditSchema,
+  discussionRemoveSchema,
+} from "../../src/features/community/content-discussion-contract";
+import {
   discussionError,
   discussionMutationError,
   getDiscussionCopy,
 } from "../../src/features/community/content-discussion-copy";
 import { confirmsDiscussionMutation } from "../../src/features/community/discussion-mutation-confirmation";
-import { publicationCopy } from "../../src/features/community/publication-feed-copy";
-import {
-  discussionEditSchema,
-  discussionRemoveSchema,
-} from "../../src/lib/content-discussion-contract";
 import {
   parsePublicationQuery,
   publicationPageQuery,
   publicationPageSchema,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 it.each([
   "?type=bad",

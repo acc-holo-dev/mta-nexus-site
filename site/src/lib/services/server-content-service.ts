@@ -5,7 +5,7 @@ import {
   editorialTypes,
   type parseContentPage,
   writerCreateSchema,
-} from "../user-platform-contract";
+} from "../../features/community/user-platform-contract";
 import { authorContentService } from "./author-content-service";
 import { editablePublication } from "./publication-editor-record";
 

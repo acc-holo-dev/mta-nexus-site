@@ -1,15 +1,15 @@
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { discussionMutationError } from "../../../../../../features/community/content-discussion-copy";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
 import {
   discussionEditSchema,
   discussionRemoveSchema,
-} from "../../../../../../lib/content-discussion-contract";
+} from "../../../../../../features/community/content-discussion-contract";
+import { discussionMutationError } from "../../../../../../features/community/content-discussion-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { contentService } from "../../../../../../lib/services/content-service";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
 
 type Context = { params: Promise<{ slug: string; id: string }> };
 async function mutate(request: NextRequest, context: Context, remove: boolean) {

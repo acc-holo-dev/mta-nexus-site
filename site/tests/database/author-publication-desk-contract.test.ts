@@ -6,7 +6,10 @@ import {
   parseAuthorPublicationDeskQuery,
   parseAuthorPublicationHistoryQuery,
 } from "../../src/features/community/author-publication-desk-contract";
-import { parsePublicationQuery, publicationHref } from "../../src/lib/publication-feed-contract";
+import {
+  parsePublicationQuery,
+  publicationHref,
+} from "../../src/features/community/publication-feed-contract";
 
 const point = {
   id: "article",

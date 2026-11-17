@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { storageQuery } from "../../../../features/moderation/storage-maintenance-query";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { storageMaintenanceService } from "../../../../lib/services/storage-maintenance-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) => {

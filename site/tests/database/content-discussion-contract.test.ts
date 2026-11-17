@@ -1,16 +1,16 @@
 import { expect, it, vi } from "vitest";
 import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 import {
+  discussionCommentSchema,
+  encodeDiscussionCursor,
+  parseDiscussionCursor,
+} from "../../src/features/community/content-discussion-contract";
+import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
 } from "../../src/features/community/content-discussion-copy";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
-import {
-  discussionCommentSchema,
-  encodeDiscussionCursor,
-  parseDiscussionCursor,
-} from "../../src/lib/content-discussion-contract";
 import { getDictionary } from "../../src/lib/i18n";
 
 it("round trips exact microsecond cursors through URL query encoding", () => {

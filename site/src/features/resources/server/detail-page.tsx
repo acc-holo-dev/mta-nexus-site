@@ -11,7 +11,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { productService } from "../../../lib/services/product-service";
@@ -38,6 +37,7 @@ import { ReverseDependencyList } from "../components/reverse-dependency-list";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../public-release-history";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
+import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
 const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";

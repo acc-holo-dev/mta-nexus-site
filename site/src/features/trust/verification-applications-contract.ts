@@ -1,6 +1,6 @@
 import { safeExternalWebUrl } from "@nexus/validation";
 import { z } from "zod";
-import { discussionCursorSchema } from "../../lib/content-discussion-contract";
+import { discussionCursorSchema } from "../community/content-discussion-contract";
 import {
   VERIFICATION_TYPES,
   verificationApplicationSchema,

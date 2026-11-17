@@ -4,16 +4,16 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { ManagedServerCard } from "../../../features/servers/managed-card-server";
+import {
+  getManagedServerCopy,
+  managedServerHref,
+  parseManagedServerQuery,
+} from "../../../features/servers/managed-server-view";
 import { serverWorkspaceCopy } from "../../../features/servers/server-workspace-copy";
 import { ManagedServerVisibilityBatch } from "../../../features/servers/visibility-batch";
 import { PlatformSignIn, platformSignInFocusClass } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  getManagedServerCopy,
-  managedServerHref,
-  parseManagedServerQuery,
-} from "../../../lib/managed-server-view";
 import { authService } from "../../../lib/services/auth-service";
 import {
   indexMtaObservations,
