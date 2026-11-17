@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { licenseOwnerCommandSchema, licenseReleaseCheckSchema } from "@nexus/validation";
 import { confirmedLicenseControl } from "../../src/features/commerce/license-control-confirmation";
-import { licenseRuntimePage } from "../../src/lib/license-runtime-query";
+import { licenseRuntimePage } from "../../src/features/commerce/license-runtime-query";
 import {
   confirmLicenseRelease,
   parseLicenseRuntimeContext,

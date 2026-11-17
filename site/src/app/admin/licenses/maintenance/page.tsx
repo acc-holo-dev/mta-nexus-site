@@ -11,7 +11,7 @@ import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseMaintenanceCopy } from "../../../../lib/license-maintenance-i18n";
-import { licenseRuntimePage } from "../../../../lib/license-runtime-query";
+import { licenseRuntimePage } from "../../../../features/commerce/license-runtime-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { licenseControlService } from "../../../../lib/services/license-control-service";
 export const dynamic = "force-dynamic";
