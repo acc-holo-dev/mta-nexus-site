@@ -30,7 +30,7 @@ import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";
 import { getFinancialCopy } from "../../lib/financial-i18n";
-import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../lib/feature-flags";
+import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../features/accounts/feature-flags";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";

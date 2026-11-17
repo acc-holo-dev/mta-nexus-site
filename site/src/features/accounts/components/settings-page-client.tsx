@@ -10,7 +10,7 @@ import {
   parseNotificationPreferences,
 } from "../../../lib/notification-preferences-confirmation";
 import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
-import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../../lib/feature-flags";
+import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
 import {
   type SettingsRecoveryEmail,
   SettingsRequestError,
