@@ -41,6 +41,7 @@ repositories и collectors остаются в прежних модулях и 
 | `server-workspace-nav-i18n.ts` | util port `server-workspace-nav-i18n` |
 | `server-claim-status-view.ts` | util port `server-claim-status-view` |
 | `server-activity-view.ts` | util port `server-activity-view` |
+| `server-review-i18n.ts` | util port `server-review-i18n` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

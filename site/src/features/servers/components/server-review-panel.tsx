@@ -10,7 +10,7 @@ import {
   serverReviewError,
   serverReviewLoadCopy,
   serverReviewState,
-} from "../../../lib/server-review-i18n";
+} from "../server-review-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";

@@ -24,7 +24,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { ServerReviewPanel } from "../../src/features/servers/components/server-review-panel";
-import { serverReviewCopy } from "../../src/lib/server-review-i18n";
+import { serverReviewCopy } from "../../src/features/servers/server-review-i18n";
 
 const { render } = createServerReviewDraftRefreshInteractionHelpers(harness, ServerReviewPanel);
 

@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { serverReviewCopy, serverReviewLoadCopy } from "../../../lib/server-review-i18n";
+import { serverReviewCopy, serverReviewLoadCopy } from "../server-review-i18n";
 
 vi.mock("../../shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
