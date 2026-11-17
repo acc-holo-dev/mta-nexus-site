@@ -27,7 +27,6 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const busyRef = useRef(false);
   const slot = `nexus:server-registration:v1:${actorId}`;
-  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
   useEffect(() => {
     let alive = true;
     async function verify() {
@@ -53,19 +52,14 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         }
         if (alive) setVerified(true);
       } catch {
-        if (alive)
-          setRecoveryMessage(
-            locale === "ru"
-              ? "Не удалось проверить сессию или восстановить черновик. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify your session or restore the draft. Refresh and sign in to the original account.",
-          );
+        if (alive) setRecoveryMessage(copy.restoreFailed);
       }
     }
     void verify();
     return () => {
       alive = false;
     };
-  }, [actorId, slot, locale]);
+  }, [actorId, slot, copy.restoreFailed]);
   useEffect(() => {
     if (!pending || !verified || !formRef.current || organizationsLoading) return;
     for (const [name, value] of Object.entries(pending.fields)) {
@@ -91,20 +85,9 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
       const result = await response.json();
       if (response.status === 401 || result?.code === "ACTOR_CHANGED") {
         setVerified(false);
-        throw new Error(
-          message(
-            "Сессия изменилась. Войдите в исходный аккаунт.",
-            "The session changed. Sign in to the original account.",
-          ),
-        );
+        throw new Error(copy.sessionChanged);
       }
-      if (!response.ok)
-        throw new Error(
-          message(
-            "Не удалось проверить результат. Попробуйте ещё раз.",
-            "Could not check the result. Try again.",
-          ),
-        );
+      if (!response.ok) throw new Error(copy.resultCheckFailed);
       if (
         typeof result?.server?.id === "string" &&
         /^[A-Za-z0-9_-]{1,128}$/u.test(result.server.id)
@@ -113,18 +96,9 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         window.location.assign(`/workspace/servers/${encodeURIComponent(result.server.id)}`);
         return;
       }
-      setRecoveryMessage(
-        message(
-          "Запись пока не подтверждена. Запрос ещё может завершиться; повторное создание заблокировано. Проверьте список серверов позже.",
-          "The listing is not confirmed yet. The request may still complete; creating another is blocked. Check your server list later.",
-        ),
-      );
+      setRecoveryMessage(copy.listingNotConfirmed);
     } catch (error) {
-      setRecoveryMessage(
-        error instanceof Error
-          ? error.message
-          : message("Не удалось проверить результат.", "Could not check the result."),
-      );
+      setRecoveryMessage(error instanceof Error ? error.message : copy.resultCheckFailedShort);
     } finally {
       busyRef.current = false;
       setLoading(false);
@@ -265,28 +239,17 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </div>
 
-      {error ? (
-        <ErrorState
-          title={error}
-          description={message(
-            "Результат создания мог остаться неподтверждённым. Проверьте его перед дальнейшими действиями.",
-            "The result may be unconfirmed. Check it before taking further action.",
-          )}
-        />
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.errorMayBeUnconfirmed} /> : null}
       {recoveryMessage ? (
         <ErrorState id="register-server-session-recovery" title={recoveryMessage} />
       ) : null}
       {verified && pending ? (
         <ErrorState
           id="register-server-create-inconclusive"
-          title={message(
-            "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
-            "The creation result is unknown. Your draft is saved and creating another is blocked.",
-          )}
+          title={copy.creationResultUnknown}
           action={
             <Button type="button" disabled={loading} onClick={recover}>
-              {message("Проверить результат", "Check result")}
+              {copy.checkResult}
             </Button>
           }
         />

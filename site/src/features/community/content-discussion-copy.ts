@@ -75,6 +75,7 @@ const en = {
   latest: "Show latest comments",
   searchKeepsDraft: "Search does not clear your draft comment.",
   formErrorHint: "The result could not be confirmed. Check the saved comment before trying again.",
+  recoverySaveFailed: "Could not save recovery data. The comment was not sent.",
 };
 const ru: Record<keyof typeof en, string> = {
   countUnavailable: "Общее число комментариев станет доступно после обновления страницы.",
@@ -152,6 +153,7 @@ const ru: Record<keyof typeof en, string> = {
   searchKeepsDraft: "Поиск не очищает черновик комментария.",
   formErrorHint:
     "Результат не подтверждён. Проверьте сохранённый комментарий перед повторной попыткой.",
+  recoverySaveFailed: "Не удалось сохранить черновик для восстановления. Комментарий не отправлен.",
 };
 export const getDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function discussionError(locale: Locale, code: unknown) {

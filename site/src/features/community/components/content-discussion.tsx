@@ -336,11 +336,7 @@ export function ContentDiscussion({
       if (firstAttempt) pendingIntent.current = null;
       writeGuard.current = false;
       setSubmitting(false);
-      setWriteError(
-        locale === "ru"
-          ? "Не удалось сохранить черновик для восстановления. Комментарий не отправлен."
-          : "Could not save recovery data. The comment was not sent.",
-      );
+      setWriteError(copy.recoverySaveFailed);
       return;
     }
     setPendingWrite(true);

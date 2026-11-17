@@ -58,6 +58,21 @@ export const publishing = {
       "The resource could not be saved. Your details are still in the form; try again.",
     chooseArchive: "Choose a build archive",
     unexpectedError: "Unexpected publishing error",
+    restoreFailed:
+      "Could not verify the session or restore the submission. Sign in to the original account and refresh.",
+    recoverySaveFailed: "Could not save recovery information. Submission was not started.",
+    sameFileRequired:
+      "Choose the same file: its name or contents do not match the original submission.",
+    checkSubmissionFields: "Check the submission fields.",
+    creationUnconfirmed:
+      "Could not confirm the original creation. Check your drafts and retry the original submission later.",
+    buildUnconfirmed:
+      "Could not confirm the original build. Check the resource versions and retry the original submission later.",
+    resultMayBeUnknown:
+      "The result may be unknown. To retry safely, select the same file; the original details are saved.",
+    errorMayHaveCompleted:
+      "The submission may have completed. A retry uses the original details and the same file.",
+    retryOriginal: "Retry original submission",
     typeScript: "Script",
     typeMap: "Map",
     typeVehicle: "Vehicle",
@@ -111,6 +126,17 @@ export const publishing = {
     unexpectedError: "Unexpected registration error",
     formErrorHint:
       "No server listing was created. Fix the fields above and submit the same form again.",
+    restoreFailed:
+      "Could not verify your session or restore the draft. Refresh and sign in to the original account.",
+    sessionChanged: "The session changed. Sign in to the original account.",
+    resultCheckFailed: "Could not check the result. Try again.",
+    resultCheckFailedShort: "Could not check the result.",
+    listingNotConfirmed:
+      "The listing is not confirmed yet. The request may still complete; creating another is blocked. Check your server list later.",
+    errorMayBeUnconfirmed: "The result may be unconfirmed. Check it before taking further action.",
+    creationResultUnknown:
+      "The creation result is unknown. Your draft is saved and creating another is blocked.",
+    checkResult: "Check result",
   },
   articles: {
     title: "MTA Engineering Hub & Articles",

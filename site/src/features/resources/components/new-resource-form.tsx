@@ -69,7 +69,6 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   const lock = useRef(false);
   const intentRef = useRef<ResourceSubmissionIntent | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
   const [resultId, setResultId] = useState<string | null>(null);
   const [createdProduct, setCreatedProduct] = useState<{
     id: string;
@@ -126,19 +125,14 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           setDraftReady(true);
         }
       } catch {
-        if (alive)
-          setError(
-            locale === "ru"
-              ? "Не удалось проверить сессию или восстановить отправку. Войдите в исходный аккаунт и обновите страницу."
-              : "Could not verify the session or restore the submission. Sign in to the original account and refresh.",
-          );
+        if (alive) setError(copy.restoreFailed);
       }
     }
     void restore();
     return () => {
       alive = false;
     };
-  }, [actorId, intentKey, storageKey, locale]);
+  }, [actorId, intentKey, storageKey, copy.restoreFailed]);
 
   useEffect(() => {
     if (!intent || !formRef.current) return;
@@ -215,12 +209,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           file.size !== active.build.size ||
           hash !== active.build.sha256
         )
-          throw new Error(
-            message(
-              "Выберите тот же файл: содержимое или имя не совпадает с исходной отправкой.",
-              "Choose the same file: its name or contents do not match the original submission.",
-            ),
-          );
+          throw new Error(copy.sameFileRequired);
       } else {
         const mtaTarget = String(form.get("mtaMinVersion") || mtaVersionTarget || "").trim();
         const request = createdProduct
@@ -262,17 +251,11 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           },
         };
         const raw = JSON.stringify(active);
-        if (!parseResourceIntent(raw, actorId))
-          throw new Error(message("Проверьте поля отправки.", "Check the submission fields."));
+        if (!parseResourceIntent(raw, actorId)) throw new Error(copy.checkSubmissionFields);
         try {
           sessionStorage.setItem(intentKey, raw);
         } catch {
-          throw new Error(
-            message(
-              "Не удалось сохранить данные для восстановления. Отправка не началась.",
-              "Could not save recovery information. Submission was not started.",
-            ),
-          );
+          throw new Error(copy.recoverySaveFailed);
         }
         intentRef.current = active;
         setIntent(active);
@@ -306,10 +289,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             releaseKnownFailure();
           throw new Error(
             !firstAttempt
-              ? message(
-                  "Не удалось подтвердить исходное создание. Проверьте черновики и повторите исходную отправку позже.",
-                  "Could not confirm the original creation. Check your drafts and retry the original submission later.",
-                )
+              ? copy.creationUnconfirmed
               : getResourceSubmissionErrorMessage(productData?.code, publishingErrorMessages) ||
                   productData?.error ||
                   copy.createError,
@@ -367,10 +347,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         );
         throw new Error(
           !firstAttempt
-            ? message(
-                "Не удалось подтвердить исходную сборку. Проверьте версии ресурса и повторите исходную отправку позже.",
-                "Could not confirm the original build. Check the resource versions and retry the original submission later.",
-              )
+            ? copy.buildUnconfirmed
             : publishingMessage || buildData?.error || copy.buildError,
         );
       }
@@ -404,14 +381,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>
       </div>
 
-      {intent ? (
-        <ErrorState
-          title={message(
-            "Результат может быть неизвестен. Для безопасного повтора выберите тот же файл; исходные данные сохранены.",
-            "The result may be unknown. To retry safely, select the same file; the original details are saved.",
-          )}
-        />
-      ) : null}
+      {intent ? <ErrorState title={copy.resultMayBeUnknown} /> : null}
       {createdProduct && (
         <div className="flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
           <p role="status" className="text-sm text-secondary">
@@ -430,15 +400,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         </div>
       )}
 
-      {error ? (
-        <ErrorState
-          title={error}
-          description={message(
-            "Отправка могла завершиться. Повтор использует исходные данные и тот же файл.",
-            "The submission may have completed. A retry uses the original details and the same file.",
-          )}
-        />
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.errorMayHaveCompleted} /> : null}
 
       <MtaMetaInspectorPanel
         onApplyMinimumVersion={setMtaVersionTarget}
@@ -611,7 +573,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               : loading
                 ? copy.submitting
                 : intent
-                  ? message("Повторить исходную отправку", "Retry original submission")
+                  ? copy.retryOriginal
                   : createdProduct
                     ? copy.retryBuild
                     : copy.submit}
