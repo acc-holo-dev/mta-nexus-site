@@ -10,7 +10,7 @@ import { resourceActivityCsv } from "../../src/lib/resource-activity-csv";
 import {
   parseAcquisitionHistoryQuery,
   parseResourceActivityQuery,
-} from "../../src/lib/resource-activity-query";
+} from "../../src/features/resources/resource-activity-query";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },

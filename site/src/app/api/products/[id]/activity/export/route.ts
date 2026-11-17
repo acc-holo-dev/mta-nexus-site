@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { resourceActivityCsv } from "../../../../../../lib/resource-activity-csv";
-import { parseResourceActivityQuery } from "../../../../../../lib/resource-activity-query";
+import { parseResourceActivityQuery } from "../../../../../../features/resources/resource-activity-query";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { resourceActivityService } from "../../../../../../lib/services/resource-activity-service";
 
