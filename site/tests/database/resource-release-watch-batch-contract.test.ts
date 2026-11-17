@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
-import { confirmedResourceReleaseWatchBatch } from "../../src/lib/resource-release-watch-batch-confirmation";
+import { confirmedResourceReleaseWatchBatch } from "../../src/features/resources/resource-release-watch-batch-confirmation";
 import {
   resourceReleaseWatchesQuery,
   resourceReleaseWatchesUrl,
