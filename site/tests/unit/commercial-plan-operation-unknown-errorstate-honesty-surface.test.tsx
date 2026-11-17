@@ -15,7 +15,7 @@ it("locks commercial-plan unknown operation marker to ErrorState without soft no
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="commercial-plan-operation-unknown"');
   expect(source).toContain(
-    "The previous operation result is unknown. Check the list and history before clearing this warning.",
+    "copy.previousResultUnknown",
   );
   expect(source).toContain(
     "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки.",
