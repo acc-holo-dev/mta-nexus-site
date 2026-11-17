@@ -5,7 +5,7 @@ import { DeveloperProfileEditor } from "../../../features/accounts/profile";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { ProfileChangeHistoryLink } from "../../../features/accounts/change-history";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
 import { editableDeveloperSchema } from "../../../lib/verification-workspace-contract";

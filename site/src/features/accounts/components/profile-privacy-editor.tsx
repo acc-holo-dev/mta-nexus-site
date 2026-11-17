@@ -13,7 +13,7 @@ import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../../../lib/profile-privacy-copy";
+} from "../profile-privacy-copy";
 import { PlatformRequestError, platformRequest } from "../../../lib/user-platform-client";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 

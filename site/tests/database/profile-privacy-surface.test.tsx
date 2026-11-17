@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../../src/lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../src/features/accounts/profile-privacy-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",

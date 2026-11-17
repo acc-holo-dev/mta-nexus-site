@@ -9,7 +9,7 @@ import {
   type NotificationPreferences,
   parseNotificationPreferences,
 } from "../../../lib/notification-preferences-confirmation";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../profile-privacy-copy";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
 import {
   type SettingsRecoveryEmail,

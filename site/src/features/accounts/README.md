@@ -7,3 +7,4 @@
 Внутренние компоненты не являются публичным API. Маршруты остаются в App Router; сервисы, авторизация, доступ к данным и существующие правила предметной области сохраняются в прежних слоях. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
 | `settings-client-api.ts` | util port `settings-client-api` |
 | `feature-flags.ts` | util port `feature-flags` |
+| `profile-privacy-copy.ts` | util port `profile-privacy-copy` |

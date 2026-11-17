@@ -5,7 +5,7 @@ import { ProfileChangeHistoryLink } from "../../../features/accounts/change-hist
 import { ProfilePrivacyEditor } from "../../../features/accounts/profile";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { editablePrivacySchema } from "../../../lib/profile-privacy-contract";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 export const dynamic = "force-dynamic";

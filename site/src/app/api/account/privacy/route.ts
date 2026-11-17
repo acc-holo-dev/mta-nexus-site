@@ -7,7 +7,7 @@ import { profilePrivacyUpdateSchema } from "../../../../lib/profile-privacy-cont
 import {
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../../../../lib/profile-privacy-copy";
+} from "../../../../features/accounts/profile-privacy-copy";
 import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 

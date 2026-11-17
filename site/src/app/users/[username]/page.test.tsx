@@ -110,7 +110,7 @@ vi.mock("../../../lib/services/auth-service", () => ({
 }));
 
 import { getDictionary } from "../../../lib/i18n";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import Page, { generateMetadata } from "./page";
 
 const input = (page?: string | string[]) => ({

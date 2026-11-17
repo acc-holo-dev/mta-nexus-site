@@ -8,7 +8,7 @@ import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../../src/lib/profile-privacy-copy";
+} from "../../src/features/accounts/profile-privacy-copy";
 
 const previous = {
   id: "user",

@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../../src/lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../src/features/accounts/profile-privacy-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
