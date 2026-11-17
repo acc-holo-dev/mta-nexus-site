@@ -12,6 +12,8 @@ import {
   resourceDeliveriesUrl,
 } from "../../../../features/resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -37,8 +39,21 @@ export default async function ResourceDownloadsPage({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = resourceDeliveriesCopy(locale),
-    dictionary = getDictionary(locale),
+    dictionary = getDictionary(locale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/library/downloads"}
+      />
+    );
+  }
+
   if (!user) {
     let returnPath = "/workspace/library/downloads";
     try {
