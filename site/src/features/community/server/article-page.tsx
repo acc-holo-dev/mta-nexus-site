@@ -1,7 +1,7 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Avatar } from "@nexus/ui";
+import { Avatar, ErrorState } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
@@ -78,9 +78,15 @@ export default async function ArticleDetailPage({
   }
   const filters = parseDiscussionQuery(discussionParams);
   let discussionFailure = filters ? "" : discussionError(locale, "INVALID_CURSOR");
+  let sessionFailed = false;
   const viewer = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+    .catch(() => {
+      sessionFailed = true;
+      return null;
+    });
+  const articlePath = `/articles/${encodeURIComponent(article.slug)}`;
+  const discussionCopy = getDiscussionCopy(locale);
   const [author, discussion, contentFollow, contentMute, reactions] = await Promise.all([
     authService.getUserById(article.authorId),
     filters
@@ -94,7 +100,7 @@ export default async function ArticleDetailPage({
           discussionFailure =
             error instanceof AppError
               ? discussionError(locale, error.code)
-              : getDiscussionCopy(locale).unavailable;
+              : discussionCopy.unavailable;
           return null;
         })
       : null,
@@ -104,28 +110,41 @@ export default async function ArticleDetailPage({
     viewer
       ? followWorkspaceRepository.muteState(viewer.id, "content", article.id).catch(() => null)
       : Promise.resolve(null),
-    contentReactionService.state(article.slug, viewer?.id).catch(() => null),
+    sessionFailed
+      ? Promise.resolve(null)
+      : contentReactionService.state(article.slug, viewer?.id).catch(() => null),
   ]);
   const followRow = Array.isArray(contentFollow)
     ? (contentFollow.find((row) => row.targetId === article.id) ?? null)
     : null;
-  const followInitial = viewer
+  const followInitial = sessionFailed
     ? {
-        authenticated: true,
-        actorId: viewer.id,
-        following: Boolean(followRow),
-        notifyComments: followRow?.notifyComments === true,
-        muted: Boolean(followRow?.mutedUntil ?? contentMute?.mutedUntil),
-        mutedUntil: followRow?.mutedUntil ?? contentMute?.mutedUntil ?? null,
-        ...(contentFollow === null || (!followRow && contentMute === null) ? { error: true } : {}),
-      }
-    : {
         authenticated: false,
         following: false,
         notifyComments: false,
         muted: false,
         mutedUntil: null,
-      };
+        error: true,
+      }
+    : viewer
+      ? {
+          authenticated: true,
+          actorId: viewer.id,
+          following: Boolean(followRow),
+          notifyComments: followRow?.notifyComments === true,
+          muted: Boolean(followRow?.mutedUntil ?? contentMute?.mutedUntil),
+          mutedUntil: followRow?.mutedUntil ?? contentMute?.mutedUntil ?? null,
+          ...(contentFollow === null || (!followRow && contentMute === null)
+            ? { error: true }
+            : {}),
+        }
+      : {
+          authenticated: false,
+          following: false,
+          notifyComments: false,
+          muted: false,
+          mutedUntil: null,
+        };
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
   const formattedDate = new Date(article.createdAt).toLocaleDateString(dateLocale, {
     month: "long",
@@ -195,7 +214,21 @@ export default async function ArticleDetailPage({
         {article.body}
       </div>
 
-      {viewer?.id !== article.authorId && (
+      {sessionFailed ? (
+        <ErrorState
+          id="article-session-unavailable"
+          title={discussionCopy.identityUnavailable}
+          description={discussionCopy.identityUnavailableDescription}
+          action={
+            <Link
+              href={articlePath}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : viewer?.id !== article.authorId ? (
         <CommunityReportForm
           key={`report:${article.id}:${viewer?.id ?? "guest"}`}
           targetType="content"
@@ -203,7 +236,7 @@ export default async function ArticleDetailPage({
           locale={locale}
           actorId={viewer?.id ?? null}
         />
-      )}
+      ) : null}
 
       <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -219,7 +252,7 @@ export default async function ArticleDetailPage({
       </div>
 
       <ContentReactions
-        key={`reactions:${article.id}:${viewer?.id ?? "guest"}`}
+        key={`reactions:${article.id}:${sessionFailed ? "session-failed" : (viewer?.id ?? "guest")}`}
         contentId={article.id}
         slug={article.slug}
         initial={reactions}
@@ -228,8 +261,9 @@ export default async function ArticleDetailPage({
 
       <ContentDiscussion
         title={article.title}
-        key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
+        key={`${article.id}:${sessionFailed ? "session-failed" : (viewer?.id ?? "anonymous")}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
         viewer={viewer ? { id: viewer.id, canModerate: can(viewer, "admin.moderation") } : null}
+        identityUnavailable={sessionFailed}
         slug={article.slug}
         contentId={article.id}
         locale={locale}
