@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Bell, BellOff, Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmsFollowMutation } from "../../../lib/follow-confirmation";
+import { confirmsFollowMutation } from "../follow-confirmation";
 import type { ObjectMuteDuration } from "../../../lib/follow-workspace-contract";
 import { followCopy, followError } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";

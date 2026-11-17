@@ -3,7 +3,7 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { confirmsFollowMutation } from "../../../lib/follow-confirmation";
+import { confirmsFollowMutation } from "../follow-confirmation";
 import {
   FOLLOW_TYPES,
   type FollowPage,

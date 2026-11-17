@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
-import { confirmsFollowMutation } from "../../../lib/follow-confirmation";
+import { confirmsFollowMutation } from "../follow-confirmation";
 import type { FollowTargetType } from "../../../lib/follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
