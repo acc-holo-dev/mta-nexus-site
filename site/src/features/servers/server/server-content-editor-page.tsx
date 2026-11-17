@@ -2,13 +2,17 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
+
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverContentService } from "../../../lib/services/servers/server-content-service";
 import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
@@ -27,7 +31,20 @@ export async function ServerContentEditorPage({
   const locale = await getRequestLocale(),
     copy = getUserPlatformCopy(locale),
     team = serverContentCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/servers/"}
+      />
+    );
+  }
+
   const returnPath = contentId
     ? `/workspace/servers/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}`
     : `/workspace/servers/${encodeURIComponent(id)}/content/new`;
