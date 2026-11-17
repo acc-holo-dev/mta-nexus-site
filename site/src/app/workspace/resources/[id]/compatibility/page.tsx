@@ -7,7 +7,7 @@ import { ProductDependencyList } from "../../../../../features/resources/detail-
 import { ResourceCompatibilityForm } from "../../../../../features/resources/compatibility-controls";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../../../../features/resources/resource-management-i18n";
 import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { productService } from "../../../../../lib/services/product-service";

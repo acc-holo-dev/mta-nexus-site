@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-management-i18n",
     "resource-media-i18n",
     "resource-deliveries-query",
     "resource-release-watches-query",
@@ -295,6 +296,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-management-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-media-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-deliveries-query.ts", "resources-view-isolation"],
     ["features/resources/resource-release-watches-query.ts", "resources-view-isolation"],
@@ -391,6 +393,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-management-i18n.ts",
     "app/resource-media-i18n.ts",
     "app/resource-deliveries-query.ts",
     "app/resource-release-watches-query.ts",
@@ -481,6 +484,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-management-i18n.ts",
     "site/src/features/resources/resource-media-i18n.ts",
     "site/src/features/resources/resource-deliveries-query.ts",
     "site/src/features/resources/resource-release-watches-query.ts",
@@ -651,6 +655,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-management-i18n.ts");
   visit("site/src/features/resources/resource-media-i18n.ts");
   visit("site/src/features/resources/resource-deliveries-query.ts");
   visit("site/src/features/resources/resource-release-watches-query.ts");

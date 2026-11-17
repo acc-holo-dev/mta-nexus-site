@@ -9,7 +9,7 @@ import { confirmedCompatibility } from "../resource-management-confirmation";
 import {
   getResourceManagementCopy,
   resourceManagementError,
-} from "../../../lib/resource-management-i18n";
+} from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { parseEditableProfile } from "../../../lib/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";

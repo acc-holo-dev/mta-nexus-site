@@ -70,7 +70,7 @@ it("locks resource variants reorder/remove to size=touch and noCandidates to Emp
   expect(source).not.toContain('size="sm"');
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(3);
 
-  const i18n = read("site/src/lib/resource-management-i18n.ts");
+  const i18n = read("site/src/features/resources/resource-management-i18n.ts");
   expect(i18n).toContain("noCandidates:");
   expect(i18n).toContain("noCandidatesHint:");
   expect(i18n.match(/noCandidatesHint:/gu)?.length).toBe(2);
@@ -100,7 +100,7 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/lib/i18n/ru/publishing.ts")).toContain("createErrorDescription");
   expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("failedDescription");
   expect(read("site/src/lib/i18n/ru/workspace.ts")).toContain("uploadFailedDescription");
-  expect(read("site/src/lib/resource-management-i18n.ts")).toContain("actionFailedDescription");
+  expect(read("site/src/features/resources/resource-management-i18n.ts")).toContain("actionFailedDescription");
   expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("actionFailedDescription");
   expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
     "actionFailedDescription",

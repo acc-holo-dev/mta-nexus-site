@@ -8,7 +8,7 @@ import { confirmedVariantCommand } from "../resource-management-confirmation";
 import {
   getResourceManagementCopy,
   resourceManagementError,
-} from "../../../lib/resource-management-i18n";
+} from "../resource-management-i18n";
 import { parseEditableProfile } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,

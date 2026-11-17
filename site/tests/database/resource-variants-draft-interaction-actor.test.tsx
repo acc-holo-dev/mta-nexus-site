@@ -20,7 +20,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { ResourceVariantsForm } from "../../src/features/resources/components/resource-variants-form";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 
 const { render, edit, submit } = createResourceVariantsDraftInteractionHelpers(
   harness,

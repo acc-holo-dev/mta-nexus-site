@@ -23,7 +23,7 @@ import RequirementsLoading from "../../src/app/workspace/resources/[id]/requirem
 import ResourcesLoading from "../../src/app/workspace/resources/loading";
 import NewResourceLoading from "../../src/app/workspace/resources/new/loading";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 
 beforeEach(() => {
   state.locale = "en";

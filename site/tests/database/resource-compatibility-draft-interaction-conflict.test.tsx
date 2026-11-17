@@ -22,7 +22,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 }));
 
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 
 const { render, edit, submit } = createResourceCompatibilityDraftInteractionHelpers(
   harness,
