@@ -5,9 +5,13 @@ import { ProfileChangeHistoryLink } from "../../../features/accounts/change-hist
 import { DeveloperProfileEditor } from "../../../features/accounts/profile";
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { editableDeveloperSchema } from "../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
+
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 export const dynamic = "force-dynamic";
@@ -24,8 +28,21 @@ export async function generateMetadata() {
 }
 export default async function DeveloperSettingsPage() {
   const locale = await getRequestLocale(),
-    copy = verificationCopy(locale),
+    copy = verificationCopy(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/settings/developer"}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/developer" />;
   if (!["developer", "admin"].includes(actor.role))
     return (
