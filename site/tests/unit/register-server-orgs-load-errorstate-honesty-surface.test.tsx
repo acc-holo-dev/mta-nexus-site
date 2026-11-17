@@ -21,8 +21,9 @@ it("routes organization lookup outages through ErrorState with touch retry", () 
   expect(source).not.toMatch(
     /organizationsFailed && \(\s*<span role="status"[\s\S]*?\{copy\.organizationsUnavailable\}/u,
   );
-  expect(source).toMatch(
-    /error \? \(\s*<ErrorState[\s\S]*?title=\{error\}[\s\S]*?description=\{message\(/u,
+  expect(source).toContain(
+    "{error ? <ErrorState title={error} description={copy.errorMayBeUnconfirmed} /> : null}",
   );
+  expect(source).not.toContain("const message = (ru: string, en: string)");
   expect(source).not.toContain('role="alert"');
 });
