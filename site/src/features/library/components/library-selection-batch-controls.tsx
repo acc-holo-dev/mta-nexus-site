@@ -219,7 +219,9 @@ export function LibrarySelectionBatchControls({
           </Button>
         </section>
       )}
-      {frozen && !saved && <p role="note">{c.frozen}</p>}
+      {frozen && !saved ? (
+        <ErrorState id="library-selection-batch-frozen" title={c.frozen} />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}

@@ -282,11 +282,9 @@ export function LibraryCollectionBatchForm({
                 ? c.retryAction
                 : c[shownAction]}
       </Button>
-      {frozen && !saved && (
-        <p role="note" className="text-xs text-muted">
-          {c.frozen}
-        </p>
-      )}
+      {frozen && !saved ? (
+        <ErrorState id="library-collection-batch-frozen" title={c.frozen} />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}

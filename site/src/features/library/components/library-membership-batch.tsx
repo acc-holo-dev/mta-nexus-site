@@ -275,11 +275,9 @@ export function LibraryMembershipBatchForm({
       >
         {busy ? c.busy : saved ? c.saved : blocked ? c.reload : frozen ? c.retryAction : h.apply}
       </Button>
-      {frozen && !saved && (
-        <p role="note" className="text-sm text-muted">
-          {c.frozen}
-        </p>
-      )}
+      {frozen && !saved ? (
+        <ErrorState id="library-membership-batch-frozen" title={c.frozen} />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}

@@ -382,11 +382,9 @@ export function LibraryCollectionCommandForm({
                   ? c.retryAction
                   : c[action]}
         </Button>
-        {frozen && !saved && (
-          <p role="note" className="text-xs text-muted">
-            {c.frozen}
-          </p>
-        )}
+        {frozen && !saved ? (
+          <ErrorState id="library-collection-command-frozen" title={c.frozen} />
+        ) : null}
         {error ? (
           <ErrorState
             title={error}
