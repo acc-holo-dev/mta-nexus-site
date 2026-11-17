@@ -3,7 +3,7 @@ import {
   NOTIFICATION_INBOX_SELECTION_LIMIT,
   notificationInboxCommandSchema,
 } from "../../src/lib/notification-inbox-contract";
-import { parseNotificationReadTarget } from "../../src/lib/notification-read";
+import { parseNotificationReadTarget } from "../../src/features/notifications/notification-read";
 
 describe("notification read target", () => {
   it.each(["", "{}", " { } "])(

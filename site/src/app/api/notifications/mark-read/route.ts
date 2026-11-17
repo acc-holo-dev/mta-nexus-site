@@ -4,7 +4,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { readBoundedText } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { parseNotificationReadTarget } from "../../../../lib/notification-read";
+import { parseNotificationReadTarget } from "../../../../features/notifications/notification-read";
 import {
   createRequestLogContext,
   jsonWithRequestId,

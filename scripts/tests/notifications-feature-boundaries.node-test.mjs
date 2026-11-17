@@ -14,6 +14,7 @@ const utilPorts = [
   "visible-polling",
   "notification-inbox-export-client",
   "notification-inbox-copy",
+  "notification-read",
 ];
 const serverPorts = ["center"];
 const safeLib =
