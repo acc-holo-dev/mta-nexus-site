@@ -130,7 +130,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/accounts/)" },
       to: {
-        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|public-profile-activity-server)\\.ts$)",
+        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|public-profile-activity-server)\\.ts$)",
       },
     },
     {
@@ -143,7 +143,7 @@ module.exports = {
       name: "accounts-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|settings-client-api|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference|verification-workspace-contract|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -153,7 +153,7 @@ module.exports = {
       name: "accounts-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

@@ -43,6 +43,7 @@ const features = [
       "change-history",
       "profile-change-history",
       "profile-pagination",
+      "developer-experience",
     ],
     privateClients: [
       "settings-active-sessions",
@@ -51,7 +52,7 @@ const features = [
       "settings-advertising-preferences-section",
     ],
     servers: [],
-    clientUtilPorts: ["profile-pagination"],
+    clientUtilPorts: ["profile-pagination", "developer-experience"],
     safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|settings-client-api|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference|verification-workspace-contract|verification-workspace-copy",
   },
   {

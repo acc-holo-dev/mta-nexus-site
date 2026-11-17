@@ -24,7 +24,7 @@ vi.mock("../../src/lib/services/verification-workspace-service", () => ({
 
 import DeveloperSettingsPage from "../../src/app/settings/developer/page";
 import VerificationPage, { generateMetadata } from "../../src/app/workspace/verification/page";
-import { DeveloperExperience } from "../../src/components/developer-experience";
+import { DeveloperExperience } from "../../src/features/accounts/developer-experience";
 import { DeveloperProfileEditor } from "../../src/features/accounts/profile";
 import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
 import type { VerificationOverview } from "../../src/lib/verification-workspace-contract";
