@@ -13,6 +13,8 @@ import { commercialTerms } from "../../../../../features/commerce/commercial-con
 import { getCommercialCopy } from "../../../../../features/commerce/commercial-i18n";
 import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -40,7 +42,20 @@ export default async function CommercialPlanAdmin({
   ]);
   const copy = getCommercialCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={dictionary.errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/commerce/plans/"}
+      />
+    );
+  }
+
   if (!user)
     return (
       <PlatformSignIn
