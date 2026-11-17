@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `73afae33` (`dev`, после services-domain + lib-http-platform — корни `lib/` / `services/` / `components/` = 0).
+**source_sha:** `57af73f2` (`dev`, после services-domain + lib-http-platform — корни `lib/` / `services/` / `components/` = 0).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на `73afae33` |
+| Область                    | Факт на `57af73f2` |
 | -------------------------- | -----------------: |
 | `features/*` domains       |                 13 |
 | `components/` tree files   |                  0 |
@@ -161,7 +161,7 @@ Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app
 
 ## TO-BE (цель читаемости)
 
-Корни `components/`, `lib/` и `lib/services/` уже опустели на AS-IS (`73afae33`). Дальше — не «ещё один переезд корня», а углубление читаемости внутри features / services domains и честность shell/i18n/journey.
+Корни `components/`, `lib/` и `lib/services/` уже опустели на AS-IS (`57af73f2`). Дальше — не «ещё один переезд корня», а углубление читаемости внутри features / services domains и честность shell/i18n/journey.
 
 ```text
 site/src/
