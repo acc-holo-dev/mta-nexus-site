@@ -19,7 +19,7 @@ import {
   REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../lib/observability";
-import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
+import { resourceAttachmentFileName } from "../../../../../features/resources/resource-attachment-filename";
 import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
 import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
 import { authService } from "../../../../../lib/services/auth-service";

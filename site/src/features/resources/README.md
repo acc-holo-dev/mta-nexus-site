@@ -85,6 +85,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-deliveries-csv.ts` | util port `resource-deliveries-csv` |
 | `resource-download-policy.ts` | util port `resource-download-policy` |
 | `resource-activity-view.ts` | util port `resource-activity-view` |
+| `resource-attachment-filename.ts` | util port `resource-attachment-filename` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
