@@ -12,7 +12,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
 import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
 import {
   libraryCollectionError,

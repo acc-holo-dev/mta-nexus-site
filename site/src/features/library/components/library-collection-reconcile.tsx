@@ -8,7 +8,7 @@ import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
 import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
 import {
   libraryCollectionError,

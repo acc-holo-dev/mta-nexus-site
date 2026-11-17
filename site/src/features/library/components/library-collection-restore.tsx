@@ -5,7 +5,7 @@ import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
 export function LibraryCollectionRestoreControls({
   preview,
   receiptId,

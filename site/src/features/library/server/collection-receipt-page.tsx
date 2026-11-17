@@ -12,7 +12,7 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

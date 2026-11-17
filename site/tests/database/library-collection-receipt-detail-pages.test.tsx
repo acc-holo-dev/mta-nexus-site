@@ -48,7 +48,7 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/receipts/[id]/page";
-import { libraryCollectionReceiptsCopy } from "../../src/lib/library-collection-receipts-i18n";
+import { libraryCollectionReceiptsCopy } from "../../src/features/library/library-collection-receipts-i18n";
 import { authService } from "../../src/lib/services/auth-service";
 
 const date = "2026-10-13T00:00:00.000Z",

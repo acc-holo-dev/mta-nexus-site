@@ -4,7 +4,7 @@ import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-hi
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionHref,
