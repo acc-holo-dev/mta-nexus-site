@@ -6,7 +6,7 @@ import {
   nextThemePreference,
   parseThemePreference,
   resolveThemePreference,
-} from "../../src/lib/theme-preference";
+} from "../../src/features/shell/theme-preference";
 
 const css = readFileSync(resolve(process.cwd(), "site/src/app/globals.css"), "utf8");
 

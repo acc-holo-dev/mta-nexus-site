@@ -10,7 +10,7 @@ import {
   resolveThemePreference,
   SYSTEM_THEME_QUERY,
   type ThemePreference,
-} from "../../../lib/theme-preference";
+} from "../theme-preference";
 import { useNexusLocale } from "../locale";
 
 export function ThemeToggle() {
