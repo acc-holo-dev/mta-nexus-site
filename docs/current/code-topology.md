@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `d53e9f97` (`dev`, slices 48–76 — batch util absorbs).
+**source_sha:** `524a952b` (`dev`, после services-domain + lib-http-platform — корни `lib/` / `services/` / `components/` = 0).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -18,9 +18,11 @@ site/
 │   ├── app/                 # App Router + HTTP adapters (282× route.ts)
 │   ├── features/            # feature-группировка (13 доменов, incl. shell/)
 │   ├── components/          # корневой UI вне features (пуст после slice 36)
-│   └── lib/                 # плоский helpers + services/ + i18n/
-│       ├── services/        # 86 оркестраторов в одном каталоге
-│       └── i18n/            # общий locale primitive
+│   └── lib/                 # только каталоги: http/ + i18n/ + platform/ + services/
+│       ├── http/            # browser/bounded/private/public adapters
+│       ├── i18n/            # общий locale primitive
+│       ├── platform/        # observability, postgres-error, offline-cache, …
+│       └── services/<domain>/  # оркестраторы по доменам (services root = 0)
 └── packages/                # канонические @nexus/* (workspace)
     ├── ui/ domain/ db/ validation/ security/ storage/ config/
 ```
@@ -29,57 +31,45 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slices 48–76 |
-| -------------------------- | -------------------: |
-| `features/*` domains       |                   13 |
-| `components/` tree files   |                    0 |
-| `components/` root files   |                    0 |
-| `lib/` tree files          |                  366 |
-| `lib/` root files          |                  253 |
-| `lib/services/` root files |                    0 |
-| `lib/**/*-i18n.ts`         |                   46 |
-| `app/**/route.ts`          |                  282 |
-| `site/tests` files         |                 1451 |
-| `@nexus/ui` src files      |                   18 |
-| `@nexus/domain` src files  |                   54 |
-| `@nexus/db` src files      |                  201 |
+| Область                    | Факт на `524a952b` |
+| -------------------------- | -----------------: |
+| `features/*` domains       |                 13 |
+| `components/` tree files   |                  0 |
+| `components/` root files   |                  0 |
+| `lib/` tree files          |                129 |
+| `lib/` root files          |                  0 |
+| `lib/` root dirs           | http, i18n, platform, services |
+| `lib/services/` root files |                  0 |
+| `lib/**/*-i18n.ts`         |                  0 |
+| `app/**/route.ts`          |                282 |
+| `site/tests` files         |               1452 |
+| `@nexus/ui` src files      |                 20 |
+| `@nexus/domain` src files  |                 54 |
+| `@nexus/db` src files      |                201 |
 
 ### Features
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    29 | 105483 |
-| commerce      |    43 | 187311 |
-| community     |    87 | 397069 |
-| discovery     |     3 |  20343 |
-| library       |    66 | 312673 |
-| moderation    |    24 | 118043 |
-| notifications |    14 |  81354 |
-| organizations |    36 | 128605 |
-| resources     |   106 | 477559 |
-| servers       |    59 | 227392 |
-| shell         |    56 |  97058 |
-| support       |    14 |  72080 |
-| trust         |     5 |  14574 |
+| accounts      |    43 | 148166 |
+| commerce      |    70 | 323371 |
+| community     |   127 | 579068 |
+| discovery     |     7 |  32516 |
+| library       |    86 | 394971 |
+| moderation    |    31 | 152820 |
+| notifications |    21 | 127325 |
+| organizations |    49 | 183699 |
+| resources     |   165 | 714708 |
+| servers       |    82 | 311591 |
+| shell         |    60 |  99104 |
+| support       |    22 | 109606 |
+| trust         |    15 |  57944 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
 ### Hotspots `lib/` root (по префиксу имени)
 
-| prefix       | files |
-| ------------ | ----: |
-| resource     |    50 |
-| server       |    27 |
-| library      |    66 | 312673 |
-| organization |    15 |
-| community    |    87 | 397069 |
-| license      |    10 |
-| public       |     9 |
-| support      |    14 | 72080  |
-| build        |     8 |
-| notification |     8 |
-| content      |     6 |
-| discussion   |     6 |
+Корень `lib/` очищен (`root_files` = 0, `root_prefix_hotspots` = []). Prefix-hotspots больше не применимы: helpers живут в `lib/http/`, `lib/platform/`, feature ports и `lib/services/<domain>/`.
 
 ### Shell / auth leftovers в `components/` root
 
@@ -165,11 +155,13 @@ Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app
 **Slice 6 done:** sidebar chrome uses shared `@nexus/ui` `BrandMark` (collapsed tile-only, expanded wordmark + locale `openFreeBeta` tag); duplicate `brand.sidebar.*` literals removed from shell inventory allowlist.  
 **Slice 7 done:** footer credit line moved to `dictionary.footer.creditLine` (en/ru); inventory allowlist no longer tracks footer copyright glue.
 
-**Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0 (inventory `deae11cfc8f7`).
+**Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
-**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache, profile-pagination, home-personal-changes); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0.
+**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache, profile-pagination, home-personal-changes); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
 
 ## TO-BE (цель читаемости)
+
+Корни `components/`, `lib/` и `lib/services/` уже опустели на AS-IS (`524a952b`). Дальше — не «ещё один переезд корня», а углубление читаемости внутри features / services domains и честность shell/i18n/journey.
 
 ```text
 site/src/
@@ -179,10 +171,11 @@ site/src/
 │   ├── accounts/ discovery/ servers/ resources/ …
 │   └── trust/                # при необходимости отдельно от moderation
 ├── lib/
-│   ├── services/<domain>/    # оркестрация по доменам (не 86 файлов в корне)
-│   ├── http/                 # browser adapters
-│   └── platform/             # locale primitives / shared non-UI
-└── (components/ → опустошать; новый UI только в feature или @nexus/ui)
+│   ├── services/<domain>/    # оркестрация по доменам (корень services пуст)
+│   ├── http/                 # browser / bounded / private / public adapters
+│   ├── i18n/                 # locale primitive
+│   └── platform/             # shared non-UI kernels
+└── (components/ → держать пустым; новый UI только в feature или @nexus/ui)
 
 site/packages/ui/             # tokens, typography, motion, layout, form controls
 ```
@@ -222,8 +215,11 @@ Live tracker на момент измерения: 19 карточек, почт
 | 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done** |
 | 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done** |
 | 7   | Footer credit line → `footer.creditLine` i18n              | честность RU/EN                  | **done** |
+| T   | services-domain — `lib/services/<domain>/`                 | читаемость service layer         | **done** |
+| T   | lib-http-platform — `lib/http/` + `lib/platform/`          | очистка `lib/` root              | **done** |
+| D/E | Scoreboard sync после http/platform + services domains     | docs honesty                     | **done** |
 
-Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep.
+Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
 ## Связанные входы
 
