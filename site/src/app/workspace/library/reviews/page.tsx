@@ -9,6 +9,8 @@ import {
 import { resourceReviewPageQuery } from "../../../../features/resources/resource-review-query";
 import { ResourceReviewPager } from "../../../../features/resources/reviews-view";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -39,8 +41,21 @@ export default async function Page({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = resourceReviewCopy(typedLocale),
     workspace = getDictionary(typedLocale).workspace,
-    dictionary = getDictionary(typedLocale),
+    dictionary = getDictionary(typedLocale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/library"}
+      />
+    );
+  }
+
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
