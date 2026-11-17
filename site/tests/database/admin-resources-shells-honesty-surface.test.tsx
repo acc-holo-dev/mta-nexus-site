@@ -23,7 +23,7 @@ import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/
 import AdminResourceRequirementsLoading from "../../src/app/admin/resources/[id]/requirements/loading";
 import AdminResourcesLoading from "../../src/app/admin/resources/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
-import { buildPackageCopy } from "../../src/lib/build-package-i18n";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";

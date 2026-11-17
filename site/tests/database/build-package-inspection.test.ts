@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import fixtures from "../fixtures/build-packages.json";
 import { buildPackageSummary } from "@nexus/domain";
 import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
-import { buildPackageCopy } from "../../src/lib/build-package-i18n";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import { getResourceSubmissionErrorMessage } from "../../src/features/resources/publishing-error-message";
 
 const bytes = (name: keyof typeof fixtures) => Buffer.from(fixtures[name], "base64");

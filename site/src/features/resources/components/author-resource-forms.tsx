@@ -29,7 +29,7 @@ import {
   getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../build-file-validation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { buildPackageCopy } from "../build-package-i18n";
 import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {
   getResourceCommerceCopy,

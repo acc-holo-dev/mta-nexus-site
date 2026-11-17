@@ -33,7 +33,7 @@ import {
   BuildPackageSummaryPanel,
 } from "../../src/features/resources/evidence";
 import { BuildPackageScreen } from "../../src/features/resources/server/build-package-screen";
-import { buildPackageCopy } from "../../src/lib/build-package-i18n";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private title>" },

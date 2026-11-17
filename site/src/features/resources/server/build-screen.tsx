@@ -4,7 +4,7 @@ import { History } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
+import { buildPackageCopy } from "../build-package-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
