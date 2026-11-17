@@ -8,6 +8,8 @@ import { formatHistoryDate } from "../../../../../features/commerce/commerce-his
 import { getResourceActivityCopy } from "../../../../../features/resources/resource-activity-i18n";
 import { resourceActivityDays } from "../../../../../features/resources/resource-activity-view";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -46,7 +48,20 @@ export default async function ResourceActivityPage({
   const basePath = `/workspace/resources/${encodeURIComponent(id)}/activity`;
   const returnQuery = returnParams.toString();
   const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
-  const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const result = await resourceActivityService
     .publisherReport(actor, id, resourceActivityDays(query.days))
