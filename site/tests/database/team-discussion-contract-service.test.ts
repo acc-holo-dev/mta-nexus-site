@@ -22,7 +22,7 @@ import {
   moderatedDiscussionRemoveSchema,
   parseModeratedDiscussionQuery,
 } from "../../src/lib/moderated-discussion-contract";
-import { moderatedDiscussionCopy } from "../../src/lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../../src/features/community/moderated-discussion-copy";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,

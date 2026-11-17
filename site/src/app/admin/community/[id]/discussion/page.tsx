@@ -1,6 +1,6 @@
 import { ModeratedDiscussionScreen } from "../../../../../features/community/moderated-discussion-server";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { moderatedDiscussionCopy } from "../../../../../lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../../../../../features/community/moderated-discussion-copy";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

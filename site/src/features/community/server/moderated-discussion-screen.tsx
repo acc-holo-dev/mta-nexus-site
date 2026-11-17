@@ -17,7 +17,7 @@ import {
   moderatedDiscussionPageSchema,
   parseModeratedDiscussionQuery,
 } from "../../../lib/moderated-discussion-contract";
-import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";

@@ -32,7 +32,7 @@ import DiscussionReportsLoading from "../../src/app/admin/community/[id]/discuss
 import DiscussionLoading from "../../src/app/admin/community/[id]/discussion/loading";
 import { ModeratedDiscussionScreen } from "../../src/features/community/server/moderated-discussion-screen";
 import { moderationCopy } from "../../src/features/community/community-moderation-copy";
-import { moderatedDiscussionCopy } from "../../src/lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../../src/features/community/moderated-discussion-copy";
 
 const time = "2026-10-11T00:00:00.000Z",
   publication = {

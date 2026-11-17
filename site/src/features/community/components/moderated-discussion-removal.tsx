@@ -12,7 +12,7 @@ import {
 import {
   moderatedDiscussionCopy,
   moderatedDiscussionError,
-} from "../../../lib/moderated-discussion-copy";
+} from "../moderated-discussion-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
 import { confirmAction } from "../../shell/confirm-action";
 export function ModeratedDiscussionRemoval({

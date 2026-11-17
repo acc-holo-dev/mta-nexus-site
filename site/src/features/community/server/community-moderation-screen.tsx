@@ -16,7 +16,7 @@ import {
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { discoveryCopy } from "../../../lib/discovery-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { communityModerationService } from "../../../lib/services/community-moderation-service";

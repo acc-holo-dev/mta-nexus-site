@@ -55,6 +55,7 @@ Feature объединяет клиентское обсуждение публ�
 | `report-batch-copy.ts`                         | util port `report-batch-copy`                                                 |
 | `follow-workspace-copy.ts`                     | util port `follow-workspace-copy`                                             |
 | `community-moderation-copy.ts` | util port `community-moderation-copy` |
+| `moderated-discussion-copy.ts` | util port `moderated-discussion-copy` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую
