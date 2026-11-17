@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 16 ноября 2026 (Europe/Moscow).  
-**source_sha:** `8bcba21f` (`dev`, slice 31 — `license-*` cluster → `features/commerce` license ports).  
+**source_sha:** `bffdc7ea` (`dev`, slice 32 — `subscription-*` cluster → `features/commerce` subscription ports).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 31 |
+| Область                    | Факт на slice 32 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
-| `components/` tree files   |               19 |
-| `components/` root files   |               19 |
+| `components/` tree files   |               15 |
+| `components/` root files   |               15 |
 | `lib/` tree files          |              410 |
 | `lib/` root files          |              298 |
 | `lib/services/` root files |               86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    25 | 100894 |
-| commerce      |    12 |  44961 |
+| commerce      |    18 |  67559 |
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
@@ -134,6 +134,8 @@ site/
 **Slice 30 done:** `storage-maintenance-controls` → [`features/moderation/storage-maintenance.ts`](../../site/src/features/moderation/storage-maintenance.ts) (`StorageDiscoveryControls`, `StorageCleanupControls`); владение **Moderation** (staff storage discovery/cleanup на `/admin/storage`, API и services без изменений); depcruise public API + `moderation-client-isolation` для порта `storage-maintenance`; потребители — `app/admin/storage/page.tsx`, `app/admin/storage/objects/[id]/page.tsx`; корень `components/` −1 production file.
 
 **Slice 31 done:** `license-*` cluster в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client port [`license-controls.ts`](../../site/src/features/commerce/license-controls.ts) (`LicenseControlPanel`, `LicenseRuntimeProbe`), server ports [`license-detail.ts`](../../site/src/features/commerce/license-detail.ts), [`license-archive.ts`](../../site/src/features/commerce/license-archive.ts), [`license-history-server.ts`](../../site/src/features/commerce/license-history-server.ts); владение **Commerce** (workspace/admin license detail, archive filters, owner/staff control panel, runtime probe); server composition в `features/commerce/server/` вне client-isolation; depcruise `commerce-feature-*` + `commerce-feature-boundaries.node-test.mjs`; корень `components/` −5 production files.
+
+**Slice 32 done:** `subscription-*` cluster в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client port [`subscription-controls.ts`](../../site/src/features/commerce/subscription-controls.ts) (`SubscriptionControls`, `SubscriptionFeeEstimator`, `SubscriptionRecovery`), shared nav port [`subscription-workspace.ts`](../../site/src/features/commerce/subscription-workspace.ts) (`subscriptionNavLinkClass`, RSC-safe); владение **Commerce** (workspace subscription activate/cancel, fee estimate, intent recovery); `PlanReviewTerms` остаётся в `components/` до plan-review absorb; depcruise `commerce-feature-*` + boundary tests; корень `components/` −4 production files.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 
