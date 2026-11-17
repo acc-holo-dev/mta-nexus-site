@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-history-presentation",
     "server-claim-confirmation",
     "server-organization-options",
     "details-controls",
@@ -146,6 +147,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-history-presentation.ts", "servers-client-isolation"],
     ["features/servers/server-claim-confirmation.ts", "servers-client-isolation"],
     ["features/servers/server-organization-options.ts", "servers-client-isolation"],
     ["features/servers/details-controls.ts", "servers-client-isolation"],
@@ -189,6 +191,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-history-presentation.ts",
     "app/server-claim-confirmation.ts",
     "app/server-organization-options.ts",
     "app/details-controls.ts",
@@ -214,6 +217,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-history-presentation.ts",
     "site/src/features/servers/server-claim-confirmation.ts",
     "site/src/features/servers/server-organization-options.ts",
     "site/src/features/servers/details-controls.ts",
@@ -270,6 +274,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-history-presentation.ts");
   visit("site/src/features/servers/server-claim-confirmation.ts");
   visit("site/src/features/servers/server-organization-options.ts");
   visit("site/src/features/servers/details-controls.ts");

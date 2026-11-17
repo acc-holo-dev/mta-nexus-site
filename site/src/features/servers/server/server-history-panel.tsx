@@ -6,7 +6,7 @@ import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
   serverHistoryChartSlots,
-} from "../../../lib/server-history-presentation";
+} from "../server-history-presentation";
 import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
 import type { ServerHistoryResult } from "../../../lib/services/server-history-service";
 

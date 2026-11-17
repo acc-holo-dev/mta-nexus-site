@@ -34,6 +34,7 @@ repositories и collectors остаются в прежних модулях и 
 | `model.ts`                      | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
 | `server-organization-options.ts` | util port `server-organization-options` |
 | `server-claim-confirmation.ts` | util port `server-claim-confirmation` |
+| `server-history-presentation.ts` | util port `server-history-presentation` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
