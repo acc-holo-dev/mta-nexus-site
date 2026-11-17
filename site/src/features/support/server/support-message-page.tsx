@@ -11,7 +11,7 @@ import { parseSupportMessageQuery } from "../../../lib/support-message-discovery
 import {
   supportMessageCopy,
   supportMessageError,
-} from "../../../lib/support-message-discovery-copy";
+} from "../support-message-discovery-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 

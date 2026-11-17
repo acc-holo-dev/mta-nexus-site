@@ -21,7 +21,7 @@ import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messag
 import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
 import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
 import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";

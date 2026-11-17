@@ -28,7 +28,7 @@ import {
   SupportMessagePage,
   supportMessageMetadata,
 } from "../../src/features/support/messages-server";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 import { getDictionary } from "../../src/lib/i18n";
 
 const id = `sup_${"a".repeat(24)}`,

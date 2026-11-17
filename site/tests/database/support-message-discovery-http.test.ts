@@ -11,7 +11,7 @@ vi.mock("@nexus/db", () => ({ supportMessageDiscoveryRepository: { page: mock.pa
 
 import { GET as download } from "../../src/app/api/support/[id]/messages/export/route";
 import { GET } from "../../src/app/api/support/[id]/messages/route";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

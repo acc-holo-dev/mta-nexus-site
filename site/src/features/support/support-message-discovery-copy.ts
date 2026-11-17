@@ -1,5 +1,5 @@
-import type { Locale } from "./i18n";
-import { supportWorkspaceError } from "./support-workspace-copy";
+import type { Locale } from "../../lib/i18n";
+import { supportWorkspaceError } from "../../lib/support-workspace-copy";
 
 const en = {
   title: "Search conversation",

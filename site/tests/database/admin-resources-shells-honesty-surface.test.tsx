@@ -30,7 +30,7 @@ import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-work
 import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";

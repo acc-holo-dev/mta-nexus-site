@@ -6,7 +6,7 @@ import {
   type SupportMessagePage,
   supportMessageHref,
 } from "../../../lib/support-message-discovery-contract";
-import { supportMessageCopy } from "../../../lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../support-message-discovery-copy";
 
 export function SupportMessageBrowser({
   page,

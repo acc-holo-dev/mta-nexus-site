@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { supportMessageCopy } from "../../../lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
   confirmSupportStatusChanged,

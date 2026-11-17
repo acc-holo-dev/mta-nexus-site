@@ -18,7 +18,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 import AdminReportHistoryLoading from "../../src/app/admin/reports/[id]/history/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
 import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";

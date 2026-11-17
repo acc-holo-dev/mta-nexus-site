@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { supportMessageCopy } from "../../../../lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../../../features/support/support-message-discovery-copy";
 
 // Honest loading shell for /support/[id]/messages.
 export default async function Loading() {

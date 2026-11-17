@@ -3,7 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { supportMessageDiscoveryService } from "../../../../../lib/services/support-message-discovery-service";
 import { parseSupportMessageQuery } from "../../../../../lib/support-message-discovery-contract";
-import { supportMessageError } from "../../../../../lib/support-message-discovery-copy";
+import { supportMessageError } from "../../../../../features/support/support-message-discovery-copy";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
