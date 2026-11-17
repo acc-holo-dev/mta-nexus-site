@@ -4,11 +4,13 @@ Feature объединяет существующие колокольчик, in
 Сессия, actor identity, серверная авторизация, сервисы доставки, outbox и workers
 остаются прежними.
 
-| Entry              | Контракт                                                       |
-| ------------------ | -------------------------------------------------------------- |
-| `bell.ts`          | `NotificationBell`; клиентский колокольчик                     |
-| `preferences.ts`   | `SettingsNotificationPreferencesSection`; клиентские настройки |
-| `center-server.ts` | Страница inbox и metadata; server-only                         |
+| Entry                          | Контракт                                                            |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `bell.ts`                      | `NotificationBell`; клиентский колокольчик                          |
+| `preferences.ts`               | `SettingsNotificationPreferencesSection`; клиентские настройки      |
+| `notification-inbox-events.ts` | `announceNotificationInboxChange`, `observeNotificationInboxChange` |
+| `visible-polling.ts`           | `startVisiblePolling` (visibility-aware poll helper)                |
+| `center-server.ts`             | Страница inbox и metadata; server-only                              |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
 production-код использует публичные входы; маршруты не импортируются feature.

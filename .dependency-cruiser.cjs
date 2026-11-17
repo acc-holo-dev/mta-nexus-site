@@ -178,7 +178,7 @@ module.exports = {
         path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$)|features/shell/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|notification-inbox-events|private-api-request|resource-release-watches-i18n|visible-polling|home-personal-changes-types)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$)|features/shell/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|private-api-request|resource-release-watches-i18n|home-personal-changes-types)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
@@ -237,7 +237,9 @@ module.exports = {
       name: "notifications-feature-public-api",
       severity: "error",
       from: { path: "^site/src/(?!features/notifications/)" },
-      to: { path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server)\\.ts$)" },
+      to: {
+        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling)\\.ts$)",
+      },
     },
     {
       name: "notifications-feature-does-not-import-routing",
@@ -248,15 +250,19 @@ module.exports = {
     {
       name: "notifications-client-isolation",
       severity: "error",
-      from: { path: "^site/src/features/notifications/(?:(?:bell|preferences)\\.ts$|components/)" },
+      from: {
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling)\\.ts$|components/)",
+      },
       to: {
-        path: "^(?:site/src/(?:features/(?!notifications/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|notification-inbox-events|private-api-request|visible-polling|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!notifications/|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "notifications-client-has-no-node-builtins",
       severity: "error",
-      from: { path: "^site/src/features/notifications/(?:(?:bell|preferences)\\.ts$|components/)" },
+      from: {
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling)\\.ts$|components/)",
+      },
       to: { dependencyTypes: ["core"] },
     },
     {

@@ -9,9 +9,10 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const clientPorts = ["bell", "preferences"];
+const utilPorts = ["notification-inbox-events", "visible-polling"];
 const serverPorts = ["center"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|notification-inbox-events|private-api-request|visible-polling|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:notification-copy|license-maintenance-i18n|resource-release-watches-i18n|notification-inbox-copy|private-api-request|notification-inbox-contract|content-discussion-contract|notification-inbox-export-client|notification-preferences-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -42,7 +43,7 @@ test("Notifications rejects private, routing, server and infrastructure edges", 
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/notifications/components/private.ts", "export const value = 1;");
   write("site/src/features/notifications/server/page.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(`site/src/features/notifications/${port}.ts`, 'export { value } from "./server/page";');
     write(`site/src/app/${port}.ts`, `export { value } from "../features/notifications/${port}";`);
   }
@@ -88,7 +89,7 @@ test("Notifications rejects private, routing, server and infrastructure edges", 
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(
       rules(`features/notifications/${port}.ts`).includes("notifications-client-isolation"),
       port,
@@ -115,7 +116,9 @@ test("Notifications rejects private, routing, server and infrastructure edges", 
 });
 
 test("Notifications client graphs exclude server dependencies transitively", () => {
-  const entries = clientPorts.map((port) => `site/src/features/notifications/${port}.ts`);
+  const entries = [...clientPorts, ...utilPorts].map(
+    (port) => `site/src/features/notifications/${port}.ts`,
+  );
   entries.push(
     ...["notification-inbox", "notification-center-tabs", "web-push-settings"].map(
       (name) => `site/src/features/notifications/components/${name}.tsx`,
@@ -144,9 +147,13 @@ test("Notifications client graphs exclude server dependencies transitively", () 
       visit(edge.resolved);
     }
   }
+  const utilPortSet = new Set(utilPorts);
   for (const entry of entries) {
-    if (!entry.includes("/components/"))
-      assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    if (!entry.includes("/components/")) {
+      const portName = entry.split("/").pop().replace(/\.ts$/u, "");
+      if (!utilPortSet.has(portName))
+        assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    }
     visit(entry);
   }
   for (const child of [

@@ -22,7 +22,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
-vi.mock("../../src/lib/notification-inbox-events", () => ({
+vi.mock("../../src/features/notifications/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
 }));
 

@@ -14,7 +14,7 @@ import {
   notificationInboxCopy,
   notificationInboxError,
 } from "../../../lib/notification-inbox-copy";
-import { announceNotificationInboxChange } from "../../../lib/notification-inbox-events";
+import { announceNotificationInboxChange } from "../notification-inbox-events";
 import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,

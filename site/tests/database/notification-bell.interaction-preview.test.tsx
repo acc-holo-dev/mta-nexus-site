@@ -29,7 +29,7 @@ vi.mock("../../src/features/shell/locale", () => ({
     dictionary: notificationBellDictionary,
   }),
 }));
-vi.mock("../../src/lib/notification-inbox-events", () => ({
+vi.mock("../../src/features/notifications/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,
   observeNotificationInboxChange: harness.observe,
 }));

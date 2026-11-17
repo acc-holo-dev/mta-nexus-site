@@ -39,13 +39,13 @@ vi.mock("react", async (original) => ({
     }
   },
 }));
-vi.mock("../../src/lib/visible-polling", () => ({
+vi.mock("../../src/features/notifications/visible-polling", () => ({
   startVisiblePolling: (options: typeof h.poll) => {
     h.poll = options;
     return () => {};
   },
 }));
-vi.mock("../../src/lib/notification-inbox-events", () => ({
+vi.mock("../../src/features/notifications/notification-inbox-events", () => ({
   observeNotificationInboxChange: () => () => {},
   announceNotificationInboxChange: () => {},
 }));

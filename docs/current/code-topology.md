@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `fabe6b1c` (`dev`, slice 40 — ad-preference → accounts).
+**source_sha:** `7edb51a1` (`dev`, slice 41 — notification inbox helpers → notifications).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,13 +29,13 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 40 |
+| Область                    | Факт на slice 41 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
 | `components/` tree files   |                0 |
 | `components/` root files   |                0 |
-| `lib/` tree files          |              406 |
-| `lib/` root files          |              293 |
+| `lib/` tree files          |              403 |
+| `lib/` root files          |              290 |
 | `lib/services/` root files |               86 |
 | `lib/**/*-i18n.ts`         |               46 |
 | `app/**/route.ts`          |              282 |
@@ -54,7 +54,7 @@ site/
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
 | moderation    |    24 | 118043 |
-| notifications |    10 |  66691 |
+| notifications |    13 |  75714 |
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
 | servers       |    54 | 218716 |
@@ -152,6 +152,8 @@ site/
 **Slice 39 done:** `home-personal-preference` → [`features/shell/home-personal-preference.ts`](../../site/src/features/shell/home-personal-preference.ts) (`parseHomePersonalPreference`, `HOME_PERSONAL_COOKIE`, …); владение **Shell**; `home-personal-changes-types` / server loader remain in `lib/` until a shell server port; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
 
 **Slice 40 done:** `ad-preference` → [`features/accounts/ad-preference.ts`](../../site/src/features/accounts/ad-preference.ts) (`parseAdPreference`, `AD_OPT_OUT_COOKIE`, …); владение **Accounts** (settings advertising opt-out); depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
+
+**Slice 41 done:** `notification-inbox-events` + `visible-polling` → [`features/notifications`](../../site/src/features/notifications/README.md): util ports [`notification-inbox-events.ts`](../../site/src/features/notifications/notification-inbox-events.ts), [`visible-polling.ts`](../../site/src/features/notifications/visible-polling.ts); владение **Notifications**; depcruise public API + client isolation; корень `lib/` −2 files (+ colocated unit test move).
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 36 — `confirm-action` / `action-confirm-checkbox`).
 
