@@ -18,6 +18,8 @@ import { ResourceModerationControls } from "../../../../features/resources/moder
 import { resourceMediaCopy } from "../../../../features/resources/resource-media-i18n";
 import { resourceRequirementsCopy } from "../../../../features/resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -43,7 +45,20 @@ export default async function ResourceModerationDetail({
   ]);
   const copy = getResourceReleaseControlCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/resources/"}
+      />
+    );
+  }
+
   if (!user)
     return (
       <PlatformSignIn locale={locale} returnPath={`/admin/resources/${encodeURIComponent(id)}`} />
