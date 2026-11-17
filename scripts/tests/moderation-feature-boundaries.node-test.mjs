@@ -10,7 +10,6 @@ const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cr
 const config = resolve(root, ".dependency-cruiser.cjs");
 const serverPorts = ["admin-home"];
 const clientPorts = ["storage-maintenance"];
-const utilPorts = ["admin-status-labels", "verification-moderation"];
 const safeLib =
   /^(?:i18n(?:\.ts$|\/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|storage-maintenance-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy)\.ts$)/u;
 
