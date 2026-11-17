@@ -15,8 +15,8 @@ import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/b
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
-import { contentService } from "../../../../lib/services/community/content-service";
 import { productService } from "../../../../lib/services/commerce/product-service";
+import { contentService } from "../../../../lib/services/community/content-service";
 import { resourceModerationService } from "../../../../lib/services/resources/resource-release-control-service";
 
 const privateHeaders = {

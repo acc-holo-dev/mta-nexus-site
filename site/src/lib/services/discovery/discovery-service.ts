@@ -13,12 +13,12 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import type { DiscoverQuery } from "../../../features/discovery/discover-query";
 import { DISCOVER_CONTENT_TYPES } from "../../../features/discovery/discover-query";
 import type { DiscoveryStreamQuery } from "../../../features/discovery/discovery-stream-contract";
+import { productService } from "../commerce/product-service";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
   mtaMasterDirectoryService,
 } from "../servers/mta-master-directory-service";
-import { productService } from "../commerce/product-service";
 
 interface SearchResultItem {
   id: string;

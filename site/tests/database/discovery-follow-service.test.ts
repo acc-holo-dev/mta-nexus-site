@@ -23,8 +23,8 @@ vi.mock("../../src/lib/services/commerce/product-service", () => ({
 vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({}));
 
 import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
-import { discoveryService } from "../../src/lib/services/discovery/discovery-service";
 import { followWorkspaceService } from "../../src/lib/services/community/follow-workspace-service";
+import { discoveryService } from "../../src/lib/services/discovery/discovery-service";
 
 beforeEach(() => {
   vi.clearAllMocks();

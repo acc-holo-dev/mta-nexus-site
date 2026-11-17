@@ -37,8 +37,8 @@ import {
 import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { adminService } from "../../lib/services/moderation/admin-service";
 import { authService } from "../../lib/services/accounts/auth-service";
+import { adminService } from "../../lib/services/moderation/admin-service";
 
 export const dynamic = "force-dynamic";
 

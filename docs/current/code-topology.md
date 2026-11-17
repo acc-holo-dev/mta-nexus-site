@@ -36,7 +36,7 @@ site/
 | `components/` root files   |                    0 |
 | `lib/` tree files          |                  366 |
 | `lib/` root files          |                  253 |
-| `lib/services/` root files |                   0 |
+| `lib/services/` root files |                    0 |
 | `lib/**/*-i18n.ts`         |                   46 |
 | `app/**/route.ts`          |                  282 |
 | `site/tests` files         |                 1451 |

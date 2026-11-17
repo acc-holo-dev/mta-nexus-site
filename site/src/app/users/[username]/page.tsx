@@ -25,13 +25,13 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
-import { productService } from "../../../lib/services/commerce/product-service";
-import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
-import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
 

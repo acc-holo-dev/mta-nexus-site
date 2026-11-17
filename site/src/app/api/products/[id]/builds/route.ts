@@ -20,9 +20,9 @@ import {
   logRequestEvent,
 } from "../../../../../lib/observability";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { productService } from "../../../../../lib/services/commerce/product-service";
 import { inspectBuildPackage } from "../../../../../lib/services/resources/build-package-inspection";
 import { buildScannerService } from "../../../../../lib/services/resources/build-scanner-service";
-import { productService } from "../../../../../lib/services/commerce/product-service";
 
 const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
