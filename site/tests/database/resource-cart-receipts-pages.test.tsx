@@ -37,7 +37,7 @@ import Detail from "../../src/app/workspace/acquisitions/receipts/[id]/page";
 import DetailLoading from "../../src/app/workspace/acquisitions/receipts/[id]/loading";
 import Page, { generateMetadata } from "../../src/app/workspace/acquisitions/receipts/page";
 import ListLoading from "../../src/app/workspace/acquisitions/receipts/loading";
-import { resourceCartReceiptsCopy } from "../../src/lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptsCopy } from "../../src/features/resources/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
 beforeEach(() => {

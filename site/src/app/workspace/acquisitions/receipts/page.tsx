@@ -7,7 +7,7 @@ import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptsCopy } from "../../../../features/resources/resource-cart-receipts-i18n";
 import {
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import {
   getResourceCommerceCopy,

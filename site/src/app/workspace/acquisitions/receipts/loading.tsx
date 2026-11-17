@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptsCopy } from "../../../../features/resources/resource-cart-receipts-i18n";
 
 // Honest loading shell for /workspace/acquisitions/receipts.
 export default async function Loading() {

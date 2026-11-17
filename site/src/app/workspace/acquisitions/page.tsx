@@ -12,7 +12,7 @@ import {
   acquisitionPage,
   acquisitionSource,
 } from "../../../lib/resource-activity-view";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptsCopy } from "../../../features/resources/resource-cart-receipts-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceActivityService } from "../../../lib/services/resource-activity-service";
 
