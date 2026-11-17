@@ -60,6 +60,7 @@ Services и repositories не дублируются и не переносят�
 | `publishing-error-message.ts`                  | util port `publishing-error-message`                                                                        |
 | `resource-publisher-nav-i18n.ts` | util port `resource-publisher-nav-i18n` |
 | `author-resource-requests.ts` | util port `author-resource-requests` |
+| `resource-cart-review-confirmation.ts` | util port `resource-cart-review-confirmation` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

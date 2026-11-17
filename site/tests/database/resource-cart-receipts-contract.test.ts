@@ -5,7 +5,7 @@ import {
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,
 } from "../../src/lib/resource-cart-receipts-query";
-import { confirmedResourceCartReview } from "../../src/lib/resource-cart-review-confirmation";
+import { confirmedResourceCartReview } from "../../src/features/resources/resource-cart-review-confirmation";
 import { resourceCartReceiptsCsv } from "../../src/lib/resource-cart-receipts-csv";
 const requestId = "11111111-1111-4111-8111-111111111111";
 const item = {

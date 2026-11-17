@@ -1,5 +1,5 @@
 import type { ResourceCartReview } from "@nexus/domain";
-import { confirmedResourceCart } from "./resource-commerce-confirmation";
+import { confirmedResourceCart } from "../../lib/resource-commerce-confirmation";
 export function confirmedResourceCartReview(value: unknown): ResourceCartReview | null {
   if (!value || typeof value !== "object") return null;
   const row = value as ResourceCartReview;
