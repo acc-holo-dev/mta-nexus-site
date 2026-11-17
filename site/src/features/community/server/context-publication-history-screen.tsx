@@ -3,6 +3,7 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationContentCopy } from "../../organizations/organization-content-copy";
@@ -16,6 +17,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
@@ -57,12 +59,19 @@ export async function ContextPublicationHistoryScreen({
     labels = getUserPlatformCopy(locale),
     path = `/workspace/${kind}/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}/history`;
   let failure = "";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      failure = copy.unavailable;
-      return null;
-    });
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
