@@ -16,7 +16,7 @@ const harness = vi.hoisted(() => ({
   committed: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
 import { OrganizationTeamBatch } from "../../src/features/organizations/components/organization-team-batch";

@@ -19,7 +19,7 @@ import { libraryMembershipBatchesCopy } from "../../../lib/library-membership-ba
 import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 export function LibraryMembershipBatchForm({
   report,
   locale,

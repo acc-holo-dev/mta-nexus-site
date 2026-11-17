@@ -12,7 +12,7 @@ import type { Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedResourceReleaseWatchBatch } from "../../../lib/resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 export function ResourceReleaseWatchBatchControls({
   items,
   locale,

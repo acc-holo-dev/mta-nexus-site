@@ -9,7 +9,7 @@ it("gates own and moderator comment removal behind confirmAction with localized 
   const source = read("site/src/features/community/components/discussion-comment-actions.tsx");
   const i18n = read("site/src/lib/content-discussion-copy.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.removeConfirmTitle");
   expect(source).toContain("copy.moderateRemoveConfirmTitle");
   expect(source).toContain("danger: true");

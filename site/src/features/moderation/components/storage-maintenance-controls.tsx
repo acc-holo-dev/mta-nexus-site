@@ -7,7 +7,7 @@ import { storageMaintenanceCopy } from "../../../lib/storage-maintenance-i18n";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 
 async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
   const response = await fetch(url, {

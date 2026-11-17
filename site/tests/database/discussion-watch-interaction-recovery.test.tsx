@@ -20,7 +20,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 
 import { FollowButton } from "../../src/features/community/follow";
 import { followCopy } from "../../src/lib/follow-workspace-copy";

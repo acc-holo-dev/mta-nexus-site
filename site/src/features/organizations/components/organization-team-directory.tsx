@@ -19,7 +19,7 @@ import {
 import { organizationTeamCopy } from "../../../lib/organization-team-copy";
 import { organizationRequest } from "../../../lib/organization-workspace-client";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
 

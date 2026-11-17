@@ -10,7 +10,7 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
 import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";

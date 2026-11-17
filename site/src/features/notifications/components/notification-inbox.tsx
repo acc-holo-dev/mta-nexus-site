@@ -23,8 +23,8 @@ import {
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 export function NotificationInbox({
   initialPage,

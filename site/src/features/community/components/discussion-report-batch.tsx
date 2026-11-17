@@ -21,8 +21,8 @@ import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({

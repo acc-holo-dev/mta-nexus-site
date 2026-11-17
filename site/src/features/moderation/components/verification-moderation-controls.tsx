@@ -14,7 +14,7 @@ import {
   verificationCopy,
   verificationDecisionError,
 } from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 export function VerificationModerationControls({

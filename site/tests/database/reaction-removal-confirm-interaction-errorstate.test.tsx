@@ -14,7 +14,7 @@ const harness = vi.hoisted(() => ({
   actorId: "actor",
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
 import { ReactionRemoval } from "../../src/features/community/reaction-removal";

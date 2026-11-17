@@ -20,8 +20,8 @@ import { platformFieldClass } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
 export function OrganizationTeamBatch({
   data,
   actorId,

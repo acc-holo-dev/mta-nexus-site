@@ -15,7 +15,7 @@ import {
 import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 export function OrganizationOwnershipTransfer({
   data,
   target,

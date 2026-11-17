@@ -23,7 +23,7 @@ import {
   writerTypes,
 } from "../../../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 
 export function AuthorContentForm({
   locale,

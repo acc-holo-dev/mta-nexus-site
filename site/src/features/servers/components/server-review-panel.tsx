@@ -12,7 +12,7 @@ import {
   serverReviewState,
 } from "../../../lib/server-review-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 

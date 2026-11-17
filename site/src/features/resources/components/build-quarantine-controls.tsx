@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 export function BuildQuarantineControls({

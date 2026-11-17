@@ -8,7 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 

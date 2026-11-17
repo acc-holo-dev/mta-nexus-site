@@ -18,7 +18,7 @@ import {
   resourceCommerceError,
 } from "../../../lib/resource-commerce-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";

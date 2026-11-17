@@ -12,7 +12,7 @@ import {
 } from "../../../lib/library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };

@@ -45,7 +45,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   }),
 }));
 
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 

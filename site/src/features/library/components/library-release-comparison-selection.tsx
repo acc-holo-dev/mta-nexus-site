@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { libraryReleaseComparisonCopy } from "../../../lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseComparisonSelection({
   productId,

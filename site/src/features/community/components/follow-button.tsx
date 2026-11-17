@@ -10,7 +10,7 @@ import type { FollowTargetType } from "../../../lib/follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../../../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { ObjectMuteControls } from "../object-mute-controls";
 

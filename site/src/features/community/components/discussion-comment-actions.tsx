@@ -6,7 +6,7 @@ import { discussionMutationError, getDiscussionCopy } from "../../../lib/content
 import { confirmsDiscussionMutation } from "../../../lib/discussion-mutation-confirmation";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 export function DiscussionCommentActions({
   comment,
   own,

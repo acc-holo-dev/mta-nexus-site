@@ -12,7 +12,7 @@ import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 export function LibrarySelectionBatchControls({
   collectionId,
   locale,

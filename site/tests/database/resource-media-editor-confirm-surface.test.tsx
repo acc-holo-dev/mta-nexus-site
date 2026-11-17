@@ -9,7 +9,7 @@ it("gates gallery image removal behind confirmAction with localized copy", () =>
   const source = read("site/src/features/resources/components/resource-media-editor.tsx");
   const i18n = read("site/src/lib/resource-media-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.removeConfirmTitle");
   expect(source).toContain("copy.removeConfirm");
   expect(source).toContain("danger: true");

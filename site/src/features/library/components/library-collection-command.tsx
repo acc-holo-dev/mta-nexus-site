@@ -15,7 +15,7 @@ import {
 } from "../../../lib/library-collections-i18n";
 import { collectionHref } from "../../../lib/library-collections-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 export function LibraryCollectionCommandForm({
   locale,
   actorId,

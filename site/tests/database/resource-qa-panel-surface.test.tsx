@@ -113,7 +113,7 @@ it("gates resolve and reopen writes behind confirmAction with localized copy", (
   const source = read("site/src/features/resources/components/resource-qa-panel.tsx");
   const i18n = read("site/src/lib/resource-qa-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.resolveConfirmTitle");
   expect(source).toContain("copy.reopenConfirmTitle");
   expect(source).toContain("danger: false");

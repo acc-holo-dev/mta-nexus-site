@@ -16,7 +16,7 @@ const h = vi.hoisted(() => ({
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));

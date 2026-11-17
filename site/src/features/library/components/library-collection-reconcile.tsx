@@ -19,7 +19,7 @@ import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 
 type Command = Extract<LibraryCollectionCommand, { action: "reconcile-items" }>;
 export function LibraryCollectionReconcileForm({

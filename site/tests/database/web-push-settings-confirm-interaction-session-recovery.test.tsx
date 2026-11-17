@@ -20,7 +20,7 @@ const harness = vi.hoisted(() => ({
   } | null,
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");

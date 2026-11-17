@@ -16,7 +16,7 @@ const harness = vi.hoisted(() => ({
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",

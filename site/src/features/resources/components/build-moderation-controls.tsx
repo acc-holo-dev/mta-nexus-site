@@ -8,7 +8,7 @@ import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { buildModerationUiState } from "../../../lib/build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 export function BuildModerationControls({

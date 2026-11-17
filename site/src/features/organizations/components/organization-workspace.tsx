@@ -23,7 +23,7 @@ import {
 } from "../../../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";

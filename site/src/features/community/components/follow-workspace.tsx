@@ -15,7 +15,7 @@ import type { Locale } from "../../../lib/i18n";
 import { publicationHref } from "../../../lib/publication-feed-contract";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { ObjectMuteControls } from "../object-mute-controls";
 
 const actionLinkClass =

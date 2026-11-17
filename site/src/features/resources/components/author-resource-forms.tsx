@@ -36,7 +36,7 @@ import {
   resourceCommerceError,
 } from "../../../lib/resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 const textareaClass =

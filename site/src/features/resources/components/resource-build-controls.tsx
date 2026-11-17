@@ -6,7 +6,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateRequest } from "../../../lib/private-request";
 import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
 import { confirmedBuildCommand } from "../../../lib/resource-build-workspace-response";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 const textareaClass =

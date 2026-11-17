@@ -13,7 +13,7 @@ import { parseEditableProfile } from "../../../lib/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 
 type Candidate = { productId: string; title: string; slug: string; status: string };

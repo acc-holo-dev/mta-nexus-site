@@ -16,7 +16,7 @@ const harness = vi.hoisted(() => ({
   onReload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("../../src/lib/user-platform-client", async (original) => {
   const actual = await original<typeof import("../../src/lib/user-platform-client")>();

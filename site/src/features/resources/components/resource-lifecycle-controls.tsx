@@ -19,8 +19,8 @@ import {
   getResourceCommerceCopy,
   resourceCommerceError,
 } from "../../../lib/resource-commerce-i18n";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";
 

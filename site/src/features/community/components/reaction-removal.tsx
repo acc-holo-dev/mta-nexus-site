@@ -1,7 +1,7 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { confirmedReactionRemoval } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
 import type { Locale } from "../../../lib/i18n";

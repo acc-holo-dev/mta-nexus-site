@@ -8,7 +8,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 import { commercialTerms } from "../../../lib/commercial-confirmation";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {

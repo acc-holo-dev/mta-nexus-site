@@ -14,7 +14,7 @@ const h = vi.hoisted(() => ({
   actor: "usr_a",
   confirm: vi.fn(async () => true),
 }));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction: h.confirm }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction: h.confirm }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({

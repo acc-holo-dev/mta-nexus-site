@@ -13,7 +13,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
 import { confirmedLicenseControl } from "../../../lib/license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../../../lib/license-control-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";

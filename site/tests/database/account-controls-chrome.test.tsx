@@ -8,7 +8,7 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
   confirm: vi.fn(),
 }));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 vi.mock("react", async (original) => ({

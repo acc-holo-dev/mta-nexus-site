@@ -16,7 +16,7 @@ import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
 } from "../../../lib/resource-release-control-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { stashSupportObjectContext } from "../../support/center";
 

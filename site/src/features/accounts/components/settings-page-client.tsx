@@ -17,7 +17,7 @@ import {
   type SettingsSession,
   settingsClientRequest,
 } from "../../../lib/settings-client-api";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { ContextSwitcher } from "./context-switcher";
 import { useNexusLocale } from "../../shell/locale";
 import { PlatformSignIn } from "../../shell/guest-auth";

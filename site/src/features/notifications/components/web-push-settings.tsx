@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 type PushStatus =

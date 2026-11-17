@@ -3,22 +3,22 @@
     "route_ts": 282
   },
   "components": {
-    "root_files": 3,
+    "root_files": 0,
     "shellish_root_files": [],
-    "tree_bytes": 7142,
-    "tree_files": 3
+    "tree_bytes": 0,
+    "tree_files": 0
   },
   "features": {
     "accounts": {
-      "bytes": 102923,
+      "bytes": 102899,
       "files": 27
     },
     "commerce": {
-      "bytes": 173258,
+      "bytes": 173226,
       "files": 38
     },
     "community": {
-      "bytes": 395262,
+      "bytes": 395166,
       "files": 85
     },
     "discovery": {
@@ -26,35 +26,35 @@
       "files": 3
     },
     "library": {
-      "bytes": 283753,
+      "bytes": 283697,
       "files": 57
     },
     "moderation": {
-      "bytes": 115011,
+      "bytes": 114979,
       "files": 22
     },
     "notifications": {
-      "bytes": 66691,
+      "bytes": 66659,
       "files": 10
     },
     "organizations": {
-      "bytes": 127293,
+      "bytes": 127253,
       "files": 35
     },
     "resources": {
-      "bytes": 447525,
+      "bytes": 447397,
       "files": 93
     },
     "servers": {
-      "bytes": 218716,
+      "bytes": 218692,
       "files": 54
     },
     "shell": {
-      "bytes": 87479,
-      "files": 49
+      "bytes": 95050,
+      "files": 54
     },
     "support": {
-      "bytes": 72088,
+      "bytes": 72080,
       "files": 14
     },
     "trust": {
@@ -145,7 +145,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "feeb96b279335e1c84a347ae30f5296657c754e4",
+  "source_sha": "49347168a741feb190c9550de17779790f67de7d",
   "tests": {
     "site_tests_files": 1451
   }

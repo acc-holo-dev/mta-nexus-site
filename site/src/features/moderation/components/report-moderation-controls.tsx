@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
 import { communityReportCopy } from "../../../lib/community-report-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {

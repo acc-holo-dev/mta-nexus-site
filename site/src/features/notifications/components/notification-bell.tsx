@@ -13,7 +13,7 @@ import {
 } from "../../../lib/notification-inbox-events";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { startVisiblePolling } from "../../../lib/visible-polling";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 

@@ -20,7 +20,7 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 

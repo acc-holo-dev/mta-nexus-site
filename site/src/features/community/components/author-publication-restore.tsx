@@ -21,7 +21,7 @@ import {
 } from "../../../lib/server-publication-history-copy";
 import { platformRequest } from "../../../lib/user-platform-client";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 export function AuthorPublicationRestore({
   id,
   revision,

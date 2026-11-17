@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 
 import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { getDictionary } from "../../src/lib/i18n";

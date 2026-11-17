@@ -14,7 +14,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 

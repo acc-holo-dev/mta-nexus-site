@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `feeb96b2` (`dev`, slice 35 — developer-experience → `features/accounts`).  
+**source_sha:** `49347168` (`dev`, slice 36 — confirm-action → `features/shell`).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -17,7 +17,7 @@ site/
 ├── src/
 │   ├── app/                 # App Router + HTTP adapters (282× route.ts)
 │   ├── features/            # feature-группировка (13 доменов, incl. shell/)
-│   ├── components/          # корневой UI вне features (сжимается после shell absorb)
+│   ├── components/          # корневой UI вне features (пуст после slice 36)
 │   └── lib/                 # плоский helpers + services/ + i18n/
 │       ├── services/        # 86 оркестраторов в одном каталоге
 │       └── i18n/            # общий locale primitive
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 35 |
+| Область                    | Факт на slice 36 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
-| `components/` tree files   |                3 |
-| `components/` root files   |                3 |
+| `components/` tree files   |                0 |
+| `components/` root files   |                0 |
 | `lib/` tree files          |              410 |
 | `lib/` root files          |              298 |
 | `lib/services/` root files |               86 |
@@ -58,7 +58,7 @@ site/
 | organizations |    35 | 127293 |
 | resources     |    93 | 447525 |
 | servers       |    54 | 218716 |
-| shell         |    49 |  87479 |
+| shell         |    54 |  95050 |
 | support       |    14 |  72088 |
 | trust         |     5 |  14574 |
 
@@ -143,7 +143,9 @@ site/
 
 **Slice 35 done:** `developer-experience` → [`features/accounts/developer-experience.ts`](../../site/src/features/accounts/developer-experience.ts) (`DeveloperExperience`); владение **Accounts** (публичная карточка verified developer на user/developer profile pages, рядом с `DeveloperProfileEditor`); RSC port в `clientUtilPorts` (без `"use client"`); depcruise `accounts-feature-*` + boundary tests; потребители — `app/users/[username]/page.tsx`, `app/developers/[username]/page.tsx`; корень `components/` −1 production file.
 
-Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
+**Slice 36 done:** `confirm-action` + `action-confirm-checkbox` → [`features/shell`](../../site/src/features/shell/README.md): client ports [`confirm-action.ts`](../../site/src/features/shell/confirm-action.ts) (`confirmAction`), [`action-confirm-checkbox.ts`](../../site/src/features/shell/action-confirm-checkbox.ts) (`ActionConfirmCheckbox`, `actionConfirmCheckboxFocusClass`); владение **Shell** (shared destructive confirm UX); depcruise public API + cross-feature client isolation (как `modal-dialog`, plus commerce shell allowlist); порты с `"use client"`; потребители — accounts/commerce/community/library/moderation/notifications/organizations/resources/servers/support; корень `components/` опустеет (0 production files).
+
+Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 36 — `confirm-action` / `action-confirm-checkbox`).
 
 **Slice 5 done:** shell+home hard-coded string inventory — [`planning/shell-home-hardcoded-strings.json`](../../planning/shell-home-hardcoded-strings.json).  
 Регенерация: `python3 planning/tools/inventory_shell_home_i18n.py --output planning/shell-home-hardcoded-strings.json`  
