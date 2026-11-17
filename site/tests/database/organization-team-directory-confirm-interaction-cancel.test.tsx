@@ -18,7 +18,7 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../../src/lib/organization-workspace-client", () => ({
+vi.mock("../../src/features/organizations/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 

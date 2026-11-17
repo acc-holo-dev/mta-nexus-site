@@ -17,7 +17,7 @@ import {
   organizationTeamPageSchema,
 } from "../../../lib/organization-team-contract";
 import { organizationTeamCopy } from "../../../lib/organization-team-copy";
-import { organizationRequest } from "../../../lib/organization-workspace-client";
+import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";

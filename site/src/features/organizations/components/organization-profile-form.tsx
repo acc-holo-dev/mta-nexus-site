@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
+import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
   editableOrganizationSchema,

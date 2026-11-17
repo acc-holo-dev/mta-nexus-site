@@ -18,7 +18,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/lib/organization-workspace-client", () => ({
+vi.mock("../../src/features/organizations/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 

@@ -14,7 +14,7 @@ import { organizationContentCopy } from "../../../lib/organization-content-copy"
 import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import { organizationTeamCopy } from "../../../lib/organization-team-copy";
-import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
+import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   editableOrganizationSchema,
   memberAddSchema,

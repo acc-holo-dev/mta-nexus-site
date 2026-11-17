@@ -14,7 +14,7 @@ import {
 } from "../../../lib/organization-batch-contract";
 import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
 import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
-import { organizationRequest } from "../../../lib/organization-workspace-client";
+import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import {
