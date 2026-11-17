@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,
@@ -49,12 +50,20 @@ export default async function AuthorContentPage({
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseAuthorPublicationDeskQuery(params);
   const returnPath = params.size ? `/workspace/content?${params}` : "/workspace/content";
-  const sessionActor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
-  if (!sessionActor) {
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  let sessionActor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    sessionActor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
   }
+  if (!sessionActor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {

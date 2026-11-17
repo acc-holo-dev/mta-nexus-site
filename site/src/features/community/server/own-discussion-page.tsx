@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
 
@@ -28,12 +29,20 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
     copy = ownDiscussionCopy(locale),
     dictionary = getDictionary(locale),
     returnPath = `/workspace/discussions/${encodeURIComponent(id)}`;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
-  if (!actor) {
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.failed}
+        retryHref={returnPath}
+      />
+    );
   }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const initial = await discussionWorkspaceService.own(actor, id).catch((error: unknown) => {
     if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
     return null;

@@ -8,6 +8,7 @@ import {
   verificationApplicationsError,
 } from "../../../../features/moderation/verification-applications-copy";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
 import {
   parseVerificationApplicationsQuery,
   verificationApplicationsHref,
@@ -55,9 +56,19 @@ export default async function VerificationHistoryPage({
     ? `/workspace/verification/history?${params}`
     : "/workspace/verification/history";
   const retryHref = filters ? returnPath : "/workspace/verification/history";
-  const sessionActor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+  let sessionActor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    sessionActor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={labels.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!sessionActor) {
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }

@@ -7,6 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationTeamService } from "../../../lib/services/organizations/organization-team-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
@@ -47,9 +48,19 @@ export default async function TeamPage({
     : query.size
       ? `/workspace/organizations/${encodeURIComponent(id)}/team?${query}`
       : organizationTeamHref(id, { query: "" });
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const filters = teamFilters;
   let error = filters ? "" : copy.invalid;
