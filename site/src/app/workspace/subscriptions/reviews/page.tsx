@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { planReviewNavLinkClass } from "../../../../components/plan-review-workspace-recovery";
+import { planReviewNavLinkClass } from "../../../../features/commerce/plan-reviews-workspace";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";

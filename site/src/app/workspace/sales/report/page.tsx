@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { SellerSalesReportView } from "../../../../components/seller-sales-report";
+import { SellerSalesReportView } from "../../../../features/commerce/seller-sales";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";

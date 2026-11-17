@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `f34af2a5` (`dev`, slice 33 — `order-*` cluster → `features/commerce` order ports).  
+**source_sha:** `e4967384` (`dev`, slice 34 — commerce plan/review/sales → `features/commerce`).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,11 +29,11 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 33 |
+| Область                    | Факт на slice 34 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
-| `components/` tree files   |               11 |
-| `components/` root files   |               11 |
+| `components/` tree files   |                4 |
+| `components/` root files   |                4 |
 | `lib/` tree files          |              410 |
 | `lib/` root files          |              298 |
 | `lib/services/` root files |               86 |
@@ -49,7 +49,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    25 | 100894 |
-| commerce      |    26 | 116429 |
+| commerce      |    38 | 173258 |
 | community     |    85 | 395262 |
 | discovery     |     3 |  20343 |
 | library       |    57 | 283753 |
@@ -138,6 +138,8 @@ site/
 **Slice 32 done:** `subscription-*` cluster в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client port [`subscription-controls.ts`](../../site/src/features/commerce/subscription-controls.ts) (`SubscriptionControls`, `SubscriptionFeeEstimator`, `SubscriptionRecovery`), shared nav port [`subscription-workspace.ts`](../../site/src/features/commerce/subscription-workspace.ts) (`subscriptionNavLinkClass`, RSC-safe); владение **Commerce** (workspace subscription activate/cancel, fee estimate, intent recovery); `PlanReviewTerms` остаётся в `components/` до plan-review absorb; depcruise `commerce-feature-*` + boundary tests; корень `components/` −4 production files.
 
 **Slice 33 done:** `order-*` cluster в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client ports [`order-cancellation.ts`](../../site/src/features/commerce/order-cancellation.ts) (`OrderCancellationForm`), [`order-case-forms.ts`](../../site/src/features/commerce/order-case-forms.ts) (`OrderCaseReviewForm`; create form internal), server composition [`order-case-server.ts`](../../site/src/features/commerce/order-case-server.ts) (list/detail/create pages + `orderCaseMetadata`), RSC port [`order-terms.ts`](../../site/src/features/commerce/order-terms.ts) (`OrderTermsReportView`); владение **Commerce** (purchase cancel, order cases, terms report); `action-confirm-checkbox` / `confirm-action` остаются в `components/`; depcruise `commerce-feature-*` + boundary tests; корень `components/` −4 production files.
+
+**Slice 34 done:** commerce leftovers в `components/` root → [`features/commerce`](../../site/src/features/commerce/README.md): client ports [`commercial-plans.ts`](../../site/src/features/commerce/commercial-plans.ts) (`CommercialPlanForm`, `CommercialFeeCalculator`), [`plan-reviews.ts`](../../site/src/features/commerce/plan-reviews.ts) (`PlanReviewForm`), RSC port [`plan-reviews-workspace.ts`](../../site/src/features/commerce/plan-reviews-workspace.ts) (`PlanReviewTerms`, `planReviewNavLinkClass`), [`plan-review-detail.ts`](../../site/src/features/commerce/plan-review-detail.ts) (`PlanReviewDetailView`), [`seller-sales.ts`](../../site/src/features/commerce/seller-sales.ts) (`SellerSalesReportView`); владение **Commerce** (admin commercial plans, public fee calculator, plan review workspace, seller report); `confirm-action` / `action-confirm-checkbox` / `developer-experience` остаются в `components/`; depcruise `commerce-feature-*` + boundary tests; корень `components/` −7 production files.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 13).
 

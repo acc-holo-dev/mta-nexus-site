@@ -20,7 +20,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
 
-import { PlanReviewForm } from "../../src/components/plan-review-form";
+import { PlanReviewForm } from "../../src/features/commerce/plan-reviews";
 
 const { render, mount, submit } = createPlanReviewRecoveryInteractionHelpers(h, PlanReviewForm);
 

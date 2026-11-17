@@ -2,7 +2,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CreditCard } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CommercialFeeCalculator } from "../../components/commercial-fee-calculator";
+import { CommercialFeeCalculator } from "../../features/commerce/commercial-plans";
 import { formatHistoryAmount, parseHistoryPage } from "../../lib/commerce-history-format";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { getDictionary } from "../../lib/i18n";

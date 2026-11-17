@@ -9,11 +9,14 @@ import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { confirmedCommercialPlan, parseCommercialAmount } from "../lib/commercial-confirmation";
-import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmAction } from "./confirm-action";
-import { useNexusLocale } from "../features/shell/locale";
+import { confirmAction } from "../../../components/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import {
+  confirmedCommercialPlan,
+  parseCommercialAmount,
+} from "../../../lib/commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../../../lib/commercial-i18n";
+import { privateApiRequest } from "../../../lib/private-api-request";
 
 export function CommercialPlanForm({
   plan,

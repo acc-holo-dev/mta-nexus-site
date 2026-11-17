@@ -14,9 +14,11 @@ const clientPorts = [
   "subscription-controls",
   "order-cancellation",
   "order-case-forms",
+  "commercial-plans",
+  "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -149,5 +151,20 @@ test("real Commerce order-case-forms graphs have no transitive server dependenci
   assertClientGraphsHaveNoServerLeaks([
     "site/src/features/commerce/order-case-forms.ts",
     "site/src/features/commerce/components/order-case-forms.tsx",
+  ]);
+});
+
+test("real Commerce commercial-plans graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/commercial-plans.ts",
+    "site/src/features/commerce/components/commercial-fee-calculator.tsx",
+    "site/src/features/commerce/components/commercial-plan-form.tsx",
+  ]);
+});
+
+test("real Commerce plan-reviews graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/plan-reviews.ts",
+    "site/src/features/commerce/components/plan-review-form.tsx",
   ]);
 });

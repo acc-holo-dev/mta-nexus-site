@@ -328,7 +328,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/commerce/)" },
       to: {
-        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-history-server|subscription-controls|subscription-workspace|order-cancellation|order-case-forms|order-terms|order-case-server)\\.ts$)",
+        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-history-server|subscription-controls|subscription-workspace|order-cancellation|order-case-forms|order-terms|order-case-server|commercial-plans|plan-reviews|plan-reviews-workspace|plan-review-detail|seller-sales)\\.ts$)",
       },
     },
     {
@@ -341,17 +341,17 @@ module.exports = {
       name: "commerce-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "commerce-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls|order-cancellation|order-case-forms|commercial-plans|plan-reviews)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

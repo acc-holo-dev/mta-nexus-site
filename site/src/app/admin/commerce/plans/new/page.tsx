@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CommercialPlanForm } from "../../../../../components/commercial-plan-form";
+import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";

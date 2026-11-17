@@ -18,6 +18,11 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `order-case-forms.ts`       | `OrderCaseReviewForm` (client); create form composed via `order-case-server`           |
 | `order-terms.ts`            | `OrderTermsReportView`; buyer/admin order terms report (RSC-safe)                      |
 | `order-case-server.ts`      | `OrderCaseListPage`, `OrderCaseDetailPage`, `OrderCaseCreatePage`, `orderCaseMetadata` |
+| `commercial-plans.ts`       | `CommercialPlanForm`, `CommercialFeeCalculator` (client)                               |
+| `plan-reviews.ts`           | `PlanReviewForm` (client)                                                              |
+| `plan-reviews-workspace.ts` | `PlanReviewTerms`, `planReviewNavLinkClass` (RSC-safe)                                 |
+| `plan-review-detail.ts`     | `PlanReviewDetailView`; workspace plan review detail                                   |
+| `seller-sales.ts`           | `SellerSalesReportView`; workspace seller sales report                                 |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

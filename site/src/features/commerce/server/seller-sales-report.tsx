@@ -2,10 +2,10 @@ import type { SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
 import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { formatFinancialMinor } from "../lib/financial-i18n";
-import type { Locale } from "../lib/i18n";
-import { sellerSalesCopy, sellerSalesTime } from "../lib/seller-sales-i18n";
-import { sellerSalesUrl, sellerSaleUrl } from "../lib/seller-sales-query";
+import { formatFinancialMinor } from "../../../lib/financial-i18n";
+import type { Locale } from "../../../lib/i18n";
+import { sellerSalesCopy, sellerSalesTime } from "../../../lib/seller-sales-i18n";
+import { sellerSalesUrl, sellerSaleUrl } from "../../../lib/seller-sales-query";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({

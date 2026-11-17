@@ -1,6 +1,6 @@
 import type { CommercialPlanTerms } from "@nexus/domain";
-import { formatHistoryAmount } from "../lib/commerce-history-format";
-import { planReviewsCopy } from "../lib/plan-reviews-i18n";
+import { formatHistoryAmount } from "../../../lib/commerce-history-format";
+import { planReviewsCopy } from "../../../lib/plan-reviews-i18n";
 export function PlanReviewTerms({
   terms,
   locale,

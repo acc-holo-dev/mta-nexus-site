@@ -21,7 +21,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { CommercialPlanForm } from "../../src/components/commercial-plan-form";
+import { CommercialPlanForm } from "../../src/features/commerce/commercial-plans";
 
 const { mount, prepare, submit, planPosts } = createCommercialPlanActorRecoveryInteractionHelpers(
   h,

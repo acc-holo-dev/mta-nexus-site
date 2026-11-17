@@ -6,7 +6,10 @@ import { expect, it } from "vitest";
 /** Honesty lock for commercial-plan unknown prior-operation marker via ErrorState. */
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/commercial-plan-form.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/commerce/components/commercial-plan-form.tsx"),
+  "utf8",
+);
 
 it("locks commercial-plan unknown operation marker to ErrorState without soft note", () => {
   expect(source).toContain("ErrorState");

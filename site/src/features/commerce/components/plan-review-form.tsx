@@ -4,13 +4,13 @@ import { Button, ErrorState } from "@nexus/ui";
 import { commercialPlanTermsSchema, planReviewCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { formatHistoryAmount } from "../lib/commerce-history-format";
-import { commercialTerms, parseCommercialAmount } from "../lib/commercial-confirmation";
-import { confirmedPlanReview, expectedPlanReviewId } from "../lib/plan-review-confirmation";
-import { planReviewError, planReviewsCopy } from "../lib/plan-reviews-i18n";
-import { planReviewHref } from "../lib/plan-reviews-query";
-import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "../features/shell/locale";
+import { useNexusLocale } from "../../shell/locale";
+import { formatHistoryAmount } from "../../../lib/commerce-history-format";
+import { commercialTerms, parseCommercialAmount } from "../../../lib/commercial-confirmation";
+import { confirmedPlanReview, expectedPlanReviewId } from "../../../lib/plan-review-confirmation";
+import { planReviewError, planReviewsCopy } from "../../../lib/plan-reviews-i18n";
+import { planReviewHref } from "../../../lib/plan-reviews-query";
+import { privateApiRequest } from "../../../lib/private-api-request";
 import { PlanReviewTerms } from "./plan-review-terms";
 export function PlanReviewForm({
   plan,

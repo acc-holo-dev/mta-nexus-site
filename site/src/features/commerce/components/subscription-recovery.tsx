@@ -1,7 +1,7 @@
 "use client";
 import { commercialPlanTermsSchema, subscriptionCommandSchema } from "@nexus/validation";
 import { useEffect, useState } from "react";
-import { PlanReviewTerms } from "../../../components/plan-review-terms";
+import { PlanReviewTerms } from "../plan-reviews-workspace";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { SubscriptionControls } from "./subscription-controls";

@@ -95,7 +95,7 @@ it("locks sales report honesty chrome with ErrorState recovery and no plain aler
 });
 
 it("locks seller sales report apply CTA to size=touch", () => {
-  const source = read("site/src/components/seller-sales-report.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
   expect(source).toContain("min-h-11");
@@ -103,7 +103,7 @@ it("locks seller sales report apply CTA to size=touch", () => {
 });
 
 it("locks seller sales report filter panel as a localized search landmark with touch select chrome", () => {
-  const source = read("site/src/components/seller-sales-report.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report.tsx");
   expect(source).toContain("<search aria-label={c.filters}>");
   expect(source).toMatch(
     /<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u,

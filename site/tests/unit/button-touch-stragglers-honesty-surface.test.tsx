@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "site/src/components/seller-sales-report.tsx",
+  "site/src/features/commerce/server/seller-sales-report.tsx",
   "site/src/features/resources/components/resource-review-controls.tsx",
   "site/src/features/support/components/support-center.tsx",
   "site/src/features/commerce/server/order-case-page.tsx",
@@ -37,7 +37,7 @@ it("locks order-case filter selects to min-h-11 field chrome", () => {
 });
 
 it("locks seller-sales apply and support create-case submit to size=touch", () => {
-  expect(read("site/src/components/seller-sales-report.tsx")).toMatch(
+  expect(read("site/src/features/commerce/server/seller-sales-report.tsx")).toMatch(
     /type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u,
   );
   expect(read("site/src/features/support/components/support-center.tsx")).toMatch(

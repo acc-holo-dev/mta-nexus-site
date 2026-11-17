@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlanReviewTerms } from "../../../../../components/plan-review-terms";
+import { PlanReviewTerms } from "../../../../../features/commerce/plan-reviews-workspace";
 import { subscriptionNavLinkClass } from "../../../../../features/commerce/subscription-workspace";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
