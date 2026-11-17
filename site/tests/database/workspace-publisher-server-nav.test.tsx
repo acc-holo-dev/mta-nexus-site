@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getResourcePublisherNavCopy } from "../../src/lib/resource-publisher-nav-i18n";
+import { getResourcePublisherNavCopy } from "../../src/features/resources/resource-publisher-nav-i18n";
 import { getServerWorkspaceNavCopy } from "../../src/lib/server-workspace-nav-i18n";
 
 const nav = vi.hoisted(() => ({

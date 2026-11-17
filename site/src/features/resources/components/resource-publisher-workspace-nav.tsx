@@ -6,7 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import {
   getResourcePublisherNavCopy,
   type ResourcePublisherNavCopy,
-} from "../../../lib/resource-publisher-nav-i18n";
+} from "../resource-publisher-nav-i18n";
 
 type NavItem = {
   key: keyof ResourcePublisherNavCopy;
