@@ -14,7 +14,7 @@ import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
 } from "../../../lib/organization-publication-history-copy";
-import { confirmedServerPublicationRestore } from "../../../lib/server-publication-history-contract";
+import { confirmedServerPublicationRestore } from "../server-publication-history-contract";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,

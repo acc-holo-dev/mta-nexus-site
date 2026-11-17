@@ -25,7 +25,7 @@ import { reportBatchCopy } from "../../src/lib/report-batch-copy";
 import {
   confirmedServerPublicationRestore,
   serverPublicationHistorySchema,
-} from "../../src/lib/server-publication-history-contract";
+} from "../../src/features/community/server-publication-history-contract";
 import { serverPublicationHistoryCopy } from "../../src/lib/server-publication-history-copy";
 import { communityReportService as reports } from "../../src/lib/services/community-report-service";
 import { serverContentService as servers } from "../../src/lib/services/server-content-service";

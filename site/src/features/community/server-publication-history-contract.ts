@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { organizationPublicationHistorySchema } from "./organization-publication-history-contract";
+import { organizationPublicationHistorySchema } from "../../lib/organization-publication-history-contract";
 export const serverPublicationHistorySchema = organizationPublicationHistorySchema
   .omit({ organization: true })
   .extend({ server: z.object({ id: z.string().min(1).max(128), name: z.string() }).strict() })

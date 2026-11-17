@@ -13,7 +13,7 @@ import {
   organizationPublicationHistoryError,
 } from "../../../lib/organization-publication-history-copy";
 import { serverContentCopy } from "../../../lib/server-content-copy";
-import { serverPublicationHistorySchema } from "../../../lib/server-publication-history-contract";
+import { serverPublicationHistorySchema } from "../server-publication-history-contract";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,

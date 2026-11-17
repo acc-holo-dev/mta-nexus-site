@@ -43,6 +43,7 @@ Feature объединяет клиентское обсуждение публ�
 | `object-mute-controls.ts`             | `ObjectMuteControls`; временный mute уведомлений по объекту подписки          |
 | `follow.ts`                           | `FollowButton`, `FollowWorkspace`; подписка и лента сохранённых               |
 | `follow-confirmation.ts`              | util port `follow-confirmation`                                               |
+| `server-publication-history-contract.ts` | util port `server-publication-history-contract` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую
