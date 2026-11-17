@@ -165,11 +165,7 @@ export default async function ArticleDetailPage({
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded bg-warning-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-warning">
-            {article.type === "review"
-              ? locale === "ru"
-                ? "Обзор"
-                : "Review"
-              : getUserPlatformCopy(locale)[article.type]}
+            {getUserPlatformCopy(locale)[article.type]}
           </span>
           <span className="font-numeric text-xs text-muted">• {formattedDate}</span>
           <span className="font-numeric text-xs text-muted">
