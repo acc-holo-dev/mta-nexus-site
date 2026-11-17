@@ -16,7 +16,7 @@ import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-hi
 import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,
-} from "../../../lib/library-collection-history-query";
+} from "../library-collection-history-query";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,

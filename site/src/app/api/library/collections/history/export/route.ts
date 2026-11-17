@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { libraryCollectionHistoryQuery } from "../../../../../../lib/library-collection-history-query";
+import { libraryCollectionHistoryQuery } from "../../../../../../features/library/library-collection-history-query";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { libraryCollectionsService } from "../../../../../../lib/services/library-collections-service";
 export function GET(request: NextRequest) {
