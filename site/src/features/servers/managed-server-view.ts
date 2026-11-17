@@ -36,4 +36,4 @@ export function managedServerHref(filters: ManagedServerFilters = {}, page = 1) 
   return `/workspace/servers${suffix ? `?${suffix}` : ""}`;
 }
 
-export { getManagedServerCopy } from "./managed-server-copy";
+export { getManagedServerCopy } from "../../lib/managed-server-copy";

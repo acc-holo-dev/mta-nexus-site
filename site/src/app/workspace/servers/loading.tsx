@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../lib/managed-server-view";
+import { getManagedServerCopy } from "../../../features/servers/managed-server-view";
 
 // Honest loading shell for /workspace/servers.
 export default async function Loading() {

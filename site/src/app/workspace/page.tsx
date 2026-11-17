@@ -14,7 +14,7 @@ import { ownDiscussionCopy } from "../../lib/discussion-workspace-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getLibraryCopy } from "../../lib/library-view";
-import { getManagedServerCopy } from "../../lib/managed-server-view";
+import { getManagedServerCopy } from "../../features/servers/managed-server-view";
 import { authService } from "../../lib/services/auth-service";
 import {
   indexMtaObservations,

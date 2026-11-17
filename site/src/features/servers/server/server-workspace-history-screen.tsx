@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../lib/managed-server-view";
+import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
 import {
   parseServerWorkspaceHistoryQuery,
