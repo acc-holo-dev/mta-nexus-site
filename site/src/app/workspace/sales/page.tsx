@@ -14,6 +14,8 @@ import { getFinancialCopy } from "../../../features/commerce/financial-i18n";
 import { sellerSalesCopy } from "../../../features/commerce/seller-sales-i18n";
 import { HistoryPagination, HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -37,7 +39,20 @@ export default async function SalesHistoryPage({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   const dictionary = getDictionary(typedLocale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={getDictionary(typedLocale).errors.message}
+        retryHref={"/workspace/sales"}
+      />
+    );
+  }
+
   if (!user) {
     const page = typeof query.page === "string" ? query.page : undefined;
     const returnPath =
