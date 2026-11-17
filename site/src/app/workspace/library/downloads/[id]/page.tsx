@@ -14,7 +14,7 @@ import { resourceDeliveriesCopy } from "../../../../../features/resources/resour
 import {
   resourceDeliveriesUrl,
   resourceDeliveryId,
-} from "../../../../../lib/resource-deliveries-query";
+} from "../../../../../features/resources/resource-deliveries-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
 

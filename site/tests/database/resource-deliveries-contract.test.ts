@@ -6,7 +6,7 @@ import {
   publisherDeliveriesQuery,
   resourceDeliveryId,
   deliverySearchParams,
-} from "../../src/lib/resource-deliveries-query";
+} from "../../src/features/resources/resource-deliveries-query";
 import { resourceDeliveriesCsv } from "../../src/features/resources/resource-deliveries-csv";
 it("preserves bounded private selectors through pagination and exports", () => {
   const query = resourceDeliveriesQuery(
