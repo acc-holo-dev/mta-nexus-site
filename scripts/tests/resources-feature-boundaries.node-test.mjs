@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-cart-receipts-query",
     "public-release-history",
     "resource-commerce-confirmation",
     "build-file-validation",
@@ -271,6 +272,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-cart-receipts-query.ts", "resources-view-isolation"],
     ["features/resources/public-release-history.ts", "resources-view-isolation"],
     ["features/resources/resource-commerce-confirmation.ts", "resources-view-isolation"],
     ["features/resources/build-file-validation.ts", "resources-view-isolation"],
@@ -343,6 +345,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-cart-receipts-query.ts",
     "app/public-release-history.ts",
     "app/resource-commerce-confirmation.ts",
     "app/build-file-validation.ts",
@@ -409,6 +412,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-cart-receipts-query.ts",
     "site/src/features/resources/public-release-history.ts",
     "site/src/features/resources/resource-commerce-confirmation.ts",
     "site/src/features/resources/build-file-validation.ts",
@@ -555,6 +559,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-cart-receipts-query.ts");
   visit("site/src/features/resources/public-release-history.ts");
   visit("site/src/features/resources/resource-commerce-confirmation.ts");
   visit("site/src/features/resources/build-file-validation.ts");

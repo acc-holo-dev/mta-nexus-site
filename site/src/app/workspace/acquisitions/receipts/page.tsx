@@ -12,7 +12,7 @@ import {
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,
   resourceCartReceiptUrl,
-} from "../../../../lib/resource-cart-receipts-query";
+} from "../../../../features/resources/resource-cart-receipts-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
 

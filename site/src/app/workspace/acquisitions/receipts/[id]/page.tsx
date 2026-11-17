@@ -11,7 +11,7 @@ import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../../lib/resource-cart-receipts-i18n";
-import { resourceCartReceiptId } from "../../../../../lib/resource-cart-receipts-query";
+import { resourceCartReceiptId } from "../../../../../features/resources/resource-cart-receipts-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
 
