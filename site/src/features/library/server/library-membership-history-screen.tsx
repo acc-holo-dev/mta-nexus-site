@@ -9,7 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

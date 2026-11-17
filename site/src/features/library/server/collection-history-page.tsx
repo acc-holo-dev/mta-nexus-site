@@ -12,7 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,

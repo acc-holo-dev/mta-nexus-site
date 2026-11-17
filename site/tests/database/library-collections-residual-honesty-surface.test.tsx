@@ -23,7 +23,7 @@ import ReconcileLoading from "../../src/app/workspace/library/collections/[id]/r
 import CollectionsError from "../../src/app/workspace/library/collections/error";
 import HistoryLoading from "../../src/app/workspace/library/collections/history/loading";
 import ReceiptLoading from "../../src/app/workspace/library/collections/receipts/[id]/loading";
-import { libraryCollectionHistoryCopy } from "../../src/lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../../src/features/library/library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 
 beforeEach(() => {
@@ -111,5 +111,5 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     "overflow-x-clip",
   );
   expect(read("site/src/lib/library-collections-i18n.ts")).toContain("loadUnavailableDescription");
-  expect(read("site/src/lib/library-collection-history-i18n.ts")).toContain("emptyHint");
+  expect(read("site/src/features/library/library-collection-history-i18n.ts")).toContain("emptyHint");
 });

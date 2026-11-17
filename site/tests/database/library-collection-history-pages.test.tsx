@@ -39,7 +39,7 @@ import Page, {
   generateMetadata,
 } from "../../src/app/workspace/library/collections/history/page";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionHistoryCopy } from "../../src/lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../../src/features/library/library-collection-history-i18n";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
