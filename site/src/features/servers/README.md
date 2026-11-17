@@ -32,6 +32,7 @@ repositories и collectors остаются в прежних модулях и 
 | `client.ts`                     | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
 | `server.ts`                     | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
 | `model.ts`                      | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
+| `server-organization-options.ts` | util port `server-organization-options` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
