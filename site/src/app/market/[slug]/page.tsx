@@ -2,7 +2,7 @@ import { config } from "@nexus/config";
 import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { safeResourceImageUrl } from "../../../lib/resource-image-url";
+import { safeResourceImageUrl } from "../../../features/resources/resource-image-url";
 import { productService } from "../../../lib/services/product-service";
 
 export { ProductDetailPage as default } from "../../../features/resources/detail-server";

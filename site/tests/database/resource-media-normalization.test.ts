@@ -1,6 +1,6 @@
 import { resourceMediaCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { safeResourceImageUrl } from "../../src/lib/resource-image-url";
+import { safeResourceImageUrl } from "../../src/features/resources/resource-image-url";
 import { normalizeResourceImage } from "../../src/lib/services/resource-image-normalization";
 import fixtures from "../fixtures/resource-images.json";
 

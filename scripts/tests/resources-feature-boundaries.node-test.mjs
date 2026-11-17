@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-image-url",
     "mta-meta-inspector-messages",
     "resource-cart-review-confirmation",
     "author-resource-requests",
@@ -265,6 +266,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-image-url.ts", "resources-view-isolation"],
     ["features/resources/mta-meta-inspector-messages.ts", "resources-view-isolation"],
     ["features/resources/resource-cart-review-confirmation.ts", "resources-view-isolation"],
     ["features/resources/author-resource-requests.ts", "resources-view-isolation"],
@@ -331,6 +333,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-image-url.ts",
     "app/mta-meta-inspector-messages.ts",
     "app/resource-cart-review-confirmation.ts",
     "app/author-resource-requests.ts",
@@ -391,6 +394,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-image-url.ts",
     "site/src/features/resources/mta-meta-inspector-messages.ts",
     "site/src/features/resources/resource-cart-review-confirmation.ts",
     "site/src/features/resources/author-resource-requests.ts",
@@ -531,6 +535,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-image-url.ts");
   visit("site/src/features/resources/mta-meta-inspector-messages.ts");
   visit("site/src/features/resources/resource-cart-review-confirmation.ts");
   visit("site/src/features/resources/author-resource-requests.ts");
