@@ -43,6 +43,7 @@ Feature объединяет существующие представления
 | `library-release-comparison-query.ts`       | util port `library-release-comparison-query`                  |
 | `library-collection-history-query.ts`       | util port `library-collection-history-query`                  |
 | `collection-releases-i18n.ts` | util port `collection-releases-i18n` |
+| `library-collection-comparison-i18n.ts` | util port `library-collection-comparison-i18n` |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

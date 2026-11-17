@@ -67,7 +67,7 @@ import Page, {
 } from "../../src/app/workspace/library/collections/[id]/compare/page";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionComparisonCopy } from "../../src/lib/library-collection-comparison-i18n";
+import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
 
 const source = {
     id: "lcol_a",

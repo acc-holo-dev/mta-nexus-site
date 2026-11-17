@@ -31,7 +31,7 @@ import CollectionDetailLoading from "../../src/app/workspace/library/collections
 import CollectionMoveItemsLoading from "../../src/app/workspace/library/collections/[id]/move-items/loading";
 import CollectionVersionsHistoryLoading from "../../src/app/workspace/library/collections/[id]/versions/history/loading";
 import MembershipHistoryDetailLoading from "../../src/app/workspace/library/collections/membership-history/[id]/loading";
-import { libraryCollectionComparisonCopy } from "../../src/lib/library-collection-comparison-i18n";
+import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 import { publicationCopy } from "../../src/lib/publication-feed-copy";
 

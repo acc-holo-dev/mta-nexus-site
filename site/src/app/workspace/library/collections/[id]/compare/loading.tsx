@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { libraryCollectionComparisonCopy } from "../../../../../../lib/library-collection-comparison-i18n";
+import { libraryCollectionComparisonCopy } from "../../../../../../features/library/library-collection-comparison-i18n";
 
 // Honest loading shell for /workspace/library/collections/[id]/compare.
 export default async function Loading() {

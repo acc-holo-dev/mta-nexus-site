@@ -9,7 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
+import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
 import {
   libraryCollectionComparisonQuery,
   libraryCollectionComparisonSuffix,
