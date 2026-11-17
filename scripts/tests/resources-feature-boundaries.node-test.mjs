@@ -128,6 +128,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "publisher-view",
     "publisher-navigation",
     "resource-submission-intent",
+    "resource-copy-i18n",
     "build-package-i18n",
     "resource-cart-receipts-i18n",
     "resource-qa-i18n",
@@ -279,6 +280,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
     ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-copy-i18n.ts", "resources-view-isolation"],
     ["features/resources/build-package-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-cart-receipts-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-qa-i18n.ts", "resources-view-isolation"],
@@ -359,6 +361,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
     "app/resource-submission-intent.ts",
+    "app/resource-copy-i18n.ts",
     "app/build-package-i18n.ts",
     "app/resource-cart-receipts-i18n.ts",
     "app/resource-qa-i18n.ts",
@@ -433,6 +436,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
     "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-copy-i18n.ts",
     "site/src/features/resources/build-package-i18n.ts",
     "site/src/features/resources/resource-cart-receipts-i18n.ts",
     "site/src/features/resources/resource-qa-i18n.ts",
@@ -587,6 +591,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
   visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-copy-i18n.ts");
   visit("site/src/features/resources/build-package-i18n.ts");
   visit("site/src/features/resources/resource-cart-receipts-i18n.ts");
   visit("site/src/features/resources/resource-qa-i18n.ts");

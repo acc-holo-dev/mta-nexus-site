@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
 import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
-import { resourceCopyCopy } from "../../src/lib/resource-copy-i18n";
+import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/lib/resource-publisher-i18n";
 import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";

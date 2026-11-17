@@ -9,7 +9,7 @@ import { ResourceCopyMetadataView } from "../../../../../../features/resources/c
 import { formatHistoryDate } from "../../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { resourceCopyCopy, resourceCopyError } from "../../../../../../lib/resource-copy-i18n";
+import { resourceCopyCopy, resourceCopyError } from "../../../../../../features/resources/resource-copy-i18n";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,

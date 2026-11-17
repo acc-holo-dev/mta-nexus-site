@@ -1,4 +1,4 @@
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
 
 const en = {
   loadUnavailable: "Draft copy management is temporarily unavailable. Please try again.",

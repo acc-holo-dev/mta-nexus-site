@@ -41,7 +41,7 @@ vi.mock("../../src/features/shell/locale", () => ({
 import Detail from "../../src/app/workspace/resources/[id]/copies/[receiptId]/page";
 import History from "../../src/app/workspace/resources/[id]/copies/page";
 import New from "../../src/app/workspace/resources/[id]/copy/page";
-import { resourceCopyCopy } from "../../src/lib/resource-copy-i18n";
+import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { date, preview, receipt, receiptId, sourceId } from "../helpers/resource-copy-fixtures";
 
 const context = {

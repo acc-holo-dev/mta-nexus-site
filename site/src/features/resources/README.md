@@ -76,6 +76,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-qa-i18n.ts` | util port `resource-qa-i18n` |
 | `resource-cart-receipts-i18n.ts` | util port `resource-cart-receipts-i18n` |
 | `build-package-i18n.ts` | util port `build-package-i18n` |
+| `resource-copy-i18n.ts` | util port `resource-copy-i18n` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
