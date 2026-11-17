@@ -7,7 +7,7 @@ import {
   PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
   passwordResetTargetMs,
   waitForPasswordResetFloor,
-} from "../../../../lib/account-recovery-request-policy";
+} from "../../../../features/accounts/account-recovery-request-policy";
 import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {

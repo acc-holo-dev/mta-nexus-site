@@ -11,7 +11,7 @@ import {
   passwordResetRemainingFloorMs,
   passwordResetTargetMs,
   waitForPasswordResetFloor,
-} from "../../src/lib/account-recovery-request-policy";
+} from "../../src/features/accounts/account-recovery-request-policy";
 
 const validChallenge = "ach_recovery_fixture";
 const validToken = "A".repeat(43);

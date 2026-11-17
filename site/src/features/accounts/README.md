@@ -9,3 +9,4 @@
 | `feature-flags.ts` | util port `feature-flags` |
 | `profile-privacy-copy.ts` | util port `profile-privacy-copy` |
 | `session-revocation.ts` | util port `session-revocation` |
+| `account-recovery-request-policy.ts` | util port `account-recovery-request-policy` |

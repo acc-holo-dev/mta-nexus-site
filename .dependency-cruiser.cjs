@@ -130,7 +130,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/accounts/)" },
       to: {
-        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|settings-client-api|feature-flags|profile-privacy-copy|session-revocation|public-profile-activity-server|ad-preference)\\.ts$)",
+        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|settings-client-api|feature-flags|profile-privacy-copy|session-revocation|account-recovery-request-policy|public-profile-activity-server|ad-preference)\\.ts$)",
       },
     },
     {
@@ -143,7 +143,7 @@ module.exports = {
       name: "accounts-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|ad-preference|settings-client-api|feature-flags|profile-privacy-copy|session-revocation)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|ad-preference|settings-client-api|feature-flags|profile-privacy-copy|session-revocation|account-recovery-request-policy)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/(?!accounts/|notifications/preferences\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/accounts/(?:server/)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:notification-preferences-confirmation|notification-inbox-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -153,7 +153,7 @@ module.exports = {
       name: "accounts-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|ad-preference|settings-client-api|feature-flags|profile-privacy-copy|session-revocation)\\.ts$|components/)",
+        path: "^site/src/features/accounts/(?:(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|ad-preference|settings-client-api|feature-flags|profile-privacy-copy|session-revocation|account-recovery-request-policy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
