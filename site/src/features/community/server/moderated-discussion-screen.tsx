@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
 import { discussionReportsHref } from "../discussion-reports-contract";
@@ -68,16 +69,20 @@ export async function ModeratedDiscussionScreen({
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
       for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
-  const href = `/admin/community/${encodeURIComponent(id)}/discussion${commentId ? `/${encodeURIComponent(commentId)}` : ""}${params.size ? `?${params}` : ""}`;
-  let sessionFailed = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      sessionFailed = true;
-      return null;
-    });
-  if (sessionFailed) {
-    return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
+  const stableHref = `/admin/community/${encodeURIComponent(id)}/discussion${commentId ? `/${encodeURIComponent(commentId)}` : ""}`;
+  const href = `${stableHref}${params.size ? `?${params}` : ""}`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={stableHref}
+      />
+    );
   }
   if (!actor) {
     return <PlatformSignIn locale={locale} returnPath={href} />;
