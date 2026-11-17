@@ -6,7 +6,7 @@ import { formatHistoryAmount } from "../../../lib/commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
-import { subscriptionsCopy } from "../../../lib/subscriptions-i18n";
+import { subscriptionsCopy } from "../subscriptions-i18n";
 import { useNexusLocale } from "../../shell/locale";
 export function SubscriptionFeeEstimator({
   actorId,

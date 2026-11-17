@@ -9,7 +9,7 @@ import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";
 import { commercialPlanService } from "../../lib/services/commercial-plan-service";
-import { subscriptionsCopy } from "../../lib/subscriptions-i18n";
+import { subscriptionsCopy } from "../../features/commerce/subscriptions-i18n";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Subscriptions and commissions | MTA NEXUS" };

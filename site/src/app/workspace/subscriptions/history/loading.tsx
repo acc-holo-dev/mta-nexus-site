@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { subscriptionsCopy } from "../../../../lib/subscriptions-i18n";
+import { subscriptionsCopy } from "../../../../features/commerce/subscriptions-i18n";
 
 // Honest loading shell for /workspace/subscriptions/history.
 export default async function Loading() {

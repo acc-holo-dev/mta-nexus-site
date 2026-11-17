@@ -53,7 +53,7 @@ import SubscriptionsLoading from "../../src/app/workspace/subscriptions/loading"
 import Account from "../../src/app/workspace/subscriptions/page";
 import ReceiptLoading from "../../src/app/workspace/subscriptions/receipts/[id]/loading";
 import Detail from "../../src/app/workspace/subscriptions/receipts/[id]/page";
-import { subscriptionsCopy } from "../../src/lib/subscriptions-i18n";
+import { subscriptionsCopy } from "../../src/features/commerce/subscriptions-i18n";
 import {
   activation,
   date,

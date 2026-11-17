@@ -12,7 +12,7 @@ import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
-import { subscriptionError, subscriptionsCopy } from "../../../../lib/subscriptions-i18n";
+import { subscriptionError, subscriptionsCopy } from "../../../../features/commerce/subscriptions-i18n";
 import {
   subscriptionActivationQuery,
   subscriptionPageParams,

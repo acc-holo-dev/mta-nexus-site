@@ -15,7 +15,7 @@ import {
   confirmedSubscriptionReceipt,
   expectedSubscriptionReceiptId,
 } from "../subscription-confirmation";
-import { subscriptionError, subscriptionsCopy } from "../../../lib/subscriptions-i18n";
+import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
 import { subscriptionAccountHref, subscriptionReceiptHref } from "../../../lib/subscriptions-query";
 import { useNexusLocale } from "../../shell/locale";
 

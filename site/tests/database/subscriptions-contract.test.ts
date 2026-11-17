@@ -11,7 +11,7 @@ import {
   confirmedSubscriptionEstimate,
   confirmedSubscriptionReceipt,
 } from "../../src/features/commerce/subscription-confirmation";
-import { subscriptionError, subscriptionsCopy } from "../../src/lib/subscriptions-i18n";
+import { subscriptionError, subscriptionsCopy } from "../../src/features/commerce/subscriptions-i18n";
 import {
   subscriptionActivationQuery,
   subscriptionEstimateQuery,

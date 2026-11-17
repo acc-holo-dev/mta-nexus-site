@@ -46,7 +46,7 @@ it("locks register server native controls to fieldControlClass without h-10 chro
 it("keeps additive formErrorHint / errorHint copy for commerce and account honesty", () => {
   expect(read("site/src/lib/i18n/en/chrome.ts")).toContain("errorHint:");
   expect(read("site/src/lib/i18n/ru/chrome.ts")).toContain("errorHint:");
-  expect(read("site/src/lib/subscriptions-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/subscriptions-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/commercial-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/features/commerce/plan-reviews-i18n.ts")).toContain("formErrorHint:");
