@@ -18,7 +18,11 @@ const clientPorts = [
   "release-follow",
   "release-selection",
 ];
-const utilPorts = ["library-release-request"];
+const utilPorts = [
+  "library-release-request",
+  "library-membership-batch-confirmation",
+  "library-selection-batches-confirmation",
+];
 const serverPorts = [
   "collections",
   "membership-history",
@@ -36,7 +40,7 @@ const serverPorts = [
   "resource-collections-page",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batch-confirmation|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-confirmation|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-batches-i18n|library-membership-history-i18n|library-membership-history-query|library-selection-batches-i18n|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

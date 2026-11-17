@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
-} from "../../../lib/library-selection-batches-confirmation";
+} from "../library-selection-batches-confirmation";
 import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {
