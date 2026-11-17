@@ -6,8 +6,8 @@ import { registerHooks } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseSync, transformSync } from "@swc/core";
-import React from "react";
 import renderer from "next/dist/compiled/react-server-dom-webpack/server.node.js";
+import React from "react";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const sourceRoot = resolve(root, "site/src");
@@ -35,12 +35,12 @@ const sourceFiles = new Set([
     "i18n.ts",
     "i18n-server.ts",
     "profile-pagination.ts",
-    "public-user-trust-copy.ts",
     "public-context-trust-copy.ts",
     "publication-feed-copy.ts",
     "verification-workspace-copy.ts",
-    "server-statistics-copy.ts",
   ].map((file) => resolve(sourceRoot, "lib", file)),
+  resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
+  resolve(sourceRoot, "features/servers/server-statistics-copy.ts"),
   ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
 ]);
 const emptyPage = async () => ({
