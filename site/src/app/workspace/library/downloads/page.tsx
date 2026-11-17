@@ -90,6 +90,7 @@ export default async function ResourceDownloadsPage({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={resourceDeliveriesUrl(query)} className={navLinkClass}>
               {dictionary.errors.retry}

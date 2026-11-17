@@ -2,6 +2,8 @@ import type { Locale } from "../../lib/platform/i18n";
 
 const en = {
   loadUnavailable: "Resource delivery evidence is temporarily unavailable. Please try again.",
+  loadUnavailableHint:
+    "Retry reloads this download history only. A temporary load failure is not an empty delivery list.",
   title: "Download history",
   loading: "Loading download history…",
   publisherTitle: "Resource deliveries",
@@ -60,6 +62,8 @@ const en = {
 };
 const ru: typeof en = {
   loadUnavailable: "Сведения о передачах ресурса временно недоступны. Попробуйте ещё раз.",
+  loadUnavailableHint:
+    "Повтор обновляет только эту историю скачиваний. Временный сбой загрузки — не пустой список передач.",
   title: "История скачиваний",
   loading: "Загрузка истории скачиваний…",
   publisherTitle: "Передачи ресурса",

@@ -55,6 +55,8 @@ const en = {
   publicProfile: "View public profile",
   signIn: "Sign in to manage verification",
   unavailable: "Unable to load verification information. Try again.",
+  unavailableHint:
+    "Retry reloads this verification workspace only. A temporary load failure is not an empty verification state.",
   mutationUnavailable:
     "The result could not be confirmed. Reload your saved profile or applications before trying again.",
   invalid: "Check the profile fields, explanation and evidence URL.",
@@ -151,6 +153,8 @@ const ru: Record<keyof typeof en, string> = {
   publicProfile: "Открыть публичный профиль",
   signIn: "Войдите для управления верификацией",
   unavailable: "Не удалось загрузить данные верификации. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот кабинет верификации. Временный сбой загрузки — не пустое состояние верификации.",
   mutationUnavailable:
     "Результат не удалось подтвердить. Загрузите сохранённый профиль или заявки перед повторным действием.",
   invalid: "Проверьте поля профиля, пояснение и ссылку на доказательства.",

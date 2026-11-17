@@ -33,6 +33,8 @@ const en = {
   limitsDescription:
     "These signals reflect current stored records, not a complete verification history or an overall reputation score. An absent badge does not mean an adverse decision. Verification evidence and private review notes are not public.",
   unavailable: "Trust signals could not be loaded. Try again.",
+  unavailableHint:
+    "Retry reloads this trust panel only. A temporary load failure is not an empty trust profile.",
   notFound: "Profile not found",
   settings: "Manage verification",
   source: "Source: NEXUS account and verification records",
@@ -69,6 +71,8 @@ const ru: Record<keyof typeof en, string> = {
   limitsDescription:
     "Сведения отражают текущие записи, а не полную историю верификации или общий балл репутации. Отсутствие знака не означает отрицательного решения. Доказательства и внутренние заметки проверяющих не публикуются.",
   unavailable: "Не удалось загрузить сведения о доверии. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только эту панель доверия. Временный сбой загрузки — не пустой профиль доверия.",
   notFound: "Профиль не найден",
   settings: "Управление верификацией",
   source: "Источник: записи аккаунта и верификации NEXUS",

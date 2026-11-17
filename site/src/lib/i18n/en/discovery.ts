@@ -19,6 +19,8 @@ export const discovery = {
     openDirectory: "Open directory",
     players: "players",
     directoryPanelUnavailable: "The official MTA directory is temporarily unavailable.",
+    directoryPanelUnavailableHint:
+      "Retry reloads this Home network panel only. A temporary directory failure is not an empty server list.",
     resourcesTitle: "Free resources",
     resourcesDescription: "Community resources you can add without payment",
     viewAllResources: "View all free resources",
@@ -29,6 +31,8 @@ export const discovery = {
     noUpdates: "No community updates have been published yet.",
     updatesLoadUnavailable:
       "Community updates are temporarily unavailable. This does not mean there are no published updates.",
+    updatesLoadUnavailableHint:
+      "Retry reloads this Home updates panel only. A temporary load failure is not an empty updates list.",
     personalTitle: "Your changes",
     personalDescription:
       "Updates from release watches, discussion follows, and unread replies to you.",
@@ -39,6 +43,8 @@ export const discovery = {
       "An empty personal strip is not a load failure. Public Home sections below stay available, and your notification inbox keeps the full history.",
     personalError:
       "Your personal changes could not be loaded. Public Home sections below are still available.",
+    personalErrorHint:
+      "Retry reloads your personal strip only. This is not a guest state and does not empty public Home sections.",
     personalRetry: "Try again",
     personalPartial: "Some personal sources could not be loaded. Showing what is available.",
     personalHidden: "Personal changes are hidden on Home. Public sections below are unchanged.",

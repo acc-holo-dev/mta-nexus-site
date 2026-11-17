@@ -49,6 +49,8 @@ const en = {
   reload: "Reload saved version",
   invalid: "Invalid filters or continuation. Start from the latest page.",
   unavailable: "The publication studio is temporarily unavailable. Try again.",
+  unavailableHint:
+    "Retry reloads this publication editor only. A temporary load failure is not a missing draft.",
   restoreDenied: "This archive cannot be restored by the author. Contact support.",
   conflict: "The publication changed. Reload its saved state.",
   loading: "Loading publications…",
@@ -107,6 +109,8 @@ const ru: typeof en = {
   reload: "Загрузить сохранённую версию",
   invalid: "Некорректные фильтры или переход. Откройте последние записи.",
   unavailable: "Кабинет публикаций временно недоступен. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот редактор публикации. Временный сбой загрузки — не отсутствующий черновик.",
   restoreDenied: "Этот архив нельзя восстановить самостоятельно. Обратитесь в поддержку.",
   conflict: "Публикация изменилась. Загрузите сохранённое состояние.",
   loading: "Загрузка публикаций…",

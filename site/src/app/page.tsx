@@ -170,6 +170,7 @@ export default async function HomePage() {
         <ErrorState
           id="home-session-unavailable"
           title={dictionary.home.personalError}
+          description={dictionary.home.personalErrorHint}
           action={
             <Link
               href="/"
@@ -248,6 +249,7 @@ export default async function HomePage() {
           <ErrorState
             id="home-directory-unavailable"
             title={dictionary.home.directoryPanelUnavailable}
+            description={dictionary.home.directoryPanelUnavailableHint}
           />
         )}
       </section>
@@ -271,6 +273,7 @@ export default async function HomePage() {
           <ErrorState
             id="home-free-resources-unavailable"
             title={dictionary.market.loadUnavailable}
+            description={dictionary.market.loadUnavailableHint}
           />
         ) : freeResources.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -312,6 +315,7 @@ export default async function HomePage() {
           <ErrorState
             id="home-community-updates-unavailable"
             title={dictionary.home.updatesLoadUnavailable}
+            description={dictionary.home.updatesLoadUnavailableHint}
           />
         ) : articles.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

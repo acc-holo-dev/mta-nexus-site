@@ -44,6 +44,7 @@ export default async function TrustPage({ params }: { params: Promise<{ username
         </header>
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             <a href={href} className={actionLinkClass}>
               {dictionary.errors.retry}

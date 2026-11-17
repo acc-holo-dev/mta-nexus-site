@@ -60,6 +60,7 @@ export default async function EditPublicationPage({ params }: { params: Promise<
       ) : (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

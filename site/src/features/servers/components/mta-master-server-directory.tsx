@@ -263,7 +263,11 @@ export function MtaMasterServerDirectory({
               {copy.unavailable}
             </p>
           ) : (
-            <ErrorState id="mta-master-directory-unavailable" title={copy.unavailable} />
+            <ErrorState
+              id="mta-master-directory-unavailable"
+              title={copy.unavailable}
+              description={copy.unavailableHint}
+            />
           )}
         </div>
 

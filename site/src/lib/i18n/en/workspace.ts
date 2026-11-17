@@ -138,6 +138,8 @@ export const workspace = {
     network: "MTA Network",
     loading: "Loading servers...",
     unavailable: "Server list unavailable.",
+    unavailableHint:
+      "Retry reloads this directory panel only. A temporary load failure is not an empty public server list.",
     updated: "Updated",
     updateUnknown: "Update time unknown.",
     search: "Search servers",
