@@ -65,7 +65,9 @@ it("recovers a lost cancellation on the dashboard without automatically sending 
     dispatchEvent: () => true,
   });
   h.fetch.mockResolvedValueOnce(reply({ authenticated: true, user: { id: "usr_a" } }));
-  const { SubscriptionRecovery } = await import("../../src/features/commerce/subscription-controls");
+  const { SubscriptionRecovery } = await import(
+    "../../src/features/commerce/subscription-controls"
+  );
   function recoveryRender() {
     h.cursor = 0;
     h.effects = [];
