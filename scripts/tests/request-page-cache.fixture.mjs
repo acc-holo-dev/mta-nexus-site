@@ -32,14 +32,14 @@ const sourceFiles = new Set([
   resolve(sourceRoot, "features/organizations/public-profile-server.ts"),
   resolve(sourceRoot, "features/organizations/server/public-profile.tsx"),
   ...["i18n.ts", "i18n-server.ts", "profile-pagination.ts"].map((file) =>
-    resolve(sourceRoot, "lib", file),
+    resolve(sourceRoot, "lib/platform", file),
   ),
   resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
   resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
   resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
   resolve(sourceRoot, "features/trust/verification-workspace-copy.ts"),
   resolve(sourceRoot, "features/servers/server-statistics-copy.ts"),
-  ...collectTsFiles(resolve(sourceRoot, "lib/platform/i18n")),
+  ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
 ]);
 const emptyPage = async () => ({
   products: [],

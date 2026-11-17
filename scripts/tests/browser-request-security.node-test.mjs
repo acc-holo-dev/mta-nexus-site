@@ -5,7 +5,7 @@ import { SESSION_LIFETIME_SECONDS } from "../../site/src/features/shell/session-
 import {
   browserRequestDecision,
   isLicenseRuntimeRequest,
-} from "../../site/src/lib/browser-request-policy.ts";
+} from "../../site/src/lib/http/browser-request-policy.ts";
 
 const env = { NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "https://nexus.test" };
 const decide = (headers = {}, method = "POST", overrides = {}) =>
