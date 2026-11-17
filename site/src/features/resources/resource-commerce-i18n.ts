@@ -49,6 +49,19 @@ const copy = {
     actionFailedDescription:
       "A failed lifecycle action is not a changed publication state. Reload before retrying.",
     history: "Publication history",
+    resourceStatus: "Resource status",
+    selectedBuild: "Selected build",
+    noneSelected: "None selected",
+    buildUnavailableTitle: "This build is unavailable for public delivery",
+    buildUnavailableDescription:
+      "Download and new release watches stay blocked until a valid build is available.",
+    contactSupportContext: "Contact support with this context",
+    openSupportCase: "Open a support case",
+    nextStatus: "Next status",
+    thenSubmitReview: " → then submit for review",
+    waitReviewNote: "This resource is waiting for review. It is not published automatically.",
+    restoreDraftWarning: "Restore returns a draft. It does not republish the resource.",
+    restoreDraftSaved: " Draft is ready for review; nothing was auto-published.",
     errors: {
       RESOURCE_CART_FULL: "The cart holds at most 20 resources. Remove an item first.",
       RESOURCE_CART_CHANGED:
@@ -123,6 +136,20 @@ const copy = {
     actionFailedDescription:
       "Неуспешное действие жизненного цикла не меняет состояние публикации. Обновите страницу перед повтором.",
     history: "История публикации",
+    resourceStatus: "Статус ресурса",
+    selectedBuild: "Выбранная сборка",
+    noneSelected: "Не выбрана",
+    buildUnavailableTitle: "Эта сборка недоступна для публичной выдачи",
+    buildUnavailableDescription:
+      "Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой.",
+    contactSupportContext: "Обратиться в поддержку с этим контекстом",
+    openSupportCase: "Открыть обращение",
+    nextStatus: "Следующее состояние",
+    thenSubmitReview: " → затем отправка на проверку",
+    waitReviewNote: "Ресурс ожидает проверки. Публикация не происходит автоматически.",
+    restoreDraftWarning:
+      "После восстановления ресурс станет черновиком, а не снова опубликованным.",
+    restoreDraftSaved: " Черновик готов к проверке; автоматической публикации нет.",
     errors: {
       RESOURCE_CART_FULL: "В корзине может быть до 20 ресурсов. Сначала уберите один из них.",
       RESOURCE_CART_CHANGED:

@@ -1,6 +1,7 @@
 import type { AdSlotPlan } from "@nexus/domain";
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { Locale } from "../../../lib/platform/i18n";
+import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
 
 /**
  * UX-24 -- admin overview of the (feature-flagged) advertising placement
@@ -30,26 +31,13 @@ export function AdminAdPlacementSection({
   /** Public SponsoredPlacementSlot renderer switch (off by default, UX-25 part A). */
   rendererEnabled: boolean;
 }) {
+  const copy = adminAdPlacementCopy(locale);
   const enabledCount = slots.filter((s) => s.slot.enabled).length;
   return (
     <section>
-      <SectionHeader
-        title={locale === "ru" ? "Размещение (lifecycle)" : "Placement lifecycle"}
-        description={
-          locale === "ru"
-            ? "Слоты, ёмкость и активные размещения (feature-flag, без публичной выдачи)"
-            : "Slots, capacity and active placements (feature-flag, no public exposure)"
-        }
-      />
+      <SectionHeader title={copy.title} description={copy.description} />
       {slots.length === 0 ? (
-        <EmptyState
-          title={locale === "ru" ? "Слоты ещё не созданы" : "No ad slots yet"}
-          description={
-            locale === "ru"
-              ? "Зарегистрируйте админ-оператором слоты через репозиторий размещений."
-              : "Register ad slots through the placement repository as an admin operator."
-          }
-        />
+        <EmptyState title={copy.emptyTitle} description={copy.emptyDescription} />
       ) : (
         <ul className="space-y-3">
           {slots.map(({ slot, pending, active }) => (
@@ -60,38 +48,21 @@ export function AdminAdPlacementSection({
               <div className="min-w-0">
                 <p className="break-words font-semibold text-primary">{slotLabel(slot)}</p>
                 <p className="font-caption text-muted">
-                  {locale === "ru"
-                    ? `Позиция ${slot.positionKey} · ёмкость ${slot.capacity}`
-                    : `Position ${slot.positionKey} · capacity ${slot.capacity}`}
+                  {copy.positionCapacity(slot.positionKey, slot.capacity)}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {pending > 0 && (
-                  <StatusBadge
-                    tone="warning"
-                    status={locale === "ru" ? `В ожидании: ${pending}` : `Pending: ${pending}`}
-                  />
-                )}
+                {pending > 0 && <StatusBadge tone="warning" status={copy.pending(pending)} />}
                 <StatusBadge
                   tone={active > 0 ? "success" : "neutral"}
-                  status={locale === "ru" ? `Активно: ${active}` : `Active: ${active}`}
+                  status={copy.active(active)}
                 />
               </div>
             </li>
           ))}
+          <li className="font-caption text-faint">{copy.enabledTotal(enabledCount)}</li>
           <li className="font-caption text-faint">
-            {locale === "ru"
-              ? `Итого включено слотов: ${enabledCount}`
-              : `Enabled slots total: ${enabledCount}`}
-          </li>
-          <li className="font-caption text-faint">
-            {locale === "ru"
-              ? rendererEnabled
-                ? "Публичный слот-рендер включён"
-                : "Публичный слот-рендер выключен (по умолчанию)"
-              : rendererEnabled
-                ? "Public slot renderer enabled"
-                : "Public slot renderer is off (default)"}
+            {rendererEnabled ? copy.rendererOn : copy.rendererOff}
           </li>
         </ul>
       )}

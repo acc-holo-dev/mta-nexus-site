@@ -143,9 +143,7 @@ export function ResourceLifecycleControls({
       : nextStep === "restore"
         ? copy.restoreNote
         : nextStep === "wait_review"
-          ? locale === "ru"
-            ? "Ресурс ожидает проверки. Публикация не происходит автоматически."
-            : "This resource is waiting for review. It is not published automatically."
+          ? copy.waitReviewNote
           : nextStep === "suspended_support"
             ? copy.blocked
             : nextStep === "archive"
@@ -163,37 +161,23 @@ export function ResourceLifecycleControls({
       </h2>
       <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Статус ресурса" : "Resource status"}
-          </dt>
+          <dt className="font-label uppercase text-muted">{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Выбранная сборка" : "Selected build"}
-          </dt>
+          <dt className="font-label uppercase text-muted">{copy.selectedBuild}</dt>
           <dd className="text-primary">
             {selectedBuild
               ? `${selectedBuild.version ?? selectedBuild.id} · ${selectedBuild.status}`
-              : locale === "ru"
-                ? "Не выбрана"
-                : "None selected"}
+              : copy.noneSelected}
           </dd>
         </div>
       </dl>
       {nextStepCopy ? <p className="text-sm text-secondary">{nextStepCopy}</p> : null}
       {selectedBuild && buildAvailability !== "available" ? (
         <ErrorState
-          title={
-            locale === "ru"
-              ? "Эта сборка недоступна для публичной выдачи"
-              : "This build is unavailable for public delivery"
-          }
-          description={
-            locale === "ru"
-              ? "Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой."
-              : "Download and new release watches stay blocked until a valid build is available."
-          }
+          title={copy.buildUnavailableTitle}
+          description={copy.buildUnavailableDescription}
           action={
             <Link
               href={unavailableBuildSupportHref()}
@@ -202,9 +186,7 @@ export function ResourceLifecycleControls({
                 stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
               }
             >
-              {locale === "ru"
-                ? "Обратиться в поддержку с этим контекстом"
-                : "Contact support with this context"}
+              {copy.contactSupportContext}
             </Link>
           }
         />
@@ -219,7 +201,7 @@ export function ResourceLifecycleControls({
                 className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 onClick={() => stashSupportObjectContext({ productId: product.id })}
               >
-                {locale === "ru" ? "Открыть обращение" : "Open a support case"}
+                {copy.openSupportCase}
               </Link>
             ) : undefined
           }
@@ -251,24 +233,13 @@ export function ResourceLifecycleControls({
             {notes[action]}
             {target ? (
               <span className="mt-1 block">
-                {locale === "ru" ? "Следующее состояние" : "Next status"}: {target}
-                {target === "draft"
-                  ? locale === "ru"
-                    ? " → затем отправка на проверку"
-                    : " → then submit for review"
-                  : ""}
+                {copy.nextStatus}: {target}
+                {target === "draft" ? copy.thenSubmitReview : ""}
               </span>
             ) : null}
           </p>
           {action === "restore" ? (
-            <ErrorState
-              id="resource-lifecycle-restore-draft"
-              title={
-                locale === "ru"
-                  ? "После восстановления ресурс станет черновиком, а не снова опубликованным."
-                  : "Restore returns a draft. It does not republish the resource."
-              }
-            />
+            <ErrorState id="resource-lifecycle-restore-draft" title={copy.restoreDraftWarning} />
           ) : null}
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>
@@ -311,11 +282,7 @@ export function ResourceLifecycleControls({
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.updated}
-          {action === "restore"
-            ? locale === "ru"
-              ? " Черновик готов к проверке; автоматической публикации нет."
-              : " Draft is ready for review; nothing was auto-published."
-            : ""}
+          {action === "restore" ? copy.restoreDraftSaved : ""}
         </p>
       )}
     </section>

@@ -4,6 +4,7 @@ import { BellOff } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
+import { adsPreferencesCopy } from "../ads-preferences-i18n";
 
 /**
  * UX-26 -- advertising opt-out preference on /settings.
@@ -23,6 +24,7 @@ export function SettingsAdvertisingPreferencesSection({
   rendererEnabled: boolean;
 }) {
   const { locale } = useNexusLocale();
+  const copy = adsPreferencesCopy(locale);
   const [preference, setPreference] = useState<AdPreference>(() => {
     if (typeof document === "undefined") return "in";
     return parseAdPreference(document.cookie.match(/nexus_ad_opt_out=([^;]*)/)?.[1]);
@@ -35,35 +37,9 @@ export function SettingsAdvertisingPreferencesSection({
     setPreference(next);
   }, [preference]);
 
-  const heading = locale === "ru" ? "Реклама и показ" : "Advertising and placements";
-  const description =
-    locale === "ru"
-      ? "Настройка касается только гипотетических sponsored-показов и не меняет органический score, порядок, отзывы, популярность или доверие. Никакого поведенческого профилирования."
-      : "This preference affects only prospective sponsored placements and never changes organic score, order, reviews, popularity or trust. No behavioral profiling.";
-  const offLine =
-    locale === "ru"
-      ? rendererEnabled
-        ? "Публичный рендер слота включён; предпочтение будет учитываться serve-путём."
-        : "Публичный рендер слота выключен (по умолчанию). Предпочтение сохраняется, но видимых sponsored-показов пока нет."
-      : rendererEnabled
-        ? "Public slot renderer enabled; the preference will be honored by the serve path."
-        : "Public slot renderer is off (default). The preference is stored, but no sponsored placements are currently shown.";
-  const toggleLabel =
-    locale === "ru"
-      ? preference === "out"
-        ? "Не показывать sponsored-размещения"
-        : "Разрешить shown: включено сейчас"
-      : preference === "out"
-        ? "Do not show sponsored placements"
-        : "Allow sponsored placements: enabled now";
-  const status =
-    locale === "ru"
-      ? preference === "out"
-        ? "Отказано (opt-out по умолчанию сохраняется)"
-        : "Разрешено"
-      : preference === "out"
-        ? "Opted out (default stays opted-out)"
-        : "Allowed";
+  const toggleLabel = preference === "out" ? copy.deny : copy.allow;
+  const status = preference === "out" ? copy.statusDenied : copy.statusAllowed;
+  const offLine = rendererEnabled ? copy.rendererOn : copy.rendererOff;
 
   return (
     <section
@@ -73,10 +49,10 @@ export function SettingsAdvertisingPreferencesSection({
       <div className="flex items-center gap-2">
         <BellOff className="h-4 w-4 text-accent" aria-hidden="true" />
         <h2 id="advertising-preferences-heading" className="text-sm font-semibold text-primary">
-          {heading}
+          {copy.heading}
         </h2>
       </div>
-      <p className="text-xs text-muted">{description}</p>
+      <p className="text-xs text-muted">{copy.description}</p>
       <div className="flex cursor-pointer items-center justify-between gap-4 py-3">
         <span>
           <span className="block text-sm text-primary">{toggleLabel}</span>

@@ -41,6 +41,14 @@ export const community = {
     topicOpenSaved: "Open saved topic in workspace",
     topicActorChanged:
       "The signed-in account changed. The previous account's pending submission is hidden.",
+    topicValidationError: "Check the title, message, and tags, then try again.",
+    topicForbidden: "You do not have permission to create a topic.",
+    topicConflict: "A similar topic already exists. Change the title and retry.",
+    topicRateLimited: "Too many attempts. Wait a moment and retry.",
+    topicRequestTimeout:
+      "The server did not confirm publication in time. The topic may not exist yet — check the list and retry if needed.",
+    topicPublishSignIn: "Sign in to publish a topic.",
+    topicServerNotFound: "The linked server was not found.",
   },
   explore: {
     title: "Explore the MTA ecosystem",

@@ -24,52 +24,32 @@ function communityTopicErrorMessage(
   payload: unknown,
   status: number,
   fallback: string,
-  locale: "ru" | "en",
+  copy: ReturnType<typeof useNexusLocale>["dictionary"]["community"],
 ): string {
-  const codes: Record<string, { ru: string; en: string }> = {
-    VALIDATION_ERROR: {
-      ru: "Проверьте заголовок, текст и теги и попробуйте снова.",
-      en: "Check the title, message, and tags, then try again.",
-    },
-    FORBIDDEN: {
-      ru: "Недостаточно прав, чтобы создать тему.",
-      en: "You do not have permission to create a topic.",
-    },
-    CONFLICT: {
-      ru: "Такая тема уже существует. Измените заголовок и повторите.",
-      en: "A similar topic already exists. Change the title and retry.",
-    },
-    RATE_LIMITED: {
-      ru: "Слишком много попыток. Подождите и повторите.",
-      en: "Too many attempts. Wait a moment and retry.",
-    },
-    REQUEST_TIMEOUT: {
-      ru: "Сервер не подтвердил публикацию вовремя. Тема могла не создаться — проверьте список и повторите при необходимости.",
-      en: "The server did not confirm publication in time. The topic may not exist yet — check the list and retry if needed.",
-    },
+  const byCode: Record<string, string> = {
+    VALIDATION_ERROR: copy.topicValidationError,
+    FORBIDDEN: copy.topicForbidden,
+    CONFLICT: copy.topicConflict,
+    RATE_LIMITED: copy.topicRateLimited,
+    REQUEST_TIMEOUT: copy.topicRequestTimeout,
   };
-
   const record =
     payload && typeof payload === "object" && !Array.isArray(payload)
       ? (payload as Record<string, unknown>)
       : null;
   const code = typeof record?.code === "string" ? record.code : "";
-  if (code && codes[code]) return codes[code][locale];
-  if (status === 401) {
-    return locale === "ru" ? "Войдите, чтобы опубликовать тему." : "Sign in to publish a topic.";
-  }
-  if (status === 403) return codes.FORBIDDEN[locale];
-  if (status === 404) {
-    return locale === "ru" ? "Связанный сервер не найден." : "The linked server was not found.";
-  }
-  if (status === 400) return codes.VALIDATION_ERROR[locale];
-  if (status === 429) return codes.RATE_LIMITED[locale];
+  if (code && byCode[code]) return byCode[code];
+  if (status === 401) return copy.topicPublishSignIn;
+  if (status === 403) return copy.topicForbidden;
+  if (status === 404) return copy.topicServerNotFound;
+  if (status === 400) return copy.topicValidationError;
+  if (status === 429) return copy.topicRateLimited;
   return fallback;
 }
 
 export function CommunityTopicForm({ actorId = null }: { actorId?: string | null }) {
   const router = useRouter();
-  const { locale, dictionary } = useNexusLocale();
+  const { dictionary } = useNexusLocale();
   const copy = dictionary.community;
   const formErrorId = useId();
   const [busy, setBusy] = useState(false);
@@ -210,7 +190,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
     event.preventDefault();
     if (lock.current || busy || restoring || foreignRef.current || occupiedRef.current) return;
     if (!actorId || !identityRef.current) {
-      setError(communityTopicErrorMessage(null, 401, copy.createError, locale));
+      setError(communityTopicErrorMessage(null, 401, copy.createError, copy));
       return;
     }
 
@@ -275,7 +255,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
           pendingRef.current = null;
           setPending(null);
         }
-        setError(communityTopicErrorMessage(payload, response.status, copy.createError, locale));
+        setError(communityTopicErrorMessage(payload, response.status, copy.createError, copy));
         setRecoveryNotice(copy.topicPending);
         return;
       }
@@ -285,7 +265,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
     } catch (caught) {
       const timedOut =
         caught instanceof DOMException && caught.name === "TimeoutError"
-          ? communityTopicErrorMessage({ code: "REQUEST_TIMEOUT" }, 0, copy.createError, locale)
+          ? communityTopicErrorMessage({ code: "REQUEST_TIMEOUT" }, 0, copy.createError, copy)
           : null;
       if (alive.current) {
         setError(timedOut ?? copy.createError);

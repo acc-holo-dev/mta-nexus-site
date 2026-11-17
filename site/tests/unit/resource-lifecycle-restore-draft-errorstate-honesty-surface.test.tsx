@@ -13,11 +13,10 @@ const source = readFileSync(
 it("locks lifecycle restore-returns-draft notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="resource-lifecycle-restore-draft"');
+  expect(source).toContain("copy.restoreDraftWarning");
   expect(source).toMatch(
     /action === "restore" \? \(\s*<ErrorState\s+id="resource-lifecycle-restore-draft"/u,
   );
   expect(source).not.toContain('className="mt-1 block text-warning"');
-  expect(source).not.toContain(
-    "Restore returns a draft. It does not republish the resource.</span>",
-  );
+  expect(source).not.toContain("Restore returns a draft. It does not republish the resource.");
 });
