@@ -8,7 +8,7 @@ import {
   discussionEditSchema,
   discussionRemoveSchema,
 } from "../../src/lib/content-discussion-contract";
-import { confirmsDiscussionMutation } from "../../src/lib/discussion-mutation-confirmation";
+import { confirmsDiscussionMutation } from "../../src/features/community/discussion-mutation-confirmation";
 import { publicationCopy } from "../../src/lib/publication-feed-copy";
 import {
   getDiscussionCopy,

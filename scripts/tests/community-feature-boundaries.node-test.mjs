@@ -25,8 +25,9 @@ const ports = [
   "follow",
   "report-evidence-links",
 ];
+const utilPorts = ["discussion-mutation-confirmation"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|discussion-mutation-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-contract|organization-publication-history-copy|server-publication-history-contract|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:community-report-contract|community-report-copy|user-platform-copy|private-api-request|user-platform-client|user-platform-contract|community-topic-intent|community-topic-submission|content-comment-client|content-comment-confirmation|content-discussion-copy|content-discussion-contract|discussion-compose-draft|discussion-workspace-copy|follow-workspace-copy|follow-workspace-contract|follow-confirmation|community-report-groups-copy|community-report-history-copy|discussion-reports-copy|community-report-groups-contract|community-report-history-contract|private-change-history-query|private-change-history-copy|community-moderation-contract|community-moderation-copy|moderated-discussion-contract|moderated-discussion-copy|discussion-reports-contract|report-batch-contract|report-batch-copy|discussion-workspace-contract|publication-feed-contract|publication-feed-copy|author-publication-desk-copy|author-publication-desk-contract|organization-content-copy|server-content-copy|support-workspace-contract|organization-publication-history-contract|organization-publication-history-copy|server-publication-history-contract|server-publication-history-copy|admin-action-confirmation|content-reaction-contract|content-reaction-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -61,7 +62,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/community/components/private.ts", "export const value = 1;");
   write("site/src/features/community/server.ts", "export const page = 1;");
-  for (const port of ports) {
+  for (const port of [...ports, ...utilPorts]) {
     write(
       `site/src/features/community/${port}.ts`,
       '"use client"; export { page } from "./server";',
@@ -125,7 +126,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     assert(module, name);
     return module.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of ports) {
+  for (const port of [...ports, ...utilPorts]) {
     assert(rules(`features/community/${port}.ts`).includes("community-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }
@@ -168,7 +169,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
 });
 
 test("real Community client graphs have no transitive server dependencies", () => {
-  const entries = ports.map((port) => `site/src/features/community/${port}.ts`);
+  const entries = [...ports, ...utilPorts].map((port) => `site/src/features/community/${port}.ts`);
   const componentEntries = [
     "community-report-detail",
     "community-report-list",
@@ -203,8 +204,11 @@ test("real Community client graphs have no transitive server dependencies", () =
       visit(edge.resolved);
     }
   }
+  const utilPortSet = new Set(utilPorts);
   for (const entry of entries) {
+    const portName = entry.split("/").pop().replace(/\.ts$/u, "");
     if (
+      !utilPortSet.has(portName) &&
       !["article-view", "publication-feed", "report-evidence-links"].some((port) =>
         entry.endsWith(`/${port}.ts`),
       )

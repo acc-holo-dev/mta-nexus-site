@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `825bacb2` (`dev`, slice 45 — library membership/selection i18n → library).
+**source_sha:** `97fef023` (`dev`, slice 46 — discussion-mutation-confirmation → community).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -29,13 +29,13 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    | Факт на slice 45 |
+| Область                    | Факт на slice 46 |
 | -------------------------- | ---------------: |
 | `features/*` domains       |               13 |
 | `components/` tree files   |                0 |
 | `components/` root files   |                0 |
-| `lib/` tree files          |              397 |
-| `lib/` root files          |              284 |
+| `lib/` tree files          |              396 |
+| `lib/` root files          |              283 |
 | `lib/services/` root files |               86 |
 | `lib/**/*-i18n.ts`         |               46 |
 | `app/**/route.ts`          |              282 |
@@ -50,7 +50,7 @@ site/
 | ------------- | ----: | -----: |
 | accounts      |    28 | 104132 |
 | commerce      |    38 | 173258 |
-| community     |    85 | 395262 |
+| community     |    86 | 395959 |
 | discovery     |     3 |  20343 |
 | library       |    62 | 298443 |
 | moderation    |    24 | 118043 |
@@ -72,7 +72,7 @@ site/
 | server       |    27 |
 | library      |    62 | 298443 |
 | organization |    15 |
-| community    |    12 |
+| community    |    86 | 395959 |
 | license      |    10 |
 | public       |     9 |
 | support      |     9 |
