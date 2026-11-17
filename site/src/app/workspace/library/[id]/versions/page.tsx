@@ -18,6 +18,8 @@ import { ResourceReleaseWatchControl } from "../../../../../features/resources/r
 import { resourceReleaseWatchesCopy } from "../../../../../features/resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -48,8 +50,21 @@ export default async function LibraryVersionsPage({
   ]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getResourceReleaseControlCopy(typedLocale),
-    dictionary = getDictionary(typedLocale),
+    dictionary = getDictionary(typedLocale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/library/"}
+      />
+    );
+  }
+
   const page = Math.min(parseHistoryPage(query.page), 1000);
   const returnPath =
     page > 1
