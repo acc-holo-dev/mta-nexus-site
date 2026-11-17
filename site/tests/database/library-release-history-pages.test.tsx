@@ -26,7 +26,7 @@ vi.mock("../../src/lib/services/resource-release-control-service", () => ({
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/auth-service";
-import { libraryReleaseHistoryCopy } from "../../src/lib/library-release-history-i18n";
+import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
@@ -112,7 +112,7 @@ it("rejects ambiguous scope and requires authentication before history calls", a
 it("shows an honest recovery state when version history fails to load", async () => {
   h.history.mockRejectedValueOnce(new Error("history unavailable"));
   const copy = (
-    await import("../../src/lib/library-release-history-i18n")
+    await import("../../src/features/library/library-release-history-i18n")
   ).libraryReleaseHistoryCopy("en");
   const html = await screen();
   expect(html).toContain('role="alert"');

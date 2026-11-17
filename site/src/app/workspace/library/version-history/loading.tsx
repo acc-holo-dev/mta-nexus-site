@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-history-i18n";
+import { libraryReleaseHistoryCopy } from "../../../../features/library/library-release-history-i18n";
 
 // Honest loading shell for /workspace/library/version-history.
 export default async function Loading() {
