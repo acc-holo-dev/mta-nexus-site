@@ -32,6 +32,8 @@ const copy = {
       revoke: "Revoke license",
       suspend: "Suspend license",
       restore: "Restore unchanged term",
+      expired: "License expired",
+      expiring: "Expiry warning",
     },
     action: "Action",
     server: "Verified server",
@@ -145,6 +147,8 @@ const copy = {
       revoke: "Отозвать лицензию",
       suspend: "Приостановить лицензию",
       restore: "Восстановить исходный срок",
+      expired: "Срок лицензии истёк",
+      expiring: "Предупреждение об истечении",
     },
     action: "Действие",
     server: "Подтверждённый сервер",
@@ -227,10 +231,6 @@ const copy = {
 } as const;
 export const getLicenseControlCopy = (locale: "ru" | "en") => copy[locale];
 export function licenseActionLabel(locale: "ru" | "en", action: string) {
-  if (action === "license.expired")
-    return locale === "ru" ? "Срок лицензии истёк" : "License expired";
-  if (action === "license.expiring")
-    return locale === "ru" ? "Предупреждение об истечении" : "Expiry warning";
   const actions: Readonly<Record<string, keyof typeof copy.en.actions>> = {
     "license.bound": "bind",
     "license.binding_refreshed": "refresh_binding",
@@ -239,6 +239,8 @@ export function licenseActionLabel(locale: "ru" | "en", action: string) {
     "license.revoked": "revoke",
     "license.suspended": "suspend",
     "license.restored": "restore",
+    "license.expired": "expired",
+    "license.expiring": "expiring",
   };
   const key = actions[action];
   return key ? copy[locale].actions[key] : copy[locale].history;
