@@ -27,6 +27,8 @@ export const discovery = {
     updatesDescription: "News, guides, and development notes from the MTA ecosystem",
     allUpdates: "All updates",
     noUpdates: "No community updates have been published yet.",
+    updatesLoadUnavailable:
+      "Community updates are temporarily unavailable. This does not mean there are no published updates.",
     personalTitle: "Your changes",
     personalDescription:
       "Updates from release watches, discussion follows, and unread replies to you.",

@@ -1,4 +1,4 @@
-import { buttonClassName, ErrorState, Rise, SectionHeader } from "@nexus/ui";
+import { buttonClassName, EmptyState, ErrorState, Rise, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -44,17 +44,33 @@ export default async function HomePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const cookieStore = await cookies();
+  let sessionFailed = false;
   const session = await authService
     .getSession(cookieStore.get("nexus_session")?.value)
-    .catch(() => null);
+    .catch(() => {
+      sessionFailed = true;
+      return null;
+    });
   const personalPreference = parseHomePersonalPreference(
     cookieStore.get(HOME_PERSONAL_COOKIE)?.value,
   );
+  let freeResourcesFailed = false;
+  let articlesFailed = false;
+  let nexusListingsFailed = false;
   const [directory, freeResources, articles, nexusListings, personalSummary] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
-    productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }),
-    contentService.listArticles(4),
-    serverService.listServers(200).catch(() => []),
+    productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }).catch(() => {
+      freeResourcesFailed = true;
+      return [];
+    }),
+    contentService.listArticles(4).catch(() => {
+      articlesFailed = true;
+      return [];
+    }),
+    serverService.listServers(200).catch(() => {
+      nexusListingsFailed = true;
+      return [];
+    }),
     session
       ? loadPersonalChangesSummary(session.id, locale, personalPreference === "hide").catch(() => ({
           status: "error" as const,
@@ -67,7 +83,9 @@ export default async function HomePage() {
         }))
       : Promise.resolve(null),
   ]);
-  const resourceAttributions = await productService.getPublicAttributions(freeResources);
+  const resourceAttributions = freeResourcesFailed
+    ? new Map()
+    : await productService.getPublicAttributions(freeResources);
   const playerSummary = directory ? summarizeKnownPlayers(directory.servers) : null;
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
   const directoryTone = directory?.isStale
@@ -148,7 +166,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {session && personalSummary ? (
+      {sessionFailed ? (
+        <ErrorState
+          id="home-session-unavailable"
+          title={dictionary.home.personalError}
+          action={
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.home.personalRetry}
+            </Link>
+          }
+        />
+      ) : session && personalSummary ? (
         <HomePersonalChangesPanel
           summary={personalSummary}
           preference={personalPreference}
@@ -199,7 +230,9 @@ export default async function HomePage() {
         {directory ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {spotlight.map((server) => {
-              const matched = nexusListings.find((listing) => matchesMtaEndpoint(listing, server));
+              const matched = nexusListingsFailed
+                ? undefined
+                : nexusListings.find((listing) => matchesMtaEndpoint(listing, server));
               return (
                 <HomeNetworkServerCard
                   key={`${server.address}:${server.port}`}
@@ -234,7 +267,12 @@ export default async function HomePage() {
             </Link>
           }
         />
-        {freeResources.length > 0 ? (
+        {freeResourcesFailed ? (
+          <ErrorState
+            id="home-free-resources-unavailable"
+            title={dictionary.market.loadUnavailable}
+          />
+        ) : freeResources.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {freeResources.map((product) => (
               <ProductCard
@@ -246,8 +284,11 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="nexus-panel p-8 text-center text-sm text-muted">
-            {dictionary.home.noResources}
+          <div id="home-free-resources-empty">
+            <EmptyState
+              title={dictionary.home.noResources}
+              description={dictionary.home.resourcesDescription}
+            />
           </div>
         )}
       </section>
@@ -267,15 +308,23 @@ export default async function HomePage() {
             </Link>
           }
         />
-        {articles.length > 0 ? (
+        {articlesFailed ? (
+          <ErrorState
+            id="home-community-updates-unavailable"
+            title={dictionary.home.updatesLoadUnavailable}
+          />
+        ) : articles.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {articles.map((article) => (
               <ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
         ) : (
-          <div className="nexus-panel p-8 text-center text-sm text-muted">
-            {dictionary.home.noUpdates}
+          <div id="home-community-updates-empty">
+            <EmptyState
+              title={dictionary.home.noUpdates}
+              description={dictionary.home.updatesDescription}
+            />
           </div>
         )}
       </section>
