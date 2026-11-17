@@ -8,7 +8,10 @@ import { changeHistoryHref } from "../../../features/accounts/private-change-his
 import { ProfileChangeHistoryView } from "../../../features/accounts/profile-change-history";
 import { parseProfileChangeHistoryQuery } from "../../../features/accounts/profile-change-history-contract";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
+
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/accounts/profile-change-history-service";
 
@@ -38,7 +41,20 @@ export default async function ProfileHistoryPage({
       : params.size
         ? `/settings/history?${params}`
         : "/settings/history";
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={privateChangeHistoryCopy(locale).invalid}
+        retryHref={"/settings/history"}
+      />
+    );
+  }
+
   if (!actor) {
     return (
       <div className={pageShellClass}>
