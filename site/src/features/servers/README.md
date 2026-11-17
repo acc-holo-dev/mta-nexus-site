@@ -35,6 +35,7 @@ repositories и collectors остаются в прежних модулях и 
 | `server-organization-options.ts` | util port `server-organization-options` |
 | `server-claim-confirmation.ts` | util port `server-claim-confirmation` |
 | `server-history-presentation.ts` | util port `server-history-presentation` |
+| `server-mutation-confirmation.ts` | util port `server-mutation-confirmation` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

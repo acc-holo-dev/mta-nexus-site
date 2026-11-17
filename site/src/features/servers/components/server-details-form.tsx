@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedUpdatedServer } from "../../../lib/server-mutation-confirmation";
+import { confirmedUpdatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../../../lib/server-mutation-errors";
 import { useNexusLocale } from "../../shell/locale";
 
