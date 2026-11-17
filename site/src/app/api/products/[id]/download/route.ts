@@ -11,7 +11,7 @@ import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../features/resources/build-download-metadata";
-import { parseDownloadBuildSelection } from "../../../../../lib/build-download-selection";
+import { parseDownloadBuildSelection } from "../../../../../features/resources/build-download-selection";
 import {
   createRequestLogContext,
   jsonWithRequestId,

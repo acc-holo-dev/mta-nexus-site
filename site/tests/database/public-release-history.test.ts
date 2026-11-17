@@ -4,7 +4,7 @@ import {
   parseDownloadBuildSelection,
   resourceDownloadUrl,
   validDownloadBuildId,
-} from "../../src/lib/build-download-selection";
+} from "../../src/features/resources/build-download-selection";
 import {
   parseReleaseHistoryPage,
   releaseHistoryCopy,
