@@ -11,7 +11,7 @@ import {
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceQaQuery } from "../../../../../lib/resource-qa-query";
+import { resourceQaQuery } from "../../../../../features/resources/resource-qa-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceQaService } from "../../../../../lib/services/resource-qa-service";
 
