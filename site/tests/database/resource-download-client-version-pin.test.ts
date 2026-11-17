@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchResourceDownload } from "../../src/lib/resource-download-client";
+import { fetchResourceDownload } from "../../src/features/resources/resource-download-client";
 import { controller, response } from "../helpers/resource-download-client-harness";
 
 afterEach(() => vi.useRealTimers());
