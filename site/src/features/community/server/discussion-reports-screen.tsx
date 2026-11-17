@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { moderationCopy } from "../community-moderation-copy";
 import { REPORT_TYPES } from "../../../lib/community-report-contract";
 import { communityReportCopy } from "../../../lib/community-report-copy";
 import {

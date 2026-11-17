@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseModerationDetailQuery } from "../../../lib/community-moderation-contract";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { moderationCopy } from "../community-moderation-copy";
 import { discussionReportsHref } from "../../../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";

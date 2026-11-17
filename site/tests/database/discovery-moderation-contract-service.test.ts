@@ -42,7 +42,7 @@ import {
   moderationHref,
   confirmsModerationCommand,
 } from "../../src/lib/community-moderation-contract";
-import { moderationCopy } from "../../src/lib/community-moderation-copy";
+import { moderationCopy } from "../../src/features/community/community-moderation-copy";
 import { discoveryStreamCopy } from "../../src/lib/discovery-stream-copy";
 const time = "2026-10-11T00:00:00.123456Z",
   date = new Date(time),

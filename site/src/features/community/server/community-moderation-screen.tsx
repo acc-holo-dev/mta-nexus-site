@@ -13,7 +13,7 @@ import {
   parseModerationDetailQuery,
   parseModerationQuery,
 } from "../../../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
+import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { discoveryCopy } from "../../../lib/discovery-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";

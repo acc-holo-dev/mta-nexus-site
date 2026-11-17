@@ -2,7 +2,7 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { moderationCopy } from "../community-moderation-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   confirmsModeratedDiscussionRemoval,

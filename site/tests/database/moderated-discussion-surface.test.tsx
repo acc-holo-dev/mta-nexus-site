@@ -31,7 +31,7 @@ vi.mock("../../src/features/community/components/moderated-discussion-removal", 
 import DiscussionReportsLoading from "../../src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
 import DiscussionLoading from "../../src/app/admin/community/[id]/discussion/loading";
 import { ModeratedDiscussionScreen } from "../../src/features/community/server/moderated-discussion-screen";
-import { moderationCopy } from "../../src/lib/community-moderation-copy";
+import { moderationCopy } from "../../src/features/community/community-moderation-copy";
 import { moderatedDiscussionCopy } from "../../src/lib/moderated-discussion-copy";
 
 const time = "2026-10-11T00:00:00.000Z",

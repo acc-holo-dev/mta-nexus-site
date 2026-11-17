@@ -9,7 +9,7 @@ import {
   confirmsModerationCommand,
   moderationDetailHref,
 } from "../../../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
+import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 

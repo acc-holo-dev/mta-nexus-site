@@ -1,4 +1,4 @@
-import { moderationCopy } from "../../../../../lib/community-moderation-copy";
+import { moderationCopy } from "../../../../../features/community/community-moderation-copy";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { moderatedDiscussionCopy } from "../../../../../lib/moderated-discussion-copy";
 
