@@ -16,6 +16,8 @@ import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-hist
 import { getLicenseControlCopy } from "../../../features/commerce/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../features/commerce/license-maintenance-i18n";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -32,7 +34,20 @@ export default async function LicensesModerationPage({
   searchParams: Promise<{ page?: string; status?: string; q?: string }>;
 }) {
   const [store, locale, query] = await Promise.all([cookies(), getRequestLocale(), searchParams]);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/admin/licenses"}
+      />
+    );
+  }
+
   if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/licenses" />;
   if (!can(user, "admin.moderation")) notFound();
   const copy = getLicenseControlCopy(locale);
