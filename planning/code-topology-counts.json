@@ -58,8 +58,8 @@
       "files": 19
     },
     "trust": {
-      "bytes": 43875,
-      "files": 10
+      "bytes": 43054,
+      "files": 9
     }
   },
   "husks": {
@@ -80,7 +80,7 @@
   "lib": {
     "i18n_modules": 1,
     "root_dirs": ["i18n", "services"],
-    "root_files": 103,
+    "root_files": 104,
     "root_prefix_hotspots": [
       {
         "files": 9,
@@ -132,8 +132,8 @@
       }
     ],
     "services_root_files": 86,
-    "tree_bytes": 828465,
-    "tree_files": 216
+    "tree_bytes": 829130,
+    "tree_files": 217
   },
   "packages_src_files": {
     "config": 1,
@@ -145,7 +145,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "0e540bd5dc6dbdb1872a5eec067f8193e54d8195",
+  "source_sha": "1a036ba987ab0f0bf34627a938dda2a9c298ffc8",
   "tests": {
     "site_tests_files": 1451
   }
