@@ -1,6 +1,6 @@
-import { confirmedCommentId } from "./content-comment-confirmation";
-import { discussionError } from "./content-discussion-copy";
-import type { Locale } from "./i18n";
+import { confirmedCommentId } from "../../lib/content-comment-confirmation";
+import { discussionError } from "../../lib/content-discussion-copy";
+import type { Locale } from "../../lib/i18n";
 
 export type ContentCommentFetch = (
   input: RequestInfo | URL,

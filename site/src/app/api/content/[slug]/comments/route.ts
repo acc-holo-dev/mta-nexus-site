@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { parseCommentIntentKey } from "../../../../../lib/content-comment-client";
+import { parseCommentIntentKey } from "../../../../../features/community/content-comment-client";
 import {
   discussionCommentSchema,
   parseDiscussionQuery,

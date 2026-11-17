@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { submitContentCommentRequest } from "../../src/lib/content-comment-client";
+import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 import {
   discussionCommentSchema,
   encodeDiscussionCursor,

@@ -10,7 +10,7 @@ import {
   createCommentIntentKey,
   parseCommentIntentKey,
   submitContentCommentRequest,
-} from "../../../lib/content-comment-client";
+} from "../content-comment-client";
 import {
   type DiscussionPage,
   discussionPageSchema,

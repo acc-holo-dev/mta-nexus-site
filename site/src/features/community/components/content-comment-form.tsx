@@ -6,7 +6,7 @@ import { type FormEvent, useRef, useState } from "react";
 import {
   createCommentIntentKey,
   submitContentCommentRequest,
-} from "../../../lib/content-comment-client";
+} from "../content-comment-client";
 import { useNexusLocale } from "../../shell/locale";
 
 export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
