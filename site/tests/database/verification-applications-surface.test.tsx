@@ -30,7 +30,7 @@ import Loading from "../../src/app/workspace/verification/history/loading";
 import History, {
   generateMetadata as historyMetadata,
 } from "../../src/app/workspace/verification/history/page";
-import { verificationApplicationsCopy } from "../../src/lib/verification-applications-copy";
+import { verificationApplicationsCopy } from "../../src/features/moderation/verification-applications-copy";
 import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",

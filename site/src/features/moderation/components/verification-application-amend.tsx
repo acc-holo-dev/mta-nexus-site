@@ -12,7 +12,7 @@ import {
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
-} from "../../../lib/verification-applications-copy";
+} from "../verification-applications-copy";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import { confirmAction } from "../../shell/confirm-action";
 export function VerificationApplicationAmend({

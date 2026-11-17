@@ -4,7 +4,7 @@ import { readBoundedJson, requireServerJsonContentType } from "../../../../../li
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { verificationApplicationsError } from "../../../../../lib/verification-applications-copy";
+import { verificationApplicationsError } from "../../../../../features/moderation/verification-applications-copy";
 import { verificationRate } from "../../../../../lib/verification-workspace-api";
 
 type Context = { params: Promise<{ id: string }> };

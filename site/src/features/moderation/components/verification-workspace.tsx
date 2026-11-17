@@ -11,7 +11,7 @@ import {
   platformFieldClass,
   platformRequest,
 } from "../../../lib/user-platform-client";
-import { verificationApplicationsCopy } from "../../../lib/verification-applications-copy";
+import { verificationApplicationsCopy } from "../verification-applications-copy";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,

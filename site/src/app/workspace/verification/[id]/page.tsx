@@ -11,7 +11,7 @@ import { verificationWorkspaceService } from "../../../../lib/services/verificat
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
-} from "../../../../lib/verification-applications-copy";
+} from "../../../../features/moderation/verification-applications-copy";
 import { verificationCopy } from "../../../../lib/verification-workspace-copy";
 
 export const dynamic = "force-dynamic";

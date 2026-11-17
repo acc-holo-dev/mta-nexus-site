@@ -15,7 +15,7 @@ import {
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
-} from "../../../../lib/verification-applications-copy";
+} from "../../../../features/moderation/verification-applications-copy";
 import { VERIFICATION_TYPES } from "../../../../lib/verification-workspace-contract";
 import { verificationCopy } from "../../../../lib/verification-workspace-copy";
 
