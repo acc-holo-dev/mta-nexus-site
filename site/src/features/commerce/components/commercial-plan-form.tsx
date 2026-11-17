@@ -101,12 +101,7 @@ export function CommercialPlanForm({
         }
         if (active) setReady(identity);
       } catch {
-        if (active)
-          setError(
-            locale === "ru"
-              ? "Не удалось проверить аккаунт или восстановить запрос. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify the account or restore the request. Refresh and sign in to the original account.",
-          );
+        if (active) setError(copy.restoreFailed);
       }
     }
     void restore();
@@ -115,7 +110,7 @@ export function CommercialPlanForm({
       epoch.current++;
       controller.current?.abort();
     };
-  }, [identity, key]);
+  }, [identity, key, copy.restoreFailed]);
   const disabled = busy || saved || !!marker || ready !== identity;
   async function clearMarker() {
     if (!marker || lock.current || ready !== identity || currentIdentity.current !== identity)
@@ -124,16 +119,12 @@ export function CommercialPlanForm({
     const version = epoch.current;
     try {
       const accepted = await confirmAction({
-        title:
-          locale === "ru" ? "Результат операции неизвестен" : "The operation result is unknown",
+        title: copy.resultUnknown,
         object: marker.slug,
-        consequences:
-          locale === "ru"
-            ? "Сначала проверьте список и историю. Снятие блокировки не подтверждает результат и может привести к повторной операции."
-            : "Check the list and history first. Clearing this warning does not confirm the result and may allow a duplicate operation.",
-        confirmLabel: locale === "ru" ? "Я проверил результат" : "I checked the result",
-        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
-        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        consequences: copy.resultUnknownConsequences,
+        confirmLabel: copy.checkedResult,
+        cancelLabel: copy.dialogCancel,
+        closeLabel: copy.dialogCancel,
         danger: true,
       });
       if (!accepted || version !== epoch.current) return;
@@ -147,12 +138,7 @@ export function CommercialPlanForm({
       setMarker(null);
       setError("");
     } catch {
-      if (version === epoch.current)
-        setError(
-          locale === "ru"
-            ? "Не удалось проверить аккаунт или снять блокировку."
-            : "Could not verify the account or clear the warning.",
-        );
+      if (version === epoch.current) setError(copy.clearMarkerFailed);
     } finally {
       if (version === epoch.current) lock.current = false;
     }
@@ -193,11 +179,7 @@ export function CommercialPlanForm({
       sessionStorage.setItem(key, raw);
       if (sessionStorage.getItem(key) !== raw) throw new Error("storage");
     } catch {
-      setError(
-        locale === "ru"
-          ? "Не удалось сохранить состояние восстановления. Запрос не отправлен."
-          : "Could not save recovery state. The request was not sent.",
-      );
+      setError(copy.recoverySaveFailed);
       return;
     }
     setMarker(intent);
@@ -403,11 +385,7 @@ export function CommercialPlanForm({
       {marker ? (
         <ErrorState
           id="commercial-plan-operation-unknown"
-          title={
-            locale === "ru"
-              ? "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки."
-              : "The previous operation result is unknown. Check the list and history before clearing this warning."
-          }
+          title={copy.previousResultUnknown}
           description={marker.slug}
           action={
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -420,7 +398,7 @@ export function CommercialPlanForm({
                 disabled={busy}
                 onClick={() => void clearMarker()}
               >
-                {locale === "ru" ? "Я проверил результат" : "I checked the result"}
+                {copy.checkedResult}
               </Button>
             </div>
           }

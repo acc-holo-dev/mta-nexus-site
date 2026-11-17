@@ -59,6 +59,17 @@ const copy = {
       "This is an estimate of the selected published terms, not an active subscription benefit. Provider fees and taxes are excluded. The seller amount is not a balance available to withdraw.",
     formErrorHint:
       "The result may be unknown. Check the current state and operation history before trying again.",
+    resultUnknown: "The operation result is unknown",
+    resultUnknownConsequences:
+      "Check the list and history first. Clearing this warning does not confirm the result and may allow a duplicate operation.",
+    checkedResult: "I checked the result",
+    dialogCancel: "Cancel",
+    clearMarkerFailed: "Could not verify the account or clear the warning.",
+    restoreFailed:
+      "Could not verify the account or restore the request. Refresh and sign in to the original account.",
+    recoverySaveFailed: "Could not save recovery state. The request was not sent.",
+    previousResultUnknown:
+      "The previous operation result is unknown. Check the list and history before clearing this warning.",
     paymentOperations: "Payment history and cancellation",
     attempts: "Recorded payment attempts",
     noAttempts: "No recorded payment attempts.",
@@ -166,6 +177,17 @@ const copy = {
       "Это оценка выбранных опубликованных условий, а не преимущество активной подписки. Сборы провайдера и налоги не включены. Сумма продавцу не является доступным для вывода балансом.",
     formErrorHint:
       "Результат может быть неизвестен. Перед повтором проверьте текущее состояние и историю операций.",
+    resultUnknown: "Результат операции неизвестен",
+    resultUnknownConsequences:
+      "Сначала проверьте список и историю. Снятие блокировки не подтверждает результат и может привести к повторной операции.",
+    checkedResult: "Я проверил результат",
+    dialogCancel: "Отмена",
+    clearMarkerFailed: "Не удалось проверить аккаунт или снять блокировку.",
+    restoreFailed:
+      "Не удалось проверить аккаунт или восстановить запрос. Обновите страницу и войдите в исходный аккаунт.",
+    recoverySaveFailed: "Не удалось сохранить состояние восстановления. Запрос не отправлен.",
+    previousResultUnknown:
+      "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки.",
     paymentOperations: "История платежей и отмена",
     attempts: "Записанные платёжные попытки",
     noAttempts: "Платёжных попыток не зафиксировано.",
