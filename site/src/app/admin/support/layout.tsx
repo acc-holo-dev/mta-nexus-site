@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../features/shell/session-error";
+
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
@@ -15,7 +17,19 @@ export default async function AdminSupportLayout({ children }: { children: React
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const token = (await cookies()).get("nexus_session")?.value;
-  const currentUser = await authService.getSession(token);
+  let currentUser: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    currentUser = await authService.getSession(token);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/admin/support"}
+      />
+    );
+  }
 
   if (!currentUser) {
     return <PlatformSignIn locale={locale} returnPath="/admin/support" />;
