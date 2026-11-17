@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { resourceCartReceiptsCsv } from "../../../../../../lib/resource-cart-receipts-csv";
+import { resourceCartReceiptsCsv } from "../../../../../../features/resources/resource-cart-receipts-csv";
 import { resourceCartReceiptQuery } from "../../../../../../features/resources/resource-cart-receipts-query";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { resourceCartReceiptsService } from "../../../../../../lib/services/resource-cart-receipts-service";
