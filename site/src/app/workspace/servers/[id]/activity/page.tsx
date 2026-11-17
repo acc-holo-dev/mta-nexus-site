@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ServerWorkspaceHistoryScreen } from "../../../../../features/servers/activity-server";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getServerActivityCopy } from "../../../../../lib/server-activity-view";
+import { getServerActivityCopy } from "../../../../../features/servers/server-activity-view";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

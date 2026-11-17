@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../lib/managed-server-view";
-import { getServerActivityCopy } from "../../../lib/server-activity-view";
+import { getServerActivityCopy } from "../server-activity-view";
 import {
   parseServerWorkspaceHistoryQuery,
   serverWorkspaceHistoryHref,

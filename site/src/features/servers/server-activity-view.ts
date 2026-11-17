@@ -3,7 +3,7 @@ import {
   type ServerActivityAction,
   type ServerActivityField,
 } from "@nexus/domain";
-import type { Locale } from "./i18n";
+import type { Locale } from "../../lib/i18n";
 
 export function serverActivityHref(serverId: string, cursor?: string | null): string {
   const path = `/workspace/servers/${encodeURIComponent(serverId)}/activity`;

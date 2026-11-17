@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-activity-view",
     "server-claim-status-view",
     "server-workspace-nav-i18n",
     "server-statistics-download",
@@ -152,6 +153,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-activity-view.ts", "servers-client-isolation"],
     ["features/servers/server-claim-status-view.ts", "servers-client-isolation"],
     ["features/servers/server-workspace-nav-i18n.ts", "servers-client-isolation"],
     ["features/servers/server-statistics-download.ts", "servers-client-isolation"],
@@ -201,6 +203,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-activity-view.ts",
     "app/server-claim-status-view.ts",
     "app/server-workspace-nav-i18n.ts",
     "app/server-statistics-download.ts",
@@ -232,6 +235,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-activity-view.ts",
     "site/src/features/servers/server-claim-status-view.ts",
     "site/src/features/servers/server-workspace-nav-i18n.ts",
     "site/src/features/servers/server-statistics-download.ts",
@@ -294,6 +298,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-activity-view.ts");
   visit("site/src/features/servers/server-claim-status-view.ts");
   visit("site/src/features/servers/server-workspace-nav-i18n.ts");
   visit("site/src/features/servers/server-statistics-download.ts");

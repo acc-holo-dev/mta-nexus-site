@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getServerActivityCopy } from "../../../../../lib/server-activity-view";
+import { getServerActivityCopy } from "../../../../../features/servers/server-activity-view";
 
 export default async function Loading() {
   const copy = getServerActivityCopy(await getRequestLocale());
