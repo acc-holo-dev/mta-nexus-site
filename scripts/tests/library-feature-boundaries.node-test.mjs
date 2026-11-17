@@ -26,6 +26,7 @@ const utilPorts = [
   "library-selection-batches-i18n",
   "collection-requirements-i18n",
   "library-collection-receipts-i18n",
+  "library-collections-confirmation",
 ];
 const serverPorts = [
   "collections",
@@ -44,7 +45,7 @@ const serverPorts = [
   "resource-collections-page",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-confirmation|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-history-i18n|library-membership-history-query|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:library-collection-receipts-i18n|library-collections-i18n|library-collections-query|private-api-request|library-collection-manifests-i18n|library-membership-history-i18n|library-membership-history-query|library-release-comparison-i18n|resource-release-control-i18n|resource-release-control-confirmation)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,

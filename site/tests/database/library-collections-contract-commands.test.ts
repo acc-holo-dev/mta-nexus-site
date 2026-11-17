@@ -1,6 +1,6 @@
 import { collectionCommandItemResults, LIBRARY_COLLECTION_BATCH_LIMIT } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { confirmedCollectionCommand } from "../../src/lib/library-collections-confirmation";
+import { confirmedCollectionCommand } from "../../src/features/library/library-collections-confirmation";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

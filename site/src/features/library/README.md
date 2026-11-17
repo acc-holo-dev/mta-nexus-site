@@ -35,6 +35,7 @@ Feature объединяет существующие представления
 | `collection-item-copy.ts`                   | Клиентская форма копирования и переноса элементов             |
 | `collection-requirements-i18n.ts` | util port `collection-requirements-i18n` |
 | `library-collection-receipts-i18n.ts` | util port `library-collection-receipts-i18n` |
+| `library-collections-confirmation.ts` | util port `library-collections-confirmation` |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

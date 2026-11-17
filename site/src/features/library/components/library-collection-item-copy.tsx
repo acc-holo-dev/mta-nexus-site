@@ -5,7 +5,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

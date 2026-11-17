@@ -13,7 +13,7 @@ import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
 } from "../library-collection-receipts-i18n";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
