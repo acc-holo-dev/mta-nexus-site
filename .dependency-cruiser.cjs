@@ -328,7 +328,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/commerce/)" },
       to: {
-        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-history-server)\\.ts$)",
+        path: "^site/src/features/commerce/(?!(?:workspace-history|license-controls|license-archive|license-detail|license-history-server|subscription-controls|subscription-workspace)\\.ts$)",
       },
     },
     {
@@ -341,17 +341,17 @@ module.exports = {
       name: "commerce-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|private-api-request)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!commerce/|shell/(?:locale)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|license-control-i18n|license-control-confirmation|license-runtime-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "commerce-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls)\\.ts$|components/)",
+        path: "^site/src/features/commerce/(?:(?:workspace-history|license-controls|subscription-controls)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

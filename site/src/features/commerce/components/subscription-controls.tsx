@@ -5,16 +5,19 @@ import { commercialPlanTermsSchema, subscriptionCommandSchema } from "@nexus/val
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { commercialTerms } from "../lib/commercial-confirmation";
-import { privateApiRequest } from "../lib/private-api-request";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../../components/action-confirm-checkbox";
+import { commercialTerms } from "../../../lib/commercial-confirmation";
+import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   confirmedSubscriptionReceipt,
   expectedSubscriptionReceiptId,
-} from "../lib/subscription-confirmation";
-import { subscriptionError, subscriptionsCopy } from "../lib/subscriptions-i18n";
-import { subscriptionAccountHref, subscriptionReceiptHref } from "../lib/subscriptions-query";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
-import { useNexusLocale } from "../features/shell/locale";
+} from "../../../lib/subscription-confirmation";
+import { subscriptionError, subscriptionsCopy } from "../../../lib/subscriptions-i18n";
+import { subscriptionAccountHref, subscriptionReceiptHref } from "../../../lib/subscriptions-query";
+import { useNexusLocale } from "../../shell/locale";
 
 type Props = {
   actorId: string;

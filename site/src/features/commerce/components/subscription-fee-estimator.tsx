@@ -2,12 +2,12 @@
 import type { commercialFeeEstimate } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { formatHistoryAmount } from "../lib/commerce-history-format";
-import { parseCommercialAmount } from "../lib/commercial-confirmation";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmedSubscriptionEstimate } from "../lib/subscription-confirmation";
-import { subscriptionsCopy } from "../lib/subscriptions-i18n";
-import { useNexusLocale } from "../features/shell/locale";
+import { formatHistoryAmount } from "../../../lib/commerce-history-format";
+import { parseCommercialAmount } from "../../../lib/commercial-confirmation";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { confirmedSubscriptionEstimate } from "../../../lib/subscription-confirmation";
+import { subscriptionsCopy } from "../../../lib/subscriptions-i18n";
+import { useNexusLocale } from "../../shell/locale";
 export function SubscriptionFeeEstimator({
   actorId,
   organizationId,

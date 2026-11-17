@@ -12,6 +12,8 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `license-detail.ts`         | `LicenseDetailView`; workspace/admin license detail                                |
 | `license-archive.ts`        | `LicenseArchiveFilters`; workspace license list filters                            |
 | `license-history-server.ts` | `LicenseHistoryPage`, `licenseHistoryMetadata`; workspace/admin license activity   |
+| `subscription-controls.ts`  | `SubscriptionControls`, `SubscriptionFeeEstimator`, `SubscriptionRecovery` (client)  |
+| `subscription-workspace.ts` | `subscriptionNavLinkClass`; subscription workspace nav chrome (RSC-safe)             |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

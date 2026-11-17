@@ -19,7 +19,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 
-import { SubscriptionControls } from "../../src/components/subscription-controls";
+import { SubscriptionControls } from "../../src/features/commerce/subscription-controls";
 
 const { mount, submit, accountPosts } = createSubscriptionIntentInteractionHelpers(
   h,

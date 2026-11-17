@@ -8,9 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const clientPorts = ["workspace-history", "license-controls"];
+const clientPorts = ["workspace-history", "license-controls", "subscription-controls"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|private-api-request)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|license-control-i18n|license-control-confirmation|license-runtime-response|plan-reviews-i18n|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -120,5 +120,14 @@ test("real Commerce license-controls graphs have no transitive server dependenci
     "site/src/features/commerce/license-controls.ts",
     "site/src/features/commerce/components/license-control-panel.tsx",
     "site/src/features/commerce/components/license-runtime-probe.tsx",
+  ]);
+});
+
+test("real Commerce subscription-controls graphs have no transitive server dependencies", () => {
+  assertClientGraphsHaveNoServerLeaks([
+    "site/src/features/commerce/subscription-controls.ts",
+    "site/src/features/commerce/components/subscription-controls.tsx",
+    "site/src/features/commerce/components/subscription-fee-estimator.tsx",
+    "site/src/features/commerce/components/subscription-recovery.tsx",
   ]);
 });

@@ -1,10 +1,10 @@
 "use client";
 import { commercialPlanTermsSchema, subscriptionCommandSchema } from "@nexus/validation";
 import { useEffect, useState } from "react";
-import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "../features/shell/locale";
+import { PlanReviewTerms } from "../../../components/plan-review-terms";
+import { privateApiRequest } from "../../../lib/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
 import { SubscriptionControls } from "./subscription-controls";
-import { PlanReviewTerms } from "./plan-review-terms";
 
 export function SubscriptionRecovery({ actorId }: { actorId: string }) {
   const { locale } = useNexusLocale();

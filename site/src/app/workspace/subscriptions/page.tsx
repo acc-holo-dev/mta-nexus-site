@@ -5,11 +5,13 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewTerms } from "../../../components/plan-review-terms";
+import {
+  SubscriptionControls,
+  SubscriptionFeeEstimator,
+  SubscriptionRecovery,
+} from "../../../features/commerce/subscription-controls";
+import { subscriptionNavLinkClass } from "../../../features/commerce/subscription-workspace";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
-import { SubscriptionControls } from "../../../components/subscription-controls";
-import { SubscriptionRecovery } from "../../../components/subscription-recovery";
-import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";
-import { subscriptionNavLinkClass } from "../../../components/subscription-workspace-recovery";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
