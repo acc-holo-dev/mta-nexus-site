@@ -5,7 +5,7 @@ import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedCompatibility } from "../../../lib/resource-management-confirmation";
+import { confirmedCompatibility } from "../resource-management-confirmation";
 import {
   getResourceManagementCopy,
   resourceManagementError,

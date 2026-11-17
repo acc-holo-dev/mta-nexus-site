@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedVariantCommand } from "../../../lib/resource-management-confirmation";
+import { confirmedVariantCommand } from "../resource-management-confirmation";
 import {
   getResourceManagementCopy,
   resourceManagementError,

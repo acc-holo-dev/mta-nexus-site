@@ -54,6 +54,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-copy-confirmation.ts` | util port `resource-copy-confirmation` |
 | `resource-review-confirmation.ts` | util port `resource-review-confirmation` |
 | `author-resource-response.ts` | util port `author-resource-response` |
+| `resource-management-confirmation.ts` | util port `resource-management-confirmation` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;
