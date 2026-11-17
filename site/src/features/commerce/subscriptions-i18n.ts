@@ -79,6 +79,9 @@ const en = {
   estimateFailed: "The fee estimate could not be confirmed. Try again.",
   formErrorHint:
     "The result may be unknown. Retry the saved request or check subscription history.",
+  recoverTitle: "Recover subscription operation",
+  recoverDescription:
+    "The previous request was not confirmed. Retry the original request or check history.",
   actions: { activate: "Free plan activated", cancel: "Subscription ended" },
   statuses: { active: "Active", expired: "Expired", cancelled: "Ended" },
 };
@@ -160,6 +163,9 @@ const ru: typeof en = {
   estimateFailed: "Расчёт комиссии не удалось подтвердить. Попробуйте снова.",
   formErrorHint:
     "Результат может быть неизвестен. Повторите сохранённый запрос или проверьте историю подписки.",
+  recoverTitle: "Восстановление операции подписки",
+  recoverDescription:
+    "Результат предыдущего запроса не подтверждён. Повторите исходный запрос или проверьте историю.",
   actions: { activate: "Бесплатный тариф подключён", cancel: "Подписка прекращена" },
   statuses: { active: "Действует", expired: "Истекла", cancelled: "Прекращена" },
 };

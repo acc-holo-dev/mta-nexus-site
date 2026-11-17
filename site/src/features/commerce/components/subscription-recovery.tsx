@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
+import { subscriptionsCopy } from "../subscriptions-i18n";
 import { SubscriptionControls } from "./subscription-controls";
 
 export function SubscriptionRecovery({ actorId }: { actorId: string }) {
   const { locale } = useNexusLocale();
+  const copy = subscriptionsCopy(locale);
   const [item, setItem] = useState<{
     actorId: string;
     command: ReturnType<typeof subscriptionCommandSchema.parse>;
@@ -66,14 +68,8 @@ export function SubscriptionRecovery({ actorId }: { actorId: string }) {
   const { command, snapshot } = item;
   return (
     <section className="space-y-4">
-      <h2>
-        {locale === "ru" ? "Восстановление операции подписки" : "Recover subscription operation"}
-      </h2>
-      <p>
-        {locale === "ru"
-          ? "Результат предыдущего запроса не подтверждён. Повторите исходный запрос или проверьте историю."
-          : "The previous request was not confirmed. Retry the original request or check history."}
-      </p>
+      <h2>{copy.recoverTitle}</h2>
+      <p>{copy.recoverDescription}</p>
       <PlanReviewTerms terms={snapshot.terms} locale={locale} />
       {command.action === "activate" ? (
         <SubscriptionControls
