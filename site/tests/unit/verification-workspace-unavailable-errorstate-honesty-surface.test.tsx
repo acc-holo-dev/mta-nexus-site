@@ -15,9 +15,10 @@ const page = readFileSync(join(root, "site/src/app/workspace/verification/page.t
 it("locks verification workspace unavailable notices to ErrorState with stable id", () => {
   expect(workspace).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(workspace).toContain('id="verification-workspace-unavailable"');
-  expect(workspace).toContain(
-    'return <ErrorState id="verification-workspace-unavailable" title={copy.unavailable} />;',
+  expect(workspace).toMatch(
+    /<ErrorState\s+id="verification-workspace-unavailable"\s+title=\{copy\.unavailable\}\s+description=\{copy\.unavailableHint\}\s*\/>/u,
   );
+  expect(workspace).toContain("description={copy.unavailableHint}");
   expect(workspace).toMatch(
     /readError \? \(\s*<ErrorState\s+id="verification-workspace-unavailable"\s+title=\{readError\}/u,
   );
