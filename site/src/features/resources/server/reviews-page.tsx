@@ -59,9 +59,13 @@ export async function PublicResourceReviewsPage({
   }
   if (product?.status !== "published") notFound();
 
-  const actor = await authService
-    .getSession(cookieStore.get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>> | null = null;
+  let sessionFailed = false;
+  try {
+    actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    sessionFailed = true;
+  }
   const result = await resourceReviewService
     .publicPage(product.id, pageQuery.page)
     .catch((error) => {
@@ -104,7 +108,16 @@ export async function PublicResourceReviewsPage({
         {copy.title} · {product.title}
       </h1>
       <p className="text-sm text-secondary">{copy.subtitle}</p>
-      {actor ? (
+      {sessionFailed ? (
+        <ErrorState
+          title={copy.pageUnavailable}
+          action={
+            <Link href={reviewsPath} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : actor ? (
         <Link
           href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
           className={actionLinkClass}

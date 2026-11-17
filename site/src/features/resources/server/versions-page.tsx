@@ -73,9 +73,13 @@ export async function PublicResourceVersionsPage({
   }
   if (!product) notFound();
 
-  const user = await authService
-    .getSession(cookieStore.get("nexus_session")?.value)
-    .catch(() => null);
+  let user: Awaited<ReturnType<typeof authService.getSession>> | null = null;
+  let sessionFailed = false;
+  try {
+    user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    sessionFailed = true;
+  }
   const history = await buildRepository
     .pagePublishedReleases(product.id, requestedPage)
     .catch(() => null);
@@ -243,7 +247,16 @@ export async function PublicResourceVersionsPage({
 
       {!canDownload && (
         <div className="text-sm text-secondary">
-          {user ? (
+          {sessionFailed ? (
+            <ErrorState
+              title={copy.loadUnavailable}
+              action={
+                <Link href={returnPath} className={actionLinkClass}>
+                  {dictionary.errors.retry}
+                </Link>
+              }
+            />
+          ) : user ? (
             <Link
               href={`/acquire?productId=${encodeURIComponent(product.id)}`}
               className={actionLinkClass}
