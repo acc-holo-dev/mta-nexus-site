@@ -14,6 +14,7 @@ it("locks claim-session lookup failure to ErrorState without soft status", () =>
   expect(source).toMatch(
     /claimViewer === undefined \? \(\s*<ErrorState\s+id="server-claim-session-unavailable"\s+title=\{/u,
   );
-  expect(source).toContain("Could not check the session for server verification.");
+  expect(source).toContain("copy.claimSessionUnavailable");
+  expect(source).not.toContain("Could not check the session for server verification.");
   expect(source).not.toMatch(/claimViewer === undefined \? \(\s*<p role="status">/u);
 });

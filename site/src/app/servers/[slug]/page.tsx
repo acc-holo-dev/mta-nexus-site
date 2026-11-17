@@ -95,7 +95,10 @@ export default async function ServerDetailPage({
     followViewer = reportViewer;
     if (claimable) claimViewer = reportViewer;
   } catch {
+    // Probe failure is not a guest: leave followViewer undefined (error seed) and
+    // mark claim/report controls as unavailable instead of inventing a signed-out viewer.
     reportViewer = null;
+    followViewer = undefined;
     if (claimable) claimViewer = undefined;
   }
   const serverReturnPath = `/servers/${encodeURIComponent(server.slug)}`;
@@ -254,14 +257,7 @@ export default async function ServerDetailPage({
         !server.ownerId &&
         !server.isVerified &&
         (claimViewer === undefined ? (
-          <ErrorState
-            id="server-claim-session-unavailable"
-            title={
-              locale === "ru"
-                ? "Не удалось проверить сессию для подтверждения сервера."
-                : "Could not check the session for server verification."
-            }
-          />
+          <ErrorState id="server-claim-session-unavailable" title={copy.claimSessionUnavailable} />
         ) : (
           <ServerClaimControlPanel
             key={`${server.id}:${claimViewer?.id ?? "guest"}`}
