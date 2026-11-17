@@ -8,6 +8,8 @@ import { ServerClaimStatusPanel } from "../../../../features/servers/claim-statu
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
 import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -33,7 +35,19 @@ export default async function ServerManagementPage({
   const copy = getDictionary(locale).serverManagement;
   const serverCopy = getManagedServerCopy(locale);
   const token = (await cookies()).get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(token);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/workspace/servers/"}
+      />
+    );
+  }
 
   if (!user) {
     return (
