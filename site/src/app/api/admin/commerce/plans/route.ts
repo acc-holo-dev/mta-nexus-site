@@ -3,7 +3,7 @@ import { commercialPlanCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { commercialAdminQuery } from "../../../../../lib/commercial-plan-query";
+import { commercialAdminQuery } from "../../../../../features/commerce/commercial-plan-query";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { commercialPlanService } from "../../../../../lib/services/commercial-plan-service";
 export function GET(request: NextRequest) {

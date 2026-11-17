@@ -15,7 +15,7 @@ import {
   commercialAdminQuery,
   commercialCatalogQuery,
   commercialQuoteQuery,
-} from "../../src/lib/commercial-plan-query";
+} from "../../src/features/commerce/commercial-plan-query";
 
 const terms = {
   titleRu: "Тариф",
