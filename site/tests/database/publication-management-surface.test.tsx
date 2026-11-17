@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import {
   type PublicationPage,
   publicationPageQuery,

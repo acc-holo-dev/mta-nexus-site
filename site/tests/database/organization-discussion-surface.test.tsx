@@ -3,7 +3,7 @@ import { expect, it, vi } from "vitest";
 import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
 import { OrganizationProfileForm } from "../../src/features/organizations/profile";
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 

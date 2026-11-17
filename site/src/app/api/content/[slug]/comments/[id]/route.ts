@@ -7,7 +7,7 @@ import {
   discussionEditSchema,
   discussionRemoveSchema,
 } from "../../../../../../lib/content-discussion-contract";
-import { discussionMutationError } from "../../../../../../lib/content-discussion-copy";
+import { discussionMutationError } from "../../../../../../features/community/content-discussion-copy";
 import { contentService } from "../../../../../../lib/services/content-service";
 import { userPlatformApi } from "../../../../../../lib/user-platform-api";
 

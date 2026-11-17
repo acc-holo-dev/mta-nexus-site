@@ -27,7 +27,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => {
 });
 
 import { DiscussionCommentActions } from "../../src/features/community/components/discussion-comment-actions";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 
 const { render, control, submit, seedModeratorRemove } =
   createDiscussionCommentActionsConfirmInteractionHelpers(

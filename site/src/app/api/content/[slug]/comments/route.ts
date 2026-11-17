@@ -9,7 +9,7 @@ import {
   discussionCommentSchema,
   parseDiscussionQuery,
 } from "../../../../../lib/content-discussion-contract";
-import { discussionError } from "../../../../../lib/content-discussion-copy";
+import { discussionError } from "../../../../../features/community/content-discussion-copy";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,

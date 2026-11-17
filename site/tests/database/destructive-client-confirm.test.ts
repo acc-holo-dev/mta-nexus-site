@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import { reactionCopy } from "../../src/lib/content-reaction-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";

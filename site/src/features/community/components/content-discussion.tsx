@@ -19,7 +19,7 @@ import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../../../lib/content-discussion-copy";
+} from "../content-discussion-copy";
 import {
   clearDiscussionComposeDraft,
   readDiscussionComposeDraft,

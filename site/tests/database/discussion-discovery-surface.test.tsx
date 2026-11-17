@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),

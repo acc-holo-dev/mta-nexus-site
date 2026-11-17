@@ -4,7 +4,7 @@ import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { OwnDiscussionDetail } from "../../src/features/community/components/own-discussion-detail";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import { ownDiscussionCopy } from "../../src/lib/discussion-workspace-copy";
 import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 

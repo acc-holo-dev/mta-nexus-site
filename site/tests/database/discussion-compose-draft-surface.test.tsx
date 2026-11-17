@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { DiscussionComposeWriteFeedback } from "../../src/features/community/components/content-discussion-compose-feedback";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import type { DiscussionComposeDraft } from "../../src/features/community/discussion-compose-draft";
 import { getDictionary } from "../../src/lib/i18n";
 

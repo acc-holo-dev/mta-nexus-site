@@ -14,7 +14,7 @@ import {
   getDiscussionCopy,
   discussionError,
   discussionMutationError,
-} from "../../src/lib/content-discussion-copy";
+} from "../../src/features/community/content-discussion-copy";
 it.each([
   "?type=bad",
   "?source=bad",

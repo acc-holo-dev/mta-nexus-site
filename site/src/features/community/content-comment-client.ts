@@ -1,5 +1,5 @@
 import { confirmedCommentId } from "./content-comment-confirmation";
-import { discussionError } from "../../lib/content-discussion-copy";
+import { discussionError } from "./content-discussion-copy";
 import type { Locale } from "../../lib/i18n";
 
 export type ContentCommentFetch = (

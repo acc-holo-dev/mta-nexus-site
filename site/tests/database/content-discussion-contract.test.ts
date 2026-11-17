@@ -9,7 +9,7 @@ import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../../src/lib/content-discussion-copy";
+} from "../../src/features/community/content-discussion-copy";
 import { getDictionary } from "../../src/lib/i18n";
 import { formatNotification } from "../../src/lib/notification-copy";
 

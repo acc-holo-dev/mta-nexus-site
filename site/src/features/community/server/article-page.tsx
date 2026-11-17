@@ -12,7 +12,7 @@ import { CommunityReportForm } from "../report-form";
 import { ContentDiscussion } from "../discussion";
 import { ContentReactions } from "../reactions";
 import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
-import { discussionError, getDiscussionCopy } from "../../../lib/content-discussion-copy";
+import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
