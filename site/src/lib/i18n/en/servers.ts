@@ -126,6 +126,8 @@ export const servers = {
     title: "Observed player history",
     unavailable:
       "Stored history is temporarily unavailable. Live directory status remains separate from historical observations.",
+    unavailableHint:
+      "Retry reloads this history panel only. A temporary load failure is not an empty observation window.",
     description:
       "Stored observations from the official MTA directory. Missing observations do not mean the server was offline.",
     recordedOnly: "Recorded observations only",
@@ -149,6 +151,8 @@ export const servers = {
     description: "Published articles, news, devlogs and announcements linked to this server.",
     moderated: "Moderated content",
     unavailable: "Server updates are temporarily unavailable. Live server status is unaffected.",
+    unavailableHint:
+      "Retry reloads this updates panel only. A temporary load failure is not an empty publication list.",
     empty: "No published server updates yet.",
     emptyHint:
       "Published articles, news, and announcements linked to this server appear here after moderation.",

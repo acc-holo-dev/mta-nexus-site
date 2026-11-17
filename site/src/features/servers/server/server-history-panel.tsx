@@ -40,6 +40,7 @@ export function ServerHistoryPanel({
         </h2>
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             retryHref ? (
               <Link

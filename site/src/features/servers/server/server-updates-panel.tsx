@@ -46,6 +46,7 @@ export function ServerUpdatesPanel({
       {updates === null ? (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             retryHref ? (
               <Link href={retryHref} className={navLinkClass}>

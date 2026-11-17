@@ -109,7 +109,10 @@ export function LibraryMembershipHistoryEntry({
                       </p>
                     </>
                   ) : (
-                    <p>{h.noCurrent}</p>
+                    <ErrorState
+                      id="library-membership-history-current-unavailable"
+                      title={h.noCurrent}
+                    />
                   )}
                   <Link
                     href={collectionHref(child.collection.id, "history")}
