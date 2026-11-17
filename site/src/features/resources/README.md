@@ -70,6 +70,7 @@ Services и repositories не дублируются и не переносят�
 | `public-release-history.ts` | util port `public-release-history` |
 | `resource-cart-receipts-query.ts` | util port `resource-cart-receipts-query` |
 | `resource-publisher-query.ts` | util port `resource-publisher-query` |
+| `resource-review-query.ts` | util port `resource-review-query` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

@@ -8,7 +8,7 @@ import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { resourceReviewCopy, resourceReviewState } from "../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
+import { resourceReviewPageQuery } from "../resource-review-query";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

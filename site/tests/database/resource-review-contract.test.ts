@@ -5,7 +5,7 @@ import {
   resourceReviewDecisionSchema,
   resourceReviewReportSchema,
 } from "@nexus/validation";
-import { resourceReviewQuery, resourceReviewPageQuery } from "../../src/lib/resource-review-query";
+import { resourceReviewQuery, resourceReviewPageQuery } from "../../src/features/resources/resource-review-query";
 import {
   confirmedReview,
   confirmedReviewDecision,

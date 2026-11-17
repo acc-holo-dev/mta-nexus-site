@@ -9,7 +9,7 @@ import { ResourceReviewList, ResourceReviewPager } from "../components/resource-
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
+import { resourceReviewPageQuery } from "../resource-review-query";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";

@@ -11,7 +11,7 @@ import {
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceReviewQuery } from "../../../../../lib/resource-review-query";
+import { resourceReviewQuery } from "../../../../../features/resources/resource-review-query";
 import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
