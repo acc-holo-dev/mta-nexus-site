@@ -65,6 +65,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "server-review-query",
     "server-workspace-copy",
     "server-mutation-errors",
     "server-review-i18n",
@@ -156,6 +157,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/server-review-query.ts", "servers-client-isolation"],
     ["features/servers/server-workspace-copy.ts", "servers-client-isolation"],
     ["features/servers/server-mutation-errors.ts", "servers-client-isolation"],
     ["features/servers/server-review-i18n.ts", "servers-client-isolation"],
@@ -209,6 +211,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/server-review-query.ts",
     "app/server-workspace-copy.ts",
     "app/server-mutation-errors.ts",
     "app/server-review-i18n.ts",
@@ -244,6 +247,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/server-review-query.ts",
     "site/src/features/servers/server-workspace-copy.ts",
     "site/src/features/servers/server-mutation-errors.ts",
     "site/src/features/servers/server-review-i18n.ts",
@@ -310,6 +314,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/server-review-query.ts");
   visit("site/src/features/servers/server-workspace-copy.ts");
   visit("site/src/features/servers/server-mutation-errors.ts");
   visit("site/src/features/servers/server-review-i18n.ts");

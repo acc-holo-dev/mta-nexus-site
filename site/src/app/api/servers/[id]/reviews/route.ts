@@ -11,7 +11,7 @@ import {
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { serverReviewQuery } from "../../../../../lib/server-review-query";
+import { serverReviewQuery } from "../../../../../features/servers/server-review-query";
 import { serverReviewService } from "../../../../../lib/services/server-review-service";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
