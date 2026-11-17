@@ -16,7 +16,7 @@ import {
   SettingsRequestError,
   type SettingsSession,
   settingsClientRequest,
-} from "../../../lib/settings-client-api";
+} from "../settings-client-api";
 import { confirmAction } from "../../shell/confirm-action";
 import { ContextSwitcher } from "./context-switcher";
 import { useNexusLocale } from "../../shell/locale";

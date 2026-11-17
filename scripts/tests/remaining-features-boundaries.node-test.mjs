@@ -56,8 +56,8 @@ const features = [
       "settings-advertising-preferences-section",
     ],
     servers: [],
-    clientUtilPorts: ["profile-pagination", "developer-experience", "ad-preference"],
-    safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|settings-client-api|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
+    clientUtilPorts: ["profile-pagination", "developer-experience", "ad-preference", "settings-client-api"],
+    safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|profile-privacy-contract|private-change-history-copy|private-change-history-query|profile-change-history-contract|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
   },
   {
     name: "shell",
