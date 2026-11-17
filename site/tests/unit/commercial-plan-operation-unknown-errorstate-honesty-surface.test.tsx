@@ -14,11 +14,10 @@ const source = readFileSync(
 it("locks commercial-plan unknown operation marker to ErrorState without soft note", () => {
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="commercial-plan-operation-unknown"');
-  expect(source).toContain(
-    "copy.previousResultUnknown",
-  );
-  expect(source).toContain(
-    "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки.",
+  expect(source).toContain("copy.previousResultUnknown");
+  expect(source).toContain("copy.checkedResult");
+  expect(source).not.toContain(
+    "The previous operation result is unknown. Check the list and history before clearing this warning.",
   );
   expect(source).toMatch(/marker \? \(\s*<ErrorState\s+id="commercial-plan-operation-unknown"/u);
   expect(source).not.toContain('<div className="space-y-2" role="note">');
