@@ -18,6 +18,8 @@ import {
 } from "../../../../../features/commerce/financial-i18n";
 import { orderTermsCopy } from "../../../../../features/commerce/order-terms-i18n";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -41,7 +43,20 @@ export default async function ReconciliationDetail({
   ]);
   const copy = getFinancialCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={dictionary.errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/commerce/reconciliation/"}
+      />
+    );
+  }
+
   if (!user)
     return (
       <PlatformSignIn
