@@ -22,7 +22,7 @@ import {
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { getLicenseControlCopy } from "../../../features/commerce/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 import { authService } from "../../../lib/services/auth-service";
 

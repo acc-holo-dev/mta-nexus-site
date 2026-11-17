@@ -8,7 +8,7 @@ import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getLicenseControlCopy, licenseActionLabel } from "../../../lib/license-control-i18n";
+import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
 import { authService } from "../../../lib/services/auth-service";
 import { licenseControlService } from "../../../lib/services/license-control-service";

@@ -3,7 +3,7 @@ import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/dom
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
   type LicenseRuntimeContext,

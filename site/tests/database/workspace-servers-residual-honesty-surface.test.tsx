@@ -16,7 +16,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
 }));
 
 import ServerTrustLoading from "../../src/app/servers/[slug]/trust/loading";
-import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
+import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
 import { serverContentCopy } from "../../src/lib/server-content-copy";
 import { serverObservationBrowserCopy } from "../../src/lib/server-observation-browser-copy";
@@ -160,6 +160,6 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(read("site/src/lib/server-publication-history-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/lib/server-content-copy.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/lib/public-context-trust-copy.ts")).toContain("unavailableHint");
-  expect(read("site/src/lib/license-control-i18n.ts")).toContain("loadUnavailableHint");
-  expect(read("site/src/lib/license-control-i18n.ts")).toContain("noHistoryHint");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain("loadUnavailableHint");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain("noHistoryHint");
 });

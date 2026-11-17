@@ -61,7 +61,7 @@ import {
   licenseHistoryMetadata,
 } from "../../src/features/commerce/license-history-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
+import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };

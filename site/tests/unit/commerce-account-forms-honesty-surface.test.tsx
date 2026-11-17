@@ -51,7 +51,7 @@ it("keeps additive formErrorHint / errorHint copy for commerce and account hones
   expect(read("site/src/lib/order-case-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/features/commerce/plan-reviews-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/license-control-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/organization-governance-copy.ts")).toContain("formErrorHint:");
   expect(read("site/src/features/moderation/storage-maintenance-i18n.ts")).toContain(
     "formErrorHint:",
@@ -69,7 +69,7 @@ it("locks license bind noServers empty to EmptyState with honesty hint copy", ()
   expect(panel).toContain("copy.noServersHint");
   expect(panel).not.toMatch(/<p className="text-sm text-muted">\{copy\.noServers\}<\/p>/u);
 
-  const i18n = read("site/src/lib/license-control-i18n.ts");
+  const i18n = read("site/src/features/commerce/license-control-i18n.ts");
   expect(i18n).toContain("noServers:");
   expect(i18n).toContain("noServersHint:");
   expect(i18n.match(/noServersHint:/gu)?.length).toBe(2);
