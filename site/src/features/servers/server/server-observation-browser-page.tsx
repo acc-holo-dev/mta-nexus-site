@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Locale } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import {
@@ -13,6 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
 import {
   parseServerObservationBrowserQuery,
   type ServerObservationBrowserQuery,
@@ -75,7 +77,14 @@ export async function ServerObservationBrowserPage({
       ? await authService.getSession((await cookies()).get("nexus_session")?.value)
       : null;
   } catch {
-    return failure(copy.unavailable);
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
+    );
   }
   if (managed && !actor) {
     const returnParams = new URLSearchParams();
