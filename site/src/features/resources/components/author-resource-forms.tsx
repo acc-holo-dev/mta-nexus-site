@@ -18,7 +18,7 @@ import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
-} from "../../../lib/author-resource-requests";
+} from "../author-resource-requests";
 import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,

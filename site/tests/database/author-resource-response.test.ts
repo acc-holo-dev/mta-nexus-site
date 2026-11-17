@@ -3,7 +3,7 @@ import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
-} from "../../src/lib/author-resource-requests";
+} from "../../src/features/resources/author-resource-requests";
 import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,

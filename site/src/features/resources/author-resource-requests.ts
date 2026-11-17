@@ -1,5 +1,5 @@
-import type { AuthorDetailsDraft } from "./author-resource-draft";
-import { privateRequest } from "./private-request";
+import type { AuthorDetailsDraft } from "../../lib/author-resource-draft";
+import { privateRequest } from "../../lib/private-request";
 
 export function authorDetailsMutationRequest(
   details: Omit<AuthorDetailsDraft, "tagsText"> & { tags: string[] },
