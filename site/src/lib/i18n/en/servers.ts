@@ -104,6 +104,15 @@ export const servers = {
     verifyUnavailable: "Control proof verification is temporarily unavailable.",
     exactEndpoint:
       "Master-list presence alone is not treated as proof. NEXUS requires the one-time token to appear on the exact server endpoint in a fresh directory snapshot.",
+    sessionOrStorageUnavailable: "Could not check the session or storage. Refresh this page.",
+    sessionChanged: "The session changed or could not be verified. Refresh this page.",
+    markerSaveFailed: "Could not save the operation marker. The request was not sent.",
+    unknownIssueTitle:
+      "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support.",
+    unknownVerifyTitle:
+      "The verification result is unknown. Retry is blocked; check your requests and contact support.",
+    checkRequests: "Check requests",
+    checkingSession: "Checking the session before showing the token…",
   },
   serverHistory: {
     chooseWindow: "History period",

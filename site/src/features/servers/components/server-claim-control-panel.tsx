@@ -108,11 +108,7 @@ export function ServerClaimControlPanel({
         }
       } catch {
         if (alive) {
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или хранилище. Обновите страницу."
-              : "Could not check the session or storage. Refresh this page.",
-          );
+          setError(getDictionary(localeRef.current).serverClaim.sessionOrStorageUnavailable);
           setReadyScope(scope);
           setReady(true);
         }
@@ -150,11 +146,7 @@ export function ServerClaimControlPanel({
             ? "unknown_verify"
             : "unknown_issue",
         );
-        setError(
-          localeRef.current === "ru"
-            ? "Сессия изменилась или не подтверждена. Обновите страницу."
-            : "The session changed or could not be verified. Refresh this page.",
-        );
+        setError(getDictionary(localeRef.current).serverClaim.sessionChanged);
       }
     }
     function visibilityChanged() {
@@ -184,11 +176,7 @@ export function ServerClaimControlPanel({
     )
       return;
     if (!mark(actorId, "issue")) {
-      setError(
-        locale === "ru"
-          ? "Не удалось сохранить отметку операции. Запрос не отправлен."
-          : "Could not save the operation marker. The request was not sent.",
-      );
+      setError(copy.markerSaveFailed);
       return;
     }
     const requestEpoch = identityEpoch.current;
@@ -244,11 +232,7 @@ export function ServerClaimControlPanel({
     )
       return;
     if (!mark(actorId, "verify")) {
-      setError(
-        locale === "ru"
-          ? "Не удалось сохранить отметку операции. Запрос не отправлен."
-          : "Could not save the operation marker. The request was not sent.",
-      );
+      setError(copy.markerSaveFailed);
       return;
     }
     const requestEpoch = identityEpoch.current;
@@ -335,30 +319,18 @@ export function ServerClaimControlPanel({
 
       {state === "unknown_issue" || state === "unknown_verify" ? (
         <ErrorState
-          title={
-            state === "unknown_issue"
-              ? locale === "ru"
-                ? "Результат создания проверки неизвестен. Токен восстановить нельзя; повтор заблокирован. Проверьте статус и обратитесь в поддержку."
-                : "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support."
-              : locale === "ru"
-                ? "Результат подтверждения неизвестен. Повтор заблокирован; проверьте заявки и обратитесь в поддержку."
-                : "The verification result is unknown. Retry is blocked; check your requests and contact support."
-          }
+          title={state === "unknown_issue" ? copy.unknownIssueTitle : copy.unknownVerifyTitle}
           action={
             <Link
               href="/workspace/verification"
               className="inline-flex min-h-11 items-center text-accent underline"
             >
-              {locale === "ru" ? "Проверить заявки" : "Check requests"}
+              {copy.checkRequests}
             </Link>
           }
         />
       ) : !identityVisible ? (
-        <p role="status">
-          {locale === "ru"
-            ? "Проверяем сессию перед показом токена…"
-            : "Checking the session before showing the token…"}
-        </p>
+        <p role="status">{copy.checkingSession}</p>
       ) : !challenge ? (
         <Button
           type="button"
