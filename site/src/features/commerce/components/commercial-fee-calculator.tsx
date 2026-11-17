@@ -8,7 +8,7 @@ import { formatHistoryAmount } from "../../../lib/commerce-history-format";
 import {
   confirmedCommercialEstimate,
   parseCommercialAmount,
-} from "../../../lib/commercial-confirmation";
+} from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../../../lib/commercial-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 

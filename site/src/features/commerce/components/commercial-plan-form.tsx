@@ -14,7 +14,7 @@ import { useNexusLocale } from "../../shell/locale";
 import {
   confirmedCommercialPlan,
   parseCommercialAmount,
-} from "../../../lib/commercial-confirmation";
+} from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../../../lib/commercial-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 

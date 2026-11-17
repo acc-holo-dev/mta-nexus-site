@@ -10,7 +10,7 @@ import {
   confirmedCommercialPlan,
   confirmedOrderCancellation,
   parseCommercialAmount,
-} from "../../src/lib/commercial-confirmation";
+} from "../../src/features/commerce/commercial-confirmation";
 import {
   commercialAdminQuery,
   commercialCatalogQuery,

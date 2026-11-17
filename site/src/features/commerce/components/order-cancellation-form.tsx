@@ -5,7 +5,7 @@ import { orderCancellationCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
-import { confirmedOrderCancellation } from "../../../lib/commercial-confirmation";
+import { confirmedOrderCancellation } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../../../lib/commercial-i18n";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { useNexusLocale } from "../../shell/locale";

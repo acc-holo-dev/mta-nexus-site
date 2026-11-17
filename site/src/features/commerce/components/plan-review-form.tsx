@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../../../lib/commerce-history-format";
-import { commercialTerms, parseCommercialAmount } from "../../../lib/commercial-confirmation";
+import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confirmation";
 import { planReviewError, planReviewsCopy } from "../../../lib/plan-reviews-i18n";
 import { planReviewHref } from "../../../lib/plan-reviews-query";

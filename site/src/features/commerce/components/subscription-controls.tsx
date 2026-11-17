@@ -9,7 +9,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
-import { commercialTerms } from "../../../lib/commercial-confirmation";
+import { commercialTerms } from "../commercial-confirmation";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import {
   confirmedSubscriptionReceipt,
