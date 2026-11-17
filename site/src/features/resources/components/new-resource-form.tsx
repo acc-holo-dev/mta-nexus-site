@@ -17,7 +17,7 @@ import {
   pendingResourceDraftKey,
 } from "../pending-resource-draft";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
-import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
+import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {
   parseResourceIntent,
   type ResourceSubmissionIntent,

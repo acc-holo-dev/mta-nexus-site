@@ -30,7 +30,7 @@ import {
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../../../lib/build-file-validation";
 import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
+import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {
   getResourceCommerceCopy,
   resourceCommerceError,
