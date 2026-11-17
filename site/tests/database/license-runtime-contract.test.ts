@@ -5,7 +5,7 @@ import { licenseRuntimePage } from "../../src/lib/license-runtime-query";
 import {
   confirmLicenseRelease,
   parseLicenseRuntimeContext,
-} from "../../src/lib/license-runtime-response";
+} from "../../src/features/commerce/license-runtime-response";
 
 const checkedAt = "2026-10-11T01:00:00.000Z";
 const command = {

@@ -8,6 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
+const utilPorts = [
+  "license-runtime-response",
+];
 const clientPorts = [
   "workspace-history",
   "license-controls",
@@ -18,7 +21,7 @@ const clientPorts = [
   "plan-reviews",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|license-runtime-response|order-case-i18n|order-case-response|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:commerce-history-format|commerce-history-i18n|commercial-confirmation|commercial-i18n|license-control-i18n|license-control-confirmation|order-case-i18n|order-case-response|plan-review-confirmation|plan-reviews-i18n|plan-reviews-query|private-api-request|subscription-confirmation|subscriptions-i18n|subscriptions-query|support-retry)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -53,7 +56,7 @@ test("Commerce rejects private, routing and infrastructure edges", (t) => {
   write("site/packages/db/src/index.ts", "export type Row = string;");
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/commerce/components/private.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(
       `site/src/features/commerce/${port}.ts`,
       'export type { Row } from "../../lib/services/session";',
@@ -79,7 +82,7 @@ test("Commerce rejects private, routing and infrastructure edges", (t) => {
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(rules(`features/commerce/${port}.ts`).includes("commerce-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }

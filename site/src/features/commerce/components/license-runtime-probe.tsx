@@ -8,7 +8,7 @@ import {
   confirmLicenseRelease,
   type LicenseRuntimeContext,
   parseLicenseRuntimeContext,
-} from "../../../lib/license-runtime-response";
+} from "../license-runtime-response";
 import { privateApiRequest } from "../../../lib/private-api-request";
 
 /** Uses only the parent's transient, one-time credential; never persists it. */
