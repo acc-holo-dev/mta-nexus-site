@@ -27,7 +27,7 @@ import { discussionReportsCopy } from "../../src/features/community/discussion-r
 import {
   confirmedOrganizationPublicationRestore,
   organizationPublicationHistorySchema,
-} from "../../src/lib/organization-publication-history-contract";
+} from "../../src/features/community/organization-publication-history-contract";
 import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
 import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
 import { communityReportService as reports } from "../../src/lib/services/community-report-service";

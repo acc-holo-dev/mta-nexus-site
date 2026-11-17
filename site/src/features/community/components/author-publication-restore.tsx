@@ -9,7 +9,7 @@ import {
   authorPublicationDeskError,
 } from "../../../lib/author-publication-desk-copy";
 import type { Locale } from "../../../lib/i18n";
-import { confirmedOrganizationPublicationRestore } from "../../../lib/organization-publication-history-contract";
+import { confirmedOrganizationPublicationRestore } from "../organization-publication-history-contract";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,

@@ -7,7 +7,7 @@ import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publicat
 import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistorySchema } from "../../../lib/organization-publication-history-contract";
+import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
