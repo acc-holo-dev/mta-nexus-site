@@ -1,9 +1,9 @@
-import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
 import { RegisterServerForm } from "../../../../features/servers/registration";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -30,13 +30,11 @@ export default async function RegisterServerPage() {
     actor = await authService.getSession(store.get("nexus_session")?.value);
   } catch {
     return (
-      <ErrorState
-        title={locale === "ru" ? "Не удалось проверить сессию" : "Could not check your session"}
-        description={
-          locale === "ru"
-            ? "Обновите страницу и попробуйте снова."
-            : "Refresh the page and try again."
-        }
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/workspace/servers/new"}
       />
     );
   }
