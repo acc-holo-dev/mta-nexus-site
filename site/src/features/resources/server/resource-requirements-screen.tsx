@@ -8,6 +8,8 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { PlatformSessionError } from "../../shell/session-error";
+
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../resource-requirements-query";
@@ -60,7 +62,20 @@ export async function ResourceRequirementsScreen({
 }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = resourceRequirementsCopy(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/resources/"}
+      />
+    );
+  }
+
   const requirementsBase =
     scope === "library"
       ? `/workspace/library/${encodeURIComponent(productId)}/requirements`
