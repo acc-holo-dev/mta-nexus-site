@@ -1,7 +1,7 @@
 import { commercialFeeEstimate, readPlanReviewTerms } from "@nexus/domain";
 import { planReviewCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedPlanReview, expectedPlanReviewId } from "../../src/lib/plan-review-confirmation";
+import { confirmedPlanReview, expectedPlanReviewId } from "../../src/features/commerce/plan-review-confirmation";
 import { planReviewError, planReviewsCopy } from "../../src/lib/plan-reviews-i18n";
 import {
   planReviewHref,
