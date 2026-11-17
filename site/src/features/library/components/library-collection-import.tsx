@@ -12,7 +12,7 @@ import {
   libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,

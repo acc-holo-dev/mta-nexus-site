@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,

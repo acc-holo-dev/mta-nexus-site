@@ -5,7 +5,7 @@ import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
 import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   collectionHref,

@@ -14,7 +14,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 
 import { LibraryCollectionBatchForm } from "../../src/features/library/collection-batch";
 import { LibraryCollectionImport } from "../../src/features/library/collection-import";
-import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
+import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
 
 const { state, collection, manifest, response, render, textarea, inspect, child } =
   createLibraryCollectionImportInteractionHelpers(
