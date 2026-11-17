@@ -33,6 +33,7 @@ Feature объединяет существующие представления
 | `collection-command.ts`                     | Клиентская форма команды коллекции                            |
 | `collection-batch.ts`                       | Клиентская форма пакетной команды                             |
 | `collection-item-copy.ts`                   | Клиентская форма копирования и переноса элементов             |
+| `collection-requirements-i18n.ts` | util port `collection-requirements-i18n` |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

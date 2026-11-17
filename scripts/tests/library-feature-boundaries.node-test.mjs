@@ -24,6 +24,7 @@ const utilPorts = [
   "library-selection-batches-confirmation",
   "library-membership-batches-i18n",
   "library-selection-batches-i18n",
+  "collection-requirements-i18n",
 ];
 const serverPorts = [
   "collections",
