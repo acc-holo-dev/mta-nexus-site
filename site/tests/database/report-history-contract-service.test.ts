@@ -23,7 +23,7 @@ import {
   discussionReportsPageSchema,
   parseDiscussionReportsQuery,
 } from "../../src/lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../src/lib/discussion-reports-copy";
+import { discussionReportsCopy } from "../../src/features/community/discussion-reports-copy";
 import {
   confirmedOrganizationPublicationRestore,
   organizationPublicationHistorySchema,

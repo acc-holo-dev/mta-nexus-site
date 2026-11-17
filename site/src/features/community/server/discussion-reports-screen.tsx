@@ -12,7 +12,7 @@ import {
   discussionReportsPageSchema,
   parseDiscussionReportsQuery,
 } from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
+import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";

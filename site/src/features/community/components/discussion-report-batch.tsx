@@ -7,7 +7,7 @@ import type { z } from "zod";
 import { communityReportCopy } from "../../../lib/community-report-copy";
 import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
+import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   confirmsReportBatchCommand,

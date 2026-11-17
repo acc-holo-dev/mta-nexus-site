@@ -46,6 +46,7 @@ Feature объединяет клиентское обсуждение публ�
 | `server-publication-history-contract.ts` | util port `server-publication-history-contract` |
 | `discussion-compose-draft.ts` | util port `discussion-compose-draft` |
 | `community-topic-intent.ts` | util port `community-topic-intent` |
+| `discussion-reports-copy.ts` | util port `discussion-reports-copy` |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

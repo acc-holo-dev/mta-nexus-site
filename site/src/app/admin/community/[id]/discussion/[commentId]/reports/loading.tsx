@@ -1,5 +1,5 @@
 import { moderationCopy } from "../../../../../../../lib/community-moderation-copy";
-import { discussionReportsCopy } from "../../../../../../../lib/discussion-reports-copy";
+import { discussionReportsCopy } from "../../../../../../../features/community/discussion-reports-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 
 export default async function Loading() {

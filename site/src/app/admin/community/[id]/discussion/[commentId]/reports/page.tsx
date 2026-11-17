@@ -1,5 +1,5 @@
 import { DiscussionReportsScreen } from "../../../../../../../features/community/discussion-reports-server";
-import { discussionReportsCopy } from "../../../../../../../lib/discussion-reports-copy";
+import { discussionReportsCopy } from "../../../../../../../features/community/discussion-reports-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
