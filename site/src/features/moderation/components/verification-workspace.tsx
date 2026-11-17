@@ -130,12 +130,7 @@ export function VerificationWorkspace({
           setVerifiedKey(identityKey);
         }
       } catch {
-        if (alive)
-          setWriteError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить аккаунт или восстановить заявку."
-              : "Could not verify the account or restore the application.",
-          );
+        if (alive) setWriteError(verificationCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -237,11 +232,7 @@ export function VerificationWorkspace({
         );
       } catch {
         setVerifiedKey("");
-        setWriteError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Заявка не отправлена."
-            : "Could not save recovery data. The application was not sent.",
-        );
+        setWriteError(copy.recoverySaveFailed);
         return;
       }
       intentRef.current = parsed.data;
@@ -618,11 +609,7 @@ export function VerificationWorkspace({
               {intent ? (
                 <ErrorState
                   id="verification-workspace-submit-unconfirmed"
-                  title={
-                    locale === "ru"
-                      ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
-                      : "The submission result is unconfirmed. Only an exact retry of the original application is available."
-                  }
+                  title={copy.submissionUnconfirmed}
                 />
               ) : null}
             </form>

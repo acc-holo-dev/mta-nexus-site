@@ -58,6 +58,10 @@ const en = {
   mutationUnavailable:
     "The result could not be confirmed. Reload your saved profile or applications before trying again.",
   invalid: "Check the profile fields, explanation and evidence URL.",
+  restoreFailed: "Could not verify the account or restore the application.",
+  recoverySaveFailed: "Could not save recovery data. The application was not sent.",
+  submissionUnconfirmed:
+    "The submission result is unconfirmed. Only an exact retry of the original application is available.",
   changed: "The profile changed. Reload before saving again.",
   authorityChanged: "Your current role or organization rights do not allow this application.",
   profileChanged:
@@ -148,6 +152,10 @@ const ru: Record<keyof typeof en, string> = {
   mutationUnavailable:
     "Результат не удалось подтвердить. Загрузите сохранённый профиль или заявки перед повторным действием.",
   invalid: "Проверьте поля профиля, пояснение и ссылку на доказательства.",
+  restoreFailed: "Не удалось проверить аккаунт или восстановить заявку.",
+  recoverySaveFailed: "Не удалось сохранить данные восстановления. Заявка не отправлена.",
+  submissionUnconfirmed:
+    "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки.",
   changed: "Профиль изменился. Загрузите актуальное состояние перед сохранением.",
   authorityChanged: "Текущая роль или права в организации не позволяют подать эту заявку.",
   profileChanged:

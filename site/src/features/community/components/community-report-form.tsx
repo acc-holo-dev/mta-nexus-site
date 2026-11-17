@@ -44,7 +44,6 @@ export function CommunityReportForm({
   const localeRef = useRef(locale);
   localeRef.current = locale;
   const storageKey = `nexus:report-intent:v1:${encodeURIComponent(actorId ?? "")}:${targetType}:${encodeURIComponent(targetId)}`;
-  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
   useEffect(() => {
     identityEpoch.current += 1;
     controller.current?.abort();
@@ -93,12 +92,7 @@ export function CommunityReportForm({
           setStorageReady(true);
         }
       } catch {
-        if (alive)
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить жалобу. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify the session or restore the report. Refresh and sign in to the original account.",
-          );
+        if (alive) setError(communityReportCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -141,12 +135,7 @@ export function CommunityReportForm({
         sessionStorage.setItem(storageKey, JSON.stringify({ actorId, request: parsed.data }));
       } catch {
         setStorageReady(false);
-        setError(
-          message(
-            "Не удалось сохранить данные для восстановления. Отправка не началась.",
-            "Could not save recovery data. The report was not sent.",
-          ),
-        );
+        setError(copy.recoverySaveFailed);
         return;
       }
       intentRef.current = parsed.data;
@@ -248,9 +237,7 @@ export function CommunityReportForm({
         error ? (
           <ErrorState title={error} />
         ) : (
-          <p role="status">
-            {message("Проверяем сессию и черновик…", "Checking the session and saved report…")}
-          </p>
+          <p role="status">{copy.checkingSession}</p>
         )
       ) : result ? (
         <div className="space-y-2">
@@ -315,11 +302,7 @@ export function CommunityReportForm({
               disabled={reason.trim().length < 10}
               className="min-h-11"
             >
-              {pending
-                ? copy.submitting
-                : intent
-                  ? message("Повторить исходную отправку", "Retry original report")
-                  : copy.submit}
+              {pending ? copy.submitting : intent ? copy.retryOriginal : copy.submit}
             </Button>
             <Link
               className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -328,23 +311,8 @@ export function CommunityReportForm({
               {copy.myReports}
             </Link>
           </div>
-          {intent ? (
-            <ErrorState
-              title={message(
-                "Результат исходной отправки пока не подтверждён. Изменение полей заблокировано; повторите исходную жалобу или проверьте список жалоб.",
-                "The original submission is not confirmed. The fields are locked; retry the original report or check your reports.",
-              )}
-            />
-          ) : null}
-          {error ? (
-            <ErrorState
-              title={error}
-              description={message(
-                "Результат мог сохраниться. Проверьте список жалоб перед дальнейшими действиями.",
-                "The report may have been saved. Check your reports before taking further action.",
-              )}
-            />
-          ) : null}
+          {intent ? <ErrorState title={copy.submissionUnconfirmed} /> : null}
+          {error ? <ErrorState title={error} description={copy.errorMayHaveSaved} /> : null}
         </form>
       )}
     </section>

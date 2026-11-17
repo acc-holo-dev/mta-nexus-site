@@ -68,7 +68,6 @@ export function OrganizationProfileForm({
   currentCreationKey.current = creationKey;
   const localeRef = useRef(locale);
   localeRef.current = locale;
-  const text = (ru: string, en: string) => (locale === "ru" ? ru : en);
   useEffect(() => {
     if (initial) return;
     let alive = true;
@@ -106,12 +105,7 @@ export function OrganizationProfileForm({
           setCreationReady(true);
         }
       } catch {
-        if (alive)
-          setCreationNotice(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить черновик."
-              : "Could not verify the session or restore the draft.",
-          );
+        if (alive) setCreationNotice(getOrganizationCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -151,20 +145,10 @@ export function OrganizationProfileForm({
         router.push(`/workspace/organizations/${encodeURIComponent(item.id)}`);
         return;
       }
-      setCreationNotice(
-        text(
-          "Организация пока не подтверждена. Исходный запрос ещё может завершиться; повторное создание заблокировано.",
-          "The organization is not confirmed yet. The original request may still complete; creating another is blocked.",
-        ),
-      );
+      setCreationNotice(copy.creationUnconfirmed);
     } catch {
       if (identityEpoch.current !== requestEpoch) return;
-      setCreationNotice(
-        text(
-          "Не удалось проверить результат. Войдите в исходный аккаунт и попробуйте снова.",
-          "Could not check the result. Sign in to the original account and try again.",
-        ),
-      );
+      setCreationNotice(copy.resultCheckFailed);
     } finally {
       guard.current = false;
       setBusy(false);
@@ -368,7 +352,7 @@ export function OrganizationProfileForm({
           disabled={busy}
           onClick={() => void recoverCreation()}
         >
-          {text("Проверить результат", "Check result")}
+          {copy.checkResult}
         </Button>
       ) : null}
       {showDraft && (Boolean(initial) || (creationReady && verifiedCreationKey === creationKey)) ? (

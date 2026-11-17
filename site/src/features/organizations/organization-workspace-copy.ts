@@ -79,6 +79,11 @@ const en = {
   updated: "Member updated.",
   createHelp:
     "The organization will be owned by your personal account. Verification is handled separately.",
+  restoreFailed: "Could not verify the session or restore the draft.",
+  creationUnconfirmed:
+    "The organization is not confirmed yet. The original request may still complete; creating another is blocked.",
+  resultCheckFailed: "Could not check the result. Sign in to the original account and try again.",
+  checkResult: "Check result",
 };
 const ru: Record<keyof typeof en, string> = {
   leave: "Покинуть организацию",
@@ -161,6 +166,12 @@ const ru: Record<keyof typeof en, string> = {
   updated: "Данные участника сохранены.",
   createHelp:
     "Организация будет принадлежать вашему личному аккаунту. Верификация выполняется отдельно.",
+  restoreFailed: "Не удалось проверить сессию или восстановить черновик.",
+  creationUnconfirmed:
+    "Организация пока не подтверждена. Исходный запрос ещё может завершиться; повторное создание заблокировано.",
+  resultCheckFailed:
+    "Не удалось проверить результат. Войдите в исходный аккаунт и попробуйте снова.",
+  checkResult: "Проверить результат",
 };
 export const getOrganizationCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function organizationError(locale: Locale, code: unknown) {

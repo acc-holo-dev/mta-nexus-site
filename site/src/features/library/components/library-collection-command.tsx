@@ -141,12 +141,7 @@ export function LibraryCollectionCommandForm({
           setCreateReady(true);
         }
       } catch {
-        if (alive)
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить коллекцию. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not check the session or restore the collection. Refresh and sign in to the original account.",
-          );
+        if (alive) setError(libraryCollectionsCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -259,11 +254,7 @@ export function LibraryCollectionCommandForm({
         sessionStorage.setItem(storageKey, raw);
         if (sessionStorage.getItem(storageKey) !== raw) throw new Error("storage");
       } catch {
-        setError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Коллекция не отправлена."
-            : "Could not save recovery data. The collection was not submitted.",
-        );
+        setError(c.recoverySaveFailed);
         return;
       }
     }

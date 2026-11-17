@@ -15,8 +15,9 @@ it("routes unconfirmed verification submit intent through ErrorState and keeps s
   expect(source).toContain(
     '<ErrorState id="verification-workspace-write-failed" title={writeError} />',
   );
+  expect(source).toContain("copy.submissionUnconfirmed");
   expect(source).toMatch(
-    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{\s*locale === "ru"\s*\?\s*"Результат отправки не подтверждён\. Доступен только точный повтор исходной заявки\."\s*:\s*"The submission result is unconfirmed\. Only an exact retry of the original application is available\."\s*\}\s*\/>/u,
+    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{copy\.submissionUnconfirmed\}\s*\/>/u,
   );
   expect(source).toContain('role="status" className="text-sm text-success"');
   expect(source).toContain("{copy.submitted}");

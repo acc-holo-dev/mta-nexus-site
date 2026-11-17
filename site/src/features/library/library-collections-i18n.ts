@@ -105,6 +105,9 @@ const en = {
   quota: "The collection limit has been reached.",
   retry:
     "The result could not be confirmed. Retry the same operation or reload to check the current state.",
+  restoreFailed:
+    "Could not check the session or restore the collection. Refresh and sign in to the original account.",
+  recoverySaveFailed: "Could not save recovery data. The collection was not submitted.",
   retryAction: "Retry same operation",
   actionErrorDescription:
     "A failed collection command is not a saved change. Retry the same operation or reload the current state.",
@@ -223,6 +226,9 @@ const ru: typeof en = {
   quota: "Достигнут лимит коллекций или записей.",
   retry:
     "Результат не удалось подтвердить. Повторите ту же операцию или обновите страницу для проверки текущего состояния.",
+  restoreFailed:
+    "Не удалось проверить сессию или восстановить коллекцию. Обновите страницу и войдите в исходный аккаунт.",
+  recoverySaveFailed: "Не удалось сохранить данные восстановления. Коллекция не отправлена.",
   retryAction: "Повторить ту же операцию",
   actionErrorDescription:
     "Неудачная команда коллекции — это не сохранённое изменение. Повторите ту же операцию или обновите текущее состояние.",

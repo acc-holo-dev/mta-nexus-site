@@ -88,6 +88,15 @@ const en = {
   decisionUnavailable:
     "The result could not be confirmed. Load the current report before trying again.",
   formErrorHint: "The report was not saved. Fix the fields above and submit the same form again.",
+  restoreFailed:
+    "Could not verify the session or restore the report. Refresh and sign in to the original account.",
+  recoverySaveFailed: "Could not save recovery data. The report was not sent.",
+  checkingSession: "Checking the session and saved report…",
+  retryOriginal: "Retry original report",
+  submissionUnconfirmed:
+    "The original submission is not confirmed. The fields are locked; retry the original report or check your reports.",
+  errorMayHaveSaved:
+    "The report may have been saved. Check your reports before taking further action.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Мои жалобы в сообществе",
@@ -175,6 +184,15 @@ const ru: Record<keyof typeof en, string> = {
   decisionUnavailable:
     "Результат не удалось подтвердить. Загрузите актуальную жалобу перед повторным действием.",
   formErrorHint: "Жалоба не сохранена. Исправьте поля выше и отправьте ту же форму снова.",
+  restoreFailed:
+    "Не удалось проверить сессию или восстановить жалобу. Обновите страницу и войдите в исходный аккаунт.",
+  recoverySaveFailed: "Не удалось сохранить данные для восстановления. Отправка не началась.",
+  checkingSession: "Проверяем сессию и черновик…",
+  retryOriginal: "Повторить исходную отправку",
+  submissionUnconfirmed:
+    "Результат исходной отправки пока не подтверждён. Изменение полей заблокировано; повторите исходную жалобу или проверьте список жалоб.",
+  errorMayHaveSaved:
+    "Результат мог сохраниться. Проверьте список жалоб перед дальнейшими действиями.",
 };
 export const communityReportCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function communityReportError(locale: Locale, code: unknown) {
