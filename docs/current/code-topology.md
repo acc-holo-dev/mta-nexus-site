@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `da0bf578` (`dev`, slices 48–76 — batch util absorbs).
+**source_sha:** `d53e9f97` (`dev`, slices 48–76 — batch util absorbs).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -49,15 +49,15 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    29 | 105483 |
-| commerce      |    43 | 186933 |
-| community     |    87 | 397010 |
+| commerce      |    43 | 187311 |
+| community     |    87 | 397069 |
 | discovery     |     3 |  20343 |
-| library       |    66 | 312575 |
+| library       |    66 | 312673 |
 | moderation    |    24 | 118043 |
 | notifications |    14 |  81354 |
-| organizations |    36 | 128469 |
-| resources     |   106 | 476003 |
-| servers       |    59 | 227045 |
+| organizations |    36 | 128605 |
+| resources     |   106 | 477559 |
+| servers       |    59 | 227392 |
 | shell         |    56 |  97058 |
 | support       |    14 |  72080 |
 | trust         |     5 |  14574 |
@@ -70,9 +70,9 @@ site/
 | ------------ | ----: |
 | resource     |    50 |
 | server       |    27 |
-| library      |    66 | 312575 |
+| library      |    66 | 312673 |
 | organization |    15 |
-| community    |    87 | 397010 |
+| community    |    87 | 397069 |
 | license      |    10 |
 | public       |     9 |
 | support      |    14 | 72080  |
