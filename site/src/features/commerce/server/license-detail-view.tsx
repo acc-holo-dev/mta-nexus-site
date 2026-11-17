@@ -1,6 +1,6 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
-import type { licenseControlService } from "../../../lib/services/license-control-service";
+import type { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";

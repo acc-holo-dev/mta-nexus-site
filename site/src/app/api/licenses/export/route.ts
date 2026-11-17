@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { licenseArchiveCsv } from "../../../../features/commerce/license-archive-csv";
 import { licenseArchiveQuery } from "../../../../features/commerce/license-archive-query";
 import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
-import { licenseControlService } from "../../../../lib/services/license-control-service";
+import { licenseControlService } from "../../../../lib/services/commerce/license-control-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const result = await licenseControlService.archive(

@@ -7,7 +7,7 @@ const confirmPasswordReset = vi.hoisted(() => vi.fn(async () => ({ revokedSessio
 const waitForPasswordResetFloor = vi.hoisted(() => vi.fn(async () => undefined));
 const passwordResetTargetMs = vi.hoisted(() => vi.fn(() => 0));
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     requestPasswordReset,
     confirmPasswordReset,

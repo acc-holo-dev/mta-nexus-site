@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { collectionsQuery } from "../../../../../../../../features/library/library-collections-query";
 import { resourceCommerceRequest } from "../../../../../../../../features/resources/resource-commerce-http";
-import { librarySelectionBatchesService } from "../../../../../../../../lib/services/library-selection-batches-service";
+import { librarySelectionBatchesService } from "../../../../../../../../lib/services/library/library-selection-batches-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const result = await librarySelectionBatchesService.history(

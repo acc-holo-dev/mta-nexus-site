@@ -6,8 +6,8 @@ import type {
   PersonalChangesSummary,
 } from "../features/shell/home-personal-changes-types";
 import type { Locale } from "./i18n";
-import { followWorkspaceService } from "./services/follow-workspace-service";
-import { formatNotificationInboxPage } from "./services/notification-inbox-service";
+import { followWorkspaceService } from "./services/community/follow-workspace-service";
+import { formatNotificationInboxPage } from "./services/notifications/notification-inbox-service";
 
 export type { PersonalChangesSummary } from "../features/shell/home-personal-changes-types";
 

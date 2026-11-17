@@ -14,10 +14,10 @@ vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/notification-inbox-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
   notificationInboxService: { page: state.page },
 }));
 

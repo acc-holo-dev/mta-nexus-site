@@ -29,7 +29,7 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("keeps non-clean builds impossible to approve", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
     const config = read("site/packages/config/src/index.ts");
 
     expect(service).toContain('build.scanStatus !== "clean"');
@@ -38,8 +38,8 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("moves INSTREAM framing into a backpressure-aware transport helper", () => {
-    const scanner = read("site/src/lib/services/build-scanner-service.ts");
-    const transport = read("site/src/lib/services/clamav-instream.ts");
+    const scanner = read("site/src/lib/services/resources/build-scanner-service.ts");
+    const transport = read("site/src/lib/services/resources/clamav-instream.ts");
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).not.toContain("socket.write(length)");

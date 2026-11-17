@@ -14,7 +14,7 @@ const state = vi.hoisted(() => ({ locale: "en" as "ru" | "en", resolve: vi.fn(),
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 vi.mock("next/navigation", () => ({

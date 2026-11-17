@@ -21,7 +21,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: afterMock };
 });
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -33,7 +33,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
@@ -41,11 +41,11 @@ vi.mock("../../src/lib/services/product-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
 
-vi.mock("../../src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
 

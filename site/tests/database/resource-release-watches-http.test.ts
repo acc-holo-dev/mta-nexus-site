@@ -13,7 +13,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   command: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate, generateId: () => "aud_a" }));

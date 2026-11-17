@@ -19,13 +19,13 @@ const claimState = vi.hoisted(() => ({
   alreadyClaimed: false,
 }));
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => authState.user),
   },
 }));
 
-vi.mock("../../../../lib/services/commerce-service", () => ({
+vi.mock("../../../../lib/services/commerce/commerce-service", () => ({
   commerceService: {
     claimFreeResource: vi.fn(async () => ({
       entitlement: {
@@ -50,7 +50,7 @@ vi.mock("@nexus/security", () => ({
   getClientIp: vi.fn(() => "127.0.0.1"),
 }));
 
-import { commerceService } from "../../../../lib/services/commerce-service";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 import { POST } from "./route";
 
 function request(body: unknown) {

@@ -5,7 +5,7 @@ import { OrganizationProfileForm } from "../../../../features/organizations/prof
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-5 overflow-x-clip py-8";
 const navLinkClass =

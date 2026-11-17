@@ -23,7 +23,7 @@ const article = () =>
     likeCount: 0,
     viewCount: 1,
   }) as unknown as Content;
-vi.mock("../../../lib/services/content-service", () => ({
+vi.mock("../../../lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug: async () => article(),
     pageDiscussion: async () => ({ items: [], hasMore: false, nextCursor: null }),
@@ -46,7 +46,7 @@ vi.mock("@nexus/db", () => ({
     muteState: follow.muteState,
   },
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getUserById: async () => null,
     getSession: async () => follow.session,
@@ -58,7 +58,7 @@ vi.mock("../../../features/community/discussion", () => ({
     <div data-follow-initial={JSON.stringify(props.followInitial ?? null)} />
   ),
 }));
-vi.mock("../../../lib/services/content-reaction-service", () => ({
+vi.mock("../../../lib/services/community/content-reaction-service", () => ({
   contentReactionService: {
     state: async () => ({
       contentId: "article",

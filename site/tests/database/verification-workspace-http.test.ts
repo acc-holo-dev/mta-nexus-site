@@ -17,10 +17,10 @@ vi.mock("next/server", async (original) => ({
   ...(await original<typeof import("next/server")>()),
   after: mocks.after,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService: mocks,
 }));
 vi.mock("@nexus/db", () => ({

@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({ organizationWorkspaceRepository: mocks }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({

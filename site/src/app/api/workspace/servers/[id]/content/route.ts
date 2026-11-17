@@ -7,7 +7,7 @@ import {
 } from "../../../../../../features/servers/server-content-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { serverContentService } from "../../../../../../lib/services/server-content-service";
+import { serverContentService } from "../../../../../../lib/services/servers/server-content-service";
 
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {

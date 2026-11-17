@@ -37,10 +37,10 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getManagedProduct: state.findManagedProduct },
 }));
 

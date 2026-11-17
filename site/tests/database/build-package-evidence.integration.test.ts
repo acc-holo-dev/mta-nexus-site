@@ -12,7 +12,7 @@ import {
 } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../../src/lib/services/resources/build-package-inspection";
 import fixtures from "../fixtures/build-packages.json";
 
 // Requires a disposable PostgreSQL database migrated through 0059; no payment or entitlement mutation.

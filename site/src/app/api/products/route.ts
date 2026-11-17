@@ -13,8 +13,8 @@ import {
   type RequestLogContext,
 } from "../../../lib/observability";
 import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

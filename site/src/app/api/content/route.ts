@@ -12,9 +12,9 @@ import {
   type RequestLogContext,
 } from "../../../lib/observability";
 import { isPostgresDeadlock } from "../../../lib/postgres-error";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
-import { serverService } from "../../../lib/services/server-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { serverService } from "../../../lib/services/servers/server-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

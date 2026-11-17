@@ -16,7 +16,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "../helpers/library-collections-http-harness"
   );

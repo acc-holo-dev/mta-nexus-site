@@ -21,10 +21,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: mocks,
 }));
 

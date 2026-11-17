@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { orderOperationsService } from "../../../../../lib/services/commercial-plan-service";
+import { orderOperationsService } from "../../../../../lib/services/commerce/commercial-plan-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const values = request.nextUrl.searchParams.getAll("page"),

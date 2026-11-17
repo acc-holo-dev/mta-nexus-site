@@ -55,15 +55,15 @@ vi.mock("../../../lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
-vi.mock("../../../lib/services/profile-privacy-service", () => ({
+vi.mock("../../../lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
   },
 }));
-vi.mock("../../../lib/services/mta-master-directory-service", () => ({
+vi.mock("../../../lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: state.directory },
   indexMtaObservations: () => () => undefined,
 }));
@@ -103,7 +103,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: () => state.session(),
   },

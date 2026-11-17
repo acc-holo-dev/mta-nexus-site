@@ -24,7 +24,7 @@ import { HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 const navLinkClass =

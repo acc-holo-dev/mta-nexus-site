@@ -38,7 +38,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 
@@ -86,25 +86,25 @@ vi.mock("../../../features/moderation/object-report", async () => {
   };
 });
 
-vi.mock("../../../lib/services/server-service", () => ({
+vi.mock("../../../lib/services/servers/server-service", () => ({
   serverService: { getServerBySlug: mocks.getServer },
 }));
 
-vi.mock("../../../lib/services/mta-master-directory-service", () => ({
+vi.mock("../../../lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: mocks.directory },
   matchesMtaEndpoint: mocks.matches,
   mtaLiveStatus: mocks.liveStatus,
 }));
 
-vi.mock("../../../lib/services/server-history-service", () => ({
+vi.mock("../../../lib/services/servers/server-history-service", () => ({
   serverHistoryService: { getHistoryForServer: mocks.history },
 }));
 
-vi.mock("../../../lib/services/content-service", () => ({
+vi.mock("../../../lib/services/community/content-service", () => ({
   contentService: { listServerUpdates: mocks.updates },
 }));
 
-vi.mock("../../../lib/services/server-review-service", () => ({
+vi.mock("../../../lib/services/servers/server-review-service", () => ({
   serverReviewService: { publicPage: mocks.publicPage },
 }));
 

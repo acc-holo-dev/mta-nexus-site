@@ -5,7 +5,7 @@ const mock = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({ profileChangeHistoryRepository: { page: mock } }));
 
 import { parseProfileChangeHistoryQuery } from "../../src/features/accounts/profile-change-history-contract";
-import { profileChangeHistoryService as service } from "../../src/lib/services/profile-change-history-service";
+import { profileChangeHistoryService as service } from "../../src/lib/services/accounts/profile-change-history-service";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = { period: "30" as const, group: "privacy" as const, query: "" };

@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   serverHistoryService,
   serverHistoryWindows,
-} from "../../../../../lib/services/server-history-service";
+} from "../../../../../lib/services/servers/server-history-service";
 
 export const dynamic = "force-dynamic";
 

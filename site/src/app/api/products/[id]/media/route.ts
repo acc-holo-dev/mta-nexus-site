@@ -5,7 +5,7 @@ import { resourceCommerceRequest } from "../../../../../features/resources/resou
 import { resourceMediaUpload } from "../../../../../features/resources/resource-media-upload-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceMediaService } from "../../../../../lib/services/resource-media-service";
+import { resourceMediaService } from "../../../../../lib/services/resources/resource-media-service";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, context: Context) {

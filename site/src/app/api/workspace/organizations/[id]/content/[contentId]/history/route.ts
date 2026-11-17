@@ -7,7 +7,7 @@ import {
   organizationContentRate,
 } from "../../../../../../../../features/organizations/organization-content-api";
 import { organizationPublicationHistoryError } from "../../../../../../../../features/organizations/organization-publication-history-copy";
-import { organizationContentService } from "../../../../../../../../lib/services/organization-content-service";
+import { organizationContentService } from "../../../../../../../../lib/services/organizations/organization-content-service";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; contentId: string }> },

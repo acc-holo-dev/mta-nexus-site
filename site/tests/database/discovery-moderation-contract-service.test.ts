@@ -18,11 +18,11 @@ vi.mock("@nexus/db", () => ({
   },
   communityModerationWorkspaceRepository: { page: mocks.page, detail: mocks.detail },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { moderateContent: mocks.command },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {},
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),
@@ -44,8 +44,8 @@ import {
   parseModerationDetailQuery,
   parseModerationQuery,
 } from "../../src/features/moderation/community-moderation-contract";
-import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
-import { discoveryService as discovery } from "../../src/lib/services/discovery-service";
+import { communityModerationService as moderation } from "../../src/lib/services/community/community-moderation-service";
+import { discoveryService as discovery } from "../../src/lib/services/discovery/discovery-service";
 
 const time = "2026-10-11T00:00:00.123456Z",
   date = new Date(time),

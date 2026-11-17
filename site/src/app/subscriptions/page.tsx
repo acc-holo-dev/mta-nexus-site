@@ -12,7 +12,7 @@ import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";
 import { subscriptionsCopy } from "../../features/commerce/subscriptions-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { commercialPlanService } from "../../lib/services/commercial-plan-service";
+import { commercialPlanService } from "../../lib/services/commerce/commercial-plan-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Subscriptions and commissions | MTA NEXUS" };

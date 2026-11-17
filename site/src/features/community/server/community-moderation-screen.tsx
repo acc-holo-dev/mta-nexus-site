@@ -6,8 +6,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { communityModerationService } from "../../../lib/services/community-moderation-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { discoveryCopy } from "../../discovery/discovery-copy";
 import {
   moderationDetailHref,

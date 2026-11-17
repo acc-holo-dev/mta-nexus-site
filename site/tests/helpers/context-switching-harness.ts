@@ -69,7 +69,7 @@ export const contextSwitchingMocks = {
   ),
 };
 
-/** Factory for `vi.mock("../site/src/lib/services/auth-service", …)` from suite files under `site/tests/unit` or `site/tests/database`. */
+/** Factory for `vi.mock("../site/src/lib/services/accounts/auth-service", …)` from suite files under `site/tests/unit` or `site/tests/database`. */
 export function createContextSwitchingAuthMock() {
   return {
     authService: {

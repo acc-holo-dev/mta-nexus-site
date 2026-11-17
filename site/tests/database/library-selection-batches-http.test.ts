@@ -14,10 +14,10 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../../src/lib/services/library/library-selection-batches-service", () => ({
   librarySelectionBatchesService: {
     preview: state.preview,
     command: state.command,

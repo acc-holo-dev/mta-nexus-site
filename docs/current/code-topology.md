@@ -36,7 +36,7 @@ site/
 | `components/` root files   |                    0 |
 | `lib/` tree files          |                  366 |
 | `lib/` root files          |                  253 |
-| `lib/services/` root files |                   86 |
+| `lib/services/` root files |                   0 |
 | `lib/**/*-i18n.ts`         |                   46 |
 | `app/**/route.ts`          |                  282 |
 | `site/tests` files         |                 1451 |
@@ -164,6 +164,8 @@ Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app
 
 **Slice 6 done:** sidebar chrome uses shared `@nexus/ui` `BrandMark` (collapsed tile-only, expanded wordmark + locale `openFreeBeta` tag); duplicate `brand.sidebar.*` literals removed from shell inventory allowlist.  
 **Slice 7 done:** footer credit line moved to `dictionary.footer.creditLine` (en/ru); inventory allowlist no longer tracks footer copyright glue.
+
+**Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0 (inventory `deae11cfc8f7`).
 
 ## TO-BE (цель читаемости)
 

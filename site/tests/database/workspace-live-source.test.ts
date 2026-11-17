@@ -49,7 +49,7 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { pageManagedByUser: repos.managedServers },
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -59,7 +59,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: repos.directory,
   },

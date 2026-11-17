@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { authService } from "../../../src/lib/services/auth-service";
+import { authService } from "../../../src/lib/services/accounts/auth-service";
 import { accountMailOutbox } from "../src/account-mail-schema";
 import { closeDatabaseConnection, db } from "../src/client";
 

@@ -47,9 +47,9 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService: { getSession } }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService: { getSession } }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     pageCommunity: listCommunityTopics,
   },

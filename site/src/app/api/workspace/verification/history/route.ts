@@ -4,7 +4,7 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { verificationApplicationsError } from "../../../../../features/moderation/verification-applications-copy";
 import { parseVerificationApplicationsQuery } from "../../../../../features/trust/verification-applications-contract";
 import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { verificationWorkspaceService } from "../../../../../lib/services/moderation/verification-workspace-service";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

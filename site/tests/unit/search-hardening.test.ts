@@ -21,7 +21,7 @@ describe("public search hardening", () => {
 
   it("bounds every discovery source and the final result set", () => {
     const service = readFileSync(
-      resolve(process.cwd(), "site/src/lib/services/discovery-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/discovery/discovery-service.ts"),
       "utf8",
     );
 

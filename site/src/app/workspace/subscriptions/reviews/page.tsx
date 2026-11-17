@@ -18,8 +18,8 @@ import { planReviewNavLinkClass } from "../../../../features/commerce/plan-revie
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { planReviewsService } from "../../../../lib/services/commerce/plan-reviews-service";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";

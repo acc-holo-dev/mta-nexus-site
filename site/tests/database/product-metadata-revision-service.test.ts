@@ -8,7 +8,7 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: {},
 }));
 
-import { ProductService } from "../../src/lib/services/product-service";
+import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 const service = new ProductService();
 const actor = { id: "author", role: "developer" } as User;

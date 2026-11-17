@@ -12,8 +12,8 @@ import { resourceCartReceiptId } from "../../../../../features/resources/resourc
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { resourceCartReceiptsService } from "../../../../../lib/services/commerce/resource-cart-receipts-service";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {

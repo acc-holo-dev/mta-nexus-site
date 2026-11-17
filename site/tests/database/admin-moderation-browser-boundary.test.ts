@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {
@@ -19,24 +19,24 @@ vi.mock("@nexus/db", () => ({
   reportRepository: {},
   verificationRepository: {},
 }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../../src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: {},
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: {},
 }));
-vi.mock("../../src/lib/services/license-control-service", () => ({
+vi.mock("../../src/lib/services/commerce/license-control-service", () => ({
   licenseControlService: {},
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService: {},
 }));
 

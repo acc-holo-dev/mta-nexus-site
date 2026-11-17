@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
   getRecoveryEmailStatus: vi.fn(),
   requestRecoveryEmailVerification: vi.fn(),
 }));
-vi.mock("../../../../lib/services/auth-service", () => ({ authService: state }));
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({ authService: state }));
 
 import { GET, POST } from "./route";
 

@@ -12,8 +12,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { authService } from "../../../../../lib/services/auth-service";
-import { resourceQaService } from "../../../../../lib/services/resource-qa-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { resourceQaService } from "../../../../../lib/services/resources/resource-qa-service";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);

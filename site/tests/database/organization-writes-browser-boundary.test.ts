@@ -4,12 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: (prefix: string) => `${prefix}_new`,
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: {
     page: vi.fn(),
     get: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock("../../src/lib/services/organization-content-service", () => ({
     restore: vi.fn(),
   },
 }));
-vi.mock("../../src/lib/services/organization-workspace-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-workspace-service", () => ({
   organizationWorkspaceService: {
     list: vi.fn(),
     get: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock("../../src/lib/services/organization-workspace-service", () => ({
     batchMembers: vi.fn(),
   },
 }));
-vi.mock("../../src/lib/services/organization-governance-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-governance-service", () => ({
   organizationGovernanceService: {
     transfer: vi.fn(),
   },

@@ -30,13 +30,13 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session, getUserById: mocks.author },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page, resolve: mocks.resolve },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.discussion },
 }));
 
@@ -44,7 +44,7 @@ import ArticlePage from "../../src/app/articles/[slug]/page";
 import UserActivity from "../../src/app/users/[username]/activity/page";
 import FollowingPage from "../../src/app/workspace/feed/page";
 
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 const time = "2026-10-10T12:00:00.000Z";

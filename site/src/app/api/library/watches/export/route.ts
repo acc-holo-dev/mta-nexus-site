@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { resourceReleaseWatchesQuery } from "../../../../../features/resources/resource-release-watches-query";
-import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
+import { resourceReleaseWatchesService } from "../../../../../lib/services/resources/resource-release-watches-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const query = resourceReleaseWatchesQuery(request.nextUrl.searchParams);

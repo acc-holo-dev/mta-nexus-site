@@ -7,8 +7,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/observability";
-import { authService } from "../../lib/services/auth-service";
-import { serverStatisticsService } from "../../lib/services/server-statistics-service";
+import { authService } from "../../lib/services/accounts/auth-service";
+import { serverStatisticsService } from "../../lib/services/servers/server-statistics-service";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
 import { parseServerStatisticsQuery } from "./server-statistics-contract";
 import { serverStatisticsError } from "./server-statistics-copy";

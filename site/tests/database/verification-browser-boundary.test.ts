@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
@@ -18,10 +18,10 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: { findById: vi.fn(), listUserMemberships: vi.fn() },
   userRepository: { listModeratorIds: vi.fn() },
 }));
-vi.mock("../../src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService: {
     overview: vi.fn(),
     apply: vi.fn(),

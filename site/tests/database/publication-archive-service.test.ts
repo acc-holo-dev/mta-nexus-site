@@ -10,7 +10,7 @@ import {
   parsePublicationQuery,
   publicationPageQuery,
 } from "../../src/features/community/publication-feed-contract";
-import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
+import { publicationFeedService as service } from "../../src/lib/services/discovery/publication-feed-service";
 
 const scope = { kind: "server" as const, id: "server" };
 const boundary = { createdAt: "2026-10-11T00:00:00.123456Z", id: "boundary" };

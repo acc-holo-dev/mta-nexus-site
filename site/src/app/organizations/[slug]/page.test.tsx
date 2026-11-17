@@ -48,10 +48,10 @@ vi.mock("../../../lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: () => state.session(),
   },

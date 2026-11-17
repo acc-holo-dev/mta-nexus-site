@@ -12,7 +12,7 @@ import {
 } from "../../../../../features/trust/public-verification-history-copy";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { publicVerificationHistoryService } from "../../../../../lib/services/public-verification-history-service";
+import { publicVerificationHistoryService } from "../../../../../lib/services/trust/public-verification-history-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const actionLinkClass =

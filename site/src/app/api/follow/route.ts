@@ -13,7 +13,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request: NextRequest) {

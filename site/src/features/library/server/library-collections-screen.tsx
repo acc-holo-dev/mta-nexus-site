@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../library-collections-i18n";

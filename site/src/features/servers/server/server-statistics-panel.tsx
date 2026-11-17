@@ -2,7 +2,7 @@ import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
-import type { ServerStatisticsResult } from "../../../lib/services/server-statistics-service";
+import type { ServerStatisticsResult } from "../../../lib/services/servers/server-statistics-service";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";

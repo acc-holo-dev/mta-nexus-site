@@ -6,7 +6,10 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { discoveryService, type SearchResultType } from "../../../lib/services/discovery-service";
+import {
+  discoveryService,
+  type SearchResultType,
+} from "../../../lib/services/discovery/discovery-service";
 
 const MAX_QUERY_LENGTH = 100;
 const DEFAULT_LIMIT = 50;

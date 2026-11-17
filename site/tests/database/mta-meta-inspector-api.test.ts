@@ -17,7 +17,7 @@ const state = vi.hoisted(() => ({
 
 const rate = vi.hoisted(() => vi.fn());
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },

@@ -31,8 +31,8 @@ import {
   approvalCopy,
   approvalError,
 } from "../../src/features/trust/public-verification-history-copy";
-import { discussionWorkspaceService as own } from "../../src/lib/services/discussion-workspace-service";
-import { publicVerificationHistoryService as approvals } from "../../src/lib/services/public-verification-history-service";
+import { discussionWorkspaceService as own } from "../../src/lib/services/community/discussion-workspace-service";
+import { publicVerificationHistoryService as approvals } from "../../src/lib/services/trust/public-verification-history-service";
 
 const actor = { id: "actor", role: "user" } as User,
   time = "2026-10-11T00:00:00.123456Z";

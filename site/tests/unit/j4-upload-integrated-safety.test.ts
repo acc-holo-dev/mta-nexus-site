@@ -65,7 +65,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("retains a second organization-aware authorization check at the mutation boundary", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');
@@ -78,8 +78,8 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("uses a backpressure-aware bounded ClamAV INSTREAM transport", () => {
-    const scanner = read("site/src/lib/services/build-scanner-service.ts");
-    const transport = read("site/src/lib/services/clamav-instream.ts");
+    const scanner = read("site/src/lib/services/resources/build-scanner-service.ts");
+    const transport = read("site/src/lib/services/resources/clamav-instream.ts");
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).toContain("const CLAMAV_MAX_RESPONSE_BYTES = 8 * 1024");
@@ -89,7 +89,7 @@ describe("integrated J4 build upload safety contract", () => {
 
   it("keeps moderation on the deterministic serialized publication path", () => {
     const repository = readBuildsRepositoryModules();
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
 
     const dollar = "$";
     expect(repository).toContain(`.set({ updatedAt: sql\`${dollar}{products.updatedAt}\` })`);

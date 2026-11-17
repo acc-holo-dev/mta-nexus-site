@@ -13,7 +13,7 @@ import {
 } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { normalizeResourceImage } from "../../src/lib/services/resource-image-normalization";
+import { normalizeResourceImage } from "../../src/lib/services/resources/resource-image-normalization";
 import packages from "../fixtures/build-packages.json";
 import fixtures from "../fixtures/resource-images.json";
 

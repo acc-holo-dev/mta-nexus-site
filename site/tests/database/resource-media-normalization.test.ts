@@ -1,7 +1,7 @@
 import { resourceMediaCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
 import { safeResourceImageUrl } from "../../src/features/resources/resource-image-url";
-import { normalizeResourceImage } from "../../src/lib/services/resource-image-normalization";
+import { normalizeResourceImage } from "../../src/lib/services/resources/resource-image-normalization";
 import fixtures from "../fixtures/resource-images.json";
 
 it.each(["png", "jpeg", "webp"] as const)(

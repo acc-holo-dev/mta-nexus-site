@@ -20,10 +20,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/order-case-service", () => ({ orderCaseService: state }));
+vi.mock("../../src/lib/services/commerce/order-case-service", () => ({ orderCaseService: state }));
 vi.mock("../../src/features/support/thread", () => ({
   SupportCaseThread: ({ caseId }: { caseId: string }) => (
     <div data-case={caseId}>Existing conversation</div>

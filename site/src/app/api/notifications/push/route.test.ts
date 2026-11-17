@@ -40,7 +40,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_1" })),
     getSessionIdentity: vi.fn(async () => ({ user: { id: "usr_1" }, sessionId: "ses_1" })),
@@ -52,7 +52,7 @@ vi.mock("../../../../features/notifications/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(),
 }));
 
-vi.mock("../../../../lib/services/web-push-endpoint-policy", () => ({
+vi.mock("../../../../lib/services/notifications/web-push-endpoint-policy", () => ({
   parseWebPushEndpoint: vi.fn((value: string) => new URL(value)),
 }));
 

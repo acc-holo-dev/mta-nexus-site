@@ -23,7 +23,7 @@ vi.mock("@nexus/db", () => ({
   },
   licenseRepository: { pageUserHistory: state.licenses },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

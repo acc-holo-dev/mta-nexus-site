@@ -7,7 +7,7 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import { parseServerHistoryWindow } from "../../src/features/servers/server-history-window";
-import { serverHistoryService } from "../../src/lib/services/server-history-service";
+import { serverHistoryService } from "../../src/lib/services/servers/server-history-service";
 
 const listing = { id: "server", name: "Server", slug: "server", visibility: "public" as const };
 const end = new Date("2026-10-09T12:00:00Z");

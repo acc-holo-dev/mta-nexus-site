@@ -4,7 +4,7 @@ import {
   type ClamAvInstreamSocket,
   clamAvInstreamLimits,
   writeClamAvInstream,
-} from "../../src/lib/services/clamav-instream";
+} from "../../src/lib/services/resources/clamav-instream";
 
 class FakeSocket extends EventEmitter {
   readonly writes: Array<string | Uint8Array> = [];

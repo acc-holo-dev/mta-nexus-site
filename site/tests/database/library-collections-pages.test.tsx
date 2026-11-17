@@ -31,13 +31,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: {
     page: state.page,
     detail: state.detail,
@@ -70,7 +70,7 @@ vi.mock("../../src/features/resources/download", () => ({
 import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {

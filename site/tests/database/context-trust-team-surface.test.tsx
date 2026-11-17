@@ -25,13 +25,13 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/public-context-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-context-trust-service", () => ({
   publicContextTrustService: { page: mocks.trust },
 }));
-vi.mock("../../src/lib/services/organization-team-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
 

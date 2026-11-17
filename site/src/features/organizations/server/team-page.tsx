@@ -3,8 +3,8 @@ import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationTeamService } from "../../../lib/services/organization-team-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationTeamService } from "../../../lib/services/organizations/organization-team-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {

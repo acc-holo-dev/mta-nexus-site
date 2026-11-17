@@ -26,11 +26,11 @@ vi.mock("@nexus/security", async () => {
     consumeRateLimit: (...args: unknown[]) => harnessSources.rateLimit(...args),
   };
 });
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const { sources: harnessSources } = await import("../helpers/discovery-search-behavior-harness");
   return {
     ...(await importOriginal<
-      typeof import("../../src/lib/services/mta-master-directory-service")
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
     >()),
     mtaMasterDirectoryService: { getDirectory: harnessSources.directory },
   };

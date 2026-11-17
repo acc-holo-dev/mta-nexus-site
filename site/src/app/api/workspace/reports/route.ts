@@ -12,7 +12,7 @@ import {
 } from "../../../../features/community/community-report-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { communityReportService } from "../../../../lib/services/community-report-service";
+import { communityReportService } from "../../../../lib/services/community/community-report-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

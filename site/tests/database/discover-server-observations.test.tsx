@@ -27,7 +27,7 @@ vi.mock("next/link", async () => {
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => sources.locale,
 }));
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: {
     page: async (input: { query: string; page: number }) => ({
       type: "servers",
@@ -38,15 +38,17 @@ vi.mock("../../src/lib/services/discovery-service", () => ({
   },
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
 vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("../../src/lib/services/mta-master-directory-service")>();
+    await importOriginal<
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
+    >();
   let snapshot: readonly unknown[] | null = null;
   let lookup: ReturnType<typeof actual.indexMtaObservations> | null = null;
   return {

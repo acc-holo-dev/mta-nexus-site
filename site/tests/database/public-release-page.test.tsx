@@ -47,16 +47,16 @@ vi.mock("next/link", async () => {
 vi.mock("@nexus/db", () => ({
   buildRepository: { pagePublishedReleases: state.history },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: state.getProduct,
     canManageProduct: state.canManage,
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: state.checkRight },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

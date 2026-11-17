@@ -8,7 +8,7 @@ import {
 } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import { buildMasterObservationCandidates } from "../../src/lib/services/server-observation-matching";
+import { buildMasterObservationCandidates } from "../../src/lib/services/servers/server-observation-matching";
 
 async function withServer(run: (id: string) => Promise<void>) {
   const suffix = `${Date.now().toString(36)}_${process.pid}_${Math.random().toString(36).slice(2, 10)}`;

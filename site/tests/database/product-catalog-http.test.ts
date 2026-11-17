@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ listPublicPage: vi.fn(), getProductById: vi.fn() }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { listPublicPage: mocks.listPublicPage, getProductById: mocks.getProductById },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService: {} }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService: {} }));
 
 import { GET as getProduct } from "../../src/app/api/products/[id]/route";
 import { GET } from "../../src/app/api/products/route";

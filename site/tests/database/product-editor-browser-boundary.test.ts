@@ -4,27 +4,27 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     createProduct: vi.fn(),
     updateProductDetails: vi.fn(),
     getManagedProduct: vi.fn(),
   },
 }));
-vi.mock("../../src/lib/services/resource-management-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-management-service", () => ({
   resourceManagementService: {
     updateCompatibility: vi.fn(),
     saveVariants: vi.fn(),
     managedVariants: vi.fn(),
   },
 }));
-vi.mock("../../src/lib/services/resource-copy-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-copy-service", () => ({
   resourceCopyService: { create: vi.fn(), preview: vi.fn() },
 }));
 

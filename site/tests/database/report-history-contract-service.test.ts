@@ -16,7 +16,7 @@ vi.mock("@nexus/db", () => ({
   serverContentRepository: {},
   communityReportsRepository: state,
 }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
 
 import {
   discussionReportsHref,
@@ -29,9 +29,9 @@ import {
   organizationPublicationHistorySchema,
 } from "../../src/features/community/organization-publication-history-contract";
 import { organizationPublicationHistoryCopy } from "../../src/features/organizations/organization-publication-history-copy";
-import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
-import { communityReportService as reports } from "../../src/lib/services/community-report-service";
-import { organizationContentService as organizations } from "../../src/lib/services/organization-content-service";
+import { communityModerationService as moderation } from "../../src/lib/services/community/community-moderation-service";
+import { communityReportService as reports } from "../../src/lib/services/community/community-report-service";
+import { organizationContentService as organizations } from "../../src/lib/services/organizations/organization-content-service";
 
 const time = "2026-10-11T00:00:00.123456Z",
   next = "2026-10-11T00:00:00.123457Z",

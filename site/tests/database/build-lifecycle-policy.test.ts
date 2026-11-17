@@ -25,7 +25,7 @@ const command = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -40,7 +40,7 @@ vi.mock("@nexus/security", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { command, detail: vi.fn() },
 }));
 

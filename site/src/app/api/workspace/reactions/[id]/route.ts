@@ -6,7 +6,7 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { reactionError } from "../../../../../features/community/content-reaction-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
+import { contentReactionService } from "../../../../../lib/services/community/content-reaction-service";
 
 const command = z.object({}).strict();
 export const DELETE = withBrowserMutation(

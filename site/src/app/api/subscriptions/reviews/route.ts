@@ -4,7 +4,7 @@ import { planReviewsQuery } from "../../../../features/commerce/plan-reviews-que
 import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
+import { planReviewsService } from "../../../../lib/services/commerce/plan-reviews-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) =>
     planReviewsService.page(actor, planReviewsQuery(request.nextUrl.searchParams)),

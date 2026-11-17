@@ -15,10 +15,10 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/collections/lcol_a/watches",
 }));
 vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
 vi.mock("../../src/features/resources/release-watch", () => ({

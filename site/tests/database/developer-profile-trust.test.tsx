@@ -16,14 +16,14 @@ const state = vi.hoisted(() => ({
 const directoryPage = vi.hoisted(() => vi.fn());
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
 vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null }));
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { page: directoryPage },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => null,
 }));
 

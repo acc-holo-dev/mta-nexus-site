@@ -3,7 +3,7 @@ import { ConflictError, UnauthorizedError } from "@nexus/domain";
 import { generateId, generateSessionToken, hashPassword } from "@nexus/security";
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import { authService } from "../../../../src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
 import { auditEvents, db, sessions, users } from "../client";
 import { auditRepository } from "./audit";
 import { authRepository } from "./auth";

@@ -21,16 +21,16 @@ const state = vi.hoisted(() => ({
   download: vi.fn(),
   claim: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-activity-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true, claimFreeResource: state.claim },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { canManageProduct: async () => false },
 }));
 vi.mock("@nexus/security", async (importOriginal) => ({

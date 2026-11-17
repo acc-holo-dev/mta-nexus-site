@@ -8,16 +8,16 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   page: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.rate })),
 }));
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
-vi.mock("../../src/lib/services/build-package-service", () => ({
+vi.mock("../../src/lib/services/resources/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
 

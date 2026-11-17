@@ -14,17 +14,17 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => ({ id: "author" }) },
 }));
-vi.mock("../../../../lib/services/product-service", () => ({
+vi.mock("../../../../lib/services/commerce/product-service", () => ({
   productService: {
     getManagedProduct: mocks.product,
     getManagedHistory: mocks.history,
     getResourceLifecycleHistory: async () => [],
   },
 }));
-vi.mock("../../../../lib/services/resource-publication-readiness-service", () => ({
+vi.mock("../../../../lib/services/resources/resource-publication-readiness-service", () => ({
   resourcePublicationReadinessService: {
     summary: async () => ({
       productId: "resource",

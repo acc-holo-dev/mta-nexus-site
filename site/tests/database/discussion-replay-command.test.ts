@@ -21,10 +21,10 @@ vi.mock("../../scripts/discussion-replay-database", () => ({
 vi.mock("../../scripts/discussion-replay-storage", () => ({
   withDiscussionReplayCheckpoint: mocks.storage,
 }));
-vi.mock("../../src/lib/services/discussion-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-follow-notification-service", () => ({
   notifyDiscussionReplies: mocks.deliver,
 }));
-vi.mock("../../src/lib/services/discussion-notification-replay", () => ({
+vi.mock("../../src/lib/services/community/discussion-notification-replay", () => ({
   replayDiscussionNotifications: mocks.replay,
 }));
 

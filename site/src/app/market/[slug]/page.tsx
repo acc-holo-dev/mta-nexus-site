@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { safeResourceImageUrl } from "../../../features/resources/resource-image-url";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { productService } from "../../../lib/services/product-service";
+import { productService } from "../../../lib/services/commerce/product-service";
 
 export { ProductDetailPage as default } from "../../../features/resources/detail-server";
 

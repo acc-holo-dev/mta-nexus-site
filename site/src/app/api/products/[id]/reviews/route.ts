@@ -12,7 +12,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
+import { resourceReviewService } from "../../../../../lib/services/resources/resource-review-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "no-store" };

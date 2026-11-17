@@ -7,7 +7,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { generateId, generateSessionToken } from "@nexus/security";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterEach, describe, it } from "vitest";
-import { authService } from "../../../../src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
 import { accountMailOutbox } from "../account-mail-schema";
 import {
   accountAuthState,

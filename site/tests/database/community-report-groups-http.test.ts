@@ -14,7 +14,7 @@ const mock = vi.hoisted(() => ({
   previewPublicationBatch: vi.fn(),
   decidePublicationBatch: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/security", () => ({

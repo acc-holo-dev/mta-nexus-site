@@ -6,11 +6,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   type ServerObservationBrowserResult,
   serverStatisticsService,
-} from "../../../lib/services/server-statistics-service";
+} from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {

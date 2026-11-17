@@ -20,13 +20,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/guide",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { page: mocks.page },
 }));
-vi.mock("../../src/lib/services/public-user-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

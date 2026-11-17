@@ -10,7 +10,7 @@ import {
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
 import { beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../../src/lib/services/commerce-service";
+import { commerceService } from "../../src/lib/services/commerce/commerce-service";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 describe("Nexus 1.2 Public Platform Journeys", () => {

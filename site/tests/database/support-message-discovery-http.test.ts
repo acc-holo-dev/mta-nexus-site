@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mock = vi.hoisted(() => ({ session: vi.fn(), rate: vi.fn(), page: vi.fn() }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));

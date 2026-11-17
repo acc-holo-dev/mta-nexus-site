@@ -26,7 +26,7 @@ const logout = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession,
     logout,

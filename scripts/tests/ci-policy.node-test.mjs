@@ -90,7 +90,10 @@ test("unknown or mixed application paths never claim unit_only", () => {
       .unitOnly,
     false,
   );
-  assert.equal(classifyChanges(["apps/web/src/lib/services/auth-service.ts"]).unitOnly, false);
+  assert.equal(
+    classifyChanges(["apps/web/src/lib/services/accounts/auth-service.ts"]).unitOnly,
+    false,
+  );
   assert.equal(classifyChanges(["mystery/new-tool.sh"]).unitOnly, false);
   assert.equal(classifyChanges(["packages/domain/src/entities.ts"]).unitOnly, false);
 });

@@ -23,7 +23,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { POST as disabledCheckout } from "../../src/app/api/checkout/route";
-import { CommerceService } from "../../src/lib/services/commerce-service";
+import { CommerceService } from "../../src/lib/services/commerce/commerce-service";
 
 describe("open free-beta commerce behavior", () => {
   beforeEach(() => {

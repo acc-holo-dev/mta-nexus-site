@@ -22,7 +22,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(),
 }));
 
-import { ContentService } from "../../src/lib/services/content-service";
+import { ContentService } from "../../src/lib/services/community/content-service";
 
 describe("content feed separation behavior", () => {
   const service = new ContentService();

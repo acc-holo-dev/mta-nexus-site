@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("server ownership hardening surface", () => {
   it("hardens registration ownership and validates organization identifiers", () => {
-    const service = read("site/src/lib/services/server-service.ts");
+    const service = read("site/src/lib/services/servers/server-service.ts");
     const route = read("site/src/app/api/servers/route.ts");
     expect(service).toContain("ownerId: input.organizationId ? undefined : actor.id");
     expect(route).toContain("serverRegistrationSchema.safeParse");
@@ -23,7 +23,7 @@ describe("server ownership hardening surface", () => {
   });
 
   it("uses one server management contract in service and workspace page", () => {
-    const service = read("site/src/lib/services/server-service.ts");
+    const service = read("site/src/lib/services/servers/server-service.ts");
     const page = read("site/src/app/workspace/servers/[id]/page.tsx");
 
     expect(service).toContain("async canManageServer(");

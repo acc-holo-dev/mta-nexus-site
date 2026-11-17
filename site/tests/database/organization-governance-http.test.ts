@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   findByEmail: vi.fn(),
   verifyPassword: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/db", () => ({

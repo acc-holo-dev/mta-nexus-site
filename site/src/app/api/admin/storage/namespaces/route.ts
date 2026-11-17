@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { storageOffset } from "../../../../../features/moderation/storage-maintenance-query";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { storageMaintenanceService } from "../../../../../lib/services/storage-maintenance-service";
+import { storageMaintenanceService } from "../../../../../lib/services/moderation/storage-maintenance-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const expected = request.headers.get("x-nexus-actor-id");

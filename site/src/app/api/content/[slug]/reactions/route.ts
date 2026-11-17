@@ -8,8 +8,8 @@ import { getTrustedRequestIp } from "../../../../../features/shell/request-clien
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { authService } from "../../../../../lib/services/auth-service";
-import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { contentReactionService } from "../../../../../lib/services/community/content-reaction-service";
 
 const validQuery = (request: NextRequest) => {
   if (request.nextUrl.searchParams.size)

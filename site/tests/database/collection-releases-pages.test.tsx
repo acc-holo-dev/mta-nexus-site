@@ -18,10 +18,10 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/collections/lcol_a/releases",
 }));
 vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { releases: h.releases },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -49,7 +49,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 import { collectionReleasesCopy } from "../../src/features/library/collection-releases-i18n";
 import { CollectionReleasesScreen } from "../../src/features/library/collection-releases-server";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const item = {
   productId: "prd_a",

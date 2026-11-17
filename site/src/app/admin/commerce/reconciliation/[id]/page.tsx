@@ -20,7 +20,7 @@ import { orderTermsCopy } from "../../../../../features/commerce/order-terms-i18
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded financial evidence | MTA NEXUS",

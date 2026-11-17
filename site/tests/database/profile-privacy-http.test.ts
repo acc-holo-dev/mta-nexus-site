@@ -9,10 +9,10 @@ const mocks = vi.hoisted(() => ({
   own: vi.fn(),
   update: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/profile-privacy-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: { own: mocks.own, update: mocks.update },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

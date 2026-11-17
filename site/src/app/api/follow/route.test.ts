@@ -17,7 +17,7 @@ const state = vi.hoisted(() => ({
 const markSingle = vi.hoisted(() => vi.fn(async () => false));
 const markAll = vi.hoisted(() => vi.fn(async () => undefined));
 
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 

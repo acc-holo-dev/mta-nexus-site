@@ -15,10 +15,10 @@ const mocks = vi.hoisted(() => ({
   trust: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: {
     state: mocks.state,
     set: mocks.set,
@@ -26,7 +26,7 @@ vi.mock("../../src/lib/services/content-reaction-service", () => ({
     remove: mocks.remove,
   },
 }));
-vi.mock("../../src/lib/services/public-user-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

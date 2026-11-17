@@ -24,14 +24,14 @@ import { trustCopy } from "../../../features/trust/public-user-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
-import { productService } from "../../../lib/services/product-service";
-import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
-import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
+import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
 

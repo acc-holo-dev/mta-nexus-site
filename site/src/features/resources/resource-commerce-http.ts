@@ -7,7 +7,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/observability";
-import { authService } from "../../lib/services/auth-service";
+import { authService } from "../../lib/services/accounts/auth-service";
 
 export async function resourceCommerceRequest(
   request: NextRequest,

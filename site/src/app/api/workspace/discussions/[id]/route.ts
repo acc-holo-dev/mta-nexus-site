@@ -7,7 +7,7 @@ import { discussionEditSchema } from "../../../../../features/community/content-
 import { ownDiscussionError } from "../../../../../features/community/discussion-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { discussionWorkspaceService } from "../../../../../lib/services/discussion-workspace-service";
+import { discussionWorkspaceService } from "../../../../../lib/services/community/discussion-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };
 const removal = z.object({ expectedRevision: z.string().regex(/^[a-f0-9]{64}$/u) }).strict();

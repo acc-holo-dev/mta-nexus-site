@@ -17,7 +17,7 @@ import {
   accountMailOutboxRepository as queue,
 } from "../../packages/db/src/repositories/account-mail-outbox";
 import { userRepository } from "../../packages/db/src/repositories/users";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 export const key = randomBytes(32);
 export const cipher = new AccountMailCipher("d2_test", { d2_test: key });

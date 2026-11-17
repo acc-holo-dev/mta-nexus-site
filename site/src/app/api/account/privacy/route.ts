@@ -9,7 +9,7 @@ import {
 import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
+import { profilePrivacyService } from "../../../../lib/services/accounts/profile-privacy-service";
 
 export const dynamic = "force-dynamic";
 const validQuery = (request: NextRequest) => {

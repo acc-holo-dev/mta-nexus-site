@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
 import { SupportCenter } from "../center";
 import { supportQuery } from "../support-workspace-contract";

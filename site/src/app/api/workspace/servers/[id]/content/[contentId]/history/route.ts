@@ -7,7 +7,7 @@ import {
   serverContentRate,
 } from "../../../../../../../../features/servers/server-content-api";
 import { serverPublicationHistoryError } from "../../../../../../../../features/servers/server-publication-history-copy";
-import { serverContentService } from "../../../../../../../../lib/services/server-content-service";
+import { serverContentService } from "../../../../../../../../lib/services/servers/server-content-service";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; contentId: string }> },

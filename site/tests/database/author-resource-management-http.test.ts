@@ -12,10 +12,10 @@ const mocks = vi.hoisted(() => ({
   updateProductDetails: vi.fn(),
   consumeRateLimit: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: mocks }));
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: mocks }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.consumeRateLimit }));
 
 import { PATCH } from "../../src/app/api/products/[id]/route";

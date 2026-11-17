@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicContextTrustService } from "../../../lib/services/public-context-trust-service";
+import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
 import {
   type ContextKind,
   contextTrustHref,

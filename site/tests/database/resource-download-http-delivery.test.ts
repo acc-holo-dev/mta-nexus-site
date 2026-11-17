@@ -3,7 +3,7 @@ import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { expect, it, vi } from "vitest";
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
   return {
     authService: {
@@ -12,7 +12,7 @@ vi.mock("../../src/lib/services/auth-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/commerce-service", async () => {
+vi.mock("../../src/lib/services/commerce/commerce-service", async () => {
   const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
   return {
     commerceService: {
@@ -21,7 +21,7 @@ vi.mock("../../src/lib/services/commerce-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/product-service", async () => {
+vi.mock("../../src/lib/services/commerce/product-service", async () => {
   const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
   return {
     productService: {

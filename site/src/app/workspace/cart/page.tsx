@@ -7,8 +7,8 @@ import { getResourceCommerceCopy } from "../../../features/resources/resource-co
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { commerceService } from "../../../lib/services/commerce-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../lib/services/commerce/commerce-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

@@ -35,7 +35,7 @@ vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -62,7 +62,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/admin-service", () => ({
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
   adminService: {
     getSystemHealthMetrics: mocks.health,
     listReports: mocks.listReports,

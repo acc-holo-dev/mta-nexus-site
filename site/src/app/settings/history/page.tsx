@@ -9,8 +9,8 @@ import { ProfileChangeHistoryView } from "../../../features/accounts/profile-cha
 import { parseProfileChangeHistoryQuery } from "../../../features/accounts/profile-change-history-contract";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { profileChangeHistoryService } from "../../../lib/services/profile-change-history-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { profileChangeHistoryService } from "../../../lib/services/accounts/profile-change-history-service";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

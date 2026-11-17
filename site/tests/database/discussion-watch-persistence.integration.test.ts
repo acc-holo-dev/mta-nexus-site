@@ -27,8 +27,8 @@ import {
   resolveDiscussionReplayDatabaseIdentity,
 } from "../../scripts/discussion-replay-database";
 import { withDiscussionReplayCheckpoint } from "../../scripts/discussion-replay-storage";
-import { notifyDiscussionReplies } from "../../src/lib/services/discussion-follow-notification-service";
-import { replayDiscussionNotifications } from "../../src/lib/services/discussion-notification-replay";
+import { notifyDiscussionReplies } from "../../src/lib/services/community/discussion-follow-notification-service";
+import { replayDiscussionNotifications } from "../../src/lib/services/community/discussion-notification-replay";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 const actors: string[] = [];

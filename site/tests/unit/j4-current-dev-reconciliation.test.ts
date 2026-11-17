@@ -38,7 +38,7 @@ describe("current-dev build upload reconciliation", () => {
   });
 
   it("keeps releaseBuild authoritative with the same preflight helper", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');

@@ -7,7 +7,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/observability";
-import { authService } from "../../lib/services/auth-service";
+import { authService } from "../../lib/services/accounts/auth-service";
 import { userPlatformError } from "../community/user-platform-copy";
 
 export async function userPlatformApi(

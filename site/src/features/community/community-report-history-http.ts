@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { resolveLocale } from "../../lib/i18n";
-import { communityReportHistoryService } from "../../lib/services/community-report-history-service";
+import { communityReportHistoryService } from "../../lib/services/community/community-report-history-service";
 import { privateChangeHistoryDownload } from "../accounts/private-change-history-download";
 import { userPlatformApi } from "../accounts/user-platform-api";
 import { reportId, reportRateLimit } from "./community-report-api";

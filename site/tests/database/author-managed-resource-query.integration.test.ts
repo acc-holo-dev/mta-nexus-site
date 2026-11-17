@@ -8,7 +8,7 @@ import {
   productRepository,
 } from "../../packages/db/src/repositories/products";
 import { auditEvents, products, users } from "../../packages/db/src/schema";
-import { ProductService } from "../../src/lib/services/product-service";
+import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 it("enforces author and organization authority in PostgreSQL, including revocation", async () => {
   await db.transaction(async (tx) => {

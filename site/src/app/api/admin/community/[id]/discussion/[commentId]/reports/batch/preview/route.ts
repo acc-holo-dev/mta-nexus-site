@@ -8,7 +8,7 @@ import {
   requireServerJsonContentType,
 } from "../../../../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../../../../lib/browser-route-adapter";
-import { communityReportService } from "../../../../../../../../../../lib/services/community-report-service";
+import { communityReportService } from "../../../../../../../../../../lib/services/community/community-report-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; commentId: string }> }) => {
     return userPlatformApi(

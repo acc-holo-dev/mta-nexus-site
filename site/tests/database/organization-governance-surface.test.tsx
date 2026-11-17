@@ -17,10 +17,10 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/organization-governance-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-governance-service", () => ({
   organizationGovernanceService: mocks,
 }));
 

@@ -4,7 +4,7 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { reportRateLimit } from "../../../../../features/community/community-report-api";
 import { parseReportGroupsQuery } from "../../../../../features/community/community-report-groups-contract";
 import { reportGroupsError } from "../../../../../features/community/community-report-groups-copy";
-import { communityReportGroupsService } from "../../../../../lib/services/community-report-groups-service";
+import { communityReportGroupsService } from "../../../../../lib/services/community/community-report-groups-service";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

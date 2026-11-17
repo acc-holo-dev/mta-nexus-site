@@ -24,7 +24,7 @@ vi.mock("@nexus/security", () => ({
   can: vi.fn(() => false),
 }));
 
-import { ProductService } from "../../src/lib/services/product-service";
+import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 describe("resource dependency resolution behavior", () => {
   beforeEach(() => {

@@ -3,8 +3,8 @@ import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { platformReportService } from "../../../lib/services/platform-report-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { platformReportCopy } from "../platform-report-i18n";
 

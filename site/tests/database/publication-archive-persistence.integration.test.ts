@@ -7,7 +7,7 @@ import {
   parsePublicationQuery,
   publicationPageQuery,
 } from "../../src/features/community/publication-feed-contract";
-import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
+import { publicationFeedService as service } from "../../src/lib/services/discovery/publication-feed-service";
 
 const actorIds: string[] = [],
   serverIds: string[] = [];

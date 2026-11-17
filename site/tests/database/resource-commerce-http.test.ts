@@ -16,10 +16,10 @@ const mocks = vi.hoisted(() => ({
   transition: vi.fn(),
   order: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.user },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: {
     getResourceCart: mocks.get,
     addResourceToCart: mocks.add,
@@ -28,7 +28,7 @@ vi.mock("../../src/lib/services/commerce-service", () => ({
     getBuyerOrderDetails: mocks.order,
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { transitionResource: mocks.transition },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

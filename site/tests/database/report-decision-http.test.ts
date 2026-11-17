@@ -17,14 +17,14 @@ const mocks = vi.hoisted(() => ({
   findById: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: async () => mocks.user,
     confirmStaffActionPassword: async () => ({ expectedPasswordHash: "hash_mod" }),
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {

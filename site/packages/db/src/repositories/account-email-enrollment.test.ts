@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { generateId } from "@nexus/security";
 import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { authService } from "../../../../src/lib/services/auth-service";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
 import { accountMailOutbox } from "../account-mail-schema";
 import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { auditEvents, db } from "../client";

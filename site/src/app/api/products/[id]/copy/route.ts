@@ -3,7 +3,7 @@ import { resourceCommerceRequest } from "../../../../../features/resources/resou
 import { resourceCopiesQuery } from "../../../../../features/resources/resource-copy-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCopyService } from "../../../../../lib/services/resource-copy-service";
+import { resourceCopyService } from "../../../../../lib/services/resources/resource-copy-service";
 
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, { params }: Context) {

@@ -1,6 +1,6 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {

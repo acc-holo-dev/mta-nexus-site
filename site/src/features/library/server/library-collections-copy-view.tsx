@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";

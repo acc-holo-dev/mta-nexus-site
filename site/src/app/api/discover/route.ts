@@ -9,7 +9,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { discoveryService } from "../../../lib/services/discovery-service";
+import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
   const copy = discoveryCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));

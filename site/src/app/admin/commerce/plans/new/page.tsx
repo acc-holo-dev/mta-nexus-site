@@ -6,7 +6,7 @@ import { getCommercialCopy } from "../../../../../features/commerce/commercial-i
 import { CommercialPlanForm } from "../../../../../features/commerce/commercial-plans";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Create commercial plan | MTA NEXUS",

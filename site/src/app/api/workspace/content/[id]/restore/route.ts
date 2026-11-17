@@ -5,7 +5,7 @@ import { userPlatformApi } from "../../../../../../features/accounts/user-platfo
 import { authorPublicationDeskError } from "../../../../../../features/community/author-publication-desk-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { authorContentService } from "../../../../../../lib/services/author-content-service";
+import { authorContentService } from "../../../../../../lib/services/organizations/author-content-service";
 export const POST = withBrowserMutation(
   async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return userPlatformApi(

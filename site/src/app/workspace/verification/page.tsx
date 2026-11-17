@@ -11,8 +11,8 @@ import {
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
 

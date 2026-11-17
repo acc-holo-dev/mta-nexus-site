@@ -10,10 +10,10 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/saved",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/follow-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.page },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

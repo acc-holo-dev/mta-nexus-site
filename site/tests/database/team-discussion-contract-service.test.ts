@@ -13,7 +13,7 @@ vi.mock("@nexus/db", () => ({
   communityModerationWorkspaceRepository: state,
   discussionManagementRepository: state,
 }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
 
 import {
   confirmsModeratedDiscussionRemoval,
@@ -30,8 +30,8 @@ import {
   organizationBatchPreviewInput,
 } from "../../src/features/organizations/organization-batch-contract";
 import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
-import { communityModerationService as moderation } from "../../src/lib/services/community-moderation-service";
-import { organizationWorkspaceService as teams } from "../../src/lib/services/organization-workspace-service";
+import { communityModerationService as moderation } from "../../src/lib/services/community/community-moderation-service";
+import { organizationWorkspaceService as teams } from "../../src/lib/services/organizations/organization-workspace-service";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z",

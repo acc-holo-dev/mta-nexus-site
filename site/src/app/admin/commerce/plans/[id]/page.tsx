@@ -15,8 +15,8 @@ import { CommercialPlanForm } from "../../../../../features/commerce/commercial-
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { commercialPlanService } from "../../../../../lib/services/commercial-plan-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { commercialPlanService } from "../../../../../lib/services/commerce/commercial-plan-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

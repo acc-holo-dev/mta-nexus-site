@@ -20,7 +20,7 @@ import {
 import {
   type ServerStatisticsResult,
   serverStatisticsService,
-} from "../../src/lib/services/server-statistics-service";
+} from "../../src/lib/services/servers/server-statistics-service";
 
 const summary = {
   observationCount: 100,

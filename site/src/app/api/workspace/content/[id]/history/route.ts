@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
 import { parseAuthorPublicationHistoryQuery } from "../../../../../../features/community/author-publication-desk-contract";
 import { authorPublicationDeskError } from "../../../../../../features/community/author-publication-desk-copy";
-import { authorContentService } from "../../../../../../lib/services/author-content-service";
+import { authorContentService } from "../../../../../../lib/services/organizations/author-content-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

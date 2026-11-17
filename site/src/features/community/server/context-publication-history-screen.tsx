@@ -4,7 +4,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationContentCopy } from "../../organizations/organization-content-copy";
 import {
   organizationPublicationHistoryCopy,

@@ -18,8 +18,8 @@ import { getLicenseMaintenanceCopy } from "../../../features/commerce/license-ma
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { licenseControlService } from "../../../lib/services/license-control-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

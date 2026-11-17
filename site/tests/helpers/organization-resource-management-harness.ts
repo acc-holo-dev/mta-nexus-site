@@ -10,8 +10,8 @@ import {
 } from "@nexus/db";
 import { and, eq } from "drizzle-orm";
 import { assertProductMutationAuthority } from "../../packages/db/src/repositories/product-mutation-authority";
-import { productService } from "../../src/lib/services/product-service";
-import { serverService } from "../../src/lib/services/server-service";
+import { productService } from "../../src/lib/services/commerce/product-service";
+import { serverService } from "../../src/lib/services/servers/server-service";
 
 export {
   assertProductMutationAuthority,

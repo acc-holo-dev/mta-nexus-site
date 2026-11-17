@@ -4,7 +4,7 @@ import { userPlatformApi } from "../../../../../../../../features/accounts/user-
 import { reportRateLimit } from "../../../../../../../../features/community/community-report-api";
 import { parseDiscussionReportsQuery } from "../../../../../../../../features/community/discussion-reports-contract";
 import { moderatedDiscussionError } from "../../../../../../../../features/community/moderated-discussion-copy";
-import { communityModerationService } from "../../../../../../../../lib/services/community-moderation-service";
+import { communityModerationService } from "../../../../../../../../lib/services/community/community-moderation-service";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; commentId: string }> },

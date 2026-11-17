@@ -6,8 +6,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { communityReportService } from "../../../lib/services/community-report-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import {

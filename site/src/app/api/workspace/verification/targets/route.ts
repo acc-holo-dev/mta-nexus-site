@@ -6,7 +6,7 @@ import {
   verificationRate,
 } from "../../../../../features/trust/verification-workspace-api";
 import { verificationError } from "../../../../../features/trust/verification-workspace-copy";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { verificationWorkspaceService } from "../../../../../lib/services/moderation/verification-workspace-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

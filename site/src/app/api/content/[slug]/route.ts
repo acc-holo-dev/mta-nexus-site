@@ -4,7 +4,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../lib/observability";
-import { contentService } from "../../../../lib/services/content-service";
+import { contentService } from "../../../../lib/services/community/content-service";
 
 const publicHeaders = {
   "Cache-Control": "no-store",

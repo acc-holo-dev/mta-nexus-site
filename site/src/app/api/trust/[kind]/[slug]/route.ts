@@ -8,7 +8,7 @@ import {
 } from "../../../../../features/trust/public-context-trust-contract";
 import { contextTrustError } from "../../../../../features/trust/public-context-trust-copy";
 import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { publicContextTrustService } from "../../../../../lib/services/public-context-trust-service";
+import { publicContextTrustService } from "../../../../../lib/services/trust/public-context-trust-service";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ kind: string; slug: string }> },

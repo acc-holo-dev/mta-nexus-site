@@ -14,13 +14,13 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
   browseRate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: { previewVisibility: state.preview, saveVisibility: state.save },
 }));
-vi.mock("../../src/lib/services/server-workspace-history-service", () => ({
+vi.mock("../../src/lib/services/servers/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.history },
 }));
 vi.mock("../../src/features/servers/server-content-api", () => ({

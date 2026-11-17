@@ -6,13 +6,13 @@ const state = vi.hoisted(() => ({
   allowed: true,
   find: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
-vi.mock("../../src/lib/services/community-topic-recovery-service", () => ({
+vi.mock("../../src/lib/services/community/community-topic-recovery-service", () => ({
   communityTopicRecoveryService: { findOwned: state.find },
 }));
 

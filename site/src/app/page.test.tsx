@@ -77,32 +77,32 @@ vi.mock("../lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
-vi.mock("../lib/services/mta-master-directory-service", async () => {
+vi.mock("../lib/services/servers/mta-master-directory-service", async () => {
   const actual = await vi.importActual<
-    typeof import("../lib/services/mta-master-directory-service")
-  >("../lib/services/mta-master-directory-service");
+    typeof import("../lib/services/servers/mta-master-directory-service")
+  >("../lib/services/servers/mta-master-directory-service");
   return {
     ...actual,
     mtaMasterDirectoryService: { getDirectory: mocks.getDirectory },
   };
 });
 
-vi.mock("../lib/services/product-service", () => ({
+vi.mock("../lib/services/commerce/product-service", () => ({
   productService: {
     listProducts: mocks.listProducts,
     getPublicAttributions: async () => new Map(),
   },
 }));
 
-vi.mock("../lib/services/content-service", () => ({
+vi.mock("../lib/services/community/content-service", () => ({
   contentService: { listArticles: mocks.listArticles },
 }));
 
-vi.mock("../lib/services/server-service", () => ({
+vi.mock("../lib/services/servers/server-service", () => ({
   serverService: { listServers: mocks.listServers },
 }));
 
-vi.mock("../lib/services/auth-service", () => ({
+vi.mock("../lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 

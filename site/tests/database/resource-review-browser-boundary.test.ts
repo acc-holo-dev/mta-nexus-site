@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
@@ -14,7 +14,7 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "aud_a",
   getClientIp: () => "unknown",
 }));
-vi.mock("../../src/lib/services/resource-review-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-review-service", () => ({
   resourceReviewService: {
     command: vi.fn(),
     report: vi.fn(),

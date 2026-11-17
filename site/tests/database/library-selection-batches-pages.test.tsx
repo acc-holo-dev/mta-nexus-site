@@ -19,13 +19,13 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { detail: state.detail },
 }));
-vi.mock("../../src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../../src/lib/services/library/library-selection-batches-service", () => ({
   librarySelectionBatchesService: { history: state.history },
 }));
 vi.mock("../../src/features/library/components/library-selection-batch-controls", () => ({
@@ -37,7 +37,7 @@ vi.mock("../../src/features/library/components/library-selection-batch-controls"
 import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };

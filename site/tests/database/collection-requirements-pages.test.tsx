@@ -19,10 +19,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-requirements-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-requirements-service", () => ({
   resourceRequirementsService: { collectionReport: state.report },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -43,7 +43,7 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
 import { collectionRequirementsCopy } from "../../src/features/library/collection-requirements-i18n";
 import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",

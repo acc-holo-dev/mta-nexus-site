@@ -7,7 +7,7 @@ import {
   organizationMutationToken,
 } from "../../../../../../features/organizations/organization-workspace-api";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { organizationGovernanceService } from "../../../../../../lib/services/organization-governance-service";
+import { organizationGovernanceService } from "../../../../../../lib/services/organizations/organization-governance-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
     return userPlatformApi(

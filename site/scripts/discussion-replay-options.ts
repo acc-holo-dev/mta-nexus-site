@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { replayTimestamp } from "../src/lib/services/discussion-replay-checkpoint";
+import { replayTimestamp } from "../src/lib/services/community/discussion-replay-checkpoint";
 
 export function discussionReplayOptions(args: string[]) {
   const [checkpointName, fromInput, untilInput, ...rest] = args;

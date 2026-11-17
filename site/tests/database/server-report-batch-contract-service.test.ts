@@ -27,8 +27,8 @@ import {
   reportBatchPreviewInput,
 } from "../../src/features/moderation/report-batch-contract";
 import { serverPublicationHistoryCopy } from "../../src/features/servers/server-publication-history-copy";
-import { communityReportService as reports } from "../../src/lib/services/community-report-service";
-import { serverContentService as servers } from "../../src/lib/services/server-content-service";
+import { communityReportService as reports } from "../../src/lib/services/community/community-report-service";
+import { serverContentService as servers } from "../../src/lib/services/servers/server-content-service";
 
 const actor = { id: "staff", role: "moderator" } as User,
   time = "2026-10-11T00:00:00.123456Z",

@@ -12,8 +12,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
-import { followWorkspaceService } from "../../../lib/services/follow-workspace-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 

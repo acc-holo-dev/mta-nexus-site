@@ -29,11 +29,11 @@ vi.mock("../../src/lib/i18n-server", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { authService: { getSession: async () => harnessState.actor } };
 });
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: async () => ({
       id: "prd_a",
@@ -64,7 +64,7 @@ import Public from "../../src/app/market/[slug]/reviews/page";
 import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 it.each(["en", "ru"] as const)(
   "public %s reviews expose public authors, distinguish legacy evidence and preserve pages",

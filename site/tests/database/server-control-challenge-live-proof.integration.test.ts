@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async () => {
   const { directoryState: state } = await import("../helpers/server-control-challenge-harness");
   return {
     mtaMasterDirectoryService: {

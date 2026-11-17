@@ -9,7 +9,7 @@ import {
 import { discussionMutationError } from "../../../../../../features/community/content-discussion-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { contentService } from "../../../../../../lib/services/content-service";
+import { contentService } from "../../../../../../lib/services/community/content-service";
 
 type Context = { params: Promise<{ slug: string; id: string }> };
 async function mutate(request: NextRequest, context: Context, remove: boolean) {

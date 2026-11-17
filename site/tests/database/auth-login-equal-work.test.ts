@@ -26,7 +26,7 @@ vi.mock("../../src/features/shell/request-client-ip", () => ({
 }));
 
 import { POST } from "../../src/app/api/auth/login/route";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 beforeEach(() => vi.resetAllMocks());
 afterEach(() => vi.unstubAllEnvs());

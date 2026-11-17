@@ -6,14 +6,14 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { cache } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { discoveryService } from "../../../lib/services/discovery-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 import {
   indexMtaObservations,
   type MtaMasterServer,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
-import { productService } from "../../../lib/services/product-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
+import { productService } from "../../../lib/services/commerce/product-service";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
 import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";

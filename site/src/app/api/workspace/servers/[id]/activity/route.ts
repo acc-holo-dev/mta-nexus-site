@@ -4,7 +4,7 @@ import { userPlatformApi } from "../../../../../../features/accounts/user-platfo
 import { serverContentRate } from "../../../../../../features/servers/server-content-api";
 import { parseServerWorkspaceHistoryQuery } from "../../../../../../features/servers/server-workspace-contract";
 import { serverWorkspaceError } from "../../../../../../features/servers/server-workspace-copy";
-import { serverWorkspaceHistoryService } from "../../../../../../lib/services/server-workspace-history-service";
+import { serverWorkspaceHistoryService } from "../../../../../../lib/services/servers/server-workspace-history-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const response = await userPlatformApi(
     request,

@@ -20,7 +20,7 @@ const state = vi.hoisted(() => ({
   decide: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("../../src/features/shell/request-client-ip", () => ({

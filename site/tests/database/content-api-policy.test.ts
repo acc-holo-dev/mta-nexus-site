@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
   can: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 
@@ -36,14 +36,14 @@ vi.mock("@nexus/db", () => ({
   productRepository: { findById: mocks.findProduct },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: {
     getServerById: vi.fn(),
     canManageServer: vi.fn(),
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { canManageProduct: vi.fn() },
 }));
 

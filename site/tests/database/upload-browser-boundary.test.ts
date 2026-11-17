@@ -4,14 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 vi.mock("@nexus/db", () => ({ resourceMediaRepository: {} }));
 vi.mock("@nexus/storage", () => ({ storageService: {} }));
-vi.mock("../../src/lib/services/resource-media-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-media-service", () => ({
   resourceMediaService: {},
 }));
 

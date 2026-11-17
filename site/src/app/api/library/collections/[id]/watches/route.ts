@@ -5,7 +5,7 @@ import { resourceCommerceRequest } from "../../../../../../features/resources/re
 import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
+import { resourceReleaseWatchesService } from "../../../../../../lib/services/resources/resource-release-watches-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const query = resourceReleaseWatchesQuery(request.nextUrl.searchParams);

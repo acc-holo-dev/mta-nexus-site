@@ -1,6 +1,6 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { ResourceDownloadButton } from "../../resources/download";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { LibraryCollectionBatchForm } from "../collection-batch";

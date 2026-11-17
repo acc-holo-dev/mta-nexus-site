@@ -19,13 +19,13 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/community-report-groups-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-groups-service", () => ({
   communityReportGroupsService: { page: mock.groups },
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: { publicationReports: mock.reports },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));

@@ -8,7 +8,7 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { search: vi.fn(async () => []) },
 }));
 

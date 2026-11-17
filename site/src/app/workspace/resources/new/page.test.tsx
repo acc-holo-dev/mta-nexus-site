@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
 import { getDictionary } from "../../../../lib/i18n";
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -13,7 +13,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/resources/new",
 }));
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));

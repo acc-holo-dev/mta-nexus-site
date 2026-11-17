@@ -18,8 +18,8 @@ import { getResourceCommerceCopy } from "../../../../features/resources/resource
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { commerceService } from "../../../../lib/services/commerce-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

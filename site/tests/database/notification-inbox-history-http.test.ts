@@ -12,10 +12,10 @@ const state = vi.hoisted(() => ({
   command: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/notification-inbox-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
   notificationInboxService: { page: state.page, command: state.command },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));

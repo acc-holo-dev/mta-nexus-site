@@ -11,8 +11,8 @@ import {
   type RequestLogContext,
 } from "../../../../../../lib/observability";
 import { isPostgresDeadlock } from "../../../../../../lib/postgres-error";
-import { authService } from "../../../../../../lib/services/auth-service";
-import { serverClaimService } from "../../../../../../lib/services/server-claim-service";
+import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { serverClaimService } from "../../../../../../lib/services/servers/server-claim-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

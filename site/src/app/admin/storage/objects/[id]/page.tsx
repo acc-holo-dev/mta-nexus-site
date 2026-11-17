@@ -8,8 +8,8 @@ import { storageMaintenanceCopy } from "../../../../../features/moderation/stora
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { storageMaintenanceService } from "../../../../../lib/services/storage-maintenance-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { storageMaintenanceService } from "../../../../../lib/services/moderation/storage-maintenance-service";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 const linkClass =

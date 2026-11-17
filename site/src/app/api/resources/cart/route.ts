@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { commerceService } from "../../../../lib/services/commerce-service";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) => commerceService.getResourceCart(actor));

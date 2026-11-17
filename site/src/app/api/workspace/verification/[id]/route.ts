@@ -5,7 +5,7 @@ import { verificationApplicationsError } from "../../../../../features/moderatio
 import { verificationRate } from "../../../../../features/trust/verification-workspace-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { verificationWorkspaceService } from "../../../../../lib/services/moderation/verification-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {

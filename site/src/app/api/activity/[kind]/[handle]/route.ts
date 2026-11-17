@@ -10,7 +10,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { publicationFeedService } from "../../../../../lib/services/publication-feed-service";
+import { publicationFeedService } from "../../../../../lib/services/discovery/publication-feed-service";
 export const dynamic = "force-dynamic";
 export async function GET(
   request: NextRequest,

@@ -1,0 +1,233 @@
+import { organizationRepository, serverRepository } from "@nexus/db";
+import type { Server, User } from "@nexus/domain";
+import {
+  AppError,
+  eventBus,
+  ForbiddenError,
+  isValidMtaAddress,
+  normalizeMtaAddress,
+} from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
+import {
+  serverVisibilityCommand,
+  serverVisibilityInput,
+  serverVisibilityPreviewSchema,
+  serverVisibilityResultSchema,
+} from "../../../features/servers/server-workspace-contract";
+import { isUniqueConstraintViolation } from "../../postgres-error";
+
+function throwServerMutationConflict(error: unknown): never {
+  if (isUniqueConstraintViolation(error, ["servers_slug_idx", "servers_slug_unique"])) {
+    throw new AppError("Server slug is already in use", 409, "SERVER_SLUG_TAKEN");
+  }
+  if (isUniqueConstraintViolation(error, ["servers_endpoint_idx"])) {
+    throw new AppError("This server endpoint is already registered", 409, "SERVER_ENDPOINT_TAKEN");
+  }
+  throw error;
+}
+
+function canonicalServerAddress(value: string): string {
+  const address = normalizeMtaAddress(value);
+  if (!isValidMtaAddress(address)) {
+    throw new AppError("Invalid MTA server address", 400, "INVALID_SERVER_ADDRESS");
+  }
+  return address;
+}
+
+type ServerDetailsUpdate = Partial<
+  Pick<
+    Server,
+    | "name"
+    | "description"
+    | "websiteUrl"
+    | "discordUrl"
+    | "rulesUrl"
+    | "mediaUrls"
+    | "language"
+    | "region"
+    | "gameplayTags"
+    | "ipAddress"
+    | "port"
+    | "httpPort"
+    | "gameMode"
+    | "mapName"
+    | "maxPlayers"
+    | "visibility"
+  >
+>;
+
+class ServerService {
+  async previewVisibility(actor: User, value: unknown) {
+    const input = serverVisibilityInput.safeParse(value);
+    if (!input.success) throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    const result = await serverRepository.previewVisibilityBatch(actor.id, input.data);
+    return serverVisibilityPreviewSchema.parse(result);
+  }
+  async saveVisibility(actor: User, value: unknown) {
+    const input = serverVisibilityCommand.safeParse(value);
+    if (!input.success) throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    const result = await serverRepository.applyVisibilityBatch(
+      actor.id,
+      input.data,
+      input.data.serverIds.map(() => generateId("aud")),
+    );
+    return serverVisibilityResultSchema.parse(result);
+  }
+
+  async listServers(limit = 100): Promise<Server[]> {
+    return serverRepository.listActivePublic(limit);
+  }
+
+  async searchServers(query: string, limit = 24): Promise<Server[]> {
+    return serverRepository.searchActivePublic(query, limit);
+  }
+
+  async getServerBySlug(slug: string): Promise<Server | null> {
+    return serverRepository.findBySlug(slug);
+  }
+
+  async getServerById(id: string): Promise<Server | null> {
+    return serverRepository.findById(id);
+  }
+
+  async recoverCreatedServer(actorId: string, nonce: string, token: string) {
+    return serverRepository.findCreatedForRecovery(actorId, nonce, token);
+  }
+
+  async getManagedServerDetails(id: string, actor: User) {
+    return serverRepository.findManagedDetails(id, actor.id);
+  }
+
+  async createServer(
+    input: Omit<
+      Server,
+      "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt"
+    >,
+    actor: User,
+    creationNonce?: string,
+    currentToken?: string,
+  ): Promise<Server> {
+    if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
+
+    // Organization authority is checked under row locks by createWithAudit.
+    // Do not perform an authorization read outside its database transaction.
+
+    const ipAddress = canonicalServerAddress(input.ipAddress);
+    const id = generateId("srv");
+    let server: Server;
+    try {
+      server = await serverRepository.createWithAudit(
+        {
+          ...input,
+          ipAddress,
+          // Ownership is derived from the authenticated actor, never a
+          // caller-supplied ownerId. Organization listings have no personal owner.
+          ownerId: input.organizationId ? undefined : actor.id,
+          id,
+          // Editorial status is independent from the official MTA network status.
+          status: "active",
+          isVerified: false,
+        },
+        {
+          id: generateId("aud"),
+          actorId: actor.id,
+          actorType: "user",
+          action: "server.created",
+          targetId: id,
+          targetType: "server",
+          details: {
+            name: input.name,
+            ip: ipAddress,
+            port: input.port,
+            ...(creationNonce ? { creationNonce } : {}),
+          },
+        },
+        currentToken ?? "",
+      );
+    } catch (error) {
+      throwServerMutationConflict(error);
+    }
+
+    // The server and audit are committed. Best-effort event subscribers
+    // cannot turn a successful creation into a client-visible 500/retry.
+    try {
+      await eventBus.publish({
+        id: generateId("evt"),
+        type: "server.created",
+        version: 1,
+        timestamp: new Date().toISOString(),
+        actor: { id: actor.id, type: "user" },
+        aggregateId: id,
+        aggregateType: "server",
+        payload: {
+          serverId: id,
+          name: server.name,
+          ownerId: server.ownerId,
+          organizationId: server.organizationId,
+          ip: server.ipAddress,
+          port: server.port,
+        },
+      });
+    } catch {
+      // Do not log event payloads, addresses or subscriber error details.
+      console.error("Nexus committed write succeeded but event dispatch failed", {
+        eventType: "server.created",
+        aggregateType: "server",
+        aggregateId: id,
+      });
+    }
+
+    return server;
+  }
+
+  async canManageServer(server: Server, actor: User): Promise<boolean> {
+    if (can(actor, "server.manage", server)) return true;
+    if (!server.organizationId) return false;
+
+    const organization = await organizationRepository.findById(server.organizationId);
+    // Never grant access based on an orphaned listing or stale membership.
+    if (!organization) return false;
+    if (organization.ownerId === actor.id) return true;
+
+    const membership = await organizationRepository.findServerMembershipForUser(
+      server.organizationId,
+      actor.id,
+    );
+    return can(actor, "server.manage", server, {
+      organizationMemberships: membership ? [membership] : [],
+    });
+  }
+
+  async updateServer(
+    serverId: string,
+    updates: ServerDetailsUpdate,
+    actor: User,
+    expectedUpdatedAt?: Date,
+  ): Promise<Server> {
+    const canonicalUpdates =
+      updates.ipAddress === undefined
+        ? updates
+        : { ...updates, ipAddress: canonicalServerAddress(updates.ipAddress) };
+    try {
+      return await serverRepository.updateManagedWithAudit(
+        serverId,
+        canonicalUpdates,
+        {
+          id: generateId("aud"),
+          actorId: actor.id,
+          actorType: "user",
+          action: "server.updated",
+          targetId: serverId,
+          targetType: "server",
+          details: { fields: Object.keys(canonicalUpdates) },
+        },
+        actor,
+        expectedUpdatedAt,
+      );
+    } catch (error) {
+      throwServerMutationConflict(error);
+    }
+  }
+}
+
+export const serverService = new ServerService();

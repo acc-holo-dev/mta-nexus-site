@@ -17,8 +17,8 @@ import { resourceReleaseWatchesQuery } from "../../../../../../features/resource
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { authService } from "../../../../../../lib/services/auth-service";
-import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
+import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { resourceReleaseWatchesService } from "../../../../../../lib/services/resources/resource-release-watches-service";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

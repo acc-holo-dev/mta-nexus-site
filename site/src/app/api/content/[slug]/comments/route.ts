@@ -17,8 +17,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { authService } from "../../../../../lib/services/auth-service";
-import { contentService } from "../../../../../lib/services/content-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { contentService } from "../../../../../lib/services/community/content-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);

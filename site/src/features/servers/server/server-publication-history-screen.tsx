@@ -1,4 +1,4 @@
-import { serverContentService } from "../../../lib/services/server-content-service";
+import { serverContentService } from "../../../lib/services/servers/server-content-service";
 import { ContextPublicationHistoryScreen } from "../../community/context-history-server";
 export function ServerPublicationHistoryScreen(props: {
   id: string;

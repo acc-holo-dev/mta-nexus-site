@@ -19,19 +19,19 @@ vi.mock("@nexus/db", async () => {
     followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
   };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "../helpers/discovery-follow-surface-harness"
   );
   return { authService: { getSession: mocks.viewer } };
 });
-vi.mock("../../src/lib/services/discovery-service", async () => {
+vi.mock("../../src/lib/services/discovery/discovery-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "../helpers/discovery-follow-surface-harness"
   );
   return { discoveryService: { page: mocks.page } };
 });
-vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "../helpers/discovery-follow-surface-harness"
   );
@@ -40,7 +40,7 @@ vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
     indexMtaObservations: () => () => null,
   };
 });
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
 vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null }));

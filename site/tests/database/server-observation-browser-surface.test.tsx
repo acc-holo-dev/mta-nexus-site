@@ -18,10 +18,10 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/servers/server/observations",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/server-statistics-service", () => ({
+vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

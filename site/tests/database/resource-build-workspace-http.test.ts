@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
   command: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: mocks.auth,
     confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
@@ -28,17 +28,17 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_a",
   };
 });
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: mocks.detail, command: mocks.command },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { reviewBuild: mocks.review },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../../src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
 vi.mock("@nexus/db", () => ({

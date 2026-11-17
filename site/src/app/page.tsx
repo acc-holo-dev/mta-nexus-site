@@ -13,15 +13,15 @@ import {
 import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
-import { authService } from "../lib/services/auth-service";
-import { contentService } from "../lib/services/content-service";
+import { authService } from "../lib/services/accounts/auth-service";
+import { contentService } from "../lib/services/community/content-service";
 import {
   type MtaMasterServer,
   matchesMtaEndpoint,
   mtaMasterDirectoryService,
-} from "../lib/services/mta-master-directory-service";
-import { productService } from "../lib/services/product-service";
-import { serverService } from "../lib/services/server-service";
+} from "../lib/services/servers/mta-master-directory-service";
+import { productService } from "../lib/services/commerce/product-service";
+import { serverService } from "../lib/services/servers/server-service";
 
 export const dynamic = "force-dynamic";
 

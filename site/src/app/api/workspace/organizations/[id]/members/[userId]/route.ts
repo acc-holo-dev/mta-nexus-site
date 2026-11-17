@@ -6,7 +6,7 @@ import {
   organizationMutationToken,
 } from "../../../../../../../features/organizations/organization-workspace-api";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
-import { organizationWorkspaceService } from "../../../../../../../lib/services/organization-workspace-service";
+import { organizationWorkspaceService } from "../../../../../../../lib/services/organizations/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string; userId: string }> };
 function mutation(request: NextRequest, context: Context, remove: boolean) {

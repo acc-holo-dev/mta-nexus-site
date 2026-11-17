@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { libraryMembershipHistoryQuery } from "../../../../../../features/library/library-membership-history-query";
 import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
-import { libraryCollectionsService } from "../../../../../../lib/services/library-collections-service";
+import { libraryCollectionsService } from "../../../../../../lib/services/library/library-collections-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const report = await libraryCollectionsService.membershipHistory(

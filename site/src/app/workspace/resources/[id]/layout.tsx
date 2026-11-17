@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 import { ResourcePublisherWorkspaceNav } from "../../../../features/resources/publisher-navigation";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 export default async function ResourcePublisherLayout({
   children,

@@ -11,7 +11,7 @@ async function main() {
 
   // Import application/database code only after the explicit mutation guard.
   const [{ captureKnownServerObservations }, { closeDatabaseConnection }] = await Promise.all([
-    import("../src/lib/services/server-observation-collector"),
+    import("../src/lib/services/servers/server-observation-collector"),
     import("@nexus/db"),
   ]);
 

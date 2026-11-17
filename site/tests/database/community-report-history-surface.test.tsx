@@ -13,10 +13,10 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/community-report-history-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-history-service", () => ({
   communityReportHistoryService: { page: mock.page },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));

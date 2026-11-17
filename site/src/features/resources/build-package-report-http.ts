@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { resourceBuildWorkspaceService } from "../../lib/services/resource-build-workspace-service";
+import { resourceBuildWorkspaceService } from "../../lib/services/resources/resource-build-workspace-service";
 import { resourceCommerceRequest } from "./resource-commerce-http";
 export function buildPackageReportRequest(
   request: NextRequest,

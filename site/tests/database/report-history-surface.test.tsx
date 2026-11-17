@@ -21,16 +21,16 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../../src/lib/services/server-content-service", () => ({
+vi.mock("../../src/lib/services/servers/server-content-service", () => ({
   serverContentService: state,
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("../../src/features/community/author-publication-restore", () => ({

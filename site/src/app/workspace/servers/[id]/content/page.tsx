@@ -20,8 +20,8 @@ import { serverContentCopy } from "../../../../../features/servers/server-conten
 import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { serverContentService } from "../../../../../lib/services/server-content-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { serverContentService } from "../../../../../lib/services/servers/server-content-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

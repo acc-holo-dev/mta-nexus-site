@@ -4,23 +4,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "aud_a",
   getClientIp: () => "unknown",
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { claimFreeResource: vi.fn() },
 }));
-vi.mock("../../src/lib/services/server-claim-service", () => ({
+vi.mock("../../src/lib/services/servers/server-claim-service", () => ({
   serverClaimService: { issueChallenge: vi.fn(), verifyChallenge: vi.fn() },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { transitionResource: vi.fn() },
 }));
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { command: vi.fn(), detail: vi.fn() },
 }));
 

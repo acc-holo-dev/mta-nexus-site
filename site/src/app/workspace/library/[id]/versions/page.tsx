@@ -20,9 +20,9 @@ import { resourceRequirementsCopy } from "../../../../../features/resources/reso
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
-import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { libraryReleaseService } from "../../../../../lib/services/resources/resource-release-control-service";
+import { resourceReleaseWatchesService } from "../../../../../lib/services/resources/resource-release-watches-service";
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

@@ -8,7 +8,7 @@ import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-
 import { auditEvents, db } from "../../packages/db/src/client";
 import { authRepository } from "../../packages/db/src/repositories/auth";
 import { userRepository } from "../../packages/db/src/repositories/users";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 import {
   account,
   auditId,

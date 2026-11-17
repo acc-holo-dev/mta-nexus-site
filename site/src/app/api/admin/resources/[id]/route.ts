@@ -5,7 +5,7 @@ import { resourceCommerceRequest } from "../../../../../features/resources/resou
 import { resourceControlPageQuery } from "../../../../../features/resources/resource-release-control-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceModerationService } from "../../../../../lib/services/resource-release-control-service";
+import { resourceModerationService } from "../../../../../lib/services/resources/resource-release-control-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     resourceModerationService.detail(

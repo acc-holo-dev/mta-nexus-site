@@ -23,13 +23,13 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/license-control-service", () => ({
+vi.mock("../../src/lib/services/commerce/license-control-service", () => ({
   licenseControlService: {
     detail: state.detail,
     servers: state.servers,

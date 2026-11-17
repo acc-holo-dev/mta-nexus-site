@@ -5,7 +5,7 @@ import {
   reportRateLimit,
 } from "../../../../features/community/community-report-api";
 import { communityReportError } from "../../../../features/community/community-report-copy";
-import { communityReportService } from "../../../../lib/services/community-report-service";
+import { communityReportService } from "../../../../lib/services/community/community-report-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

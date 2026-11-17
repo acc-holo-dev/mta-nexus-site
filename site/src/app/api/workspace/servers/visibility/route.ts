@@ -5,7 +5,7 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { serverWorkspaceError } from "../../../../../features/servers/server-workspace-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { serverService } from "../../../../../lib/services/server-service";
+import { serverService } from "../../../../../lib/services/servers/server-service";
 export const POST = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(
     request,

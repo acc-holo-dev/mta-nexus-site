@@ -4,7 +4,7 @@ import {
   planReviewsQuery,
 } from "../../../../../features/commerce/plan-reviews-query";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
+import { planReviewsService } from "../../../../../lib/services/commerce/plan-reviews-service";
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const query = planReviewsQuery(request.nextUrl.searchParams, true);

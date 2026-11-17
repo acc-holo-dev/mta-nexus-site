@@ -28,13 +28,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { resourceMemberships: state.report },
 }));
 vi.mock("../../src/features/library/collection-command", () => ({
@@ -67,7 +67,7 @@ import Page, {
 } from "../../src/app/workspace/library/[id]/collections/page";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const collection = {
   id: "lcol_a",

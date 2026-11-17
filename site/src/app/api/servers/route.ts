@@ -11,14 +11,14 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
   mtaLiveStatus,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
-import { serverService } from "../../../lib/services/server-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
+import { serverService } from "../../../lib/services/servers/server-service";
 
 // Reject unexpected authority fields instead of silently stripping them.
 const serverRegistrationSchema = createServerSchema.strict();

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { collectionReleasesQuery } from "../../../../../../features/library/collection-releases-query";
 import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
-import { libraryCollectionsService } from "../../../../../../lib/services/library-collections-service";
+import { libraryCollectionsService } from "../../../../../../lib/services/library/library-collections-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     libraryCollectionsService.releases(

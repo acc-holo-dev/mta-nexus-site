@@ -35,7 +35,7 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
-import { ProductService } from "../../src/lib/services/product-service";
+import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 const actor = {
   id: "usr_dev",

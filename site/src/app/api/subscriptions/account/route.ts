@@ -4,7 +4,7 @@ import { subscriptionsQuery } from "../../../../features/commerce/subscriptions-
 import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
+import { subscriptionsService } from "../../../../lib/services/commerce/subscriptions-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) =>
     subscriptionsService.dashboard(

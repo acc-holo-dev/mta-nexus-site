@@ -17,16 +17,16 @@ const verificationWorkspaceService = vi.hoisted(() => ({
   updateProfile: vi.fn(async () => ({ id: "usr_owner", specialties: ["Lua"] })),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
-vi.mock("../../src/lib/services/public-profile-service", () => ({
+vi.mock("../../src/lib/services/accounts/public-profile-service", () => ({
   publicProfileService,
   editableProfile: (user: { id: string }) => ({ id: user.id }),
 }));
-vi.mock("../../src/lib/services/profile-privacy-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService,
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService,
 }));
 

@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { resourceBuildWorkspaceService } from "../../../../../../lib/services/resource-build-workspace-service";
+import { resourceBuildWorkspaceService } from "../../../../../../lib/services/resources/resource-build-workspace-service";
 
 type Context = { params: Promise<{ id: string; buildId: string }> };
 export function GET(request: NextRequest, { params }: Context) {

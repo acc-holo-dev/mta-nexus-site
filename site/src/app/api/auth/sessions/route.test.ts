@@ -30,7 +30,7 @@ const listSessions = vi.hoisted(() =>
   ]),
 );
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     getSessionIdentity: vi.fn(async () =>
@@ -49,7 +49,7 @@ vi.mock("@nexus/domain", () => ({
   AppError: class AppError extends Error {},
 }));
 
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 import { DELETE, GET } from "./route";
 
 function listRequest() {

@@ -13,8 +13,8 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { parseWebPushEndpoint } from "../../../../lib/services/notifications/web-push-endpoint-policy";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

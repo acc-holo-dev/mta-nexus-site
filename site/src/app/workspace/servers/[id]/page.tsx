@@ -10,8 +10,8 @@ import { getManagedServerCopy } from "../../../../features/servers/managed-serve
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { serverService } from "../../../../lib/services/server-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { serverService } from "../../../../lib/services/servers/server-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

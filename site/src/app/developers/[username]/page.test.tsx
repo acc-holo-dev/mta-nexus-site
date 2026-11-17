@@ -33,7 +33,7 @@ const state = vi.hoisted(() => ({
   followStates: vi.fn(async (): Promise<string[]> => []),
   muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getUserByUsername: async () => state.user,
     getSession: () => state.session(),
@@ -46,7 +46,7 @@ vi.mock("@nexus/db", () => ({
     muteState: state.muteState,
   },
 }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: {
     getPublicAttributions: async () => new Map(),
   },
@@ -55,7 +55,7 @@ vi.mock("../../../lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/profile-privacy-service", () => ({
+vi.mock("../../../lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
   },

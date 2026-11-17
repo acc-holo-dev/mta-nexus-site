@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { parseContentPage } from "../../../../features/community/user-platform-contract";
 import { userPlatformError } from "../../../../features/community/user-platform-copy";
 import { resolveLocale } from "../../../../lib/i18n";
-import { contentService } from "../../../../lib/services/content-service";
+import { contentService } from "../../../../lib/services/community/content-service";
 export async function GET(request: NextRequest) {
   const filters = parseContentPage(request.nextUrl.searchParams);
   try {

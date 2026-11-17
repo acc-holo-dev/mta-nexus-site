@@ -14,17 +14,17 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined })
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.pageDiscussion },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
 
 import Page from "../../src/app/articles/[slug]/page";
 
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 

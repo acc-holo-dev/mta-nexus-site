@@ -17,14 +17,14 @@ vi.mock("@nexus/db", () => ({
   authorContentRepository: { pagePublic: mocks.content },
   followWorkspaceRepository: { page: mocks.follows },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { listPublicPage: mocks.products },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({}));
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({}));
 
 import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
-import { discoveryService } from "../../src/lib/services/discovery-service";
-import { followWorkspaceService } from "../../src/lib/services/follow-workspace-service";
+import { discoveryService } from "../../src/lib/services/discovery/discovery-service";
+import { followWorkspaceService } from "../../src/lib/services/community/follow-workspace-service";
 
 beforeEach(() => {
   vi.clearAllMocks();

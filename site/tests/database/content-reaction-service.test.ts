@@ -9,8 +9,8 @@ vi.mock("@nexus/db", () => ({
 
 import { parseReactionPage } from "../../src/features/community/content-reaction-contract";
 import { publicUserTrustSchema } from "../../src/features/trust/public-user-trust-contract";
-import { contentReactionService as service } from "../../src/lib/services/content-reaction-service";
-import { publicUserTrustService as trust } from "../../src/lib/services/public-user-trust-service";
+import { contentReactionService as service } from "../../src/lib/services/community/content-reaction-service";
+import { publicUserTrustService as trust } from "../../src/lib/services/trust/public-user-trust-service";
 
 const actor = { id: "actor", role: "user" } as User;
 const time = "2026-10-11T00:00:00.123456Z";

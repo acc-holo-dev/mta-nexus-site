@@ -7,11 +7,11 @@ const h = vi.hoisted(() => ({
   rate: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 

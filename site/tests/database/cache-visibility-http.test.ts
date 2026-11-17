@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -48,13 +48,13 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: {
     listServers: mocks.servers,
   },
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: mocks.directory,
   },
@@ -62,7 +62,7 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
   mtaLiveStatus: vi.fn(() => "unknown"),
 }));
 
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: {
     search: mocks.search,
   },

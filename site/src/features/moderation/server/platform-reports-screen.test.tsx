@@ -9,10 +9,10 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => ({ id: "member" }) },
 }));
-vi.mock("../../../lib/services/platform-report-service", () => ({
+vi.mock("../../../lib/services/moderation/platform-report-service", () => ({
   platformReportService: { listForReporter: state.list, detailForReporter: state.detail },
 }));
 

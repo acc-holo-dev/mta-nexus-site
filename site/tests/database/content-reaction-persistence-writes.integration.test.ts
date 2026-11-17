@@ -10,7 +10,7 @@ import {
   users,
 } from "../../packages/db/src/schema";
 import { parseReactionPage } from "../../src/features/community/content-reaction-contract";
-import { contentReactionService } from "../../src/lib/services/content-reaction-service";
+import { contentReactionService } from "../../src/lib/services/community/content-reaction-service";
 import {
   actor,
   command,

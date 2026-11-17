@@ -20,8 +20,8 @@ import {
   serverWorkspaceCopy,
   serverWorkspaceError,
 } from "../../src/features/servers/server-workspace-copy";
-import { serverService } from "../../src/lib/services/server-service";
-import { serverWorkspaceHistoryService } from "../../src/lib/services/server-workspace-history-service";
+import { serverService } from "../../src/lib/services/servers/server-service";
+import { serverWorkspaceHistoryService } from "../../src/lib/services/servers/server-workspace-history-service";
 
 const time = "2026-10-12T00:00:00.123456Z",
   next = "2026-10-12T00:00:00.124456Z",

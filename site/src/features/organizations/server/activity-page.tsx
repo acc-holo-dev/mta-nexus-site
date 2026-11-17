@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationGovernanceService } from "../../../lib/services/organizations/organization-governance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrganizationHistoryView } from "../history-view";

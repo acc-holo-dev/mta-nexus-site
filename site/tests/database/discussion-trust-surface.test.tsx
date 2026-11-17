@@ -22,13 +22,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/discussions",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-workspace-service", () => ({
   discussionWorkspaceService: { page: mocks.page, own: mocks.own },
 }));
-vi.mock("../../src/lib/services/public-verification-history-service", () => ({
+vi.mock("../../src/lib/services/trust/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

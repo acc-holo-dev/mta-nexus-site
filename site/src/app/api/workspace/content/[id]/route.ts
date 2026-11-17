@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { authorContentService } from "../../../../../lib/services/author-content-service";
+import { authorContentService } from "../../../../../lib/services/organizations/author-content-service";
 
 type Context = { params: Promise<{ id: string }> };
 async function target(context: Context) {

@@ -19,8 +19,8 @@ import {
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { subscriptionsService } from "../../../../lib/services/commerce/subscriptions-service";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";

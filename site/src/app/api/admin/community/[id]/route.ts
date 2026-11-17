@@ -9,7 +9,7 @@ import {
 } from "../../../../../features/moderation/community-moderation-contract";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { communityModerationService } from "../../../../../lib/services/community-moderation-service";
+import { communityModerationService } from "../../../../../lib/services/community/community-moderation-service";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, { params }: Context) {

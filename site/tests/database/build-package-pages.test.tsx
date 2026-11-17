@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../../src/lib/services/resources/build-package-inspection";
 import packageFixtures from "../fixtures/build-packages.json";
 
 const state = vi.hoisted(() => ({
@@ -19,10 +19,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/build-package-service", () => ({
+vi.mock("../../src/lib/services/resources/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
 

@@ -6,8 +6,8 @@ import { editablePrivacySchema } from "../../../features/accounts/profile-privac
 import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 export const dynamic = "force-dynamic";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";

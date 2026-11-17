@@ -17,17 +17,17 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));
 vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.viewer },
 }));
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { page: mocks.page },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: async () => null },
   indexMtaObservations: () => () => null,
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: mocks.attributions },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

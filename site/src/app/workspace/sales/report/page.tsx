@@ -10,8 +10,8 @@ import { sellerSalesPageQuery } from "../../../../features/commerce/seller-sales
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { sellerSalesService } from "../../../../lib/services/commerce/seller-sales-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

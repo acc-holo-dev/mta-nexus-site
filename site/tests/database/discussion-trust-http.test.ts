@@ -14,13 +14,13 @@ const mocks = vi.hoisted(() => ({
   approvals: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-workspace-service", () => ({
   discussionWorkspaceService: { page: mocks.page, own: mocks.own, mutate: mocks.mutate },
 }));
-vi.mock("../../src/lib/services/public-verification-history-service", () => ({
+vi.mock("../../src/lib/services/trust/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

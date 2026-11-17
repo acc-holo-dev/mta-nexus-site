@@ -26,7 +26,7 @@ describe("build upload preflight authorization", () => {
   });
 
   it("keeps a second authorization check inside releaseBuild", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');

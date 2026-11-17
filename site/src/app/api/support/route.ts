@@ -15,7 +15,7 @@ import { supportQuery } from "../../../features/support/support-workspace-contra
 import { parseBoundedJson } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext } from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);

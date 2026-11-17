@@ -12,11 +12,11 @@ const mocks = vi.hoisted(() => ({
   consumeRateLimit: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     createProduct: mocks.createProduct,
     findCreatedDraftForReplay: mocks.findCreatedDraftForReplay,

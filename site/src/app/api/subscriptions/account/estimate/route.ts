@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { subscriptionEstimateQuery } from "../../../../../features/commerce/subscriptions-query";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { subscriptionsService } from "../../../../../lib/services/subscriptions-service";
+import { subscriptionsService } from "../../../../../lib/services/commerce/subscriptions-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) =>
     subscriptionsService.estimate(actor, subscriptionEstimateQuery(request.nextUrl.searchParams)),

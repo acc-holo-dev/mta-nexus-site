@@ -10,8 +10,8 @@ import { orderTermsPageQuery } from "../../../../../../features/commerce/order-t
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { authService } from "../../../../../../lib/services/auth-service";
-import { orderTermsService } from "../../../../../../lib/services/order-terms-service";
+import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { orderTermsService } from "../../../../../../lib/services/commerce/order-terms-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Order terms | MTA NEXUS",

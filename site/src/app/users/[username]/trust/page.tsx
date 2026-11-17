@@ -7,7 +7,7 @@ import { PublicUserTrustPanel } from "../../../../features/trust/public-user-tru
 import { trustCopy } from "../../../../features/trust/public-user-trust-copy";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { publicUserTrustService } from "../../../../lib/services/public-user-trust-service";
+import { publicUserTrustService } from "../../../../lib/services/trust/public-user-trust-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const actionLinkClass =

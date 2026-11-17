@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
-} from "../../src/lib/services/mta-master-directory-service";
+} from "../../src/lib/services/servers/mta-master-directory-service";
 
 describe("incremental MTA observation index", () => {
   it("defers traversal and reuses the scanned prefix for out-of-order and repeated lookups", () => {

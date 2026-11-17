@@ -18,16 +18,16 @@ vi.mock("next/navigation", () => ({
   },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
 
 import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
 import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,

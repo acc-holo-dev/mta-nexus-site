@@ -13,7 +13,7 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   })),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_claim_ip",
@@ -22,7 +22,7 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: {
     claimFreeResource: vi.fn(async () => ({
       entitlement: {

@@ -24,7 +24,7 @@ import {
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import { resourceReleaseWorkerRepository } from "../../packages/db/src/repositories/resource-release-worker";
-import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../../src/lib/services/resources/build-package-inspection";
 import archives from "../fixtures/build-packages.json";
 
 // Requires a disposable PostgreSQL database migrated through 0061. No storage writes.

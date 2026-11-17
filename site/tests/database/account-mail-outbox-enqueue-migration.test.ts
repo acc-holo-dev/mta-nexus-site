@@ -11,7 +11,7 @@ import type {
 } from "../../packages/db/src/repositories/account-mail-crypto";
 import { AccountMailCipher } from "../../packages/db/src/repositories/account-mail-crypto";
 import { userRepository } from "../../packages/db/src/repositories/users";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 import {
   account,
   cipher,

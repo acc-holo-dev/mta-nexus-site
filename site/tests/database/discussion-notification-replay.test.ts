@@ -2,7 +2,7 @@ import { expect, it, vi } from "vitest";
 import {
   type ReplayCheckpoint,
   replayDiscussionNotifications,
-} from "../../src/lib/services/discussion-notification-replay";
+} from "../../src/lib/services/community/discussion-notification-replay";
 
 const time = "2026-10-12T00:00:00.000123Z";
 const initial: ReplayCheckpoint = {

@@ -14,11 +14,11 @@ import { ManagedServerVisibilityBatch } from "../../../features/servers/visibili
 import { PlatformSignIn, platformSignInFocusClass } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 

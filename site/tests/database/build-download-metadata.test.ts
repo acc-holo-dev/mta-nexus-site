@@ -9,13 +9,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalStorageProvider } from "../../packages/storage/src/local-provider";
 
 const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), finish: vi.fn(), hash: "" }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => ({ id: "admin", role: "admin" }) },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { canManageProduct: async () => true },
 }));
 vi.mock("@nexus/security", () => ({

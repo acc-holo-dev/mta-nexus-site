@@ -7,10 +7,10 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
-vi.mock("../../../lib/services/resource-publisher-service", () => ({
+vi.mock("../../../lib/services/resources/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: mocks.list },
 }));
 vi.mock("next/navigation", () => ({

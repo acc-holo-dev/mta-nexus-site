@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { vi } from "vitest";
 
-vi.mock("../../src/lib/services/resource-management-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-management-service", () => ({
   resourceManagementService: { publicVariants: vi.fn(async () => null) },
 }));
 
@@ -43,7 +43,7 @@ vi.mock("../../src/lib/i18n-server", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     authService: {
@@ -52,7 +52,7 @@ vi.mock("../../src/lib/services/auth-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/commerce-service", async () => {
+vi.mock("../../src/lib/services/commerce/commerce-service", async () => {
   const { state } = await import("./resource-detail-acquisition-ui-state");
   return {
     commerceService: {
@@ -61,18 +61,18 @@ vi.mock("../../src/lib/services/commerce-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/resource-review-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-review-service", () => ({
   resourceReviewService: {
     publicPage: vi.fn(async () => ({ reviews: [], total: 0, page: 1, totalPages: 1 })),
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", async () => {
+vi.mock("../../src/lib/services/commerce/product-service", async () => {
   const { productService } = await import("./resource-detail-acquisition-ui-state");
   return { productService };
 });
 
-vi.mock("../../src/lib/services/resource-qa-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-qa-service", () => ({
   resourceQaService: {
     publicPage: vi.fn(async () => ({
       threads: [],
@@ -135,7 +135,7 @@ vi.mock("../../src/features/resources/components/resource-release-watch-control"
   };
 });
 
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     detail: vi.fn(async () => ({
       productId: "prd_detail",

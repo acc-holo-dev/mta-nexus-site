@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { and, eq } from "drizzle-orm";
-import { authService } from "../../../src/lib/services/auth-service";
+import { authService } from "../../../src/lib/services/accounts/auth-service";
 import { generateId } from "../../security/src/index";
 import { accountMailOutbox } from "../src/account-mail-schema";
 import { auditEvents, db, users } from "../src/client";

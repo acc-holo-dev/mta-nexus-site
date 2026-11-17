@@ -11,8 +11,8 @@ import { ReactionRemoval } from "../../../features/community/reaction-removal";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { contentReactionService } from "../../../lib/services/content-reaction-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 
 export const dynamic = "force-dynamic";
 

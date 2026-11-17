@@ -5,7 +5,7 @@ import { userPlatformApi } from "../../../../../features/accounts/user-platform-
 import { parseNotificationInboxQuery } from "../../../../../features/notifications/notification-inbox-contract";
 import { notificationInboxError } from "../../../../../features/notifications/notification-inbox-copy";
 import { resolveLocale } from "../../../../../lib/i18n";
-import { notificationInboxService } from "../../../../../lib/services/notification-inbox-service";
+import { notificationInboxService } from "../../../../../lib/services/notifications/notification-inbox-service";
 
 export async function GET(request: NextRequest) {
   const response = await userPlatformApi(

@@ -21,7 +21,7 @@ const mocks = vi.hoisted(() => ({
   memberships: vi.fn(),
 }));
 
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 

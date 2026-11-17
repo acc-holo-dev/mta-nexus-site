@@ -10,7 +10,7 @@ import { notificationInboxError } from "../../../../features/notifications/notif
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { resolveLocale } from "../../../../lib/i18n";
-import { notificationInboxService } from "../../../../lib/services/notification-inbox-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

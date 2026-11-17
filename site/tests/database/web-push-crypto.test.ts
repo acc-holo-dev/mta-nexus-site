@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   createVapidAuthorization,
   encryptWebPushMessage,
-} from "../../src/lib/services/web-push-crypto";
+} from "../../src/lib/services/notifications/web-push-crypto";
 
 function decode(value: string) {
   return Buffer.from(value, "base64url");

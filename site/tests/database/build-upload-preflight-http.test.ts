@@ -14,7 +14,7 @@ const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
 const deleteAsset = vi.hoisted(() => vi.fn());
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_attacker",
@@ -26,14 +26,14 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     assertCanReleaseBuild: preflight,
     releaseBuild,
   },
 }));
 
-vi.mock("../../src/lib/services/build-scanner-service", () => ({
+vi.mock("../../src/lib/services/resources/build-scanner-service", () => ({
   buildScannerService: {
     scan,
   },

@@ -12,7 +12,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { serverReviewService } from "../../../../../lib/services/server-review-service";
+import { serverReviewService } from "../../../../../lib/services/servers/server-review-service";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);

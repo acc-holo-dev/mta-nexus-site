@@ -11,8 +11,8 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { commerceService } from "../../../../lib/services/commerce-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

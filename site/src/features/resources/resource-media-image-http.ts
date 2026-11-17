@@ -11,7 +11,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/observability";
-import { authService } from "../../lib/services/auth-service";
+import { authService } from "../../lib/services/accounts/auth-service";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
 
 let activeReads = 0;

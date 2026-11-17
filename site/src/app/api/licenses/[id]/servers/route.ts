@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { parseHistoryPage } from "../../../../../features/commerce/commerce-history-format";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
-import { licenseControlService } from "../../../../../lib/services/license-control-service";
+import { licenseControlService } from "../../../../../lib/services/commerce/license-control-service";
 
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (user) => {

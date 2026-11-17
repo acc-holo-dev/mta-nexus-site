@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
+import { resourceReleaseWatchesService } from "../../../../../lib/services/resources/resource-release-watches-service";
 export const POST = withBrowserMutation((request: NextRequest) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     const currentToken = request.cookies.get("nexus_session")?.value;

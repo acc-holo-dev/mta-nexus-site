@@ -6,7 +6,7 @@ const { getDirectory, logEvent } = vi.hoisted(() => ({
   logEvent: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory },
 }));
 vi.mock("../../src/lib/observability", () => ({

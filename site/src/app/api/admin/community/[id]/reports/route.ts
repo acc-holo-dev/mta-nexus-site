@@ -7,7 +7,7 @@ import {
 } from "../../../../../../features/community/community-report-api";
 import { communityReportError } from "../../../../../../features/community/community-report-copy";
 import { publicationReportsPageSchema } from "../../../../../../features/community/community-report-groups-contract";
-import { communityReportService } from "../../../../../../lib/services/community-report-service";
+import { communityReportService } from "../../../../../../lib/services/community/community-report-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

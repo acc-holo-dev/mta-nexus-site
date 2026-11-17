@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import { parsePublicationQuery } from "../../../../features/community/publication-feed-contract";
 import { publicationError } from "../../../../features/community/publication-feed-copy";
-import { publicationFeedService } from "../../../../lib/services/publication-feed-service";
+import { publicationFeedService } from "../../../../lib/services/discovery/publication-feed-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

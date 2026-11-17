@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../../../../../features/resources/resource-commerce-http";
 import { readBoundedJson } from "../../../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../../../lib/browser-route-adapter";
-import { resourceQaService } from "../../../../../../../../../lib/services/resource-qa-service";
+import { resourceQaService } from "../../../../../../../../../lib/services/resources/resource-qa-service";
 
 export const POST = withBrowserMutation(
   (

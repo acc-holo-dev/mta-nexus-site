@@ -18,16 +18,16 @@ const state = vi.hoisted(() => ({
   history: vi.fn(),
   restore: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/organization-workspace-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-workspace-service", () => ({
   organizationWorkspaceService: state,
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));

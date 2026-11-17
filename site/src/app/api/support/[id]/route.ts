@@ -15,7 +15,7 @@ import {
 import { parseBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 async function loadAuthorizedCase(currentToken: string | undefined, id: string) {
   const user = currentToken ? await authService.getSession(currentToken) : null;

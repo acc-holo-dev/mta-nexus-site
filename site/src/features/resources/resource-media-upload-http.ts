@@ -11,8 +11,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/observability";
-import { authService } from "../../lib/services/auth-service";
-import { resourceMediaService } from "../../lib/services/resource-media-service";
+import { authService } from "../../lib/services/accounts/auth-service";
+import { resourceMediaService } from "../../lib/services/resources/resource-media-service";
 export async function resourceMediaUpload(request: NextRequest, productId: string) {
   const context = createRequestLogContext(request);
   const respond = (body: unknown, status = 200) =>

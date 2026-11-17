@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationFeedService } from "../../../lib/services/publication-feed-service";
+import { publicationFeedService } from "../../../lib/services/discovery/publication-feed-service";
 import { PublicationFeed } from "../../community/publication-feed";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { publicationFeedView } from "../../community/publication-feed-view";

@@ -22,10 +22,10 @@ import {
   REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../lib/observability";
-import { authService } from "../../../../../lib/services/auth-service";
-import { commerceService } from "../../../../../lib/services/commerce-service";
-import { productService } from "../../../../../lib/services/product-service";
-import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../../../lib/services/commerce/commerce-service";
+import { productService } from "../../../../../lib/services/commerce/product-service";
+import { resourceDeliveriesService } from "../../../../../lib/services/commerce/resource-deliveries-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

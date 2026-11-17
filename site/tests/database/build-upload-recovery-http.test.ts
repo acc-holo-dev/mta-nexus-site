@@ -16,19 +16,19 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn(),
   scan: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_author", role: "developer" })),
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     assertCanReleaseBuild: mocks.authorize,
     releaseBuild: mocks.release,
     recoverPendingBuildUpload: mocks.recover,
   },
 }));
-vi.mock("../../src/lib/services/build-scanner-service", () => ({
+vi.mock("../../src/lib/services/resources/build-scanner-service", () => ({
   buildScannerService: { scan: mocks.scan },
 }));
 vi.mock("@nexus/storage", () => ({

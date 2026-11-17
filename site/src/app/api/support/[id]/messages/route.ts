@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { parseSupportMessageQuery } from "../../../../../features/support/support-message-discovery-contract";
 import { supportMessageError } from "../../../../../features/support/support-message-discovery-copy";
-import { supportMessageDiscoveryService } from "../../../../../lib/services/support-message-discovery-service";
+import { supportMessageDiscoveryService } from "../../../../../lib/services/support/support-message-discovery-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

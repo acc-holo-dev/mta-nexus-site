@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@nexus/db", () => ({
   userLibraryRepository: { pageByUser: state.page },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

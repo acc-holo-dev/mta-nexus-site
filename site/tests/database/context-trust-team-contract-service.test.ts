@@ -22,8 +22,8 @@ import {
   publicContextTrustSchema,
 } from "../../src/features/trust/public-context-trust-contract";
 import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
-import { organizationTeamService as team } from "../../src/lib/services/organization-team-service";
-import { publicContextTrustService as trust } from "../../src/lib/services/public-context-trust-service";
+import { organizationTeamService as team } from "../../src/lib/services/organizations/organization-team-service";
+import { publicContextTrustService as trust } from "../../src/lib/services/trust/public-context-trust-service";
 
 const time = "2026-10-11T00:00:00.123456Z",
   actor = { id: "actor", role: "admin" } as User;

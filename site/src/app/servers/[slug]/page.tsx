@@ -20,16 +20,16 @@ import { authEntryHref } from "../../../features/shell/auth-return";
 import { contextTrustCopy } from "../../../features/trust/public-context-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { contentService } from "../../../lib/services/content-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { contentService } from "../../../lib/services/community/content-service";
 import {
   matchesMtaEndpoint,
   mtaLiveStatus,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
-import { serverHistoryService } from "../../../lib/services/server-history-service";
-import { serverReviewService } from "../../../lib/services/server-review-service";
-import { serverService } from "../../../lib/services/server-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
+import { serverHistoryService } from "../../../lib/services/servers/server-history-service";
+import { serverReviewService } from "../../../lib/services/servers/server-review-service";
+import { serverService } from "../../../lib/services/servers/server-service";
 
 export const dynamic = "force-dynamic";
 

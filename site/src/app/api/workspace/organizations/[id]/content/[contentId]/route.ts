@@ -10,7 +10,7 @@ import {
   requireServerJsonContentType,
 } from "../../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
-import { organizationContentService } from "../../../../../../../lib/services/organization-content-service";
+import { organizationContentService } from "../../../../../../../lib/services/organizations/organization-content-service";
 
 type Context = { params: Promise<{ id: string; contentId: string }> };
 export function GET(request: NextRequest, context: Context) {

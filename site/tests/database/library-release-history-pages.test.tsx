@@ -16,17 +16,17 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/version-history",
 }));
 vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 
 import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",

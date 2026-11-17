@@ -4,10 +4,10 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { statisticsFixture } from "../helpers/server-statistics-fixture";
 
 const state = vi.hoisted(() => ({ read: vi.fn(), session: vi.fn(), rate: vi.fn() }));
-vi.mock("../../src/lib/services/server-statistics-service", () => ({
+vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { read: state.read },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));

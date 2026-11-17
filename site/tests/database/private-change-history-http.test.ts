@@ -8,13 +8,13 @@ const mock = vi.hoisted(() => ({
   organization: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/profile-change-history-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-change-history-service", () => ({
   profileChangeHistoryService: { page: mock.profile },
 }));
-vi.mock("../../src/lib/services/organization-governance-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-governance-service", () => ({
   organizationGovernanceService: { history: mock.organization },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));

@@ -7,7 +7,7 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: { pageInbox: state.inbox },
   resourceReleaseWatchesRepository: { page: state.watches },
 }));
-vi.mock("../../src/lib/services/follow-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.follows },
 }));
 

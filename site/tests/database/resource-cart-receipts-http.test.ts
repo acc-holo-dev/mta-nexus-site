@@ -9,14 +9,14 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/resource-cart-receipts-service", () => ({
+vi.mock("../../src/lib/services/commerce/resource-cart-receipts-service", () => ({
   resourceCartReceiptsService: { page: state.page, detail: state.detail },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { reviewResourceCart: state.review },
 }));
 

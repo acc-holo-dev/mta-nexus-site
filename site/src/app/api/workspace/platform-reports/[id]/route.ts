@@ -4,8 +4,8 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { authService } from "../../../../../lib/services/auth-service";
-import { platformReportService } from "../../../../../lib/services/platform-report-service";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { platformReportService } from "../../../../../lib/services/moderation/platform-report-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 

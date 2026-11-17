@@ -7,7 +7,7 @@ import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   editableProfile,
   publicProfileService,
-} from "../../../../lib/services/public-profile-service";
+} from "../../../../lib/services/accounts/public-profile-service";
 export function GET(request: NextRequest) {
   return userPlatformApi(request, async (user) => ({ profile: editableProfile(user) }));
 }

@@ -39,7 +39,7 @@ const pushRepository = vi.hoisted(() => ({
   removeAuthenticated: vi.fn(async () => true),
 }));
 
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     getSessionIdentity: vi.fn(async () =>
@@ -83,7 +83,7 @@ vi.mock("../../../features/notifications/web-push-subscription", () => ({
   })),
 }));
 
-import { authService } from "../../../lib/services/auth-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import { POST as markReadPOST } from "./mark-read/route";
 import { GET as preferencesGET, PATCH as preferencesPATCH } from "./preferences/route";
 import { DELETE as pushDELETE, GET as pushGET, POST as pushPOST } from "./push/route";

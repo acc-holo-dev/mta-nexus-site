@@ -17,10 +17,10 @@ vi.mock("next/navigation", () => ({
     throw Error("NEXT_NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/server-workspace-history-service", () => ({
+vi.mock("../../src/lib/services/servers/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.page },
 }));
 vi.mock("../../src/lib/i18n-server", () => ({

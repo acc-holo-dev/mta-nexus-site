@@ -1,6 +1,6 @@
 import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,

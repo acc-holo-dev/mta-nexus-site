@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { buildPackageService } from "../../lib/services/build-package-service";
+import { buildPackageService } from "../../lib/services/resources/build-package-service";
 import { parseBuildPackageQuery } from "./build-package-query";
 import { resourceCommerceRequest } from "./resource-commerce-http";
 export function buildPackageFilesRequest(
