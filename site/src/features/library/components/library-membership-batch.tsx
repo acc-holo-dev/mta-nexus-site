@@ -17,7 +17,7 @@ import { collectionHref } from "../../../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
 import { libraryMembershipBatchesCopy } from "../library-membership-batches-i18n";
 import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
+import { membershipHistoryHref } from "../library-membership-history-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 export function LibraryMembershipBatchForm({

@@ -11,7 +11,7 @@ import {
   collectionsQuery,
 } from "../../../lib/library-collections-query";
 import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
+import { membershipHistoryHref } from "../library-membership-history-query";
 import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import {

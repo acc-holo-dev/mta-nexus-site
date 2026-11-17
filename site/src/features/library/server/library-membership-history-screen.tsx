@@ -20,7 +20,7 @@ import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
   membershipHistoryHref,
-} from "../../../lib/library-membership-history-query";
+} from "../library-membership-history-query";
 import { authService } from "../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
