@@ -25,7 +25,10 @@ const ports = [
   "follow",
   "report-evidence-links",
 ];
-const utilPorts = ["discussion-mutation-confirmation", "follow-confirmation"  "server-publication-history-contract",
+const utilPorts = [
+  "discussion-mutation-confirmation",
+  "follow-confirmation",
+  "server-publication-history-contract",
   "discussion-compose-draft",
   "community-topic-intent",
   "discussion-reports-copy",

@@ -37,11 +37,11 @@ Feature объединяет существующие представления
 | `library-collection-receipts-i18n.ts`       | util port `library-collection-receipts-i18n`                  |
 | `library-collections-confirmation.ts`       | util port `library-collections-confirmation`                  |
 | `library-collection-manifests-i18n.ts`      | util port `library-collection-manifests-i18n`                 |
-| `library-collection-comparison-query.ts` | util port `library-collection-comparison-query` |
-| `library-release-history-i18n.ts` | util port `library-release-history-i18n` |
-| `collection-releases-query.ts` | util port `collection-releases-query` |
-| `library-release-comparison-query.ts` | util port `library-release-comparison-query` |
-| `library-collection-history-query.ts` | util port `library-collection-history-query` |
+| `library-collection-comparison-query.ts`    | util port `library-collection-comparison-query`               |
+| `library-release-history-i18n.ts`           | util port `library-release-history-i18n`                      |
+| `collection-releases-query.ts`              | util port `collection-releases-query`                         |
+| `library-release-comparison-query.ts`       | util port `library-release-comparison-query`                  |
+| `library-collection-history-query.ts`       | util port `library-collection-history-query`                  |
 
 Список, детали, история, копирование и внутренние представления принадлежат
 feature. Внешний production-код использует публичные входы; feature не импортирует

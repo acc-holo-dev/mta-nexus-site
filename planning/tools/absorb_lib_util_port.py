@@ -188,8 +188,8 @@ def add_to_util_ports(text: str, name: str) -> str:
     else:
         new_block = block.rstrip()
         if not new_block.endswith(","):
-            # insert before ]
-            new_block = re.sub(r"\]\s*$", f'  "{name}",\n]', new_block)
+            # ensure a comma after the previous last element
+            new_block = re.sub(r"\]\s*$", f',\n  "{name}",\n]', new_block)
         else:
             new_block = re.sub(r"\]\s*$", f'\n  "{name}",\n]', new_block)
     return text[: m.start(1)] + new_block + text[m.end(1) :]

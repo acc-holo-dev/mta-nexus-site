@@ -1,9 +1,13 @@
 import { expect, it } from "vitest";
-import { licenseArchiveQuery, licenseArchiveUrl } from "../../src/features/commerce/license-archive-query";
+import { licenseMaintenanceOptions } from "../../packages/db/src/license-maintenance-config";
+import {
+  licenseArchiveQuery,
+  licenseArchiveUrl,
+} from "../../src/features/commerce/license-archive-query";
 import { licenseArchiveCsv } from "../../src/lib/license-archive-csv";
 import { licenseTermNotification } from "../../src/lib/license-maintenance-i18n";
 import { formatNotification } from "../../src/lib/notification-copy";
-import { licenseMaintenanceOptions } from "../../packages/db/src/license-maintenance-config";
+
 it("strictly bounds buyer queries and preserves every active filter in navigation", () => {
   const query = licenseArchiveQuery(
     new URLSearchParams(

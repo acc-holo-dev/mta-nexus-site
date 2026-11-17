@@ -19,18 +19,21 @@ import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
+  adSlotRendererEnabled,
+  advertisingLifecycleEnabled,
+} from "../../features/accounts/feature-flags";
+import { ContentModerationControls } from "../../features/community/content-moderation";
+import {
   AdminAdPlacementSection,
   AdminBuildsQuarantineSection,
   AdminHealthStats,
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../../features/moderation/admin-home";
-import { ContentModerationControls } from "../../features/community/content-moderation";
 import { PlatformSignIn } from "../../features/shell/guest-auth";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";
 import { getFinancialCopy } from "../../lib/financial-i18n";
-import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../features/accounts/feature-flags";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";

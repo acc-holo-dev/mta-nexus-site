@@ -8,7 +8,9 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const utilPorts = ["organization-member-confirmation"  "organization-workspace-client",
+const utilPorts = [
+  "organization-member-confirmation",
+  "organization-workspace-client",
   "organization-team-copy",
 ];
 const clientPorts = ["workspace", "team", "profile", "history-view"];

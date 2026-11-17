@@ -7,8 +7,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HistoryShell } from "../../../features/commerce/workspace-history";
 import { LicenseArchiveFilters } from "../../../features/commerce/license-archive";
+import {
+  licenseArchiveQuery,
+  licenseArchiveUrl,
+} from "../../../features/commerce/license-archive-query";
+import { HistoryShell } from "../../../features/commerce/workspace-history";
 import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import {
   effectiveLicenseStatus,
@@ -18,7 +22,6 @@ import {
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { licenseArchiveQuery, licenseArchiveUrl } from "../../../features/commerce/license-archive-query";
 import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 import { authService } from "../../../lib/services/auth-service";
