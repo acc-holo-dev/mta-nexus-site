@@ -40,7 +40,7 @@ import {
   publicationReportsMetadata,
 } from "../../src/features/community/server/publication-reports-page";
 import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../../src/lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { communityReportCopy } from "../../src/lib/community-report-copy";
 import { reportBatchCopy } from "../../src/lib/report-batch-copy";
 

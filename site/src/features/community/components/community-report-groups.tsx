@@ -8,7 +8,7 @@ import {
   type ReportGroupsPage,
   reportGroupsHref,
 } from "../../../lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
 import { platformFieldClass } from "../../../lib/user-platform-client";

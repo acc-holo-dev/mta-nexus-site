@@ -9,7 +9,7 @@ import {
   publicationReportPageQuery,
   publicationReportsPageSchema,
 } from "../../../lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportService } from "../../../lib/services/community-report-service";

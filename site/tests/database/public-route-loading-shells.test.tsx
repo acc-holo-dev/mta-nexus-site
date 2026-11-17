@@ -10,7 +10,7 @@ import ReportGroupsLoading from "../../src/app/admin/reports/targets/loading";
 import LibraryCollectionsLoading from "../../src/app/workspace/library/collections/loading";
 import UserTrustHistoryLoading from "../../src/app/users/[username]/trust/history/loading";
 import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { reportGroupsCopy } from "../../src/lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
 import { approvalCopy } from "../../src/lib/public-verification-history-copy";
 

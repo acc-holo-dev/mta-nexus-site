@@ -1,4 +1,4 @@
-import { reportGroupsCopy } from "../../../../../lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../../../../../features/community/community-report-groups-copy";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 export default async function Loading() {

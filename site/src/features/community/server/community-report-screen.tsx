@@ -10,7 +10,7 @@ import {
   communityReportPageSchema,
 } from "../../../lib/community-report-contract";
 import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";

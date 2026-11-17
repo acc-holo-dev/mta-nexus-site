@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";

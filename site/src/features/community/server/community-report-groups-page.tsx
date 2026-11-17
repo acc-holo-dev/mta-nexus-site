@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../../../lib/community-report-api";
 import { parseReportGroupsQuery } from "../../../lib/community-report-groups-contract";
-import { reportGroupsCopy, reportGroupsError } from "../../../lib/community-report-groups-copy";
+import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { communityReportGroupsService } from "../../../lib/services/community-report-groups-service";
