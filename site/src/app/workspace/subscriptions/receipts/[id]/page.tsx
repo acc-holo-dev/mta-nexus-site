@@ -55,7 +55,7 @@ export default async function SubscriptionReceiptPage({
         locale={locale}
         title={getDictionary(locale).errors.title}
         message={c.loadUnavailable}
-        retryHref={subscriptionReceiptHref(path.id, pageParams.get("organizationId") ?? undefined)}
+        retryHref={subscriptionReceiptHref(path.id)}
       />
     );
   }

@@ -50,7 +50,7 @@ export default async function PlanReviewPage({
         locale={locale}
         title={getDictionary(locale).errors.title}
         message={c.loadUnavailable}
-        retryHref={planReviewHref(id, pageParams.get("organizationId") ?? undefined)}
+        retryHref={planReviewHref(id)}
       />
     );
   }
