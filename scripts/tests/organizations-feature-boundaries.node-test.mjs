@@ -8,9 +8,7 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
-const utilPorts = [
-  "organization-member-confirmation",
-];
+const utilPorts = ["organization-member-confirmation"];
 const clientPorts = ["workspace", "team", "profile", "history-view"];
 const serverPorts = [
   "content-editor",
@@ -130,7 +128,9 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
 });
 
 test("Organizations client graphs exclude server dependencies transitively", () => {
-  const entries = [...clientPorts, ...utilPorts].map((port) => `site/src/features/organizations/${port}.ts`);
+  const entries = [...clientPorts, ...utilPorts].map(
+    (port) => `site/src/features/organizations/${port}.ts`,
+  );
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
   const graph = JSON.parse(result.stdout);
@@ -156,11 +156,13 @@ test("Organizations client graphs exclude server dependencies transitively", () 
       visit(edge.resolved);
     }
   }
+  const utilPortSet = new Set(utilPorts);
   for (const entry of entries) {
-    if (!entry.endsWith("/history-view.ts"))
+    if (!entry.endsWith("/history-view.ts")) {
       const portName = entry.split("/").pop().replace(/\.ts$/u, "");
-      if (!(typeof utilPorts !== "undefined" && utilPorts.includes(portName)))
+      if (!utilPortSet.has(portName))
         assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    }
     visit(entry);
   }
   for (const child of [

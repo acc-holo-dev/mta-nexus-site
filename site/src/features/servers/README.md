@@ -8,35 +8,35 @@ repositories и collectors остаются в прежних модулях и 
 
 ## Публичные entrypoints
 
-| Entry                           | Контракт                                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `connect.ts`                    | `ServerConnectControls`; client connect/copy UI                                                   |
-| `statistics-export.ts`          | `ServerStatisticsExportButton`; client экспорт                                                    |
-| `statistics-view.ts`            | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
-| `statistics-server.ts`          | Statistics page, metadata и loading; server-only                                                  |
-| `observations-server.ts`        | Observation browser, metadata и loading; server-only                                              |
-| `history-server.ts`             | `ServerHistoryPanel`; server-only                                                                 |
-| `registration.ts`               | `RegisterServerForm`; client регистрация                                                          |
-| `claim-controls.ts`             | `ServerClaimControlPanel`; client подтверждение контроля                                          |
-| `details-controls.ts`           | `ServerDetailsForm`; client настройки                                                             |
-| `claim-status-server.ts`        | `ServerClaimStatusPanel`; server-only статус                                                      |
-| `managed-card-server.ts`        | `ManagedServerCard`; server-only карточка                                                         |
-| `content-editor-server.ts`      | `ServerContentEditorPage`; server-only редактор публикаций                                        |
-| `activity-server.ts`            | `ServerWorkspaceHistoryScreen`; server-only активность                                            |
-| `publication-history-server.ts` | `ServerPublicationHistoryScreen`; server-only история публикаций                                  |
-| `updates-server.ts`             | `ServerUpdatesPanel`; server-only обновления                                                      |
-| `workspace-navigation.ts`       | `ServerWorkspaceNav`; client навигация workspace                                                  |
-| `review-controls.ts`            | `ServerReviewPanel`; client отзывы                                                                |
-| `follow.ts`                     | `ServerFollowButton`; client подписка                                                             |
-| `visibility-batch.ts`           | `ManagedServerVisibilityBatch`; client пакетная видимость                                         |
-| `client.ts`                     | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
-| `server.ts`                     | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
-| `model.ts`                      | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
-| `server-organization-options.ts` | util port `server-organization-options` |
-| `server-claim-confirmation.ts` | util port `server-claim-confirmation` |
-| `server-history-presentation.ts` | util port `server-history-presentation` |
-| `server-mutation-confirmation.ts` | util port `server-mutation-confirmation` |
-| `server-review-confirmation.ts` | util port `server-review-confirmation` |
+| Entry                             | Контракт                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `connect.ts`                      | `ServerConnectControls`; client connect/copy UI                                                   |
+| `statistics-export.ts`            | `ServerStatisticsExportButton`; client экспорт                                                    |
+| `statistics-view.ts`              | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
+| `statistics-server.ts`            | Statistics page, metadata и loading; server-only                                                  |
+| `observations-server.ts`          | Observation browser, metadata и loading; server-only                                              |
+| `history-server.ts`               | `ServerHistoryPanel`; server-only                                                                 |
+| `registration.ts`                 | `RegisterServerForm`; client регистрация                                                          |
+| `claim-controls.ts`               | `ServerClaimControlPanel`; client подтверждение контроля                                          |
+| `details-controls.ts`             | `ServerDetailsForm`; client настройки                                                             |
+| `claim-status-server.ts`          | `ServerClaimStatusPanel`; server-only статус                                                      |
+| `managed-card-server.ts`          | `ManagedServerCard`; server-only карточка                                                         |
+| `content-editor-server.ts`        | `ServerContentEditorPage`; server-only редактор публикаций                                        |
+| `activity-server.ts`              | `ServerWorkspaceHistoryScreen`; server-only активность                                            |
+| `publication-history-server.ts`   | `ServerPublicationHistoryScreen`; server-only история публикаций                                  |
+| `updates-server.ts`               | `ServerUpdatesPanel`; server-only обновления                                                      |
+| `workspace-navigation.ts`         | `ServerWorkspaceNav`; client навигация workspace                                                  |
+| `review-controls.ts`              | `ServerReviewPanel`; client отзывы                                                                |
+| `follow.ts`                       | `ServerFollowButton`; client подписка                                                             |
+| `visibility-batch.ts`             | `ManagedServerVisibilityBatch`; client пакетная видимость                                         |
+| `client.ts`                       | `MtaMasterServerDirectory`, `ServerCard`, `HomeNetworkServerCard`; клиентский UI                  |
+| `server.ts`                       | `ServersPage`; Next server-only composition, locale и существующий `serverService`                |
+| `model.ts`                        | Тип наблюдения, live status, endpoint/profile projection, pagination и HTTP freshness; чистый код |
+| `server-organization-options.ts`  | util port `server-organization-options`                                                           |
+| `server-claim-confirmation.ts`    | util port `server-claim-confirmation`                                                             |
+| `server-history-presentation.ts`  | util port `server-history-presentation`                                                           |
+| `server-mutation-confirmation.ts` | util port `server-mutation-confirmation`                                                          |
+| `server-review-confirmation.ts`   | util port `server-review-confirmation`                                                            |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён
