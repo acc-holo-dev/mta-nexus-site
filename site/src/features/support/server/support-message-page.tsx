@@ -8,12 +8,9 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { supportMessageDiscoveryService } from "../../../lib/services/support-message-discovery-service";
 import { parseSupportMessageQuery } from "../../../lib/support-message-discovery-contract";
-import {
-  supportMessageCopy,
-  supportMessageError,
-} from "../support-message-discovery-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { SupportMessageBrowser } from "../components/support-message-browser";
+import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
 
 export async function supportMessageMetadata() {
   return {

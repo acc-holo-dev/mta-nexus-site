@@ -123,13 +123,13 @@ def patch_depcruise(feat: str, name: str, isolation: str) -> None:
             continue
         fm = re.search(
             r'from:\s*(?:\{\s*path:\s*"(\^site/src/features/[^"]+)"|path:\s*"(\^site/src/features/[^"]+)")',
-            text[ridx : ridx + 1200],
+            text[ridx : ridx + 8000],
         )
         if not fm:
             # fallback: first features path in rule
             fm = re.search(
                 r'path: "(\^site/src/features/[^"]+)"',
-                text[ridx : ridx + 900],
+                text[ridx : ridx + 8000],
             )
             if not fm:
                 continue
@@ -187,11 +187,8 @@ def add_to_util_ports(text: str, name: str) -> str:
         new_block = f'[\n  "{name}",\n]'
     else:
         new_block = block.rstrip()
-        if not new_block.endswith(","):
-            # ensure a comma after the previous last element
-            new_block = re.sub(r"\]\s*$", f',\n  "{name}",\n]', new_block)
-        else:
-            new_block = re.sub(r"\]\s*$", f'\n  "{name}",\n]', new_block)
+        # Avoid creating an empty slot when the last element already has a trailing comma.
+        new_block = re.sub(r",?\s*\]\s*$", f',\n  "{name}",\n]', new_block)
     return text[: m.start(1)] + new_block + text[m.end(1) :]
 
 

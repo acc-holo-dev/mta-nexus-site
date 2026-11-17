@@ -33,15 +33,10 @@ const utilPorts = [
   "collection-releases-query",
   "library-release-comparison-query",
   "library-collection-history-query",
-,
   "collection-releases-i18n",
-,
   "library-collection-comparison-i18n",
-,
   "library-collection-inventory-i18n",
-,
   "library-release-comparison-i18n",
-,
   "library-collection-inventory-query",
 ];
 const serverPorts = [

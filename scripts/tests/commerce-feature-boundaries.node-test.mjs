@@ -17,11 +17,8 @@ const utilPorts = [
   "license-archive-query",
   "order-case-query",
   "license-runtime-query",
-,
   "commercial-confirmation",
-,
   "order-terms-i18n",
-,
   "seller-sales-i18n",
 ];
 const clientPorts = [

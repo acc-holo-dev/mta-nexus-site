@@ -42,9 +42,7 @@ repositories и collectors остаются в прежних модулях и 
 | `server-claim-status-view.ts`     | util port `server-claim-status-view`                                                              |
 | `server-activity-view.ts`         | util port `server-activity-view`                                                                  |
 | `server-review-i18n.ts`           | util port `server-review-i18n`                                                                    |
-| `server-mutation-errors.ts` | util port `server-mutation-errors` |
-| `server-content-api.ts` | util port `server-content-api` |
-| `managed-server-view.ts` | util port `managed-server-view` |
+| `server-mutation-errors.ts`       | util port `server-mutation-errors`                                                                |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

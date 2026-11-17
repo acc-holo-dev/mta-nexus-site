@@ -11,21 +11,18 @@ import {
   notificationInboxPageSchema,
 } from "../../../lib/notification-inbox-contract";
 import {
-  notificationInboxCopy,
-  notificationInboxError,
-} from "../notification-inbox-copy";
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
 import { announceNotificationInboxChange } from "../notification-inbox-events";
 import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
 } from "../notification-inbox-export-client";
-import {
-  ActionConfirmCheckbox,
-  actionConfirmCheckboxFocusClass,
-} from "../../shell/action-confirm-checkbox";
-import { confirmAction } from "../../shell/confirm-action";
-import { useNexusLocale } from "../../shell/locale";
 export function NotificationInbox({
   initialPage,
   filters,

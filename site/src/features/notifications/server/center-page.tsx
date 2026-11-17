@@ -3,9 +3,6 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { NotificationCenterTabs } from "../components/notification-center-tabs";
-import { NotificationInbox } from "../components/notification-inbox";
-import { PlatformSignIn } from "../../shell/guest-auth";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
@@ -14,12 +11,12 @@ import {
   notificationInboxHref,
   parseNotificationInboxQuery,
 } from "../../../lib/notification-inbox-contract";
-import {
-  notificationInboxCopy,
-  notificationInboxError,
-} from "../notification-inbox-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { notificationInboxService } from "../../../lib/services/notification-inbox-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { NotificationCenterTabs } from "../components/notification-center-tabs";
+import { NotificationInbox } from "../components/notification-inbox";
+import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
 export async function generateMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return {

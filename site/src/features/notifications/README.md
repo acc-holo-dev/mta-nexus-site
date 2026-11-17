@@ -12,7 +12,7 @@ Feature объединяет существующие колокольчик, in
 | `visible-polling.ts`                  | `startVisiblePolling` (visibility-aware poll helper)                |
 | `notification-inbox-export-client.ts` | Inbox page export fetch/validate (`fetchNotificationInboxExport`)   |
 | `center-server.ts`                    | Страница inbox и metadata; server-only                              |
-| `notification-inbox-copy.ts` | util port `notification-inbox-copy` |
+| `notification-inbox-copy.ts`          | util port `notification-inbox-copy`                                 |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
 production-код использует публичные входы; маршруты не импортируются feature.

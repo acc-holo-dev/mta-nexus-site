@@ -9,7 +9,7 @@ import { ServerClaimStatusPanel } from "../../../../features/servers/claim-statu
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
+import { getManagedServerCopy } from "../../../../lib/managed-server-view";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 

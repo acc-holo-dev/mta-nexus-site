@@ -32,13 +32,9 @@ const utilPorts = [
   "discussion-compose-draft",
   "community-topic-intent",
   "discussion-reports-copy",
-,
   "community-topic-submission",
-,
   "organization-publication-history-contract",
-,
   "content-comment-client",
-,
   "community-report-groups-copy",
 ];
 const safeLib =

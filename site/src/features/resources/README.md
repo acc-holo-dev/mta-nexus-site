@@ -63,11 +63,10 @@ Services и repositories не дублируются и не переносят�
 | `resource-cart-review-confirmation.ts`         | util port `resource-cart-review-confirmation`                                                               |
 | `mta-meta-inspector-messages.ts`               | util port `mta-meta-inspector-messages`                                                                     |
 | `resource-image-url.ts`                        | util port `resource-image-url`                                                                              |
-| `private-request.ts` | util port `private-request` |
-| `author-resource-draft.ts` | util port `author-resource-draft` |
-| `build-file-validation.ts` | util port `build-file-validation` |
-| `resource-commerce-confirmation.ts` | util port `resource-commerce-confirmation` |
-| `resource-download-client.ts` | util port `resource-download-client` |
+| `private-request.ts`                           | util port `private-request`                                                                                 |
+| `author-resource-draft.ts`                     | util port `author-resource-draft`                                                                           |
+| `build-file-validation.ts`                     | util port `build-file-validation`                                                                           |
+| `resource-commerce-confirmation.ts`            | util port `resource-commerce-confirmation`                                                                  |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

@@ -20,7 +20,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 }));
 
 import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
-import { getManagedServerCopy } from "../../src/features/servers/managed-server-view";
+import { getManagedServerCopy } from "../../src/lib/managed-server-view";
 import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
 
 const { render, commitBatch, review } = createManagedServerVisibilityInteractionHelpers(

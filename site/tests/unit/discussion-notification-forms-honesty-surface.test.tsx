@@ -81,7 +81,9 @@ it("keeps additive formErrorHint / errorHint copy for discussion and notificatio
     "Inspection did not finish. Choose the same meta.xml again",
   );
   expect(read("site/src/lib/i18n/ru/product.ts")).toContain("Проверка не завершена.");
-  expect(read("site/src/features/notifications/notification-inbox-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/notifications/notification-inbox-copy.ts")).toContain(
+    "formErrorHint:",
+  );
   expect(read("site/src/lib/follow-workspace-copy.ts")).toContain(
     "Retry reloads the saved follow state.",
   );

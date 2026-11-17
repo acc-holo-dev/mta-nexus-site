@@ -13,7 +13,7 @@ import {
   getManagedServerCopy,
   managedServerHref,
   parseManagedServerQuery,
-} from "../../../features/servers/managed-server-view";
+} from "../../../lib/managed-server-view";
 import { serverWorkspaceCopy } from "../../../lib/server-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import {

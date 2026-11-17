@@ -11,7 +11,7 @@ import {
   type DownloadFailure,
   fetchResourceDownload,
   ResourceDownloadError,
-} from "../resource-download-client";
+} from "../../../lib/resource-download-client";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";

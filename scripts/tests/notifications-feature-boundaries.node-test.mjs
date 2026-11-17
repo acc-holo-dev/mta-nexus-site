@@ -13,7 +13,6 @@ const utilPorts = [
   "notification-inbox-events",
   "visible-polling",
   "notification-inbox-export-client",
-,
   "notification-inbox-copy",
 ];
 const serverPorts = ["center"];

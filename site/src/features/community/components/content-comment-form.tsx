@@ -3,11 +3,8 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useRef, useState } from "react";
-import {
-  createCommentIntentKey,
-  submitContentCommentRequest,
-} from "../content-comment-client";
 import { useNexusLocale } from "../../shell/locale";
+import { createCommentIntentKey, submitContentCommentRequest } from "../content-comment-client";
 
 export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
   const router = useRouter();
