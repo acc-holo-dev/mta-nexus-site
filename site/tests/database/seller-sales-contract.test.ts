@@ -1,6 +1,6 @@
 import { type SellerSale, sellerSaleEvidence, sellerSalesWindow } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { sellerSalesCsv } from "../../src/lib/seller-sales-csv";
+import { sellerSalesCsv } from "../../src/features/commerce/seller-sales-csv";
 import {
   sellerSalesPageQuery,
   sellerSalesQuery,

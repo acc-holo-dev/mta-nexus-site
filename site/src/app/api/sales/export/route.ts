@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
-import { sellerSalesCsv } from "../../../../lib/seller-sales-csv";
+import { sellerSalesCsv } from "../../../../features/commerce/seller-sales-csv";
 import { sellerSalesQuery } from "../../../../lib/seller-sales-query";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
 export function GET(request: NextRequest) {

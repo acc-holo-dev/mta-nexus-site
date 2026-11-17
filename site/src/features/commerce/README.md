@@ -40,6 +40,7 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `financial-i18n.ts`               | util port `financial-i18n`                                                             |
 | `license-archive-csv.ts` | util port `license-archive-csv` |
 | `subscription-time.ts` | util port `subscription-time` |
+| `seller-sales-csv.ts` | util port `seller-sales-csv` |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.
