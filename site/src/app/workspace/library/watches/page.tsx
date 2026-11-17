@@ -13,6 +13,8 @@ import {
   resourceReleaseWatchesUrl,
 } from "../../../../features/resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -40,7 +42,20 @@ export default async function ReleaseWatchesPage({
     typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en",
     copy = resourceReleaseWatchesCopy(typedLocale),
     dictionary = getDictionary(typedLocale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={typedLocale}
+        title={getDictionary(typedLocale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/library/watches"}
+      />
+    );
+  }
+
   if (!user) {
     let returnPath = "/workspace/library/watches";
     try {
