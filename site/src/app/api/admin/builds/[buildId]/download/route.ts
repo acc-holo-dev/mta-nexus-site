@@ -6,7 +6,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
-} from "../../../../../../lib/build-download-metadata";
+} from "../../../../../../features/resources/build-download-metadata";
 import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
 import {
   createRequestLogContext,

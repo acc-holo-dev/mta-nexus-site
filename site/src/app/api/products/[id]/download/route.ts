@@ -10,7 +10,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
-} from "../../../../../lib/build-download-metadata";
+} from "../../../../../features/resources/build-download-metadata";
 import { parseDownloadBuildSelection } from "../../../../../lib/build-download-selection";
 import {
   createRequestLogContext,
