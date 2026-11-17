@@ -50,6 +50,8 @@ const en = {
   all: "Follow-based reviews",
   openTrust: "Server trust",
   loadUnavailable: "Reviews are temporarily unavailable. This does not mean there are no reviews.",
+  loadUnavailableHint:
+    "Retry reloads this review list only. A temporary load failure is not an empty follow-based review list.",
   loadRetry: "Retry loading reviews",
   reloadReason: "Your review is saved on the server. Reload to edit it again.",
 };
@@ -105,6 +107,8 @@ const ru: typeof en = {
   all: "Отзывы на основании follow",
   openTrust: "Доверие к серверу",
   loadUnavailable: "Отзывы временно недоступны. Это не означает, что отзывов нет.",
+  loadUnavailableHint:
+    "Повтор обновляет только этот список отзывов. Временный сбой загрузки — не пустой список отзывов на основании follow.",
   loadRetry: "Повторить загрузку",
   reloadReason: "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
 };
@@ -117,6 +121,7 @@ export function serverReviewLoadCopy(locale: Locale) {
   const copy = serverReviewCopy(locale);
   return {
     unavailable: copy.loadUnavailable,
+    unavailableHint: copy.loadUnavailableHint,
     retry: copy.loadRetry,
     reloadReason: copy.reloadReason,
   };

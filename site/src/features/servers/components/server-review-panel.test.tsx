@@ -53,6 +53,7 @@ describe("server review panel honest load states", () => {
       }),
     );
     expect(html).toContain(loadCopy.unavailable);
+    expect(html).toContain(loadCopy.unavailableHint);
     expect(html).toContain(loadCopy.retry);
     expect(html).toContain('role="alert"');
     expect(html).toContain("min-h-11");

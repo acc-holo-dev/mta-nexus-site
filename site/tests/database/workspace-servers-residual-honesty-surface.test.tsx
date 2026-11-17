@@ -140,6 +140,8 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
 it("locks residual honesty copy for server and license residual shells", () => {
   expect(serverWorkspaceCopy("en").historyUnavailableHint.length).toBeGreaterThan(0);
   expect(serverWorkspaceCopy("ru").historyUnavailableHint.length).toBeGreaterThan(0);
+  expect(serverWorkspaceCopy("en").unavailableHint.length).toBeGreaterThan(0);
+  expect(serverWorkspaceCopy("ru").unavailableHint.length).toBeGreaterThan(0);
   expect(serverStatisticsCopy("en").unavailableHint.length).toBeGreaterThan(0);
   expect(serverStatisticsCopy("ru").unavailableHint.length).toBeGreaterThan(0);
   expect(serverObservationBrowserCopy("en").unavailableHint.length).toBeGreaterThan(0);
@@ -157,6 +159,8 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(read("site/src/features/servers/server-workspace-copy.ts")).toContain(
     "historyUnavailableHint",
   );
+  expect(read("site/src/features/servers/server-workspace-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/features/servers/server-review-i18n.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/features/servers/server-observation-browser-copy.ts")).toContain(
     "unavailableHint",

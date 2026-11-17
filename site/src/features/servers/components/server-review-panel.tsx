@@ -334,6 +334,7 @@ export function ServerReviewPanel({
       {unavailable || !page ? (
         <ErrorState
           title={loadCopy.unavailable}
+          description={loadCopy.unavailableHint}
           action={
             <Button
               type="button"

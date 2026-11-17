@@ -72,6 +72,7 @@ export default async function ManagedServersPage({
         <h1 className="font-display text-primary">{copy.title}</h1>
         <ErrorState
           title={workspace.unavailable}
+          description={workspace.unavailableHint}
           action={
             <Link href={managedServerHref(filters, page)} className={navLinkClass}>
               {workspace.reload}
