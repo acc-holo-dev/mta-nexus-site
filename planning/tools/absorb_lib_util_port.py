@@ -20,13 +20,16 @@ def insert_alt(ports: str, name: str, feature: str) -> str:
         return ports
     # Prefer stable anchors to avoid splitting nested (?:...)-server groups.
     anchors = {
-        "resources": ["|server|", "|resource-submission-intent|", "|evidence|"],
-        "servers": ["|statistics-server|", "|claim-controls|", "|follow|"],
-        "commerce": ["|license-history-server|", "|seller-sales|", "|plan-reviews|"],
-        "library": ["|release-comparison-server|", "|library-selection-batches-i18n|"],
-        "community": ["|reports-server|", "|discussion-mutation-confirmation|", "|follow|"],
-        "organizations": ["|content-editor-server|", "|history-view|"],
-        "accounts": ["|public-profile-activity-server|", "|ad-preference|"],
+        "resources": ["|server|", "|mta-version-target|", "|resource-submission-intent|", "|evidence|"],
+        "servers": ["|statistics-server|", "|server-review-confirmation|", "|claim-controls|", "|follow|"],
+        "commerce": ["|license-history-server|", "|subscription-confirmation|", "|seller-sales|", "|plan-reviews|"],
+        "library": ["|release-comparison-server|", "|library-collection-manifests-i18n|", "|library-selection-batches-i18n|"],
+        "community": ["|reports-server|", "|follow-confirmation|", "|discussion-mutation-confirmation|", "|follow|"],
+        "organizations": ["|content-editor-server|", "|organization-member-confirmation|", "|history-view|"],
+        "accounts": ["|public-profile-activity-server|", "|ad-preference|", "|settings-client-api|"],
+        "moderation": ["|verification-moderation|", "|admin-status-labels|"],
+        "notifications": ["|notification-inbox-export-client|", "|visible-polling|", "|preferences|"],
+        "support": ["|center-server|"],
     }
     wrapped = f"|{ports}|"
     for anchor in anchors.get(feature, []):
@@ -35,34 +38,65 @@ def insert_alt(ports: str, name: str, feature: str) -> str:
     return ports + "|" + name
 
 
+def rewrite_relative_lib_imports(dst: Path) -> None:
+    text = dst.read_text()
+    def repl(m: re.Match[str]) -> str:
+        target = m.group(1)
+        # keep feature-local imports if they already exist beside dst
+        base = target[2:]
+        local = dst.parent / (base if base.endswith(".ts") else base + ".ts")
+        if local.exists() or (dst.parent / base).exists():
+            return m.group(0)
+        return f'from "../../lib/{base}"'
+    new = re.sub(r'''from ["'](\./[^"']+)["']''', repl, text)
+    if new != text:
+        dst.write_text(new)
+
+
 def rewrite_imports(name: str, feat: str) -> None:
     try:
         files = sh(["rg", "-l", name, "site"]).splitlines()
     except subprocess.CalledProcessError:
         files = []
-    repls = [
-        (rf'from "\.\./\.\./\.\./lib/{re.escape(name)}"', f'from "../{name}"'),
-        (
-            rf'from "\.\./\.\./src/lib/{re.escape(name)}"',
-            f'from "../../src/features/{feat}/{name}"',
-        ),
-        (
-            rf'site/src/lib/{re.escape(name)}\.ts',
-            f"site/src/features/{feat}/{name}.ts",
-        ),
-        (
-            rf'"\.\./\.\./src/lib/{re.escape(name)}"',
-            f'"../../src/features/{feat}/{name}"',
-        ),
-    ]
+    dst = ROOT / f"site/src/features/{feat}/{name}.ts"
+    feat_root = ROOT / f"site/src/features/{feat}"
     for rel in files:
         path = ROOT / rel
-        if not path.is_file():
+        if not path.is_file() or path.resolve() == dst.resolve():
             continue
         text = path.read_text()
         orig = text
-        for pat, rep in repls:
-            text = re.sub(pat, rep, text)
+        text = re.sub(
+            rf'(from ["\'])((?:\.\./)+)lib/{re.escape(name)}(["\'])',
+            rf"\1\2features/{feat}/{name}\3",
+            text,
+        )
+        text = re.sub(
+            rf'(read\(["\'])site/src/lib/{re.escape(name)}\.ts(["\'])',
+            rf"\1site/src/features/{feat}/{name}.ts\2",
+            text,
+        )
+        text = re.sub(
+            rf'(["\'])\.\./\.\./src/lib/{re.escape(name)}(["\'])',
+            rf"\1../../src/features/{feat}/{name}\2",
+            text,
+        )
+        try:
+            path.relative_to(feat_root)
+            in_feat = True
+        except ValueError:
+            in_feat = False
+        if in_feat:
+            import os
+
+            rel_imp = Path(os.path.relpath(dst.with_suffix(""), path.parent)).as_posix()
+            if not rel_imp.startswith("."):
+                rel_imp = "./" + rel_imp
+            text = re.sub(
+                rf'from ["\'](?:\.\./)*features/{re.escape(feat)}/{re.escape(name)}["\']',
+                f'from "{rel_imp}"',
+                text,
+            )
         if text != orig:
             path.write_text(text)
 
@@ -346,6 +380,7 @@ def main() -> int:
     else:
         raise SystemExit(f"missing {src}")
     rewrite_imports(name, feat)
+    rewrite_relative_lib_imports(dst)
     patch_depcruise(feat, name, isolation)
     if feat == "resources":
         patch_resources(name)
