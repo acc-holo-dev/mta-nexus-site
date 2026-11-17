@@ -21,7 +21,7 @@ import {
 } from "../../../../../lib/observability";
 import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
 import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
-import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
+import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productService } from "../../../../../lib/services/product-service";
