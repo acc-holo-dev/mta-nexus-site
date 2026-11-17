@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { serverHistoryBarPercent } from "../server-history-presentation";
-import { serverObservationBrowserCopy } from "../../../lib/server-observation-browser-copy";
+import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { serverStatisticsIntervals } from "../../../lib/server-statistics-export";

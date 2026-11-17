@@ -47,6 +47,7 @@ repositories и collectors остаются в прежних модулях и 
 | `server-review-query.ts`          | util port `server-review-query`                                                                   |
 | `server-follow-notifications.ts`  | util port `server-follow-notifications`                                                           |
 | `server-statistics-copy.ts` | util port `server-statistics-copy` |
+| `server-observation-browser-copy.ts` | util port `server-observation-browser-copy` |
 
 App routes, общие components/lib и другие features используют эти entrypoints.
 Прямой импорт `components/`, `model/` или `server/` извне feature запрещён

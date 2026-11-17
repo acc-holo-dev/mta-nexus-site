@@ -14,7 +14,7 @@ import {
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
-} from "../../../lib/server-observation-browser-copy";
+} from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { authService } from "../../../lib/services/auth-service";

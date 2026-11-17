@@ -13,7 +13,7 @@ import { serverObservationBrowserCsv } from "../../src/lib/server-statistics-exp
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
-} from "../../src/lib/server-observation-browser-copy";
+} from "../../src/features/servers/server-observation-browser-copy";
 const end = "2026-10-11T00:00:00.000Z",
   exact = "2026-10-10T23:59:00.123456Z",
   context = "a".repeat(64);
