@@ -45,7 +45,7 @@ import Activity, {
   metadata as activityMeta,
 } from "../../src/app/workspace/resources/[id]/activity/page";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceActivityCopy } from "../../src/lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../src/features/resources/resource-activity-i18n";
 import {
   acquisitionPage,
   acquisitionSource,
@@ -167,7 +167,7 @@ it("hides activity when current management permission is lost", async () => {
   await expect(Activity(activityInput)).rejects.toThrow("NEXT_NOT_FOUND");
 });
 it("shows an honest recovery state when publisher activity fails", async () => {
-  const { getResourceActivityCopy } = await import("../../src/lib/resource-activity-i18n");
+  const { getResourceActivityCopy } = await import("../../src/features/resources/resource-activity-i18n");
   state.report.mockRejectedValue(new Error("activity unavailable"));
   const copy = getResourceActivityCopy("en");
   const html = renderToStaticMarkup(await Activity(activityInput));

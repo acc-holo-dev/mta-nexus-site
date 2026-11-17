@@ -88,6 +88,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-attachment-filename.ts` | util port `resource-attachment-filename` |
 | `resource-activity-query.ts` | util port `resource-activity-query` |
 | `resource-release-watch-history-i18n.ts` | util port `resource-release-watch-history-i18n` |
+| `resource-activity-i18n.ts` | util port `resource-activity-i18n` |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

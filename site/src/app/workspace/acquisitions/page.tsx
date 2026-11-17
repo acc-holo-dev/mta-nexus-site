@@ -6,7 +6,7 @@ import { PlatformSignIn } from "../../../features/shell/guest-auth";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../../features/resources/resource-activity-i18n";
 import {
   acquisitionHistoryHref,
   acquisitionPage,

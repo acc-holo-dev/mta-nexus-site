@@ -9,7 +9,7 @@ import { GuestAuthLinks } from "../../features/shell/guest-auth";
 import { authEntryHref } from "../../features/shell/auth-return";
 import { useNexusLocale } from "../../features/shell/locale";
 import { licenseModelLabel } from "../../lib/license-model-i18n";
-import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../features/resources/resource-activity-i18n";
 import { confirmedResourceClaim } from "../../features/resources/resource-commerce-confirmation";
 
 interface ProductInfo {

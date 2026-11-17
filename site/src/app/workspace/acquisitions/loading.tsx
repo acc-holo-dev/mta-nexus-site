@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../../features/resources/resource-activity-i18n";
 
 // Honest loading shell for /workspace/acquisitions.
 export default async function Loading() {

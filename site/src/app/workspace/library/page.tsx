@@ -23,7 +23,7 @@ import {
   parseLibraryFilter,
   parseLibraryPage,
 } from "../../../lib/library-view";
-import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../../features/resources/resource-activity-i18n";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
