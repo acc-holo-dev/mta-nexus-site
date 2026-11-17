@@ -13,6 +13,8 @@ import { getResourceBuildWorkspaceCopy } from "../../../../features/resources/re
 import { getResourceCommerceCopy } from "../../../../features/resources/resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -44,7 +46,20 @@ export default async function ManageResourcePage({
   const returnQuery = returnParams.toString();
   const resourcePath = `/workspace/resources/${encodeURIComponent(id)}`;
   const returnPath = returnQuery ? `${resourcePath}?${returnQuery}` : resourcePath;
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={returnPath}
+      />
+    );
+  }
+
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
