@@ -10,6 +10,8 @@ import { ResourceDownloadButton } from "../../../../../features/resources/downlo
 import { resourceCartReceiptsCopy } from "../../../../../features/resources/resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../../../../../features/resources/resource-cart-receipts-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
+import { PlatformSessionError } from "../../../../../features/shell/session-error";
+
 import { getDictionary } from "../../../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -34,7 +36,20 @@ export default async function ResourceCartReceiptPage({
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]),
     copy = resourceCartReceiptsCopy(locale);
   const dictionary = getDictionary(locale);
-  const user = await authService.getSession(store.get("nexus_session")?.value);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/workspace/acquisitions/receipts/"}
+      />
+    );
+  }
+
   const returnPath = `/workspace/acquisitions/receipts/${encodeURIComponent(id)}`;
   if (!user) {
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
