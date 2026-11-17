@@ -8,7 +8,7 @@ import { communityReportCopy } from "../../../lib/community-report-copy";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { orderCaseCopy } from "../../../lib/order-case-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { storageMaintenanceCopy } from "../../../lib/storage-maintenance-i18n";
+import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { ReportModerationControls } from "../report-controls";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];

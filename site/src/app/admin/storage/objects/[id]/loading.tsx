@@ -1,5 +1,5 @@
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { storageMaintenanceCopy } from "../../../../../lib/storage-maintenance-i18n";
+import { storageMaintenanceCopy } from "../../../../../features/moderation/storage-maintenance-i18n";
 
 // Honest loading shell for /admin/storage/objects/[id].
 export default async function Loading() {

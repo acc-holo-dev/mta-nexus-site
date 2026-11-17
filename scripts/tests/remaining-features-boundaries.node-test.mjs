@@ -30,10 +30,10 @@ const features = [
       "admin-status-labels",
       "verification-moderation",
     ],
-    clientUtilPorts: ["admin-status-labels", "verification-moderation"],
+    clientUtilPorts: ["admin-status-labels", "verification-moderation", "storage-maintenance-i18n"],
     privateClients: [],
     servers: [["reports-server", "platform-reports-screen.tsx"]],
-    safe: "platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|storage-maintenance-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy",
+    safe: "platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy",
   },
   {
     name: "accounts",

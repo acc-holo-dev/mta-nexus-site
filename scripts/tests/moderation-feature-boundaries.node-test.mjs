@@ -9,9 +9,12 @@ const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
 const serverPorts = ["admin-home"];
+const utilPorts = [
+  "storage-maintenance-i18n",
+];
 const clientPorts = ["storage-maintenance"];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|storage-maintenance-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy)\.ts$)/u;
+  /^(?:i18n(?:\.ts$|\/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy)\.ts$)/u;
 
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
@@ -53,7 +56,7 @@ test("Moderation rejects private, routing and infrastructure edges", (t) => {
     );
     write(`site/src/app/${port}.ts`, `export { value } from "../features/moderation/${port}";`);
   }
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(
       `site/src/features/moderation/${port}.ts`,
       'export type { Row } from "../../lib/services/session";',
@@ -88,7 +91,7 @@ test("Moderation rejects private, routing and infrastructure edges", (t) => {
   for (const port of serverPorts) {
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(rules(`features/moderation/${port}.ts`).includes("moderation-client-isolation"), port);
     assert.deepEqual(rules(`app/${port}.ts`), []);
   }

@@ -98,7 +98,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/moderation/)" },
       to: {
-        path: "^site/src/features/moderation/(?!(?:object-report|report-controls|reports-server|verification-amend|verification-controls|verification-workspace|admin-home|storage-maintenance|admin-status-labels|verification-moderation)\\.ts$)",
+        path: "^site/src/features/moderation/(?!(?:object-report|report-controls|reports-server|verification-amend|verification-controls|verification-workspace|admin-home|storage-maintenance|admin-status-labels|storage-maintenance-i18n|verification-moderation)\\.ts$)",
       },
     },
     {
@@ -111,17 +111,17 @@ module.exports = {
       name: "moderation-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation)\\.ts$|components/)",
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n)\\.ts$|components/)",
       },
       to: {
-        path: "^(?:site/src/(?:features/(?!moderation/|community/report-evidence-links\\.ts$|resources/(?:qa-report-actions|quarantine-controls)\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/moderation/(?:server/|(?:reports-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|storage-maintenance-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
+        path: "^(?:site/src/(?:features/(?!moderation/|community/report-evidence-links\\.ts$|resources/(?:qa-report-actions|quarantine-controls)\\.ts$|shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/moderation/(?:server/|(?:reports-server)\\.ts$)|lib/(?!(?:i18n(?:\\.ts$|/)|(?:platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
       },
     },
     {
       name: "moderation-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation)\\.ts$|components/)",
+        path: "^site/src/features/moderation/(?:(?:object-report|report-controls|verification-amend|verification-controls|verification-workspace|storage-maintenance|admin-status-labels|verification-moderation|storage-maintenance-i18n)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
