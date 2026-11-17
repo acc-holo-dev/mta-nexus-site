@@ -7,7 +7,7 @@ import { formatHistoryAmount, parseHistoryPage } from "../../lib/commerce-histor
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { planReviewsCopy } from "../../lib/plan-reviews-i18n";
+import { planReviewsCopy } from "../../features/commerce/plan-reviews-i18n";
 import { commercialPlanService } from "../../lib/services/commercial-plan-service";
 import { subscriptionsCopy } from "../../lib/subscriptions-i18n";
 

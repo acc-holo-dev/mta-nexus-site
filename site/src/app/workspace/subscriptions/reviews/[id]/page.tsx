@@ -9,7 +9,7 @@ import { planReviewNavLinkClass } from "../../../../../features/commerce/plan-re
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
+import { planReviewsCopy } from "../../../../../features/commerce/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewsPageParams,

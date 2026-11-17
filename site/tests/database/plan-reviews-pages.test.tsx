@@ -50,7 +50,7 @@ import Detail from "../../src/app/workspace/subscriptions/reviews/[id]/page";
 import ReviewsLoading from "../../src/app/workspace/subscriptions/reviews/loading";
 import New from "../../src/app/workspace/subscriptions/reviews/new/page";
 import History from "../../src/app/workspace/subscriptions/reviews/page";
-import { planReviewsCopy } from "../../src/lib/plan-reviews-i18n";
+import { planReviewsCopy } from "../../src/features/commerce/plan-reviews-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const terms = {

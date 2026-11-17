@@ -5,7 +5,7 @@ import {
   confirmedPlanReview,
   expectedPlanReviewId,
 } from "../../src/features/commerce/plan-review-confirmation";
-import { planReviewError, planReviewsCopy } from "../../src/lib/plan-reviews-i18n";
+import { planReviewError, planReviewsCopy } from "../../src/features/commerce/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewNewQuery,

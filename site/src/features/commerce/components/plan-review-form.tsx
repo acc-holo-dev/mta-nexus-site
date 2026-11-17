@@ -8,7 +8,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../../../lib/commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confirmation";
-import { planReviewError, planReviewsCopy } from "../../../lib/plan-reviews-i18n";
+import { planReviewError, planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref } from "../../../lib/plan-reviews-query";
 import { privateApiRequest } from "../../../lib/private-api-request";
 import { PlanReviewTerms } from "./plan-review-terms";

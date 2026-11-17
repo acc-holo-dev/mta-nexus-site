@@ -9,7 +9,7 @@ import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { planReviewsCopy } from "../../../../lib/plan-reviews-i18n";
+import { planReviewsCopy } from "../../../../features/commerce/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewsPageParams,
