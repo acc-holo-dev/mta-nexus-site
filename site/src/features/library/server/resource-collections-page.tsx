@@ -200,10 +200,12 @@ export default async function ResourceCollectionsPage({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
+    const title = libraryCollectionError(locale, error.code);
     return (
       <section className={`${pageShellClass} max-w-xl`}>
         <ErrorState
-          title={libraryCollectionError(locale, error.code)}
+          title={title}
+          description={title === c.retry ? c.loadUnavailableDescription : undefined}
           action={
             <Link href={collectionHref()} className={navLinkClass}>
               {c.title}

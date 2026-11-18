@@ -241,7 +241,11 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
 
       {error ? <ErrorState title={error} description={copy.errorMayBeUnconfirmed} /> : null}
       {recoveryMessage ? (
-        <ErrorState id="register-server-session-recovery" title={recoveryMessage} />
+        <ErrorState
+          id="register-server-session-recovery"
+          title={recoveryMessage}
+          description={copy.sessionRecoveryHint}
+        />
       ) : null}
       {verified && pending ? (
         <ErrorState

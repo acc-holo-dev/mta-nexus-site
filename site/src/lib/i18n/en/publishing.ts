@@ -132,6 +132,8 @@ export const publishing = {
       "No server listing was created. Fix the fields above and submit the same form again.",
     restoreFailed:
       "Could not verify your session or restore the draft. Refresh and sign in to the original account.",
+    sessionRecoveryHint:
+      "Retry after refresh rechecks this registration session only. A temporary recovery failure is not a created server listing.",
     sessionChanged: "The session changed. Sign in to the original account.",
     resultCheckFailed: "Could not check the result. Try again.",
     resultCheckFailedShort: "Could not check the result.",

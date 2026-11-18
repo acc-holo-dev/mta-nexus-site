@@ -36,6 +36,8 @@ const en = {
   expired: "The conversation page is no longer available. Open the latest messages.",
   missing: "This message is no longer available in this case.",
   unavailable: "The conversation could not be loaded. Please try again.",
+  unavailableHint:
+    "A load failure is not an empty conversation. Retry to fetch the latest messages in this case.",
 };
 const ru: typeof en = {
   title: "Поиск в переписке",
@@ -72,6 +74,8 @@ const ru: typeof en = {
   expired: "Эта страница переписки больше недоступна. Откройте последние сообщения.",
   missing: "Это сообщение больше недоступно в данном обращении.",
   unavailable: "Не удалось загрузить переписку. Повторите попытку.",
+  unavailableHint:
+    "Сбой загрузки — не пустая переписка. Повторите запрос, чтобы получить последние сообщения в этом обращении.",
 };
 export const supportMessageCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function supportMessageError(locale: Locale, code: unknown) {

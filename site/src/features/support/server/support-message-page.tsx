@@ -11,6 +11,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
 
 export async function supportMessageMetadata() {
   return {
@@ -72,14 +73,18 @@ export async function SupportMessagePage({
     );
     return <SupportMessageBrowser page={page} filters={filters} locale={locale} staff={staff} />;
   } catch (error) {
+    const title = supportMessageError(
+      locale,
+      error instanceof AppError ? error.code : "INTERNAL_ERROR",
+    );
     return (
       <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <ErrorState
-          title={supportMessageError(
-            locale,
-            error instanceof AppError ? error.code : "INTERNAL_ERROR",
-          )}
+          title={title}
+          description={
+            title === supportWorkspaceCopy(locale).unavailable ? copy.unavailableHint : undefined
+          }
           action={
             <Link
               href={path}

@@ -314,10 +314,12 @@ export async function LibraryMembershipHistoryScreen({
       );
     }
     if (error.statusCode === 404) notFound();
+    const title = libraryCollectionError(locale, error.code);
     return (
       <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
         <ErrorState
-          title={libraryCollectionError(locale, error.code)}
+          title={title}
+          description={title === c.retry ? m.loadUnavailableDescription : undefined}
           action={
             <Link
               href={membershipHistoryHref()}

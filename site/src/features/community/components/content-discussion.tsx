@@ -400,15 +400,25 @@ export function ContentDiscussion({
           locale={locale}
           initial={
             followInitial ??
-            (viewer
-              ? undefined
-              : {
-                  authenticated: false,
+            (identityUnavailable
+              ? {
+                  // Session unresolved ≠ guest — do not invent signed-out follow seed.
+                  authenticated: null,
                   following: false,
                   notifyComments: false,
                   muted: false,
                   mutedUntil: null,
-                })
+                  error: true,
+                }
+              : viewer
+                ? undefined
+                : {
+                    authenticated: false,
+                    following: false,
+                    notifyComments: false,
+                    muted: false,
+                    mutedUntil: null,
+                  })
           }
         />
         <div className="flex flex-wrap gap-4">

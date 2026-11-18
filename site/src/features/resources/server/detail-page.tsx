@@ -204,7 +204,8 @@ export async function ProductDetailPage({
   const hasAccess = isPublic && (canManageProduct || isLicensed || isAdmin);
   const saveInitial = sessionFailed
     ? {
-        authenticated: false,
+        // Session probe failure ≠ guest — keep FollowButton off guest CTAs.
+        authenticated: null,
         actorId: null,
         following: false,
         error: true,

@@ -17,6 +17,7 @@ it("locks product detail session probe failure to null auth, not guest CTAs", ()
     /getSession\([\s\S]*?\)\.catch\(\(\)\s*=>\s*\{\s*sessionFailed = true;\s*return null;\s*\}\)/u,
   );
   expect(source).toContain("authenticated={sessionFailed ? null : Boolean(user)}");
+  expect(source).toMatch(/sessionFailed\s*\?\s*\{\s*(?:\/\/[^\n]*\n\s*)*authenticated:\s*null,/u);
   expect(source).toContain("error: true");
   expect(source).toContain("retryHref={detailReturnPath}");
 });

@@ -99,11 +99,13 @@ export async function ServerStatisticsPage({
     );
   } catch (error) {
     const code = error instanceof AppError ? error.code : "INTERNAL_ERROR";
+    const title = serverStatisticsError(locale, code);
     return (
       <div className={pageShellClass}>
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <ErrorState
-          title={serverStatisticsError(locale, code)}
+          title={title}
+          description={title === copy.unavailable ? copy.unavailableHint : undefined}
           action={
             <nav className="flex flex-wrap justify-center gap-4 text-sm">
               <Link href={serverStatisticsHref(path, query)} className={navLinkClass}>

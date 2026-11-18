@@ -59,7 +59,11 @@ const copy = {
     none: "None declared",
     download: "Download this recorded version",
     unavailable: "This recorded version is currently unavailable.",
+    unavailableHint:
+      "This receipt loaded successfully. The recorded version is not downloadable right now; that is not a receipt load failure.",
     removed: "You no longer have effective download access.",
+    removedHint:
+      "This receipt loaded successfully. Effective download access for this item ended; that is not a receipt load failure.",
     versions: "Manage download versions",
     export: "Export displayed page",
     changed: "A resource or approved version changed. Review the cart again.",
@@ -121,7 +125,11 @@ const copy = {
     none: "Не заявлены",
     download: "Скачать записанную версию",
     unavailable: "Записанная версия сейчас недоступна.",
+    unavailableHint:
+      "Квитанция загружена успешно. Записанная версия сейчас недоступна для скачивания; это не сбой загрузки квитанции.",
     removed: "Действующих прав на скачивание больше нет.",
+    removedHint:
+      "Квитанция загружена успешно. Действующих прав на скачивание по этой позиции больше нет; это не сбой загрузки квитанции.",
     versions: "Управление версиями скачивания",
     export: "Экспорт текущей страницы",
     changed: "Ресурс или одобренная версия изменились. Проверьте корзину заново.",

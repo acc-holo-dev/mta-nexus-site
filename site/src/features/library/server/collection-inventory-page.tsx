@@ -411,10 +411,12 @@ export default async function Page({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
+    const title = libraryCollectionError(locale, error.code);
     return (
       <section className={pageShellClass}>
         <ErrorState
-          title={libraryCollectionError(locale, error.code)}
+          title={title}
+          description={title === c.retry ? v.loadUnavailableDescription : undefined}
           action={
             <Link href={collectionInventoryHref()} className={navLinkClass}>
               {c.reload}

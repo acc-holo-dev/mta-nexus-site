@@ -131,7 +131,10 @@ export default async function ResourceCartReceiptPage({
                   />
                 </div>
               ) : (
-                <ErrorState title={item.hasCurrentAccess ? copy.unavailable : copy.removed} />
+                <ErrorState
+                  title={item.hasCurrentAccess ? copy.unavailable : copy.removed}
+                  description={item.hasCurrentAccess ? copy.unavailableHint : copy.removedHint}
+                />
               )}
               {item.downloadable ? (
                 <Link

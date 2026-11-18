@@ -180,6 +180,7 @@ it("treats session probe failure as identity error, not a guest follow seed", as
   const html = renderToStaticMarkup(await Page(input()));
   expect(follow.contentStates).not.toHaveBeenCalled();
   expect(html).toContain('data-identity-unavailable="1"');
+  expect(html).toContain("&quot;authenticated&quot;:null");
   expect(html).toContain("&quot;error&quot;:true");
   expect(html).toContain("article-session-unavailable");
   expect(html).not.toContain(

@@ -61,6 +61,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
       ) : (
         <ErrorState
           title={copy.failed}
+          description={copy.loadUnavailableHint}
           action={
             <a href={returnPath} className={linkClass}>
               {dictionary.errors.retry}

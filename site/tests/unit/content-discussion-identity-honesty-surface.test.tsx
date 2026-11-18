@@ -20,4 +20,8 @@ it("locks ContentDiscussion identityUnavailable away from guest-lie CTAs", () =>
   );
   expect(source).toContain("if (identityUnavailable)");
   expect(source).toContain("identityUnavailable || text.trim().length < 2");
+  expect(source).toMatch(
+    /identityUnavailable\s*\?\s*\{\s*(?:\/\/[^\n]*\n\s*)*authenticated:\s*null,/u,
+  );
+  expect(source).toMatch(/viewer\s*\?\s*undefined\s*:\s*\{\s*authenticated:\s*false,/u);
 });
