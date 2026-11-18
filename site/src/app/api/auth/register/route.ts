@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { registerSchema } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
+import { authRegisterApiCopy } from "../../../../features/accounts/auth-register-api-copy";
 import {
   SESSION_COOKIE_NAME,
   sessionCookieOptions,
@@ -10,6 +11,7 @@ import { getTrustedRequestIp } from "../../../../features/shell/request-client-i
 import { SESSION_LIFETIME_SECONDS } from "../../../../features/shell/session-policy";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
@@ -27,13 +29,14 @@ function json(body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authRegisterApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const ip = getTrustedRequestIp(request);
     const rl = await consumeRateLimit("authRegistration", ip);
     if (!rl.success) {
       return json(
         {
-          error: "Too many registration attempts. Please try again later.",
+          error: copy.rate,
         },
         429,
       );
@@ -45,7 +48,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (!parsed.success) {
       return json(
         {
-          error: "Validation failed",
+          error: copy.validationFailed,
           details: parsed.error.format(),
         },
         400,
@@ -73,6 +76,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json({ error: "Failed to register" }, 500);
+    return json({ error: copy.failed }, 500);
   }
 });
