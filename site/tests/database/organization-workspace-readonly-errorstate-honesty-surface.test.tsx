@@ -66,6 +66,12 @@ it("locks organization workspace readonly notice to ErrorState without soft mute
   );
 });
 
+it("locks organization workspace retry ErrorState to unavailableHint recovery description", () => {
+  expect(source).toContain("description={copy.unavailableHint}");
+  expect(getOrganizationCopy("en").unavailableHint.length).toBeGreaterThan(0);
+  expect(getOrganizationCopy("ru").unavailableHint.length).toBeGreaterThan(0);
+});
+
 it.each(["en", "ru"] as const)(
   "renders organization workspace readonly through ErrorState alert in %s",
   (locale) => {

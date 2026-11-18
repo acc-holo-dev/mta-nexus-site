@@ -21,7 +21,7 @@ site/
 │   └── lib/                 # только каталоги: http/ + i18n/ + platform/ + services/
 │       ├── http/            # browser/bounded/private/public adapters
 │       ├── i18n/            # общий locale primitive
-│       ├── platform/        # observability, postgres-error, offline-cache, …
+│       ├── platform/        # observability, postgres-error, i18n barrel …
 │       └── services/<domain>/  # оркестраторы по доменам (services root = 0)
 └── packages/                # канонические @nexus/* (workspace)
     ├── ui/ domain/ db/ validation/ security/ storage/ config/
@@ -181,9 +181,11 @@ Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`;
 
 **Slice 51 done:** Shell `global-error-copy` port (`globalErrorCopy`, `detectGlobalErrorLocale`) extracted from `app/global-error.tsx` for bilingual honesty without layout/i18n provider; `/acquire` client product/session loading fallbacks compose `HonestLoadingShell`.
 
+**Slice 52 done:** `offline-cache-policy` → [`features/shell/offline-cache-policy.ts`](../../site/src/features/shell/offline-cache-policy.ts) (Shell ownership; proxy + SW public-readonly opt-in); C residual retry ErrorStates wired to existing/new recovery descriptions — support center/thread, profile privacy, organization workspace/team directory (`uncertainHint`), Web Push (`webPushErrorHint`), `/acquire` claim (`claimErrorHint`).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
-**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
+**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
 
 ## TO-BE (цель читаемости)
 
@@ -262,6 +264,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 50                                                                                    | docs honesty                     | **done** |
 | T/A | Slice 51 — Shell `global-error-copy` + acquire HonestLoadingShell fallbacks                                       | читаемость + RU/EN + loading     | **done** |
 | D/E | Scoreboard sync после Slice 51                                                                                    | docs honesty                     | **done** |
+| T/C | Slice 52 — Shell `offline-cache-policy` absorb + residual retry ErrorState descriptions                           | читаемость + journey honesty     | **done** |
+| D/E | Scoreboard sync после Slice 52                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

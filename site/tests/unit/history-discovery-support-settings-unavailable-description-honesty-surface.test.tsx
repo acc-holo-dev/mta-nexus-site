@@ -25,6 +25,14 @@ const pages: Array<[string, string]> = [
     "site/src/features/accounts/components/settings-active-sessions.tsx",
     "copy.sessionUnavailableHint",
   ],
+  ["site/src/features/accounts/components/profile-privacy-editor.tsx", "copy.reloadHint"],
+  ["site/src/features/organizations/components/organization-workspace.tsx", "copy.unavailableHint"],
+  ["site/src/features/notifications/components/web-push-settings.tsx", "copy.webPushErrorHint"],
+  [
+    "site/src/features/organizations/components/organization-team-directory.tsx",
+    "copy.uncertainHint",
+  ],
+  ["site/src/app/acquire/page.tsx", "copy.claimErrorHint"],
 ];
 
 it("locks history/discovery/saved/support/settings load ErrorStates to recovery hints", () => {
@@ -50,4 +58,15 @@ it("locks history/discovery/saved/support/settings load ErrorStates to recovery 
   expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("loadFailedHint:");
   expect(read("site/src/lib/i18n/en/admin.ts")).toContain("sessionUnavailableHint:");
   expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("sessionUnavailableHint:");
+  expect(read("site/src/features/accounts/profile-privacy-copy.ts")).toContain("reloadHint:");
+  expect(read("site/src/features/organizations/organization-workspace-copy.ts")).toContain(
+    "unavailableHint:",
+  );
+  expect(read("site/src/lib/i18n/en/admin.ts")).toContain("webPushErrorHint:");
+  expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("webPushErrorHint:");
+  expect(read("site/src/features/organizations/organization-team-copy.ts")).toContain(
+    "uncertainHint:",
+  );
+  expect(read("site/src/lib/i18n/en/product.ts")).toContain("claimErrorHint:");
+  expect(read("site/src/lib/i18n/ru/product.ts")).toContain("claimErrorHint:");
 });

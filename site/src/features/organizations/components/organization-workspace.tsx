@@ -444,6 +444,7 @@ export function OrganizationWorkspacePanel({
         {error && (
           <ErrorState
             title={error}
+            description={copy.unavailableHint}
             action={
               <Button
                 type="button"

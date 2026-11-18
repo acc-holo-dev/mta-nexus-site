@@ -404,6 +404,7 @@ export function SupportCaseThread({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.caseLoadErrorHint}
           action={
             <Button
               type="button"

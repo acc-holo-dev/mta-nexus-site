@@ -431,6 +431,7 @@ export function SupportCenter({
       {formError ? (
         <ErrorState
           title={formError}
+          description={copy.loadErrorHint}
           action={
             <Button
               type="button"

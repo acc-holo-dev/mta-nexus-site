@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   appendVaryHeader,
   isOfflineCacheablePublicPath,
-} from "../../src/lib/platform/offline-cache-policy";
+} from "../../src/features/shell/offline-cache-policy";
 
 describe("public offline cache policy", () => {
   it("allows only the intentionally small read-only surface", () => {

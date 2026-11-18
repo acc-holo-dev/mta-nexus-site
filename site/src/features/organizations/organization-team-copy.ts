@@ -26,6 +26,8 @@ const en = {
   unavailableHint:
     "Retry reloads this team directory only. A temporary load failure is not an empty member list.",
   uncertain: "Reload the saved team before making another change.",
+  uncertainHint:
+    "Reload refreshes this team directory from the server before another role or access change. An uncertain save is not a removed member.",
   workspace: "Organization workspace",
   management: "Add members or manage ownership",
   transfer: "Select in ownership workspace",
@@ -58,6 +60,8 @@ const ru: Record<keyof typeof en, string> = {
   unavailableHint:
     "Повтор обновляет только каталог команды. Временный сбой загрузки — не пустой список участников.",
   uncertain: "Загрузите сохранённую команду перед следующим изменением.",
+  uncertainHint:
+    "Перезагрузка обновляет каталог команды с сервера перед следующим изменением роли или доступа. Неподтверждённое сохранение — не удалённый участник.",
   workspace: "Кабинет организации",
   management: "Добавление участников и управление владением",
   transfer: "Выбрать в кабинете владения",

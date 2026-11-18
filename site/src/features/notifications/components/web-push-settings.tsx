@@ -432,6 +432,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
         <ErrorState
           id="web-push-settings-status"
           title={copy.webPushError}
+          description={copy.webPushErrorHint}
           action={
             <Button type="button" size="touch" variant="outline" onClick={retryLoad}>
               {copy.retry}

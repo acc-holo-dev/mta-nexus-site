@@ -294,6 +294,8 @@ export const product = {
     loadFailed: "Could not load the resource. Please try again.",
     retry: "Try again",
     claimFailed: "Could not add the resource",
+    claimErrorHint:
+      "Retry repeats this library claim only. A temporary failure is not a paid checkout and does not remove existing library access.",
     unexpected: "An unexpected error occurred",
     free: "Free",
   },

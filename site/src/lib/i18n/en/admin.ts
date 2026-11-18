@@ -302,6 +302,8 @@ export const admin = {
     webPushDenied:
       "Browser notification permission is blocked for this site. Open your browser site settings, allow notifications, then return here and enable push. Inbox and watches are unaffected.",
     webPushError: "Web Push state could not be confirmed. Try checking again.",
+    webPushErrorHint:
+      "Retry rechecks this browser push probe only. A temporary check failure is not a disabled inbox or watch preference.",
     webPushLoading: "Checking browser push...",
     webPushCleanupHint:
       "This browser has a push subscription not registered for this session. To remove it, enable push and then disable it, or manage notification permissions in your browser settings.",

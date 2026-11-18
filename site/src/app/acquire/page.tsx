@@ -287,6 +287,7 @@ function AcquireContent() {
       {error ? (
         <ErrorState
           title={error}
+          description={copy.claimErrorHint}
           action={
             needsSignIn && acquireReturnPath ? (
               <GuestAuthLinks

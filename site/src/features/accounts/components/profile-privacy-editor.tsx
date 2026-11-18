@@ -236,6 +236,7 @@ export function ProfilePrivacyEditor({
       {notice?.error ? (
         <ErrorState
           title={notice.text}
+          description={copy.reloadHint}
           action={
             <Button
               type="button"

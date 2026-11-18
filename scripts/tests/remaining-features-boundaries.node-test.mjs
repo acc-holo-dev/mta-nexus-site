@@ -117,6 +117,7 @@ const features = [
       "theme-preference",
       "home-personal-preference",
       "global-error-copy",
+      "offline-cache-policy",
       "honest-loading",
     ],
     clientUtilPorts: [
@@ -127,6 +128,7 @@ const features = [
       "theme-preference",
       "home-personal-preference",
       "global-error-copy",
+      "offline-cache-policy",
       "honest-loading",
       "safe-public-error-reference",
       "home-personal-changes-types",
