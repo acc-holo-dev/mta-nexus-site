@@ -231,6 +231,7 @@ export default async function Page({
                       <ErrorState
                         id="library-collection-history-current-unavailable"
                         title={h.noCurrent}
+                        description={h.noCurrentHint}
                       />
                     )}
                     {command && "sourceCollectionId" in command && (

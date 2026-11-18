@@ -25,6 +25,8 @@ const en = {
     "I confirm removing the selected references from the source and keeping them in the destination.",
   moveSourceUnavailable:
     "The source cannot be changed. Restore an archived collection before moving references.",
+  moveSourceUnavailableHint:
+    "An archived source cannot send references. Restoring the collection is separate from reloading this page.",
   sourceSuccessor: "Recorded source revision after moving",
   copyItemsNote:
     "Copy up to 20 references to another active collection. The source may be archived. Unavailable references keep their IDs and hidden titles. Existing destination references are kept once; download rights, saved versions and release watches are unchanged.",
@@ -77,6 +79,10 @@ const en = {
   unavailable: "Resource unavailable",
   unavailableNote:
     "Current access or a safe published version is missing. The reference can still be removed.",
+  unavailableNoteHint:
+    "The reference may stay listed while access or a safe build is missing. Removing it does not reload the whole collection.",
+  itemUnavailableHint:
+    "This reference keeps its place, but delivery is blocked until access or a safe build returns.",
   inCollection: "Already in collection",
   open: "Open resource",
   versions: "Version preferences",
@@ -148,6 +154,8 @@ const ru: typeof en = {
     "Подтверждаю удаление выбранных записей из источника и сохранение их в назначении.",
   moveSourceUnavailable:
     "Источник нельзя изменить. Восстановите архивную коллекцию перед переносом записей.",
+  moveSourceUnavailableHint:
+    "Архивный источник не может отправить записи. Восстановление коллекции — отдельно от обновления этой страницы.",
   sourceSuccessor: "Записанная редакция источника после переноса",
   copyItemsNote:
     "Скопируйте до 20 записей в другую активную коллекцию. Источник может быть в архиве. У недоступных ресурсов сохраняются ID и скрытые названия. Имеющиеся записи назначения не дублируются; права на скачивание, выбор версий и подписки на выпуски сохраняются.",
@@ -198,6 +206,10 @@ const ru: typeof en = {
   unavailable: "Ресурс недоступен",
   unavailableNote:
     "Нет действующего доступа или безопасной опубликованной версии. Запись можно убрать из коллекции.",
+  unavailableNoteHint:
+    "Запись может оставаться в списке, пока нет доступа или безопасной сборки. Удаление не перезагружает всю коллекцию.",
+  itemUnavailableHint:
+    "Ссылка сохраняется в составе, но передача заблокирована, пока не вернутся доступ или безопасная сборка.",
   inCollection: "Уже в коллекции",
   open: "Открыть ресурс",
   versions: "Выбор версии",

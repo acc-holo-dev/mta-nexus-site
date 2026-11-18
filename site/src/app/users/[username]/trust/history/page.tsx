@@ -124,6 +124,7 @@ export default async function ApprovalHistoryPage({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <a href={latest} className={actionLinkClass}>
               {dictionary.errors.retry}

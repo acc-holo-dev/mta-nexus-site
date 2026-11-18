@@ -153,6 +153,7 @@ export default async function TeamPage({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <a href={organizationTeamHref(id, filters ?? { query: "" })} className={navLinkClass}>
               {team.reload}

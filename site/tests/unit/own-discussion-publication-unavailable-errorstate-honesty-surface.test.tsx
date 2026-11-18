@@ -14,8 +14,12 @@ it("locks unavailable publication notice to ErrorState alert", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="own-discussion-publication-unavailable"');
-  expect(source).toMatch(
-    /!comment\.available \? \(\s*<ErrorState id="own-discussion-publication-unavailable" title=\{copy\.hiddenNote\} \/>\s*\) : null/u,
+  expect(source).toContain('id="own-discussion-publication-unavailable"');
+  expect(source).toContain("title={copy.hiddenNote}");
+  expect(source).toContain("description={copy.hiddenPublicationHint}");
+  expect(source).toMatch(/!comment\.available \?/u);
+  expect(read("site/src/features/community/discussion-workspace-copy.ts")).toContain(
+    "hiddenPublicationHint:",
   );
   expect(source).not.toContain('className="text-sm text-muted">{copy.hiddenNote}</p>');
 });

@@ -11,6 +11,7 @@ export type HomePersonalCopy = {
   empty: string;
   emptyHint: string;
   error: string;
+  errorHint: string;
   retry: string;
   partial: string;
   hidden: string;
@@ -87,6 +88,7 @@ export function HomePersonalChangesPanel({
       {summary.status === "error" ? (
         <ErrorState
           title={copy.error}
+          description={copy.errorHint}
           action={
             <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
               <Link href="/" className={actionLinkClass}>

@@ -34,6 +34,8 @@ const en = {
   invalid: "Invalid group filters. Reset them and try again.",
   expired: "This group is no longer in the current queue. Refresh the groups.",
   unavailable: "Report groups could not be loaded. Try again.",
+  unavailableHint:
+    "Retry reloads this report queue only. A temporary load failure is not an empty moderation queue.",
   publicationTitle: "Reports about this publication",
   publicationDescription:
     "Review the current publication and decide selected reports. Each decision is recorded; the requester can track its status.",
@@ -74,6 +76,8 @@ const ru: typeof en = {
   invalid: "Некорректные фильтры групп. Сбросьте их и повторите попытку.",
   expired: "Этой группы больше нет в текущей очереди. Обновите список.",
   unavailable: "Не удалось загрузить группы жалоб. Повторите попытку.",
+  unavailableHint:
+    "Повтор обновляет только эту очередь жалоб. Временный сбой загрузки — не пустая очередь модерации.",
   publicationTitle: "Жалобы на эту публикацию",
   publicationDescription:
     "Проверьте текущую публикацию и примите решения по выбранным жалобам. Каждое решение сохраняется; заявитель может отслеживать его статус.",

@@ -313,7 +313,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                         {item.title}
                       </Link>
                     ) : (
-                      <ErrorState id="resource-cart-item-unavailable" title={copy.unavailable} />
+                      <ErrorState
+                        id="resource-cart-item-unavailable"
+                        title={copy.unavailable}
+                        description={copy.itemUnavailableHint}
+                      />
                     )}
                     <p className="text-sm text-muted">
                       {item.available ? `${copy.free} · ${item.version}` : copy.unavailableNote}

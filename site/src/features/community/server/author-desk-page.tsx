@@ -187,6 +187,7 @@ export default async function AuthorContentPage({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}

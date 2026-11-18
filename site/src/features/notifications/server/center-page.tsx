@@ -179,6 +179,7 @@ export default async function NotificationCenterPage({
         {error ? (
           <ErrorState
             title={error}
+            description={copy.unavailableHint}
             action={
               <Link
                 href={returnPath}

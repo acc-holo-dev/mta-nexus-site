@@ -125,7 +125,11 @@ export default async function ResourceCollectionsPage({
         </p>
         <p className="text-sm text-muted">{c.limit}</p>
         {!result.resource.available && (
-          <ErrorState id="library-resource-collections-unavailable" title={c.unavailableNote} />
+          <ErrorState
+            id="library-resource-collections-unavailable"
+            title={c.unavailableNote}
+            description={c.unavailableNoteHint}
+          />
         )}
         {!result.resource.canAdd && (
           <ErrorState id="library-resource-collections-no-add-access" title={c.noAddAccess} />

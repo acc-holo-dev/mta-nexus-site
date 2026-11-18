@@ -92,6 +92,7 @@ export async function ServerContentEditorPage({
       ) : (
         <ErrorState
           title={failure}
+          description={team.loadUnavailableHint}
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}

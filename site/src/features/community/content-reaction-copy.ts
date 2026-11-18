@@ -19,6 +19,8 @@ const en = {
   saved: "Reaction saved.",
   removed: "Reaction removed.",
   unavailable: "Unable to load reactions. Try again.",
+  unavailableHint:
+    "Retry reloads this reactions list only. A temporary load failure is not an empty reaction history.",
   uncertain: "The result is not confirmed. Reload the saved state before trying again.",
   unknownCounts: "Counts unavailable until the saved state loads.",
   reload: "Reload saved state",
@@ -60,6 +62,8 @@ const ru: Record<keyof typeof en, string> = {
   saved: "Реакция сохранена.",
   removed: "Реакция удалена.",
   unavailable: "Не удалось загрузить реакции. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот список реакций. Временный сбой загрузки — не пустая история реакций.",
   uncertain: "Результат не подтверждён. Загрузите сохранённое состояние перед повторной попыткой.",
   unknownCounts: "Счётчики недоступны, пока не загружено сохранённое состояние.",
   reload: "Загрузить сохранённое состояние",

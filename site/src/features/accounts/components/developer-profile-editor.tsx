@@ -194,6 +194,7 @@ export function DeveloperProfileEditor({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"

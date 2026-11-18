@@ -112,6 +112,7 @@ export function LibraryMembershipHistoryEntry({
                     <ErrorState
                       id="library-membership-history-current-unavailable"
                       title={h.noCurrent}
+                      description={h.noCurrentHint}
                     />
                   )}
                   <Link

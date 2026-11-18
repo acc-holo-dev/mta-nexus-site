@@ -54,6 +54,8 @@ const en = {
   empty: "No reports in this view yet.",
   emptyFiltered: "No reports match these filters.",
   unavailable: "Unable to load reports. Try again.",
+  unavailableHint:
+    "Retry reloads this report queue only. A temporary load failure is not an empty moderation queue.",
   retry: "Try again",
   back: "Back to reports",
   detail: "Report details",
@@ -151,6 +153,8 @@ const ru: Record<keyof typeof en, string> = {
   empty: "В этом разделе пока нет жалоб.",
   emptyFiltered: "По этим фильтрам жалоб нет.",
   unavailable: "Не удалось загрузить жалобы. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только эту очередь жалоб. Временный сбой загрузки — не пустая очередь модерации.",
   retry: "Повторить",
   back: "К списку жалоб",
   detail: "Подробности жалобы",

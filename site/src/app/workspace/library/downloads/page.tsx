@@ -197,7 +197,11 @@ export default async function ResourceDownloadsPage({
                     version={receipt.version}
                   />
                 ) : (
-                  <ErrorState id="library-download-unavailable" title={copy.unavailable} />
+                  <ErrorState
+                    id="library-download-unavailable"
+                    title={copy.unavailable}
+                    description={copy.unavailableHint}
+                  />
                 )}
               </div>
             </li>

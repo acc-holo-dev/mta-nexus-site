@@ -128,7 +128,11 @@ function ServerCard({
         </div>
       </div>
       {copyMessage === copy.copyUnavailable ? (
-        <ErrorState id="mta-master-directory-copy-unavailable" title={copy.copyUnavailable} />
+        <ErrorState
+          id="mta-master-directory-copy-unavailable"
+          title={copy.copyUnavailable}
+          description={copy.copyUnavailableHint}
+        />
       ) : (
         <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
           {copyMessage}
@@ -310,6 +314,7 @@ export function MtaMasterServerDirectory({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"

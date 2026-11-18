@@ -19,6 +19,8 @@ const copy = {
     binding: "Server binding",
     noBinding: "Not bound",
     serverUnavailable: "Server no longer available under your permissions",
+    serverUnavailableHint:
+      "The binding still references this server ID. A missing display name is not the same as an unbound license.",
     tokenState: "Runtime token",
     active: "Active",
     inactive: "Inactive",
@@ -134,6 +136,8 @@ const copy = {
     binding: "Привязка к серверу",
     noBinding: "Не привязана",
     serverUnavailable: "Сервер больше недоступен по вашим правам",
+    serverUnavailableHint:
+      "Привязка по-прежнему ссылается на этот ID сервера. Отсутствие названия — не то же самое, что отсутствие привязки.",
     tokenState: "Токен проверки",
     active: "Активен",
     inactive: "Неактивен",

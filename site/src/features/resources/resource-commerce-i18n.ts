@@ -21,6 +21,8 @@ const copy = {
     library: "Open library",
     refresh: "Refresh cart",
     unavailable: "Unavailable resource",
+    itemUnavailableHint:
+      "This line is withdrawn or blocked for acquisition. Remove it before confirming the cart; that is not a cart load failure.",
     unavailableNote: "Remove unavailable items before continuing.",
     free: "Free",
     owned: "Already in your library",
@@ -111,6 +113,8 @@ const copy = {
     library: "Открыть библиотеку",
     refresh: "Обновить корзину",
     unavailable: "Недоступный ресурс",
+    itemUnavailableHint:
+      "Эта строка снята с получения или заблокирована. Уберите её перед подтверждением корзины — это не сбой загрузки корзины.",
     unavailableNote: "Уберите недоступные ресурсы, чтобы продолжить.",
     free: "Бесплатно",
     owned: "Уже в библиотеке",

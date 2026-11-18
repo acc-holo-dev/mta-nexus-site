@@ -35,7 +35,11 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
               license.serverName ? (
                 license.serverName
               ) : (
-                <ErrorState id="license-server-unavailable" title={copy.serverUnavailable} />
+                <ErrorState
+                  id="license-server-unavailable"
+                  title={copy.serverUnavailable}
+                  description={copy.serverUnavailableHint}
+                />
               )
             ) : license.legacyServerBound ? (
               history.bound

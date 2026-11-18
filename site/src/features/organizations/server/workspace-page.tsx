@@ -81,6 +81,7 @@ export default async function OrganizationPage({
           <h1 className="font-display text-primary">{copy.title}</h1>
           <ErrorState
             title={failure}
+            description={copy.unavailableHint}
             action={
               <Link className={navLinkClass} href={returnPath}>
                 {copy.reload}

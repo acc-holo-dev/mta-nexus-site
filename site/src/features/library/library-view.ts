@@ -36,6 +36,8 @@ export const libraryCopy = {
     unavailableResource: "Resource temporarily unavailable",
     unavailableReason:
       "This resource is unpublished or has no approved, safely scanned build. Downloads are disabled until availability is restored.",
+    unavailableReasonHint:
+      "Grants may still appear here while public delivery is blocked. That state is not fixed by reloading the library list.",
     availableReason: "Access is rechecked whenever a download starts.",
     added: "Added",
     open: "Open resource",
@@ -69,6 +71,8 @@ export const libraryCopy = {
     unavailableResource: "Ресурс временно недоступен",
     unavailableReason:
       "Ресурс не опубликован либо не имеет одобренной, безопасно проверенной сборки. Скачивание недоступно до восстановления публикации.",
+    unavailableReasonHint:
+      "Права могут оставаться в списке, пока публичная передача заблокирована. Это не устраняется простым обновлением страницы библиотеки.",
     availableReason: "Права доступа проверяются заново перед каждым скачиванием.",
     added: "Добавлен",
     open: "Открыть ресурс",

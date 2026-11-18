@@ -248,6 +248,7 @@ export default async function ResourceLibraryPage({
                     <ErrorState
                       id="library-item-unavailable-reason"
                       title={copy.unavailableReason}
+                      description={copy.unavailableReasonHint}
                     />
                   )}
                   <Link

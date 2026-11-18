@@ -39,7 +39,11 @@ export function OwnDiscussionDetail({
         {comment.title ?? copy.hidden}
       </h1>
       {!comment.available ? (
-        <ErrorState id="own-discussion-publication-unavailable" title={copy.hiddenNote} />
+        <ErrorState
+          id="own-discussion-publication-unavailable"
+          title={copy.hiddenNote}
+          description={copy.hiddenPublicationHint}
+        />
       ) : null}
       {!comment.editable && <ErrorState id="own-discussion-readonly" title={copy.readOnly} />}
       <time dateTime={comment.createdAt} className="text-xs text-muted">

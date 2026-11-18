@@ -298,7 +298,11 @@ export async function ProductDetailPage({
           </p>
         ) : null}
         {!attribution?.organization && !attribution?.author ? (
-          <ErrorState id="market-publisher-unavailable" title={copy.publisherUnavailable} />
+          <ErrorState
+            id="market-publisher-unavailable"
+            title={copy.publisherUnavailable}
+            description={copy.publisherUnavailableHint}
+          />
         ) : null}
       </div>
 

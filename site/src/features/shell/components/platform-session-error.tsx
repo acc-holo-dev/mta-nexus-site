@@ -18,6 +18,7 @@ export function PlatformSessionError({
       <h1 className="font-display text-primary">{title}</h1>
       <ErrorState
         title={message}
+        description={getDictionary(locale).errors.sessionRetryHint}
         action={
           <Link
             href={retryHref}

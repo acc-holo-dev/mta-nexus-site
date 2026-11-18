@@ -19,5 +19,11 @@ it.each(surfaces)("locks copyUnavailable notice to ErrorState in %s", (relative)
   expect(source).toContain("ErrorState");
   expect(source).toContain("copy-unavailable");
   expect(source).toMatch(/title=\{copy\.copyUnavailable\}/);
+  expect(source).toMatch(/description=\{copy\.copyUnavailableHint\}/);
   expect(source).toMatch(/copyMessage === copy\.copyUnavailable/);
+});
+
+it("locks bilingual copyUnavailableHint in workspace servers copy", () => {
+  expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("copyUnavailableHint:");
+  expect(read("site/src/lib/i18n/ru/workspace.ts")).toContain("copyUnavailableHint:");
 });

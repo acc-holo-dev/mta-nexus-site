@@ -14,8 +14,10 @@ it("locks market publisherUnavailable notice to ErrorState", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="market-publisher-unavailable"');
-  expect(source).toMatch(
-    /<ErrorState id="market-publisher-unavailable" title=\{copy\.publisherUnavailable\}/,
-  );
+  expect(source).toContain('id="market-publisher-unavailable"');
+  expect(source).toContain("title={copy.publisherUnavailable}");
+  expect(source).toContain("description={copy.publisherUnavailableHint}");
+  expect(read("site/src/lib/i18n/en/product.ts")).toContain("publisherUnavailableHint:");
+  expect(read("site/src/lib/i18n/ru/product.ts")).toContain("publisherUnavailableHint:");
   expect(source).not.toContain('className="text-muted">{copy.publisherUnavailable}</p>');
 });

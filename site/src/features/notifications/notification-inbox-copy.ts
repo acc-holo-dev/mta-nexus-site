@@ -74,6 +74,8 @@ const en = {
   live: "The history updates as notifications arrive or their reading status changes. Selection is limited to this page.",
   invalid: "Invalid notification filters or selection. Start from the latest inbox.",
   unavailable: "The inbox is temporarily unavailable. Try again.",
+  unavailableHint:
+    "Retry reloads this inbox page only. A temporary load failure is not an empty notification list.",
   unauthorized: "Sign in to view your notifications.",
   forbidden: "This notification update is not allowed.",
   missing: "A selected notification is no longer available.",
@@ -156,6 +158,8 @@ const ru: typeof en = {
   live: "История обновляется при появлении уведомлений и изменении прочитанного состояния. Выбор ограничен текущей страницей.",
   invalid: "Некорректные фильтры или выбор уведомлений. Откройте последние сообщения.",
   unavailable: "Список уведомлений временно недоступен. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только эту страницу входящих. Временный сбой загрузки — не пустой список уведомлений.",
   unauthorized: "Войдите, чтобы просмотреть уведомления.",
   forbidden: "Это изменение уведомлений запрещено.",
   missing: "Одно из выбранных уведомлений больше недоступно.",

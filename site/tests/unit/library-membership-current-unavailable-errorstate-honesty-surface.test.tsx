@@ -14,8 +14,9 @@ const source = readFileSync(
 it("locks membership history current-unavailable notice to ErrorState without soft caption", () => {
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="library-membership-history-current-unavailable"');
+  expect(source).toContain("description={h.noCurrentHint}");
   expect(source).toMatch(
-    /<ErrorState\s+id="library-membership-history-current-unavailable"\s+title=\{h\.noCurrent\}\s*\/>/u,
+    /<ErrorState\s+id="library-membership-history-current-unavailable"\s+title=\{h\.noCurrent\}/u,
   );
   expect(source).not.toMatch(/return <p>\{h\.noCurrent\}<\/p>|<p>\{h\.noCurrent\}<\/p>/u);
 });

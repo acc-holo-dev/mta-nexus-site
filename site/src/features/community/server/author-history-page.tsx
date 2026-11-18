@@ -111,6 +111,7 @@ export default async function PublicationHistoryPage({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}

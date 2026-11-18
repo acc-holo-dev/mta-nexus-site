@@ -123,6 +123,7 @@ export default async function OwnDiscussionsPage({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.loadUnavailableHint}
           action={
             <a href={latest} className={linkClass}>
               {dictionary.errors.retry}

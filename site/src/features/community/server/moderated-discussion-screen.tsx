@@ -141,6 +141,7 @@ export async function ModeratedDiscussionScreen({
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
         <ErrorState
           title={failure || general.unavailable}
+          description={copy.loadUnavailableHint}
           action={
             <div className="flex flex-wrap justify-center gap-4">
               <a href={href} className={navLinkClass}>

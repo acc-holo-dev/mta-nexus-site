@@ -161,6 +161,7 @@ export default async function VerificationHistoryPage({
       {error ? (
         <ErrorState
           title={error}
+          description={labels.unavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}

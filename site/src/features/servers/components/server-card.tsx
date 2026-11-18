@@ -75,7 +75,11 @@ function CopyAddressControl({
         {copying ? copy.copying : copy.copyAddress}
       </Button>
       {copyMessage === copy.copyUnavailable ? (
-        <ErrorState id="server-card-copy-unavailable" title={copy.copyUnavailable} />
+        <ErrorState
+          id="server-card-copy-unavailable"
+          title={copy.copyUnavailable}
+          description={copy.copyUnavailableHint}
+        />
       ) : (
         <p role="status" className="text-[11px] text-secondary [overflow-wrap:anywhere]">
           {copyMessage}

@@ -107,7 +107,11 @@ export function ServerConnectControls({
         </p>
       ) : null}
       {copyMessage === copy.copyUnavailable ? (
-        <ErrorState id="server-connect-copy-unavailable" title={copy.copyUnavailable} />
+        <ErrorState
+          id="server-connect-copy-unavailable"
+          title={copy.copyUnavailable}
+          description={copy.copyUnavailableHint}
+        />
       ) : (
         <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
           {copyMessage}

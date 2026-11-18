@@ -86,6 +86,7 @@ export default async function VerificationApplicationPage({
       {error ? (
         <ErrorState
           title={error}
+          description={labels.unavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

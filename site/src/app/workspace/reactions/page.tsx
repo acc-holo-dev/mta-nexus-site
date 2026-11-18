@@ -127,6 +127,7 @@ export default async function ReactionsPage({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <a href={latest} className={linkClass}>
               {dictionary.errors.retry}

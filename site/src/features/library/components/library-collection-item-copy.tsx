@@ -161,7 +161,11 @@ export function LibraryCollectionItemCopyForm({
   }
   if (!frozen && move && (source.status !== "active" || source.revision >= 2147483647))
     return (
-      <ErrorState id="library-collection-move-source-unavailable" title={c.moveSourceUnavailable} />
+      <ErrorState
+        id="library-collection-move-source-unavailable"
+        title={c.moveSourceUnavailable}
+        description={c.moveSourceUnavailableHint}
+      />
     );
   if (!destinations.length && !pending.current)
     return <ErrorState id="library-collection-no-destination" title={c.noDestination} />;

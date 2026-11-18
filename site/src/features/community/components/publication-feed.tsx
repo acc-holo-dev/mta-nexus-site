@@ -154,6 +154,7 @@ export function PublicationFeed({
       {error && (
         <ErrorState
           title={error}
+          description={copy.loadUnavailableHint}
           action={
             <a
               href={publicationHref(

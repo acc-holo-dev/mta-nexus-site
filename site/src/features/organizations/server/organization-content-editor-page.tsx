@@ -87,6 +87,7 @@ export async function OrganizationContentEditorPage({
       ) : (
         <ErrorState
           title={failure}
+          description={copy.unavailableHint}
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}

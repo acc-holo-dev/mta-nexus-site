@@ -44,7 +44,7 @@ export const discovery = {
     personalError:
       "Your personal changes could not be loaded. Public Home sections below are still available.",
     personalErrorHint:
-      "Retry reloads your personal strip only. This is not a guest state and does not empty public Home sections.",
+      "Retry reloads your personal changes only. A temporary load failure is not an empty activity list.",
     personalRetry: "Try again",
     personalPartial: "Some personal sources could not be loaded. Showing what is available.",
     personalHidden: "Personal changes are hidden on Home. Public sections below are unchanged.",

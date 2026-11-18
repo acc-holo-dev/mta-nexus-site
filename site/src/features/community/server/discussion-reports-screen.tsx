@@ -126,6 +126,7 @@ export async function DiscussionReportsScreen({
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
         <ErrorState
           title={failure || copy.unavailable}
+          description={copy.loadUnavailableHint}
           action={
             <a href={path} className={navLinkClass}>
               {general.reload}

@@ -65,6 +65,7 @@ export async function CommunityReportGroupsPage({
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
           )}
+          description={copy.unavailableHint}
           action={
             <Link
               href="/admin/reports/targets"

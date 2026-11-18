@@ -110,7 +110,11 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
           />
         </div>
       ) : (
-        <ErrorState id="library-download-receipt-unavailable" title={copy.unavailable} />
+        <ErrorState
+          id="library-download-receipt-unavailable"
+          title={copy.unavailable}
+          description={copy.unavailableHint}
+        />
       )}
       <SupportDownloadHelpLink
         productId={receipt.resourceId}

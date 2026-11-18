@@ -239,7 +239,11 @@ export async function LibraryCollectionsDetailView({
                 buildId={item.buildId ?? undefined}
               />
             ) : (
-              <ErrorState id="library-collection-item-unavailable" title={c.unavailableNote} />
+              <ErrorState
+                id="library-collection-item-unavailable"
+                title={c.unavailableNote}
+                description={c.itemUnavailableHint}
+              />
             )}
             <div className="flex flex-wrap gap-4 text-sm">
               <Link

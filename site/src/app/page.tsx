@@ -191,6 +191,7 @@ export default async function HomePage() {
             empty: dictionary.home.personalEmpty,
             emptyHint: dictionary.home.personalEmptyHint,
             error: dictionary.home.personalError,
+            errorHint: dictionary.home.personalErrorHint,
             retry: dictionary.home.personalRetry,
             partial: dictionary.home.personalPartial,
             hidden: dictionary.home.personalHidden,

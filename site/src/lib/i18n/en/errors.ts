@@ -5,6 +5,8 @@ export const errors = {
     message:
       "An unexpected error occurred while loading this page. Retry the request or return to the home page.",
     retry: "Try again",
+    sessionRetryHint:
+      "Retry rechecks this page session only. A temporary failure is not a signed-out guest state.",
     home: "Go home",
     referenceLabel: "Support reference",
     referenceHint: "Include this code when contacting support.",

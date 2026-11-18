@@ -23,6 +23,8 @@ const en = {
   scope:
     "These are retained approval records, not a full verification lifecycle. Pending and rejected applications, evidence and staff notes are private. An old approval does not establish current verification; a missing record does not imply rejection or misconduct.",
   unavailable: "Approval records could not be loaded. Try again.",
+  unavailableHint:
+    "Retry reloads this approval history only. A temporary load failure is not an empty verification record.",
   invalid: "Invalid approval page. Open the latest records to continue.",
   current: "Current verification",
   verified: "Currently verified",
@@ -52,6 +54,8 @@ const ru: Record<keyof typeof en, string> = {
   scope:
     "Это сохранённые записи одобрений, а не полный жизненный цикл верификации. Ожидающие и отклонённые заявки, доказательства и внутренние заметки приватны. Прошлое одобрение не подтверждает текущий статус; отсутствие записи не означает отказ или нарушение.",
   unavailable: "Не удалось загрузить записи одобрений. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только эту историю одобрений. Временный сбой загрузки — не пустая запись верификации.",
   invalid: "Некорректная страница одобрений. Откройте новые записи, чтобы продолжить.",
   current: "Подтверждение сейчас",
   verified: "Подтверждено сейчас",

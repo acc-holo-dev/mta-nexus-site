@@ -172,6 +172,8 @@ export const workspace = {
     copying: "Copying...",
     copied: "Address copied",
     copyUnavailable: "Copy is unavailable. The address is selected; copy it manually.",
+    copyUnavailableHint:
+      "Clipboard access failed; the address field is selected for manual copy. This is not a directory or server load failure.",
     noDetails: "No additional server details",
     passwordRequired: "Password required",
     playersUnknown: "Player count unknown",

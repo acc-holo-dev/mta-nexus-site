@@ -41,6 +41,8 @@ const en = {
   details: "View receipt",
   retry: "Download this version again",
   unavailable: "This exact archive is currently unavailable for your account.",
+  unavailableHint:
+    "Access or the build failed the latest checks. Starting download again is separate from reloading this history.",
   days: "Period",
   dayCount: "days",
   apply: "Apply",
@@ -100,6 +102,8 @@ const ru: typeof en = {
   details: "Открыть запись",
   retry: "Скачать эту версию повторно",
   unavailable: "Этот архив сейчас недоступен вашему аккаунту.",
+  unavailableHint:
+    "Доступ или сборка не прошли последнюю проверку. Повторное скачивание — отдельно от обновления этой истории.",
   days: "Период",
   dayCount: "дней",
   apply: "Применить",

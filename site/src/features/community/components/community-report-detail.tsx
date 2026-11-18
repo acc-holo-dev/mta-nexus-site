@@ -169,6 +169,7 @@ export function CommunityReportDetailView({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"

@@ -146,6 +146,7 @@ export async function PublicContextTrustPage({
         {error && (
           <ErrorState
             title={error}
+            description={approvals.unavailableHint}
             action={
               <a href={latest} className={actionLinkClass}>
                 {dictionary.errors.retry}

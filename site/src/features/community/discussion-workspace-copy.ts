@@ -22,12 +22,16 @@ const en = {
   hidden: "Publication unavailable",
   hiddenNote:
     "The publication is no longer public. Its details are hidden; you can still remove your own comment.",
+  hiddenPublicationHint:
+    "The publication is hidden, not deleted. You can still remove your own comment from this private view.",
   open: "Manage comment",
   back: "Back to my comments",
   workspace: "Back to workspace",
   discussion: "Open in discussion",
   loading: "Loading your comments…",
   failed: "Your comments could not be loaded. Try again.",
+  loadUnavailableHint:
+    "Retry reloads your comments list only. A temporary load failure is not an empty comment history.",
   invalid: "Invalid comment page. Open the latest page to continue.",
   signIn: "Sign in to manage your comments",
   removed: "Your comment was removed. Replies remain.",
@@ -60,12 +64,16 @@ const ru: Record<keyof typeof en, string> = {
   hidden: "Публикация недоступна",
   hiddenNote:
     "Публикация больше не публичная. Её данные скрыты; свой комментарий по-прежнему можно удалить.",
+  hiddenPublicationHint:
+    "Публикация скрыта, но не удалена. Свой комментарий по-прежнему можно убрать в этом личном просмотре.",
   open: "Управление комментарием",
   back: "К моим комментариям",
   workspace: "К кабинету",
   discussion: "Открыть в обсуждении",
   loading: "Загрузка ваших комментариев…",
   failed: "Не удалось загрузить ваши комментарии. Попробуйте ещё раз.",
+  loadUnavailableHint:
+    "Повтор обновляет только список ваших комментариев. Временный сбой загрузки — не пустая история комментариев.",
   invalid: "Некорректная страница комментариев. Откройте страницу новых комментариев.",
   signIn: "Войдите для управления своими комментариями",
   removed: "Ваш комментарий удалён. Ответы сохранены.",

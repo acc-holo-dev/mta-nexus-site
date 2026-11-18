@@ -43,6 +43,8 @@ const en = {
   invalid: "Invalid report activity filters. Reset the filters and try again.",
   expired: "This activity page is no longer available. Open the latest activity.",
   unavailable: "Report activity could not be loaded. Try again.",
+  unavailableHint:
+    "Retry reloads this report activity only. A temporary load failure is not an empty activity record.",
 };
 const ru: typeof en = {
   title: "История жалобы",
@@ -81,6 +83,8 @@ const ru: typeof en = {
   invalid: "Некорректные фильтры истории жалобы. Сбросьте их и повторите попытку.",
   expired: "Эта страница истории больше недоступна. Откройте последние события.",
   unavailable: "Не удалось загрузить историю жалобы. Повторите попытку.",
+  unavailableHint:
+    "Повтор обновляет только историю этой жалобы. Временный сбой загрузки — не пустая запись активности.",
 };
 export const reportHistoryCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function reportHistoryError(locale: Locale, code: unknown) {

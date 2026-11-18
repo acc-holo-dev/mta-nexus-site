@@ -91,6 +91,7 @@ export default async function OrganizationPublications({
       {!result ? (
         <ErrorState
           title={failure}
+          description={copy.unavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {copy.retry}

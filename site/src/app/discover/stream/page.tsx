@@ -3,6 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../../features/discovery/directory-server";
 import { discoverHref } from "../../../features/discovery/discover-query";
+import { discoveryCopy } from "../../../features/discovery/discovery-copy";
 import {
   discoveryStreamHref,
   parseDiscoveryStreamQuery,
@@ -77,6 +78,7 @@ export default async function StreamPage({
       {error ? (
         <ErrorState
           title={error}
+          description={discoveryCopy(locale).unavailableHint}
           action={
             <Link href={discoveryStreamHref(state ?? fallback)} className={actionLinkClass}>
               {dictionary.errors.retry}

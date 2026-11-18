@@ -15,8 +15,11 @@ it("locks license server unavailable and binding changed notices to ErrorState",
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="license-server-unavailable"');
   expect(source).toContain('id="license-binding-changed"');
-  expect(source).toMatch(
-    /<ErrorState id="license-server-unavailable" title=\{copy\.serverUnavailable\}/,
+  expect(source).toContain('id="license-server-unavailable"');
+  expect(source).toContain("title={copy.serverUnavailable}");
+  expect(source).toContain("description={copy.serverUnavailableHint}");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain(
+    "serverUnavailableHint:",
   );
   expect(source).toMatch(/<ErrorState id="license-binding-changed" title=\{copy\.changed\}/);
   expect(source).not.toContain("? (license.serverName ?? copy.serverUnavailable)");

@@ -23,6 +23,8 @@ const en = {
   emptyFilteredHint: "Try another search, role or access filter, or reset to the latest members.",
   invalid: "Invalid team page. Open the latest members to continue.",
   unavailable: "The team directory could not be loaded. Try again.",
+  unavailableHint:
+    "Retry reloads this team directory only. A temporary load failure is not an empty member list.",
   uncertain: "Reload the saved team before making another change.",
   workspace: "Organization workspace",
   management: "Add members or manage ownership",
@@ -53,6 +55,8 @@ const ru: Record<keyof typeof en, string> = {
     "Попробуйте другой поиск, роль или доступ либо откройте список новых участников.",
   invalid: "Некорректная страница команды. Откройте список новых участников.",
   unavailable: "Не удалось загрузить каталог команды. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только каталог команды. Временный сбой загрузки — не пустой список участников.",
   uncertain: "Загрузите сохранённую команду перед следующим изменением.",
   workspace: "Кабинет организации",
   management: "Добавление участников и управление владением",

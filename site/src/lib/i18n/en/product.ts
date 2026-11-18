@@ -91,6 +91,8 @@ export const product = {
     publisher: "Publisher",
     author: "Author",
     publisherUnavailable: "Publisher unavailable",
+    publisherUnavailableHint:
+      "Publisher attribution is hidden on this listing. That is not the same as the resource being unpublished.",
     security:
       "Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.",
   },

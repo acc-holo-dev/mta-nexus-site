@@ -14,8 +14,14 @@ const source = readFileSync(
 it("locks collection history current-unavailable notice to ErrorState without soft muted caption", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState, Input } from "@nexus/ui"');
   expect(source).toContain('id="library-collection-history-current-unavailable"');
+  expect(source).toContain("description={h.noCurrentHint}");
   expect(source).toMatch(
-    /<ErrorState\s+id="library-collection-history-current-unavailable"\s+title=\{h\.noCurrent\}\s*\/>/u,
+    /<ErrorState\s+id="library-collection-history-current-unavailable"\s+title=\{h\.noCurrent\}/u,
   );
+  const i18n = readFileSync(
+    join(root, "site/src/features/library/library-collection-history-i18n.ts"),
+    "utf8",
+  );
+  expect(i18n).toContain("noCurrentHint:");
   expect(source).not.toContain('className="text-muted">{h.noCurrent}</p>');
 });

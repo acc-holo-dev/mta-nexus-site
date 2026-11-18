@@ -48,6 +48,7 @@ function panelCopy(locale: "en" | "ru"): HomePersonalCopy {
     empty: home.personalEmpty,
     emptyHint: home.personalEmptyHint,
     error: home.personalError,
+    errorHint: home.personalErrorHint,
     retry: home.personalRetry,
     partial: home.personalPartial,
     hidden: home.personalHidden,

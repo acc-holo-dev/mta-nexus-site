@@ -22,6 +22,8 @@ const en = {
   fullCopy:
     "Full copy receipt stores a count and digest; individual resource IDs are not recorded.",
   noCurrent: "Current collection unavailable",
+  noCurrentHint:
+    "The collection ID in the receipt no longer resolves with your access. That gap is not a missing history row.",
   time: "Time (UTC)",
   loading: "Loading collection command history…",
 };
@@ -49,6 +51,8 @@ const ru: typeof en = {
   fullCopy:
     "Квитанция полной копии хранит количество и хэш состава; отдельные ID ресурсов не записаны.",
   noCurrent: "Текущая коллекция недоступна",
+  noCurrentHint:
+    "ID коллекции в квитанции больше не совпадает с вашим доступом. Это не пропуск строки в истории.",
   time: "Время (UTC)",
   loading: "Загружаем историю команд коллекций…",
 };
