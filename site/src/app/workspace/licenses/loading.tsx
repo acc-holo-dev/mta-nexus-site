@@ -1,29 +1,23 @@
 import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
+import { HonestLoadingShell } from "../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/licenses.
 export default async function Loading() {
   const copy = getCommerceHistoryCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
-      aria-busy="true"
-      aria-labelledby="licenses-loading-heading"
+      headingId="licenses-loading-heading"
+      title={copy.licensesTitle}
+      loadingLabel={copy.loading}
     >
-      <header className="space-y-2">
-        <h1 id="licenses-loading-heading" className="font-display text-primary">
-          {copy.licensesTitle}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-10 w-64 rounded bg-inset" />
         {[1, 2, 3, 4].map((key) => (
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

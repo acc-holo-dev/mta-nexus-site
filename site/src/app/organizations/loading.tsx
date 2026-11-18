@@ -1,29 +1,25 @@
 import { discoveryCopy } from "../../features/discovery/discovery-copy";
+import { HonestLoadingShell } from "../../features/shell/honest-loading";
 import { getRequestLocale } from "../../lib/platform/i18n-server";
 
 // Honest loading shell for /organizations.
 export default async function Loading() {
   const copy = discoveryCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="min-w-0 space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="organizations-loading-heading"
+      headingId="organizations-loading-heading"
+      title={copy.organizationsTitle}
+      loadingLabel={copy.organizationsLoading}
+      headerClassName="space-y-2 border-b border-base pb-6"
+      titleClassName="text-2xl font-extrabold text-primary"
     >
-      <header className="space-y-2 border-b border-base pb-6">
-        <h1 id="organizations-loading-heading" className="text-2xl font-extrabold text-primary">
-          {copy.organizationsTitle}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.organizationsLoading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-11 max-w-full rounded bg-inset" />
         {[1, 2, 3, 4].map((key) => (
           <div key={key} className="h-24 max-w-full rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

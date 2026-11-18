@@ -166,6 +166,8 @@ Scope: `app/discover`, `app/servers` (публичный каталог/карт
 
 **Slice 45 done:** public-guest inventory coverage expansion (A/B) — same snapshot + tool. Added app roots `market`, `community`, `organizations`, `users`, `developers`, `support`, `explore`, `acquire`; selective guest feature components (market/resource listing & detail chrome, community feed/discussion/article card, public profile pagination/experience, support entry — not staff report/moderation or org workspace forms). Scanner skips TS `=>` false-positives; version prefix `v`, `SHA-256`, and unknown-marker `—` allowlisted. `unallowlisted: 0`; no new locale copy ternaries; no dictionary moves required (surfaces already on RU/EN keys).
 
+**Slice 46 done:** shared RSC honest loading chrome → [`features/shell/honest-loading.ts`](../../site/src/features/shell/honest-loading.ts) (`HonestLoadingShell`); владение **Shell**; depcruise public API + `clientUtilPorts` (no `"use client"`); ~82 near-identical `app/**/loading.tsx` migrated (workspace commerce history, auth, public directory/profile, legal/settings clusters) preserving heading ids / titles / skeleton markup; `PublicationFeedLoading` optionally composes the shell.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -236,6 +238,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | C   | Journey honesty — load/session/empty/recovery program complete; write/form ErrorStates intentionally out of scope | честность user journey           | **done** |
 | D/E | Scoreboard sync после residual honesty + Slice 42/43                                                              | docs honesty                     | **done** |
 | D/E | Scoreboard sync после Slice 44/45 public-guest i18n + journey C close                                             | docs honesty                     | **done** |
+| T   | Slice 46 — Shell `HonestLoadingShell` + large `loading.tsx` absorb                                                | читаемость + loading honesty     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

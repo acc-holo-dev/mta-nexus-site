@@ -1,26 +1,19 @@
 import { notificationInboxCopy } from "../../features/notifications/notification-inbox-copy";
+import { HonestLoadingShell } from "../../features/shell/honest-loading";
 import { getRequestLocale } from "../../lib/platform/i18n-server";
 
 // Honest loading shell for /notifications.
 export default async function NotificationInboxLoading() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="notification-inbox-loading-heading"
+      headingId="notification-inbox-loading-heading"
+      title={copy.title}
+      loadingLabel={copy.loading}
+      headerClassName="space-y-3 border-b border-base pb-6"
+      titleClassName="text-2xl font-extrabold text-primary"
     >
-      <header className="space-y-3 border-b border-base pb-6">
-        <h1
-          id="notification-inbox-loading-heading"
-          className="text-2xl font-extrabold text-primary"
-        >
-          {copy.title}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-10 w-full max-w-md rounded bg-inset" />
         <div className="h-28 rounded bg-inset" />
@@ -28,6 +21,6 @@ export default async function NotificationInboxLoading() {
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

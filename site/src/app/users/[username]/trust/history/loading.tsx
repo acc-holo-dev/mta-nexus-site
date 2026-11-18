@@ -1,3 +1,4 @@
+import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
 import { approvalCopy } from "../../../../../features/trust/public-verification-history-copy";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 
@@ -5,24 +6,19 @@ import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 export default async function Loading() {
   const copy = approvalCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="user-trust-history-loading-heading"
+      headingId="user-trust-history-loading-heading"
+      title={copy.title}
+      loadingLabel={copy.loading}
+      headerClassName="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6"
+      titleClassName="text-xl font-bold text-primary"
     >
-      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
-        <h1 id="user-trust-history-loading-heading" className="text-xl font-bold text-primary">
-          {copy.title}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         {[1, 2, 3].map((key) => (
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

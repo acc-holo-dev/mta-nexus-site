@@ -1,3 +1,4 @@
+import { HonestLoadingShell } from "../../../features/shell/honest-loading";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestLocale } from "../../../lib/platform/i18n-server";
 
@@ -5,24 +6,17 @@ import { getRequestLocale } from "../../../lib/platform/i18n-server";
 export default async function Loading() {
   const copy = getDictionary(await getRequestLocale()).serverDetail;
   return (
-    <section
+    <HonestLoadingShell
       className="min-w-0 space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="server-detail-loading-heading"
+      headingId="server-detail-loading-heading"
+      title={copy.breadcrumb}
+      loadingLabel={copy.loading}
     >
-      <header className="space-y-2">
-        <h1 id="server-detail-loading-heading" className="font-display text-primary">
-          {copy.breadcrumb}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-32 rounded bg-inset" />
         <div className="h-24 rounded bg-inset" />
         <div className="h-40 rounded bg-inset" />
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }
