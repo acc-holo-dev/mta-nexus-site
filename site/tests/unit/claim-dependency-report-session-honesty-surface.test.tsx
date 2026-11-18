@@ -41,5 +41,8 @@ it("locks object-report null auth and QA ask-unavailable to session/load honesty
   );
   const qa = read("site/src/features/resources/components/resource-qa-panel.tsx");
   expect(qa).toContain('id="resource-qa-ask-unavailable"');
-  expect(qa).toContain("description={copy.unavailableDescription}");
+  expect(qa).toMatch(
+    /<ErrorState id="resource-qa-ask-unavailable" title=\{copy\.unavailable\} \/>/u,
+  );
+  expect(qa).toContain("description={copy.identityUnavailableDescription}");
 });

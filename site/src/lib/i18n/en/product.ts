@@ -161,14 +161,14 @@ export const product = {
     noneDeclared: "None declared",
     resolutionUnavailable: "Catalogue resolution temporarily unavailable",
     resolutionUnavailableHint:
-      "A temporary catalogue lookup failure is not a missing dependency list. Retry after the catalogue recovers.",
+      "A temporary catalogue lookup failure is not a missing dependency list. Try again after the catalogue recovers.",
     selfReference: "self reference",
     notFound: "not found in public NEXUS catalogue",
     resolutionNotice:
       "Resolution checks public catalogue presence only; it is not a compatibility guarantee.",
     reverseUnavailable: "Reverse dependency lookup is temporarily unavailable.",
     reverseUnavailableHint:
-      "A temporary reverse-lookup failure is not an empty dependents list. Retry after the catalogue recovers.",
+      "A temporary reverse-lookup failure is not an empty dependents list. Try again after the catalogue recovers.",
     noDependents:
       "No published free NEXUS resources currently declare this resource as a direct dependency.",
     limitReached:
