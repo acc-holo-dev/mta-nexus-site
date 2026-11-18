@@ -206,20 +206,20 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| #   | Slice                                                      | Ось                              | Статус   |
-| --- | ---------------------------------------------------------- | -------------------------------- | -------- |
-| 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done** |
-| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done** |
-| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done** |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done** |
-| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done** |
-| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done** |
-| 7   | Footer credit line → `footer.creditLine` i18n              | честность RU/EN                  | **done** |
-| T   | services-domain — `lib/services/<domain>/`                 | читаемость service layer         | **done** |
-| T   | lib-http-platform — `lib/http/` + `lib/platform/`          | очистка `lib/` root              | **done** |
-| D/E | Scoreboard sync после http/platform + services domains     | docs honesty                     | **done** |
+| #   | Slice                                                      | Ось                              | Статус     |
+| --- | ---------------------------------------------------------- | -------------------------------- | ---------- |
+| 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done**   |
+| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done**   |
+| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done**   |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done**   |
+| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done**   |
+| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done**   |
+| 7   | Footer credit line → `footer.creditLine` i18n              | честность RU/EN                  | **done**   |
+| T   | services-domain — `lib/services/<domain>/`                 | читаемость service layer         | **done**   |
+| T   | lib-http-platform — `lib/http/` + `lib/platform/`          | очистка `lib/` root              | **done**   |
+| D/E | Scoreboard sync после http/platform + services domains     | docs honesty                     | **done**   |
 | C   | Journey honesty — empty≠fail / session≠guest / recovery    | честность user journey           | **active** |
-| D/E | Scoreboard sync после recovery + follow null-auth          | docs honesty                     | **done** |
+| D/E | Scoreboard sync после recovery + follow null-auth          | docs honesty                     | **done**   |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
