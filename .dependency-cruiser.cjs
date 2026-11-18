@@ -194,7 +194,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/discovery/)" },
       to: {
-        path: "^site/src/features/discovery/(?!(?:discovery-stream-copy|discovery-copy|discovery-stream-contract|discover-query|directory-server)\\.ts$)",
+        path: "^site/src/features/discovery/(?!(?:discovery-search-api-copy|discovery-stream-copy|discovery-copy|discovery-stream-contract|discover-query|directory-server)\\.ts$)",
       },
     },
     {

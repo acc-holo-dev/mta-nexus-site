@@ -142,6 +142,7 @@ const features = [
     name: "discovery",
     clients: [],
     clientUtilPorts: [
+      "discovery-search-api-copy",
       "discovery-stream-copy",
       "discovery-copy",
       "discovery-stream-contract",

@@ -1,5 +1,6 @@
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { discoverySearchApiCopy } from "../../../features/discovery/discovery-search-api-copy";
 import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
 import { resolveLocale } from "../../../lib/i18n";
 import {
@@ -33,6 +34,8 @@ const errorHeaders = {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+  const copy = discoverySearchApiCopy(locale);
 
   try {
     const query = (request.nextUrl.searchParams.get("q") || "").trim();
@@ -41,7 +44,7 @@ export async function GET(request: NextRequest) {
       return jsonWithRequestId(
         context,
         {
-          error: `Search query must be at most ${MAX_QUERY_LENGTH} characters`,
+          error: copy.queryTooLong(MAX_QUERY_LENGTH),
         },
         {
           status: 400,
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
     if (requestedType && !SEARCH_TYPES.has(requestedType as SearchResultType)) {
       return jsonWithRequestId(
         context,
-        { error: "Unknown search type" },
+        { error: copy.unknownType },
         {
           status: 400,
           headers: errorHeaders,
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
       return jsonWithRequestId(
         context,
         {
-          error: "Search rate limit exceeded. Please try again shortly.",
+          error: copy.rate,
           unavailable: true,
         },
         {
@@ -98,7 +101,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
     const results = await discoveryService.search(query, limit, type || undefined, locale);
 
     return Response.json(
@@ -123,7 +125,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "Search is temporarily unavailable",
+        error: copy.unavailable,
         unavailable: true,
       },
       {

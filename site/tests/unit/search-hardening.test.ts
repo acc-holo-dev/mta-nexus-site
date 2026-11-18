@@ -12,7 +12,8 @@ describe("public search hardening", () => {
     expect(route).not.toContain("getClientIp(request.headers)");
     expect(route).toContain("MAX_QUERY_LENGTH");
     expect(route).toContain("SEARCH_TYPES");
-    expect(route).toContain("Unknown search type");
+    expect(route).toContain("discoverySearchApiCopy");
+    expect(route).toContain("copy.unknownType");
     expect(route).toMatch(
       /Math\.min\(\s*Math\.max\(\s*Math\.floor\(requestedLimit\),\s*1,?\s*\),\s*DEFAULT_LIMIT,?\s*\)/u,
     );

@@ -210,6 +210,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 64 done:** scoreboard honesty — `code-topology.md` counts/features/`source_sha` match tip inventory after Wave 63 (was still stamped Wave 56/57). Topology Wave-class exhausted again pending owner API-envelope or F/ops direction.
 
+**Wave 65 done:** `/api/search` error envelope (query length / unknown type / rate / unavailable) uses bilingual `discoverySearchApiCopy` via `nexus_locale`; JSON shape unchanged (`error` + `unavailable`). First tip of scoped API-envelope localization.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -314,8 +316,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Wave 62 — stale public-guest allowlist purge + design-direction sync                                              | docs / inventory honesty         | **done** |
 | A   | Wave 63 — discovery search serverFallback via nexus_locale                                                        | API RU/EN honesty                | **done** |
 | D/E | Wave 64 — scoreboard sync (`code-topology.md` ↔ tip inventory)                                                    | docs honesty                     | **done** |
+| A   | Wave 65 — `/api/search` error envelope via discoverySearchApiCopy                                                 | API envelope RU/EN               | **done** |
 
-Дальше: topology Wave-класс **exhausted**. Owner decision: scoped API envelope localization (start `/api/search` error parity with `/api/discover`) или F/ops external gates. Новые TOPO ID не заводить.
+Дальше: API-envelope localization program started (Wave 65). Next reversible tips: other discovery/auth/servers English error strings with existing or new copy modules. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
