@@ -73,6 +73,7 @@ export const servers = {
     unlisted: "Unlisted",
     private: "Private",
     saving: "Saving...",
+    savingLocked: "Saving. Fields are temporarily locked.",
     save: "Save details",
   },
   serverClaim: {

@@ -78,6 +78,7 @@ export const servers = {
     unlisted: "По ссылке",
     private: "Приватный",
     saving: "Сохранение...",
+    savingLocked: "Сохранение выполняется. Поля временно недоступны.",
     save: "Сохранить",
   },
   serverClaim: {

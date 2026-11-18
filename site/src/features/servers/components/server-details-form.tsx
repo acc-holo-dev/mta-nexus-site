@@ -100,7 +100,7 @@ export function ServerDetailsForm({
   actorId: string;
 }) {
   const router = useRouter();
-  const { locale, dictionary } = useNexusLocale();
+  const { dictionary } = useNexusLocale();
   const copy = dictionary.serverManagement;
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -319,9 +319,7 @@ export function ServerDetailsForm({
         >
           {loading && (
             <p role="status" className="text-xs text-muted sm:col-span-2">
-              {locale === "ru"
-                ? "Сохранение выполняется. Поля временно недоступны."
-                : "Saving. Fields are temporarily locked."}
+              {copy.savingLocked}
             </p>
           )}
           <Input

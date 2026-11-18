@@ -105,9 +105,7 @@ export function ContentModerationControls({
           workspace
             ? moderationError(locale, response.ok ? "UNCONFIRMED" : data?.code)
             : data?.code === "CONTENT_STATE_CHANGED"
-              ? locale === "ru"
-                ? "Публикация изменилась. Загрузите и проверьте новую версию перед решением."
-                : "The publication changed. Reload and review the new version before deciding."
+              ? moderationError(locale, "CONTENT_STATE_CHANGED")
               : copy.contentFailed,
         );
         return;

@@ -77,7 +77,8 @@ export function ContentDiscussion({
   identityUnavailable?: boolean;
   /** SSR/API-hydrated follow+mute so controls do not flash unmuted after Save. */
   followInitial?: {
-    authenticated: boolean;
+    /** `null` = session probe failed (not a guest). */
+    authenticated: boolean | null;
     actorId?: string | null;
     following: boolean;
     notifyComments: boolean;

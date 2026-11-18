@@ -119,7 +119,7 @@ export default async function ArticleDetailPage({
     : null;
   const followInitial = sessionFailed
     ? {
-        authenticated: false,
+        authenticated: null,
         following: false,
         notifyComments: false,
         muted: false,

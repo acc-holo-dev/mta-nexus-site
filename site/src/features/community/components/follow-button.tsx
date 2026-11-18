@@ -15,7 +15,8 @@ import { followActionCopy, followCopy, followError } from "../follow-workspace-c
 import { ObjectMuteControls } from "../object-mute-controls";
 
 type InitialFollowState = {
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   actorId?: string | null;
   following: boolean;
   self?: boolean;
@@ -69,7 +70,7 @@ function FollowControl({
     "checking" | "anonymous" | "self" | "following" | "not-following" | "error"
   >(
     initial
-      ? initial.error
+      ? initial.authenticated === null || initial.error
         ? "error"
         : !initial.authenticated
           ? "anonymous"
@@ -106,7 +107,13 @@ function FollowControl({
   useEffect(() => {
     // Skip follow-state fetch when SSR already hydrated identity. Mute may still
     // load via ObjectMuteControls when initial mute fields are absent.
-    if (initial && attempt === 0 && (!initial.authenticated || initial.actorId)) return;
+    if (
+      initial &&
+      attempt === 0 &&
+      initial.authenticated !== null &&
+      (!initial.authenticated || initial.actorId)
+    )
+      return;
     let active = true;
     const controller = new AbortController();
     writeBlocked.current = true;

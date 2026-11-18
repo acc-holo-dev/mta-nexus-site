@@ -1,6 +1,7 @@
 /** SSR/API seed for FollowButton: follow + mute without a client flash. */
 export type FollowInitialState = {
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   actorId?: string | null;
   following: boolean;
   self?: boolean;
@@ -19,7 +20,7 @@ export function buildFollowInitialState(args: {
   self?: boolean;
 }): FollowInitialState {
   if (args.actor === undefined) {
-    return { authenticated: false, actorId: null, following: false, error: true };
+    return { authenticated: null, actorId: null, following: false, error: true };
   }
   const actor = args.actor ?? null;
   if (!actor) {
