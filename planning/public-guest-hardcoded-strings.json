@@ -1,0 +1,58 @@
+{
+  "allowlist": [
+    {
+      "id": "servers.detail.unknown-player-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/app/servers/[slug]/page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "servers.card.unknown-occupancy-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/servers/components/server-card.tsx",
+      "text": "—"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "servers.detail.unknown-player-dash",
+      "kind": "unknown-marker",
+      "line": 377,
+      "path": "site/src/app/servers/[slug]/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "servers.detail.unknown-player-dash",
+      "kind": "unknown-marker",
+      "line": 378,
+      "path": "site/src/app/servers/[slug]/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "servers.card.unknown-occupancy-dash",
+      "kind": "unknown-marker",
+      "line": 198,
+      "path": "site/src/features/servers/components/server-card.tsx",
+      "text": "—"
+    }
+  ],
+  "scan_roots": [
+    "site/src/app/discover",
+    "site/src/app/servers",
+    "site/src/app/articles",
+    "site/src/features/discovery",
+    "site/src/features/servers/components/mta-master-server-directory.tsx",
+    "site/src/features/servers/components/server-card.tsx",
+    "site/src/features/servers/components/server-connect-controls.tsx",
+    "site/src/features/servers/components/server-follow-button.tsx"
+  ],
+  "scope": "Git-tracked public guest surfaces — discover, public servers directory/detail, articles, discovery feature (excluding server/ and *-server ports), and guest server directory components — hard-coded guest-facing literals + locale copy ternaries.",
+  "source_sha": "c20aa64cc36318a0cbf6b6f9adbf9f6ba67d5c51",
+  "summary": {
+    "allowlisted": 3,
+    "findings": 3,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 28,
+    "unallowlisted": 0
+  }
+}

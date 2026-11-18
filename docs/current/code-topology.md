@@ -159,6 +159,11 @@ Scope: `features/shell` (без тестов, без `server/` и `*-server` п�
 **Slice 6 done:** sidebar chrome uses shared `@nexus/ui` `BrandMark` (collapsed tile-only, expanded wordmark + locale `openFreeBeta` tag); duplicate `brand.sidebar.*` literals removed from shell inventory allowlist.  
 **Slice 7 done:** footer credit line moved to `dictionary.footer.creditLine` (en/ru); inventory allowlist no longer tracks footer copyright glue.
 
+**Slice 44 done:** public-guest hard-coded string inventory (A/B) — [`planning/public-guest-hardcoded-strings.json`](../../planning/public-guest-hardcoded-strings.json).  
+Регенерация: `python3 planning/tools/inventory_public_guest_i18n.py --output planning/public-guest-hardcoded-strings.json`  
+Проверка: `python3 planning/tools/inventory_public_guest_i18n.py --check planning/public-guest-hardcoded-strings.json`  
+Scope: `app/discover`, `app/servers` (публичный каталог/карточка), `app/articles`, `features/discovery` (без `server/` и `*-server`), guest directory components (`mta-master-server-directory`, `server-card`, `server-connect-controls`, `server-follow-button`). Sibling к Slice 5 — shell+home контракт не расширяли. Unknown-marker `—` в allowlist; `serverDetail.discord` уведён в RU+EN dictionaries.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -219,6 +224,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | 5   | i18n inventory automation (shell+home hard-coded strings)                                                                                      | честность RU/EN                  | **done**   |
 | 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                                                       | brand honesty + guest path       | **done**   |
 | 7   | Footer credit line → `footer.creditLine` i18n                                                                                                  | честность RU/EN                  | **done**   |
+| 44  | i18n inventory automation (public-guest discover/servers/articles)                                                                             | честность RU/EN                  | **done**   |
 | T   | services-domain — `lib/services/<domain>/`                                                                                                     | читаемость service layer         | **done**   |
 | T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                                              | очистка `lib/` root              | **done**   |
 | T   | Slice 42 — Shell `home-personal-changes` server port                                                                                           | читаемость + Shell ownership     | **done**   |

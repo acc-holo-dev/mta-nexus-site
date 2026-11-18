@@ -319,7 +319,7 @@ export default async function ServerDetailPage({
                   rel="noreferrer"
                   className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
-                  Discord ↗
+                  {copy.discord} ↗
                 </a>
               )}
               {rulesUrl && (

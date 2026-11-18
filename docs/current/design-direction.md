@@ -41,7 +41,7 @@ Contrast gate: `site/tests/unit/design-token-contrast.test.ts`. Keep accent blue
 | `BrandMark` | NX tile + wordmark for navbar/footer shell   |
 | `Rise`      | Staggered presence motion for hero hierarchy |
 
-Next structural absorb moves shell chrome into `features/shell` (see topology queue).
+Shell chrome lives in `features/shell` (Slices 4/6/7). Further shell work is i18n honesty and journey polish on the topology queue — not another chrome absorb.
 
 ## Proof bar
 

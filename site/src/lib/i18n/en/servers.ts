@@ -10,6 +10,7 @@ export const servers = {
     language: "Language",
     region: "Region",
     website: "Website",
+    discord: "Discord",
     rules: "Rules",
     openMedia: "Open media",
     livePlayerLoad: "Live player load",

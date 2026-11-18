@@ -234,5 +234,28 @@ class TrackerContractTests(unittest.TestCase):
         self.assertIn('planning/shell-home-hardcoded-strings.json', body)
         self.assertIn('inventory_shell_home_i18n.py', body)
 
+    def test_public_guest_i18n_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'public-guest-hardcoded-strings.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/public-guest-hardcoded-strings.json')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_public_guest_i18n.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertEqual(snapshot_data.get('summary', {}).get('unallowlisted'), 0)
+        self.assertEqual(snapshot_data.get('summary', {}).get('locale_copy_ternaries'), 0)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/public-guest-hardcoded-strings.json', body)
+        self.assertIn('inventory_public_guest_i18n.py', body)
+
 
 if __name__=='__main__':unittest.main()
