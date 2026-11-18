@@ -17,12 +17,6 @@
       "kind": "jsx-text",
       "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
       "text": "v"
-    },
-    {
-      "id": "market.provenance.sha256-label",
-      "kind": "jsx-text",
-      "path": "site/src/features/resources/components/build-provenance-details.tsx",
-      "text": "SHA-256"
     }
   ],
   "findings": [
@@ -98,7 +92,7 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "8d208ab346cc5d6e0056f159ae25103ffd8a7ee8",
+  "source_sha": "156ce80b6ffa60598acdde2d3d3a191a9aa00f5d",
   "summary": {
     "allowlisted": 3,
     "findings": 3,

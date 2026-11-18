@@ -127,12 +127,6 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "kind": "jsx-text",
         "text": "v",
     },
-    {
-        "id": "market.provenance.sha256-label",
-        "path": "site/src/features/resources/components/build-provenance-details.tsx",
-        "kind": "jsx-text",
-        "text": "SHA-256",
-    }
 )
 
 
