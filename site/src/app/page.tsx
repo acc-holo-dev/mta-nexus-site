@@ -121,21 +121,16 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-center gap-6 px-6 py-16 sm:px-10 sm:py-20">
           <Rise delay="none">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              {dictionary.home.liveEcosystem}
-            </p>
-          </Rise>
-          <Rise delay="short">
             <h1 className="font-display text-5xl tracking-tight text-primary sm:text-7xl">
               {dictionary.home.brand}
             </h1>
           </Rise>
-          <Rise delay="medium">
+          <Rise delay="short">
             <p className="max-w-2xl text-lg font-semibold text-primary sm:text-xl">
               {dictionary.home.title}
             </p>
           </Rise>
-          <Rise delay="long">
+          <Rise delay="medium">
             <p className="max-w-xl text-sm leading-relaxed text-secondary sm:text-base">
               {dictionary.home.description}
             </p>

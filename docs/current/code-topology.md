@@ -198,6 +198,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 58 done:** service-worker offline document copy → Shell [`offline-document-copy.ts`](../../site/src/features/shell/offline-document-copy.ts) injected into [`sw.js/route.ts`](../../site/src/app/sw.js/route.ts); resource build/detail MTA and SHA-256 labels → dictionary keys (`managementCopy.mta`, `copy.mtaVersion`, `packageCopy.sha256Label`); honesty locks for both surfaces.
 
+**Wave 59 done:** Home hero budget — drop `liveEcosystem` eyebrow; brand + title + description + CTA only. Micro honesty — plan-review empty `<option>` → `unknownMarker`; admin quarantine `SHA-256` → `storageMaintenanceCopy.hash`.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -293,8 +295,10 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 56/57 (single squash tip)                                                              | docs honesty                     | **done** |
 | A/C | Wave 58 — SW offline document i18n + resource MTA/SHA-256 labels                                                  | честность RU/EN + PWA honesty    | **done** |
 | D/E | Scoreboard sync после Wave 58                                                                                     | docs honesty                     | **done** |
+| A/C | Wave 59 — Home hero budget + plan-review/quarantine micro honesty                                                 | Shell 2027 + RU/EN honesty       | **done** |
+| D/E | Scoreboard sync после Wave 59                                                                                     | docs honesty                     | **done** |
 
-Дальше: F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
+Дальше: F только как локальный ops prep; optional PWA token/UX-05 locks. Новые TOPO ID в `planning/tasks.json` не заводить.
 
 ## Связанные входы
 

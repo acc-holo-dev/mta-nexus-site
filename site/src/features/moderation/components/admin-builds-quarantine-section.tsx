@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
+import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 const touchLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -71,6 +72,7 @@ export function AdminBuildsQuarantineSection({
   moreRiskBuilds: boolean;
   adminHref: (changes: Record<string, string | number>) => string;
 }) {
+  const hashLabel = storageMaintenanceCopy(locale).hash;
   return (
     <>
       <section>
@@ -123,7 +125,7 @@ export function AdminBuildsQuarantineSection({
                     </Link>
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
+                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · {hashLabel}
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
                     {build.sha256Hash}
@@ -227,7 +229,7 @@ export function AdminBuildsQuarantineSection({
                     </Link>
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
+                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · {hashLabel}
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
                     {build.sha256Hash}

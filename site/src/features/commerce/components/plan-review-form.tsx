@@ -5,6 +5,7 @@ import { commercialPlanTermsSchema, planReviewCommandSchema } from "@nexus/valid
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
@@ -236,7 +237,7 @@ export function PlanReviewForm({
                 onChange={(e) => setOrganization(e.target.value)}
                 className="w-full rounded border border-base bg-surface p-2"
               >
-                <option value="">—</option>
+                <option value="">{unknownMarker(locale)}</option>
                 {frozen &&
                 organizationId &&
                 !scopes.some((scope) => scope.id === organizationId) ? (
