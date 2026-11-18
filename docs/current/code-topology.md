@@ -202,6 +202,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 60 done:** SW offline document uses Shell `offlineDocumentTheme` (dark tokens + nexus fonts) and bilingual `pushFallbackBody`; push handler picks locale via `navigator.language`.
 
+**Wave 61 done:** provenance UI `SHA-256` → `provenance.hash`; UX-05 regression locks for native `color-scheme: inherit`, autofill `--nexus-text`/`--nexus-inset`, and longhand typography utilities.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -301,8 +303,10 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 59                                                                                     | docs honesty                     | **done** |
 | A/C | Wave 60 — SW offline theme tokens + bilingual push fallback                                                       | PWA honesty + Shell 2027         | **done** |
 | D/E | Scoreboard sync после Wave 60                                                                                     | docs honesty                     | **done** |
+| A/C | Wave 61 — provenance.hash + UX-05 theme/typography verification locks                                             | RU/EN honesty + UX-05            | **done** |
+| D/E | Scoreboard sync после Wave 61                                                                                     | docs honesty                     | **done** |
 
-Дальше: F только как локальный ops prep; optional UX-05 typography/theme locks. Новые TOPO ID в `planning/tasks.json` не заводить.
+Дальше: F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
 ## Связанные входы
 

@@ -100,6 +100,7 @@ export const product = {
   },
   provenance: {
     title: "Происхождение артефакта",
+    hash: "SHA-256",
     cleanScanRecorded: "Чистая проверка зафиксирована",
     blockedMalicious: "Заблокировано как вредоносное",
     scannerUnavailable: "Сканер недоступен",

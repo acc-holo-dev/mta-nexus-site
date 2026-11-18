@@ -66,7 +66,7 @@ export function BuildProvenanceDetails({
           <Fingerprint className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           {copy.title}
         </span>
-        <span className="font-mono text-faint">SHA-256</span>
+        <span className="font-mono text-faint">{copy.hash}</span>
       </summary>
 
       <div className="space-y-3 border-t border-base px-3 py-3 text-[11px]">
@@ -117,7 +117,7 @@ export function BuildProvenanceDetails({
             </>
           ) : null}
 
-          <dt className="text-faint">SHA-256</dt>
+          <dt className="text-faint">{copy.hash}</dt>
           <dd>
             <code className="block select-all break-all rounded border border-base bg-inset px-2 py-1.5 font-mono text-[10px] leading-relaxed text-secondary">
               {build.sha256Hash}

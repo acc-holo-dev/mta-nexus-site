@@ -100,6 +100,7 @@ export const product = {
   },
   provenance: {
     title: "Artifact provenance",
+    hash: "SHA-256",
     cleanScanRecorded: "Clean scan recorded",
     blockedMalicious: "Blocked as malicious",
     scannerUnavailable: "Scanner unavailable",
