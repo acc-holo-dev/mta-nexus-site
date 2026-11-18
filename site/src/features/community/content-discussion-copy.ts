@@ -3,6 +3,8 @@ import { userPlatformError } from "./user-platform-copy";
 
 const en = {
   countUnavailable: "Comment total unavailable until refresh.",
+  countUnavailableHint:
+    "A missing total is not an empty discussion. Refresh to load the current comment count.",
   reloadSaved: "Reload saved comment",
   search: "Search comments or authors",
   applySearch: "Search",
@@ -79,6 +81,8 @@ const en = {
 };
 const ru: Record<keyof typeof en, string> = {
   countUnavailable: "Общее число комментариев станет доступно после обновления страницы.",
+  countUnavailableHint:
+    "Отсутствие счётчика — не пустое обсуждение. Обновите страницу, чтобы загрузить актуальное число комментариев.",
   reloadSaved: "Загрузить сохранённый комментарий",
   search: "Поиск по комментариям и авторам",
   applySearch: "Найти",

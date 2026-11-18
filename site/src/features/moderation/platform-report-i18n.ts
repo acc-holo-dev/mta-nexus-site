@@ -11,6 +11,9 @@ const copy = {
     unavailable: "Platform reports are temporarily unavailable.",
     unavailableDescription:
       "A load failure is not an empty history. Retry to fetch your filed reports.",
+    identityUnavailable: "Could not verify your session for reporting.",
+    identityUnavailableDescription:
+      "A session check failure is not a signed-out guest. Retry before signing in or filing a report.",
     retry: "Try again",
     detail: "Report status",
     status: "Status",
@@ -78,6 +81,9 @@ const copy = {
     unavailable: "Жалобы платформы временно недоступны.",
     unavailableDescription:
       "Сбой загрузки — это не пустая история. Повторите запрос, чтобы получить поданные жалобы.",
+    identityUnavailable: "Не удалось проверить сессию для подачи жалобы.",
+    identityUnavailableDescription:
+      "Сбой проверки сессии — это не гостевой вход. Повторите проверку до входа или подачи жалобы.",
     retry: "Повторить",
     detail: "Статус жалобы",
     status: "Статус",

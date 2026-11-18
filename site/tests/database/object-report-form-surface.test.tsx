@@ -29,7 +29,7 @@ it.each(["en", "ru"] as const)(
         registerHref="/auth/register"
       />,
     );
-    expect(html).toContain(platformReportCopy(locale).unavailable);
+    expect(html).toContain(platformReportCopy(locale).identityUnavailable);
     expect(html).toContain(platformReportCopy(locale).retry);
     expect(html).toContain('href="/users/alice"');
     expect(html).not.toContain("/auth/login");

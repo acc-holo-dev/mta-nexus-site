@@ -25,6 +25,8 @@ export const servers = {
       "Live status is based on the latest public MTA directory observation. Editorial server details are managed separately.",
     serverFallback: "MTA server",
     claimSessionUnavailable: "Could not check the session for server verification.",
+    claimSessionUnavailableHint:
+      "A session check failure is not a signed-out guest. Retry before starting a control challenge or signing in.",
   },
   serverManagement: {
     signInRequired: "Sign in required",

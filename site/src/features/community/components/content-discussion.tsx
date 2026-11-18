@@ -434,7 +434,11 @@ export function ContentDiscussion({
         {displayCount !== null ? (
           ` (${displayCount})`
         ) : (
-          <ErrorState id="discussion-count-unavailable" title={copy.countUnavailable} />
+          <ErrorState
+            id="discussion-count-unavailable"
+            title={copy.countUnavailable}
+            description={copy.countUnavailableHint}
+          />
         )}
       </h2>
       <search aria-label={copy.search}>

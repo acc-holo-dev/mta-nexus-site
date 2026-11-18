@@ -19,7 +19,9 @@ export function ProductDependencyList({
   }
 
   if (!resolution) {
-    return <ErrorState title={copy.resolutionUnavailable} />;
+    return (
+      <ErrorState title={copy.resolutionUnavailable} description={copy.resolutionUnavailableHint} />
+    );
   }
 
   return (

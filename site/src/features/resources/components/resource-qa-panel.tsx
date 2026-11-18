@@ -658,7 +658,11 @@ export function ResourceQaPanel({
               </Button>
             </form>
           ) : !readError ? (
-            <ErrorState id="resource-qa-ask-unavailable" title={copy.unavailable} />
+            <ErrorState
+              id="resource-qa-ask-unavailable"
+              title={copy.unavailable}
+              description={copy.unavailableDescription}
+            />
           ) : null}
 
           {loadingDetail ? (

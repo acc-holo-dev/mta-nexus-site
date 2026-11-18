@@ -107,7 +107,8 @@ export function ObjectReportForm({
   if (authenticated === null) {
     return (
       <ErrorState
-        title={copy.unavailable}
+        title={copy.identityUnavailable}
+        description={copy.identityUnavailableDescription}
         action={
           retryHref ? (
             <a

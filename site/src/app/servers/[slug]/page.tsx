@@ -257,7 +257,11 @@ export default async function ServerDetailPage({
         !server.ownerId &&
         !server.isVerified &&
         (claimViewer === undefined ? (
-          <ErrorState id="server-claim-session-unavailable" title={copy.claimSessionUnavailable} />
+          <ErrorState
+            id="server-claim-session-unavailable"
+            title={copy.claimSessionUnavailable}
+            description={copy.claimSessionUnavailableHint}
+          />
         ) : (
           <ServerClaimControlPanel
             key={`${server.id}:${claimViewer?.id ?? "guest"}`}
