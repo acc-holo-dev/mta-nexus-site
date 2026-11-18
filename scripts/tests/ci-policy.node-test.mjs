@@ -2,11 +2,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
+import { execFileSync } from "node:child_process";
 import {
   classifyChanges,
+  emptyTreeOid,
   ghcrPublishJobPermissions,
+  gitObjectExists,
   isTrustedGhcrPublishEvent,
   requiredJobs,
+  resolveDiffBase,
   summarizeJobs,
 } from "../ci-policy.mjs";
 
@@ -301,6 +305,26 @@ test("OPS-10 trusted GHCR publish requires full_acceptance and never trusts pull
     contents: "read",
     packages: "write",
   });
+});
+
+test("force-push missing before SHA falls back to a reachable diff base", () => {
+  const head = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  assert.equal(gitObjectExists("0000000000000000000000000000000000000000"), false);
+  assert.equal(gitObjectExists("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"), false);
+  assert.equal(gitObjectExists(head), true);
+
+  const empty = emptyTreeOid();
+  assert.match(empty, /^[0-9a-f]{40}$/);
+
+  for (const missing of [null, "0".repeat(40), "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"]) {
+    const base = resolveDiffBase(missing, head);
+    assert.equal(gitObjectExists(base), true, String(missing));
+    // Prefer merge-base with main/dev when available; empty tree is last resort.
+    assert.notEqual(base, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
+  }
+
+  // Reachable requested base is preserved.
+  assert.equal(resolveDiffBase(head, head), head);
 });
 
 test("GHCR publish only trusts main or version tags for push and manual runs", () => {

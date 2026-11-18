@@ -167,14 +167,61 @@ export function ghcrPublishJobPermissions({ trustedPublish = false } = {}) {
     : Object.freeze({ contents: "read" });
 }
 
+/** Empty tree OID — used when the push base is missing or unreachable (force-push). */
+export function emptyTreeOid() {
+  return execFileSync("git", ["hash-object", "-t", "tree", "/dev/null"], {
+    encoding: "utf8",
+  }).trim();
+}
+
+/** True when git can read the object in this clone. */
+export function gitObjectExists(oid) {
+  if (!oid || /^0+$/.test(oid)) return false;
+  try {
+    execFileSync("git", ["cat-file", "-e", `${oid}^{commit}`], {
+      encoding: "utf8",
+      stdio: ["ignore", "ignore", "ignore"],
+    });
+    return true;
+  } catch {
+    try {
+      execFileSync("git", ["cat-file", "-e", oid], {
+        encoding: "utf8",
+        stdio: ["ignore", "ignore", "ignore"],
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+/**
+ * Resolve a reachable diff base for scope classification.
+ * Force-pushes leave `github.event.before` dangling; fall back to merge-base with
+ * main, then to the empty tree so Classify changes cannot crash on `bad object`.
+ */
+export function resolveDiffBase(requestedBase, head) {
+  if (gitObjectExists(requestedBase)) return requestedBase;
+  for (const candidate of ["origin/main", "main", "origin/dev", "dev"]) {
+    try {
+      const mergeBase = execFileSync("git", ["merge-base", head, candidate], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (gitObjectExists(mergeBase)) return mergeBase;
+    } catch {
+      // Candidate ref may be absent in shallow or fork clones.
+    }
+  }
+  return emptyTreeOid();
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
   const head = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-  let base = event.pull_request?.base?.sha ?? event.before;
-  if (!base || /^0+$/.test(base))
-    base = execFileSync("git", ["hash-object", "-t", "tree", "/dev/null"], {
-      encoding: "utf8",
-    }).trim();
+  const requestedBase = event.pull_request?.base?.sha ?? event.before;
+  const base = resolveDiffBase(requestedBase, head);
   const files =
     process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
       ? []
