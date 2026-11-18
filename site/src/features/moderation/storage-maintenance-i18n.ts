@@ -4,6 +4,8 @@ export function storageMaintenanceCopy(locale: string) {
         title: "Обслуживание хранилища",
         loading: "Загрузка журнала хранилища…",
         loadUnavailable: "Обслуживание хранилища временно недоступно. Попробуйте ещё раз.",
+        loadUnavailableHint:
+          "Повтор обновляет только этот журнал хранилища. Временный сбой загрузки — не пустой инвентарь объектов.",
         clearFilters: "Сбросить фильтры",
         back: "Администрирование",
         inventory: "Журнал объектов",
@@ -61,6 +63,8 @@ export function storageMaintenanceCopy(locale: string) {
         title: "Storage maintenance",
         loading: "Loading storage journal…",
         loadUnavailable: "Storage maintenance is temporarily unavailable. Please try again.",
+        loadUnavailableHint:
+          "Retry reloads this storage journal only. A temporary load failure is not an empty object inventory.",
         clearFilters: "Clear filters",
         back: "Administration",
         inventory: "Object journal",

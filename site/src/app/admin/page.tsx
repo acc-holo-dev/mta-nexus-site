@@ -165,6 +165,7 @@ export default async function AdminPage({
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
           title={copy.hubUnavailable}
+          description={copy.hubUnavailableHint}
           action={
             <Link
               href={adminHref({})}

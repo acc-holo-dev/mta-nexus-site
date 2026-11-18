@@ -3,6 +3,8 @@ import type { Locale } from "../../lib/platform/i18n";
 const copy = {
   en: {
     loadUnavailable: "Resource activity is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this resource activity only. A temporary load failure is not an empty activity journal.",
     historyLoadUnavailable: "Acquisition history is temporarily unavailable. Please try again.",
     historyLoadUnavailableHint:
       "Retry reloads this acquisition history only. A temporary load failure is not an empty purchase journal.",
@@ -51,6 +53,8 @@ const copy = {
   },
   ru: {
     loadUnavailable: "Активность ресурса временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту активность ресурса. Временный сбой загрузки — не пустой журнал активности.",
     historyLoadUnavailable: "История приобретений временно недоступна. Попробуйте ещё раз.",
     historyLoadUnavailableHint:
       "Повтор обновляет только эту историю приобретений. Временный сбой загрузки — не пустой журнал покупок.",

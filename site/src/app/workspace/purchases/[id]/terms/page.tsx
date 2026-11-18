@@ -93,6 +93,7 @@ export default async function TermsPage({
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
           action={
             <Link href={returnHref} className={linkClass}>
               {dictionary.errors.retry}

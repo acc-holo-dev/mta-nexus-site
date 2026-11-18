@@ -2,6 +2,8 @@ import type { Locale } from "../../lib/platform/i18n";
 
 const en = {
   loadUnavailable: "Draft copy management is temporarily unavailable. Please try again.",
+  loadUnavailableHint:
+    "Retry reloads this copy workspace only. A temporary load failure is not an empty copy receipt list.",
   title: "Copy into a new draft",
   history: "Draft copies",
   recorded: "Recorded copy",
@@ -79,6 +81,8 @@ const en = {
 };
 const ru: typeof en = {
   loadUnavailable: "Управление копиями черновиков временно недоступно. Попробуйте ещё раз.",
+  loadUnavailableHint:
+    "Повтор обновляет только этот кабинет копий. Временный сбой загрузки — не пустой список квитанций копий.",
   title: "Копировать в новый черновик",
   history: "Копии черновиков",
   recorded: "Сохранённая копия",

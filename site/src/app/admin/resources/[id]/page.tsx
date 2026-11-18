@@ -89,6 +89,7 @@ export default async function ResourceModerationDetail({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={returnHref}

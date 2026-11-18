@@ -103,6 +103,7 @@ export default async function ResourceCopyPage({
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

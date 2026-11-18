@@ -29,6 +29,8 @@ const copy = {
     reviewLoading: "Loading financial reconciliation…",
     loadUnavailable:
       "Financial reconciliation is temporarily unavailable. Database records were not loaded.",
+    loadUnavailableHint:
+      "Retry reloads this reconciliation view only. A temporary load failure is not an empty order review list.",
     clearFilters: "Show all recorded orders",
     reviewOnly: "Requires review",
     allOrders: "All recorded orders",
@@ -78,6 +80,8 @@ const copy = {
     review: "Сверка финансовых состояний",
     reviewLoading: "Загрузка сверки финансовых состояний…",
     loadUnavailable: "Сверка финансовых состояний временно недоступна. Записи БД не загружены.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту сверку. Временный сбой загрузки — не пустой список заказов на проверку.",
     clearFilters: "Показать все записанные заказы",
     reviewOnly: "Требуют проверки",
     allOrders: "Все записанные заказы",

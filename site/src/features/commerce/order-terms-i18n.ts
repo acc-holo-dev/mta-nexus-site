@@ -6,6 +6,8 @@ const copies = {
     termsLoading: "Loading recorded order terms…",
     loadUnavailable:
       "Recorded order terms are temporarily unavailable. Database snapshots were not loaded.",
+    loadUnavailableHint:
+      "Retry reloads this terms snapshot only. A temporary load failure is not a cancelled order or missing purchase.",
     back: "Back to order",
     lines: "Order lines",
     legacy: "No recorded snapshot",
@@ -50,6 +52,8 @@ const copies = {
     termsLoading: "Загрузка зафиксированных условий заказа…",
     loadUnavailable:
       "Зафиксированные условия заказа временно недоступны. Снимки из БД не загружены.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот снимок условий. Временный сбой загрузки — не отмена заказа и не отсутствие покупки.",
     back: "К заказу",
     lines: "Строки заказа",
     legacy: "Снимок условий не записан",

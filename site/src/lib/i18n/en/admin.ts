@@ -6,6 +6,8 @@ export const admin = {
     title: "Administration",
     loading: "Loading administration…",
     hubUnavailable: "Administration queues are temporarily unavailable. Please try again.",
+    hubUnavailableHint:
+      "Retry reloads this administration hub only. A temporary load failure is not an empty moderation queue.",
     supportQueue: "Support queue",
     reportsQueue: "Reports queue",
     description: "Platform moderation, verification queue, resource review, and audit trail.",

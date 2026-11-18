@@ -60,6 +60,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={returnHref} className={linkClass}>
               {dictionary.errors.retry}

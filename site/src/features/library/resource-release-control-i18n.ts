@@ -8,6 +8,8 @@ const copy = {
     moderation: "Resource moderation",
     moderationLoading: "Loading resource moderation…",
     loadUnavailable: "Resource moderation is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this moderation workspace only. A temporary load failure is not an empty review queue.",
     updatesLoadUnavailable: "Library updates are temporarily unavailable. Please try again.",
     updatesLoadUnavailableHint:
       "Retry reloads this updates page only. A temporary load failure is not an empty updates list.",
@@ -124,6 +126,8 @@ const copy = {
     moderation: "Модерация ресурсов",
     moderationLoading: "Загрузка модерации ресурсов…",
     loadUnavailable: "Модерация ресурсов временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот кабинет модерации. Временный сбой загрузки — не пустая очередь ревью.",
     updatesLoadUnavailable: "Обновления библиотеки временно недоступны. Попробуйте ещё раз.",
     updatesLoadUnavailableHint:
       "Повтор обновляет только эту страницу обновлений. Временный сбой загрузки — не пустой список обновлений.",

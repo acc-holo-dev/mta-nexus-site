@@ -35,6 +35,8 @@ const copy = {
     empty: "No plans on this page.",
     loading: "Loading commercial plans…",
     loadUnavailable: "Commercial plans are temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this commercial workspace only. A temporary load failure is not an empty plan or purchase list.",
     clearFilters: "Clear filters",
     previous: "Previous",
     next: "Next",
@@ -155,6 +157,8 @@ const copy = {
     empty: "На этой странице нет тарифов.",
     loading: "Загрузка коммерческих тарифов…",
     loadUnavailable: "Коммерческие тарифы временно недоступны. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот коммерческий кабинет. Временный сбой загрузки — не пустой список тарифов или покупок.",
     clearFilters: "Сбросить фильтры",
     previous: "Назад",
     next: "Далее",
