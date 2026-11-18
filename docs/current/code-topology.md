@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `ff61b052` (`dev`, после journey-honesty recovery hints + follow session≠guest; корни `lib/` / `components/` = 0).
+**source_sha:** `pending-inventory` (tip intent: Shell `home-personal-changes` server port absorb; inventory JSON обновляется отдельно).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -139,11 +139,15 @@ site/
 
 **Slice 38 done:** `theme-preference` → [`features/shell/theme-preference.ts`](../../site/src/features/shell/theme-preference.ts) (`parseThemePreference`, `resolveThemePreference`, `nextThemePreference`, `colorSchemeForTheme`, `SYSTEM_THEME_QUERY`); владение **Shell**; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
 
-**Slice 39 done:** `home-personal-preference` → [`features/shell/home-personal-preference.ts`](../../site/src/features/shell/home-personal-preference.ts) (`parseHomePersonalPreference`, `HOME_PERSONAL_COOKIE`, …); владение **Shell**; `home-personal-changes-types` / server loader remain in `lib/` until a shell server port; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
+**Slice 39 done:** `home-personal-preference` → [`features/shell/home-personal-preference.ts`](../../site/src/features/shell/home-personal-preference.ts) (`parseHomePersonalPreference`, `HOME_PERSONAL_COOKIE`, …); владение **Shell**; types уже в [`home-personal-changes-types.ts`](../../site/src/features/shell/home-personal-changes-types.ts); server loader перенесён в Slice 42; depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
 
 **Slice 40 done:** `ad-preference` → [`features/accounts/ad-preference.ts`](../../site/src/features/accounts/ad-preference.ts) (`parseAdPreference`, `AD_OPT_OUT_COOKIE`, …); владение **Accounts** (settings advertising opt-out); depcruise public API + `clientUtilPorts`; корень `lib/` −1 file.
 
 **Slice 41 done:** `notification-inbox-events` + `visible-polling` → [`features/notifications`](../../site/src/features/notifications/README.md): util ports [`notification-inbox-events.ts`](../../site/src/features/notifications/notification-inbox-events.ts), [`visible-polling.ts`](../../site/src/features/notifications/visible-polling.ts); владение **Notifications**; depcruise public API + client isolation; корень `lib/` −2 files (+ colocated unit test move).
+
+**Slice 42 done:** `home-personal-changes` server loader → [`features/shell/home-personal-changes-server.ts`](../../site/src/features/shell/home-personal-changes-server.ts) (`loadPersonalChangesSummary`); реализация в [`features/shell/server/home-personal-changes.ts`](../../site/src/features/shell/server/home-personal-changes.ts); владение **Shell**; потребители — `app/page.tsx` + home-personal / feed tests; depcruise public API + shell `servers` boundary; `lib/platform/home-personal-changes.ts` удалён.
+
+**Slice 43 done:** `parseProfilePage` → [`features/accounts/profile-pagination.ts`](../../site/src/features/accounts/profile-pagination.ts) (рядом с `ProfileResourcePagination`); владение **Accounts**; потребители — user/developer pages + org public profile; `lib/platform/profile-pagination.ts` удалён.
 
 Cross-feature shell/chrome leftovers в `components/` root: **cleared** (после slice 36 — `confirm-action` / `action-confirm-checkbox`).
 
@@ -157,7 +161,7 @@ Scope: `features/shell` (без тестов), `app/page.tsx`, home panels, `app
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
-**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache, profile-pagination, home-personal-changes); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
+**Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
 
 ## TO-BE (цель читаемости)
 
@@ -206,20 +210,22 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| #   | Slice                                                      | Ось                              | Статус     |
-| --- | ---------------------------------------------------------- | -------------------------------- | ---------- |
-| 1   | Topology scoreboard (этот документ + inventory)            | скорость разработки / понятность | **done**   |
-| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)   | babysitting tax                  | **done**   |
-| 3   | Design direction + `@nexus/ui` tokens/primitives           | shell 2027                       | **done**   |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell` | читаемость + путь гостя          | **done**   |
-| 5   | i18n inventory automation (shell+home hard-coded strings)  | честность RU/EN                  | **done**   |
-| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)   | brand honesty + guest path       | **done**   |
-| 7   | Footer credit line → `footer.creditLine` i18n              | честность RU/EN                  | **done**   |
-| T   | services-domain — `lib/services/<domain>/`                 | читаемость service layer         | **done**   |
-| T   | lib-http-platform — `lib/http/` + `lib/platform/`          | очистка `lib/` root              | **done**   |
-| D/E | Scoreboard sync после http/platform + services domains     | docs honesty                     | **done**   |
-| C   | Journey honesty — empty≠fail / session≠guest / recovery    | честность user journey           | **active** |
-| D/E | Scoreboard sync после recovery + follow null-auth          | docs honesty                     | **done**   |
+| #   | Slice                                                                                                                                          | Ось                              | Статус     |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ---------- |
+| 1   | Topology scoreboard (этот документ + inventory)                                                                                                | скорость разработки / понятность | **done**   |
+| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)                                                                                       | babysitting tax                  | **done**   |
+| 3   | Design direction + `@nexus/ui` tokens/primitives                                                                                               | shell 2027                       | **done**   |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell`                                                                                     | читаемость + путь гостя          | **done**   |
+| 5   | i18n inventory automation (shell+home hard-coded strings)                                                                                      | честность RU/EN                  | **done**   |
+| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                                                       | brand honesty + guest path       | **done**   |
+| 7   | Footer credit line → `footer.creditLine` i18n                                                                                                  | честность RU/EN                  | **done**   |
+| T   | services-domain — `lib/services/<domain>/`                                                                                                     | читаемость service layer         | **done**   |
+| T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                                              | очистка `lib/` root              | **done**   |
+| T   | Slice 42 — Shell `home-personal-changes` server port                                                                                           | читаемость + Shell ownership     | **done**   |
+| T   | Slice 43 — Accounts `parseProfilePage` into `profile-pagination` port                                                                          | читаемость + Accounts ownership  | **done**   |
+| D/E | Scoreboard sync после http/platform + services domains                                                                                         | docs honesty                     | **done**   |
+| C   | Journey honesty — empty≠fail / session≠guest / recovery; residual write/form ErrorStates вне scope / после residual sweep в основном завершено | честность user journey           | **active** |
+| D/E | Scoreboard sync после residual honesty + Slice 42/43                                                                                           | docs honesty                     | **done**   |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
