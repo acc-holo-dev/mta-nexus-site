@@ -66,6 +66,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "registration",
     "claim-controls",
     "managed-server-copy",
+    "servers-directory-api-copy",
     "server-observation-browser-contract",
     "server-statistics-contract",
     "server-history-window",
@@ -168,6 +169,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
     ["features/servers/managed-server-copy.ts", "servers-client-isolation"],
+    ["features/servers/servers-directory-api-copy.ts", "servers-client-isolation"],
     ["features/servers/server-observation-browser-contract.ts", "servers-client-isolation"],
     ["features/servers/server-statistics-contract.ts", "servers-client-isolation"],
     ["features/servers/server-history-window.ts", "servers-client-isolation"],
@@ -232,6 +234,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/registration.ts",
     "app/claim-controls.ts",
     "app/managed-server-copy.ts",
+    "app/servers-directory-api-copy.ts",
     "app/server-observation-browser-contract.ts",
     "app/server-statistics-contract.ts",
     "app/server-history-window.ts",
@@ -278,6 +281,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
     "site/src/features/servers/managed-server-copy.ts",
+    "site/src/features/servers/servers-directory-api-copy.ts",
     "site/src/features/servers/server-observation-browser-contract.ts",
     "site/src/features/servers/server-statistics-contract.ts",
     "site/src/features/servers/server-history-window.ts",
@@ -355,6 +359,7 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
   visit("site/src/features/servers/managed-server-copy.ts");
+  visit("site/src/features/servers/servers-directory-api-copy.ts");
   visit("site/src/features/servers/server-observation-browser-contract.ts");
   visit("site/src/features/servers/server-statistics-contract.ts");
   visit("site/src/features/servers/server-history-window.ts");

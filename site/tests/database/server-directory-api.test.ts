@@ -102,22 +102,52 @@ describe("official MTA directory API", () => {
 
   it("rejects invalid pagination without reading the master list", async () => {
     const response = await GET(
-      new NextRequest("https://nexus.test/api/servers/directory?limit=101"),
+      new NextRequest("https://nexus.test/api/servers/directory?limit=101", {
+        headers: { cookie: "nexus_locale=en" },
+      }),
     );
     expect(response.status).toBe(400);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("X-Request-Id")).toBe("test-request");
+    expect(await response.json()).toMatchObject({ error: "Invalid directory query" });
     expect(getDirectory).not.toHaveBeenCalled();
+  });
+
+  it("returns bilingual 400 / 503 directory errors from nexus_locale", async () => {
+    const invalidRu = await GET(
+      new NextRequest("https://nexus.test/api/servers/directory?limit=101", {
+        headers: { cookie: "nexus_locale=ru" },
+      }),
+    );
+    expect(invalidRu.status).toBe(400);
+    expect(await invalidRu.json()).toMatchObject({ error: "Некорректный запрос каталога" });
+
+    getDirectory.mockRejectedValueOnce(new Error("upstream unavailable"));
+    const downRu = await GET(
+      new NextRequest("https://nexus.test/api/servers/directory", {
+        headers: { cookie: "nexus_locale=ru" },
+      }),
+    );
+    expect(downRu.status).toBe(503);
+    expect(await downRu.json()).toMatchObject({
+      error: "Официальный каталог серверов MTA временно недоступен",
+    });
   });
 
   it("returns a retryable 503 when the master server is unavailable", async () => {
     getDirectory.mockRejectedValue(new Error("upstream unavailable"));
-    const response = await GET(new NextRequest("https://nexus.test/api/servers/directory"));
+    const response = await GET(
+      new NextRequest("https://nexus.test/api/servers/directory", {
+        headers: { cookie: "nexus_locale=en" },
+      }),
+    );
     expect(response.status).toBe(503);
     expect(response.headers.get("Retry-After")).toBe("30");
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("X-Request-Id")).toBe("test-request");
-    expect((await response.json()).error).toMatch(/temporarily unavailable/);
+    expect((await response.json()).error).toBe(
+      "The official MTA server directory is temporarily unavailable",
+    );
     expect(logEvent).toHaveBeenCalledOnce();
   });
 });

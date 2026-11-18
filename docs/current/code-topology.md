@@ -212,6 +212,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 65 done:** `/api/search` error envelope (query length / unknown type / rate / unavailable) uses bilingual `discoverySearchApiCopy` via `nexus_locale`; JSON shape unchanged (`error` + `unavailable`). First tip of scoped API-envelope localization.
 
+**Wave 66 done:** `/api/servers/directory` 400/503 errors use bilingual `serversDirectoryApiCopy` via `nexus_locale`; JSON shape unchanged (`error` / `details` / `Retry-After`).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -318,8 +320,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Wave 64 — scoreboard sync (`code-topology.md` ↔ tip inventory)                                                    | docs honesty                     | **done** |
 | A   | Wave 65 — `/api/search` error envelope via discoverySearchApiCopy                                                 | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 65                                                                                     | docs honesty                     | **done** |
+| A   | Wave 66 — `/api/servers/directory` errors via serversDirectoryApiCopy                                             | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization program started (Wave 65). Next reversible tips: other discovery/auth/servers English error strings with existing or new copy modules. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next reversible tip: auth password/session English (or ad-hoc RU ternary) errors. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
