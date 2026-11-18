@@ -7,6 +7,9 @@ export const errors = {
     retry: "Try again",
     sessionRetryHint:
       "Retry rechecks this page session only. A temporary failure is not a signed-out guest state.",
+    formErrorHint:
+      "The change was not saved. Fix the fields above if needed, then submit the same form again.",
+    unknownMarker: "—",
     home: "Go home",
     referenceLabel: "Support reference",
     referenceHint: "Include this code when contacting support.",

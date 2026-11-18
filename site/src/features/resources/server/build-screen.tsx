@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceBuildWorkspaceService } from "../../../lib/services/resources/resource-build-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -125,7 +126,11 @@ export async function ResourceBuildScreen({
         {resourceRequirementsCopy(locale).title}
       </Link>
       {product.metadataReviewRequired ? (
-        <ErrorState id="resource-metadata-review-required" title={publisherCopy.reviewRequired} />
+        <ErrorState
+          id="resource-metadata-review-required"
+          title={publisherCopy.reviewRequired}
+          description={publisherCopy.reviewRequiredHint}
+        />
       ) : null}
       {staff && (
         <Link
@@ -146,11 +151,11 @@ export async function ResourceBuildScreen({
           )}
           <p className="whitespace-pre-wrap break-words text-secondary">{product.description}</p>
           <p className="break-words text-sm text-secondary">
-            {publisherCopy.tags}: {(product.tags ?? []).join(", ") || "—"}
+            {publisherCopy.tags}: {formatUnknown(locale, (product.tags ?? []).join(", "))}
           </p>
           <h3 className="font-semibold text-primary">{publisherCopy.requirements}</h3>
           <p className="text-sm text-secondary">
-            MTA: {product.compatibility?.mtaMinVersion || "—"}
+            MTA: {formatUnknown(locale, product.compatibility?.mtaMinVersion)}
           </p>
           <ul className="list-inside list-disc text-sm text-secondary">
             {(product.compatibility?.dependencies ?? []).map((slug) => (

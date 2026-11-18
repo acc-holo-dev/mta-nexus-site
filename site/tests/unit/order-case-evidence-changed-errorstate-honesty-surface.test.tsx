@@ -13,9 +13,9 @@ const source = readFileSync(
 it("locks evidence-changed notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="order-case-evidence-changed"');
-  expect(source).toMatch(
-    /evidenceChanged \? \(\s*<ErrorState id="order-case-evidence-changed" title=\{copy\.changed\} \/>\s*\) : null/u,
-  );
+  expect(source).toContain('id="order-case-evidence-changed"');
+  expect(source).toContain("title={copy.changed}");
+  expect(source).toContain("description={copy.changedHint}");
   expect(source).not.toContain('role="note" className="text-sm text-warning"');
   expect(source).not.toContain('className="text-sm text-warning">\n          {copy.changed}');
 });

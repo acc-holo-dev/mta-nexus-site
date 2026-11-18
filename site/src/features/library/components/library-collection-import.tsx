@@ -198,7 +198,9 @@ export function LibraryCollectionImport({
           />
         ) : null}
       </form>
-      {frozen ? <ErrorState id="library-collection-import-frozen" title={m.frozen} /> : null}
+      {frozen ? (
+        <ErrorState id="library-collection-import-frozen" title={m.frozen} description={c.retry} />
+      ) : null}
       {preview && (
         <section className="space-y-4" aria-label={m.result}>
           <h2>{m.result}</h2>

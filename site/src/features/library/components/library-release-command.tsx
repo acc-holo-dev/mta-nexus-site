@@ -182,7 +182,11 @@ export function LibraryReleaseCommandStatus({
       ) : null}
       {pending && !saved ? (
         <div className="space-y-3">
-          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          <ErrorState
+            id="library-release-command-pending"
+            title={copy.pendingNote}
+            description={copy.errors.actionErrorDescription}
+          />
           {!blocked ? (
             <Button
               type="button"

@@ -20,13 +20,13 @@ SCAN_PATHS = (
     "site/src/features/shell",
     "site/src/app/page.tsx",
     "site/src/app/layout.tsx",
-    "site/packages/ui/src/brand-mark.tsx",
+    "site/packages/ui/src/brand-mark.tsx"
 )
 
 # locale === "ru"|"en" ? "<user copy>" : "<user copy>"
 LOCALE_COPY_TERNARY = re.compile(
     r"""locale\s*===\s*["'](?:ru|en)["']\s*\?\s*["']([^"']{2,})["']\s*:\s*["']([^"']{2,})["']""",
-    re.MULTILINE,
+    re.MULTILINE
 )
 
 # BCP-47 / locale codes used for formatting — not guest copy.
@@ -39,17 +39,17 @@ ALT_LITERAL = re.compile(r"""\balt\s*=\s*["']([^"']+)["']""")
 
 # JSX text on one line: >copy< or >copy{expr}
 JSX_TEXT = re.compile(
-    r""">\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)""",
+    r""">\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)"""
 )
 
 # Multiline JSX children: >\n  copy\n</tag>
 JSX_TEXT_MULTILINE = re.compile(
-    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<""",
+    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<"""
 )
 
 # Split brand words glued with {" "}: MTA{" "}
 JSX_TEXT_SPACE_GLUE = re.compile(
-    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}""",
+    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}"""
 )
 
 # Metadata template strings
@@ -82,13 +82,7 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "path": "site/src/app/layout.tsx",
         "kind": "template",
         "text": "%s | MTA NEXUS",
-    },
-    {
-        "id": "home.unknown-stat-dash",
-        "path": "site/src/app/page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
+    }
 )
 
 
@@ -96,8 +90,19 @@ def _git_show(revision: str, path: str) -> str:
     return subprocess.check_output(
         ["git", "show", f"{revision}:{path}"],
         cwd=ROOT,
-        text=True,
-    )
+        text=True
+)
+
+
+def _read_source(revision: str, path: str) -> str:
+    """Prefer the working tree when inventorying the current checkout."""
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    target = subprocess.check_output(["git", "rev-parse", revision], cwd=ROOT, text=True).strip()
+    if target == head:
+        file_path = ROOT / path
+        if file_path.is_file():
+            return file_path.read_text(encoding="utf8")
+    return _git_show(revision, path)
 
 
 def _ls_paths(revision: str) -> list[str]:
@@ -106,8 +111,8 @@ def _ls_paths(revision: str) -> list[str]:
         raw = subprocess.check_output(
             ["git", "ls-tree", "-r", "--name-only", revision, "--", prefix],
             cwd=ROOT,
-            text=True,
-        )
+            text=True
+)
         for path in raw.splitlines():
             path = path.replace("\\", "/")
             if path.endswith((".test.ts", ".test.tsx", ".md")):
@@ -161,8 +166,8 @@ def _findings_in_source(path: str, source: str) -> list[dict[str, object]]:
             ("title", TITLE_LITERAL),
             ("placeholder", PLACEHOLDER_LITERAL),
             ("alt", ALT_LITERAL),
-            ("template", TEMPLATE_LITERAL),
-        ):
+            ("template", TEMPLATE_LITERAL)
+):
             for match in pattern.finditer(line):
                 text = match.group(1).strip()
                 if _is_noise_text(text):
@@ -207,7 +212,7 @@ def inventory(revision: str = "HEAD") -> dict[str, object]:
     paths = _ls_paths(revision)
     findings: list[dict[str, object]] = []
     for path in paths:
-        findings.extend(_findings_in_source(path, _git_show(revision, path)))
+        findings.extend(_findings_in_source(path, _read_source(revision, path)))
 
     # Deduplicate identical path/line/kind/text hits from overlapping scanners.
     unique: dict[tuple[object, ...], dict[str, object]] = {}
@@ -266,8 +271,8 @@ def _biome_format(path: Path) -> None:
         cwd=ROOT,
         check=False,
         capture_output=True,
-        text=True,
-    )
+        text=True
+)
 
 
 def _stable_payload(data: dict[str, object]) -> dict[str, object]:
@@ -305,8 +310,8 @@ def main() -> int:
     parser.add_argument(
         "--check",
         type=Path,
-        help="Fail unless path matches freshly generated inventory (source_sha ignored)",
-    )
+        help="Fail unless path matches freshly generated inventory (source_sha ignored)"
+)
     args = parser.parse_args()
     data = inventory(args.revision)
     text = _canonical(data)
@@ -354,8 +359,8 @@ def main() -> int:
                     "source_sha": data["source_sha"],
                     "summary": data["summary"],
                 },
-                ensure_ascii=False,
-            )
+                ensure_ascii=False
+)
         )
     return 0
 

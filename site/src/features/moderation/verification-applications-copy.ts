@@ -31,6 +31,8 @@ const en = {
   invalid: "Check application filters, explanation and evidence URL.",
   changed: "The application or its evidence changed. Reload the saved version.",
   readOnly: "MTA control proofs and resolved applications cannot be edited here.",
+  readOnlyHint:
+    "This application status no longer allows edits here. Submit a new application from the verification centre if your evidence changed.",
   current: "The submitted professional profile matches the current saved profile.",
   profileChanged:
     "Your professional profile changed after submission. If this application is pending, review your profile and update its evidence before approval.",
@@ -79,6 +81,8 @@ const ru: Record<keyof typeof en, string> = {
   invalid: "Проверьте фильтры заявки, пояснение и ссылку на доказательства.",
   changed: "Заявка или её доказательства изменились. Загрузите сохранённую версию.",
   readOnly: "Подтверждения управления MTA и завершённые заявки здесь не редактируются.",
+  readOnlyHint:
+    "В этом статусе заявку здесь нельзя изменить. Если доказательства изменились, подайте новую заявку в центре верификации.",
   current: "Поданный профессиональный профиль соответствует текущему сохранённому профилю.",
   profileChanged:
     "После подачи профессиональный профиль изменился. Если заявка ещё рассматривается, проверьте профиль и обновите доказательства перед одобрением.",

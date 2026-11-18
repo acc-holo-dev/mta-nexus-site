@@ -186,11 +186,19 @@ export function ResourceReleaseWatchBatchControls({
       <p className="text-sm text-secondary">{note}</p>
       <p className="text-xs text-muted">{copy.batchLimit}</p>
       {enabling && capacity === 0 ? (
-        <ErrorState id="resource-release-watch-batch-maximum" title={copy.maximum} />
+        <ErrorState
+          id="resource-release-watch-batch-maximum"
+          title={copy.maximum}
+          description={copy.batchMaximumHint}
+        />
       ) : null}
       {enabling && skipped.length > 0 ? (
-        <div className="space-y-2" role="note">
-          <p className="text-sm text-muted">{copy.skippedNote}</p>
+        <div className="space-y-2">
+          <ErrorState
+            id="resource-release-watch-batch-skipped"
+            title={copy.skippedNote}
+            description={copy.failedDescription}
+          />
           <ul className="space-y-1 text-sm text-secondary">
             {skipped.map((item) => (
               <li key={item.productId}>
@@ -235,7 +243,11 @@ export function ResourceReleaseWatchBatchControls({
       )}
       {pending && !saved && (
         <div className="space-y-3">
-          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          <ErrorState
+            id="resource-release-watch-batch-pending"
+            title={copy.pendingNote}
+            description={copy.failedDescription}
+          />
           {!blocked && (
             <Button
               type="button"

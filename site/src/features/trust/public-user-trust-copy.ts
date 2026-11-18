@@ -26,6 +26,8 @@ const en = {
     "Current ownership, not past membership or work history. Hidden and inactive servers are excluded.",
   publications: "Public publications",
   hiddenActivity: "Activity is hidden by the profile owner.",
+  hiddenActivityHint:
+    "The owner hid publication activity. A hidden count is not proof of zero publications.",
   activity: "Browse public activity",
   publicationScope:
     "Currently published materials. Publication and reader reactions do not independently verify professional experience.",
@@ -64,6 +66,8 @@ const ru: Record<keyof typeof en, string> = {
     "Текущее владение, а не прошлое участие в команде или история работы. Скрытые и неактивные серверы исключены.",
   publications: "Публичные публикации",
   hiddenActivity: "Владелец профиля скрыл активность.",
+  hiddenActivityHint:
+    "Владелец скрыл публикационную активность. Скрытый счётчик не доказывает отсутствие публикаций.",
   activity: "Посмотреть публичную активность",
   publicationScope:
     "Материалы, опубликованные сейчас. Публикации и реакции читателей сами по себе не подтверждают профессиональный опыт.",

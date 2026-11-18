@@ -2,7 +2,7 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
@@ -30,7 +30,8 @@ export function VerificationApplicationAmend({
 }) {
   const router = useRouter(),
     copy = verificationApplicationsCopy(locale),
-    labels = verificationCopy(locale);
+    labels = verificationCopy(locale),
+    formErrorHint = getDictionary(locale).errors.formErrorHint;
   const [proof, setProof] = useState(proofUrl ?? ""),
     [explanation, setExplanation] = useState(notes ?? ""),
     [busy, setBusy] = useState(false),
@@ -144,7 +145,9 @@ export function VerificationApplicationAmend({
           {busy ? labels.loading : copy.amend}
         </Button>
       </fieldset>
-      {notice && !saved ? <ErrorState id="verification-amend-notice" title={notice} /> : null}
+      {notice && !saved ? (
+        <ErrorState id="verification-amend-notice" title={notice} description={formErrorHint} />
+      ) : null}
       {notice && saved ? (
         <p role="status" className="text-sm text-success">
           {notice}

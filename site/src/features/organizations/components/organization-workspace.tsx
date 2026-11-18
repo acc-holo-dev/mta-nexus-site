@@ -202,7 +202,13 @@ export function OrganizationWorkspacePanel({
       >
         {organizationTeamCopy(locale).title}
       </Link>
-      {!manageable && <ErrorState id="organization-workspace-readonly" title={copy.readOnly} />}
+      {!manageable && (
+        <ErrorState
+          id="organization-workspace-readonly"
+          title={copy.readOnly}
+          description={copy.readOnlyHint}
+        />
+      )}
       <OrganizationProfileForm
         key={`${actorId}:${data.organization.id}`}
         locale={locale}

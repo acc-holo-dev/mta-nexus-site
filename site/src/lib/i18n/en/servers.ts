@@ -17,6 +17,8 @@ export const servers = {
     noObservation: "No current observation in the official MTA directory.",
     staleSnapshot:
       "Showing the latest available directory snapshot. Player counts may be outdated.",
+    staleSnapshotHint:
+      "A delayed directory refresh is not a connection error. Counts may change after the next observation.",
     connectionIp: "Connection IP",
     selectHint:
       "If the protocol link does not open MTA, copy or select this address and paste it into MTA Quick Connect.",
@@ -118,8 +120,12 @@ export const servers = {
     markerSaveFailed: "Could not save the operation marker. The request was not sent.",
     unknownIssueTitle:
       "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support.",
+    unknownIssueHint:
+      "Open verification requests before creating another token. Retry from this panel stays blocked until the outcome is known.",
     unknownVerifyTitle:
       "The verification result is unknown. Retry is blocked; check your requests and contact support.",
+    unknownVerifyHint:
+      "Open verification requests to see whether proof was recorded. Do not start a new challenge until the outcome is known.",
     checkRequests: "Check requests",
     checkingSession: "Checking the session before showing the token…",
   },

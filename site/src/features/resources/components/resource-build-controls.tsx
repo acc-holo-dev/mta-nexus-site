@@ -113,7 +113,11 @@ export function ResourceBuildControls({
         {copy.revision}: {current.revision} · {copy.statuses[current.status]}
       </p>
       {withdrawn ? (
-        <ErrorState id="resource-build-withdrawn-unavailable" title={copy.unavailable} />
+        <ErrorState
+          id="resource-build-withdrawn-unavailable"
+          title={copy.unavailable}
+          description={copy.unavailableDescription}
+        />
       ) : null}
       {current.status === "pending_review" && <p className="text-secondary">{copy.pending}</p>}
       {editable && !withdrawn && (
@@ -200,7 +204,9 @@ export function ResourceBuildControls({
           </details>
         </div>
       )}
-      {message && uncertain ? <ErrorState title={message} /> : null}
+      {message && uncertain ? (
+        <ErrorState title={message} description={copy.failedDescription} />
+      ) : null}
       {message && !uncertain ? <p role="status">{message}</p> : null}
       {uncertain && (
         <Button

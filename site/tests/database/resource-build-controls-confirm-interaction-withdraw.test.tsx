@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   build,
   createResourceBuildControlsConfirmInteractionHelpers,
@@ -19,7 +20,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" as const }),
+  useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
 }));
 
 import { ResourceBuildControls } from "../../src/features/resources/components/resource-build-controls";

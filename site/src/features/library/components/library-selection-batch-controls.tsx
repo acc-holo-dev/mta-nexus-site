@@ -220,7 +220,11 @@ export function LibrarySelectionBatchControls({
         </section>
       )}
       {frozen && !saved ? (
-        <ErrorState id="library-selection-batch-frozen" title={c.frozen} />
+        <ErrorState
+          id="library-selection-batch-frozen"
+          title={c.frozen}
+          description={c.actionErrorDescription}
+        />
       ) : null}
       {error ? (
         <ErrorState

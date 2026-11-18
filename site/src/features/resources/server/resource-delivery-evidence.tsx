@@ -1,5 +1,6 @@
 import type { ResourceDeliveryReceipt } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 /** Server-only evidence projection; never serialize account/storage context. */
@@ -24,8 +25,10 @@ export function ResourceDeliveryEvidence({
       <div>
         <dt className="text-muted">{copy.bytes}</dt>
         <dd>
-          {receipt.status === "started" ? "—" : receipt.bytesSent.toLocaleString(locale)} /{" "}
-          {receipt.expectedBytes.toLocaleString(locale)}
+          {receipt.status === "started"
+            ? unknownMarker(locale)
+            : receipt.bytesSent.toLocaleString(locale)}{" "}
+          / {receipt.expectedBytes.toLocaleString(locale)}
         </dd>
       </div>
       <div>

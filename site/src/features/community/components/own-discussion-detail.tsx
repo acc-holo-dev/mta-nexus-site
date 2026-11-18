@@ -45,7 +45,13 @@ export function OwnDiscussionDetail({
           description={copy.hiddenPublicationHint}
         />
       ) : null}
-      {!comment.editable && <ErrorState id="own-discussion-readonly" title={copy.readOnly} />}
+      {!comment.editable && (
+        <ErrorState
+          id="own-discussion-readonly"
+          title={copy.readOnly}
+          description={copy.readOnlyHint}
+        />
+      )}
       <time dateTime={comment.createdAt} className="text-xs text-muted">
         {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
           timeZone: "UTC",

@@ -262,11 +262,7 @@ export function MtaMasterServerDirectory({
                 copy.updateUnknown
               )}
             </p>
-          ) : error ? (
-            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
-              {copy.unavailable}
-            </p>
-          ) : (
+          ) : error ? null : (
             <ErrorState
               id="mta-master-directory-unavailable"
               title={copy.unavailable}
@@ -308,7 +304,11 @@ export function MtaMasterServerDirectory({
       </div>
 
       {directory?.isStale && !loading ? (
-        <ErrorState id="mta-master-directory-stale" title={copy.stale} />
+        <ErrorState
+          id="mta-master-directory-stale"
+          title={copy.stale}
+          description={copy.staleHint}
+        />
       ) : null}
 
       {error && (

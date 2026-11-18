@@ -1,6 +1,7 @@
 vi.mock("server-only", () => ({}));
 
 import { existsSync, readFileSync } from "node:fs";
+import { getDictionary } from "../../src/lib/i18n";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -17,7 +18,7 @@ vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import DiscussionsDetailLoading from "../../src/app/workspace/discussions/[id]/loading";

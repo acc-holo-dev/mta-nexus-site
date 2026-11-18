@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import { findTestButton } from "../helpers/flatten-react-test-tree";
 import {
   createServerReviewDraftRefreshInteractionHelpers,
@@ -20,7 +21,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" as const }),
+  useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
 }));
 
 import { ServerReviewPanel } from "../../src/features/servers/components/server-review-panel";

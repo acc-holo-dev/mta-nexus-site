@@ -14,7 +14,7 @@ const source = readFileSync(
 it("locks recommendationBlocked notice to ErrorState without soft secondary text", () => {
   expect(source).toContain('import { Button, ErrorState, fieldClassBlock } from "@nexus/ui"');
   expect(source).toMatch(
-    /canRecommendRefund && monetary && !recommendationEligible && \(\s*<ErrorState id="order-case-recommendation-blocked" title=\{copy\.recommendationBlocked\} \/>\s*\)/u,
+    /canRecommendRefund && monetary && !recommendationEligible && \(\s*<ErrorState[\s\S]*?id="order-case-recommendation-blocked"[\s\S]*?title=\{copy\.recommendationBlocked\}[\s\S]*?description=\{copy\.recommendationBlockedHint\}/u,
   );
   expect(source).not.toContain(
     'className="text-sm text-secondary">{copy.recommendationBlocked}</p>',

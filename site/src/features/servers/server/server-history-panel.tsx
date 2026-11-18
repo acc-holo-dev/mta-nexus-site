@@ -2,6 +2,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { Activity, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
 import {
   formatHistoryIntervalUtc,
@@ -10,8 +11,8 @@ import {
 } from "../server-history-presentation";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 
-function metric(value: number | null) {
-  return value == null ? "—" : String(value);
+function metric(locale: Locale, value: number | null) {
+  return formatUnknown(locale, value);
 }
 
 const periodLinkClass =
@@ -116,9 +117,9 @@ export function ServerHistoryPanel({
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           [copy.samples, history.summary.observationCount],
-          [copy.peakPlayers, metric(history.summary.peakPlayers)],
-          [copy.averagePlayers, metric(history.summary.averagePlayers)],
-          [copy.latestStored, metric(history.summary.latestPlayers)],
+          [copy.peakPlayers, metric(locale, history.summary.peakPlayers)],
+          [copy.averagePlayers, metric(locale, history.summary.averagePlayers)],
+          [copy.latestStored, metric(locale, history.summary.latestPlayers)],
         ].map(([label, value]) => (
           <div key={String(label)} className="min-w-0 rounded-lg border border-base bg-inset p-3">
             <div className="font-label uppercase text-faint">{label}</div>

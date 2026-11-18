@@ -12,6 +12,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
@@ -436,7 +437,13 @@ export function ResourceQaPanel({
           }
         />
       ) : null}
-      {writeError ? <ErrorState id="resource-qa-write-failed" title={writeError} /> : null}
+      {writeError ? (
+        <ErrorState
+          id="resource-qa-write-failed"
+          title={writeError}
+          description={getDictionary(locale).errors.formErrorHint}
+        />
+      ) : null}
 
       {selectedId && detail ? (
         <div className="min-w-0 space-y-4 overflow-x-clip">
@@ -464,7 +471,10 @@ export function ResourceQaPanel({
             </div>
             <p className="break-words text-sm text-secondary">{detail.thread.body}</p>
             <p className="text-xs text-faint">
-              {detail.thread.author?.displayName ?? detail.thread.author?.username ?? "—"}
+              {formatUnknown(
+                locale,
+                detail.thread.author?.displayName ?? detail.thread.author?.username,
+              )}
             </p>
           </article>
 
@@ -532,7 +542,9 @@ export function ResourceQaPanel({
                 >
                   <p className="break-words text-sm text-secondary">{item.body}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-faint">
-                    <span>{item.author?.displayName ?? item.author?.username ?? "—"}</span>
+                    <span>
+                      {formatUnknown(locale, item.author?.displayName ?? item.author?.username)}
+                    </span>
                     {item.isResolved ? <span>{copy.resolved}</span> : null}
                     {canResolve && detail.thread.status !== "resolved" ? (
                       <button
@@ -616,7 +628,11 @@ export function ResourceQaPanel({
               />
             </div>
           ) : capabilities?.askReason === "access_required" ? (
-            <ErrorState id="resource-qa-access-required" title={copy.accessRequired} />
+            <ErrorState
+              id="resource-qa-access-required"
+              title={copy.accessRequired}
+              description={getDictionary(locale).errors.formErrorHint}
+            />
           ) : canAsk ? (
             <form className="min-w-0 space-y-2" onSubmit={onAsk}>
               <label className="block min-w-0 space-y-1 text-xs text-muted">
@@ -658,7 +674,11 @@ export function ResourceQaPanel({
               </Button>
             </form>
           ) : !readError ? (
-            <ErrorState id="resource-qa-ask-unavailable" title={copy.unavailable} />
+            <ErrorState
+              id="resource-qa-ask-unavailable"
+              title={copy.unavailable}
+              description={copy.unavailableDescription}
+            />
           ) : null}
 
           {loadingDetail ? (

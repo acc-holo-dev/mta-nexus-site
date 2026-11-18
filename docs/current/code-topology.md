@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `b5ef69e9` (`dev`, после Slice 42/43 platform absorbs + residual honesty).
+**source_sha:** `c711bd7c` (`dev`, Wave 56+57 squash).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,18 +31,18 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `ff61b052` |
+| Область                    |             Факт на `c711bd7c` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
 | `components/` root files   |                              0 |
-| `lib/` tree files          |                            129 |
+| `lib/` tree files          |                            125 |
 | `lib/` root files          |                              0 |
 | `lib/` root dirs           | http, i18n, platform, services |
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1585 |
+| `site/tests` files         |                           1591 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -51,19 +51,19 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    44 | 148930 |
-| commerce      |    70 | 326593 |
-| community     |   127 | 584185 |
-| discovery     |     7 |  32895 |
-| library       |    86 | 401782 |
-| moderation    |    32 | 152991 |
-| notifications |    21 | 131020 |
-| organizations |    49 | 185690 |
-| resources     |   165 | 722595 |
-| servers       |    82 | 310327 |
-| shell         |    60 |  99104 |
-| support       |    22 | 108927 |
-| trust         |    15 |  59635 |
+| accounts      |    44 | 149315 |
+| commerce      |    70 | 327334 |
+| community     |   127 | 588642 |
+| discovery     |     7 |  32999 |
+| library       |    86 | 404082 |
+| moderation    |    32 | 153453 |
+| notifications |    21 | 131398 |
+| organizations |    49 | 186459 |
+| resources     |   165 | 725710 |
+| servers       |    82 | 310785 |
+| shell         |    66 | 109452 |
+| support       |    22 | 110547 |
+| trust         |    15 |  59971 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -192,6 +192,10 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Slice 55 done:** collapse `lib/platform/i18n` + `lib/platform/i18n-server` into [`lib/i18n`](../../site/src/lib/i18n/index.ts) + [`lib/i18n/server.ts`](../../site/src/lib/i18n/server.ts); mass import rewrite (~500+ files); depcruise `safeLib` + `resources-view-isolation` allow `i18n(?:\\.ts$|/)`; `lib/platform/` retains only observability + postgres-error.
 
+**Wave 56 done:** write/form + residual ErrorState honesty (formerly OOS). Shared primitives: `errors.formErrorHint`, `errors.unknownMarker`, helpers [`lib/i18n/unknown.ts`](../../site/src/lib/i18n/unknown.ts). Production `ErrorState` surfaces carry recovery `description`; honesty locks and interaction harnesses updated for the new props.
+
+**Wave 57 done:** adopt `formatUnknown` / `unknownMarker` across production surfaces; purge unknown-marker inventory allowlists (0 remaining); policy lock [`unknown-marker-honesty-policy.test.ts`](../../site/tests/unit/unknown-marker-honesty-policy.test.ts); relocate `lib/platform/observability` + `postgres-error` into folder modules.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -281,8 +285,12 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 54                                                                                    | docs honesty                     | **done** |
 | T   | Slice 55 — collapse `lib/platform/i18n*` into `lib/i18n`                                                          | читаемость lib ownership         | **done** |
 | D/E | Scoreboard sync после Slice 55                                                                                    | docs honesty                     | **done** |
+| C   | Wave 56 — write/form + residual ErrorState honesty (~50 commits, one CI tip)                                      | journey honesty (бывший OOS)     | **done** |
+| A/C | Wave 57 — formatUnknown adoption + unknown-marker allowlist purge + policy                                        | честность RU/EN + unknown        | **done** |
+| T   | Wave 57 — `lib/platform/{observability,postgres-error}/` folder modules                                           | читаемость lib ownership         | **done** |
+| D/E | Scoreboard sync после Wave 56/57 (single squash tip)                                                              | docs honesty                     | **done** |
 
-Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
+Дальше: F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
 ## Связанные входы
 

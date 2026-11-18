@@ -430,6 +430,7 @@ export function AuthorResourceForms({
           <ErrorState
             id="author-resource-details-readonly"
             title={getResourcePublisherCopy(locale).readonly}
+            description={dictionary.errors.formErrorHint}
           />
         ) : (
           <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
@@ -507,6 +508,7 @@ export function AuthorResourceForms({
           <ErrorState
             id="author-resource-upload-blocked"
             title={getResourceCommerceCopy(locale).errors.PRODUCT_STATE_CHANGED}
+            description={getResourceCommerceCopy(locale).errors.fallback}
           />
         ) : (
           <p className="text-sm text-secondary">{publishing.submittedDescription}</p>

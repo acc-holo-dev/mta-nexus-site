@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createPlanReviewRecoveryInteractionHelpers,
   mockReactHooks,
@@ -17,7 +18,7 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: h.locale }),
+  useNexusLocale: () => ({ locale: h.locale, dictionary: getDictionary(h.locale) }),
 }));
 
 import { PlanReviewForm } from "../../src/features/commerce/plan-reviews";

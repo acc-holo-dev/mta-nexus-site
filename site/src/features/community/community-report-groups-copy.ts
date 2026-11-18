@@ -12,6 +12,8 @@ const en = {
   inspect: "Review related reports",
   context: "Open moderation context",
   unknown: "Target unavailable or its community context could not be verified.",
+  unknownHint:
+    "Report counts and links remain valid. The target preview could not be loaded for display.",
   first: "First matching report",
   last: "Latest matching report",
   period: "Period",
@@ -54,6 +56,8 @@ const ru: typeof en = {
   inspect: "Рассмотреть связанные жалобы",
   context: "Открыть контекст модерации",
   unknown: "Цель недоступна или её связь с сообществом не подтверждена.",
+  unknownHint:
+    "Счётчики и ссылки на жалобы остаются действительными. Превью цели для отображения загрузить не удалось.",
   first: "Первая подходящая жалоба",
   last: "Последняя подходящая жалоба",
   period: "Период",

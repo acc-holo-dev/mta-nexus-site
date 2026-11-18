@@ -40,6 +40,11 @@ export function resourceRequirementsCopy(locale: string) {
           review: "Нужна дополнительная проверка",
           blocked: "Есть препятствия",
         },
+        stateBlockedHint:
+          "Устраните перечисленные препятствия, прежде чем считать подготовку завершённой.",
+        stateReviewHint:
+          "Проверьте отмеченные условия перед скачиванием или развёртыванием на сервере.",
+        cycleHint: "Разорвите цикл зависимостей или измените выбор перед получением.",
         modes: {
           latest: "Последняя опубликованная",
           fixed: "Закреплённая",
@@ -98,6 +103,9 @@ export function resourceRequirementsCopy(locale: string) {
           review: "Further inspection needed",
           blocked: "Obstacles found",
         },
+        stateBlockedHint: "Resolve listed obstacles before treating preparation as complete.",
+        stateReviewHint: "Inspect flagged conditions before download or server deployment.",
+        cycleHint: "Break the dependency cycle or change selections before acquisition.",
         modes: { latest: "Latest published", fixed: "Pinned", preview: "Preview" },
         codes: {
           unavailable: "Dependency unavailable in the public catalog",

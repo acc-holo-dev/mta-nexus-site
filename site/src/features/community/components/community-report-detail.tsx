@@ -299,7 +299,11 @@ export function CommunityReportDetailView({
                 )}
               </>
             ) : (
-              <ErrorState id="community-report-target-missing" title={copy.missing} />
+              <ErrorState
+                id="community-report-target-missing"
+                title={copy.missing}
+                description={copy.missingHint}
+              />
             )}
           </section>
           {staff && (report.status === "open" || report.status === "under_review") && (

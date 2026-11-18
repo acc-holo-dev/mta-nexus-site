@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getDictionary } from "../../src/lib/i18n";
 import { expect, it, vi } from "vitest";
 import { flattenReactTestTree } from "../helpers/flatten-react-test-tree";
 import {
@@ -19,7 +20,7 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
 import { SubscriptionControls } from "../../src/features/commerce/subscription-controls";

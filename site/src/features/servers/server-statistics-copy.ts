@@ -14,6 +14,8 @@ const en = {
   private: "Available to current server managers and platform administrators.",
   paused:
     "This listing is currently excluded from collection. Previously stored observations may remain available.",
+  pausedHint:
+    "Stored samples may still appear below. This is a collection block, not an empty statistics period.",
   current: "Selected period",
   previous: "Previous equal-length period",
   comparison: "Period comparison",
@@ -96,6 +98,8 @@ const ru: typeof en = {
   private: "Доступно текущим управляющим сервера и администраторам платформы.",
   paused:
     "Сейчас эта карточка исключена из сбора данных. Ранее сохранённые наблюдения могут оставаться доступными.",
+  pausedHint:
+    "Сохранённые выборки могут по-прежнему отображаться ниже. Это блокировка сбора, а не пустой период статистики.",
   current: "Выбранный период",
   previous: "Предыдущий период той же длины",
   comparison: "Сравнение периодов",

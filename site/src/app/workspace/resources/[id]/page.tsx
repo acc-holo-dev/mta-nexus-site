@@ -105,7 +105,11 @@ export default async function ManageResourcePage({
         </Link>
       </header>
       {product.metadataReviewRequired ? (
-        <ErrorState id="resource-metadata-review-required" title={publisherCopy.reviewRequired} />
+        <ErrorState
+          id="resource-metadata-review-required"
+          title={publisherCopy.reviewRequired}
+          description={publisherCopy.reviewNote}
+        />
       ) : null}
       <ResourcePublicationReadinessPanel
         summary={publicationReadiness}

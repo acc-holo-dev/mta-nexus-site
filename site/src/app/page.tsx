@@ -13,6 +13,7 @@ import {
 } from "../features/shell/home-personal-preference";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n/server";
+import { formatUnknown } from "../lib/i18n/unknown";
 import { authService } from "../lib/services/accounts/auth-service";
 import { productService } from "../lib/services/commerce/product-service";
 import { contentService } from "../lib/services/community/content-service";
@@ -98,13 +99,13 @@ export default async function HomePage() {
   );
   const playersLabel =
     !directory || directory.isStale || !playerSummary
-      ? "—"
+      ? formatUnknown(locale, undefined)
       : playerSummary.known === 0
         ? dictionary.servers.playersUnknown
         : playersPartial
           ? `${playerSummary.sum.toLocaleString(numberLocale)} · ${dictionary.servers.playersUnknown}`
           : playerSummary.sum.toLocaleString(numberLocale);
-  const serversLabel = directory?.servers.length ?? "—";
+  const serversLabel = formatUnknown(locale, directory?.servers.length);
   const spotlight = directory?.servers.slice(0, 6) ?? [];
 
   return (

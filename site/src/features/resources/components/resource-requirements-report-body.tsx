@@ -43,7 +43,9 @@ export function ResourceRequirementsReportBody({
                 ? `${report.issues[0].slug} · ${copy.codes[report.issues[0].code]}`
                 : report.cycles[0]
                   ? report.cycles[0].join(" → ")
-                  : undefined
+                  : report.state === "blocked"
+                    ? copy.stateBlockedHint
+                    : copy.stateReviewHint
             }
           />
         ))}
@@ -80,6 +82,7 @@ export function ResourceRequirementsReportBody({
               key={cycle.join(":")}
               id={`resource-requirements-cycle-${cycle.join("-")}`}
               title={cycle.join(" → ")}
+              description={copy.cycleHint}
             />
           ))}
         </section>

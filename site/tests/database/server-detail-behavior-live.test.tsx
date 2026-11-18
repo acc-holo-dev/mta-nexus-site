@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { unknownMarker } from "../../src/lib/i18n/unknown";
 import {
   deferred,
   mocks,
@@ -255,7 +256,7 @@ describe("server detail live directory and history", () => {
       }),
     );
 
-    expect(html).toMatch(/>—\s*</u);
+    expect(html).toMatch(new RegExp(`>${unknownMarker("en")}\\s*<`, "u"));
     expect(html).toContain('style="width:0%"');
     expect(html).toContain("Open in MTA");
     expect(html).toContain("203.0.113.50:22003");

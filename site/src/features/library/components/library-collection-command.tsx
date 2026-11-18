@@ -340,7 +340,7 @@ export function LibraryCollectionCommandForm({
   return (
     <>
       {requiresStoredIntent && (!createReady || readyActor !== actorId) && error ? (
-        <ErrorState title={error} />
+        <ErrorState title={error} description={c.actionErrorDescription} />
       ) : null}
       <form
         onSubmit={submit}
@@ -383,7 +383,11 @@ export function LibraryCollectionCommandForm({
                   : c[action]}
         </Button>
         {frozen && !saved ? (
-          <ErrorState id="library-collection-command-frozen" title={c.frozen} />
+          <ErrorState
+            id="library-collection-command-frozen"
+            title={c.frozen}
+            description={c.retry}
+          />
         ) : null}
         {error ? (
           <ErrorState

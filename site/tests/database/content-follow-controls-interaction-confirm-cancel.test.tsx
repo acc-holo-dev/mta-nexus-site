@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getDictionary } from "../../src/lib/i18n";
 import { expect, it, vi } from "vitest";
 import {
   createContentFollowControlsInteractionHelpers,
@@ -18,7 +19,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
 vi.mock("next/navigation", () => ({

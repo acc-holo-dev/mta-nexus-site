@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { getDictionary } from "../../src/lib/i18n";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -43,7 +44,7 @@ vi.mock("../../src/lib/services/commerce/subscriptions-service", () => ({
   },
 }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import ActivateLoading from "../../src/app/workspace/subscriptions/activate/loading";

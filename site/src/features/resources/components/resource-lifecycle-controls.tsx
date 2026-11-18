@@ -194,6 +194,7 @@ export function ResourceLifecycleControls({
       {actions.length === 0 ? (
         <ErrorState
           title={copy.blocked}
+          description={copy.actionFailedDescription}
           action={
             product.status === "suspended" ? (
               <Link
@@ -239,7 +240,11 @@ export function ResourceLifecycleControls({
             ) : null}
           </p>
           {action === "restore" ? (
-            <ErrorState id="resource-lifecycle-restore-draft" title={copy.restoreDraftWarning} />
+            <ErrorState
+              id="resource-lifecycle-restore-draft"
+              title={copy.restoreDraftWarning}
+              description={copy.restoreNote}
+            />
           ) : null}
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>

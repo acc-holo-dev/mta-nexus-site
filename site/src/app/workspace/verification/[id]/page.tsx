@@ -161,7 +161,11 @@ export default async function VerificationApplicationPage({
               locale={locale}
             />
           ) : (
-            <ErrorState id="verification-application-readonly" title={copy.readOnly} />
+            <ErrorState
+              id="verification-application-readonly"
+              title={copy.readOnly}
+              description={copy.readOnlyHint}
+            />
           )}
           <section className="nexus-panel min-w-0 space-y-4 p-5">
             <h2 className="font-semibold text-primary">{copy.events}</h2>

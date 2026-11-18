@@ -18,9 +18,15 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (originalModule) => mockReactHooks(harness)(originalModule));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
-}));
+vi.mock("../../src/features/shell/locale", async () => {
+  const { getDictionary } = await import("../../src/lib/i18n");
+  return {
+    useNexusLocale: () => ({
+      locale: harness.locale,
+      dictionary: getDictionary(harness.locale),
+    }),
+  };
+});
 vi.mock("../../src/features/community/user-platform-client", async (originalModule) => ({
   ...(await originalModule<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,

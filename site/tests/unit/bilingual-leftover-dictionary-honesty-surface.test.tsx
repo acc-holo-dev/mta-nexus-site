@@ -29,3 +29,13 @@ it("locks server details saving status to dictionary savingLocked", () => {
   expect(read("site/src/lib/i18n/en/servers.ts")).toContain("savingLocked:");
   expect(read("site/src/lib/i18n/ru/servers.ts")).toContain("savingLocked:");
 });
+
+it("locks shell session check failure to ErrorState with account errorHint", () => {
+  const source = read("site/src/features/shell/components/shell-session-unavailable.tsx");
+  expect(source).toContain('id="shell-session-unavailable"');
+  expect(source).toContain("title={copy.checkError}");
+  expect(source).toContain("description={copy.errorHint}");
+  expect(source).toContain("ErrorState");
+  expect(source).not.toContain('className="space-y-1 text-xs text-muted"');
+  expect(source).not.toContain('<p role="status"');
+});

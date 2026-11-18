@@ -1,4 +1,5 @@
 import type { Locale } from "../../lib/i18n";
+import { unknownMarker } from "../../lib/i18n/unknown";
 import { getCommerceHistoryCopy } from "./commerce-history-i18n";
 import { getCommercialCopy } from "./commercial-i18n";
 
@@ -152,7 +153,7 @@ export function financialReferenceLabel(locale: Locale, reference: string) {
     : getCommercialCopy(locale).unknown;
 }
 export function formatFinancialMinor(value: string | number, currency: string, locale: Locale) {
-  if (!["USD", "EUR", "RUB"].includes(currency)) return "—";
+  if (!["USD", "EUR", "RUB"].includes(currency)) return unknownMarker(locale);
   const amount = BigInt(value),
     absolute = amount < 0n ? -amount : amount;
   return `${amount < 0n ? "−" : ""}${(absolute / 100n).toLocaleString(locale)}${locale === "ru" ? "," : "."}${(absolute % 100n).toString().padStart(2, "0")} ${currency}`;

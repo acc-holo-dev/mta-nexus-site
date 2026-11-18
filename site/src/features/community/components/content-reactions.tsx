@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
@@ -173,7 +174,9 @@ export function ContentReactions({
           >
             <span aria-hidden="true">{CONTENT_REACTION_EMOJI[reaction]}</span>
             {copy[reaction]}{" "}
-            <span className="font-numeric">{shownState ? shownState.counts[reaction] : "—"}</span>
+            <span className="font-numeric">
+              {shownState ? shownState.counts[reaction] : formatUnknown(locale, undefined)}
+            </span>
           </Button>
         ))}
         {shownState?.reaction && (
@@ -213,7 +216,16 @@ export function ContentReactions({
           {copy.my}
         </Link>
       )}
-      {message && blocked ? <ErrorState title={message} /> : null}
+      {message && blocked ? (
+        <ErrorState
+          title={message}
+          description={
+            message === copy.unavailable
+              ? copy.unavailableHint
+              : getDictionary(locale).errors.formErrorHint
+          }
+        />
+      ) : null}
       {message && !blocked ? (
         <p role="status" className="text-xs text-success">
           {message}

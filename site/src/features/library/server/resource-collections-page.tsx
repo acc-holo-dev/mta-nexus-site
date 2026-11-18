@@ -132,7 +132,11 @@ export default async function ResourceCollectionsPage({
           />
         )}
         {!result.resource.canAdd && (
-          <ErrorState id="library-resource-collections-no-add-access" title={c.noAddAccess} />
+          <ErrorState
+            id="library-resource-collections-no-add-access"
+            title={c.noAddAccess}
+            description={c.noAddAccessHint}
+          />
         )}
         {!result.collections.length ? (
           <EmptyState
@@ -184,9 +188,14 @@ export default async function ResourceCollectionsPage({
                   <ErrorState
                     id="library-resource-collection-revision-locked"
                     title={c.revisionLocked}
+                    description={c.revisionLockedHint}
                   />
                 ) : collection.itemCount >= result.itemLimit ? (
-                  <ErrorState id="library-resource-collection-full" title={c.fullCollection} />
+                  <ErrorState
+                    id="library-resource-collection-full"
+                    title={c.fullCollection}
+                    description={c.capacityErrorDescription}
+                  />
                 ) : null}
               </li>
             );
@@ -205,7 +214,17 @@ export default async function ResourceCollectionsPage({
       <section className={`${pageShellClass} max-w-xl`}>
         <ErrorState
           title={title}
-          description={title === c.retry ? c.loadUnavailableDescription : undefined}
+          description={
+            title === c.retry
+              ? c.loadUnavailableDescription
+              : title === c.signInRequired
+                ? dictionary.errors.sessionRetryHint
+                : title.startsWith(c.fullCollection) || title.startsWith(c.quota)
+                  ? c.capacityErrorDescription
+                  : title === c.invalid
+                    ? dictionary.errors.formErrorHint
+                    : c.actionErrorDescription
+          }
           action={
             <Link href={collectionHref()} className={navLinkClass}>
               {c.title}

@@ -15,6 +15,7 @@ import { PlatformSignIn, platformSignInFocusClass } from "../../features/shell/g
 import { PlatformSessionError } from "../../features/shell/session-error";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n/server";
+import { formatUnknown } from "../../lib/i18n/unknown";
 import { authService } from "../../lib/services/accounts/auth-service";
 import {
   indexMtaObservations,
@@ -141,14 +142,14 @@ export default async function WorkspacePage() {
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label={dictionary.workspace.resources}
-          value={library ? library.counts.all : "—"}
+          value={formatUnknown(locale, library ? library.counts.all : undefined)}
           tone="purple"
           icon={<Box className="h-4 w-4" />}
           context={dictionary.workspace.inLibrary}
         />
         <StatCard
           label={serverCopy.title}
-          value={serverBundle ? serverBundle.serverPage.total : "—"}
+          value={formatUnknown(locale, serverBundle ? serverBundle.serverPage.total : undefined)}
           tone="accent"
           icon={<ServerIcon className="h-4 w-4" />}
           context={
@@ -161,7 +162,7 @@ export default async function WorkspacePage() {
         />
         <StatCard
           label={dictionary.workspace.playersOnline}
-          value={playerCountsKnown ? onlinePlayers : "—"}
+          value={formatUnknown(locale, playerCountsKnown ? onlinePlayers : undefined)}
           tone="success"
           icon={<Users className="h-4 w-4" />}
           context={serverCopy.previewPlayers}

@@ -61,12 +61,12 @@ SCAN_PATHS = (
     "site/src/features/servers/components/server-workspace-nav.tsx",
     "site/src/features/support/components/support-case-actions.tsx",
     "site/src/features/support/components/support-status-history.tsx",
-    "site/src/features/trust/components/public-user-trust.tsx",
+    "site/src/features/trust/components/public-user-trust.tsx"
 )
 
 LOCALE_COPY_TERNARY = re.compile(
     r"""locale\s*===\s*["'](?:ru|en)["']\s*\?\s*["']([^"']{2,})["']\s*:\s*["']([^"']{2,})["']""",
-    re.MULTILINE,
+    re.MULTILINE
 )
 
 LOCALE_TAG = re.compile(r"^(?:[a-z]{2}(?:-[A-Z]{2})?|[a-z]{2})$")
@@ -77,15 +77,15 @@ PLACEHOLDER_LITERAL = re.compile(r"""\bplaceholder\s*=\s*["']([^"']+)["']""")
 ALT_LITERAL = re.compile(r"""\balt\s*=\s*["']([^"']+)["']""")
 
 JSX_TEXT = re.compile(
-    r"""(?<!=)>\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)""",
+    r"""(?<!=)>\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)"""
 )
 
 JSX_TEXT_MULTILINE = re.compile(
-    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<""",
+    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<"""
 )
 
 JSX_TEXT_SPACE_GLUE = re.compile(
-    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}""",
+    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}"""
 )
 
 TEMPLATE_LITERAL = re.compile(r"""template\s*:\s*["']([^"']+)["']""")
@@ -93,78 +93,6 @@ TEMPLATE_LITERAL = re.compile(r"""template\s*:\s*["']([^"']+)["']""")
 UNKNOWN_MARKER = re.compile(r"""["']—["']""")
 
 ALLOWLIST: tuple[dict[str, str], ...] = (
-    {
-        "id": "library.collection-history.unknown-marker-dash",
-        "path": "site/src/features/library/server/collection-history-page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "library.collection-receipt.unknown-marker-dash",
-        "path": "site/src/features/library/server/collection-receipt-page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "library.collections-history-view.unknown-marker-dash",
-        "path": "site/src/features/library/server/library-collections-history-view.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "library.selection-batch.unknown-marker-dash",
-        "path": "site/src/features/library/server/library-selection-batch-screen.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.build-package-evidence.unknown-marker-dash",
-        "path": "site/src/features/resources/components/build-package-evidence.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.build-screen.unknown-marker-dash",
-        "path": "site/src/features/resources/server/build-screen.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.market-page.unknown-marker-dash",
-        "path": "site/src/features/resources/server/market-page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.delivery-evidence.unknown-marker-dash",
-        "path": "site/src/features/resources/server/resource-delivery-evidence.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.review-report.unknown-marker-dash",
-        "path": "site/src/features/resources/server/resource-review-report-screen.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "resources.versions-page.unknown-marker-dash",
-        "path": "site/src/features/resources/server/versions-page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "servers.review-panel.unknown-marker-dash",
-        "path": "site/src/features/servers/components/server-review-panel.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "servers.history-panel.unknown-marker-dash",
-        "path": "site/src/features/servers/server/server-history-panel.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
 )
 
 
@@ -172,8 +100,8 @@ def _git_show(revision: str, path: str) -> str:
     return subprocess.check_output(
         ["git", "show", f"{revision}:{path}"],
         cwd=ROOT,
-        text=True,
-    )
+        text=True
+)
 
 
 def _read_source(revision: str, path: str) -> str:
@@ -193,8 +121,8 @@ def _ls_paths(revision: str) -> list[str]:
         raw = subprocess.check_output(
             ["git", "ls-tree", "-r", "--name-only", revision, "--", prefix],
             cwd=ROOT,
-            text=True,
-        )
+            text=True
+)
         for path in raw.splitlines():
             path = path.replace("\\", "/")
             if path.endswith((".test.ts", ".test.tsx", ".md")):
@@ -243,8 +171,8 @@ def _findings_in_source(path: str, source: str) -> list[dict[str, object]]:
             ("title", TITLE_LITERAL),
             ("placeholder", PLACEHOLDER_LITERAL),
             ("alt", ALT_LITERAL),
-            ("template", TEMPLATE_LITERAL),
-        ):
+            ("template", TEMPLATE_LITERAL)
+):
             for match in pattern.finditer(line):
                 text = match.group(1).strip()
                 if _is_noise_text(text):
@@ -345,8 +273,8 @@ def _biome_format(path: Path) -> None:
         cwd=ROOT,
         check=False,
         capture_output=True,
-        text=True,
-    )
+        text=True
+)
 
 
 def _stable_payload(data: dict[str, object]) -> dict[str, object]:
@@ -384,8 +312,8 @@ def main() -> int:
     parser.add_argument(
         "--check",
         type=Path,
-        help="Fail unless path matches freshly generated inventory (source_sha ignored)",
-    )
+        help="Fail unless path matches freshly generated inventory (source_sha ignored)"
+)
     args = parser.parse_args()
     data = inventory(args.revision)
     text = _canonical(data)
@@ -434,8 +362,8 @@ def main() -> int:
                     "source_sha": data["source_sha"],
                     "summary": data["summary"],
                 },
-                ensure_ascii=False,
-            )
+                ensure_ascii=False
+)
         )
     return 0
 

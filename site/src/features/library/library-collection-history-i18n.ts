@@ -15,6 +15,8 @@ const en = {
   loadUnavailableDescription:
     "A load failure is not an empty history. Retry to fetch the latest recorded collection operations.",
   unknown: "The recorded operation could not be verified.",
+  unknownHint:
+    "An unverified operation is not a load failure. Open another history entry or retry if loading failed.",
   current: "Current collection",
   recorded: "Recorded collection",
   sourceCurrent: "Current source collection",
@@ -44,6 +46,8 @@ const ru: typeof en = {
   loadUnavailableDescription:
     "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные операции.",
   unknown: "Записанную операцию не удалось проверить.",
+  unknownHint:
+    "Непроверенная операция — не ошибка загрузки. Откройте другую запись истории или повторите запрос при сбое загрузки.",
   current: "Текущая коллекция",
   recorded: "Записанная коллекция",
   sourceCurrent: "Текущая исходная коллекция",

@@ -20,15 +20,17 @@ it("locks verification workspace write and unconfirmed-submit notices to ErrorSt
   expect(source).toContain('id="verification-workspace-write-failed"');
   expect(source).toContain('id="verification-workspace-submit-unconfirmed"');
   expect(source).toContain("copy.submissionUnconfirmed");
+  expect(source).toContain("copy.mutationUnavailable");
+  expect(source).toContain("dictionary.errors.formErrorHint");
   expect(copy).toContain("submissionUnconfirmed:");
   expect(source).toMatch(
-    /verifiedKey !== identityKey && writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s*\/>/u,
+    /verifiedKey !== identityKey && writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s+description=\{copy\.mutationUnavailable\}\s*\/>/u,
   );
   expect(source).toMatch(
-    /writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s*\/>/u,
+    /writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s+description=\{copy\.mutationUnavailable\}\s*\/>/u,
   );
   expect(source).toMatch(
-    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{copy\.submissionUnconfirmed\}\s*\/>/u,
+    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{copy\.submissionUnconfirmed\}\s+description=\{dictionary\.errors\.formErrorHint\}\s*\/>/u,
   );
   expect(source).not.toContain(
     "The submission result is unconfirmed. Only an exact retry of the original application is available.",

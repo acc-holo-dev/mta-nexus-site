@@ -11,6 +11,10 @@ const copies = {
     reviewNote:
       "Gallery changes withdraw publication and pending review. Submit the resource for moderation again when your changes are ready. Earlier external previews are replaced when you first edit this uploaded gallery.",
     readonly: "This gallery is read-only while the resource is archived or suspended.",
+    readonlyDescription:
+      "Restore the resource draft or resolve the restriction before uploading or reordering images.",
+    reviewNoteDescription:
+      "Submit the resource for moderation again when gallery changes are ready.",
     file: "Image file",
     caption: "Caption",
     upload: "Upload image",
@@ -70,6 +74,9 @@ const copies = {
     reviewNote:
       "Изменения галереи снимают публикацию и отменяют текущую проверку. После изменений отправьте ресурс на модерацию снова. Прежние внешние превью заменяются при первом изменении загруженной галереи.",
     readonly: "Галерея доступна только для чтения, пока ресурс архивирован или приостановлен.",
+    readonlyDescription:
+      "Восстановите черновик ресурса или снимите ограничение перед загрузкой или изменением порядка изображений.",
+    reviewNoteDescription: "Когда изменения галереи готовы, снова отправьте ресурс на модерацию.",
     file: "Файл изображения",
     caption: "Подпись",
     upload: "Загрузить изображение",

@@ -106,7 +106,7 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   expect(empty).toContain(copy.emptyHint);
   expect(empty).toContain("overflow-x-clip");
   expect(empty).toContain('id="resource-qa-ask-unavailable"');
-  expect(empty).not.toContain(copy.unavailableDescription);
+  expect(empty).toContain(copy.unavailableDescription);
 });
 
 it("gates resolve and reopen writes behind confirmAction with localized copy", () => {

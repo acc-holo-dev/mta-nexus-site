@@ -14,7 +14,7 @@ it("locks gallery readonly notice to ErrorState without soft text-warning", () =
   expect(source).toContain('import { Button, EmptyState, ErrorState, Input } from "@nexus/ui"');
   expect(source).toContain('id="resource-media-readonly"');
   expect(source).toMatch(
-    /readonly \? <ErrorState id="resource-media-readonly" title=\{copy\.readonly\} \/> : null/u,
+    /readonly \? \(\s*<ErrorState\s+id="resource-media-readonly"\s+title=\{copy\.readonly\}\s+description=\{copy\.readonlyDescription\}/u,
   );
   expect(source).not.toContain('role="note" className="text-warning"');
   expect(source).not.toContain('className="text-warning">\n          {copy.readonly}');

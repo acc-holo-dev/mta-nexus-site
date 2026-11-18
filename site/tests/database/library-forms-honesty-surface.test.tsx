@@ -36,6 +36,14 @@ it("locks library form sources to ErrorState honesty without plain alert paragra
   }
 });
 
+it("locks library release command pending recovery to ErrorState", () => {
+  const source = read("site/src/features/library/components/library-release-command.tsx");
+  expect(source).toContain('id="library-release-command-pending"');
+  expect(source).toContain("title={copy.pendingNote}");
+  expect(source).toContain("description={copy.errors.actionErrorDescription}");
+  expect(source).not.toContain('<p className="text-sm text-muted">{copy.pendingNote}</p>');
+});
+
 it("keeps additive action-error copy for library form locales", () => {
   expect(libraryCollectionsCopy("en").actionErrorDescription.length).toBeGreaterThan(20);
   expect(libraryCollectionsCopy("ru").actionErrorDescription.length).toBeGreaterThan(20);

@@ -24,6 +24,8 @@ const copy = {
     itemUnavailableHint:
       "This line is withdrawn or blocked for acquisition. Remove it before confirming the cart; that is not a cart load failure.",
     unavailableNote: "Remove unavailable items before continuing.",
+    unavailableNoteHint:
+      "Remove unavailable lines or refresh the cart before confirming acquisition.",
     free: "Free",
     owned: "Already in your library",
     done: "Resources added to your library.",
@@ -116,6 +118,8 @@ const copy = {
     itemUnavailableHint:
       "Эта строка снята с получения или заблокирована. Уберите её перед подтверждением корзины — это не сбой загрузки корзины.",
     unavailableNote: "Уберите недоступные ресурсы, чтобы продолжить.",
+    unavailableNoteHint:
+      "Уберите недоступные строки или обновите корзину перед подтверждением получения.",
     free: "Бесплатно",
     owned: "Уже в библиотеке",
     done: "Ресурсы добавлены в библиотеку.",

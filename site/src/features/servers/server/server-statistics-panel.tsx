@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
@@ -95,7 +95,13 @@ export function ServerStatisticsPanel({
         {report.server.endpointRevision > 0 && (
           <p className="text-sm text-muted">{copy.lifetime}</p>
         )}
-        {!report.collectionEligible && <p className="text-sm text-muted">{copy.paused}</p>}
+        {!report.collectionEligible ? (
+          <ErrorState
+            id="server-statistics-collection-paused"
+            title={copy.paused}
+            description={copy.pausedHint}
+          />
+        ) : null}
         <StatisticsScrollArea labelledBy="server-statistics-comparison">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">{copy.comparison}</caption>

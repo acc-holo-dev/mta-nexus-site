@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
         </form>
 
         {notice?.error ? (
-          <ErrorState title={notice.text} />
+          <ErrorState title={notice.text} description={dictionary.errors.formErrorHint} />
         ) : notice ? (
           <p
             role="status"

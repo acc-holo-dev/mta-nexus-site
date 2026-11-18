@@ -284,7 +284,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       ) : null}
       {uncertain && !busy ? (
         <div data-cart-state="pending">
-          <ErrorState title={receiptCopy.pending} />
+          <ErrorState title={receiptCopy.pending} description={receiptCopy.pendingHint} />
         </div>
       ) : null}
       {!cart.items.length ? (
@@ -319,9 +319,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                         description={copy.itemUnavailableHint}
                       />
                     )}
-                    <p className="text-sm text-muted">
-                      {item.available ? `${copy.free} · ${item.version}` : copy.unavailableNote}
-                    </p>
+                    {item.available ? (
+                      <p className="text-sm text-muted">
+                        {copy.free} · {item.version}
+                      </p>
+                    ) : null}
                     {item.alreadyOwned ? (
                       <p className="text-sm text-success" data-cart-state="owned">
                         {copy.owned}
@@ -349,7 +351,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         </ul>
       )}
       {unavailable ? (
-        <ErrorState id="resource-cart-unavailable" title={copy.unavailableNote} />
+        <ErrorState
+          id="resource-cart-unavailable"
+          title={copy.unavailableNote}
+          description={copy.unavailableNoteHint}
+        />
       ) : null}
       <div className="flex min-w-0 flex-wrap gap-3">
         {uncertain ? (

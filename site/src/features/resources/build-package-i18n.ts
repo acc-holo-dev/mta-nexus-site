@@ -54,6 +54,18 @@ const copy = {
     external: "External resource not checked",
     unsafe: "Unsafe or missing path",
     truncated: "The bounded reference list is incomplete.",
+    truncatedHint:
+      "Download the private JSON report for the full list. This view does not load more references.",
+    legacyHint:
+      "No inventory was recorded for this build. Comparison and reference checks stay unavailable.",
+    noBaselineHint:
+      "Choose another baseline with recorded inventory, or review selected-version files only.",
+    missingReferencesHint:
+      "Fix missing or unresolved paths in the package. This summary does not change the archive.",
+    referenceIssueHint:
+      "Recorded from static inspection only. Repack or fix paths before resubmitting.",
+    structuralIssueHint:
+      "Static meta.xml notes only. Fix the manifest and upload a new build if needed.",
     dependencies: "Resource names declared in the package",
     dependenciesNote: "These are MTA names from the package, not verified marketplace links.",
     acl: "Requested ACL names",
@@ -125,6 +137,18 @@ const copy = {
     external: "Внешний ресурс не проверен",
     unsafe: "Опасный или пустой путь",
     truncated: "Список ссылок ограничен и неполон.",
+    truncatedHint:
+      "Скачайте закрытый JSON-отчёт для полного списка. Этот экран не подгружает остальные ссылки.",
+    legacyHint:
+      "Для этой сборки не записан перечень файлов. Сравнение и проверка ссылок недоступны.",
+    noBaselineHint:
+      "Выберите другую базовую версию с записанным перечнем или просматривайте только файлы выбранной версии.",
+    missingReferencesHint:
+      "Исправьте отсутствующие или нераспознанные пути в пакете. Сводка не меняет архив.",
+    referenceIssueHint:
+      "Записано только при статической проверке. Пересоберите пакет или исправьте пути перед повторной отправкой.",
+    structuralIssueHint:
+      "Только статические замечания meta.xml. Исправьте манифест и при необходимости загрузите новую сборку.",
     dependencies: "Имена ресурсов, объявленные в пакете",
     dependenciesNote: "Это имена MTA из пакета, а не проверенные ссылки Marketplace.",
     acl: "Запрошенные имена ACL",

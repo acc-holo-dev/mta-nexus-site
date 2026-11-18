@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { librarySelectionBatchesService } from "../../../lib/services/library/library-selection-batches-service";
@@ -126,12 +127,13 @@ export async function LibrarySelectionBatchScreen({
                       <li key={item.productId} className="break-all text-sm">
                         <code>{item.productId}</code>
                         <p>
-                          {c.previous}: {c[item.previous.mode]} · {item.previous.buildId ?? "—"} ·{" "}
-                          {c.selectionRevision}: {item.previous.revision}
+                          {c.previous}: {c[item.previous.mode]} ·{" "}
+                          {formatUnknown(locale, item.previous.buildId)} · {c.selectionRevision}:{" "}
+                          {item.previous.revision}
                         </p>
                         <p>
-                          {c.next}: {c[item.next.mode]} · {item.next.buildId ?? "—"} ·{" "}
-                          {c.selectionRevision}: {item.next.revision}
+                          {c.next}: {c[item.next.mode]} · {formatUnknown(locale, item.next.buildId)}{" "}
+                          · {c.selectionRevision}: {item.next.revision}
                         </p>
                       </li>
                     ))}

@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import { findTestButton } from "../helpers/flatten-react-test-tree";
 import {
   actor,
@@ -17,7 +18,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
+  useNexusLocale: () => ({ locale: harness.locale, dictionary: getDictionary(harness.locale) }),
 }));
 
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";

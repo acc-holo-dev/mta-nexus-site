@@ -15,7 +15,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { parseProfilePage, ProfileResourcePagination } from "../../accounts/profile-pagination";
+import { ProfileResourcePagination, parseProfilePage } from "../../accounts/profile-pagination";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";

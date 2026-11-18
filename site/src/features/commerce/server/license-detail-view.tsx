@@ -61,7 +61,11 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
         license.bindingReady ? (
           <p className="text-sm text-secondary">{copy.available}</p>
         ) : (
-          <ErrorState id="license-binding-changed" title={copy.changed} />
+          <ErrorState
+            id="license-binding-changed"
+            title={copy.changed}
+            description={copy.changedHint}
+          />
         )
       ) : null}
       <section className="min-w-0 space-y-3">

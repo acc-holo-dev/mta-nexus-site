@@ -7,6 +7,8 @@ const en = {
   current: "Current membership",
   desired: "Keep this resource in the collection",
   cannotAdd: "Current access or collection capacity does not allow adding.",
+  cannotAddHint:
+    "A blocked add is not a saved batch change. Adjust access, capacity or revision before retrying the group.",
   receipt: "Group receipt",
   success: "All reviewed collection changes are recorded.",
   noChanges: "Choose a different membership in at least one collection.",
@@ -23,6 +25,8 @@ const ru: typeof en = {
   current: "Текущий состав",
   desired: "Оставить этот ресурс в коллекции",
   cannotAdd: "Действующий доступ или вместимость коллекции не позволяют добавить ресурс.",
+  cannotAddHint:
+    "Блокировка добавления — не сохранённое изменение группы. Настройте доступ, вместимость или редакцию перед повтором.",
   receipt: "Квитанция группы",
   success: "Все выбранные изменения коллекций записаны.",
   noChanges: "Измените состав хотя бы одной коллекции.",

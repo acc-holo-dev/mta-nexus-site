@@ -58,9 +58,9 @@ const workspace: OrganizationWorkspace = {
 it("locks organization workspace readonly notice to ErrorState without soft muted caption", () => {
   expect(source).toContain('import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="organization-workspace-readonly"');
-  expect(source).toMatch(
-    /\{!manageable && <ErrorState id="organization-workspace-readonly" title=\{copy\.readOnly\} \/>\}/u,
-  );
+  expect(source).toContain('id="organization-workspace-readonly"');
+  expect(source).toContain("title={copy.readOnly}");
+  expect(source).toContain("description={copy.readOnlyHint}");
   expect(source).not.toContain(
     'className="nexus-panel p-4 text-sm text-muted">{copy.readOnly}</p>',
   );

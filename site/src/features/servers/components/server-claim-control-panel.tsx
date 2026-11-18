@@ -320,6 +320,7 @@ export function ServerClaimControlPanel({
       {state === "unknown_issue" || state === "unknown_verify" ? (
         <ErrorState
           title={state === "unknown_issue" ? copy.unknownIssueTitle : copy.unknownVerifyTitle}
+          description={state === "unknown_issue" ? copy.unknownIssueHint : copy.unknownVerifyHint}
           action={
             <Link
               href="/workspace/verification"
@@ -412,7 +413,7 @@ export function ServerClaimControlPanel({
         </div>
       )}
 
-      {error ? <ErrorState title={error} /> : null}
+      {error ? <ErrorState title={error} description={dictionary.errors.formErrorHint} /> : null}
 
       <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
     </section>

@@ -6,6 +6,7 @@ import { Copy, Gamepad2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -195,7 +196,9 @@ export function ServerCard({
               </span>
             </span>
             <span className="font-numeric text-faint">
-              {occupancyPercent == null ? "—" : `${occupancyPercent}%`}
+              {occupancyPercent == null
+                ? formatUnknown(locale, occupancyPercent)
+                : `${occupancyPercent}%`}
             </span>
           </div>
           <div className="h-1 w-full overflow-hidden rounded-full bg-inset">

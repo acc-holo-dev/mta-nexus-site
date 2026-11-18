@@ -55,9 +55,9 @@ const data: OrganizationTeamPage = {
 it("locks organization team directory readonly notice to ErrorState without soft muted caption", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="organization-team-directory-readonly"');
-  expect(source).toMatch(
-    /<ErrorState id="organization-team-directory-readonly" title=\{team\.readOnly\} \/>/u,
-  );
+  expect(source).toContain('id="organization-team-directory-readonly"');
+  expect(source).toContain("title={team.readOnly}");
+  expect(source).toContain("description={team.readOnlyHint}");
   expect(source).not.toContain('className="text-sm text-muted">{team.readOnly}</p>');
 });
 

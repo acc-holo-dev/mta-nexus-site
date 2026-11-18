@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {
@@ -244,7 +244,9 @@ export function ManagedServerVisibilityBatch({
           {copy.busy}
         </p>
       )}
-      {error ? <ErrorState title={error} /> : null}
+      {error ? (
+        <ErrorState title={error} description={getDictionary(locale).errors.formErrorHint} />
+      ) : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}

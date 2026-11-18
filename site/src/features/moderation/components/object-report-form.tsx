@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
@@ -29,6 +29,7 @@ export function ObjectReportForm({
   registerHref: string;
 }) {
   const copy = platformReportCopy(locale);
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [type, setType] = useState<(typeof REPORT_TYPES)[number]>("abuse");
@@ -196,7 +197,9 @@ export function ObjectReportForm({
           placeholder={copy.reportReasonPlaceholder}
         />
       </label>
-      {error ? <ErrorState id="object-report-failed" title={error} /> : null}
+      {error ? (
+        <ErrorState id="object-report-failed" title={error} description={formErrorHint} />
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           type="submit"

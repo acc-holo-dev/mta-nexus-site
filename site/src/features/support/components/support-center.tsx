@@ -308,7 +308,11 @@ export function SupportCenter({
           {staffMode ? copy.staffDescription : copy.description}
         </p>
         {!staffMode ? (
-          <ErrorState id="support-no-guaranteed-sla" title={copy.noGuaranteedSla} />
+          <ErrorState
+            id="support-no-guaranteed-sla"
+            title={copy.noGuaranteedSla}
+            description={copy.noGuaranteedSlaHint}
+          />
         ) : null}
       </header>
 

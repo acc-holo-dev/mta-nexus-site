@@ -35,7 +35,11 @@ export function LibraryMembershipHistoryEntry({
         {c.receipt}: {item.id}
       </code>
       {!receipt ? (
-        <ErrorState id="library-membership-history-unknown" title={h.unknown} />
+        <ErrorState
+          id="library-membership-history-unknown"
+          title={h.unknown}
+          description={h.unknownHint}
+        />
       ) : (
         <>
           <code className="block break-all text-xs">

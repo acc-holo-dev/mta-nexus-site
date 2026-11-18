@@ -21,7 +21,7 @@ it("locks new-resource unknown intent notice to ErrorState and keeps hard error 
   expect(source).toContain("copy.restoreFailed");
   expect(source).toContain("copy.recoverySaveFailed");
   expect(source).toMatch(
-    /\{intent \? <ErrorState title=\{copy\.resultMayBeUnknown\} \/> : null\}/u,
+    /\{intent \? \(\s*<ErrorState title=\{copy\.resultMayBeUnknown\} description=\{copy\.buildErrorDescription\} \/>\s*\) : null\}/u,
   );
   expect(source).toContain("<ErrorState");
   expect(source).toContain("title={error}");

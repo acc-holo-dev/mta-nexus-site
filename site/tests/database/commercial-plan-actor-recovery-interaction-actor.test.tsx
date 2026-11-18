@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createCommercialPlanActorRecoveryInteractionHelpers,
   mockReactHooks,
@@ -19,7 +20,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction: h.con
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
 import { CommercialPlanForm } from "../../src/features/commerce/commercial-plans";

@@ -218,7 +218,11 @@ export function LibraryMembershipBatchForm({
                     {collection.inCollection ? c.inCollection : c.notInCollection}
                   </p>
                   {cannotAdd ? (
-                    <ErrorState id="library-membership-cannot-add" title={h.cannotAdd} />
+                    <ErrorState
+                      id="library-membership-cannot-add"
+                      title={h.cannotAdd}
+                      description={h.cannotAddHint}
+                    />
                   ) : null}
                   {readOnly &&
                     (collection.status === "archived" ? (
@@ -229,6 +233,7 @@ export function LibraryMembershipBatchForm({
                       <ErrorState
                         id="library-membership-revision-locked"
                         title={c.revisionLocked}
+                        description={c.revisionLockedHint}
                       />
                     ))}
                 </li>
@@ -276,7 +281,7 @@ export function LibraryMembershipBatchForm({
         {busy ? c.busy : saved ? c.saved : blocked ? c.reload : frozen ? c.retryAction : h.apply}
       </Button>
       {frozen && !saved ? (
-        <ErrorState id="library-membership-batch-frozen" title={c.frozen} />
+        <ErrorState id="library-membership-batch-frozen" title={c.frozen} description={c.retry} />
       ) : null}
       {error ? (
         <ErrorState

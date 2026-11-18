@@ -12,12 +12,13 @@ const source = readFileSync(
 
 it("routes community-topic pending/unknown recovery through ErrorState and keeps busy status", () => {
   expect(source).toContain('import { Button, ErrorState, Field } from "@nexus/ui"');
-  expect(source).toContain(
-    "{pending ? <ErrorState title={recoveryNotice || copy.topicPending} /> : null}",
+  expect(source).toMatch(
+    /\{pending \? \(\s*<ErrorState\s+title=\{recoveryNotice \|\| copy\.topicPending\}\s+description=\{copy\.createErrorDescription\}\s*\/>\s*\) : null\}/u,
   );
   expect(source).toContain('role="status"');
   expect(source).toContain("{copy.publishing}");
   expect(source).toContain("title={error}");
+  expect(source).toContain("description={copy.createErrorDescription}");
   expect(source).not.toMatch(
     /\{pending && \(\s*<p role="status" className="text-sm text-secondary">\s*\{recoveryNotice \|\| copy\.topicPending\}\s*<\/p>\s*\)\}/u,
   );

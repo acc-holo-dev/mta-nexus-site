@@ -52,6 +52,14 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
   }
 });
 
+it("locks resource copy form frozen recovery to ErrorState", () => {
+  const source = read("site/src/features/resources/components/resource-copy-form.tsx");
+  expect(source).toContain('id="resource-copy-form-frozen"');
+  expect(source).toContain("title={c.frozen}");
+  expect(source).toContain("description={c.retry}");
+  expect(source).not.toMatch(/frozen && \(\s*<p role="note"/u);
+});
+
 it("locks resource media editor reorder/remove CTAs to size=touch", () => {
   const source = read("site/src/features/resources/components/resource-media-editor.tsx");
   expect(source).toContain("EmptyState");

@@ -32,6 +32,10 @@ const surfaces = [
     path: "site/src/features/library/components/library-collection-command.tsx",
     id: "library-collection-command-frozen",
   },
+  {
+    path: "site/src/features/library/components/library-collection-item-copy.tsx",
+    id: "library-collection-item-copy-frozen",
+  },
 ] as const;
 
 /** Honesty lock: library frozen/unknown-result markers use ErrorState, not soft notes. */
@@ -41,7 +45,16 @@ it("locks library frozen recovery markers to ErrorState with stable ids", () => 
     expect(source, surface.path).toContain(`id="${surface.id}"`);
     expect(source, surface.path).toContain("ErrorState");
     expect(source, surface.path).toMatch(
-      new RegExp(`<ErrorState\\s+id="${surface.id}"\\s+title=\\{(?:m|c)\\.frozen\\}\\s*/>`, "u"),
+      new RegExp(
+        `<ErrorState[\\s\\S]*?id="${surface.id}"[\\s\\S]*?title=\\{(?:m|c)\\.frozen\\}`,
+        "u",
+      ),
+    );
+    expect(source, surface.path).toMatch(
+      new RegExp(
+        `id="${surface.id}"[\\s\\S]*?description=\\{(?:m|c)\\.(?:retry|actionErrorDescription)\\}`,
+        "u",
+      ),
     );
     expect(source, surface.path).not.toMatch(/frozen &&[^;]*role="note"/u);
     expect(source, surface.path).not.toMatch(/\{frozen && <p role="note">/u);

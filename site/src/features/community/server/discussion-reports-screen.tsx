@@ -88,6 +88,7 @@ export async function DiscussionReportsScreen({
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
         <ErrorState
           title={general.denied}
+          description={general.deniedHint}
           action={
             <Link href="/admin" className={navLinkClass}>
               {dictionary.admin.title}

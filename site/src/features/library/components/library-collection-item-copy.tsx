@@ -168,7 +168,13 @@ export function LibraryCollectionItemCopyForm({
       />
     );
   if (!destinations.length && !pending.current)
-    return <ErrorState id="library-collection-no-destination" title={c.noDestination} />;
+    return (
+      <ErrorState
+        id="library-collection-no-destination"
+        title={c.noDestination}
+        description={c.noDestinationHint}
+      />
+    );
   if (!items.length && !pending.current) {
     return <EmptyState title={c.emptyItems} description={c.emptyItemsHint} />;
   }
@@ -280,9 +286,11 @@ export function LibraryCollectionItemCopyForm({
             {c.source}: {pending.current?.source.name} · {c.revision}{" "}
             {pending.current?.source.revision}
           </p>
-          <p role="note" className="text-sm text-muted">
-            {c.frozen}
-          </p>
+          <ErrorState
+            id="library-collection-item-copy-frozen"
+            title={c.frozen}
+            description={c.retry}
+          />
           <Button
             type="button"
             disabled={busy}

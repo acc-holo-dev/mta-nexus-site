@@ -13,6 +13,7 @@ import { PlatformSessionError } from "../../../../features/shell/session-error";
 
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n/server";
+import { formatUnknown } from "../../../../lib/i18n/unknown";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../../lib/services/resources/resource-review-service";
 
@@ -103,7 +104,7 @@ export default async function Page({
             <h2 className="min-w-0 break-words">{review.title ?? copy.unavailable}</h2>
             <p>
               {resourceReviewState(typedLocale, review.status)} · {copy.rating}:{" "}
-              {review.rating ?? "—"}/5
+              {formatUnknown(typedLocale, review.rating)}/5
             </p>
             <p className="line-clamp-4 whitespace-pre-wrap break-words text-sm">{review.text}</p>
             <Link

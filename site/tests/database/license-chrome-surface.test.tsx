@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from "react";
+import { getDictionary } from "../../src/lib/i18n";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
@@ -15,7 +16,7 @@ vi.mock("next/link", async () => {
   };
 });
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
 import { LicenseArchiveFilters } from "../../src/features/commerce/license-archive";

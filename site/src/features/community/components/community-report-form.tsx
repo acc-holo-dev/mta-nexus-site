@@ -24,7 +24,8 @@ export function CommunityReportForm({
 }) {
   const pathname = usePathname();
   const copy = communityReportCopy(locale);
-  const workspace = getDictionary(locale).workspace;
+  const dictionary = getDictionary(locale);
+  const workspace = dictionary.workspace;
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const [open, setOpen] = useState(false),
@@ -235,7 +236,7 @@ export function CommunityReportForm({
         />
       ) : !verified || verifiedKey !== storageKey || !storageReady ? (
         error ? (
-          <ErrorState title={error} />
+          <ErrorState title={error} description={dictionary.errors.sessionRetryHint} />
         ) : (
           <p role="status">{copy.checkingSession}</p>
         )
@@ -311,7 +312,9 @@ export function CommunityReportForm({
               {copy.myReports}
             </Link>
           </div>
-          {intent ? <ErrorState title={copy.submissionUnconfirmed} /> : null}
+          {intent ? (
+            <ErrorState title={copy.submissionUnconfirmed} description={copy.formErrorHint} />
+          ) : null}
           {error ? <ErrorState title={error} description={copy.errorMayHaveSaved} /> : null}
         </form>
       )}

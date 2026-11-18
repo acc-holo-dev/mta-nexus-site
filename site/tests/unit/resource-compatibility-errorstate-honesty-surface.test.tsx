@@ -12,8 +12,8 @@ const source = readFileSync(
 
 it("locks suspended/blocked product notice to ErrorState without fake retry", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain(
-    "{product.suspended ? <ErrorState title={copy.errors.PRODUCT_STATE_CHANGED} /> : null}",
+  expect(source).toMatch(
+    /\{product\.suspended \? \(\s*<ErrorState\s+title=\{copy\.errors\.PRODUCT_STATE_CHANGED\}\s+description=\{copy\.errors\.fallback\}\s*\/>\s*\) : null\}/u,
   );
   expect(source).not.toContain('className="text-warning">{copy.errors.PRODUCT_STATE_CHANGED}</p>');
   expect(source).toContain(

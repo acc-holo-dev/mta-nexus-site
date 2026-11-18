@@ -14,7 +14,7 @@ it("locks artifact clean-scan notice to ErrorState without soft text-warning", (
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="build-moderation-artifact-clean-scan"');
   expect(source).toMatch(
-    /!hasTrustedCleanScan \? \(\s*<ErrorState\s+id="build-moderation-artifact-clean-scan"\s+title=\{copy\.artifactRequiresCleanScan\}\s*\/>\s*\) : null/u,
+    /!hasTrustedCleanScan \? \(\s*<ErrorState\s+id="build-moderation-artifact-clean-scan"\s+title=\{copy\.artifactRequiresCleanScan\}\s+description=\{copy\.artifactRequiresCleanScanHint\}\s*\/>\s*\) : null/u,
   );
   expect(source).not.toContain("bg-warning-soft px-3 py-2 text-[11px] text-warning");
   expect(source).not.toContain(

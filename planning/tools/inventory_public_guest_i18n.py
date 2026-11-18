@@ -69,13 +69,13 @@ SCAN_PATHS = (
     "site/src/features/support/components/support-center.tsx",
     "site/src/features/support/components/support-download-help-link.tsx",
     "site/src/features/support/components/support-case-thread.tsx",
-    "site/src/features/support/components/support-message-browser.tsx",
+    "site/src/features/support/components/support-message-browser.tsx"
 )
 
 # locale === "ru"|"en" ? "<user copy>" : "<user copy>"
 LOCALE_COPY_TERNARY = re.compile(
     r"""locale\s*===\s*["'](?:ru|en)["']\s*\?\s*["']([^"']{2,})["']\s*:\s*["']([^"']{2,})["']""",
-    re.MULTILINE,
+    re.MULTILINE
 )
 
 # BCP-47 / locale codes used for formatting — not guest copy.
@@ -89,17 +89,17 @@ ALT_LITERAL = re.compile(r"""\balt\s*=\s*["']([^"']+)["']""")
 # JSX text on one line: >copy< or >copy{expr}
 # Negative lookbehind skips TS arrows (`=> Promise<…>`).
 JSX_TEXT = re.compile(
-    r"""(?<!=)>\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)""",
+    r"""(?<!=)>\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)"""
 )
 
 # Multiline JSX children: >\n  copy\n</tag>
 JSX_TEXT_MULTILINE = re.compile(
-    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<""",
+    r""">\s*\n\s*([A-Za-zА-Яа-яЁё©][^\n<{]{0,80}?)\s*\n\s*<"""
 )
 
 # Split brand words glued with {" "}: MTA{" "}
 JSX_TEXT_SPACE_GLUE = re.compile(
-    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}""",
+    r"""([A-Za-zА-Яа-яЁё]{2,})\{\s*["']\s*["']\s*\}"""
 )
 
 # Metadata template strings
@@ -109,18 +109,6 @@ TEMPLATE_LITERAL = re.compile(r"""template\s*:\s*["']([^"']+)["']""")
 UNKNOWN_MARKER = re.compile(r"""["']—["']""")
 
 ALLOWLIST: tuple[dict[str, str], ...] = (
-    {
-        "id": "servers.detail.unknown-player-dash",
-        "path": "site/src/app/servers/[slug]/page.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "servers.card.unknown-occupancy-dash",
-        "path": "site/src/features/servers/components/server-card.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
     {
         "id": "acquire.version-prefix",
         "path": "site/src/app/acquire/page.tsx",
@@ -144,25 +132,7 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "path": "site/src/features/resources/components/build-provenance-details.tsx",
         "kind": "jsx-text",
         "text": "SHA-256",
-    },
-    {
-        "id": "community.reactions.unknown-count-dash",
-        "path": "site/src/features/community/components/content-reactions.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "market.qa.unknown-author-dash",
-        "path": "site/src/features/resources/components/resource-qa-panel.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
-    {
-        "id": "market.reviews.unknown-rating-dash",
-        "path": "site/src/features/resources/components/resource-review-list.tsx",
-        "kind": "unknown-marker",
-        "text": "—",
-    },
+    }
 )
 
 
@@ -170,8 +140,8 @@ def _git_show(revision: str, path: str) -> str:
     return subprocess.check_output(
         ["git", "show", f"{revision}:{path}"],
         cwd=ROOT,
-        text=True,
-    )
+        text=True
+)
 
 
 def _read_source(revision: str, path: str) -> str:
@@ -195,8 +165,8 @@ def _ls_paths(revision: str) -> list[str]:
         raw = subprocess.check_output(
             ["git", "ls-tree", "-r", "--name-only", revision, "--", prefix],
             cwd=ROOT,
-            text=True,
-        )
+            text=True
+)
         for path in raw.splitlines():
             path = path.replace("\\", "/")
             if path.endswith((".test.ts", ".test.tsx", ".md")):
@@ -250,8 +220,8 @@ def _findings_in_source(path: str, source: str) -> list[dict[str, object]]:
             ("title", TITLE_LITERAL),
             ("placeholder", PLACEHOLDER_LITERAL),
             ("alt", ALT_LITERAL),
-            ("template", TEMPLATE_LITERAL),
-        ):
+            ("template", TEMPLATE_LITERAL)
+):
             for match in pattern.finditer(line):
                 text = match.group(1).strip()
                 if _is_noise_text(text):
@@ -358,8 +328,8 @@ def _biome_format(path: Path) -> None:
         cwd=ROOT,
         check=False,
         capture_output=True,
-        text=True,
-    )
+        text=True
+)
 
 
 def _stable_payload(data: dict[str, object]) -> dict[str, object]:
@@ -397,8 +367,8 @@ def main() -> int:
     parser.add_argument(
         "--check",
         type=Path,
-        help="Fail unless path matches freshly generated inventory (source_sha ignored)",
-    )
+        help="Fail unless path matches freshly generated inventory (source_sha ignored)"
+)
     args = parser.parse_args()
     data = inventory(args.revision)
     text = _canonical(data)
@@ -448,8 +418,8 @@ def main() -> int:
                     "source_sha": data["source_sha"],
                     "summary": data["summary"],
                 },
-                ensure_ascii=False,
-            )
+                ensure_ascii=False
+)
         )
     return 0
 

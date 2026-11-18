@@ -20,6 +20,7 @@ import { authEntryHref } from "../../../features/shell/auth-return";
 import { contextTrustCopy } from "../../../features/trust/public-context-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentService } from "../../../lib/services/community/content-service";
 import {
@@ -374,8 +375,10 @@ export default async function ServerDetailPage({
             <Users className="h-4 w-4 text-success" aria-hidden="true" />
           </div>
           <div className="text-3xl font-black text-primary">
-            {currentPlayers ?? "—"}{" "}
-            <span className="text-base font-normal text-faint">/ {maxPlayers ?? "—"}</span>
+            {formatUnknown(locale, currentPlayers)}{" "}
+            <span className="text-base font-normal text-faint">
+              / {formatUnknown(locale, maxPlayers)}
+            </span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-inset">
             <div
@@ -386,7 +389,11 @@ export default async function ServerDetailPage({
           </div>
           {!observedServer && <div className="text-[11px] text-faint">{copy.noObservation}</div>}
           {directoryIsStale ? (
-            <ErrorState id="server-directory-stale-snapshot" title={copy.staleSnapshot} />
+            <ErrorState
+              id="server-directory-stale-snapshot"
+              title={copy.staleSnapshot}
+              description={copy.staleSnapshotHint}
+            />
           ) : null}
         </div>
 

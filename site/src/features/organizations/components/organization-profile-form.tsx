@@ -4,7 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
@@ -38,6 +38,7 @@ export function OrganizationProfileForm({
   onBusyChange?: (busy: boolean) => void;
 }) {
   const copy = getOrganizationCopy(locale);
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [fields, setFields] = useState({
     name: initial?.name ?? "",
@@ -343,7 +344,7 @@ export function OrganizationProfileForm({
       <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
       {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (
-        <ErrorState title={creationNotice} />
+        <ErrorState title={creationNotice} description={formErrorHint} />
       ) : null}
       {creationNonce && !initial && verifiedCreationKey === creationKey ? (
         <Button
@@ -495,7 +496,7 @@ export function OrganizationProfileForm({
           {copy.publicView}
         </Link>
       )}
-      {error && <ErrorState title={error} />}
+      {error && <ErrorState title={error} description={formErrorHint} />}
       {saved && (
         <p
           role="status"

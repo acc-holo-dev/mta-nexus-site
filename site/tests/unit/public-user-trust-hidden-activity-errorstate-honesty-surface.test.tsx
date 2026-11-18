@@ -14,8 +14,8 @@ const source = readFileSync(
 it("locks hidden activity notice to ErrorState", () => {
   expect(source).toContain('import { Avatar, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="public-user-trust-hidden-activity"');
-  expect(source).toMatch(
-    /data\.publications === null \? \(\s*<ErrorState id="public-user-trust-hidden-activity" title=\{copy\.hiddenActivity\} \/>\s*\) : \(/u,
-  );
+  expect(source).toContain('id="public-user-trust-hidden-activity"');
+  expect(source).toContain("title={copy.hiddenActivity}");
+  expect(source).toContain("description={copy.hiddenActivityHint}");
   expect(source).not.toContain('<p className="text-sm text-muted">{copy.hiddenActivity}</p>');
 });

@@ -206,7 +206,13 @@ function ServerObservationBrowserPanel({
         filters={filters}
       />
       {report.server.endpointRevision > 0 && <p className="text-sm text-muted">{stats.lifetime}</p>}
-      {!report.collectionEligible && <p className="text-sm text-muted">{stats.paused}</p>}
+      {!report.collectionEligible ? (
+        <ErrorState
+          id="server-observation-collection-paused"
+          title={stats.paused}
+          description={stats.pausedHint}
+        />
+      ) : null}
       <search aria-label={copy.search}>
         <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
           <input type="hidden" name="window" value={report.window} />

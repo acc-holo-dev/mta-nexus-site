@@ -23,12 +23,6 @@
       "kind": "template",
       "path": "site/src/app/layout.tsx",
       "text": "%s | MTA NEXUS"
-    },
-    {
-      "id": "home.unknown-stat-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/app/page.tsx",
-      "text": "—"
     }
   ],
   "findings": [
@@ -66,20 +60,6 @@
       "line": 17,
       "path": "site/src/app/layout.tsx",
       "text": "%s | MTA NEXUS"
-    },
-    {
-      "allowlist_id": "home.unknown-stat-dash",
-      "kind": "unknown-marker",
-      "line": 101,
-      "path": "site/src/app/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "home.unknown-stat-dash",
-      "kind": "unknown-marker",
-      "line": 107,
-      "path": "site/src/app/page.tsx",
-      "text": "—"
     }
   ],
   "scan_roots": [
@@ -89,10 +69,10 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature (excluding server/ and *-server ports), home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "a0e3b8a873632a5d2ab36896de258195ee7ff44b",
+  "source_sha": "86bbad2732bd41c6dcdc68b303ae72dea589e4b0",
   "summary": {
-    "allowlisted": 7,
-    "findings": 7,
+    "allowlisted": 5,
+    "findings": 5,
     "locale_copy_ternaries": 0,
     "scanned_files": 59,
     "unallowlisted": 0

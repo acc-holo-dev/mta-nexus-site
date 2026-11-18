@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
+import { unknownMarker } from "../../src/lib/i18n/unknown";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -194,7 +195,7 @@ describe("workspace live telemetry behavior", () => {
 
     expect(html).toContain(dictionary.servers.unknown);
     expect(html).not.toContain(dictionary.servers.offline);
-    expect(html).toContain("—");
+    expect(html).toContain(unknownMarker("en"));
     expect(html).not.toContain('href="/servers/unknown-server"');
   });
 
@@ -288,7 +289,7 @@ describe("workspace live telemetry behavior", () => {
     });
     const html = renderToStaticMarkup(await WorkspacePage());
     expect(html).toContain(dictionary.servers.online);
-    expect(html).toContain("—");
+    expect(html).toContain(unknownMarker("en"));
     expect(html).toContain("On the displayed servers");
   });
 

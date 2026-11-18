@@ -26,11 +26,18 @@ it("locks residual load-failure ErrorStates to recovery description hints", () =
   );
 
   const inventory = read("site/src/features/library/server/collection-inventory-page.tsx");
-  expect(inventory).toContain(
+  expect(inventory).toContain("title === c.retry");
+  expect(inventory).toContain("v.loadUnavailableDescription");
+  expect(inventory).toContain("dictionary.errors.sessionRetryHint");
+  expect(inventory).toContain("c.capacityErrorDescription");
+  expect(inventory).toContain("dictionary.errors.formErrorHint");
+  expect(inventory).toContain("c.actionErrorDescription");
+  expect(inventory).not.toContain(
     "description={title === c.retry ? v.loadUnavailableDescription : undefined}",
   );
 
   const membership = read("site/src/features/library/server/library-membership-history-screen.tsx");
+  expect(membership).toContain("m.loadUnavailableDescription");
   expect(membership).toContain(
     "description={title === c.retry ? m.loadUnavailableDescription : undefined}",
   );
@@ -38,10 +45,15 @@ it("locks residual load-failure ErrorStates to recovery description hints", () =
   const resourceCollections = read(
     "site/src/features/library/server/resource-collections-page.tsx",
   );
-  expect(resourceCollections).toContain(
+  expect(resourceCollections).toContain("description={c.loadUnavailableDescription}");
+  expect(resourceCollections).toContain("title === c.retry");
+  expect(resourceCollections).toContain("c.loadUnavailableDescription");
+  expect(resourceCollections).toContain("dictionary.errors.sessionRetryHint");
+  expect(resourceCollections).toContain("c.capacityErrorDescription");
+  expect(resourceCollections).toContain("c.actionErrorDescription");
+  expect(resourceCollections).not.toContain(
     "description={title === c.retry ? c.loadUnavailableDescription : undefined}",
   );
-  expect(resourceCollections).toContain("description={c.loadUnavailableDescription}");
 
   const observations = read("site/src/features/servers/server/server-observation-browser-page.tsx");
   expect(observations).toContain("text === copy.unavailable || text === stats.unavailable");
@@ -51,9 +63,9 @@ it("locks residual load-failure ErrorStates to recovery description hints", () =
   );
 
   const moderation = read("site/src/features/community/server/community-moderation-screen.tsx");
-  expect(moderation).toContain(
-    "description={message === copy.unavailable ? copy.unavailableHint : undefined}",
-  );
+  expect(moderation).toContain("copy.unavailableHint");
+  expect(moderation).toContain("errors.sessionRetryHint");
+  expect(moderation).toContain("copy.deniedHint");
   expect(read("site/src/features/community/community-moderation-copy.ts")).toContain(
     "unavailableHint:",
   );

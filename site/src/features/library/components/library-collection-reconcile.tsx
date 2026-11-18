@@ -251,7 +251,11 @@ export function LibraryCollectionReconcileForm({
                 : c["reconcile-items"]}
       </Button>
       {frozen && !saved ? (
-        <ErrorState id="library-collection-reconcile-frozen" title={c.frozen} />
+        <ErrorState
+          id="library-collection-reconcile-frozen"
+          title={c.frozen}
+          description={c.retry}
+        />
       ) : null}
       {error ? (
         <ErrorState

@@ -1,94 +1,6 @@
 {
-  "allowlist": [
-    {
-      "id": "workspace.home.unknown-metric-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/app/workspace/page.tsx",
-      "text": "—"
-    },
-    {
-      "id": "workspace.library.reviews.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/app/workspace/library/reviews/page.tsx",
-      "text": "—"
-    },
-    {
-      "id": "admin.storage.object.unknown-field-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
-      "text": "—"
-    },
-    {
-      "id": "resources.review-controls.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/resources/components/resource-review-controls.tsx",
-      "text": "—"
-    },
-    {
-      "id": "resources.compatibility.unknown-value-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/resources/components/resource-compatibility-form.tsx",
-      "text": "—"
-    }
-  ],
-  "findings": [
-    {
-      "allowlist_id": "admin.storage.object.unknown-field-dash",
-      "kind": "unknown-marker",
-      "line": 94,
-      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "admin.storage.object.unknown-field-dash",
-      "kind": "unknown-marker",
-      "line": 95,
-      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "workspace.library.reviews.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "line": 106,
-      "path": "site/src/app/workspace/library/reviews/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "workspace.home.unknown-metric-dash",
-      "kind": "unknown-marker",
-      "line": 144,
-      "path": "site/src/app/workspace/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "workspace.home.unknown-metric-dash",
-      "kind": "unknown-marker",
-      "line": 151,
-      "path": "site/src/app/workspace/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "workspace.home.unknown-metric-dash",
-      "kind": "unknown-marker",
-      "line": 164,
-      "path": "site/src/app/workspace/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "resources.compatibility.unknown-value-dash",
-      "kind": "unknown-marker",
-      "line": 246,
-      "path": "site/src/features/resources/components/resource-compatibility-form.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "resources.review-controls.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "line": 237,
-      "path": "site/src/features/resources/components/resource-review-controls.tsx",
-      "text": "—"
-    }
-  ],
+  "allowlist": [],
+  "findings": [],
   "scan_roots": [
     "site/src/app/workspace",
     "site/src/app/admin",
@@ -126,10 +38,10 @@
     "site/src/features/resources/components/resource-media-editor.tsx"
   ],
   "scope": "Git-tracked member/workspace surfaces — workspace, admin, settings, auth, security app trees; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms (excluding feature server/ and *-server ports) — hard-coded member-facing literals + locale copy ternaries.",
-  "source_sha": "a0e3b8a873632a5d2ab36896de258195ee7ff44b",
+  "source_sha": "86bbad2732bd41c6dcdc68b303ae72dea589e4b0",
   "summary": {
-    "allowlisted": 8,
-    "findings": 8,
+    "allowlisted": 0,
+    "findings": 0,
     "locale_copy_ternaries": 0,
     "scanned_files": 411,
     "unallowlisted": 0

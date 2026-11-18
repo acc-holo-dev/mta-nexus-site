@@ -1,4 +1,4 @@
-import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
+import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
@@ -126,9 +126,11 @@ export function AdminVerificationQueueSection({
                   <p className="text-xs text-secondary">{copy.verificationProofCurrent}</p>
                 ) : null}
                 {request.proofMatchesServer === false ? (
-                  <p role="note" className="text-xs text-warning">
-                    {copy.verificationProofStale}
-                  </p>
+                  <ErrorState
+                    id="admin-verification-proof-stale"
+                    title={copy.verificationProofStale}
+                    description={copy.verificationProofStaleHint}
+                  />
                 ) : null}
                 {request.serverSlug ? (
                   <Link

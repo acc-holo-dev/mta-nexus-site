@@ -10,6 +10,7 @@ import { PlatformSessionError } from "../../../../../features/shell/session-erro
 
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
+import { formatUnknown } from "../../../../../lib/i18n/unknown";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { storageMaintenanceService } from "../../../../../lib/services/moderation/storage-maintenance-service";
 export const dynamic = "force-dynamic";
@@ -91,8 +92,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           [copy.eligible, item.eligible ? copy.yes : copy.no],
           [copy.modified, item.modifiedAt.toISOString()],
           [copy.observed, item.observedAt.toISOString()],
-          [copy.retired, item.retiredAt?.toISOString() ?? "—"],
-          [copy.lease, item.leaseExpiresAt?.toISOString() ?? "—"],
+          [copy.retired, formatUnknown(locale, item.retiredAt?.toISOString())],
+          [copy.lease, formatUnknown(locale, item.leaseExpiresAt?.toISOString())],
         ].map(([label, value]) => (
           <div key={label}>
             <dt className="text-sm text-muted">{label}</dt>

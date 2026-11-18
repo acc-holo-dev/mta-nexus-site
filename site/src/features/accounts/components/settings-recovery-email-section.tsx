@@ -54,9 +54,17 @@ export function SettingsRecoveryEmailSection({
                 }.`}
               </div>
             ) : recoveryEmail.eligible ? (
-              <ErrorState id="settings-recovery-not-verified" title={copy.recoveryNotVerified} />
+              <ErrorState
+                id="settings-recovery-not-verified"
+                title={copy.recoveryNotVerified}
+                description={copy.recoveryNotVerifiedHint}
+              />
             ) : (
-              <ErrorState id="settings-recovery-unavailable" title={copy.recoveryUnavailable} />
+              <ErrorState
+                id="settings-recovery-unavailable"
+                title={copy.recoveryUnavailable}
+                description={copy.recoveryUnavailableHint}
+              />
             )}
           </div>
 

@@ -17,3 +17,10 @@ it("locks session probe failure to PlatformSessionError without guest-lie", () =
   expect(source).toContain("message={c.loadUnavailable}");
   expect(source).toContain("PlatformSignIn");
 });
+
+it("locks expired subscription note to ErrorState", () => {
+  expect(source).toContain('id="subscription-expired"');
+  expect(source).toContain("title={c.statuses.expired}");
+  expect(source).toContain("description={c.expiredNote}");
+  expect(source).not.toContain('<p role="note">{c.expiredNote}</p>');
+});

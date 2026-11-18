@@ -150,7 +150,11 @@ export function CommunityReportGroups({
                 </p>
               )}
               {!item.target ? (
-                <ErrorState id="community-report-unknown-target" title={copy.unknown} />
+                <ErrorState
+                  id="community-report-unknown-target"
+                  title={copy.unknown}
+                  description={copy.unknownHint}
+                />
               ) : null}
               <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                 {(["open", "review", "resolved", "dismissed"] as const).map((key) => (

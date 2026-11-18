@@ -156,7 +156,13 @@ export default async function SubscriptionAccountPage({
               </p>
             )}
             <PlanReviewTerms terms={s.terms} locale={locale} />
-            {s.status === "expired" && <p role="note">{c.expiredNote}</p>}
+            {s.status === "expired" ? (
+              <ErrorState
+                id="subscription-expired"
+                title={c.statuses.expired}
+                description={c.expiredNote}
+              />
+            ) : null}
             {s.status === "active" && (
               <SubscriptionControls
                 key={`${actor.id}:${s.id}`}

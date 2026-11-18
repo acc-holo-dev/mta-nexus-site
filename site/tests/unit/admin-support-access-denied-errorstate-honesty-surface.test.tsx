@@ -5,7 +5,8 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/admin/support/layout.tsx"), "utf8");
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
+const source = read("site/src/app/admin/support/layout.tsx");
 
 /** Honesty lock: admin support access-denied muted copy → ErrorState. */
 it("locks admin support access denied to ErrorState with home recovery", () => {
@@ -22,4 +23,16 @@ it("locks admin support access denied to ErrorState with home recovery", () => {
   expect(source).not.toMatch(
     /<p className="font-caption text-muted">\{dictionary\.admin\.accessDeniedDescription\}<\/p>/u,
   );
+});
+
+it("locks admin verification stale proof warning to ErrorState", () => {
+  const queue = read(
+    "site/src/features/moderation/components/admin-verification-queue-section.tsx",
+  );
+  expect(queue).toContain('id="admin-verification-proof-stale"');
+  expect(queue).toContain("title={copy.verificationProofStale}");
+  expect(queue).toContain("description={copy.verificationProofStaleHint}");
+  expect(queue).not.toContain('role="note" className="text-xs text-warning"');
+  expect(read("site/src/lib/i18n/en/admin.ts")).toContain("verificationProofStaleHint:");
+  expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("verificationProofStaleHint:");
 });

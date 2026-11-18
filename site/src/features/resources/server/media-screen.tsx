@@ -108,7 +108,11 @@ export async function ResourceMediaScreen({
         {copy.title} · {gallery.product.title}
       </h1>
       <p className="text-sm text-secondary">{copy.note}</p>
-      <ErrorState id="resource-media-review-note" title={copy.reviewNote} />
+      <ErrorState
+        id="resource-media-review-note"
+        title={copy.reviewNote}
+        description={copy.reviewNoteDescription}
+      />
       {staff ? (
         <ResourceGallery items={gallery.items} title={gallery.product.title} locale={locale} />
       ) : (

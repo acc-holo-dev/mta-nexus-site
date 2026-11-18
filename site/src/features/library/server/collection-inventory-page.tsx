@@ -321,6 +321,7 @@ export default async function Page({
                       <ErrorState
                         id="library-collection-resources-selection-missing"
                         title={v.selectionMissing}
+                        description={v.selectionMissingHint}
                       />
                     )}
                   </section>
@@ -416,7 +417,17 @@ export default async function Page({
       <section className={pageShellClass}>
         <ErrorState
           title={title}
-          description={title === c.retry ? v.loadUnavailableDescription : undefined}
+          description={
+            title === c.retry
+              ? v.loadUnavailableDescription
+              : title === c.signInRequired
+                ? dictionary.errors.sessionRetryHint
+                : title.startsWith(c.fullCollection) || title.startsWith(c.quota)
+                  ? c.capacityErrorDescription
+                  : title === c.invalid
+                    ? dictionary.errors.formErrorHint
+                    : c.actionErrorDescription
+          }
           action={
             <Link href={collectionInventoryHref()} className={navLinkClass}>
               {c.reload}

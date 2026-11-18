@@ -25,6 +25,8 @@ const copy = {
       "This earlier receipt has no recorded version evidence. Current catalog data is not substituted for missing historical facts.",
     pending:
       "The result is unconfirmed. Retry the same request or inspect your receipts before changing the cart.",
+    pendingHint:
+      "Nothing was confirmed yet. Retry confirmation or open receipts before changing the cart.",
     retry: "Retry confirmation",
     failed: "The result was not confirmed. Retry or refresh.",
     empty: "No receipts match these filters.",
@@ -93,6 +95,8 @@ const copy = {
       "В этой ранней квитанции версии не записаны. Текущие данные каталога не заменяют отсутствующие исторические сведения.",
     pending:
       "Результат не подтверждён. Повторите тот же запрос или проверьте квитанции перед изменением корзины.",
+    pendingHint:
+      "Ничего ещё не подтверждено. Повторите подтверждение или откройте квитанции, прежде чем менять корзину.",
     retry: "Повторить подтверждение",
     failed: "Результат не подтверждён. Повторите запрос или обновите данные.",
     empty: "По этим фильтрам квитанций нет.",

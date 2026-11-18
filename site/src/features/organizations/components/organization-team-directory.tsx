@@ -138,7 +138,11 @@ export function OrganizationTeamDirectory({
           {copy.management}
         </Link>
       ) : (
-        <ErrorState id="organization-team-directory-readonly" title={team.readOnly} />
+        <ErrorState
+          id="organization-team-directory-readonly"
+          title={team.readOnly}
+          description={team.readOnlyHint}
+        />
       )}
       {canManageOrganization(data.role) && (
         <OrganizationTeamBatch

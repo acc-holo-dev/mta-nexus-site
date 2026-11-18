@@ -28,6 +28,8 @@ const copy = {
     reload: "Reload saved state",
     conflict: "This version changed. Reload before continuing.",
     unavailable: "Resource is withdrawn. Editing and submission are unavailable.",
+    unavailableDescription:
+      "Withdrawn resources cannot be edited or submitted from this version workspace.",
     immutable:
       "The archive and version number stay fixed. Upload a new version to replace files. Editing a rejected version creates a draft; publication requires another review.",
     pending:
@@ -103,6 +105,8 @@ const copy = {
     reload: "Загрузить сохранённое состояние",
     conflict: "Версия изменилась. Обновите страницу перед продолжением.",
     unavailable: "Ресурс снят с публикации. Редактирование и отправка недоступны.",
+    unavailableDescription:
+      "Снятый с публикации ресурс нельзя редактировать или отправлять из этой рабочей области версии.",
     immutable:
       "Архив и номер версии неизменны. Для замены файлов загрузите новую версию. Правка отклонённой версии создаёт черновик; публикация требует новой проверки.",
     pending:

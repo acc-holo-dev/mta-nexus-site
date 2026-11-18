@@ -112,7 +112,11 @@ export default async function Page({
         </p>
         {collection.status === "archived" && <p>{c.archivedNote}</p>}
         {collection.revision >= 2147483647 ? (
-          <ErrorState id="library-collection-reconcile-revision-locked" title={c.revisionLocked} />
+          <ErrorState
+            id="library-collection-reconcile-revision-locked"
+            title={c.revisionLocked}
+            description={c.revisionLockedHint}
+          />
         ) : null}
         <LibraryCollectionImport
           key={`reconcile:${collection.id}`}

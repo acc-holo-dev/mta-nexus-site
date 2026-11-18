@@ -45,6 +45,8 @@ const en = {
   latestVersion: "Latest safe release",
   effectiveVersion: "Chosen release",
   selectionMissing: "No usable chosen build. Review available versions before choosing another.",
+  selectionMissingHint:
+    "A missing build choice is not a broken inventory row. Open version controls and pick an available release.",
   compareVersions: "Compare chosen and latest releases",
   preparation: "Review this exact release",
   preferenceRevision: "Version choice revision",
@@ -100,6 +102,8 @@ const ru: typeof en = {
   latestVersion: "Последняя безопасная публикация",
   effectiveVersion: "Выбранная публикация",
   selectionMissing: "Выбранная сборка недоступна. Изучите доступные версии перед новым выбором.",
+  selectionMissingHint:
+    "Отсутствующий выбор сборки — не ошибка строки инвентаря. Откройте управление версиями и выберите доступную публикацию.",
   compareVersions: "Сравнить выбранную и последнюю публикации",
   preparation: "Проверить эту точную публикацию",
   preferenceRevision: "Ревизия выбора версии",

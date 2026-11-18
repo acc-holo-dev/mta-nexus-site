@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { confirmAction } from "../../shell/confirm-action";
 import {
   confirmedReview,
@@ -141,7 +142,11 @@ export function ResourceReviewEditor({
     <section className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.access}</p>
       {eligibilityNote ? (
-        <ErrorState id="resource-review-eligibility" title={eligibilityNote} />
+        <ErrorState
+          id="resource-review-eligibility"
+          title={eligibilityNote}
+          description={copy.eligibilityHint}
+        />
       ) : null}
       {review && <p>{resourceReviewState(locale, review.status)}</p>}
       {review?.moderationReason && (
@@ -234,7 +239,7 @@ export function ResourceReviewEditor({
           <p className="font-semibold">{copy.latestReview}</p>
           {review ? (
             <p className="whitespace-pre-wrap break-words">
-              {copy.rating}: {review.rating ?? "—"}/5 · {review.text}
+              {copy.rating}: {formatUnknown(locale, review.rating)}/5 · {review.text}
             </p>
           ) : (
             <EmptyState title={copy.noLatestReview} description={copy.noLatestReviewHint} />
@@ -266,7 +271,13 @@ export function ResourceReviewEditor({
           {copy.withdraw}
         </Button>
       )}
-      {notice?.error ? <ErrorState id="resource-review-editor-error" title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState
+          id="resource-review-editor-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
+      ) : null}
       {notice && !notice.error ? (
         <p role="status" className="text-sm">
           {notice.text}
@@ -350,7 +361,13 @@ export function ResourceReviewReportForm({
           {busy ? copy.busy : copy.send}
         </Button>
       </form>
-      {notice?.error ? <ErrorState id="resource-review-report-error" title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState
+          id="resource-review-report-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
+      ) : null}
       {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       {id ? (
         <Link
@@ -477,7 +494,11 @@ export function ResourceReviewDecisionForm({
         {busy ? copy.busy : copy.decide}
       </Button>
       {notice?.error ? (
-        <ErrorState id="resource-review-decision-error" title={notice.text} />
+        <ErrorState
+          id="resource-review-decision-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
       ) : null}
       {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       <Recovery locale={locale} />

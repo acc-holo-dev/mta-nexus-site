@@ -1,18 +1,6 @@
 {
   "allowlist": [
     {
-      "id": "servers.detail.unknown-player-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/app/servers/[slug]/page.tsx",
-      "text": "—"
-    },
-    {
-      "id": "servers.card.unknown-occupancy-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/servers/components/server-card.tsx",
-      "text": "—"
-    },
-    {
       "id": "acquire.version-prefix",
       "kind": "jsx-text",
       "path": "site/src/app/acquire/page.tsx",
@@ -35,24 +23,6 @@
       "kind": "jsx-text",
       "path": "site/src/features/resources/components/build-provenance-details.tsx",
       "text": "SHA-256"
-    },
-    {
-      "id": "community.reactions.unknown-count-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/community/components/content-reactions.tsx",
-      "text": "—"
-    },
-    {
-      "id": "market.qa.unknown-author-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/resources/components/resource-qa-panel.tsx",
-      "text": "—"
-    },
-    {
-      "id": "market.reviews.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "path": "site/src/features/resources/components/resource-review-list.tsx",
-      "text": "—"
     }
   ],
   "findings": [
@@ -62,27 +32,6 @@
       "line": 331,
       "path": "site/src/app/acquire/page.tsx",
       "text": "v"
-    },
-    {
-      "allowlist_id": "servers.detail.unknown-player-dash",
-      "kind": "unknown-marker",
-      "line": 377,
-      "path": "site/src/app/servers/[slug]/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "servers.detail.unknown-player-dash",
-      "kind": "unknown-marker",
-      "line": 378,
-      "path": "site/src/app/servers/[slug]/page.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "community.reactions.unknown-count-dash",
-      "kind": "unknown-marker",
-      "line": 176,
-      "path": "site/src/features/community/components/content-reactions.tsx",
-      "text": "—"
     },
     {
       "allowlist_id": "market.provenance.sha256-label",
@@ -106,39 +55,11 @@
       "text": "v"
     },
     {
-      "allowlist_id": "market.qa.unknown-author-dash",
-      "kind": "unknown-marker",
-      "line": 467,
-      "path": "site/src/features/resources/components/resource-qa-panel.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "market.qa.unknown-author-dash",
-      "kind": "unknown-marker",
-      "line": 535,
-      "path": "site/src/features/resources/components/resource-qa-panel.tsx",
-      "text": "—"
-    },
-    {
-      "allowlist_id": "market.reviews.unknown-rating-dash",
-      "kind": "unknown-marker",
-      "line": 46,
-      "path": "site/src/features/resources/components/resource-review-list.tsx",
-      "text": "—"
-    },
-    {
       "allowlist_id": "market.reverse-deps.version-prefix",
       "kind": "jsx-text",
       "line": 40,
       "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
       "text": "v"
-    },
-    {
-      "allowlist_id": "servers.card.unknown-occupancy-dash",
-      "kind": "unknown-marker",
-      "line": 198,
-      "path": "site/src/features/servers/components/server-card.tsx",
-      "text": "—"
     }
   ],
   "scan_roots": [
@@ -191,10 +112,10 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "a0e3b8a873632a5d2ab36896de258195ee7ff44b",
+  "source_sha": "86bbad2732bd41c6dcdc68b303ae72dea589e4b0",
   "summary": {
-    "allowlisted": 12,
-    "findings": 12,
+    "allowlisted": 5,
+    "findings": 5,
     "locale_copy_ternaries": 0,
     "scanned_files": 100,
     "unallowlisted": 0

@@ -26,6 +26,8 @@ const copy = {
     inactive: "Inactive",
     available: "Binding is currently eligible",
     changed: "Binding is unavailable or its endpoint/scope changed",
+    changedHint:
+      "The saved binding no longer matches the current server record. Reconfirm the binding from the license workspace before activating.",
     actions: {
       bind: "Bind server",
       refresh_binding: "Reconfirm the same server",
@@ -143,6 +145,8 @@ const copy = {
     inactive: "Неактивен",
     available: "Привязка сейчас соответствует требованиям",
     changed: "Привязка недоступна либо изменился адрес или организация",
+    changedHint:
+      "Сохранённая привязка больше не совпадает с текущей записью сервера. Подтвердите привязку заново в кабинете лицензии перед активацией.",
     actions: {
       bind: "Привязать сервер",
       refresh_binding: "Повторно подтвердить тот же сервер",

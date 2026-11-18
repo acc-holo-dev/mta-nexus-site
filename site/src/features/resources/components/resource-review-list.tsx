@@ -2,6 +2,7 @@ import type { ResourceReviewView } from "@nexus/domain";
 import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
 
@@ -43,7 +44,7 @@ export function ResourceReviewList({
                 {copy.rating}:{" "}
                 {review.rating && review.rating >= 1 && review.rating <= 5
                   ? `${review.rating}/5`
-                  : "—"}
+                  : unknownMarker(locale)}
               </span>
               <time dateTime={new Date(review.createdAt).toISOString()}>
                 {new Date(review.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US")}

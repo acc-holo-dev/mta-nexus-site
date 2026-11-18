@@ -16,11 +16,13 @@ it("locks recovery unavailable and not-verified notices to ErrorState", () => {
   expect(source).toContain('id="settings-recovery-not-verified"');
   expect(source).toContain('id="settings-recovery-unavailable"');
   expect(source).toMatch(
-    /<ErrorState id="settings-recovery-not-verified" title=\{copy\.recoveryNotVerified\}/,
+    /<ErrorState[\s\S]*id="settings-recovery-not-verified"[\s\S]*title=\{copy\.recoveryNotVerified\}[\s\S]*description=\{copy\.recoveryNotVerifiedHint\}/,
   );
   expect(source).toMatch(
-    /<ErrorState id="settings-recovery-unavailable" title=\{copy\.recoveryUnavailable\}/,
+    /<ErrorState[\s\S]*id="settings-recovery-unavailable"[\s\S]*title=\{copy\.recoveryUnavailable\}[\s\S]*description=\{copy\.recoveryUnavailableHint\}/,
   );
+  expect(read("site/src/lib/i18n/en/admin.ts")).toContain("recoveryNotVerifiedHint:");
+  expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("recoveryUnavailableHint:");
   expect(source).not.toContain("? copy.recoveryNotVerified");
   expect(source).not.toContain(": copy.recoveryUnavailable}");
 });

@@ -77,7 +77,12 @@ export function OrderTermsReportView({
         {flags.length ? (
           <div className="space-y-3">
             {flags.map((key) => (
-              <ErrorState key={key} id={ORDER_TERMS_FLAG_IDS[key]} title={c[key]} />
+              <ErrorState
+                key={key}
+                id={ORDER_TERMS_FLAG_IDS[key]}
+                title={c[key]}
+                description={c.consistencyNotice}
+              />
             ))}
           </div>
         ) : (

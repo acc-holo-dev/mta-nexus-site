@@ -75,7 +75,11 @@ export function ResourceVersionHelpSection({
       </div>
 
       {projection.missingAuthorContent ? (
-        <ErrorState id="resource-version-help-missing" title={copy.missingBody} />
+        <ErrorState
+          id="resource-version-help-missing"
+          title={copy.missingBody}
+          description={copy.missingBodyHint}
+        />
       ) : null}
 
       {projection.purpose ? (

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -261,10 +262,11 @@ export default async function Page({
                     {command?.action === "reconcile-items" && (
                       <div>
                         <p>
-                          {c.add}: {command.addProductIds.join(", ") || "—"}
+                          {c.add}: {formatUnknown(typedLocale, command.addProductIds.join(", "))}
                         </p>
                         <p>
-                          {c.remove}: {command.removeProductIds.join(", ") || "—"}
+                          {c.remove}:{" "}
+                          {formatUnknown(typedLocale, command.removeProductIds.join(", "))}
                         </p>
                       </div>
                     )}

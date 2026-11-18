@@ -162,6 +162,22 @@ it("locks residual honesty copy for server and license residual shells", () => {
   expect(read("site/src/features/servers/server-workspace-copy.ts")).toContain("unavailableHint");
   expect(read("site/src/features/servers/server-review-i18n.ts")).toContain("loadUnavailableHint");
   expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("unavailableHint");
+  expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("pausedHint:");
+  expect(read("site/src/features/servers/server/server-statistics-panel.tsx")).toContain(
+    'id="server-statistics-collection-paused"',
+  );
+  expect(read("site/src/features/servers/server/server-statistics-panel.tsx")).toContain(
+    "description={copy.pausedHint}",
+  );
+  expect(read("site/src/features/servers/server/server-statistics-panel.tsx")).not.toContain(
+    '<p className="text-sm text-muted">{copy.paused}</p>',
+  );
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
+    'id="server-observation-collection-paused"',
+  );
+  expect(
+    read("site/src/features/servers/server/server-observation-browser-page.tsx"),
+  ).not.toContain('<p className="text-sm text-muted">{stats.paused}</p>');
   expect(read("site/src/features/servers/server-observation-browser-copy.ts")).toContain(
     "unavailableHint",
   );

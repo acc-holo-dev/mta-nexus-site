@@ -4,6 +4,7 @@ import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
@@ -51,7 +52,9 @@ export function ServerReviewPanel({
   const { locale } = useNexusLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const workspace = getDictionary(locale).workspace;
+  const dictionary = getDictionary(locale);
+  const workspace = dictionary.workspace;
+  const formErrorHint = dictionary.errors.formErrorHint;
   const copy = serverReviewCopy(locale);
   const loadCopy = serverReviewLoadCopy(locale);
   const statusId = useId();
@@ -361,7 +364,8 @@ export function ServerReviewPanel({
                 <li key={review.id} className="nexus-panel space-y-2 p-4 text-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                     <span>
-                      {copy.author}: {review.author?.displayName || review.author?.username || "—"}
+                      {copy.author}:{" "}
+                      {formatUnknown(locale, review.author?.displayName || review.author?.username)}
                     </span>
                     <span>
                       {copy.rating}: {review.rating}/5 · {copy.follow}
@@ -399,16 +403,22 @@ export function ServerReviewPanel({
               <ErrorState
                 id="server-review-eligibility-follow-required"
                 title={copy.followRequired}
+                description={formErrorHint}
               />
             )}
             {mine?.eligibility === "owner_conflict" && (
               <ErrorState
                 id="server-review-eligibility-owner-conflict"
                 title={copy.ownerConflict}
+                description={formErrorHint}
               />
             )}
             {mine?.eligibility === "moderated" && (
-              <ErrorState id="server-review-eligibility-moderated" title={copy.moderated} />
+              <ErrorState
+                id="server-review-eligibility-moderated"
+                title={copy.moderated}
+                description={formErrorHint}
+              />
             )}
             {mine?.canReview ? (
               <form className="space-y-4" onSubmit={onSave}>
@@ -478,6 +488,7 @@ export function ServerReviewPanel({
           <ErrorState
             id="server-review-write-error"
             title={notice.text}
+            description={formErrorHint}
             action={
               <Button
                 type="button"

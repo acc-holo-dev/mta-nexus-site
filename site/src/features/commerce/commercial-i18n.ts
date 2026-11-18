@@ -74,6 +74,8 @@ const copy = {
       "The previous operation result is unknown. Check the list and history before clearing this warning.",
     previousRequestUnconfirmed:
       "The previous request was not confirmed. Retry only the saved request.",
+    previousRequestUnconfirmedHint:
+      "The cancellation was not recorded. Use the button below to retry the same request only.",
     paymentOperations: "Payment history and cancellation",
     attempts: "Recorded payment attempts",
     noAttempts: "No recorded payment attempts.",
@@ -81,6 +83,8 @@ const copy = {
       "This archive shows stored payment states; it does not independently confirm provider settlement. Cancellation is available only for a pending order with no payment attempts or financial entries. No refund or access grant is created.",
     cannotCancel:
       "This order cannot be cancelled here. Orders with payment attempts require provider reconciliation.",
+    cannotCancelHint:
+      "Cancellation here applies only to unpaid orders with no recorded payment attempts. Recorded attempts need provider reconciliation, not a repeat cancel form.",
     cancel: "Cancel unpaid order",
     cancelling: "Cancelling…",
     cancelled: "Cancellation confirmed.",
@@ -196,6 +200,8 @@ const copy = {
       "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки.",
     previousRequestUnconfirmed:
       "Результат предыдущего запроса не подтверждён. Повторите только сохранённый запрос.",
+    previousRequestUnconfirmedHint:
+      "Отмена не записана. Используйте кнопку ниже, чтобы повторить только тот же запрос.",
     paymentOperations: "История платежей и отмена",
     attempts: "Записанные платёжные попытки",
     noAttempts: "Платёжных попыток не зафиксировано.",
@@ -203,6 +209,8 @@ const copy = {
       "Архив показывает сохранённые состояния платежей, а не независимое подтверждение расчёта провайдером. Отмена доступна только для ожидающего заказа без платёжных попыток и финансовых записей. Возврат денег и права доступа не создаются.",
     cannotCancel:
       "Этот заказ нельзя отменить здесь. Заказы с платёжными попытками требуют сверки с провайдером.",
+    cannotCancelHint:
+      "Отмена здесь возможна только для неоплаченных заказов без записанных платёжных попыток. Зафиксированные попытки требуют сверки с провайдером, а не повторной формы отмены.",
     cancel: "Отменить неоплаченный заказ",
     cancelling: "Отмена…",
     cancelled: "Отмена подтверждена.",

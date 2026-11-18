@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import { flattenReactTestTree } from "../helpers/flatten-react-test-tree";
 import {
   createNotificationInboxInteractionHelpers,
@@ -22,7 +23,7 @@ vi.mock("../../src/features/shell/confirm-action", () => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 vi.mock("../../src/features/notifications/notification-inbox-events", () => ({
   announceNotificationInboxChange: harness.announce,

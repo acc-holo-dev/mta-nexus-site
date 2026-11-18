@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -158,10 +159,11 @@ export default async function Page({
             {receipt.command.action === "reconcile-items" ? (
               <div>
                 <p>
-                  {c.add}: {receipt.command.addProductIds.join(", ") || "—"}
+                  {c.add}: {formatUnknown(typedLocale, receipt.command.addProductIds.join(", "))}
                 </p>
                 <p>
-                  {c.remove}: {receipt.command.removeProductIds.join(", ") || "—"}
+                  {c.remove}:{" "}
+                  {formatUnknown(typedLocale, receipt.command.removeProductIds.join(", "))}
                 </p>
               </div>
             ) : (

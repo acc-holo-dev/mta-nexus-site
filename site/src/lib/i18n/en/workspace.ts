@@ -154,6 +154,8 @@ export const workspace = {
       "Open in MTA launches the mtasa:// protocol when your browser and client allow it. That click is a connect intent only — NEXUS does not verify play. You can also copy the address for manual Quick Connect.",
     stale:
       "Updates are delayed. Showing the last available snapshot; player counts may have changed.",
+    staleHint:
+      "The list below uses the last successful snapshot. Delayed counts are not a directory fetch failure.",
     tryAgain: "Try again",
     resetFilters: "Reset filters",
     noMatch: "No public MTA servers match these filters.",

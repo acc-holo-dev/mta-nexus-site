@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   organizationContentCopy,
   organizationContentMutationError,
@@ -33,6 +33,7 @@ export function AuthorContentForm({
   server?: { id: string; name: string };
 }) {
   const copy = getUserPlatformCopy(locale);
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [saved, setSaved] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -303,7 +304,7 @@ export function AuthorContentForm({
       )}
       {notice?.error ? (
         <div className="space-y-2">
-          <ErrorState title={notice.text} />
+          <ErrorState title={notice.text} description={formErrorHint} />
           {saved && (
             <Button
               type="button"

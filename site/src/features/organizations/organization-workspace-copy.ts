@@ -62,6 +62,8 @@ const en = {
   noMembers: "No members match this search.",
   noMembersHint: "Try another search or clear it to see the current team page.",
   readOnly: "You can view this team. Profile and team changes require an owner or administrator.",
+  readOnlyHint:
+    "Viewing the team does not grant edit access. Open the organization workspace as an owner or administrator to change the profile or membership.",
   back: "All organizations",
   errorConflict: "The organization or team changed. Reload current data before saving again.",
   profileChanged: "The saved organization changed. Compare it with your draft before continuing.",
@@ -149,6 +151,8 @@ const ru: Record<keyof typeof en, string> = {
     "Попробуйте другой поиск или сбросьте его, чтобы увидеть текущую страницу команды.",
   readOnly:
     "Вы можете просматривать команду. Для изменения профиля и команды нужны права владельца или администратора.",
+  readOnlyHint:
+    "Просмотр команды не даёт прав на изменения. Откройте кабинет организации как владелец или администратор, чтобы менять профиль или состав.",
   back: "Все организации",
   errorConflict:
     "Организация или команда изменились. Загрузите актуальные данные перед повторным сохранением.",

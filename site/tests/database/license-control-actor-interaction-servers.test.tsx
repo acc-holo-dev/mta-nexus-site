@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createLicenseControlActorInteractionHelpers,
   mockReactHooks,
@@ -19,7 +20,7 @@ const h = vi.hoisted(() => ({
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
 import { LicenseControlPanel } from "../../src/features/commerce/license-controls";

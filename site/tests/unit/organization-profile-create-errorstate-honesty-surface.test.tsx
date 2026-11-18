@@ -12,8 +12,8 @@ const source = readFileSync(
 
 it("locks organization create unknown/fail notices to ErrorState and keeps save success as status", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={creationNotice} />");
-  expect(source).toContain("{error && <ErrorState title={error} />}");
+  expect(source).toContain("<ErrorState title={creationNotice} description={formErrorHint} />");
+  expect(source).toContain("{error && <ErrorState title={error} description={formErrorHint} />}");
   expect(source).toContain('role="status"');
   expect(source).toContain("{copy.saved}");
   expect(source).not.toContain('<p role="status">{creationNotice}</p>');

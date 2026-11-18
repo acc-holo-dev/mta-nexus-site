@@ -156,6 +156,7 @@ export default async function AuthorResourcesPage({
                   id="resource-metadata-review-required"
                   className="mt-2"
                   title={publisherCopy.reviewRequired}
+                  description={publisherCopy.reviewNote}
                 />
               ) : null}
             </li>

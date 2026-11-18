@@ -14,7 +14,8 @@ const source = readFileSync(
 it("locks library membership cannotAdd blocker to ErrorState", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="library-membership-cannot-add"');
-  expect(source).toContain('<ErrorState id="library-membership-cannot-add" title={h.cannotAdd} />');
+  expect(source).toContain("title={h.cannotAdd}");
+  expect(source).toContain("description={h.cannotAddHint}");
   expect(source).not.toContain(
     '{cannotAdd && <p className="text-xs text-muted">{h.cannotAdd}</p>}',
   );

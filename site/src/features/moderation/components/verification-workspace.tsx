@@ -392,7 +392,11 @@ export function VerificationWorkspace({
         />
       ) : null}
       {verifiedKey !== identityKey && writeError ? (
-        <ErrorState id="verification-workspace-write-failed" title={writeError} />
+        <ErrorState
+          id="verification-workspace-write-failed"
+          title={writeError}
+          description={copy.mutationUnavailable}
+        />
       ) : null}
       {profile && (
         <section className="nexus-panel space-y-3 p-5">
@@ -607,12 +611,17 @@ export function VerificationWorkspace({
                 {copy.submit}
               </Button>
               {writeError ? (
-                <ErrorState id="verification-workspace-write-failed" title={writeError} />
+                <ErrorState
+                  id="verification-workspace-write-failed"
+                  title={writeError}
+                  description={copy.mutationUnavailable}
+                />
               ) : null}
               {intent ? (
                 <ErrorState
                   id="verification-workspace-submit-unconfirmed"
                   title={copy.submissionUnconfirmed}
+                  description={dictionary.errors.formErrorHint}
                 />
               ) : null}
             </form>

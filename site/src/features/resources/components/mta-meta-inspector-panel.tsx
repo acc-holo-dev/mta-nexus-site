@@ -248,6 +248,7 @@ export function MtaMetaInspectorPanel({
                 <ErrorState
                   id="mta-meta-inspector-http-exports"
                   title={`${inspection.summary.httpExportCount} ${copy.httpEnabled}`}
+                  description={copy.httpExportHint}
                 />
               ) : null}
             </div>
@@ -561,6 +562,7 @@ export function MtaMetaInspectorPanel({
                     <ErrorState
                       id={`mta-meta-inspector-issue-${issue.severity}-${issue.code}`}
                       title={getMtaMetaInspectorIssueMessage(issue, copy.structuralIssues)}
+                      description={copy.structuralIssueHint}
                     />
                   </li>
                 ))}

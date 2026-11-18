@@ -17,7 +17,7 @@ const textareaClass =
 const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function PublicProfileForm() {
-  const { locale } = useNexusLocale();
+  const { locale, dictionary } = useNexusLocale();
   const copy = getUserPlatformCopy(locale);
   const router = useRouter();
   const [profile, setProfile] = useState<EditableProfile | null>(null);
@@ -162,7 +162,18 @@ export function PublicProfileForm() {
           {copy.loading}
         </p>
       )}
-      {notice?.error ? <ErrorState title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState
+          title={notice.text}
+          description={
+            recoveryRequired
+              ? dictionary.errors.formErrorHint
+              : notice.text === copy.profileAccountChanged
+                ? copy.profileAccountChangedHint
+                : copy.unavailableHint
+          }
+        />
+      ) : null}
       {notice && !notice.error ? (
         <p role="status" className="text-sm text-success">
           {notice.text}

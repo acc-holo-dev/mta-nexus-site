@@ -126,7 +126,10 @@ export function ResourceModerationControls({
         <p role="note" className="text-sm text-secondary">
           {copy.moderationNote}
         </p>
-        <ErrorState title={copy.noTransitionAllowed} />
+        <ErrorState
+          title={copy.noTransitionAllowed}
+          description={copy.errors.actionErrorDescription}
+        />
       </div>
     );
   }
@@ -147,7 +150,11 @@ export function ResourceModerationControls({
         </div>
       </dl>
       {release ? (
-        <ErrorState id="resource-moderation-release-draft" title={copy.releaseDraftWarning} />
+        <ErrorState
+          id="resource-moderation-release-draft"
+          title={copy.releaseDraftWarning}
+          description={copy.errors.actionErrorDescription}
+        />
       ) : null}
       {selectedBuild && selectedBuild.status !== "published" ? (
         <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">

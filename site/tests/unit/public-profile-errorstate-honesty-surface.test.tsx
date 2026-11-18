@@ -12,7 +12,10 @@ const source = readFileSync(
 
 it("locks public profile form failures to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Avatar, Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={notice.text} />");
+  expect(source).toContain("title={notice.text}");
+  expect(source).toContain("dictionary.errors.formErrorHint");
+  expect(source).toContain("copy.profileAccountChangedHint");
+  expect(source).toContain("copy.unavailableHint");
   expect(source).toContain('role="status"');
   expect(source).toContain("text-success");
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');

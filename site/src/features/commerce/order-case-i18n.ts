@@ -44,9 +44,13 @@ const en = {
   reconcile: "Inspect recorded financial evidence",
   recommendationBlocked:
     "A refund recommendation requires a completed order, one matching recorded capture and no recorded refund or dispute. Reconcile the records first.",
+  recommendationBlockedHint:
+    "No refund recommendation was recorded. Reconcile the records or choose a different review action.",
   current: "Current order records",
   snapshot: "Records when the case was opened",
   changed: "The order or payment records changed after intake. Review both snapshots.",
+  changedHint:
+    "Compare the intake snapshot and current records below before submitting a review decision.",
   payments: "Payment records",
   items: "Order items",
   total: "Order total",
@@ -118,9 +122,13 @@ const ru: typeof en = {
   reconcile: "Проверить учётные финансовые данные",
   recommendationBlocked:
     "Для рекомендации возврата нужен завершённый заказ, одна соответствующая запись списания и отсутствие записей возврата или спора. Сначала проверьте учётные данные.",
+  recommendationBlockedHint:
+    "Рекомендация возврата не записана. Сверьте учётные данные или выберите другое действие разбора.",
   current: "Текущие учётные данные заказа",
   snapshot: "Учётные данные при создании обращения",
   changed: "После создания обращения изменились данные заказа или платежей. Проверьте оба снимка.",
+  changedHint:
+    "Сравните снимок на момент создания обращения и текущие записи ниже, прежде чем отправлять решение по рассмотрению.",
   payments: "Записи платежей",
   items: "Позиций заказа",
   total: "Сумма заказа",

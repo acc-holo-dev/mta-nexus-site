@@ -122,6 +122,7 @@ export function BuildModerationControls({
         <ErrorState
           id="build-moderation-artifact-clean-scan"
           title={copy.artifactRequiresCleanScan}
+          description={copy.artifactRequiresCleanScanHint}
         />
       ) : null}
 

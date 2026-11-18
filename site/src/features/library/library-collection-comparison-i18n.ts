@@ -21,8 +21,12 @@ const en = {
   unavailable: "Unavailable resources",
   transfer: "Transfer operation",
   noSourceItems: "This page has no source references to transfer.",
+  noSourceItemsHint:
+    "An empty transfer page is not a load failure. Change the search filter or open another source page.",
   destinationReadOnly:
     "Restore the destination collection before changing it. A terminal revision cannot be changed.",
+  destinationReadOnlyHint:
+    "A read-only destination is not a failed comparison. Restore the collection or choose another active pair.",
   referenceNote:
     "Copying and moving use only selected source references from this page. Existing destination entries keep their dates. Unavailable references remain transferable with hidden names.",
 };
@@ -49,8 +53,12 @@ const ru: typeof en = {
   unavailable: "Недоступные ресурсы",
   transfer: "Действие с записями",
   noSourceItems: "На этой странице нет записей источника для копирования или переноса.",
+  noSourceItemsHint:
+    "Пустая страница переноса — не ошибка загрузки. Измените поиск или откройте другую страницу источника.",
   destinationReadOnly:
     "Восстановите коллекцию назначения перед изменением. Коллекцию с предельной редакцией изменить нельзя.",
+  destinationReadOnlyHint:
+    "Недоступное назначение — не сбой сравнения. Восстановите коллекцию или выберите другую активную пару.",
   referenceNote:
     "Копирование и перенос используют только выбранные записи источника с этой страницы. Имеющиеся записи назначения сохраняют даты. Недоступные записи можно переносить со скрытыми названиями.",
 };

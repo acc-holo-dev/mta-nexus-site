@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -127,7 +128,7 @@ export async function ResourceReviewReportScreen({
             <p>{report.review.title}</p>
             <p>
               {resourceReviewState(locale, report.review.status)} · {copy.rating}:{" "}
-              {report.review.rating ?? "—"}/5
+              {formatUnknown(locale, report.review.rating)}/5
             </p>
             <p className="whitespace-pre-wrap break-words text-sm">{report.review.text}</p>
           </article>

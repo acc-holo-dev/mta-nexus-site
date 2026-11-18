@@ -209,7 +209,9 @@ export function PlanReviewForm({
   }
   return (
     <>
-      {readyScope !== renderScope && error ? <ErrorState title={error} /> : null}
+      {readyScope !== renderScope && error ? (
+        <ErrorState title={error} description={c.formErrorHint} />
+      ) : null}
       <form
         onSubmit={submit}
         hidden={readyScope !== renderScope}
@@ -294,9 +296,7 @@ export function PlanReviewForm({
         ) : null}
         <p className="text-sm text-muted">{c.baseline}</p>
         {frozen ? (
-          <p role="note" className="text-sm text-muted">
-            {c.frozen}
-          </p>
+          <ErrorState id="plan-review-form-frozen" title={c.frozen} description={c.retry} />
         ) : null}
         {error ? (
           <ErrorState title={error} description={frozen ? c.retry : c.formErrorHint} />

@@ -62,6 +62,7 @@ export async function CommunityModerationScreen({
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <ErrorState
           title={copy.denied}
+          description={copy.deniedHint}
           icon={<ShieldAlert className="h-5 w-5" aria-hidden="true" />}
         />
       </div>
@@ -82,7 +83,11 @@ export async function CommunityModerationScreen({
   const failure = (message: string, href: string) => (
     <ErrorState
       title={message}
-      description={message === copy.unavailable ? copy.unavailableHint : undefined}
+      description={
+        message === copy.unavailable || message === copy.invalid
+          ? copy.unavailableHint
+          : getDictionary(locale).errors.sessionRetryHint
+      }
       action={
         <a className={focusLink} href={href}>
           {copy.reload}

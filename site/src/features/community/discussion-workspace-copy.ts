@@ -38,6 +38,8 @@ const en = {
   edited: "Your comment changes were saved.",
   reload: "Reload saved state",
   readOnly: "This comment can be removed, but cannot be edited here.",
+  readOnlyHint:
+    "Removal still works on this page. Editing is only available where the publication allows it.",
   privacy: "This list is private. Only your own publication comments appear here.",
   changed: "This comment changed or became unavailable. Reload its saved state before continuing.",
 };
@@ -80,6 +82,8 @@ const ru: Record<keyof typeof en, string> = {
   edited: "Изменения комментария сохранены.",
   reload: "Загрузить сохранённое состояние",
   readOnly: "Этот комментарий можно удалить, но нельзя редактировать здесь.",
+  readOnlyHint:
+    "Удаление по-прежнему доступно на этой странице. Редактирование возможно только там, где публикация это разрешает.",
   privacy: "Это личный список. Здесь только ваши комментарии к публикациям.",
   changed:
     "Комментарий изменился или стал недоступен. Загрузите сохранённое состояние перед продолжением.",

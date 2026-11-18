@@ -381,7 +381,9 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>
       </div>
 
-      {intent ? <ErrorState title={copy.resultMayBeUnknown} /> : null}
+      {intent ? (
+        <ErrorState title={copy.resultMayBeUnknown} description={copy.buildErrorDescription} />
+      ) : null}
       {createdProduct && (
         <div className="flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
           <p role="status" className="text-sm text-secondary">

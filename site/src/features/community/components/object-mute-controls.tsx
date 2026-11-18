@@ -161,7 +161,9 @@ function ObjectMuteControl({
           {message}
         </p>
       ) : null}
-      {error ? <ErrorState title={error} className="items-stretch py-2" /> : null}
+      {error ? (
+        <ErrorState title={error} description={copy.errorHint} className="items-stretch py-2" />
+      ) : null}
     </div>
   );
 }

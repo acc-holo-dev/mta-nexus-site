@@ -185,7 +185,11 @@ export function OrderCancellationForm({
     <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
       {ready === scope && retry ? (
-        <ErrorState id="order-cancellation-unconfirmed" title={copy.previousRequestUnconfirmed} />
+        <ErrorState
+          id="order-cancellation-unconfirmed"
+          title={copy.previousRequestUnconfirmed}
+          description={copy.previousRequestUnconfirmedHint}
+        />
       ) : null}
       <fieldset disabled={busy || retry || saved || ready !== scope} className="space-y-4">
         <label htmlFor={`${field}-reason`} className="block space-y-2">

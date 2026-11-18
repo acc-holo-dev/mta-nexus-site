@@ -5,6 +5,7 @@ import {
 } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { getDictionary } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 
@@ -67,10 +68,15 @@ export function BuildPackageSummaryPanel({
             <ErrorState
               id="build-package-evidence-missing-refs"
               title={`${copy.references}: ${copy.absent} ${summary.missingReferences} · ${copy.unknown} ${summary.unresolvedReferences}`}
+              description={copy.missingReferencesHint}
             />
           ) : null}
           {summary.referencesTruncated ? (
-            <ErrorState id="build-package-evidence-refs-truncated" title={copy.truncated} />
+            <ErrorState
+              id="build-package-evidence-refs-truncated"
+              title={copy.truncated}
+              description={copy.truncatedHint}
+            />
           ) : null}
         </>
       )}
@@ -123,9 +129,9 @@ export function BuildPackageEvidencePanel({
               </code>
               <h3 className="font-semibold">{copy.minimum}</h3>
               <p className="break-words">
-                {copy.server}: {manifest.minimumMta?.server || "—"} · {copy.client}:{" "}
-                {manifest.minimumMta?.client || "—"} · {copy.shared}:{" "}
-                {manifest.minimumMta?.both || "—"}
+                {copy.server}: {formatUnknown(locale, manifest.minimumMta?.server)} · {copy.client}:{" "}
+                {formatUnknown(locale, manifest.minimumMta?.client)} · {copy.shared}:{" "}
+                {formatUnknown(locale, manifest.minimumMta?.both)}
               </p>
               <h3 className="font-semibold">{copy.dependencies}</h3>
               <p className="text-muted">{copy.dependenciesNote}</p>
@@ -140,7 +146,7 @@ export function BuildPackageEvidencePanel({
               <ul className="list-inside list-disc">
                 {[...new Set(manifest.aclRights)].map((v) => (
                   <li key={v} className="break-words">
-                    {v || "—"}
+                    {formatUnknown(locale, v)}
                   </li>
                 ))}
               </ul>
@@ -152,13 +158,14 @@ export function BuildPackageEvidencePanel({
                   ).values(),
                 ].map((v) => (
                   <li key={JSON.stringify([v.kind, v.path, v.status])} className="break-words">
-                    <code>{v.path || "—"}</code> · {v.kind} ·{" "}
+                    <code>{formatUnknown(locale, v.path)}</code> · {v.kind} ·{" "}
                     {v.status === "present" ? (
                       <span className="text-success">{labels[v.status]}</span>
                     ) : (
                       <ErrorState
                         id={`build-package-evidence-ref-${v.kind}-${v.status}-${v.path || "empty"}`}
                         title={labels[v.status]}
+                        description={copy.referenceIssueHint}
                       />
                     )}
                   </li>
@@ -168,6 +175,7 @@ export function BuildPackageEvidencePanel({
                 <ErrorState
                   id="build-package-evidence-manifest-refs-truncated"
                   title={copy.truncated}
+                  description={copy.truncatedHint}
                 />
               ) : null}
               {manifest.issues.length > 0 && (
@@ -186,6 +194,7 @@ export function BuildPackageEvidencePanel({
                             { ...v, message: copy.genericIssue },
                             getDictionary(locale).metaInspector.structuralIssues,
                           )}
+                          description={copy.structuralIssueHint}
                         />
                       </li>
                     ))}

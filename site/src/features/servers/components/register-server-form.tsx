@@ -251,6 +251,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         <ErrorState
           id="register-server-create-inconclusive"
           title={copy.creationResultUnknown}
+          description={copy.listingNotConfirmed}
           action={
             <Button type="button" disabled={loading} onClick={recover}>
               {copy.checkResult}

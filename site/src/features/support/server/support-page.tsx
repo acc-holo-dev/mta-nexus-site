@@ -60,7 +60,11 @@ export async function SupportPageSurface({
         <header className="space-y-2 border-b border-base pb-6">
           <h1 className="font-display text-primary">{support.title}</h1>
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
-          <ErrorState id="support-no-guaranteed-sla" title={support.noGuaranteedSla} />
+          <ErrorState
+            id="support-no-guaranteed-sla"
+            title={support.noGuaranteedSla}
+            description={support.noGuaranteedSlaHint}
+          />
         </header>
         <PlatformGuestAuthPanel locale={locale} returnPath={listReturnPath} />
       </div>

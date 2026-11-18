@@ -15,9 +15,9 @@ it("locks membership history unknown and unavailable notices to ErrorState", () 
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="library-membership-history-unknown"');
   expect(source).toContain('id="library-membership-history-unavailable"');
-  expect(source).toMatch(
-    /<ErrorState id="library-membership-history-unknown" title=\{h\.unknown\}/,
-  );
+  expect(source).toContain("title={h.unknown}");
+  expect(source).toContain("description={h.unknownHint}");
+  expect(source).toContain("title={h.unavailable}");
   expect(source).not.toContain("<p>{h.unknown}</p>");
   expect(source).not.toContain("? (resource.currentTitle ?? h.unavailable)");
 });

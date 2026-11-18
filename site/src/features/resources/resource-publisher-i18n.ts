@@ -21,6 +21,8 @@ const copy = {
     title: "Title",
     versions: "Versions",
     reviewRequired: "Editorial review required",
+    reviewRequiredHint:
+      "Update the resource card and submit a clean version for review before downloads resume.",
     editNote:
       "Changing the title, description, tags or requirements withdraws publication and returns pending versions to drafts. Submit a clean saved version for a new review; files and library rights are retained.",
     readonly:
@@ -83,6 +85,8 @@ const copy = {
     title: "Название",
     versions: "Версий",
     reviewRequired: "Нужна повторная проверка карточки",
+    reviewRequiredHint:
+      "Обновите карточку ресурса и отправьте чистую версию на проверку, прежде чем возобновятся скачивания.",
     editNote:
       "Изменение названия, описания, тегов или требований снимает публикацию и возвращает проверяемые версии в черновики. Отправьте сохранённую чистую версию на повторную проверку; файлы и права в библиотеке сохраняются.",
     readonly:

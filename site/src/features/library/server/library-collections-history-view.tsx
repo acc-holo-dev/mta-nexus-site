@@ -1,5 +1,6 @@
 import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -89,10 +90,10 @@ export async function LibraryCollectionsHistoryView({
             {item.command.action === "reconcile-items" && (
               <div>
                 <p>
-                  {c.add}: {item.command.addProductIds.join(", ") || "—"}
+                  {c.add}: {formatUnknown(locale, item.command.addProductIds.join(", "))}
                 </p>
                 <p>
-                  {c.remove}: {item.command.removeProductIds.join(", ") || "—"}
+                  {c.remove}: {formatUnknown(locale, item.command.removeProductIds.join(", "))}
                 </p>
               </div>
             )}

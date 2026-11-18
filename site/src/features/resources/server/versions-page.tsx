@@ -3,8 +3,9 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";
@@ -24,8 +25,8 @@ const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-7 overflow-x-clip py-8
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-function formatBuildSize(bytes: number): string {
-  if (!Number.isSafeInteger(bytes) || bytes <= 0) return "—";
+function formatBuildSize(bytes: number, locale: Locale): string {
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }
@@ -174,7 +175,9 @@ export async function PublicResourceVersionsPage({
               <dl className="grid gap-3 text-xs sm:grid-cols-2">
                 <div>
                   <dt className="text-muted">{copy.size}</dt>
-                  <dd className="text-secondary">{formatBuildSize(release.fileSizeBytes)}</dd>
+                  <dd className="text-secondary">
+                    {formatBuildSize(release.fileSizeBytes, locale)}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted">{copy.target}</dt>

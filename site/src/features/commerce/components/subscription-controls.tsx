@@ -295,11 +295,9 @@ export function SubscriptionControls(props: Props) {
           <p>{c.personal}</p>
         )}
       </fieldset>
-      {frozen && ready === scope && (
-        <p role="note" className="text-sm text-secondary">
-          {c.frozen}
-        </p>
-      )}
+      {frozen && ready === scope ? (
+        <ErrorState id="subscription-controls-frozen" title={c.frozen} description={c.retry} />
+      ) : null}
       {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
       <Button
         type="submit"

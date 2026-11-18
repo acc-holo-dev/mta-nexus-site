@@ -82,10 +82,15 @@ export default async function SecurityPage() {
             <ErrorState
               id="security-recovery-needs-verification"
               title={copy.recoveryNeedsVerification}
+              description={copy.recoveryNeedsVerificationHint}
             />
           )
         ) : (
-          <ErrorState id="security-recovery-unavailable" title={copy.recoveryUnavailable} />
+          <ErrorState
+            id="security-recovery-unavailable"
+            title={copy.recoveryUnavailable}
+            description={copy.recoveryUnavailableHint}
+          />
         )}
       </section>
 

@@ -445,6 +445,7 @@ export async function ProductDetailPage({
                 <ErrorState
                   id="market-paid-disabled"
                   title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}
+                  description={isPublic ? dictionary.checkout.paidDisabledHint : copy.notPublicHint}
                 />
               )}
             </div>

@@ -3,7 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
@@ -140,7 +140,9 @@ export function AuthorPublicationRestore({
       >
         {copy.restore}
       </Button>
-      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && !saved ? (
+        <ErrorState title={notice} description={getDictionary(locale).errors.formErrorHint} />
+      ) : null}
       {notice && saved ? (
         <p role="status" className="text-sm text-success">
           {notice}

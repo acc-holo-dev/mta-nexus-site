@@ -19,7 +19,9 @@ it("locks server-claim identity and unknown-result strings to serverClaim dictio
     "sessionChanged",
     "markerSaveFailed",
     "unknownIssueTitle",
+    "unknownIssueHint",
     "unknownVerifyTitle",
+    "unknownVerifyHint",
     "checkRequests",
     "checkingSession",
   ]) {

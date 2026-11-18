@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
@@ -84,7 +85,7 @@ export async function MarketPage({
             <span className="min-w-0 break-words">{dictionary.market.title}</span>
           </h1>
           <p className="mt-0.5 font-caption text-muted">
-            {dictionary.market.showing} {catalog?.products.length ?? "—"}
+            {dictionary.market.showing} {formatUnknown(locale, catalog?.products.length)}
           </p>
         </div>
       </div>

@@ -64,6 +64,8 @@ const en = {
   profileRecoveryHelp:
     "Your draft is still in the form. Copy it before navigating away or signing in again.",
   profileAccountChanged: "The signed-in account changed. The previous account's draft was closed.",
+  profileAccountChangedHint:
+    "The profile was not saved and the draft was closed. Reload the saved profile or sign in to the correct account before editing again.",
   signIn: "Sign in",
   signInRequired: "Sign in to manage your account",
   retry: "Reload saved version",
@@ -157,6 +159,8 @@ const ru: typeof en = {
   profileRecoveryHelp:
     "Черновик остался в форме. Скопируйте его перед переходом со страницы или повторным входом.",
   profileAccountChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
+  profileAccountChangedHint:
+    "Профиль не сохранён, черновик закрыт. Загрузите сохранённый профиль или войдите в нужный аккаунт перед правкой.",
   signIn: "Войти",
   signInRequired: "Войдите для управления аккаунтом",
   retry: "Загрузить сохранённую версию",

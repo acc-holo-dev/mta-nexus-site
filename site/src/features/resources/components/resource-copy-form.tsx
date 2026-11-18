@@ -101,11 +101,9 @@ export function ResourceCopyForm({
           onChange={(e) => setSlug(e.target.value)}
         />
       </fieldset>
-      {frozen && (
-        <p role="note" className="text-sm text-secondary">
-          {c.frozen}
-        </p>
-      )}
+      {frozen ? (
+        <ErrorState id="resource-copy-form-frozen" title={c.frozen} description={c.retry} />
+      ) : null}
       {error ? <ErrorState title={error} description={c.errorDescription} /> : null}
       <div className="flex flex-wrap gap-4">
         <Button type="submit" isLoading={busy} className="min-h-11">

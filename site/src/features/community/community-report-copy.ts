@@ -64,6 +64,8 @@ const en = {
   currentTarget: "Current target content",
   currentHint: "This is the current content, which may have changed since the report was filed.",
   missing: "The target is unavailable or no longer public.",
+  missingHint:
+    "The report record remains. A removed or private target is not a failed report load.",
   truncated: "Only the first 5,000 characters are shown.",
   viewTarget: "Open publication",
   author: "Author",
@@ -167,6 +169,7 @@ const ru: Record<keyof typeof en, string> = {
   currentTarget: "Текущее содержимое цели",
   currentHint: "Контент мог измениться после подачи жалобы. Здесь показана текущая версия.",
   missing: "Цель недоступна или больше не опубликована.",
+  missingHint: "Запись жалобы сохранена. Удалённая или скрытая цель — это не сбой загрузки жалобы.",
   truncated: "Показаны первые 5 000 символов.",
   viewTarget: "Открыть публикацию",
   author: "Автор",

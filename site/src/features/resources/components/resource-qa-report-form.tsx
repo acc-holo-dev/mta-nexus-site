@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
@@ -169,7 +169,13 @@ export function ResourceQaReportForm({
           placeholder={copy.reportReasonPlaceholder}
         />
       </label>
-      {error ? <ErrorState id="resource-qa-report-failed" title={error} /> : null}
+      {error ? (
+        <ErrorState
+          id="resource-qa-report-failed"
+          title={error}
+          description={getDictionary(locale).errors.formErrorHint}
+        />
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           type="submit"

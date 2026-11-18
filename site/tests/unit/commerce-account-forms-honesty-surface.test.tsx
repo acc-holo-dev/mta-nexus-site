@@ -34,6 +34,20 @@ it("locks commerce and account form failures to ErrorState with touch CTAs", () 
   }
 });
 
+it("locks subscription and plan-review frozen recovery to ErrorState", () => {
+  const subscription = read("site/src/features/commerce/components/subscription-controls.tsx");
+  expect(subscription).toContain('id="subscription-controls-frozen"');
+  expect(subscription).toContain("title={c.frozen}");
+  expect(subscription).toContain("description={c.retry}");
+  expect(subscription).not.toMatch(/frozen && ready === scope && \(\s*<p role="note"/u);
+
+  const planReview = read("site/src/features/commerce/components/plan-review-form.tsx");
+  expect(planReview).toContain('id="plan-review-form-frozen"');
+  expect(planReview).toContain("title={c.frozen}");
+  expect(planReview).toContain("description={c.retry}");
+  expect(planReview).not.toMatch(/frozen \? \(\s*<p role="note"/u);
+});
+
 it("locks register server native controls to fieldControlClass without h-10 chrome", () => {
   const source = read("site/src/features/servers/components/register-server-form.tsx");
   expect(source).toContain("fieldControlClass");
@@ -75,6 +89,14 @@ it("locks license bind noServers empty to EmptyState with honesty hint copy", ()
   expect(i18n).toContain("noServers:");
   expect(i18n).toContain("noServersHint:");
   expect(i18n.match(/noServersHint:/gu)?.length).toBe(2);
+});
+
+it("locks license runtime releaseEmpty to EmptyState with formErrorHint", () => {
+  const probe = read("site/src/features/commerce/components/license-runtime-probe.tsx");
+  expect(probe).toContain("EmptyState");
+  expect(probe).toContain("title={copy.releaseEmpty}");
+  expect(probe).toContain("description={copy.formErrorHint}");
+  expect(probe).not.toContain('<p className="text-sm text-muted">{copy.releaseEmpty}</p>');
 });
 
 it("locks license control ghost pagination and token CTAs to size=touch", () => {

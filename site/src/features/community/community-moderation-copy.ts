@@ -27,6 +27,8 @@ const en = {
     "A temporary load failure is not an empty moderation queue. Reload the saved version after the service recovers.",
   invalid: "Invalid filters or continuation. Reload the latest saved results.",
   denied: "A current administrator or moderator role is required.",
+  deniedHint:
+    "Sign in with an account that holds a current administrator or moderator role, or switch workspace context.",
   signIn: "Sign in",
   loading: "Loading moderation workspace…",
   back: "Back to moderation",
@@ -77,6 +79,8 @@ const ru: Record<keyof typeof en, string> = {
     "Временный сбой загрузки — это не пустая очередь модерации. Загрузите сохранённую версию после восстановления сервиса.",
   invalid: "Некорректные фильтры или продолжение. Загрузите новые сохранённые результаты.",
   denied: "Нужна действующая роль администратора или модератора.",
+  deniedHint:
+    "Войдите под аккаунтом с действующей ролью администратора или модератора либо смените контекст кабинета.",
   signIn: "Войти",
   loading: "Загрузка кабинета модерации…",
   back: "К модерации",

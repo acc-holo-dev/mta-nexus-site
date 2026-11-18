@@ -5,6 +5,7 @@ import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { formatUnknown } from "../../../lib/i18n/unknown";
 import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 import { confirmedCompatibility } from "../resource-management-confirmation";
@@ -27,7 +28,7 @@ export function ResourceCompatibilityForm({
     suspended: boolean;
   };
 }) {
-  const { locale } = useNexusLocale(),
+  const { dictionary, locale } = useNexusLocale(),
     copy = getResourceManagementCopy(locale),
     router = useRouter();
   const field = useId(),
@@ -188,6 +189,7 @@ export function ResourceCompatibilityForm({
         <ErrorState
           id="resource-compatibility-suspended-readonly"
           title={getResourcePublisherCopy(locale).readonly}
+          description={dictionary.errors.formErrorHint}
         />
       ) : (
         <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
@@ -231,7 +233,12 @@ export function ResourceCompatibilityForm({
           <p id={`${field}-hint`} className="text-xs text-muted">
             {copy.dependencyHint}
           </p>
-          {product.suspended ? <ErrorState title={copy.errors.PRODUCT_STATE_CHANGED} /> : null}
+          {product.suspended ? (
+            <ErrorState
+              title={copy.errors.PRODUCT_STATE_CHANGED}
+              description={copy.errors.fallback}
+            />
+          ) : null}
           <Button type="submit" isLoading={busy} disabled={disabled} className="min-h-11">
             {busy ? copy.working : copy.save}
           </Button>
@@ -243,7 +250,7 @@ export function ResourceCompatibilityForm({
               <p>{copy.compatibilityChanged}</p>
               <p>{copy.compatibilityDraftHelp}</p>
               <p>
-                {copy.mta}: {newest.compatibility.mtaMinVersion ?? "—"}
+                {copy.mta}: {formatUnknown(locale, newest.compatibility.mtaMinVersion)}
               </p>
               <p className="whitespace-pre-wrap break-words">
                 {copy.dependencies}: {(newest.compatibility.dependencies ?? []).join("\n")}

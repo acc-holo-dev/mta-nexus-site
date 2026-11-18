@@ -9,8 +9,12 @@ const en = {
     "See all your collections and add or remove this resource. Unavailable references keep their IDs and hidden titles.",
   notInCollection: "Not in collection",
   noAddAccess: "Current resource access is required to add a new reference.",
+  noAddAccessHint:
+    "Membership cannot change without current resource access. Restore access or adjust another collection first.",
   fullCollection: "This collection has reached its resource limit.",
   revisionLocked: "This collection can no longer be changed.",
+  revisionLockedHint:
+    "A terminal revision is not a load failure. Open another collection or review history before retrying.",
   subtitle:
     "Group resources you have acquired. Collections are private and do not grant download rights.",
   name: "Collection name",
@@ -32,6 +36,8 @@ const en = {
     "Copy up to 20 references to another active collection. The source may be archived. Unavailable references keep their IDs and hidden titles. Existing destination references are kept once; download rights, saved versions and release watches are unchanged.",
   destination: "Destination collection",
   noDestination: "Create or restore another collection to use as a destination.",
+  noDestinationHint:
+    "Create or restore another active collection before copying or moving. A missing destination is not a failed transfer.",
   copyItemsConfirm: "I confirm the source and destination revisions and the selected references.",
   additions: "New references to add",
   openDestination: "Open destination collection",
@@ -138,8 +144,12 @@ const ru: typeof en = {
     "Все ваши коллекции: добавьте ресурс или уберите его запись. У недоступных ресурсов сохраняются ID и скрытые названия.",
   notInCollection: "Нет в коллекции",
   noAddAccess: "Для добавления новой записи нужен действующий доступ к ресурсу.",
+  noAddAccessHint:
+    "Состав нельзя изменить без действующего доступа к ресурсу. Восстановите доступ или сначала измените другую коллекцию.",
   fullCollection: "В коллекции достигнут лимит ресурсов.",
   revisionLocked: "Эту коллекцию больше нельзя изменять.",
+  revisionLockedHint:
+    "Предельная редакция — не ошибка загрузки. Откройте другую коллекцию или просмотрите историю перед повтором.",
   subtitle:
     "Группируйте полученные ресурсы. Коллекции доступны только вам и не предоставляют права на скачивание.",
   name: "Название коллекции",
@@ -161,6 +171,8 @@ const ru: typeof en = {
     "Скопируйте до 20 записей в другую активную коллекцию. Источник может быть в архиве. У недоступных ресурсов сохраняются ID и скрытые названия. Имеющиеся записи назначения не дублируются; права на скачивание, выбор версий и подписки на выпуски сохраняются.",
   destination: "Коллекция назначения",
   noDestination: "Создайте или восстановите другую коллекцию назначения.",
+  noDestinationHint:
+    "Создайте или восстановите другую активную коллекцию перед копированием или переносом. Отсутствие назначения — не сбой переноса.",
   copyItemsConfirm: "Подтверждаю редакции источника и назначения и выбранные записи.",
   additions: "Новых записей для добавления",
   openDestination: "Открыть коллекцию назначения",

@@ -15,7 +15,7 @@ it("locks author resource details readonly notice to ErrorState without soft sec
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
   expect(source).toContain('id="author-resource-details-readonly"');
   expect(source).toContain(
-    '<ErrorState\n            id="author-resource-details-readonly"\n            title={getResourcePublisherCopy(locale).readonly}\n          />',
+    '<ErrorState\n            id="author-resource-details-readonly"\n            title={getResourcePublisherCopy(locale).readonly}\n            description={dictionary.errors.formErrorHint}\n          />',
   );
   expect(source).not.toMatch(
     /uploadBlocked\s*\?\s*getResourcePublisherCopy\(locale\)\.readonly\s*:\s*getResourcePublisherCopy\(locale\)\.editNote/u,

@@ -14,9 +14,18 @@ const source = readFileSync(
 it("locks resource release watch batch maximum to ErrorState", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="resource-release-watch-batch-maximum"');
-  expect(source).toContain(
-    '<ErrorState id="resource-release-watch-batch-maximum" title={copy.maximum} />',
-  );
+  expect(source).toContain("description={copy.batchMaximumHint}");
   expect(source).not.toContain('{enabling && capacity === 0 && <p role="note">{copy.maximum}</p>}');
   expect(source).not.toMatch(/id="resource-release-watch-batch-maximum"[^>]*action=/u);
+});
+
+it("locks resource release watch batch pending and skipped recovery to ErrorState", () => {
+  expect(source).toContain('id="resource-release-watch-batch-pending"');
+  expect(source).toContain('id="resource-release-watch-batch-skipped"');
+  expect(source).toContain("title={copy.pendingNote}");
+  expect(source).toContain("title={copy.skippedNote}");
+  expect(source).toContain("description={copy.failedDescription}");
+  expect(source).not.toContain('<p className="text-sm text-muted">{copy.pendingNote}</p>');
+  expect(source).not.toContain('<p className="text-sm text-muted">{copy.skippedNote}</p>');
+  expect(source).not.toContain('role="note"');
 });

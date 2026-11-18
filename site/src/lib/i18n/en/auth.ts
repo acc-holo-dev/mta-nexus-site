@@ -30,6 +30,8 @@ export const auth = {
     already: "Already have an account?",
     newUser: "New to MTA Nexus?",
     genericError: "The request could not be completed. Please try again.",
+    formErrorHint:
+      "Sign-in was not completed. Check the fields above and submit the same form again.",
     registerError: "We could not confirm registration. Try signing in before registering again.",
     loginError: "We could not confirm sign in. Check your connection and try again.",
   },

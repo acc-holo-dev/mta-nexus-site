@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getDictionary } from "../../src/lib/i18n";
 import { expect, it, vi } from "vitest";
 import {
   createResourceCartControlsConfirmInteractionHelpers,
@@ -22,7 +23,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 vi.mock("../../src/features/shell/locale", () => ({
-  useNexusLocale: () => ({ locale: "en" as const }),
+  useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
 }));
 
 import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";

@@ -64,7 +64,10 @@ export async function PlatformReportsScreen({
       return (
         <div className="space-y-4">
           <SectionHeader as="h1" title={copy.detail} description={copy.help} />
-          <ErrorState title={copy.notFound} />
+          <ErrorState
+            title={copy.notFound}
+            description={getDictionary(typedLocale).errors.formErrorHint}
+          />
           <Link
             href="/workspace/platform-reports"
             className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

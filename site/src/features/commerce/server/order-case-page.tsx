@@ -468,7 +468,11 @@ export async function OrderCaseDetailPage({
         {copy.financeNote}
       </p>
       {result.evidenceChanged ? (
-        <ErrorState id="order-case-evidence-changed" title={copy.changed} />
+        <ErrorState
+          id="order-case-evidence-changed"
+          title={copy.changed}
+          description={copy.changedHint}
+        />
       ) : null}
       <Evidence data={result.snapshot} locale={locale} title={copy.snapshot} />
       <Evidence data={current} locale={locale} title={copy.current} />

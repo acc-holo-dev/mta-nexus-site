@@ -102,6 +102,7 @@ export function ServerDetailsForm({
   const router = useRouter();
   const { dictionary } = useNexusLocale();
   const copy = dictionary.serverManagement;
+  const formErrorHint = dictionary.errors.formErrorHint;
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState(() => revisionToken(server.updatedAt));
@@ -541,15 +542,25 @@ export function ServerDetailsForm({
               </span>
             )}
           </div>
-          {notice?.error ? <ErrorState title={notice.text} className="sm:col-span-2" /> : null}
+          {notice?.error ? (
+            <ErrorState title={notice.text} description={formErrorHint} className="sm:col-span-2" />
+          ) : null}
         </form>
       )}
-      {!identityVerified && notice?.error && <ErrorState title={notice.text} />}
-      {foreignActor && notice?.error && <ErrorState title={notice.text} />}
+      {!identityVerified && notice?.error && (
+        <ErrorState title={notice.text} description={formErrorHint} />
+      )}
+      {foreignActor && notice?.error && (
+        <ErrorState title={notice.text} description={formErrorHint} />
+      )}
       {needsCheck && !foreignActor && (
         <div className="space-y-2">
           {!lastSavedAt ? (
-            <ErrorState id="server-details-missing-revision" title={copy.missingRevision} />
+            <ErrorState
+              id="server-details-missing-revision"
+              title={copy.missingRevision}
+              description={formErrorHint}
+            />
           ) : null}
           <Button
             type="button"

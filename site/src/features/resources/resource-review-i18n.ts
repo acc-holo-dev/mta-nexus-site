@@ -77,6 +77,9 @@ const en = {
   signIn: "Sign in",
   reload: "Reload saved state",
   unknown: "The result could not be confirmed. Reload the saved state before continuing.",
+  noticeErrorDescription:
+    "The review change was not saved. Reload the saved state before trying again.",
+  eligibilityHint: "Publishing stays disabled until the condition above is resolved.",
   failure: "Unable to save. Please try again.",
   changed: "The review or report changed. Reload before trying again.",
   draftChanged: "The saved review changed. Compare it with your draft before continuing.",
@@ -178,6 +181,9 @@ const ru: typeof en = {
   signIn: "Войти",
   reload: "Обновить сохранённое состояние",
   unknown: "Результат не подтверждён. Обновите сохранённое состояние перед продолжением.",
+  noticeErrorDescription:
+    "Изменение отзыва не сохранено. Обновите сохранённое состояние перед повторной попыткой.",
+  eligibilityHint: "Публикация недоступна, пока не выполнено условие выше.",
   failure: "Не удалось сохранить. Попробуйте ещё раз.",
   changed: "Отзыв или жалоба изменились. Обновите страницу перед повтором.",
   draftChanged: "Сохранённый отзыв изменился. Сравните его с черновиком перед продолжением.",

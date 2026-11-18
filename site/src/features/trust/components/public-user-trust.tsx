@@ -99,7 +99,11 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 className="font-heading text-primary">{copy.publications}</h2>
         {data.publications === null ? (
-          <ErrorState id="public-user-trust-hidden-activity" title={copy.hiddenActivity} />
+          <ErrorState
+            id="public-user-trust-hidden-activity"
+            title={copy.hiddenActivity}
+            description={copy.hiddenActivityHint}
+          />
         ) : (
           <>
             <p className="font-numeric text-2xl font-bold text-primary">{data.publications}</p>

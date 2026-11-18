@@ -30,6 +30,7 @@ export const admin = {
       "Control proof matches the current server endpoint and ownership scope.",
     verificationProofStale:
       "Control proof no longer matches the current server endpoint or ownership scope.",
+    verificationProofStaleHint: "Reject or request an updated proof before approving this claim.",
     noVerificationHistory: "No verification decisions yet.",
     pendingRequests: "pending requests",
     requester: "Requester",
@@ -127,6 +128,8 @@ export const admin = {
     reject: "Reject",
     reviewArtifact: "Review artifact",
     artifactRequiresCleanScan: "Artifact download requires a trusted clean scan",
+    artifactRequiresCleanScanHint:
+      "Approve and reject stay disabled until a trusted clean scan is recorded. Download opens only after scan provenance exists.",
     approveBuildConfirm: "Approve this clean build for publication?",
     rejectBuildConfirm: "Reject this build?",
     buildFailed: "Build moderation failed.",
@@ -170,7 +173,11 @@ export const admin = {
     recovery: "Recovery email",
     recoveryVerified: "Verified for account recovery",
     recoveryNeedsVerification: "Recovery email still needs verification",
+    recoveryNeedsVerificationHint:
+      "Recovery email verification is not complete. Open security settings to send the verification email.",
     recoveryUnavailable: "Recovery status is unavailable",
+    recoveryUnavailableHint:
+      "Recovery status could not be confirmed here. Open security settings to check the recovery email again.",
     sessions: "Active sessions",
     sessionsDescription: "Only active, unexpired sessions owned by this account are shown.",
     currentSession: "Current session",
@@ -311,7 +318,11 @@ export const admin = {
     recoveryAccountChanged:
       "The signed-in account changed. Reload settings before checking recovery email.",
     recoveryNotVerified: "Not verified for recovery yet.",
+    recoveryNotVerifiedHint:
+      "Recovery email verification is not complete. Enter your current password below and send the verification email.",
     recoveryUnavailable: "Recovery email verification is unavailable for this account.",
+    recoveryUnavailableHint:
+      "Verification cannot be started from here. Reload settings to check the status again.",
     recoveryPassword: "Current password for recovery email",
     verifyRecoveryEmail: "Verify recovery email",
     recoveryAlreadyVerified: "This recovery email is already verified.",

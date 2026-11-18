@@ -12,12 +12,10 @@ it("locks security recovery unavailable and needs-verification to ErrorState", (
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="security-recovery-needs-verification"');
   expect(source).toContain('id="security-recovery-unavailable"');
-  expect(source).toMatch(
-    /<ErrorState\s+id="security-recovery-needs-verification"\s+title=\{copy\.recoveryNeedsVerification\}\s*\/>/u,
-  );
-  expect(source).toMatch(
-    /<ErrorState\s+id="security-recovery-unavailable"\s+title=\{copy\.recoveryUnavailable\}\s*\/>/u,
-  );
+  expect(source).toContain('id="security-recovery-needs-verification"');
+  expect(source).toContain("title={copy.recoveryNeedsVerification}");
+  expect(source).toContain("description={copy.recoveryNeedsVerificationHint}");
+  expect(source).toContain("description={copy.recoveryUnavailableHint}");
   expect(source).toContain('className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>');
   expect(source).not.toContain(": copy.recoveryNeedsVerification");
   expect(source).not.toContain(": copy.recoveryUnavailable}");

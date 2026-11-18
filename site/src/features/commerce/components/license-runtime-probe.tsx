@@ -1,7 +1,7 @@
 "use client";
 import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/domain";
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
-import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getLicenseControlCopy } from "../license-control-i18n";
@@ -192,7 +192,7 @@ export function LicenseRuntimeProbe({
           )}
         </>
       ) : (
-        <p className="text-sm text-muted">{copy.releaseEmpty}</p>
+        <EmptyState title={copy.releaseEmpty} description={copy.formErrorHint} />
       )}
       {command && (
         <label className="block space-y-1 text-sm">

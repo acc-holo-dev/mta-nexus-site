@@ -14,6 +14,8 @@ const en = {
   wait: "A request is already awaiting moderation. A new challenge is available after the moderator closes it. Current management permissions are checked again before approval.",
   outdated:
     "The proof no longer matches this server's address or organization. The moderator must reject a pending request before a new proof can be submitted.",
+  outdatedHint:
+    "Refresh status after moderation closes the pending request. Mismatched proof is not an approved claim.",
   retry: "You can submit a new control proof for review.",
   refresh: "Refresh status",
   errors: {
@@ -53,6 +55,8 @@ const ru: typeof en = {
   wait: "Заявка уже ожидает модерации. Новая проверка станет доступна после её закрытия модератором. Перед одобрением права управления проверяются заново.",
   outdated:
     "Доказательство больше не соответствует адресу или организации сервера. Модератор должен отклонить ожидающую заявку, прежде чем можно будет отправить новое доказательство.",
+  outdatedHint:
+    "Обновите статус после того, как модерация закроет ожидающую заявку. Несовпадение доказательства — не одобренная заявка.",
   retry: "Можно отправить новое доказательство контроля на рассмотрение.",
   refresh: "Обновить статус",
   errors: {

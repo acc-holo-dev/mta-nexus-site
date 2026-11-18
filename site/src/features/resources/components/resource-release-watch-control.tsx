@@ -187,8 +187,10 @@ export function ResourceReleaseWatchControl({
           <p className="text-xs text-muted">{copy.limit}</p>
         </>
       ) : null}
-      {!commerceEnabled ? <ErrorState title={copy.suppressed} /> : null}
-      {disabledReason ? <ErrorState title={disabledReason} /> : null}
+      {!commerceEnabled ? (
+        <ErrorState title={copy.suppressed} description={copy.suppressedHint} />
+      ) : null}
+      {disabledReason ? <ErrorState title={disabledReason} description={copy.blockedHint} /> : null}
       {!hasAccess && acquireHref ? (
         <Link
           href={acquireHref}
@@ -211,9 +213,11 @@ export function ResourceReleaseWatchControl({
       )}
       {pending && !saved && (
         <div className="space-y-2">
-          <p role="note" className="text-sm text-muted">
-            {copy.pendingNote}
-          </p>
+          <ErrorState
+            id="resource-release-watch-pending"
+            title={copy.pendingNote}
+            description={copy.failedDescription}
+          />
           {!blocked && (
             <Button
               type="button"

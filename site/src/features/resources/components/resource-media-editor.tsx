@@ -118,7 +118,13 @@ export function ResourceMediaEditor({
   }
   return (
     <div className="space-y-5" aria-busy={busy}>
-      {readonly ? <ErrorState id="resource-media-readonly" title={copy.readonly} /> : null}
+      {readonly ? (
+        <ErrorState
+          id="resource-media-readonly"
+          title={copy.readonly}
+          description={copy.readonlyDescription}
+        />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}

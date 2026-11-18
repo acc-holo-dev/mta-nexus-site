@@ -1,4 +1,6 @@
 import type { LicenseStatus, OrderStatus } from "@nexus/domain";
+import type { Locale } from "../../lib/i18n";
+import { unknownMarker } from "../../lib/i18n/unknown";
 
 /** Never trust a query string to control SQL page size or large offsets. */
 export function parseHistoryPage(value: string | string[] | undefined): number {
@@ -21,7 +23,7 @@ export function effectiveLicenseStatus(
   return status;
 }
 
-export function formatHistoryDate(value: Date, locale: "en" | "ru"): string {
+export function formatHistoryDate(value: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-US", {
     year: "numeric",
     month: "short",
@@ -31,13 +33,9 @@ export function formatHistoryDate(value: Date, locale: "en" | "ru"): string {
 }
 
 /** Amounts are stored in ISO currency minor units; invalid values fail closed. */
-export function formatHistoryAmount(
-  minorUnits: number,
-  currency: string,
-  locale: "en" | "ru",
-): string {
+export function formatHistoryAmount(minorUnits: number, currency: string, locale: Locale): string {
   if (!Number.isSafeInteger(minorUnits) || !/^[A-Z]{3}$/u.test(currency)) {
-    return "—";
+    return unknownMarker(locale);
   }
   try {
     const formatter = new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "en-US", {
@@ -45,10 +43,10 @@ export function formatHistoryAmount(
       currency,
     });
     const fractionDigits = formatter.resolvedOptions().maximumFractionDigits;
-    if (fractionDigits === undefined) return "—";
+    if (fractionDigits === undefined) return unknownMarker(locale);
     return formatter.format(minorUnits / 10 ** fractionDigits);
   } catch {
-    return "—";
+    return unknownMarker(locale);
   }
 }
 

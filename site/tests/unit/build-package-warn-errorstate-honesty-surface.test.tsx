@@ -12,10 +12,8 @@ const source = readFileSync(
 
 it("locks legacy/no-baseline package notices to ErrorState without fake retry", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
-  expect(source).toContain(
-    "{!detail.build.hasInventory ? <ErrorState title={copy.legacy} /> : null}",
-  );
-  expect(source).toContain("<ErrorState title={copy.noBaseline} />");
+  expect(source).toContain("description={copy.legacyHint}");
+  expect(source).toContain("description={copy.noBaselineHint}");
   expect(source).not.toContain('className="text-warning">{copy.legacy}</p>');
   expect(source).not.toContain('className="text-warning">{copy.noBaseline}</p>');
 });
