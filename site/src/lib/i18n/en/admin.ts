@@ -344,12 +344,16 @@ export const admin = {
     unconfirmedSessionRevocation: "Unconfirmed session revocation",
     sessionEnded: "Session ended. That sign-in can no longer access your account.",
     sessionUnavailable: "The session list is unavailable. Reload settings to check it.",
+    sessionUnavailableHint:
+      "Retry reloads the session list only. A temporary load failure is not an empty sessions page and does not sign you out.",
     noSessions: "No active sessions found. Reload settings to confirm your sign-in.",
     preferenceSaved: "Notification preference saved.",
     backendUnavailable: "Account settings are temporarily unavailable.",
     unreadableResponse: "The server returned an unreadable response.",
     invalidResponse: "Invalid settings response",
     loadFailed: "Could not load account settings. Your sign-in status has not been confirmed.",
+    loadFailedHint:
+      "Retry reloads account settings only. This is not a guest state and does not change your password or sessions.",
     authRequired: "Authentication required",
     requestUnconfirmed: "The request could not be confirmed. Reload settings before retrying.",
     invalidSessionResponse: "Invalid session response",

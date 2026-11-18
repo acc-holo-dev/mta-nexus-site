@@ -138,6 +138,7 @@ export async function ServerWorkspaceHistoryScreen({
       {!data ? (
         <ErrorState
           title={failure || copy.historyUnavailable}
+          description={copy.historyUnavailableHint}
           action={
             <Link href={serverWorkspaceHistoryHref(id, query)} className={navLinkClass}>
               {copy.reload}

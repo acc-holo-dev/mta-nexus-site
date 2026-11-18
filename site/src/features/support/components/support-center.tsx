@@ -526,6 +526,7 @@ export function SupportCenter({
         ) : listError ? (
           <ErrorState
             title={listError}
+            description={copy.loadErrorHint}
             action={
               <Button
                 type="button"

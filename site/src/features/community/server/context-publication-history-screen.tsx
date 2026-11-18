@@ -113,6 +113,7 @@ export async function ContextPublicationHistoryScreen({
       {!data ? (
         <ErrorState
           title={failure || copy.unavailable}
+          description={copy.unavailableHint}
           action={
             <a href={path} className={navLinkClass}>
               {history.reload}

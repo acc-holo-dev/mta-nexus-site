@@ -31,6 +31,8 @@ const en = {
     "Nothing matches these filters in this catalog type. The empty list is a confirmed result, not a loading failure.",
   activeFilters: "Active filters",
   unavailable: "The directory is temporarily unavailable. Please try again.",
+  unavailableHint:
+    "Retry reloads this directory page only. A temporary load failure is not an empty catalog result.",
   invalid: "Invalid directory filters.",
   rate: "Too many searches. Please try again shortly.",
   serversHint: "NEXUS listings. Browse the official MTA directory for live servers.",
@@ -70,6 +72,8 @@ const ru: Record<keyof typeof en, string> = {
     "По этим фильтрам в выбранном типе каталога ничего нет. Пустой список — подтверждённый результат, а не сбой загрузки.",
   activeFilters: "Активные фильтры",
   unavailable: "Каталог временно недоступен. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только эту страницу каталога. Временный сбой загрузки — не пустой результат поиска.",
   invalid: "Некорректные фильтры каталога.",
   rate: "Слишком много запросов. Попробуйте чуть позже.",
   serversHint: "Карточки NEXUS. Действующие серверы доступны в официальном каталоге MTA.",

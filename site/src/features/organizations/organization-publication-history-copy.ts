@@ -16,6 +16,8 @@ const en = {
   restoredNotice: "The publication was restored as an organization draft.",
   identity: "Team member",
   unavailable: "Publication history could not be loaded. Reload the organization workspace.",
+  unavailableHint:
+    "This does not change publication status. Reload history after the editorial service recovers.",
   historyEmptyHint:
     "Editorial status changes for this organization publication appear here after they are retained.",
 };
@@ -34,6 +36,8 @@ const ru: Record<keyof typeof en, string> = {
   restoredNotice: "Публикация возвращена в черновики организации.",
   identity: "Участник команды",
   unavailable: "Не удалось загрузить историю публикации. Загрузите кабинет организации.",
+  unavailableHint:
+    "Это не меняет статус публикации. Перезагрузите историю после восстановления сервиса редакции.",
   historyEmptyHint:
     "Изменения статуса этой публикации организации появляются здесь после сохранения в журнале.",
 };

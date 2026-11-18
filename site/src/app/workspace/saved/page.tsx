@@ -76,6 +76,7 @@ export default async function SavedPage({
         </header>
         <ErrorState
           title={copy.pageError}
+          description={copy.pageErrorHint}
           action={
             <Link href={returnPath} className={retryLinkClass}>
               {dictionary.errors.retry}

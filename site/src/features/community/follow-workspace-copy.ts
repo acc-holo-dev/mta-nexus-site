@@ -74,6 +74,8 @@ const en = {
   discover: "Discover profiles and servers",
   refreshing: "Refreshing…",
   pageError: "Could not load your follows.",
+  pageErrorHint:
+    "Retry reloads this saved-follows list only. A temporary load failure is not an empty follows page.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Сохранённое и подписки",
@@ -149,6 +151,8 @@ const ru: Record<keyof typeof en, string> = {
   discover: "Найти профили и серверы",
   refreshing: "Обновление…",
   pageError: "Не удалось загрузить подписки.",
+  pageErrorHint:
+    "Повтор обновляет только этот список подписок. Временный сбой загрузки — не пустая страница сохранённого.",
 };
 
 export type FollowActionCopy = {

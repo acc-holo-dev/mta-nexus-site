@@ -140,6 +140,8 @@ export const community = {
     create: "Create case",
     creating: "Creating...",
     loadError: "Could not load support cases.",
+    loadErrorHint:
+      "Retry reloads this support case list only. A temporary load failure is not an empty support inbox.",
     createError: "Could not create the support case.",
     authRequired: "Sign in to create and track support cases.",
     signIn: "Sign in",
@@ -147,6 +149,8 @@ export const community = {
     loading: "Loading support cases...",
     caseLoading: "Loading this support case...",
     caseLoadError: "Could not load this support case.",
+    caseLoadErrorHint:
+      "Retry reloads this support case thread only. A temporary load failure is not a closed or empty case.",
     historyLoading: "Loading status history...",
     empty: "No support cases yet.",
     open: "Open",

@@ -328,6 +328,7 @@ export function SupportCaseThread({
         </Link>
         <ErrorState
           title={error ?? copy.caseLoadError}
+          description={copy.caseLoadErrorHint}
           action={
             <Button
               type="button"

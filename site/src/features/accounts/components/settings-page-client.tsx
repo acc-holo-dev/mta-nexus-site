@@ -530,6 +530,7 @@ export function SettingsPageClient() {
         </header>
         <ErrorState
           title={notice?.text ?? copy.loadFailed}
+          description={copy.loadFailedHint}
           action={
             <Button
               type="button"

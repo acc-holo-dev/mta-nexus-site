@@ -164,6 +164,7 @@ export async function DirectoryResults({
     return (
       <ErrorState
         title={loadError}
+        description={copy.unavailableHint}
         action={
           <Link
             className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
