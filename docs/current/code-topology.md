@@ -164,6 +164,8 @@ Scope: `features/shell` (без тестов, без `server/` и `*-server` п�
 Проверка: `python3 planning/tools/inventory_public_guest_i18n.py --check planning/public-guest-hardcoded-strings.json`  
 Scope: `app/discover`, `app/servers` (публичный каталог/карточка), `app/articles`, `features/discovery` (без `server/` и `*-server`), guest directory components (`mta-master-server-directory`, `server-card`, `server-connect-controls`, `server-follow-button`). Sibling к Slice 5 — shell+home контракт не расширяли. Unknown-marker `—` в allowlist; `serverDetail.discord` уведён в RU+EN dictionaries.
 
+**Slice 45 done:** public-guest inventory coverage expansion (A/B) — same snapshot + tool. Added app roots `market`, `community`, `organizations`, `users`, `developers`, `support`, `explore`, `acquire`; selective guest feature components (market/resource listing & detail chrome, community feed/discussion/article card, public profile pagination/experience, support entry — not staff report/moderation or org workspace forms). Scanner skips TS `=>` false-positives; version prefix `v`, `SHA-256`, and unknown-marker `—` allowlisted. `unallowlisted: 0`; no new locale copy ternaries; no dictionary moves required (surfaces already on RU/EN keys).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -215,23 +217,25 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| #   | Slice                                                                                                                                          | Ось                              | Статус     |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ---------- |
-| 1   | Topology scoreboard (этот документ + inventory)                                                                                                | скорость разработки / понятность | **done**   |
-| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)                                                                                       | babysitting tax                  | **done**   |
-| 3   | Design direction + `@nexus/ui` tokens/primitives                                                                                               | shell 2027                       | **done**   |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell`                                                                                     | читаемость + путь гостя          | **done**   |
-| 5   | i18n inventory automation (shell+home hard-coded strings)                                                                                      | честность RU/EN                  | **done**   |
-| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                                                       | brand honesty + guest path       | **done**   |
-| 7   | Footer credit line → `footer.creditLine` i18n                                                                                                  | честность RU/EN                  | **done**   |
-| 44  | i18n inventory automation (public-guest discover/servers/articles)                                                                             | честность RU/EN                  | **done**   |
-| T   | services-domain — `lib/services/<domain>/`                                                                                                     | читаемость service layer         | **done**   |
-| T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                                              | очистка `lib/` root              | **done**   |
-| T   | Slice 42 — Shell `home-personal-changes` server port                                                                                           | читаемость + Shell ownership     | **done**   |
-| T   | Slice 43 — Accounts `parseProfilePage` into `profile-pagination` port                                                                          | читаемость + Accounts ownership  | **done**   |
-| D/E | Scoreboard sync после http/platform + services domains                                                                                         | docs honesty                     | **done**   |
-| C   | Journey honesty — empty≠fail / session≠guest / recovery; residual write/form ErrorStates вне scope / после residual sweep в основном завершено | честность user journey           | **active** |
-| D/E | Scoreboard sync после residual honesty + Slice 42/43                                                                                           | docs honesty                     | **done**   |
+| #   | Slice                                                                                                             | Ось                              | Статус   |
+| --- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
+| 1   | Topology scoreboard (этот документ + inventory)                                                                   | скорость разработки / понятность | **done** |
+| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)                                                          | babysitting tax                  | **done** |
+| 3   | Design direction + `@nexus/ui` tokens/primitives                                                                  | shell 2027                       | **done** |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell`                                                        | читаемость + путь гостя          | **done** |
+| 5   | i18n inventory automation (shell+home hard-coded strings)                                                         | честность RU/EN                  | **done** |
+| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                          | brand honesty + guest path       | **done** |
+| 7   | Footer credit line → `footer.creditLine` i18n                                                                     | честность RU/EN                  | **done** |
+| 44  | i18n inventory automation (public-guest discover/servers/articles)                                                | честность RU/EN                  | **done** |
+| 45  | i18n inventory coverage (public-guest market/community/orgs/users/support/…)                                      | честность RU/EN                  | **done** |
+| T   | services-domain — `lib/services/<domain>/`                                                                        | читаемость service layer         | **done** |
+| T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                 | очистка `lib/` root              | **done** |
+| T   | Slice 42 — Shell `home-personal-changes` server port                                                              | читаемость + Shell ownership     | **done** |
+| T   | Slice 43 — Accounts `parseProfilePage` into `profile-pagination` port                                             | читаемость + Accounts ownership  | **done** |
+| D/E | Scoreboard sync после http/platform + services domains                                                            | docs honesty                     | **done** |
+| C   | Journey honesty — load/session/empty/recovery program complete; write/form ErrorStates intentionally out of scope | честность user journey           | **done** |
+| D/E | Scoreboard sync после residual honesty + Slice 42/43                                                              | docs honesty                     | **done** |
+| D/E | Scoreboard sync после Slice 44/45 public-guest i18n + journey C close                                             | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

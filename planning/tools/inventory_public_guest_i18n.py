@@ -21,12 +21,55 @@ SCAN_PATHS = (
     "site/src/app/discover",
     "site/src/app/servers",
     "site/src/app/articles",
+    "site/src/app/market",
+    "site/src/app/community",
+    "site/src/app/organizations",
+    "site/src/app/users",
+    "site/src/app/developers",
+    "site/src/app/support",
+    "site/src/app/explore",
+    "site/src/app/acquire",
     "site/src/features/discovery",
     # Public directory / listing cards only — not workspace claim/manage forms.
     "site/src/features/servers/components/mta-master-server-directory.tsx",
     "site/src/features/servers/components/server-card.tsx",
     "site/src/features/servers/components/server-connect-controls.tsx",
     "site/src/features/servers/components/server-follow-button.tsx",
+    # Market / resource guest surfaces (prefer specific components over whole tree).
+    "site/src/features/resources/components/product-card.tsx",
+    "site/src/features/resources/components/resource-preview.tsx",
+    "site/src/features/resources/components/resource-gallery.tsx",
+    "site/src/features/resources/components/resource-gallery-lightbox.tsx",
+    "site/src/features/resources/components/resource-download-button.tsx",
+    "site/src/features/resources/components/resource-review-list.tsx",
+    "site/src/features/resources/components/product-dependency-list.tsx",
+    "site/src/features/resources/components/reverse-dependency-list.tsx",
+    "site/src/features/resources/components/resource-variant-choices.tsx",
+    "site/src/features/resources/components/resource-version-help-section.tsx",
+    "site/src/features/resources/components/resource-version-help-support-link.tsx",
+    "site/src/features/resources/components/build-provenance-details.tsx",
+    "site/src/features/resources/components/resource-qa-panel.tsx",
+    "site/src/features/resources/components/resource-release-watch-control.tsx",
+    "site/src/features/resources/components/resource-cart-controls.tsx",
+    # Community public feed / article / discussion (not staff report moderation).
+    "site/src/features/community/components/article-card.tsx",
+    "site/src/features/community/components/publication-feed.tsx",
+    "site/src/features/community/components/follow-button.tsx",
+    "site/src/features/community/components/content-catalog-controls.tsx",
+    "site/src/features/community/components/content-discussion.tsx",
+    "site/src/features/community/components/content-discussion-compose-feedback.tsx",
+    "site/src/features/community/components/content-reactions.tsx",
+    "site/src/features/community/components/content-comment-form.tsx",
+    "site/src/features/community/components/content-follow-controls.tsx",
+    "site/src/features/community/components/community-topic-form.tsx",
+    # Public creator / member profile chrome.
+    "site/src/features/accounts/components/developer-experience.tsx",
+    "site/src/features/accounts/components/profile-resource-pagination.tsx",
+    # Public support entry (staff filters share the same surface; skip case admin panels).
+    "site/src/features/support/components/support-center.tsx",
+    "site/src/features/support/components/support-download-help-link.tsx",
+    "site/src/features/support/components/support-case-thread.tsx",
+    "site/src/features/support/components/support-message-browser.tsx",
 )
 
 # locale === "ru"|"en" ? "<user copy>" : "<user copy>"
@@ -44,8 +87,9 @@ PLACEHOLDER_LITERAL = re.compile(r"""\bplaceholder\s*=\s*["']([^"']+)["']""")
 ALT_LITERAL = re.compile(r"""\balt\s*=\s*["']([^"']+)["']""")
 
 # JSX text on one line: >copy< or >copy{expr}
+# Negative lookbehind skips TS arrows (`=> Promise<…>`).
 JSX_TEXT = re.compile(
-    r""">\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)""",
+    r"""(?<!=)>\s*([A-Za-zА-Яа-яЁё©][^<{]{0,80}?)\s*(?:\{|<)""",
 )
 
 # Multiline JSX children: >\n  copy\n</tag>
@@ -74,6 +118,48 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
     {
         "id": "servers.card.unknown-occupancy-dash",
         "path": "site/src/features/servers/components/server-card.tsx",
+        "kind": "unknown-marker",
+        "text": "—",
+    },
+    {
+        "id": "acquire.version-prefix",
+        "path": "site/src/app/acquire/page.tsx",
+        "kind": "jsx-text",
+        "text": "v",
+    },
+    {
+        "id": "market.product-card.version-prefix",
+        "path": "site/src/features/resources/components/product-card.tsx",
+        "kind": "jsx-text",
+        "text": "v",
+    },
+    {
+        "id": "market.reverse-deps.version-prefix",
+        "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
+        "kind": "jsx-text",
+        "text": "v",
+    },
+    {
+        "id": "market.provenance.sha256-label",
+        "path": "site/src/features/resources/components/build-provenance-details.tsx",
+        "kind": "jsx-text",
+        "text": "SHA-256",
+    },
+    {
+        "id": "community.reactions.unknown-count-dash",
+        "path": "site/src/features/community/components/content-reactions.tsx",
+        "kind": "unknown-marker",
+        "text": "—",
+    },
+    {
+        "id": "market.qa.unknown-author-dash",
+        "path": "site/src/features/resources/components/resource-qa-panel.tsx",
+        "kind": "unknown-marker",
+        "text": "—",
+    },
+    {
+        "id": "market.reviews.unknown-rating-dash",
+        "path": "site/src/features/resources/components/resource-review-list.tsx",
         "kind": "unknown-marker",
         "text": "—",
     },
@@ -239,9 +325,11 @@ def inventory(revision: str = "HEAD") -> dict[str, object]:
     return {
         "source_sha": sha,
         "scope": (
-            "Git-tracked public guest surfaces — discover, public servers directory/"
-            "detail, articles, discovery feature (excluding server/ and *-server "
-            "ports), and guest server directory components — hard-coded guest-facing "
+            "Git-tracked public guest surfaces — discover, servers, articles, market, "
+            "community, organizations, users, developers, support, explore, acquire; "
+            "discovery feature; guest server directory components; guest market/"
+            "resource, community feed/discussion, profile, and support UI components "
+            "(excluding feature server/ and *-server ports) — hard-coded guest-facing "
             "literals + locale copy ternaries."
         ),
         "scan_roots": list(SCAN_PATHS),
