@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
-**measured_at:** 17 ноября 2026 (Europe/Moscow).  
-**source_sha:** `e55154d3` (`dev`, после services-domain + lib-http-platform — корни `lib/` / `services/` / `components/` = 0).
+**measured_at:** 18 ноября 2026 (Europe/Moscow).  
+**source_sha:** `de4e020a` (`dev`, после journey-honesty recovery hints + follow session≠guest; корни `lib/` / `components/` = 0).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `e55154d3` |
+| Область                    |             Факт на `de4e020a` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1452 |
+| `site/tests` files         |                           1584 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -51,19 +51,19 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    43 | 148166 |
-| commerce      |    70 | 323371 |
-| community     |   127 | 579068 |
-| discovery     |     7 |  32516 |
-| library       |    86 | 394971 |
-| moderation    |    31 | 152820 |
-| notifications |    21 | 127325 |
-| organizations |    49 | 183699 |
-| resources     |   165 | 714708 |
-| servers       |    82 | 311591 |
+| accounts      |    44 | 148930 |
+| commerce      |    70 | 326593 |
+| community     |   127 | 584185 |
+| discovery     |     7 |  32895 |
+| library       |    86 | 401782 |
+| moderation    |    32 | 152946 |
+| notifications |    21 | 131020 |
+| organizations |    49 | 185690 |
+| resources     |   165 | 722595 |
+| servers       |    82 | 310265 |
 | shell         |    60 |  99104 |
-| support       |    22 | 109606 |
-| trust         |    15 |  57944 |
+| support       |    22 | 108927 |
+| trust         |    15 |  59635 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -218,6 +218,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | T   | services-domain — `lib/services/<domain>/`                 | читаемость service layer         | **done** |
 | T   | lib-http-platform — `lib/http/` + `lib/platform/`          | очистка `lib/` root              | **done** |
 | D/E | Scoreboard sync после http/platform + services domains     | docs honesty                     | **done** |
+| C   | Journey honesty — empty≠fail / session≠guest / recovery    | честность user journey           | **active** |
+| D/E | Scoreboard sync после recovery + follow null-auth          | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
