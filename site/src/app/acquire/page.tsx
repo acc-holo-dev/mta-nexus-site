@@ -10,6 +10,7 @@ import { getResourceActivityCopy } from "../../features/resources/resource-activ
 import { confirmedResourceClaim } from "../../features/resources/resource-commerce-confirmation";
 import { authEntryHref } from "../../features/shell/auth-return";
 import { GuestAuthLinks } from "../../features/shell/guest-auth";
+import { HonestLoadingShell } from "../../features/shell/honest-loading";
 import { useNexusLocale } from "../../features/shell/locale";
 
 interface ProductInfo {
@@ -249,14 +250,19 @@ function AcquireContent() {
 
   if (!product || product.id !== productId) {
     return (
-      <div
-        role="status"
-        aria-live="polite"
-        aria-busy="true"
-        className="mx-auto min-w-0 max-w-2xl overflow-x-clip py-12 text-center text-sm text-muted"
+      <HonestLoadingShell
+        className="mx-auto min-w-0 max-w-2xl space-y-4 overflow-x-clip py-12"
+        headingId="acquire-product-loading-heading"
+        title={copy.title}
+        loadingLabel={copy.loadingProduct}
+        titleClassName="font-display text-primary"
+        statusClassName="text-sm text-muted"
       >
-        {copy.loadingProduct}
-      </div>
+        <div className="animate-pulse space-y-4" aria-hidden="true">
+          <div className="h-28 rounded bg-inset" />
+          <div className="h-12 w-48 rounded bg-inset" />
+        </div>
+      </HonestLoadingShell>
     );
   }
 
@@ -372,14 +378,19 @@ export default function AcquirePage() {
   return (
     <Suspense
       fallback={
-        <div
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-          className="mx-auto min-w-0 max-w-2xl overflow-x-clip py-12 text-center text-sm text-muted"
+        <HonestLoadingShell
+          className="mx-auto min-w-0 max-w-2xl space-y-4 overflow-x-clip py-12"
+          headingId="acquire-session-loading-heading"
+          title={dictionary.checkout.title}
+          loadingLabel={dictionary.checkout.loadingSession}
+          titleClassName="font-display text-primary"
+          statusClassName="text-sm text-muted"
         >
-          {dictionary.checkout.loadingSession}
-        </div>
+          <div className="animate-pulse space-y-4" aria-hidden="true">
+            <div className="h-28 rounded bg-inset" />
+            <div className="h-12 w-48 rounded bg-inset" />
+          </div>
+        </HonestLoadingShell>
       }
     >
       <AcquireContent />

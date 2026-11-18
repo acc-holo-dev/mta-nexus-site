@@ -179,6 +179,8 @@ Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`;
 
 **Slice 50 done:** client loading shells + residual version placeholders — `settings-page-client` and `support-case-thread` loading returns compose `HonestLoadingShell`; author/resource/library requirements form placeholders (`1.1.0` / `1.6.0` / `1.6.0-9.22279.0`) moved into publishing + `resource-requirements-i18n` dictionaries.
 
+**Slice 51 done:** Shell `global-error-copy` port (`globalErrorCopy`, `detectGlobalErrorLocale`) extracted from `app/global-error.tsx` for bilingual honesty without layout/i18n provider; `/acquire` client product/session loading fallbacks compose `HonestLoadingShell`.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -258,6 +260,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 49                                                                                    | docs honesty                     | **done** |
 | T/A | Slice 50 — settings/support client loaders + residual version placeholders                                        | loading honesty + RU/EN          | **done** |
 | D/E | Scoreboard sync после Slice 50                                                                                    | docs honesty                     | **done** |
+| T/A | Slice 51 — Shell `global-error-copy` + acquire HonestLoadingShell fallbacks                                       | читаемость + RU/EN + loading     | **done** |
+| D/E | Scoreboard sync после Slice 51                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

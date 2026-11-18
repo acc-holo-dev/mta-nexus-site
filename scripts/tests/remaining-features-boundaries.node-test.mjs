@@ -116,6 +116,7 @@ const features = [
       "action-confirm-checkbox",
       "theme-preference",
       "home-personal-preference",
+      "global-error-copy",
       "honest-loading",
     ],
     clientUtilPorts: [
@@ -125,6 +126,7 @@ const features = [
       "legal-document",
       "theme-preference",
       "home-personal-preference",
+      "global-error-copy",
       "honest-loading",
       "safe-public-error-reference",
       "home-personal-changes-types",

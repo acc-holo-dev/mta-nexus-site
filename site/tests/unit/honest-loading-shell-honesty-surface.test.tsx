@@ -30,6 +30,7 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/workspace/servers/new/loading.tsx",
     "site/src/app/workspace/platform-reports/loading.tsx",
     "site/src/app/workspace/platform-reports/[id]/loading.tsx",
+    "site/src/app/acquire/page.tsx",
     "site/src/app/loading.tsx",
   ]) {
     const source = read(relative);
