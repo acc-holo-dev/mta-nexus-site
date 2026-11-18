@@ -140,6 +140,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "resource-requirements-query",
     "resource-requirements-i18n",
     "resource-commerce-i18n",
+    "resource-claim-api-copy",
     "resource-release-control-query",
     "build-download-selection",
     "resource-download-sha256",
@@ -322,6 +323,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/resource-requirements-query.ts", "resources-view-isolation"],
     ["features/resources/resource-requirements-i18n.ts", "resources-view-isolation"],
     ["features/resources/resource-commerce-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-claim-api-copy.ts", "resources-view-isolation"],
     ["features/resources/resource-release-control-query.ts", "resources-view-isolation"],
     ["features/resources/build-download-selection.ts", "resources-view-isolation"],
     ["features/resources/resource-download-sha256.ts", "resources-view-isolation"],
@@ -433,6 +435,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/resource-requirements-query.ts",
     "app/resource-requirements-i18n.ts",
     "app/resource-commerce-i18n.ts",
+    "app/resource-claim-api-copy.ts",
     "app/resource-release-control-query.ts",
     "app/build-download-selection.ts",
     "app/resource-download-sha256.ts",
@@ -538,6 +541,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/resource-requirements-query.ts",
     "site/src/features/resources/resource-requirements-i18n.ts",
     "site/src/features/resources/resource-commerce-i18n.ts",
+    "site/src/features/resources/resource-claim-api-copy.ts",
     "site/src/features/resources/resource-release-control-query.ts",
     "site/src/features/resources/build-download-selection.ts",
     "site/src/features/resources/resource-download-sha256.ts",
@@ -723,6 +727,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/resource-requirements-query.ts");
   visit("site/src/features/resources/resource-requirements-i18n.ts");
   visit("site/src/features/resources/resource-commerce-i18n.ts");
+  visit("site/src/features/resources/resource-claim-api-copy.ts");
   visit("site/src/features/resources/resource-release-control-query.ts");
   visit("site/src/features/resources/build-download-selection.ts");
   visit("site/src/features/resources/resource-download-sha256.ts");

@@ -2,9 +2,11 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { claimResourceSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resourceClaimApiCopy } from "../../../../features/resources/resource-claim-api-copy";
 import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -28,6 +30,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = resourceClaimApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const ip = getTrustedRequestIp(request);
@@ -36,7 +39,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many resource claims. Please try again later.",
+          error: copy.rate,
         },
         429,
       );
@@ -45,7 +48,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user || !token) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     requireServerJsonContentType(request);
@@ -56,7 +59,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid resource claim",
+          error: copy.invalidClaim,
           details: parsed.error.format(),
         },
         400,
@@ -87,7 +90,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: appError?.message || "Resource claim failed",
+        error: appError?.message || copy.claimFailed,
       },
       appError?.statusCode || 500,
     );
