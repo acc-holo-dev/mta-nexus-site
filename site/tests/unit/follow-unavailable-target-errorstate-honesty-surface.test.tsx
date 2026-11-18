@@ -13,8 +13,10 @@ const source = readFileSync(
 /** Honesty lock for follow items whose target href is unavailable. */
 it("locks follow unavailable target notice to ErrorState", () => {
   expect(source).toContain('id="follow-unavailable-target"');
+  expect(source).toContain("title={copy.unavailableTarget}");
+  expect(source).toContain("description={copy.unavailableTargetHint}");
   expect(source).toMatch(
-    /item\.href \? \([\s\S]*?\) : \(\s*<ErrorState id="follow-unavailable-target" title=\{copy\.unavailableTarget\} \/>\s*\)/u,
+    /item\.href \? \([\s\S]*?\) : \(\s*<ErrorState[\s\S]*?id="follow-unavailable-target"/u,
   );
   expect(source).not.toContain("<span>{copy.unavailableTarget}</span>");
 });

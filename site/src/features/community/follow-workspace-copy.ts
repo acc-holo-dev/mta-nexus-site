@@ -42,6 +42,8 @@ const en = {
   toCollectionHint:
     "Organizes this resource in a private collection. It does not turn on release-watch notifications.",
   unavailableTarget: "This target is no longer available",
+  unavailableTargetHint:
+    "The follow entry remains. A missing public target is not a failed load of your follows list.",
   removed: "Removed from your follows.",
   remove: "Remove",
   removeConfirmTitle: "Remove save or follow?",
@@ -119,6 +121,8 @@ const ru: Record<keyof typeof en, string> = {
   toCollectionHint:
     "Добавляет ресурс в приватную коллекцию. Это не включает уведомления о новых версиях.",
   unavailableTarget: "Объект больше недоступен",
+  unavailableTargetHint:
+    "Запись подписки сохраняется. Отсутствие публичного объекта — не сбой загрузки списка подписок.",
   removed: "Подписка удалена.",
   remove: "Удалить",
   removeConfirmTitle: "Убрать сохранение или подписку?",

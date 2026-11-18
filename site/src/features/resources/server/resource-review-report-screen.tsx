@@ -132,7 +132,11 @@ export async function ResourceReviewReportScreen({
             <p className="whitespace-pre-wrap break-words text-sm">{report.review.text}</p>
           </article>
         ) : (
-          <ErrorState id="resource-review-report-unavailable" title={copy.unavailable} />
+          <ErrorState
+            id="resource-review-report-unavailable"
+            title={copy.reportReviewUnavailable}
+            description={copy.reportReviewUnavailableHint}
+          />
         )}
         {staff && "moderatorNotes" in report && report.moderatorNotes && (
           <p className="whitespace-pre-wrap text-sm">

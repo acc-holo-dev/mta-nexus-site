@@ -211,6 +211,7 @@ export function FollowWorkspace({
       {error && (
         <ErrorState
           title={error}
+          description={copy.pageErrorHint}
           action={
             <Button
               type="button"
@@ -267,7 +268,11 @@ export function FollowWorkspace({
                       {item.title}
                     </Link>
                   ) : (
-                    <ErrorState id="follow-unavailable-target" title={copy.unavailableTarget} />
+                    <ErrorState
+                      id="follow-unavailable-target"
+                      title={copy.unavailableTarget}
+                      description={copy.unavailableTargetHint}
+                    />
                   )}
                   {item.verified && (
                     <ShieldCheck className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
