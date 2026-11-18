@@ -106,7 +106,9 @@ it("private report previews do not show unavailable review text or staff notes",
   const html = renderToStaticMarkup(
     await ResourceReviewReportScreen({ staff: false, id: "rpt_a" }),
   );
-  expect(html).toContain("Resource unavailable");
+  expect(html).toContain("The reported review is no longer available.");
+  expect(html).toContain("Missing review text is not a failed report load.");
+  expect(html).not.toContain("Resource unavailable");
   expect(html).not.toContain("INTERNAL_STAFF_NOTE");
   expect(html).not.toContain("remove_review");
   expect(mocks.reportDetail).toHaveBeenCalledWith({ actorId: "usr_a", staff: false }, "rpt_a");
