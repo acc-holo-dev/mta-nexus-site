@@ -220,6 +220,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 69 done:** `/api/auth/sessions` GET/DELETE errors use bilingual `authSessionsApiCopy` via `nexus_locale`; JSON shape unchanged.
 
+**Wave 70 done:** `/api/auth/login` errors use bilingual `authLoginApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` passthrough remains English).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -334,8 +336,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 68                                                                                     | docs honesty                     | **done** |
 | A   | Wave 69 — `/api/auth/sessions` errors via authSessionsApiCopy                                                     | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 69                                                                                     | docs honesty                     | **done** |
+| A   | Wave 70 — `/api/auth/login` errors via authLoginApiCopy                                                           | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: auth `login` / `password-reset` / `context` / `register` English residuals. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: auth `password-reset` / `context` / `register` / `email-verification` English residuals. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

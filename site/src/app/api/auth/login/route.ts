@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { loginSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { authLoginApiCopy } from "../../../../features/accounts/auth-login-api-copy";
 import {
   SESSION_COOKIE_NAME,
   sessionCookieOptions,
@@ -10,6 +11,7 @@ import { getTrustedRequestIp } from "../../../../features/shell/request-client-i
 import { SESSION_LIFETIME_SECONDS } from "../../../../features/shell/session-policy";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -32,6 +34,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authLoginApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const ip = getTrustedRequestIp(request);
     const rl = await consumeRateLimit("authLogin", ip);
@@ -45,7 +48,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many login attempts. Please try again in a few minutes.",
+          error: copy.rate,
         },
         429,
       );
@@ -58,7 +61,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid login credentials",
+          error: copy.invalidCredentials,
           details: parsed.error.format(),
         },
         400,
@@ -86,6 +89,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json(context, { error: "Failed to log in" }, 500);
+    return json(context, { error: copy.failed }, 500);
   }
 });

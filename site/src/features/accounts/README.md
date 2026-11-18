@@ -11,6 +11,7 @@
 | `auth-password-api-copy.ts` | util port `auth-password-api-copy` |
 | `auth-session-api-copy.ts` | util port `auth-session-api-copy` |
 | `auth-sessions-api-copy.ts` | util port `auth-sessions-api-copy` |
+| `auth-login-api-copy.ts` | util port `auth-login-api-copy` |
 | `session-revocation.ts` | util port `session-revocation` |
 | `account-recovery-request-policy.ts` | util port `account-recovery-request-policy` |
 | `account-recovery-browser.ts` | util port `account-recovery-browser` |
