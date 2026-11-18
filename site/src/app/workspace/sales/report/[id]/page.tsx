@@ -104,6 +104,7 @@ export default async function SellerSalePage({
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
           action={
             <Link href={returnPath} className={linkClass}>
               {dictionary.errors.retry}

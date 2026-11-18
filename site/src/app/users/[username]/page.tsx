@@ -104,6 +104,7 @@ export default async function UserProfilePage({
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={profileHref}

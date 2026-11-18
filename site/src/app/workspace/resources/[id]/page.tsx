@@ -77,6 +77,7 @@ export default async function ManageResourcePage({
         </Link>
         <ErrorState
           title={publisherCopy.loadUnavailable}
+          description={publisherCopy.loadUnavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

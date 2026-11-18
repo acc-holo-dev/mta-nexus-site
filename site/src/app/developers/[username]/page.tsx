@@ -82,6 +82,7 @@ export default async function DeveloperProfilePage({
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={profilePath} className={actionLinkClass}>
               {dictionary.errors.retry}

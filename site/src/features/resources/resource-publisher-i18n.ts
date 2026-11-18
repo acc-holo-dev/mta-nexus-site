@@ -3,6 +3,8 @@ import type { Locale } from "../../lib/platform/i18n";
 const copy = {
   en: {
     loadUnavailable: "This resource workspace is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this resource workspace only. A temporary load failure is not a missing build or empty readiness state.",
     search: "Resource title or slug",
     filters: "Publisher filters",
     apply: "Apply filters",
@@ -63,6 +65,8 @@ const copy = {
   },
   ru: {
     loadUnavailable: "Кабинет ресурса временно недоступен. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот кабинет ресурса. Временный сбой загрузки — не отсутствие сборки и не пустая готовность.",
     search: "Название или slug ресурса",
     filters: "Фильтры кабинета",
     apply: "Применить",

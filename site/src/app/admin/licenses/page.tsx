@@ -97,6 +97,7 @@ export default async function LicensesModerationPage({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={returnHref}

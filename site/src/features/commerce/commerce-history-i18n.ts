@@ -49,6 +49,8 @@ export const commerceHistoryCopy = {
     emptyLicenses: "No historical licenses for this account.",
     emptyLicensesFiltered: "No licenses match these filters.",
     loadUnavailable: "License history is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this license history only. A temporary load failure is not an empty license archive.",
     licenseNotice:
       "A historical license entry is not a guarantee of active download or server access. Current access is checked separately.",
     resource: "Resource",
@@ -133,6 +135,8 @@ export const commerceHistoryCopy = {
     emptyLicenses: "У этого аккаунта нет сохранённых лицензий.",
     emptyLicensesFiltered: "Нет лицензий с выбранными фильтрами.",
     loadUnavailable: "История лицензий временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту историю лицензий. Временный сбой загрузки — не пустой архив лицензий.",
     licenseNotice:
       "Историческая запись о лицензии не гарантирует доступ к скачиванию или серверу. Актуальные права проверяются отдельно.",
     resource: "Ресурс",

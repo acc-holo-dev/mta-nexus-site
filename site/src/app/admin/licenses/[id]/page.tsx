@@ -59,6 +59,7 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}

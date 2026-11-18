@@ -100,6 +100,7 @@ export default async function PublisherDeliveriesPage({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

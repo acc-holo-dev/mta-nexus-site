@@ -90,6 +90,8 @@ export const community = {
     profileDescription: "Профиль MTA Nexus:",
     loading: "Загрузка профиля…",
     loadUnavailable: "Профиль временно недоступен. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот профиль. Временный сбой загрузки — не пустой профиль и не отсутствие ресурсов.",
     verifiedMember: "Проверенный участник",
     memberFallback: "Участник сообщества MTA и пользователь платформы.",
     joined: "На платформе с",

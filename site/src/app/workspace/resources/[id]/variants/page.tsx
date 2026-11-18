@@ -59,6 +59,7 @@ export default async function ResourceVariantsPage({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

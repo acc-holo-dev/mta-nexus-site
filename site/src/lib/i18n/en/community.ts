@@ -91,6 +91,8 @@ export const community = {
     profileDescription: "MTA Nexus profile of",
     loading: "Loading profile…",
     loadUnavailable: "This profile is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this profile only. A temporary load failure is not an empty profile or missing resources.",
     verifiedMember: "Verified member",
     memberFallback: "MTA community member and platform explorer.",
     joined: "Joined",

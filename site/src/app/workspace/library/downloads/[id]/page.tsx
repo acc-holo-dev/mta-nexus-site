@@ -74,6 +74,7 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={`/workspace/library/downloads/${encodeURIComponent(id)}`}

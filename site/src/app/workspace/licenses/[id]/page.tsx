@@ -64,6 +64,7 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}
