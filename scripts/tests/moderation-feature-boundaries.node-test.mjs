@@ -18,6 +18,7 @@ const utilPorts = [
   "report-batch-contract",
   "community-moderation-contract",
   "reports-api-copy",
+  "platform-reports-api-copy",
 ];
 const clientPorts = ["storage-maintenance"];
 const safeLib =

@@ -20,6 +20,7 @@
 | `report-batch-contract.ts`                                                       | util port `report-batch-contract`                                         |
 | `community-moderation-contract.ts`                                               | util port `community-moderation-contract`                                 |
 | `reports-api-copy.ts`                                                            | util port `reports-api-copy`                                              |
+| `platform-reports-api-copy.ts`                                                   | util port `platform-reports-api-copy`                                     |
 
 Внутренние `components/` не являются публичным API. Границы — dependency-cruiser и
 `scripts/tests/moderation-feature-boundaries.node-test.mjs`.

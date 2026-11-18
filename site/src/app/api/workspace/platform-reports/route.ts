@@ -1,4 +1,6 @@
 import type { NextRequest } from "next/server";
+import { platformReportsApiCopy } from "../../../../features/moderation/platform-reports-api-copy";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -11,13 +13,14 @@ const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = platformReportsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
       return jsonWithRequestId(
         context,
-        { error: "Unauthorized" },
+        { error: copy.unauthorized },
         { status: 401, headers: privateHeaders },
       );
     }
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest) {
     if (!/^[1-9]\d{0,4}$/.test(rawPage)) {
       return jsonWithRequestId(
         context,
-        { error: "Invalid page" },
+        { error: copy.invalidPage },
         { status: 400, headers: privateHeaders },
       );
     }
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
     });
     return jsonWithRequestId(
       context,
-      { error: "Failed to load platform reports" },
+      { error: copy.listFailed },
       { status: 500, headers: privateHeaders },
     );
   }

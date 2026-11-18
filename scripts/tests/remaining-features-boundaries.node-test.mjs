@@ -49,6 +49,7 @@ const features = [
       "report-batch-contract",
       "community-moderation-contract",
       "reports-api-copy",
+      "platform-reports-api-copy",
     ],
     privateClients: [],
     servers: [["reports-server", "platform-reports-screen.tsx"]],
