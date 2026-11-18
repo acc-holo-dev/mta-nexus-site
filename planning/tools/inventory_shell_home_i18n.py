@@ -112,6 +112,11 @@ def _ls_paths(revision: str) -> list[str]:
             path = path.replace("\\", "/")
             if path.endswith((".test.ts", ".test.tsx", ".md")):
                 continue
+            # Server-only shell ports/loaders are not guest UI copy surfaces.
+            if "/features/shell/server/" in f"/{path}":
+                continue
+            if path.endswith(("-server.ts", "-server.tsx")):
+                continue
             if path.endswith((".ts", ".tsx")):
                 paths.append(path)
     return sorted(set(paths))
@@ -125,6 +130,9 @@ def _is_noise_text(text: str) -> bool:
         return True
     # Technical tokens / single glyphs already covered; keep brand dashes.
     if stripped in {"·", "|", "/", "#", "..."}:
+        return True
+    # JSX_TEXT can false-match TS arrow bodies (`> ident.method(`).
+    if "(" in stripped or ")" in stripped or ".charCodeAt" in stripped:
         return True
     return False
 
@@ -228,8 +236,9 @@ def inventory(revision: str = "HEAD") -> dict[str, object]:
     return {
         "source_sha": sha,
         "scope": (
-            "Git-tracked shell feature, home page/panels, root layout metadata, "
-            "and BrandMark — hard-coded guest-facing literals + locale copy ternaries."
+            "Git-tracked shell feature (excluding server/ and *-server ports), "
+            "home page/panels, root layout metadata, and BrandMark — hard-coded "
+            "guest-facing literals + locale copy ternaries."
         ),
         "scan_roots": list(SCAN_PATHS),
         "allowlist": [dict(entry) for entry in ALLOWLIST],
