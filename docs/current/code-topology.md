@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `c711bd7c` (`dev`, Wave 56+57 squash).
+**source_sha:** `5607d9f4` (`dev`, Wave 63 tip + inventory sync).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,18 +31,18 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `c711bd7c` |
+| Область                    |             Факт на `5607d9f4` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
 | `components/` root files   |                              0 |
-| `lib/` tree files          |                            125 |
+| `lib/` tree files          |                            126 |
 | `lib/` root files          |                              0 |
 | `lib/` root dirs           | http, i18n, platform, services |
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1591 |
+| `site/tests` files         |                           1601 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -51,19 +51,19 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    44 | 149315 |
-| commerce      |    70 | 327334 |
-| community     |   127 | 588642 |
+| accounts      |    44 | 149888 |
+| commerce      |    70 | 330120 |
+| community     |   127 | 591755 |
 | discovery     |     7 |  32999 |
-| library       |    86 | 404082 |
-| moderation    |    32 | 153453 |
+| library       |    86 | 409749 |
+| moderation    |    32 | 154689 |
 | notifications |    21 | 131398 |
-| organizations |    49 | 186459 |
-| resources     |   165 | 725710 |
-| servers       |    82 | 310785 |
-| shell         |    66 | 109452 |
-| support       |    22 | 110547 |
-| trust         |    15 |  59971 |
+| organizations |    49 | 187199 |
+| resources     |   165 | 736530 |
+| servers       |    82 | 312901 |
+| shell         |    67 | 111009 |
+| support       |    22 | 110720 |
+| trust         |    15 |  60377 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -208,6 +208,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 63 done:** `/api/search` passes `nexus_locale` into `discoveryService.search`; empty server descriptions use `serverDetail.serverFallback` (same composition as server detail metadata).
 
+**Wave 64 done:** scoreboard honesty — `code-topology.md` counts/features/`source_sha` match tip inventory after Wave 63 (was still stamped Wave 56/57). Topology Wave-class exhausted again pending owner API-envelope or F/ops direction.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -311,9 +313,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 61                                                                                     | docs honesty                     | **done** |
 | D/E | Wave 62 — stale public-guest allowlist purge + design-direction sync                                              | docs / inventory honesty         | **done** |
 | A   | Wave 63 — discovery search serverFallback via nexus_locale                                                        | API RU/EN honesty                | **done** |
-| D/E | Scoreboard sync после Wave 63                                                                                     | docs honesty                     | **done** |
+| D/E | Wave 64 — scoreboard sync (`code-topology.md` ↔ tip inventory)                                                    | docs honesty                     | **done** |
 
-Дальше: topology Wave-класс исчерпан; следующий крупный срез — API envelope localization (по указанию владельца) или F/ops gates. Новые TOPO ID не заводить.
+Дальше: topology Wave-класс **exhausted**. Owner decision: scoped API envelope localization (start `/api/search` error parity with `/api/discover`) или F/ops external gates. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

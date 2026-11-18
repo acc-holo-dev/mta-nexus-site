@@ -1,6 +1,6 @@
 # Design direction — free beta shell 2027
 
-**measured_at:** 16 ноября 2026 (Europe/Moscow).  
+**measured_at:** 18 ноября 2026 (Europe/Moscow).  
 **Baseline artifacts:** `/opt/cursor/artifacts/baseline-home-desktop.png`, `baseline-catalog-desktop.png`, `baseline-home-mobile.png`.  
 **Related:** [`code-topology.md`](code-topology.md), [`UX-CONTRACT.md`](../UX-CONTRACT.md), `@nexus/ui`, `site/src/app/globals.css`.
 
