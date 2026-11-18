@@ -34,16 +34,17 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
 
 it("renders the honest loading a11y chrome without inventing results", () => {
   const html = renderToStaticMarkup(
-    createElement(
-      HonestLoadingShell,
-      {
-        className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
-        headingId: "purchases-loading-heading",
-        title: "Purchases",
-        loadingLabel: "Loading…",
-      },
-      createElement("div", { className: "animate-pulse", "aria-hidden": "true" }, "skeleton"),
-    ),
+    createElement(HonestLoadingShell, {
+      className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+      headingId: "purchases-loading-heading",
+      title: "Purchases",
+      loadingLabel: "Loading…",
+      children: createElement(
+        "div",
+        { className: "animate-pulse", "aria-hidden": "true" },
+        "skeleton",
+      ),
+    }),
   );
   expect(html).toContain('aria-busy="true"');
   expect(html).toContain('aria-labelledby="purchases-loading-heading"');

@@ -23,7 +23,7 @@ export function HonestLoadingShell({
   titleClassName?: string;
   statusClassName?: string;
   leading?: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <section className={className} aria-busy="true" aria-labelledby={headingId}>
