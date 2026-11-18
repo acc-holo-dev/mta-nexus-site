@@ -1,5 +1,7 @@
 import { organizationRepository } from "@nexus/db";
 import type { NextRequest } from "next/server";
+import { serverOrganizationsApiCopy } from "../../../../features/servers/server-organizations-api-copy";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -14,12 +16,15 @@ const privateHeaders = {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = serverOrganizationsApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
     if (!user) {
       return jsonWithRequestId(
         context,
-        { error: "Authentication required" },
+        { error: copy.authenticationRequired },
         { status: 401, headers: privateHeaders },
       );
     }
@@ -36,7 +41,7 @@ export async function GET(request: NextRequest) {
     });
     return jsonWithRequestId(
       context,
-      { error: "Organization options temporarily unavailable" },
+      { error: copy.unavailable },
       { status: 503, headers: privateHeaders },
     );
   }

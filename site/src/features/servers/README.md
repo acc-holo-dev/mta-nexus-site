@@ -57,6 +57,7 @@ repositories и collectors остаются в прежних модулях и 
 | `managed-server-copy.ts`                 | util port `managed-server-copy`                                                                   |
 | `servers-directory-api-copy.ts`          | util port `servers-directory-api-copy`                                                            |
 | `server-claim-api-copy.ts`               | util port `server-claim-api-copy`                                                                 |
+| `server-organizations-api-copy.ts`       | util port `server-organizations-api-copy`                                                         |
 | `server-observation-browser-http.ts`     | util port `server-observation-browser-http`                                                       |
 | `server-statistics-http.ts`              | util port `server-statistics-http`                                                                |
 | `server-statistics-export.ts`            | util port `server-statistics-export`                                                              |

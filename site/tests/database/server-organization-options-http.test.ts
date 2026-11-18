@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { serverOrganizationsApiCopy } from "../../src/features/servers/server-organizations-api-copy";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_actor" } as null | { id: string },
@@ -62,7 +63,7 @@ describe("private server organization options endpoint", () => {
     expect(response.status).toBe(503);
     expectPrivate(response);
     expect(await response.json()).toEqual({
-      error: "Organization options temporarily unavailable",
+      error: serverOrganizationsApiCopy("en").unavailable,
     });
     expect(JSON.stringify(log.mock.calls)).not.toContain("private database detail");
   });
