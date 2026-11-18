@@ -73,7 +73,9 @@ it("locks server-details and publishing form placeholders to locale dictionaries
   expect(publishingForm).toContain("copy.dependenciesPlaceholder");
   expect(publishingForm).not.toContain('placeholder="core-ui, vehicle-pack"');
 
-  const compatibility = read("site/src/features/resources/components/resource-compatibility-form.tsx");
+  const compatibility = read(
+    "site/src/features/resources/components/resource-compatibility-form.tsx",
+  );
   const managementCopy = read("site/src/features/resources/resource-management-i18n.ts");
   expect(managementCopy).toContain("mtaPlaceholder:");
   expect(compatibility).toContain("copy.mtaPlaceholder");
