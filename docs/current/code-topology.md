@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `b5413d53` (`dev`, Wave 65 tip + inventory sync).
+**source_sha:** `4a1f1e5a` (`dev`, Wave 66 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `b5413d53` |
+| Область                    |             Факт на `4a1f1e5a` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1602 |
+| `site/tests` files         |                           1603 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -60,7 +60,7 @@ site/
 | notifications |    21 | 131398 |
 | organizations |    49 | 187199 |
 | resources     |   165 | 736530 |
-| servers       |    82 | 312901 |
+| servers       |    83 | 313559 |
 | shell         |    67 | 111009 |
 | support       |    22 | 110720 |
 | trust         |    15 |  60377 |
@@ -321,6 +321,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 65 — `/api/search` error envelope via discoverySearchApiCopy                                                 | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 65                                                                                     | docs honesty                     | **done** |
 | A   | Wave 66 — `/api/servers/directory` errors via serversDirectoryApiCopy                                             | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 66                                                                                     | docs honesty                     | **done** |
 
 Дальше: API-envelope localization continues. Next reversible tip: auth password/session English (or ad-hoc RU ternary) errors. F/ops remains external. Новые TOPO ID не заводить.
 
