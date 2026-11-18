@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
 }));
-vi.mock("../../../lib/platform/i18n-server", () => ({
+vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 

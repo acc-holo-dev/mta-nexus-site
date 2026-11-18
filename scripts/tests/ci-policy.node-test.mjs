@@ -101,7 +101,7 @@ test("unknown or mixed application paths never claim unit_only", () => {
 test("application changes retain all mandatory fast gates", () => {
   const policy = classifyChanges([
     "apps/web/src/components/resource-download-button.tsx",
-    "apps/web/src/lib/platform/i18n.ts",
+    "apps/web/src/lib/i18n/index.ts",
   ]);
   assert.deepEqual(policy, { code: true, unitOnly: false, full: false });
   assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);

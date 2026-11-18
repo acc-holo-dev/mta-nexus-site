@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, LogIn, type Server, ShieldAlert, Wrench } fr
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { getManagedServerCopy } from "../../servers/managed-server-copy";
 import { authEntryHref, currentBrowserReturnPath } from "../auth-return";

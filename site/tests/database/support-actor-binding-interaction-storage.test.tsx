@@ -24,7 +24,7 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/platform/i18n");
+  const { getDictionary } = await import("../../src/lib/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 vi.mock("../../src/features/support/support-retry", () => ({

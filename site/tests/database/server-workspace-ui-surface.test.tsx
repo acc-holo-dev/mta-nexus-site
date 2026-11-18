@@ -1,7 +1,7 @@
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
@@ -21,7 +21,7 @@ const localeState = vi.hoisted(() => ({
 }));
 
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/platform/i18n");
+  const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: localeState.locale,

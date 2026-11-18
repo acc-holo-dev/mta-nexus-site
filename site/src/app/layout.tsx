@@ -3,8 +3,8 @@ import Script from "next/script";
 import "./globals.css";
 import { PwaServiceWorker } from "../features/shell/pwa-service-worker";
 import { NexusShell } from "../features/shell/shell";
-import { getDictionary } from "../lib/platform/i18n";
-import { getRequestLocale } from "../lib/platform/i18n-server";
+import { getDictionary } from "../lib/i18n";
+import { getRequestLocale } from "../lib/i18n/server";
 import { bodyFont, displayFont } from "./fonts";
 
 export async function generateMetadata(): Promise<Metadata> {

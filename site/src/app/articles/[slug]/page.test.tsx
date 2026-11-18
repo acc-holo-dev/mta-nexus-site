@@ -56,7 +56,7 @@ vi.mock("../../../lib/services/accounts/auth-service", () => ({
     },
   },
 }));
-vi.mock("../../../lib/platform/i18n-server", () => ({
+vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../../features/community/discussion", () => ({

@@ -1,4 +1,4 @@
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { DirectoryFilters, DirectoryResults } from "../../discovery/directory-server";
 import { parseDiscoverQuery } from "../../discovery/discover-query";
 import { discoveryCopy } from "../../discovery/discovery-copy";

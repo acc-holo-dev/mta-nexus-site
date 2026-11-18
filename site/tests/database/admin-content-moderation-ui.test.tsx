@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -13,9 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("../../src/features/shell/locale", async () => {
-  const actual = await vi.importActual<typeof import("../../src/lib/platform/i18n")>(
-    "../../src/lib/platform/i18n",
-  );
+  const actual = await vi.importActual<typeof import("../../src/lib/i18n")>("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: state.locale,

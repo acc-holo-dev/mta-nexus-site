@@ -14,7 +14,7 @@ import {
   requireServerJsonContentType,
 } from "../../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
-import { resolveLocale } from "../../../../../lib/platform/i18n";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,

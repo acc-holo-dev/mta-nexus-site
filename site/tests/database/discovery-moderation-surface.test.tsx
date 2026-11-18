@@ -37,7 +37,7 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({
   can: (actor: { role: string }) => ["moderator", "admin"].includes(actor.role),
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -55,7 +55,7 @@ vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaLiveStatus: () => "unknown",
 }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/platform/i18n");
+  const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: mocks.locale, dictionary: getDictionary(mocks.locale) }),
   };
@@ -71,7 +71,7 @@ import { moderationCopy } from "../../src/features/community/community-moderatio
 import { ContentModerationControls } from "../../src/features/community/content-moderation";
 import { CommunityModerationScreen } from "../../src/features/community/server/community-moderation-screen";
 import { discoveryStreamCopy } from "../../src/features/discovery/discovery-stream-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const time = "2026-10-11T00:00:00.000Z",
   item = {

@@ -1,12 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../lib/platform/i18n";
+import { getDictionary } from "../../lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../../lib/platform/i18n-server", () => ({
+vi.mock("../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("next/navigation", () => ({

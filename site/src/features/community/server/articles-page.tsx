@@ -1,8 +1,8 @@
 import { EmptyState, ErrorState, PageHeader } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
 import { discoveryStreamCopy } from "../../discovery/discovery-stream-copy";
 import { ArticleCard } from "../article-view";

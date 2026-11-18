@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 

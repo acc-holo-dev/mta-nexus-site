@@ -51,7 +51,7 @@ vi.mock("../../../lib/services/commerce/product-service", () => ({
     getPublicAttributions: async () => new Map(),
   },
 }));
-vi.mock("../../../lib/platform/i18n-server", () => ({
+vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
@@ -98,7 +98,7 @@ vi.mock("@nexus/ui", () => ({
   ),
 }));
 
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import Page, { generateMetadata } from "./page";
 
 const params = () => ({ params: Promise.resolve({ username: "creator" }) });

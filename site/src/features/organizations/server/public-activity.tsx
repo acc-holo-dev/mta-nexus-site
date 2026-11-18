@@ -1,4 +1,4 @@
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { PublicProfileActivity } from "../../accounts/public-profile-activity-server";
 import { publicationCopy } from "../../community/publication-feed-copy";
 

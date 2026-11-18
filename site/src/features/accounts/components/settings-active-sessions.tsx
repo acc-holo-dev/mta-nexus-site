@@ -2,7 +2,7 @@
 
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
-import type { getDictionary } from "../../../lib/platform/i18n";
+import type { getDictionary } from "../../../lib/i18n";
 import type { SettingsSession } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];

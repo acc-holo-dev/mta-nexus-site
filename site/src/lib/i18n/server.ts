@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { type Locale, resolveLocale } from "./i18n";
+import { type Locale, resolveLocale } from "./index";
 
 const LOCALE_COOKIE = "nexus_locale";
 

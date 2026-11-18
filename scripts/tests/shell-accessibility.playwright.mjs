@@ -11,7 +11,7 @@ import { waitForReadyCapture } from "../browser-page-ready.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
-const { getDictionary } = await import("../../site/src/lib/platform/i18n.ts");
+const { getDictionary } = await import("../../site/src/lib/i18n/index.ts");
 const { discoveryCopy } = await import("../../site/src/features/discovery/discovery-copy.ts");
 const { notificationInboxCopy } = await import(
   "../../site/src/features/notifications/notification-inbox-copy.ts"

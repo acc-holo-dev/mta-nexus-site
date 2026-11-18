@@ -5,7 +5,7 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   developers: [] as Array<Record<string, unknown>>,
@@ -27,7 +27,7 @@ vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => null,
 }));
 
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 

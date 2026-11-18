@@ -1,6 +1,6 @@
 import { subscriptionsCopy } from "../../../../features/commerce/subscriptions-i18n";
 import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/subscriptions/history.
 export default async function Loading() {

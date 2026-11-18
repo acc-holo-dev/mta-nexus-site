@@ -1,6 +1,6 @@
 import { HonestLoadingShell } from "../../features/shell/honest-loading";
-import { getDictionary } from "../../lib/platform/i18n";
-import { getRequestLocale } from "../../lib/platform/i18n-server";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n/server";
 
 export default async function SettingsLoading() {
   const locale = await getRequestLocale();

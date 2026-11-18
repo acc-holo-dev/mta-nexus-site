@@ -2,7 +2,7 @@ import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { REPORT_TYPES } from "../community-report-contract";

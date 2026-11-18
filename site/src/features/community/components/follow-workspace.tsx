@@ -3,7 +3,7 @@ import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {

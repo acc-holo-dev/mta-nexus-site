@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/watches/history",
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
@@ -22,7 +22,7 @@ vi.mock("../../src/lib/services/resources/resource-release-watches-service", () 
 }));
 
 import Page, { metadata } from "../../src/app/workspace/library/watches/history/page";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>
   renderToStaticMarkup(

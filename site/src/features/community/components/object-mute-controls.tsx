@@ -3,7 +3,7 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import type { FollowTargetType, ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";

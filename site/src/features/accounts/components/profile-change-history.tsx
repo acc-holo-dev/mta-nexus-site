@@ -5,7 +5,7 @@ import {
 } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";

@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/platform/i18n";
+import type { Locale } from "../../lib/i18n";
 import { platformRequest } from "../community/user-platform-client";
 import { organizationGovernanceMutationError } from "./organization-governance-copy";
 import { organizationError } from "./organization-workspace-copy";

@@ -32,7 +32,7 @@ vi.mock("next/script", async () => {
   };
 });
 
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => runtime.locale,
 }));
 
@@ -83,7 +83,7 @@ import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error
 import RootLayout from "../../src/app/layout";
 import NotFound from "../../src/app/not-found";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 function executeThemeScript(
   source: string,

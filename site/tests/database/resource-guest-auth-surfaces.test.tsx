@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { AddResourceToCart } from "../../src/features/resources/components/resource-cart-controls";
 import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/market/resource",

@@ -1,7 +1,7 @@
 import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
 

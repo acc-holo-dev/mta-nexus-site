@@ -9,8 +9,8 @@ import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-re
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";

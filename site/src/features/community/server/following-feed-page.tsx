@@ -1,7 +1,7 @@
 import type { User } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";

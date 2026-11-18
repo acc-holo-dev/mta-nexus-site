@@ -2,8 +2,8 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverContentService } from "../../../lib/services/servers/server-content-service";

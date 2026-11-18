@@ -1,7 +1,7 @@
 import { moderationCopy } from "../../../../../../features/community/community-moderation-copy";
 import { moderatedDiscussionCopy } from "../../../../../../features/community/moderated-discussion-copy";
 import { HonestLoadingShell } from "../../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/i18n/server";
 
 export default async function Loading() {
   const locale = await getRequestLocale();

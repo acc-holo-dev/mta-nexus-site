@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalDocument } from "../../features/shell/legal-document";
-import { getDictionary } from "../../lib/platform/i18n";
-import { getRequestLocale } from "../../lib/platform/i18n-server";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n/server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 

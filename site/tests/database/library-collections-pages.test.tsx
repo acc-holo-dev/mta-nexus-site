@@ -34,7 +34,7 @@ vi.mock("next/link", async () => {
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/library/library-collections-service", () => ({
@@ -69,7 +69,7 @@ vi.mock("../../src/features/resources/download", () => ({
 
 import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
 import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = new Date("2026-10-11T00:00:00Z"),

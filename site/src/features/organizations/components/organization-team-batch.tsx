@@ -6,7 +6,7 @@ import {
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import {
   ActionConfirmCheckbox,

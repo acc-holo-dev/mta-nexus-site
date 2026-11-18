@@ -1,6 +1,6 @@
 import { followCopy } from "../../../features/community/follow-workspace-copy";
 import { HonestLoadingShell } from "../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/saved.
 export default async function Loading() {

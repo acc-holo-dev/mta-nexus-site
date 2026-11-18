@@ -1,6 +1,6 @@
 import { resourceReviewCopy } from "../../../../../features/resources/resource-review-i18n";
 import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 
 // Honest loading shell for /admin/commerce/reviews/[id].
 export default async function Loading() {

@@ -6,8 +6,8 @@ import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { Database, Globe2, HardDrive, Mail, ScanLine, TerminalSquare } from "lucide-react";
 import { notFound } from "next/navigation";
 import packageMetadata from "../../../../package.json";
-import { getDictionary } from "../../lib/platform/i18n";
-import { getRequestLocale } from "../../lib/platform/i18n-server";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 

@@ -3,7 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { supportMessageDiscoveryService } from "../../../lib/services/support/support-message-discovery-service";
 import { PlatformSignIn } from "../../shell/guest-auth";

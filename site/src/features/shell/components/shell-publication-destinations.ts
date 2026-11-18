@@ -1,5 +1,5 @@
 import { Code2, MessageSquare, ShieldAlert, ShieldCheck } from "lucide-react";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { communityReportCopy } from "../../community/community-report-copy";
 import { reactionCopy } from "../../community/content-reaction-copy";
 import { ownDiscussionCopy } from "../../community/discussion-workspace-copy";

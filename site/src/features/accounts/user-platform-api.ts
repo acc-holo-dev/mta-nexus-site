@@ -1,7 +1,7 @@
 import type { User } from "@nexus/domain";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { type Locale, resolveLocale } from "../../lib/platform/i18n";
+import { type Locale, resolveLocale } from "../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,

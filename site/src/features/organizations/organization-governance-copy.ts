@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/platform/i18n";
+import type { Locale } from "../../lib/i18n";
 import { privateChangeHistoryError } from "../accounts/private-change-history-copy";
 import { organizationError } from "./organization-workspace-copy";
 

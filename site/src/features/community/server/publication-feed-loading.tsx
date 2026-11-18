@@ -1,4 +1,4 @@
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { publicationCopy } from "../publication-feed-copy";
 

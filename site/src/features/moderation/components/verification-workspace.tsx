@@ -4,8 +4,8 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import type { Locale } from "../../../lib/platform/i18n";
-import { getDictionary } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import {
   PlatformRequestError,
   platformFieldClass,

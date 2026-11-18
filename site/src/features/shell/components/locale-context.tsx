@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;

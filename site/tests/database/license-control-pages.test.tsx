@@ -26,7 +26,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/commerce/license-control-service", () => ({
@@ -62,7 +62,7 @@ import {
   licenseHistoryMetadata,
 } from "../../src/features/commerce/license-history-server";
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {

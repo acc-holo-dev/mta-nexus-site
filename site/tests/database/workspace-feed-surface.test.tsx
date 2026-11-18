@@ -8,7 +8,7 @@ import {
   publicationPageQuery,
 } from "../../src/features/community/publication-feed-contract";
 import { publicationCopy } from "../../src/features/community/publication-feed-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "ru" | "en",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({

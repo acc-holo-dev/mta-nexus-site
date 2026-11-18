@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   PlatformWorkspaceGuestAuthLinks,
   PlatformWorkspaceSignInCopy,

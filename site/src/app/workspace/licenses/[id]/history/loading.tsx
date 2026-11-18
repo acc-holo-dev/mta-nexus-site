@@ -1,7 +1,7 @@
 import { getCommerceHistoryCopy } from "../../../../../features/commerce/commerce-history-i18n";
 import { getLicenseControlCopy } from "../../../../../features/commerce/license-control-i18n";
 import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/licenses/[id]/history.
 export default async function Loading() {

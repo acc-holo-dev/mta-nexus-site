@@ -9,7 +9,7 @@ import { getResourceCommerceCopy } from "../../src/features/resources/resource-c
 import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
@@ -31,7 +31,7 @@ const localeState = vi.hoisted(() => ({
 }));
 
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/platform/i18n");
+  const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({
       locale: localeState.locale,

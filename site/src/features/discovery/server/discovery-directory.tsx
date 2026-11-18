@@ -5,7 +5,7 @@ import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { cache } from "react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { discoveryService } from "../../../lib/services/discovery/discovery-service";

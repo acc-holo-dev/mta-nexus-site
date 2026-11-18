@@ -2,7 +2,7 @@ import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { communityReportCopy } from "../../src/features/community/community-report-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const harness = vi.hoisted(() => ({ slots: [] as unknown[], cursor: 0 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/guide" }));

@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { getOrganizationCopy } from "../../organizations/organization-workspace-copy";
 import { getManagedServerCopy } from "../../servers/managed-server-copy";

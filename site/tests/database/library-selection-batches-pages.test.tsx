@@ -16,7 +16,7 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/versions",
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -36,7 +36,7 @@ vi.mock("../../src/features/library/components/library-selection-batch-controls"
 
 import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
 import { LibrarySelectionBatchScreen as screen } from "../../src/features/library/selection-batch-server";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };

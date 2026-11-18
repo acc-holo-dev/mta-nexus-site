@@ -1,7 +1,7 @@
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { AccountControls } from "../../accounts/controls";
 import { NotificationBell } from "../../notifications/bell";
 import { LocaleProvider } from "../locale";

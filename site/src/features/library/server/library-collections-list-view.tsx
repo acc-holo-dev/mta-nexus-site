@@ -1,6 +1,6 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";

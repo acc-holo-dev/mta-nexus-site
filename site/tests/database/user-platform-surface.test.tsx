@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
-import { getDictionary, type Locale } from "../../src/lib/platform/i18n";
+import { getDictionary, type Locale } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/community/content-service", () => ({

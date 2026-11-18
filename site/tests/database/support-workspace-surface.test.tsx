@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({ session: vi.fn(), locale: "en" as "ru" | "en" 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -19,7 +19,7 @@ import { SupportCenter } from "../../src/features/support/center";
 import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";
 import { supportWorkspaceCopy } from "../../src/features/support/support-workspace-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,

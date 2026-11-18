@@ -8,7 +8,7 @@ import {
   communityTopicRequest,
   confirmedCommunityTopicPath,
 } from "../../src/features/community/community-topic-submission";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   pathname: "/community",
@@ -43,7 +43,7 @@ vi.mock("../../src/features/shell/locale", () => ({
   }),
 }));
 
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));

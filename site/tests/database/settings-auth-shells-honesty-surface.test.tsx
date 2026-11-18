@@ -11,7 +11,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/navigation", () => ({
@@ -22,7 +22,7 @@ import LoginPage from "../../src/app/auth/login/page";
 import RegisterPage from "../../src/app/auth/register/page";
 import SettingsPage from "../../src/app/settings/page";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "en";

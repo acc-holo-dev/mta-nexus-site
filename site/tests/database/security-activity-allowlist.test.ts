@@ -1,6 +1,6 @@
 import { SECURITY_SUBJECT_ACTIONS } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   isSecurityActivityAction,
   SECURITY_ACTIVITY_ACTIONS,

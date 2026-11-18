@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const sources = vi.hoisted(() => ({
   servers: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("next/link", async () => {
       ReactModule.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => sources.locale,
 }));
 vi.mock("../../src/lib/services/discovery/discovery-service", () => ({

@@ -8,7 +8,7 @@ import {
   verificationTargetsSchema,
 } from "../../../features/trust/verification-workspace-contract";
 import { verificationCopy } from "../../../features/trust/verification-workspace-copy";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 

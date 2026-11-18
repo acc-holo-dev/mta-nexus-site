@@ -1,7 +1,7 @@
 import { getResourceBuildWorkspaceCopy } from "../../../../../../features/resources/resource-build-workspace-i18n";
 import { HonestLoadingShell } from "../../../../../../features/shell/honest-loading";
-import { getDictionary } from "../../../../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../../../../lib/i18n";
+import { getRequestLocale } from "../../../../../../lib/i18n/server";
 
 // Honest loading shell for /admin/resources/[id]/builds/[buildId].
 export default async function Loading() {

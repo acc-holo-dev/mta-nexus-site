@@ -11,8 +11,8 @@ import { ResourceReleaseWatchControl } from "../../../../features/resources/rele
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
 
-import { getDictionary } from "../../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../../lib/i18n";
+import { getRequestLocale } from "../../../../lib/i18n/server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../../lib/services/resources/resource-release-control-service";
 

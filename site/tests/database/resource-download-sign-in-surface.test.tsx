@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { ResourceDownloadError } from "../../src/features/resources/resource-download-client";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],

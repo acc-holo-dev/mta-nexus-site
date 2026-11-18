@@ -1,5 +1,5 @@
 import type { ResourceCopyMetadata } from "@nexus/domain";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { resourceCopyCopy } from "../resource-copy-i18n";
 export function ResourceCopyMetadataView({
   metadata,

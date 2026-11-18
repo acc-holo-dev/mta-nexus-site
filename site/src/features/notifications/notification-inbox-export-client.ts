@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Locale } from "../../lib/platform/i18n";
+import type { Locale } from "../../lib/i18n";
 import {
   INBOX_CATEGORIES,
   INBOX_PERIODS,

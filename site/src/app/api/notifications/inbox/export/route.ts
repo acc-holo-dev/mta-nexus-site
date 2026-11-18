@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
 import { parseNotificationInboxQuery } from "../../../../../features/notifications/notification-inbox-contract";
 import { notificationInboxError } from "../../../../../features/notifications/notification-inbox-copy";
-import { resolveLocale } from "../../../../../lib/platform/i18n";
+import { resolveLocale } from "../../../../../lib/i18n";
 import { notificationInboxService } from "../../../../../lib/services/notifications/notification-inbox-service";
 
 export async function GET(request: NextRequest) {

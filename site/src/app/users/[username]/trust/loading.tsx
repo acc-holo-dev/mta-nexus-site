@@ -1,6 +1,6 @@
 import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
 import { trustCopy } from "../../../../features/trust/public-user-trust-copy";
-import { getRequestLocale } from "../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../lib/i18n/server";
 
 // Honest loading shell for /users/[username]/trust.
 export default async function Loading() {

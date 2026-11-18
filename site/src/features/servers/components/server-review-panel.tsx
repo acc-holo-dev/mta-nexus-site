@@ -3,7 +3,7 @@
 import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";

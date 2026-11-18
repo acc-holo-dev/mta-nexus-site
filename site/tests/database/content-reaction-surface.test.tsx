@@ -5,7 +5,7 @@ import { reactionCopy } from "../../src/features/community/content-reaction-copy
 import { ContentReactions } from "../../src/features/community/reactions";
 import { PublicUserTrustPanel } from "../../src/features/trust/public-user-trust";
 import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -29,7 +29,7 @@ vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
 vi.mock("../../src/lib/services/trust/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 

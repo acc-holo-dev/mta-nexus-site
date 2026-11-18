@@ -2,8 +2,8 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
 import {
   type ContextKind,

@@ -2,7 +2,7 @@ import { PRODUCT_TYPES, type Product } from "@nexus/domain";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
 import { ResourcePreview } from "./resource-preview";

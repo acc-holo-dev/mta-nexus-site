@@ -30,7 +30,7 @@ vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: mocks.attributions },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => "en",
 }));
 
@@ -39,7 +39,7 @@ import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery
 import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
 import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
 import { LocaleProvider } from "../../src/features/shell/locale";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 function resourceProduct() {
   return {

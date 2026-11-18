@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -55,7 +55,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
@@ -356,7 +356,7 @@ describe("workspace live telemetry behavior", () => {
   it.each(["en", "ru"] as const)(
     "renders an honest workspace loading shell with clipped overflow in %s",
     async (locale) => {
-      const { getRequestLocale } = await import("../../src/lib/platform/i18n-server");
+      const { getRequestLocale } = await import("../../src/lib/i18n/server");
       vi.mocked(getRequestLocale).mockResolvedValueOnce(locale);
       const copy = getDictionary(locale).workspace;
       const html = renderToStaticMarkup(await WorkspaceLoading());

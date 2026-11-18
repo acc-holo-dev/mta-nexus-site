@@ -248,9 +248,7 @@ registerHooks({
   },
 });
 
-const { getRequestLocale } = await import(
-  pathToFileURL(resolve(sourceRoot, "lib/platform/i18n-server.ts"))
-);
+const { getRequestLocale } = await import(pathToFileURL(resolve(sourceRoot, "lib/i18n/server.ts")));
 async function render(route, key, request) {
   const [name, parameter, kind] = route;
   const { default: Page, generateMetadata } = await import(

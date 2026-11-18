@@ -73,7 +73,7 @@ vi.mock("../features/servers/client", async () => {
   };
 });
 
-vi.mock("../lib/platform/i18n-server", () => ({
+vi.mock("../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 

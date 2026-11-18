@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/platform/i18n";
+import type { Locale } from "../../lib/i18n";
 import { trustError } from "./public-user-trust-copy";
 
 const en = {

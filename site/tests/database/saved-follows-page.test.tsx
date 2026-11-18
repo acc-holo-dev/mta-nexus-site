@@ -16,7 +16,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.page },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/features/community/follow", () => ({

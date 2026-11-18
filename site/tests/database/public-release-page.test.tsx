@@ -59,7 +59,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: state.checkRight },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/features/resources/components/resource-download-button", async () => {
@@ -88,7 +88,7 @@ vi.mock("../../src/features/resources/components/resource-download-button", asyn
 
 import ReleasePage, { metadata } from "../../src/app/market/[slug]/versions/page";
 import { getReleaseHistoryCopy } from "../../src/features/resources/public-release-history";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const release = {
   id: "bld_clean_1",

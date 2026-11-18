@@ -248,21 +248,9 @@ def apply(moves: list[tuple[Path, Path, str]], dry_run: bool) -> int:
             continue
         text = path.read_text()
         new = rewrite_text(text, stem_to_layer)
-        # special: from "…/lib/i18n" barrel only (not i18n/en)
-        new2 = re.sub(
-            r"""(["'])((?:(?:\.\./)+|\./)?(?:(?:src/)?lib/))i18n\1""",
-            lambda m: f"{m.group(1)}{m.group(2)}platform/i18n{m.group(1)}"
-            if "platform/i18n" not in m.group(0)
-            else m.group(0),
-            new,
-        )
-        new2 = re.sub(
-            r"""(["'])(site/src/lib/)i18n(\.[a-z]+)?\1""",
-            lambda m: f"{m.group(1)}{m.group(2)}platform/i18n{m.group(3) or ''}{m.group(1)}",
-            new2,
-        )
-        if new2 != text:
-            path.write_text(new2)
+        # lib/i18n stays at lib/i18n (Slice 55); do not rewrite the barrel into platform/
+        if new != text:
+            path.write_text(new)
             changed += 1
             print(f"rewrote {rel}")
     print(f"files_rewritten={changed}")

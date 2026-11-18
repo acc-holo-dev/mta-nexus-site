@@ -31,7 +31,7 @@ vi.mock("../../src/lib/services/community/discussion-workspace-service", () => (
 vi.mock("../../src/lib/services/trust/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
@@ -42,7 +42,7 @@ import HistoryPage, {
 import DetailPage from "../../src/app/workspace/discussions/[id]/page";
 import DiscussionsLoading from "../../src/app/workspace/discussions/loading";
 import OwnPage, { generateMetadata } from "../../src/app/workspace/discussions/page";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const item = {
     id: "comment",

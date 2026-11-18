@@ -1,6 +1,6 @@
 import { getOrganizationCopy } from "../../../features/organizations/organization-workspace-copy";
 import { HonestLoadingShell } from "../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/organizations.
 export default async function Loading() {

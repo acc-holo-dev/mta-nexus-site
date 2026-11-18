@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSessionError } from "../../shell/session-error";
 import { CommunityTopicForm } from "../topic-form";

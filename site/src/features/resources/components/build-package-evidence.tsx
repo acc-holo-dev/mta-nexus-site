@@ -4,7 +4,7 @@ import {
   buildPackageSummary,
 } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
-import { getDictionary } from "../../../lib/platform/i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 

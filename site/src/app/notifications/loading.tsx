@@ -1,6 +1,6 @@
 import { notificationInboxCopy } from "../../features/notifications/notification-inbox-copy";
 import { HonestLoadingShell } from "../../features/shell/honest-loading";
-import { getRequestLocale } from "../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../lib/i18n/server";
 
 // Honest loading shell for /notifications.
 export default async function NotificationInboxLoading() {

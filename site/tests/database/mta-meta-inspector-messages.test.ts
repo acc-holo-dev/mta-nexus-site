@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getMtaMetaInspectorIssueMessage } from "../../src/features/resources/mta-meta-inspector-messages";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 describe("localized MTA manifest diagnostics", () => {
   it("uses Russian and English messages for every parser diagnostic", () => {

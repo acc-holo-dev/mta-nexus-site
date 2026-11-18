@@ -1,6 +1,6 @@
 import { getManagedServerCopy } from "../../../features/servers/managed-server-view";
 import { HonestLoadingShell } from "../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/servers.
 export default async function Loading() {

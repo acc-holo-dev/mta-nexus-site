@@ -1,5 +1,5 @@
 import type { ResourceCartReviewItem } from "@nexus/domain";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 export function ResourceCartReviewEvidence({
   item,

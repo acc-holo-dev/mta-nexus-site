@@ -1,6 +1,6 @@
 import { organizationTeamCopy } from "../../../../../features/organizations/organization-team-copy";
 import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 
 export default async function Loading() {
   const copy = organizationTeamCopy(await getRequestLocale());

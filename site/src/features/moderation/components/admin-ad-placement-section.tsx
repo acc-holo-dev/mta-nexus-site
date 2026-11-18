@@ -1,6 +1,6 @@
 import type { AdSlotPlan } from "@nexus/domain";
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
 
 /**

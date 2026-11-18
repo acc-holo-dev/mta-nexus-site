@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { parsePublicationQuery } from "../../../../../features/community/publication-feed-contract";
 import { publicationError } from "../../../../../features/community/publication-feed-copy";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
-import { resolveLocale } from "../../../../../lib/platform/i18n";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,

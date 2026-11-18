@@ -18,7 +18,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -36,7 +36,7 @@ import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../../src/app/users/[username]/activity/page";
 import { publicationCopy } from "../../src/features/community/publication-feed-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const saved = {
   id: "actor",

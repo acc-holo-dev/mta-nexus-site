@@ -7,7 +7,7 @@ import {
   HomePersonalChangesPanel,
   type HomePersonalCopy,
 } from "../../src/features/shell/home-personal";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("@nexus/ui", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@nexus/ui")>();

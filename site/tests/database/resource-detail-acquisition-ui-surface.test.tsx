@@ -23,7 +23,7 @@ vi.mock("@nexus/db", () => ({
 import "../helpers/resource-detail-acquisition-ui-harness";
 import ProductDetailPage from "../../src/app/market/[slug]/page";
 import { licenseModelLabel } from "../../src/features/commerce/license-model-i18n";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   build,
   product,

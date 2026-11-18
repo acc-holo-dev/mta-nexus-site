@@ -1,4 +1,4 @@
-import type { Locale } from "../../lib/platform/i18n";
+import type { Locale } from "../../lib/i18n";
 import { confirmedCommentId } from "./content-comment-confirmation";
 import { discussionError } from "./content-discussion-copy";
 

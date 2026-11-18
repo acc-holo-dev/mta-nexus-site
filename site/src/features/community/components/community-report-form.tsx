@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";

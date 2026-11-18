@@ -13,7 +13,7 @@ import {
   communityReportMutationError,
 } from "../../src/features/community/community-report-copy";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const report = {
   targetType: "comment",

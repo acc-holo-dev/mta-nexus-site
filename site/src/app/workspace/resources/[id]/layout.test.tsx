@@ -10,7 +10,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
-vi.mock("../../../../lib/platform/i18n-server", () => ({
+vi.mock("../../../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../../../features/resources/publisher-navigation", () => ({

@@ -1,6 +1,6 @@
 import { communityReportCopy } from "../../../features/community/community-report-copy";
 import { HonestLoadingShell } from "../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 // Honest loading shell for /admin/reports.
 export default async function Loading() {

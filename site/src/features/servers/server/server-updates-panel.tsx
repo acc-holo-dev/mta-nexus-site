@@ -2,7 +2,7 @@ import type { Content } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { ArticleCard } from "../../community/article-view";
 import { publicationCopy } from "../../community/publication-feed-copy";
 

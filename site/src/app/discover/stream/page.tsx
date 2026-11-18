@@ -13,8 +13,8 @@ import {
   discoveryStreamCopy,
   discoveryStreamError,
 } from "../../../features/discovery/discovery-stream-copy";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
 export const dynamic = "force-dynamic";
 const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
 const actionLinkClass =

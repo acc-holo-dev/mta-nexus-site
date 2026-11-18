@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 

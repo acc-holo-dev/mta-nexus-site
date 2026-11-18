@@ -10,7 +10,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -36,7 +36,7 @@ import EditPage, {
 } from "../../src/app/workspace/content/[id]/page";
 import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
 import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();

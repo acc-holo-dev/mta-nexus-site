@@ -1,7 +1,7 @@
 import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import type { Locale } from "../../../lib/platform/i18n";
+import type { Locale } from "../../../lib/i18n";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,

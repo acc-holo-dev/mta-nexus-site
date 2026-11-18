@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/platform/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -26,7 +26,7 @@ vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
 import PurchaseDetailLoading from "../../src/app/workspace/purchases/[id]/loading";
 import Page from "../../src/app/workspace/purchases/[id]/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const input = {
   params: Promise.resolve({ id: "ord_a" }),

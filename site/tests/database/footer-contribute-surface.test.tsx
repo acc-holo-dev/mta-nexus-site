@@ -4,7 +4,7 @@ import { expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
 import { FooterContribute } from "../../src/features/shell/footer";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 it.each(["en", "ru"] as const)(
   "hides workspace contribute links until the session is known in %s",

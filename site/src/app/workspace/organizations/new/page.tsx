@@ -4,7 +4,7 @@ import { getOrganizationCopy } from "../../../../features/organizations/organiza
 import { OrganizationProfileForm } from "../../../../features/organizations/profile";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
-import { getRequestLocale } from "../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../lib/i18n/server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-5 overflow-x-clip py-8";

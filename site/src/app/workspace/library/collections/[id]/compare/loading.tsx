@@ -1,6 +1,6 @@
 import { libraryCollectionComparisonCopy } from "../../../../../../features/library/library-collection-comparison-i18n";
 import { HonestLoadingShell } from "../../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/library/collections/[id]/compare.
 export default async function Loading() {

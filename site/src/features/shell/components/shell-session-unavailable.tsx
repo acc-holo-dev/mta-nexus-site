@@ -2,7 +2,7 @@
 
 import { Button } from "@nexus/ui";
 import { RefreshCw } from "lucide-react";
-import { getDictionary, type Locale } from "../../../lib/platform/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 
 /** A failed probe never claims that the visitor has signed out. */
 export function ShellSessionUnavailable({

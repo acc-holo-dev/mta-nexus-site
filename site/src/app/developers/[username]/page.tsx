@@ -15,8 +15,8 @@ import { buildFollowInitialState } from "../../../features/community/follow-init
 import { publicationCopy } from "../../../features/community/publication-feed-copy";
 import { ProductCard } from "../../../features/resources/view";
 import { trustCopy } from "../../../features/trust/public-user-trust-copy";
-import { getDictionary } from "../../../lib/platform/i18n";
-import { getRequestCookieStore, getRequestLocale } from "../../../lib/platform/i18n-server";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";

@@ -1,7 +1,7 @@
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
-import type { getDictionary, Locale } from "../../../lib/platform/i18n";
+import type { getDictionary, Locale } from "../../../lib/i18n";
 import { orderCaseCopy } from "../../commerce/order-case-i18n";
 import { communityReportCopy } from "../../community/community-report-copy";
 import { ReportEvidenceLinks } from "../../community/report-evidence-links";

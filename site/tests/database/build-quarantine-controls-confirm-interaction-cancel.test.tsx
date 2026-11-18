@@ -18,7 +18,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
 vi.mock("../../src/features/shell/locale", async () => {
-  const { getDictionary } = await import("../../src/lib/platform/i18n");
+  const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
   };
@@ -26,7 +26,7 @@ vi.mock("../../src/features/shell/locale", async () => {
 
 import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
 import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
-import { getDictionary } from "../../src/lib/platform/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const { render, actionButton } = createBuildQuarantineControlsConfirmInteractionHelpers(
   harness,

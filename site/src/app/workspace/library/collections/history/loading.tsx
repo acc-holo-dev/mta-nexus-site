@@ -1,6 +1,6 @@
 import { libraryCollectionHistoryCopy } from "../../../../../features/library/library-collection-history-i18n";
 import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
-import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 
 // Honest loading shell for /workspace/library/collections/history.
 export default async function Loading() {
