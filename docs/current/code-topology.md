@@ -214,6 +214,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 66 done:** `/api/servers/directory` 400/503 errors use bilingual `serversDirectoryApiCopy` via `nexus_locale`; JSON shape unchanged (`error` / `details` / `Retry-After`).
 
+**Wave 67 done:** `/api/auth/password` errors use bilingual `authPasswordApiCopy` via `nexus_locale` (replaces ad-hoc RU ternary for ACCOUNT_CHANGED); JSON shape unchanged.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -322,8 +324,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 65                                                                                     | docs honesty                     | **done** |
 | A   | Wave 66 — `/api/servers/directory` errors via serversDirectoryApiCopy                                             | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 66                                                                                     | docs honesty                     | **done** |
+| A   | Wave 67 — `/api/auth/password` errors via authPasswordApiCopy                                                     | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next reversible tip: auth password/session English (or ad-hoc RU ternary) errors. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: other auth routes (`session` / `sessions` / `login` / `password-reset`) English residuals. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

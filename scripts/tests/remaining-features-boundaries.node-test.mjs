@@ -81,6 +81,7 @@ const features = [
       "settings-client-api",
       "feature-flags",
       "profile-privacy-copy",
+      "auth-password-api-copy",
       "session-revocation",
       "account-recovery-request-policy",
       "account-recovery-browser",
