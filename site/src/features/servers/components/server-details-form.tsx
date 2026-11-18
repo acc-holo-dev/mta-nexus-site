@@ -381,7 +381,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.websiteUrl}
             defaultValue={displayServer.websiteUrl || ""}
-            placeholder="https://..."
+            placeholder={copy.websiteUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -391,7 +391,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.discordUrl}
             defaultValue={displayServer.discordUrl || ""}
-            placeholder="https://discord.gg/..."
+            placeholder={copy.discordUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -401,7 +401,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.rulesUrl}
             defaultValue={displayServer.rulesUrl || ""}
-            placeholder="https://..."
+            placeholder={copy.rulesUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -431,7 +431,7 @@ export function ServerDetailsForm({
               label={copy.gameplayTags}
               maxLength={500}
               defaultValue={(displayServer.gameplayTags || []).join(", ")}
-              placeholder="roleplay, economy, freeroam"
+              placeholder={copy.gameplayTagsPlaceholder}
               disabled={loading}
               pending={loading}
             />
@@ -450,7 +450,7 @@ export function ServerDetailsForm({
                 maxLength={4007}
                 defaultValue={(displayServer.mediaUrls || []).join("\n")}
                 rows={3}
-                placeholder="https://..."
+                placeholder={copy.mediaUrlsPlaceholder}
                 disabled={loading}
                 aria-describedby={control.describedBy}
                 className={fieldControlClass({

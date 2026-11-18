@@ -1,0 +1,137 @@
+{
+  "allowlist": [
+    {
+      "id": "workspace.home.unknown-metric-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/app/workspace/page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "workspace.library.reviews.unknown-rating-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/app/workspace/library/reviews/page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "admin.storage.object.unknown-field-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.review-controls.unknown-rating-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/components/resource-review-controls.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.compatibility.unknown-value-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/components/resource-compatibility-form.tsx",
+      "text": "—"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "admin.storage.object.unknown-field-dash",
+      "kind": "unknown-marker",
+      "line": 94,
+      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "admin.storage.object.unknown-field-dash",
+      "kind": "unknown-marker",
+      "line": 95,
+      "path": "site/src/app/admin/storage/objects/[id]/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "workspace.library.reviews.unknown-rating-dash",
+      "kind": "unknown-marker",
+      "line": 106,
+      "path": "site/src/app/workspace/library/reviews/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "workspace.home.unknown-metric-dash",
+      "kind": "unknown-marker",
+      "line": 144,
+      "path": "site/src/app/workspace/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "workspace.home.unknown-metric-dash",
+      "kind": "unknown-marker",
+      "line": 151,
+      "path": "site/src/app/workspace/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "workspace.home.unknown-metric-dash",
+      "kind": "unknown-marker",
+      "line": 164,
+      "path": "site/src/app/workspace/page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.compatibility.unknown-value-dash",
+      "kind": "unknown-marker",
+      "line": 246,
+      "path": "site/src/features/resources/components/resource-compatibility-form.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.review-controls.unknown-rating-dash",
+      "kind": "unknown-marker",
+      "line": 237,
+      "path": "site/src/features/resources/components/resource-review-controls.tsx",
+      "text": "—"
+    }
+  ],
+  "scan_roots": [
+    "site/src/app/workspace",
+    "site/src/app/admin",
+    "site/src/app/settings",
+    "site/src/app/auth",
+    "site/src/app/security",
+    "site/src/features/library/components",
+    "site/src/features/commerce/components",
+    "site/src/features/moderation/components",
+    "site/src/features/organizations/components",
+    "site/src/features/notifications/components",
+    "site/src/features/accounts/components",
+    "site/src/features/community/components/author-content-form.tsx",
+    "site/src/features/community/components/author-publication-restore.tsx",
+    "site/src/features/community/components/follow-workspace.tsx",
+    "site/src/features/community/components/own-discussion-detail.tsx",
+    "site/src/features/community/components/community-report-detail.tsx",
+    "site/src/features/community/components/community-report-form.tsx",
+    "site/src/features/community/components/community-report-list.tsx",
+    "site/src/features/community/components/discussion-report-batch.tsx",
+    "site/src/features/community/components/content-moderation-controls.tsx",
+    "site/src/features/community/components/moderated-discussion-removal.tsx",
+    "site/src/features/community/components/reaction-removal.tsx",
+    "site/src/features/servers/components/server-details-form.tsx",
+    "site/src/features/servers/components/register-server-form.tsx",
+    "site/src/features/servers/components/managed-server-visibility-batch.tsx",
+    "site/src/features/resources/components/resource-lifecycle-controls.tsx",
+    "site/src/features/resources/components/resource-copy-form.tsx",
+    "site/src/features/resources/components/resource-review-controls.tsx",
+    "site/src/features/resources/components/new-resource-form.tsx",
+    "site/src/features/resources/components/resource-build-controls.tsx",
+    "site/src/features/resources/components/resource-compatibility-form.tsx",
+    "site/src/features/resources/components/build-quarantine-controls.tsx",
+    "site/src/features/resources/components/build-moderation-controls.tsx",
+    "site/src/features/resources/components/resource-media-editor.tsx"
+  ],
+  "scope": "Git-tracked member/workspace surfaces — workspace, admin, settings, auth, security app trees; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms (excluding feature server/ and *-server ports) — hard-coded member-facing literals + locale copy ternaries.",
+  "source_sha": "f1ec47e38ccb32db142ba0f8f065b863d48a479f",
+  "summary": {
+    "allowlisted": 8,
+    "findings": 8,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 411,
+    "unallowlisted": 0
+  }
+}

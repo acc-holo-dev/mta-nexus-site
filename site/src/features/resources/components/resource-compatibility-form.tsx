@@ -201,7 +201,7 @@ export function ResourceCompatibilityForm({
             maxLength={64}
             disabled={busy}
             readOnly={product.suspended}
-            placeholder="1.6.0"
+            placeholder={copy.mtaPlaceholder}
             onChange={(event) => {
               setMta(event.target.value);
               setDirty(true);

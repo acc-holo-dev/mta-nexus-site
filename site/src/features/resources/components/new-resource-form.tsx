@@ -526,7 +526,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               name="dependencies"
               label={copy.dependencies}
               maxLength={1000}
-              placeholder="core-ui, vehicle-pack"
+              placeholder={copy.dependenciesPlaceholder}
               readOnly={Boolean(createdProduct || intent)}
             />
           </div>

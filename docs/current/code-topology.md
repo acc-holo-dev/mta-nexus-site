@@ -170,6 +170,11 @@ Scope: `app/discover`, `app/servers` (публичный каталог/карт
 
 **Slice 47 done:** residual honest loading absorb — ~101 remaining manual `aria-busy` `app/**/loading.tsx` (admin moderation/support/storage, workspace content/library/orgs/servers, global `app/loading.tsx`) migrated onto `HonestLoadingShell`; optional `description` slot for registration chrome (`workspace/servers/new`); re-export / feed / specialized feature loaders left as thin wrappers.
 
+**Slice 48 done:** workspace-member hard-coded string inventory (A/B) — [`planning/workspace-member-hardcoded-strings.json`](../../planning/workspace-member-hardcoded-strings.json).  
+Регенерация: `python3 planning/tools/inventory_workspace_member_i18n.py --output planning/workspace-member-hardcoded-strings.json`  
+Проверка: `python3 planning/tools/inventory_workspace_member_i18n.py --check planning/workspace-member-hardcoded-strings.json`  
+Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms. Moved remaining form placeholder literals into EN/RU dictionaries (`serverRegistration` / `serverManagement` / `publishing` / `resource-management-i18n`). Unknown-marker `—` allowlisted; `unallowlisted: 0`.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -243,6 +248,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | T   | Slice 46 — Shell `HonestLoadingShell` + large `loading.tsx` absorb                                                | читаемость + loading honesty     | **done** |
 | T   | Slice 47 — residual admin/workspace/global `loading.tsx` → `HonestLoadingShell`                                   | читаемость + loading honesty     | **done** |
 | D/E | Scoreboard sync после Slice 47                                                                                    | docs honesty                     | **done** |
+| A/B | Slice 48 — workspace-member i18n inventory + form placeholder dictionary move                                     | честность RU/EN                  | **done** |
+| D/E | Scoreboard sync после Slice 48                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

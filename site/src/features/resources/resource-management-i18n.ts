@@ -38,6 +38,7 @@ const copy = {
     actionFailedDescription:
       "The result could not be confirmed. Check the saved state before retrying.",
     mta: "Minimum MTA version",
+    mtaPlaceholder: "1.6.0",
     dependencies: "Dependency resource slugs",
     dependencyHint:
       "One slug per line, up to 25. Missing or private dependencies remain unresolved; this setting never grants access to their files.",
@@ -120,6 +121,7 @@ const copy = {
     actionFailedDescription:
       "Результат не подтверждён. Проверьте сохранённое состояние перед повторной попыткой.",
     mta: "Минимальная версия MTA",
+    mtaPlaceholder: "1.6.0",
     dependencies: "Slug зависимых ресурсов",
     dependencyHint:
       "Один slug на строку, не более 25. Недоступные и приватные зависимости остаются неразрешёнными; эта настройка не предоставляет доступ к их файлам.",

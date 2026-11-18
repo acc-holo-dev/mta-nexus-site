@@ -359,7 +359,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="websiteUrl"
           type="url"
           label={copy.websiteUrl}
-          placeholder="https://..."
+          placeholder={copy.websiteUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -369,7 +369,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="discordUrl"
           type="url"
           label={copy.discordUrl}
-          placeholder="https://discord.gg/..."
+          placeholder={copy.discordUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -379,7 +379,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="rulesUrl"
           type="url"
           label={copy.rulesUrl}
-          placeholder="https://..."
+          placeholder={copy.rulesUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -410,7 +410,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             name="gameplayTags"
             label={copy.gameplayTags}
             maxLength={500}
-            placeholder="roleplay, economy, freeroam"
+            placeholder={copy.gameplayTagsPlaceholder}
             disabled={loading}
             readOnly={!!pending}
           />
@@ -425,7 +425,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             name="mediaUrls"
             rows={3}
             maxLength={3000}
-            placeholder="https://..."
+            placeholder={copy.mediaUrlsPlaceholder}
             disabled={loading}
             readOnly={!!pending}
             className={fieldControlClass({
