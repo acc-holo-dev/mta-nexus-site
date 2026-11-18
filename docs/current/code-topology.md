@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `4de9d209` (`dev`, Wave 78 tip).
+**source_sha:** `4a74ff40` (`dev`, Wave 79 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `4de9d209` |
+| Область                    |             Факт на `4a74ff40` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1627 |
+| `site/tests` files         |                           1629 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -56,7 +56,7 @@ site/
 | community     |   127 | 591755 |
 | discovery     |     8 |  33815 |
 | library       |    86 | 409749 |
-| moderation    |    33 | 156335 |
+| moderation    |    34 | 157176 |
 | notifications |    21 | 131398 |
 | organizations |    49 | 187199 |
 | resources     |   167 | 738584 |
@@ -373,6 +373,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 78 — `/api/resources/inspect-meta` errors via resourceInspectMetaApiCopy                                     | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 78                                                                                     | docs honesty                     | **done** |
 | A   | Wave 79 — workspace platform-reports (+ detail) errors via platformReportsApiCopy                                 | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 79                                                                                     | docs honesty                     | **done** |
 
 Дальше: API-envelope localization continues. Next: claim-challenge success `instruction`, inspect-meta success `note`, or `/api/workspace/server-organizations`. F/ops remains external. Новые TOPO ID не заводить.
 
