@@ -232,7 +232,7 @@ describe("server detail review load honesty", () => {
       await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
     );
     expect(html).toContain(
-      "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+      "&quot;authenticated&quot;:null,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
     );
     expect(html).not.toContain("PRIVATE_SESSION");
     expect(html).toContain('data-report-auth="null"');
