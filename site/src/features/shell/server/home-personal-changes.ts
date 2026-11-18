@@ -6,8 +6,6 @@ import { followWorkspaceService } from "../../../lib/services/community/follow-w
 import { formatNotificationInboxPage } from "../../../lib/services/notifications/notification-inbox-service";
 import type { PersonalChangeReason, PersonalChangesSummary } from "../home-personal-changes-types";
 
-export type { PersonalChangesSummary } from "../home-personal-changes-types";
-
 const LIMIT = 12;
 
 function safeInternalHref(value: string | null | undefined): string | null {
