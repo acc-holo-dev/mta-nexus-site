@@ -12,6 +12,7 @@ export function resourceRequirementsCopy(locale: string) {
         libraryPreview:
           "Предварительная проверка указанного выпуска. Выбор версии не меняется. Для зависимостей используются ваши текущие настройки, а декларации каталога относятся к текущему состоянию ресурса. Вернитесь к сравнению для подтверждения выбора; скачивание доступно после отдельной проверки прав.",
         target: "Версия MTA сервера",
+        targetPlaceholder: "1.6.0-9.22279.0",
         check: "Проверить",
         build: "Сборка",
         snapshot: "Снимок проверки",
@@ -69,6 +70,7 @@ export function resourceRequirementsCopy(locale: string) {
         libraryPreview:
           "Preview of the specified release. Your version choice is unchanged. Dependencies use your current preferences, and catalog declarations describe the resource's current state. Return to comparison to confirm your choice; downloads require a separate access check.",
         target: "Server MTA version",
+        targetPlaceholder: "1.6.0-9.22279.0",
         check: "Check",
         build: "Build",
         snapshot: "Check snapshot",

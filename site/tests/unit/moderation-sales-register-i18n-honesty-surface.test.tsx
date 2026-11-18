@@ -70,8 +70,16 @@ it("locks server-details and publishing form placeholders to locale dictionaries
   const publishingForm = read("site/src/features/resources/components/new-resource-form.tsx");
   const publishing = read("site/src/lib/i18n/en/publishing.ts");
   expect(publishing).toContain("dependenciesPlaceholder:");
+  expect(publishing).toContain("versionPlaceholder:");
+  expect(publishing).toContain("minMtaVersionPlaceholder:");
   expect(publishingForm).toContain("copy.dependenciesPlaceholder");
   expect(publishingForm).not.toContain('placeholder="core-ui, vehicle-pack"');
+
+  const authorForms = read("site/src/features/resources/components/author-resource-forms.tsx");
+  expect(authorForms).toContain("publishing.versionPlaceholder");
+  expect(authorForms).toContain("publishing.minMtaVersionPlaceholder");
+  expect(authorForms).not.toContain('placeholder="1.1.0"');
+  expect(authorForms).not.toContain('placeholder="1.6.0"');
 
   const compatibility = read(
     "site/src/features/resources/components/resource-compatibility-form.tsx",
@@ -80,4 +88,17 @@ it("locks server-details and publishing form placeholders to locale dictionaries
   expect(managementCopy).toContain("mtaPlaceholder:");
   expect(compatibility).toContain("copy.mtaPlaceholder");
   expect(compatibility).not.toContain('placeholder="1.6.0"');
+
+  const requirementsCopy = read("site/src/features/resources/resource-requirements-i18n.ts");
+  const resourceRequirements = read(
+    "site/src/features/resources/server/resource-requirements-screen.tsx",
+  );
+  const collectionRequirements = read(
+    "site/src/features/library/server/collection-requirements-screen.tsx",
+  );
+  expect(requirementsCopy).toContain("targetPlaceholder:");
+  expect(resourceRequirements).toContain("copy.targetPlaceholder");
+  expect(collectionRequirements).toContain("copy.targetPlaceholder");
+  expect(resourceRequirements).not.toContain('placeholder="1.6.0-9.22279.0"');
+  expect(collectionRequirements).not.toContain('placeholder="1.6.0-9.22279.0"');
 });

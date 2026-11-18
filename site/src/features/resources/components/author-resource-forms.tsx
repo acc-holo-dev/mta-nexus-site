@@ -526,7 +526,7 @@ export function AuthorResourceForms({
             }}
             required
             maxLength={64}
-            placeholder="1.1.0"
+            placeholder={publishing.versionPlaceholder}
             pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
           />
           <Input
@@ -539,7 +539,7 @@ export function AuthorResourceForms({
               setSubmitted(false);
             }}
             maxLength={64}
-            placeholder="1.6.0"
+            placeholder={publishing.minMtaVersionPlaceholder}
           />
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-release-notes`} className={nativeLabelClass}>

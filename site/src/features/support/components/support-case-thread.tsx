@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
@@ -293,26 +294,20 @@ export function SupportCaseThread({
 
   if (loading) {
     return (
-      <section
+      <HonestLoadingShell
         className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
-        aria-busy="true"
-        aria-labelledby="support-case-thread-loading-heading"
+        headingId="support-case-thread-loading-heading"
+        title={copy.title}
+        loadingLabel={copy.caseLoading}
+        headerClassName="space-y-2 border-b border-base pb-5"
       >
-        <header className="space-y-2 border-b border-base pb-5">
-          <h1 id="support-case-thread-loading-heading" className="font-display text-primary">
-            {copy.title}
-          </h1>
-          <p role="status" aria-live="polite" className="text-sm text-muted">
-            {copy.caseLoading}
-          </p>
-        </header>
         <div className="animate-pulse space-y-3" aria-hidden="true">
           <div className="h-8 max-w-lg rounded bg-inset" />
           {[1, 2, 3].map((key) => (
             <div key={key} className="h-16 rounded bg-inset" />
           ))}
         </div>
-      </section>
+      </HonestLoadingShell>
     );
   }
 

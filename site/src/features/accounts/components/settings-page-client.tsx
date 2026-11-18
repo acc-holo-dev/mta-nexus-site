@@ -12,6 +12,7 @@ import {
 import { SettingsNotificationPreferencesSection } from "../../notifications/preferences";
 import { confirmAction } from "../../shell/confirm-action";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
@@ -492,19 +493,14 @@ export function SettingsPageClient() {
 
   if (loading) {
     return (
-      <section
+      <HonestLoadingShell
         className={pageShellClass}
-        aria-busy="true"
-        aria-labelledby="settings-loading-heading"
+        headingId="settings-loading-heading"
+        title={copy.title}
+        loadingLabel={copy.loading}
+        headerClassName=""
+        statusClassName="mt-1 font-caption text-muted"
       >
-        <header>
-          <h1 id="settings-loading-heading" className="font-display text-primary">
-            {copy.title}
-          </h1>
-          <p role="status" aria-live="polite" className="mt-1 font-caption text-muted">
-            {copy.loading}
-          </p>
-        </header>
         <div className="animate-pulse space-y-8" aria-hidden="true">
           {[1, 2, 3, 4].map((key) => (
             <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
@@ -513,7 +509,7 @@ export function SettingsPageClient() {
             </div>
           ))}
         </div>
-      </section>
+      </HonestLoadingShell>
     );
   }
 

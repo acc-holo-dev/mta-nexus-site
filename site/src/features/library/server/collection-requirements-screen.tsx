@@ -120,7 +120,7 @@ export async function CollectionRequirementsScreen({
           <input
             name="targetMta"
             maxLength={64}
-            placeholder="1.6.0-9.22279.0"
+            placeholder={copy.targetPlaceholder}
             defaultValue={query.targetMta}
             className="border border-base bg-inset p-2"
             required
