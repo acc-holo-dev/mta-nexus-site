@@ -175,6 +175,8 @@ Scope: `app/discover`, `app/servers` (публичный каталог/карт
 Проверка: `python3 planning/tools/inventory_workspace_member_i18n.py --check planning/workspace-member-hardcoded-strings.json`  
 Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms. Moved remaining form placeholder literals into EN/RU dictionaries (`serverRegistration` / `serverManagement` / `publishing` / `resource-management-i18n`). Unknown-marker `—` allowlisted; `unallowlisted: 0`.
 
+**Slice 49 done:** specialized server/feature + platform-report loading chrome → `HonestLoadingShell` — `ServerStatisticsLoading`, `ServerObservationBrowserLoading`, and `/workspace/platform-reports` list/detail `loading.tsx` (was bare muted paragraph). Remaining `loading.tsx` without the shell are thin re-exports / PublicationFeed / trust wrappers.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error, offline-cache; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -250,6 +252,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 47                                                                                    | docs honesty                     | **done** |
 | A/B | Slice 48 — workspace-member i18n inventory + form placeholder dictionary move                                     | честность RU/EN                  | **done** |
 | D/E | Scoreboard sync после Slice 48                                                                                    | docs honesty                     | **done** |
+| T   | Slice 49 — server statistics/observations + platform-reports loaders → `HonestLoadingShell`                       | читаемость + loading honesty     | **done** |
+| D/E | Scoreboard sync после Slice 49                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 
