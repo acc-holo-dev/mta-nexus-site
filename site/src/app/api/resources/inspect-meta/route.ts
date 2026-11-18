@@ -6,8 +6,10 @@ import {
   MetaInspectionInputError,
   metaInspectionLimits,
 } from "../../../../features/resources/mta-meta-inspector";
+import { resourceInspectMetaApiCopy } from "../../../../features/resources/resource-inspect-meta-api-copy";
 import { readBoundedText } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -30,17 +32,20 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = resourceInspectMetaApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     if (!can(user, "product.create")) {
-      return json(context, { error: "Developer access required" }, 403);
+      return json(context, { error: copy.developerRequired }, 403);
     }
 
     const rateLimit = await consumeRateLimit("resourceInspection", user.id);
@@ -48,7 +53,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many resource inspections. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -59,7 +64,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Send meta.xml as text/plain",
+          error: copy.textPlainRequired,
         },
         415,
       );
@@ -82,7 +87,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return json(
           context,
           {
-            error: "meta.xml exceeds the inspection limit",
+            error: copy.exceedsLimit,
             maxBytes: metaInspectionLimits.maxBytes,
           },
           413,
@@ -112,7 +117,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Could not inspect meta.xml",
+        error: copy.inspectFailed,
       },
       422,
     );

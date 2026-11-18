@@ -97,6 +97,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-release-control-query.ts`            | util port `resource-release-control-query`                                                                  |
 | `resource-commerce-i18n.ts`                    | util port `resource-commerce-i18n`                                                                          |
 | `resource-claim-api-copy.ts`                   | util port `resource-claim-api-copy`                                                                         |
+| `resource-inspect-meta-api-copy.ts`            | util port `resource-inspect-meta-api-copy`                                                                  |
 | `resource-requirements-i18n.ts`                | util port `resource-requirements-i18n`                                                                      |
 | `resource-requirements-query.ts`               | util port `resource-requirements-query`                                                                     |
 | `resource-review-i18n.ts`                      | util port `resource-review-i18n`                                                                            |

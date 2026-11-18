@@ -236,6 +236,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 77 done:** `/api/servers/[id]/claim-challenge` (+ `/verify`) POST errors use bilingual `serverClaimApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` passthrough and success `instruction` remain English).
 
+**Wave 78 done:** `/api/resources/inspect-meta` POST errors use bilingual `resourceInspectMetaApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError`/`MetaInspectionInputError` passthrough and success `note` remain English).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -366,8 +368,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 76                                                                                     | docs honesty                     | **done** |
 | A   | Wave 77 — servers claim-challenge (+ verify) errors via serverClaimApiCopy                                        | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 77                                                                                     | docs honesty                     | **done** |
+| A   | Wave 78 — `/api/resources/inspect-meta` errors via resourceInspectMetaApiCopy                                     | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: `/api/resources/inspect-meta` or claim-challenge success `instruction`. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: claim-challenge success `instruction`, inspect-meta success `note`, or `/api/workspace/platform-reports`. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
