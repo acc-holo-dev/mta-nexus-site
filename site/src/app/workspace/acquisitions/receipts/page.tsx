@@ -98,6 +98,7 @@ export default async function ResourceCartReceiptsPage({
         </nav>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href={returnHref} className={linkClass}>
               {dictionary.errors.retry}

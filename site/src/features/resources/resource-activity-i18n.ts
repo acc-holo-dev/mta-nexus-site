@@ -4,6 +4,8 @@ const copy = {
   en: {
     loadUnavailable: "Resource activity is temporarily unavailable. Please try again.",
     historyLoadUnavailable: "Acquisition history is temporarily unavailable. Please try again.",
+    historyLoadUnavailableHint:
+      "Retry reloads this acquisition history only. A temporary load failure is not an empty purchase journal.",
     history: "Acquisition history",
     analytics: "Resource activity",
     loading: "Loading acquisition history…",
@@ -50,6 +52,8 @@ const copy = {
   ru: {
     loadUnavailable: "Активность ресурса временно недоступна. Попробуйте ещё раз.",
     historyLoadUnavailable: "История приобретений временно недоступна. Попробуйте ещё раз.",
+    historyLoadUnavailableHint:
+      "Повтор обновляет только эту историю приобретений. Временный сбой загрузки — не пустой журнал покупок.",
     history: "История приобретений",
     analytics: "Активность ресурса",
     loading: "Загрузка истории приобретений…",

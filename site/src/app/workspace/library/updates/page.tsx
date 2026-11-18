@@ -64,6 +64,7 @@ export default async function LibraryUpdatesPage({
         </Link>
         <ErrorState
           title={copy.updatesLoadUnavailable}
+          description={copy.updatesLoadUnavailableHint}
           action={
             <Link href={returnPath} className={navLinkClass}>
               {dictionary.errors.retry}

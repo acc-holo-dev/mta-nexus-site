@@ -123,11 +123,15 @@ export const workspace = {
     emptyLibraryHint:
       "Free resources and active grants appear here after you add them to your account.",
     libraryUnavailable: "Your resource library preview is temporarily unavailable.",
+    libraryUnavailableHint:
+      "Retry reloads this workspace library preview only. A temporary load failure is not an empty library.",
     serversDescription: "Only servers owned by your account",
     manage: "Manage",
     noServers: "You have not registered a server yet.",
     noServersHint: "Register a personal server to manage it from this workspace.",
     serversUnavailable: "Your managed servers preview is temporarily unavailable.",
+    serversUnavailableHint:
+      "Retry reloads this managed-servers preview only. A temporary load failure is not an empty server list.",
   },
   servers: {
     title: "Multi Theft Auto servers",

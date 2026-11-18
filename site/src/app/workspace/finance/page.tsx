@@ -100,6 +100,7 @@ export default async function FinancialStatements({
         </Link>
         <ErrorState
           title={copy.statementsLoadUnavailable}
+          description={copy.statementsLoadUnavailableHint}
           action={
             <Link href={returnHref} className={linkClass}>
               {dictionary.errors.retry}

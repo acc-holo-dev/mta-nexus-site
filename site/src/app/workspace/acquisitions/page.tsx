@@ -78,6 +78,7 @@ export default async function AcquisitionHistoryPage({
         </header>
         <ErrorState
           title={copy.historyLoadUnavailable}
+          description={copy.historyLoadUnavailableHint}
           action={
             <Link href={retryHref} className={navLinkClass}>
               {dictionary.errors.retry}

@@ -97,6 +97,7 @@ export default async function Page({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableDescription}
           action={
             <Link href={href(query.page)} className={navLinkClass}>
               {dictionary.errors.retry}

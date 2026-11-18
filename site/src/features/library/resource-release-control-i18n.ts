@@ -9,6 +9,8 @@ const copy = {
     moderationLoading: "Loading resource moderation…",
     loadUnavailable: "Resource moderation is temporarily unavailable. Please try again.",
     updatesLoadUnavailable: "Library updates are temporarily unavailable. Please try again.",
+    updatesLoadUnavailableHint:
+      "Retry reloads this updates page only. A temporary load failure is not an empty updates list.",
     versionsLoadUnavailable:
       "Library version selection is temporarily unavailable. Please try again.",
     versionsLoadUnavailableDescription:
@@ -123,6 +125,8 @@ const copy = {
     moderationLoading: "Загрузка модерации ресурсов…",
     loadUnavailable: "Модерация ресурсов временно недоступна. Попробуйте ещё раз.",
     updatesLoadUnavailable: "Обновления библиотеки временно недоступны. Попробуйте ещё раз.",
+    updatesLoadUnavailableHint:
+      "Повтор обновляет только эту страницу обновлений. Временный сбой загрузки — не пустой список обновлений.",
     versionsLoadUnavailable: "Выбор версии библиотеки временно недоступен. Попробуйте ещё раз.",
     versionsLoadUnavailableDescription:
       "Ошибка загрузки — это не пустой список версий. Повторите запрос, чтобы получить текущую настройку скачивания и одобренные выпуски.",

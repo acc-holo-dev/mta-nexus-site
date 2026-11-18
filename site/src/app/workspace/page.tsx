@@ -195,6 +195,7 @@ export default async function WorkspacePage() {
         {!library ? (
           <ErrorState
             title={dictionary.workspace.libraryUnavailable}
+            description={dictionary.workspace.libraryUnavailableHint}
             action={
               <Link href="/workspace" className={retryLinkClass}>
                 {dictionary.errors.retry}
@@ -266,6 +267,7 @@ export default async function WorkspacePage() {
         {!serverBundle ? (
           <ErrorState
             title={dictionary.workspace.serversUnavailable}
+            description={dictionary.workspace.serversUnavailableHint}
             action={
               <Link href="/workspace" className={retryLinkClass}>
                 {dictionary.errors.retry}

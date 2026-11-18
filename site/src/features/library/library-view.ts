@@ -31,6 +31,8 @@ export const libraryCopy = {
       "Switch to All or another availability filter to see the rest of your library.",
     clearFilters: "Show all library resources",
     loadUnavailable: "Your resource library is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this library page only. A temporary load failure is not an empty library.",
     unavailableResource: "Resource temporarily unavailable",
     unavailableReason:
       "This resource is unpublished or has no approved, safely scanned build. Downloads are disabled until availability is restored.",
@@ -62,6 +64,8 @@ export const libraryCopy = {
       "Выберите «Все» или другой фильтр доступности, чтобы увидеть остальные ресурсы.",
     clearFilters: "Показать всю библиотеку",
     loadUnavailable: "Библиотека ресурсов временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту страницу библиотеки. Временный сбой загрузки — не пустая библиотека.",
     unavailableResource: "Ресурс временно недоступен",
     unavailableReason:
       "Ресурс не опубликован либо не имеет одобренной, безопасно проверенной сборки. Скачивание недоступно до восстановления публикации.",

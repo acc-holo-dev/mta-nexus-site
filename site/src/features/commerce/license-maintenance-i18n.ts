@@ -45,6 +45,8 @@ const copy = {
     back: "License moderation",
     currentPage: "Current page",
     loadUnavailable: "License term processing is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this maintenance queue only. A temporary load failure is not an empty license term list.",
   },
   ru: {
     filters: "Фильтры лицензий",
@@ -90,6 +92,8 @@ const copy = {
     back: "Модерация лицензий",
     currentPage: "Текущая страница",
     loadUnavailable: "Обработка сроков лицензий временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту очередь обслуживания. Временный сбой загрузки — не пустой список сроков лицензий.",
   },
 };
 export const getLicenseMaintenanceCopy = (locale: "ru" | "en") => copy[locale];

@@ -8,6 +8,8 @@ const copy = {
     loading: "Loading financial statements…",
     statementsLoadUnavailable:
       "Financial statements are temporarily unavailable. Database records were not loaded.",
+    statementsLoadUnavailableHint:
+      "Retry reloads this statements page only. A temporary load failure is not an empty finance history.",
     personal: "Personal account",
     organization: "Organization account",
     organizations: "Organization statements",
@@ -56,6 +58,8 @@ const copy = {
     title: "Финансовые выписки",
     loading: "Загрузка финансовых выписок…",
     statementsLoadUnavailable: "Финансовые выписки временно недоступны. Записи БД не загружены.",
+    statementsLoadUnavailableHint:
+      "Повтор обновляет только эту страницу выписок. Временный сбой загрузки — не пустая финансовая история.",
     personal: "Личный счёт",
     organization: "Счёт организации",
     organizations: "Выписки организаций",

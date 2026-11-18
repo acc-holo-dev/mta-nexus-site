@@ -6,6 +6,8 @@ const copy = {
     loading: "Loading acquisition receipts…",
     loadUnavailable:
       "Acquisition receipts are temporarily unavailable. Saved receipts were not loaded.",
+    loadUnavailableHint:
+      "Retry reloads this receipt list only. A temporary load failure is not an empty acquisition journal.",
     receipts: "Receipts",
     apply: "Apply filters",
     clear: "Clear filters",
@@ -66,6 +68,8 @@ const copy = {
     title: "Квитанции бесплатного получения",
     loading: "Загрузка квитанций получения…",
     loadUnavailable: "Квитанции получения временно недоступны. Сохранённые квитанции не загружены.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот список квитанций. Временный сбой загрузки — не пустой журнал получений.",
     receipts: "Квитанции",
     apply: "Применить фильтры",
     clear: "Сбросить фильтры",

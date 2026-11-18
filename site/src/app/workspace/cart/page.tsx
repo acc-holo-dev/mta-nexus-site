@@ -48,6 +48,7 @@ export default async function ResourceCartPage() {
         </header>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link href="/workspace/cart" className={retryLinkClass}>
               {getDictionary(locale).errors.retry}

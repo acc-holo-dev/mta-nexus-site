@@ -15,6 +15,8 @@ const copy = {
     acquire: "Add all to library",
     empty: "Your resource cart is empty.",
     loadUnavailable: "Your resource cart is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this cart only. A temporary load failure is not an empty cart.",
     browse: "Browse resources",
     library: "Open library",
     refresh: "Refresh cart",
@@ -103,6 +105,8 @@ const copy = {
     acquire: "Добавить всё в библиотеку",
     empty: "Корзина ресурсов пуста.",
     loadUnavailable: "Корзина ресурсов временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту корзину. Временный сбой загрузки — не пустая корзина.",
     browse: "Выбрать ресурсы",
     library: "Открыть библиотеку",
     refresh: "Обновить корзину",

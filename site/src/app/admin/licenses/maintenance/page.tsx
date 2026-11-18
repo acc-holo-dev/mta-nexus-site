@@ -86,6 +86,7 @@ export default async function Page({
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={returnHref}

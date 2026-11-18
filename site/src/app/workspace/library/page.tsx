@@ -145,6 +145,7 @@ export default async function ResourceLibraryPage({
       {!result ? (
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={libraryHref(filter, page)}
