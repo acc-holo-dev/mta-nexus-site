@@ -162,7 +162,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/shell/)" },
       to: {
-        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|honest-loading)\\.ts$)",
+        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|offline-document-copy|honest-loading)\\.ts$)",
       },
     },
     {
