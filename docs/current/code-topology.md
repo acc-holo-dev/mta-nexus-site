@@ -196,6 +196,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 57 done:** adopt `formatUnknown` / `unknownMarker` across production surfaces; purge unknown-marker inventory allowlists (0 remaining); policy lock [`unknown-marker-honesty-policy.test.ts`](../../site/tests/unit/unknown-marker-honesty-policy.test.ts); relocate `lib/platform/observability` + `postgres-error` into folder modules.
 
+**Wave 58 done:** service-worker offline document copy → Shell [`offline-document-copy.ts`](../../site/src/features/shell/offline-document-copy.ts) injected into [`sw.js/route.ts`](../../site/src/app/sw.js/route.ts); resource build/detail MTA and SHA-256 labels → dictionary keys (`managementCopy.mta`, `copy.mtaVersion`, `packageCopy.sha256Label`); honesty locks for both surfaces.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -289,6 +291,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | A/C | Wave 57 — formatUnknown adoption + unknown-marker allowlist purge + policy                                        | честность RU/EN + unknown        | **done** |
 | T   | Wave 57 — `lib/platform/{observability,postgres-error}/` folder modules                                           | читаемость lib ownership         | **done** |
 | D/E | Scoreboard sync после Wave 56/57 (single squash tip)                                                              | docs honesty                     | **done** |
+| A/C | Wave 58 — SW offline document i18n + resource MTA/SHA-256 labels                                                  | честность RU/EN + PWA honesty    | **done** |
+| D/E | Scoreboard sync после Wave 58                                                                                     | docs honesty                     | **done** |
 
 Дальше: F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

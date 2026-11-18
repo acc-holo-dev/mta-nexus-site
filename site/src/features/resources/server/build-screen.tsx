@@ -18,6 +18,7 @@ import { ResourceBuildControls } from "../components/resource-build-controls";
 import { BuildPackageEvidencePanel, BuildProvenanceDetails } from "../evidence";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../resource-media-i18n";
+import { getResourceManagementCopy } from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
@@ -104,6 +105,7 @@ export async function ResourceBuildScreen({
   }
   const { product, build, history } = detail;
   const publisherCopy = getResourcePublisherCopy(locale);
+  const managementCopy = getResourceManagementCopy(locale);
   const trustedScan =
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
@@ -155,7 +157,7 @@ export async function ResourceBuildScreen({
           </p>
           <h3 className="font-semibold text-primary">{publisherCopy.requirements}</h3>
           <p className="text-sm text-secondary">
-            MTA: {formatUnknown(locale, product.compatibility?.mtaMinVersion)}
+            {managementCopy.mta}: {formatUnknown(locale, product.compatibility?.mtaMinVersion)}
           </p>
           <ul className="list-inside list-disc text-sm text-secondary">
             {(product.compatibility?.dependencies ?? []).map((slug) => (

@@ -34,6 +34,7 @@ import { ResourceReviewList } from "../components/resource-review-list";
 import { ResourceVariantChoices } from "../components/resource-variant-choices";
 import { ResourceVersionHelpSection } from "../components/resource-version-help-section";
 import { ReverseDependencyList } from "../components/reverse-dependency-list";
+import { buildPackageCopy } from "../build-package-i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../public-release-history";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
@@ -118,6 +119,7 @@ export async function ProductDetailPage({
   ]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
+  const packageCopy = buildPackageCopy(locale);
   const commerceCopy = getResourceCommerceCopy(locale);
   const watchCopy = resourceReleaseWatchesCopy(locale);
   const reviewCopy = resourceReviewCopy(locale);
@@ -578,7 +580,7 @@ export async function ProductDetailPage({
                         </span>
                       </div>
                       <span className="font-numeric text-[11px] text-faint">
-                        SHA-256: {build.sha256Hash.slice(0, 16)}…
+                        {packageCopy.sha256Label}: {build.sha256Hash.slice(0, 16)}…
                       </span>
                     </div>
 
@@ -590,7 +592,7 @@ export async function ProductDetailPage({
                         {copy.size}: {formatFileSize(build.fileSizeBytes)}
                       </span>
                       <span>
-                        MTA:{" "}
+                        {copy.mtaVersion}:{" "}
                         {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
                       </span>
                       <span>{build.isSigned ? copy.signaturePresent : copy.signatureMissing}</span>
