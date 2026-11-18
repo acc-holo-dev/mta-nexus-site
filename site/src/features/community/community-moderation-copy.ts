@@ -23,6 +23,8 @@ const en = {
   noHistory: "No retained moderation decisions on this page.",
   empty: "No matching publications.",
   unavailable: "Moderation data could not be loaded. Reload the saved version.",
+  unavailableHint:
+    "A temporary load failure is not an empty moderation queue. Reload the saved version after the service recovers.",
   invalid: "Invalid filters or continuation. Reload the latest saved results.",
   denied: "A current administrator or moderator role is required.",
   signIn: "Sign in",
@@ -71,6 +73,8 @@ const ru: Record<keyof typeof en, string> = {
   noHistory: "На этой странице нет сохранённых решений модерации.",
   empty: "Подходящих публикаций нет.",
   unavailable: "Не удалось загрузить данные модерации. Загрузите сохранённую версию.",
+  unavailableHint:
+    "Временный сбой загрузки — это не пустая очередь модерации. Загрузите сохранённую версию после восстановления сервиса.",
   invalid: "Некорректные фильтры или продолжение. Загрузите новые сохранённые результаты.",
   denied: "Нужна действующая роль администратора или модератора.",
   signIn: "Войти",

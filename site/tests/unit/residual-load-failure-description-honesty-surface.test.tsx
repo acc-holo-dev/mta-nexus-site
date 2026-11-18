@@ -42,4 +42,19 @@ it("locks residual load-failure ErrorStates to recovery description hints", () =
     "description={title === c.retry ? c.loadUnavailableDescription : undefined}",
   );
   expect(resourceCollections).toContain("description={c.loadUnavailableDescription}");
+
+  const observations = read("site/src/features/servers/server/server-observation-browser-page.tsx");
+  expect(observations).toContain("text === copy.unavailable || text === stats.unavailable");
+  expect(observations).toContain("copy.unavailableHint");
+  expect(read("site/src/features/servers/server-observation-browser-copy.ts")).toContain(
+    "unavailableHint:",
+  );
+
+  const moderation = read("site/src/features/community/server/community-moderation-screen.tsx");
+  expect(moderation).toContain(
+    "description={message === copy.unavailable ? copy.unavailableHint : undefined}",
+  );
+  expect(read("site/src/features/community/community-moderation-copy.ts")).toContain(
+    "unavailableHint:",
+  );
 });

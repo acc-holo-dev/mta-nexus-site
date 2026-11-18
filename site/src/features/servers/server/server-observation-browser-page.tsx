@@ -63,6 +63,9 @@ export async function ServerObservationBrowserPage({
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
         title={text}
+        description={
+          text === copy.unavailable || text === stats.unavailable ? copy.unavailableHint : undefined
+        }
         action={
           <a href={href} className={navLinkClass}>
             {stats.retry}

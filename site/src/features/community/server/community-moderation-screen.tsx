@@ -82,6 +82,7 @@ export async function CommunityModerationScreen({
   const failure = (message: string, href: string) => (
     <ErrorState
       title={message}
+      description={message === copy.unavailable ? copy.unavailableHint : undefined}
       action={
         <a className={focusLink} href={href}>
           {copy.reload}
