@@ -25,11 +25,18 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/workspace/purchases/loading.tsx",
     "site/src/app/auth/login/loading.tsx",
     "site/src/app/users/[username]/loading.tsx",
+    "site/src/app/admin/loading.tsx",
+    "site/src/app/workspace/content/loading.tsx",
+    "site/src/app/workspace/servers/new/loading.tsx",
+    "site/src/app/loading.tsx",
   ]) {
     const source = read(relative);
     expect(source).toContain("features/shell/honest-loading");
     expect(source).toContain("<HonestLoadingShell");
   }
+
+  const shellSource = read("site/src/features/shell/components/honest-loading-shell.tsx");
+  expect(shellSource).toContain("description");
 });
 
 it("renders the honest loading a11y chrome without inventing results", () => {
@@ -40,6 +47,7 @@ it("renders the honest loading a11y chrome without inventing results", () => {
         className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
         headingId: "purchases-loading-heading",
         title: "Purchases",
+        description: createElement("p", { className: "text-sm text-secondary" }, "Neutral desk"),
         loadingLabel: "Loading…",
       },
       createElement("div", { className: "animate-pulse", "aria-hidden": "true" }, "skeleton"),
@@ -51,6 +59,7 @@ it("renders the honest loading a11y chrome without inventing results", () => {
   expect(html).toContain('role="status"');
   expect(html).toContain('aria-live="polite"');
   expect(html).toContain("Purchases");
+  expect(html).toContain("Neutral desk");
   expect(html).toContain("Loading…");
   expect(html).toContain('aria-hidden="true"');
 });

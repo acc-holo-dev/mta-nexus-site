@@ -1,5 +1,6 @@
 import { authorPublicationDeskCopy } from "../../../../features/community/author-publication-desk-copy";
 import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
+import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/content/[id].
@@ -8,19 +9,12 @@ export default async function Loading() {
   const copy = getUserPlatformCopy(locale);
   const desk = authorPublicationDeskCopy(locale);
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="edit-publication-loading-heading"
+      headingId="edit-publication-loading-heading"
+      title={copy.edit}
+      loadingLabel={desk.loading}
     >
-      <header className="space-y-2">
-        <h1 id="edit-publication-loading-heading" className="font-display text-primary">
-          {copy.edit}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {desk.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-10 w-40 rounded bg-inset" />
         <div className="h-32 rounded bg-inset" />
@@ -28,6 +22,6 @@ export default async function Loading() {
           <div key={key} className="h-16 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

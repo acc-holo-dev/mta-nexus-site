@@ -8,6 +8,7 @@ export function HonestLoadingShell({
   className,
   headingId,
   title,
+  description,
   loadingLabel,
   headerClassName = DEFAULT_HEADER_CLASS,
   titleClassName = DEFAULT_TITLE_CLASS,
@@ -18,6 +19,7 @@ export function HonestLoadingShell({
   className?: string;
   headingId: string;
   title: ReactNode;
+  description?: ReactNode;
   loadingLabel: ReactNode;
   headerClassName?: string;
   titleClassName?: string;
@@ -32,6 +34,7 @@ export function HonestLoadingShell({
         <h1 id={headingId} className={titleClassName}>
           {title}
         </h1>
+        {description}
         <p role="status" aria-live="polite" className={statusClassName}>
           {loadingLabel}
         </p>

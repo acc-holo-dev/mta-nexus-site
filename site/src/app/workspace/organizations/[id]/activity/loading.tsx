@@ -1,28 +1,22 @@
 import { organizationGovernanceCopy } from "../../../../../features/organizations/organization-governance-copy";
+import { HonestLoadingShell } from "../../../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../../../lib/platform/i18n-server";
 
 export default async function Loading() {
   const copy = organizationGovernanceCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
-      aria-busy="true"
-      aria-labelledby="organization-activity-loading-heading"
+      headingId="organization-activity-loading-heading"
+      title={copy.history}
+      loadingLabel={copy.historyDescription}
     >
-      <header className="space-y-2">
-        <h1 id="organization-activity-loading-heading" className="font-display text-primary">
-          {copy.history}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.historyDescription}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-10 w-2/3 max-w-md rounded bg-inset" />
         {[1, 2, 3].map((key) => (
           <div key={key} className="h-24 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

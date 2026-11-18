@@ -1,28 +1,23 @@
 import { verificationApplicationsCopy } from "../../../../features/moderation/verification-applications-copy";
+import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 export default async function Loading() {
   const copy = verificationApplicationsCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8"
-      aria-busy="true"
-      aria-labelledby="verification-detail-loading-heading"
+      headingId="verification-detail-loading-heading"
+      title={copy.detail}
+      loadingLabel={copy.loading}
+      titleClassName="text-xl font-semibold text-primary"
     >
-      <header className="space-y-2">
-        <h1 id="verification-detail-loading-heading" className="text-xl font-semibold text-primary">
-          {copy.detail}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-6 w-2/3 rounded bg-inset" />
         {[1, 2, 3].map((key) => (
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

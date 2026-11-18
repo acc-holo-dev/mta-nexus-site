@@ -1,28 +1,22 @@
 import { resourceReviewCopy } from "../../../../features/resources/resource-review-i18n";
+import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/library/reviews.
 export default async function Loading() {
   const copy = resourceReviewCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="library-reviews-loading-heading"
+      headingId="library-reviews-loading-heading"
+      title={copy.own}
+      loadingLabel={copy.pageLoading}
     >
-      <header className="space-y-2">
-        <h1 id="library-reviews-loading-heading" className="font-display text-primary">
-          {copy.own}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.pageLoading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         {[1, 2, 3].map((key) => (
           <div key={key} className="h-28 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

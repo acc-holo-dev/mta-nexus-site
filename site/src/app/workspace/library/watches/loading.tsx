@@ -1,29 +1,25 @@
 import { resourceReleaseWatchesCopy } from "../../../../features/resources/resource-release-watches-i18n";
+import { HonestLoadingShell } from "../../../../features/shell/honest-loading";
 import { getRequestLocale } from "../../../../lib/platform/i18n-server";
 
 // Honest loading shell for /workspace/library/watches.
 export default async function Loading() {
   const copy = resourceReleaseWatchesCopy(await getRequestLocale());
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="release-watches-loading-heading"
+      headingId="release-watches-loading-heading"
+      title={copy.title}
+      loadingLabel={copy.loading}
+      headerClassName="border-b border-base pb-6"
+      statusClassName="mt-2 text-sm text-muted"
     >
-      <header className="border-b border-base pb-6">
-        <h1 id="release-watches-loading-heading" className="font-display text-primary">
-          {copy.title}
-        </h1>
-        <p role="status" aria-live="polite" className="mt-2 text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-28 rounded bg-inset" />
         {[1, 2, 3].map((key) => (
           <div key={key} className="h-24 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }

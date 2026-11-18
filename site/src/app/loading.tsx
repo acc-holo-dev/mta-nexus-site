@@ -1,5 +1,6 @@
 "use client";
 
+import { HonestLoadingShell } from "../features/shell/honest-loading";
 import { useNexusLocale } from "../features/shell/locale";
 
 const PLACEHOLDER_KEYS = [1, 2, 3] as const;
@@ -8,17 +9,15 @@ export default function GlobalLoading() {
   const { dictionary } = useNexusLocale();
 
   return (
-    <section
+    <HonestLoadingShell
       className="mx-auto min-w-0 max-w-7xl space-y-6 overflow-x-clip"
-      aria-busy="true"
-      aria-labelledby="global-loading-heading"
+      headingId="global-loading-heading"
+      title={dictionary.errors.loading}
+      loadingLabel={dictionary.errors.loading}
+      headerClassName=""
+      titleClassName="sr-only"
+      statusClassName="sr-only"
     >
-      <h1 id="global-loading-heading" className="sr-only">
-        {dictionary.errors.loading}
-      </h1>
-      <p role="status" aria-live="polite" className="sr-only">
-        {dictionary.errors.loading}
-      </p>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-8 w-64 rounded-md bg-inset" />
         <div className="h-24 rounded bg-inset" />
@@ -26,6 +25,6 @@ export default function GlobalLoading() {
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </section>
+    </HonestLoadingShell>
   );
 }
