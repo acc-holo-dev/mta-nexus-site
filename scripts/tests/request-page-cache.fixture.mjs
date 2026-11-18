@@ -31,9 +31,7 @@ const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
   resolve(sourceRoot, "features/organizations/public-profile-server.ts"),
   resolve(sourceRoot, "features/organizations/server/public-profile.tsx"),
-  ...["i18n.ts", "i18n-server.ts", "profile-pagination.ts"].map((file) =>
-    resolve(sourceRoot, "lib/platform", file),
-  ),
+  ...["i18n.ts", "i18n-server.ts"].map((file) => resolve(sourceRoot, "lib/platform", file)),
   resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
   resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
   resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
@@ -78,6 +76,11 @@ const read = async (kind, key) => {
 };
 const nothing = () => null;
 const mocks = {
+  "profile-pagination": {
+    ProfileResourcePagination: () => null,
+    parseProfilePage: (value) =>
+      typeof value === "string" && /^[1-9]\d{0,8}$/.test(value) ? Number(value) : 1,
+  },
   "@nexus/db": {
     userRepository: { findByUsername: (key) => read("user", key) },
     organizationRepository: { findBySlug: (key) => read("organization", key) },

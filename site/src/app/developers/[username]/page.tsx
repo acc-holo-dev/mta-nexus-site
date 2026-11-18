@@ -6,7 +6,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { DeveloperExperience } from "../../../features/accounts/developer-experience";
-import { ProfileResourcePagination } from "../../../features/accounts/profile-pagination";
+import {
+  parseProfilePage,
+  ProfileResourcePagination,
+} from "../../../features/accounts/profile-pagination";
 import { FollowButton } from "../../../features/community/follow";
 import { buildFollowInitialState } from "../../../features/community/follow-initial-state";
 import { publicationCopy } from "../../../features/community/publication-feed-copy";
@@ -14,7 +17,6 @@ import { ProductCard } from "../../../features/resources/view";
 import { trustCopy } from "../../../features/trust/public-user-trust-copy";
 import { getDictionary } from "../../../lib/platform/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/platform/i18n-server";
-import { parseProfilePage } from "../../../lib/platform/profile-pagination";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";
