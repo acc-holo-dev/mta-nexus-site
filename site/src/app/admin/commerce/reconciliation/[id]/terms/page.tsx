@@ -78,6 +78,7 @@ export default async function TermsPage({
         <section className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
           <ErrorState
             title={c.invalid}
+            description={c.invalidHint}
             action={
               <Link href="/admin/commerce/reconciliation" className={linkClass}>
                 {c.back}

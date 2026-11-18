@@ -78,6 +78,7 @@ export default async function TermsPage({
         <section className={pageShellClass}>
           <ErrorState
             title={c.invalid}
+            description={c.invalidHint}
             action={
               <Link href="/workspace/purchases" className={linkClass}>
                 {c.back}

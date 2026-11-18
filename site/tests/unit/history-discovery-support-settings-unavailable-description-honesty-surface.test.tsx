@@ -33,6 +33,21 @@ const pages: Array<[string, string]> = [
     "copy.uncertainHint",
   ],
   ["site/src/app/acquire/page.tsx", "copy.claimErrorHint"],
+  ["site/src/app/auth/verify-email/page.tsx", "copy.invalidVerificationHint"],
+  ["site/src/app/auth/verify-email/page.tsx", "copy.verifyErrorHint"],
+  ["site/src/app/auth/reset-password/page.tsx", "copy.invalidResetHint"],
+  ["site/src/app/auth/reset-password/page.tsx", "copy.resetErrorHint"],
+  ["site/src/app/workspace/library/downloads/page.tsx", "copy.invalidHint"],
+  ["site/src/app/workspace/resources/[id]/deliveries/page.tsx", "copy.invalidHint"],
+  ["site/src/app/workspace/acquisitions/receipts/page.tsx", "copy.invalidHint"],
+  ["site/src/app/workspace/purchases/[id]/terms/page.tsx", "c.invalidHint"],
+  ["site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx", "c.invalidHint"],
+  ["site/src/features/servers/server/server-statistics-page.tsx", "copy.invalidHint"],
+  ["site/src/features/community/server/community-report-screen.tsx", "copy.queryInvalidHint"],
+  ["site/src/features/community/server/community-report-screen.tsx", "copy.forbiddenHint"],
+  ["site/src/features/support/server/support-page.tsx", "copy.queryInvalidHint"],
+  ["site/src/features/support/server/support-page.tsx", "copy.forbiddenHint"],
+  ["site/src/features/support/server/support-page.tsx", "copy.notFoundHint"],
 ];
 
 it("locks history/discovery/saved/support/settings load ErrorStates to recovery hints", () => {
@@ -69,4 +84,27 @@ it("locks history/discovery/saved/support/settings load ErrorStates to recovery 
   );
   expect(read("site/src/lib/i18n/en/product.ts")).toContain("claimErrorHint:");
   expect(read("site/src/lib/i18n/ru/product.ts")).toContain("claimErrorHint:");
+  expect(read("site/src/lib/i18n/en/auth.ts")).toContain("invalidVerificationHint:");
+  expect(read("site/src/lib/i18n/ru/auth.ts")).toContain("invalidVerificationHint:");
+  expect(read("site/src/lib/i18n/en/auth.ts")).toContain("verifyErrorHint:");
+  expect(read("site/src/lib/i18n/ru/auth.ts")).toContain("verifyErrorHint:");
+  expect(read("site/src/lib/i18n/en/auth.ts")).toContain("invalidResetHint:");
+  expect(read("site/src/lib/i18n/ru/auth.ts")).toContain("invalidResetHint:");
+  expect(read("site/src/lib/i18n/en/auth.ts")).toContain("resetErrorHint:");
+  expect(read("site/src/lib/i18n/ru/auth.ts")).toContain("resetErrorHint:");
+  expect(read("site/src/features/resources/resource-deliveries-i18n.ts")).toContain("invalidHint:");
+  expect(read("site/src/features/resources/resource-cart-receipts-i18n.ts")).toContain(
+    "invalidHint:",
+  );
+  expect(read("site/src/features/commerce/order-terms-i18n.ts")).toContain("invalidHint:");
+  expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("invalidHint:");
+  expect(read("site/src/features/community/community-report-copy.ts")).toContain(
+    "queryInvalidHint:",
+  );
+  expect(read("site/src/features/community/community-report-copy.ts")).toContain("forbiddenHint:");
+  expect(read("site/src/features/support/support-workspace-copy.ts")).toContain(
+    "queryInvalidHint:",
+  );
+  expect(read("site/src/features/support/support-workspace-copy.ts")).toContain("forbiddenHint:");
+  expect(read("site/src/features/support/support-workspace-copy.ts")).toContain("notFoundHint:");
 });

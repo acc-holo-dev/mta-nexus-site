@@ -86,6 +86,7 @@ export default function VerifyEmailPage() {
         {state.kind === "invalid" && (
           <ErrorState
             title={copy.invalidVerification}
+            description={copy.invalidVerificationHint}
             action={
               <Link href="/settings" className={navLinkClass}>
                 {copy.backToSettings}
@@ -112,6 +113,7 @@ export default function VerifyEmailPage() {
           <>
             <ErrorState
               title={state.message}
+              description={copy.verifyErrorHint}
               action={
                 state.proof ? (
                   <Button

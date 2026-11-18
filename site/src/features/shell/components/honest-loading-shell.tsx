@@ -13,6 +13,7 @@ export function HonestLoadingShell({
   headerClassName = DEFAULT_HEADER_CLASS,
   titleClassName = DEFAULT_TITLE_CLASS,
   statusClassName = DEFAULT_STATUS_CLASS,
+  headingLevel = 1,
   leading,
   children,
 }: {
@@ -24,16 +25,19 @@ export function HonestLoadingShell({
   headerClassName?: string;
   titleClassName?: string;
   statusClassName?: string;
+  /** Nested settings/workspace panels use h2; route loaders keep the default h1. */
+  headingLevel?: 1 | 2;
   leading?: ReactNode;
   children?: ReactNode;
 }) {
+  const HeadingTag = headingLevel === 2 ? "h2" : "h1";
   return (
     <section className={className} aria-busy="true" aria-labelledby={headingId}>
       {leading}
       <header {...(headerClassName ? { className: headerClassName } : {})}>
-        <h1 id={headingId} className={titleClassName}>
+        <HeadingTag id={headingId} className={titleClassName}>
           {title}
-        </h1>
+        </HeadingTag>
         {description}
         <p role="status" aria-live="polite" className={statusClassName}>
           {loadingLabel}

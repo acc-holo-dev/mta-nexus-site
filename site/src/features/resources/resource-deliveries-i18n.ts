@@ -53,6 +53,8 @@ const en = {
   next: "Next",
   of: "of",
   invalid: "Invalid filters. Open the history again to reset them.",
+  invalidHint:
+    "Reset opens the unfiltered download history. Invalid filters are not an empty history and do not change delivery rights.",
   storage_error: "Storage stream error",
   size_mismatch: "Archive length changed",
   hash_mismatch: "Archive checksum changed",
@@ -114,6 +116,8 @@ const ru: typeof en = {
   next: "Далее",
   of: "из",
   invalid: "Некорректные фильтры. Откройте историю заново для сброса.",
+  invalidHint:
+    "Сброс открывает историю скачиваний без фильтров. Некорректные фильтры — не пустая история и не смена прав выдачи.",
   storage_error: "Ошибка потока хранилища",
   size_mismatch: "Размер архива изменился",
   hash_mismatch: "Контрольная сумма архива изменилась",

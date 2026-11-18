@@ -72,6 +72,7 @@ export default async function ResourceDownloadsPage({
       <section className={`${pageShellClass} max-w-xl`}>
         <ErrorState
           title={copy.invalid}
+          description={copy.invalidHint}
           action={
             <Link href="/workspace/library/downloads" className={navLinkClass}>
               {copy.title}

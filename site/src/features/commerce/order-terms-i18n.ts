@@ -41,6 +41,8 @@ const copies = {
     signIn: "Sign in",
     signInRequired: "Sign in to view order terms",
     invalid: "Invalid report page.",
+    invalidHint:
+      "Open the latest terms page. An invalid page link is not a missing order and does not cancel purchase terms.",
     empty: "No order lines recorded.",
     notice:
       "Snapshots record the resource title, seller and line value when a line is inserted. They survive later resource changes. Older lines retain unknown terms; current catalog data cannot reconstruct them. Baseline commission and hold rules do not prove an applied fee, held funds, provider capture, refund or license issuance. License declarations do not grant a license or change its term. Paid checkout remains unavailable.",
@@ -87,6 +89,8 @@ const copies = {
     signIn: "Войти",
     signInRequired: "Войдите для просмотра условий заказа",
     invalid: "Некорректная страница отчёта.",
+    invalidHint:
+      "Откройте последнюю страницу условий. Некорректная ссылка — не отсутствие заказа и не отмена условий покупки.",
     empty: "Строки заказа отсутствуют.",
     notice:
       "Снимок фиксирует название ресурса, продавца и стоимость при добавлении строки. Последующие изменения ресурса его не меняют. У старых строк условия неизвестны: текущий каталог не позволяет восстановить их. Базовая комиссия и срок удержания не подтверждают применённую комиссию, удержанные средства, списание, возврат или выдачу лицензии. Запись лицензионной модели не выдаёт лицензию и не меняет её срок. Платное оформление пока недоступно.",

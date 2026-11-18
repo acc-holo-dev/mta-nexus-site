@@ -3,6 +3,7 @@
 import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 
 type ContextOption = {
@@ -121,15 +122,17 @@ export function ContextSwitcher() {
 
   if (loading) {
     return (
-      <section aria-busy={true} className="nexus-panel space-y-3 p-5">
-        <div>
-          <h2 className="text-sm font-semibold text-primary">{copy.title}</h2>
-          <p className="mt-1 text-xs text-muted">{copy.description}</p>
-        </div>
-        <p role="status" aria-live="polite" className="text-xs text-muted">
-          {loadingLabel}
-        </p>
-      </section>
+      <HonestLoadingShell
+        className="nexus-panel space-y-3 p-5"
+        headingId="workspace-context-loading-heading"
+        headingLevel={2}
+        title={copy.title}
+        description={<p className="mt-1 text-xs text-muted">{copy.description}</p>}
+        loadingLabel={loadingLabel}
+        titleClassName="text-sm font-semibold text-primary"
+        statusClassName="text-xs text-muted"
+        headerClassName="space-y-1"
+      />
     );
   }
 

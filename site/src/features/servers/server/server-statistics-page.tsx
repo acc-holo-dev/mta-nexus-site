@@ -83,6 +83,7 @@ export async function ServerStatisticsPage({
       <div className={pageShellClass}>
         <ErrorState
           title={copy.invalid}
+          description={copy.invalidHint}
           action={
             <Link href={path} className={navLinkClass}>
               {copy.refresh}

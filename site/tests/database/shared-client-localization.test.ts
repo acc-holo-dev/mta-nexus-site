@@ -14,8 +14,8 @@ describe("shared client localization and request hardening", () => {
     expect(source.match(/credentials: "same-origin"/g)?.length).toBe(2);
     expect(source.match(/cache: "no-store"/g)?.length).toBe(2);
     expect(source.match(/AbortSignal.timeout\(10_000\)/g)?.length).toBe(2);
-    expect(source).toContain('role="status"');
-    expect(source).toContain('aria-live="polite"');
+    expect(source).toContain("HonestLoadingShell");
+    expect(source).toContain("headingLevel={2}");
     expect(source).toContain("dictionary.workspace.loading");
 
     const en = getDictionary("en").workspaceContext;

@@ -183,6 +183,8 @@ Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`;
 
 **Slice 52 done:** `offline-cache-policy` → [`features/shell/offline-cache-policy.ts`](../../site/src/features/shell/offline-cache-policy.ts) (Shell ownership; proxy + SW public-readonly opt-in); C residual retry ErrorStates wired to existing/new recovery descriptions — support center/thread, profile privacy, organization workspace/team directory (`uncertainHint`), Web Push (`webPushErrorHint`), `/acquire` claim (`claimErrorHint`).
 
+**Slice 53 done:** `HonestLoadingShell` gains `headingLevel` (nested h2 panels); settings context-switcher loading chrome composes it; C residual auth/settings + invalid-filter/forbidden recovery descriptions — verify-email / reset-password, settings notice (`loadFailedHint`), downloads/deliveries/receipts/order-terms/statistics `invalidHint`, community-report + support forbidden/queryInvalid/notFound hints.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -266,6 +268,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 51                                                                                    | docs honesty                     | **done** |
 | T/C | Slice 52 — Shell `offline-cache-policy` absorb + residual retry ErrorState descriptions                           | читаемость + journey honesty     | **done** |
 | D/E | Scoreboard sync после Slice 52                                                                                    | docs honesty                     | **done** |
+| T/C | Slice 53 — HonestLoadingShell `headingLevel` + auth/settings/invalid-filter recovery descriptions                 | читаемость + journey honesty     | **done** |
+| D/E | Scoreboard sync после Slice 53                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

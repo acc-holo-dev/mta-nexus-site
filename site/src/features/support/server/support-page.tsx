@@ -72,6 +72,7 @@ export async function SupportPageSurface({
         <h1 className="font-display text-primary">{support.staffQueue}</h1>
         <ErrorState
           title={copy.forbidden}
+          description={copy.forbiddenHint}
           action={
             <Link
               href="/support"
@@ -96,6 +97,7 @@ export async function SupportPageSurface({
         <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.notFound}
+          description={copy.notFoundHint}
           action={
             <Link
               href={base}
@@ -114,6 +116,7 @@ export async function SupportPageSurface({
         <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.queryInvalid}
+          description={copy.queryInvalidHint}
           action={
             <Link
               href={base}

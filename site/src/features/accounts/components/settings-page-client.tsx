@@ -553,6 +553,7 @@ export function SettingsPageClient() {
         <ErrorState
           id="settings-notice"
           title={notice.text}
+          description={copy.loadFailedHint}
           action={
             <Button
               type="button"

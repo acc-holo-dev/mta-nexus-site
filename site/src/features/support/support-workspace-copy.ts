@@ -8,6 +8,8 @@ export function supportWorkspaceCopy(locale: Locale) {
         reset: "Сбросить фильтры",
         noMatches: "По выбранным фильтрам обращений нет.",
         queryInvalid: "Некорректные фильтры обращений.",
+        queryInvalidHint:
+          "Сброс очищает только фильтры обращений. Некорректные фильтры — не пустой список и не отказ в доступе.",
         resolveOwn: "Моя проблема решена",
         reopenOwn: "Проблема осталась",
         ownHelp:
@@ -36,7 +38,11 @@ export function supportWorkspaceCopy(locale: Locale) {
         latest: "Последние события",
         auth: "Для работы с обращениями войдите в аккаунт.",
         forbidden: "Нет прав на это действие.",
+        forbiddenHint:
+          "Вернитесь к списку обращений. Отказ в праве — не сбой загрузки и не удалённое обращение.",
         notFound: "Обращение недоступно.",
+        notFoundHint:
+          "Откройте актуальный список обращений. Недоступность — не пустой фильтр и не временный сбой сервиса.",
         invalid: "Проверьте поля запроса.",
         tooLarge: "Сообщение слишком большое.",
         media: "Требуется запрос JSON.",
@@ -53,6 +59,8 @@ export function supportWorkspaceCopy(locale: Locale) {
         reset: "Reset filters",
         noMatches: "No cases match these filters.",
         queryInvalid: "Invalid support case filters.",
+        queryInvalidHint:
+          "Reset clears only these support filters. Invalid filters are not an empty list and do not deny access.",
         resolveOwn: "My problem is solved",
         reopenOwn: "I still need help",
         ownHelp:
@@ -81,7 +89,11 @@ export function supportWorkspaceCopy(locale: Locale) {
         latest: "Latest events",
         auth: "Sign in to work with support cases.",
         forbidden: "You cannot perform this action.",
+        forbiddenHint:
+          "Return to the support case list. Missing permission is not a load failure and does not mean the case was deleted.",
         notFound: "Support case is unavailable.",
+        notFoundHint:
+          "Open the current support list. Unavailability is not an empty filter and not a temporary service outage.",
         invalid: "Check the request fields.",
         tooLarge: "The message is too large.",
         media: "A JSON request is required.",

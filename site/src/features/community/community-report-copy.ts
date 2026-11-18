@@ -46,6 +46,8 @@ const en = {
   textSearch: "Report text or ID",
   searchHint: "Literal text search, up to 80 characters.",
   queryInvalid: "Invalid report filters. Clear them and try again.",
+  queryInvalidHint:
+    "Reset clears only these report filters. Invalid filters are not an empty queue and do not change moderation rights.",
   reset: "Clear filters",
   previous: "Previous page",
   next: "Next page",
@@ -80,6 +82,8 @@ const en = {
   decisionSaved: "Decision saved.",
   reload: "Load current report",
   forbidden: "Moderator access required.",
+  forbiddenHint:
+    "Return to admin home. Missing moderator access is not a load failure and does not hide reports you already opened.",
   invalid: "Check the report fields and evidence links.",
   ownTarget: "You cannot report your own publication or comment.",
   changed: "This report has changed. Load the current report before deciding again.",
@@ -145,6 +149,8 @@ const ru: Record<keyof typeof en, string> = {
   textSearch: "Текст или ID жалобы",
   searchHint: "Поиск буквального текста, до 80 символов.",
   queryInvalid: "Некорректные фильтры жалоб. Сбросьте их и повторите попытку.",
+  queryInvalidHint:
+    "Сброс очищает только эти фильтры жалоб. Некорректные фильтры — не пустая очередь и не смена прав модерации.",
   reset: "Сбросить фильтры",
   previous: "Предыдущая страница",
   next: "Следующая страница",
@@ -177,6 +183,8 @@ const ru: Record<keyof typeof en, string> = {
   decisionSaved: "Решение сохранено.",
   reload: "Загрузить актуальную жалобу",
   forbidden: "Нужны права модератора.",
+  forbiddenHint:
+    "Вернитесь на главную admin. Отсутствие прав модератора — не сбой загрузки и не скрытие уже открытых жалоб.",
   invalid: "Проверьте поля жалобы и ссылки на доказательства.",
   ownTarget: "Нельзя пожаловаться на свою публикацию или комментарий.",
   changed: "Состояние жалобы изменилось. Загрузите актуальную жалобу перед решением.",

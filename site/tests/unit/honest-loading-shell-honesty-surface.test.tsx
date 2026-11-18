@@ -51,6 +51,13 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
 
   const shellSource = read("site/src/features/shell/components/honest-loading-shell.tsx");
   expect(shellSource).toContain("description");
+  expect(shellSource).toContain("headingLevel");
+  expect(read("site/src/features/accounts/components/context-switcher.tsx")).toContain(
+    "<HonestLoadingShell",
+  );
+  expect(read("site/src/features/accounts/components/context-switcher.tsx")).toContain(
+    "headingLevel={2}",
+  );
 });
 
 it("renders the honest loading a11y chrome without inventing results", () => {
@@ -70,10 +77,27 @@ it("renders the honest loading a11y chrome without inventing results", () => {
   expect(html).toContain('aria-busy="true"');
   expect(html).toContain('aria-labelledby="purchases-loading-heading"');
   expect(html).toContain('id="purchases-loading-heading"');
+  expect(html).toContain("<h1");
   expect(html).toContain('role="status"');
   expect(html).toContain('aria-live="polite"');
   expect(html).toContain("Purchases");
   expect(html).toContain("Neutral desk");
   expect(html).toContain("Loading…");
   expect(html).toContain('aria-hidden="true"');
+});
+
+it("supports nested panel headings without promoting them to h1", () => {
+  const html = renderToStaticMarkup(
+    createElement(HonestLoadingShell, {
+      headingId: "context-loading-heading",
+      headingLevel: 2,
+      title: "Workspace context",
+      loadingLabel: "Loading…",
+      titleClassName: "text-sm font-semibold text-primary",
+      statusClassName: "text-xs text-muted",
+    }),
+  );
+  expect(html).toContain("<h2");
+  expect(html).not.toContain("<h1");
+  expect(html).toContain('aria-busy="true"');
 });

@@ -109,6 +109,7 @@ export default function ResetPasswordPage() {
         {state.kind === "invalid" && (
           <ErrorState
             title={copy.invalidReset}
+            description={copy.invalidResetHint}
             action={
               <Link href="/auth/forgot-password" className={navLinkClass}>
                 {copy.requestNew}
@@ -126,7 +127,9 @@ export default function ResetPasswordPage() {
           >
             <p className="text-sm leading-relaxed text-muted">{copy.resetDescription}</p>
 
-            {state.kind === "error" && <ErrorState title={state.message} />}
+            {state.kind === "error" && (
+              <ErrorState title={state.message} description={copy.resetErrorHint} />
+            )}
 
             <Input
               id="reset-new-password"

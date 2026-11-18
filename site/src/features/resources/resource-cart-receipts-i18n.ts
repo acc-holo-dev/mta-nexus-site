@@ -31,6 +31,8 @@ const copy = {
     emptyNever: "You have no acquisition receipts yet.",
     emptyFiltered: "No receipts match these filters.",
     invalid: "Invalid receipt filters. Open the first page.",
+    invalidHint:
+      "Open the first page to clear filters. Invalid filters are not an empty receipt history and do not change library access.",
     signIn: "Sign in",
     signInRequired: "Sign in to view your receipts",
     library: "Library",
@@ -97,6 +99,8 @@ const copy = {
     emptyNever: "Квитанций получения пока нет.",
     emptyFiltered: "По этим фильтрам квитанций нет.",
     invalid: "Некорректные фильтры квитанций. Откройте первую страницу.",
+    invalidHint:
+      "Первая страница сбрасывает фильтры. Некорректные фильтры — не пустая история квитанций и не смена доступа к библиотеке.",
     signIn: "Войти",
     signInRequired: "Войдите, чтобы просмотреть квитанции",
     library: "Библиотека",

@@ -68,6 +68,7 @@ export async function CommunityReportScreen({
         <h1 className="font-display text-primary">{title}</h1>
         <ErrorState
           title={copy.forbidden}
+          description={copy.forbiddenHint}
           action={
             <Link
               href="/admin"
@@ -123,6 +124,7 @@ export async function CommunityReportScreen({
         {header}
         <ErrorState
           title={copy.queryInvalid}
+          description={copy.queryInvalidHint}
           action={
             <Link
               href={base}

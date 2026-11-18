@@ -70,6 +70,8 @@ const en = {
     "This does not invent observations. Retry the selected period after the statistics service recovers.",
   retry: "Retry",
   invalid: "Invalid period or page link. Open the latest period to continue.",
+  invalidHint:
+    "Open the latest statistics period. An invalid link is not an empty traffic period and does not change server visibility.",
   expired: "This observation page is no longer available. Return to the newest observations.",
   signIn: "Sign in to view statistics",
   signInAction: "Sign in",
@@ -150,6 +152,8 @@ const ru: typeof en = {
     "Это не создаёт наблюдения. Повторите выбранный период после восстановления сервиса статистики.",
   retry: "Повторить",
   invalid: "Некорректная ссылка на период или страницу. Откройте последний период для продолжения.",
+  invalidHint:
+    "Откройте последний период статистики. Некорректная ссылка — не пустой период трафика и не смена видимости сервера.",
   expired: "Эта страница наблюдений больше недоступна. Вернитесь к новым наблюдениям.",
   signIn: "Войдите, чтобы открыть статистику",
   signInAction: "Войти",

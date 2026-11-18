@@ -76,6 +76,7 @@ export default async function PublisherDeliveriesPage({
       <section className={pageShellClass}>
         <ErrorState
           title={copy.invalid}
+          description={copy.invalidHint}
           action={
             <Link
               href={`/workspace/resources/${encodeURIComponent(id)}/deliveries`}
