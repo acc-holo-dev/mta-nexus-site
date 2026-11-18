@@ -31,7 +31,6 @@ LAYER_BY_STEM: dict[str, str] = {
     "observability": "platform",
     "postgres-error": "platform",
     "offline-cache-policy": "platform",
-    "profile-pagination": "platform",
     "i18n": "platform",
     "i18n-server": "platform",
     "home-personal-changes": "platform",
@@ -227,7 +226,7 @@ def apply(moves: list[tuple[Path, Path, str]], dry_run: bool) -> int:
             [
                 "rg",
                 "-l",
-                r"lib/(auth-request-body|bounded-json|bounded-multipart|browser-request|browser-route|license-bearer|private-api-request|public-platform-api|observability|postgres-error|offline-cache-policy|profile-pagination|i18n-server|home-personal-changes|/i18n[\"'])",
+                r"lib/(auth-request-body|bounded-json|bounded-multipart|browser-request|browser-route|license-bearer|private-api-request|public-platform-api|observability|postgres-error|offline-cache-policy|i18n-server|home-personal-changes|/i18n[\"'])",
                 "site",
                 "scripts",
                 "package.json",

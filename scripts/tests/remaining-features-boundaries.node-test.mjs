@@ -129,7 +129,7 @@ const features = [
       "session-policy",
     ],
     privateClients: ["shell-session-unavailable"],
-    servers: [],
+    servers: [["home-personal-changes-server", "home-personal-changes.ts"]],
     safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|http/private-api-request|resource-release-watches-i18n",
   },
   {

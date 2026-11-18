@@ -106,7 +106,7 @@ vi.mock("../lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../lib/platform/home-personal-changes", () => ({
+vi.mock("../features/shell/home-personal-changes-server", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 

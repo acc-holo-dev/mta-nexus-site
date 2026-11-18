@@ -11,7 +11,7 @@ vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.follows },
 }));
 
-import { loadPersonalChangesSummary } from "../../src/lib/platform/home-personal-changes";
+import { loadPersonalChangesSummary } from "../../src/features/shell/home-personal-changes-server";
 
 it("reads one inbox snapshot to classify localized personal changes", async () => {
   state.inbox.mockResolvedValueOnce({
