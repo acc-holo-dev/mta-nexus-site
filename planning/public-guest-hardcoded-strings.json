@@ -47,7 +47,7 @@
     "site/src/features/servers/components/server-follow-button.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, public servers directory/detail, articles, discovery feature (excluding server/ and *-server ports), and guest server directory components — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "c20aa64cc36318a0cbf6b6f9adbf9f6ba67d5c51",
+  "source_sha": "120127b675d1e04731e2b4fcae1df2987051eb0e",
   "summary": {
     "allowlisted": 3,
     "findings": 3,
