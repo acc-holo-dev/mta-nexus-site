@@ -88,6 +88,7 @@ const features = [
       "auth-password-reset-api-copy",
       "auth-register-api-copy",
       "auth-context-api-copy",
+      "auth-email-verification-api-copy",
       "session-revocation",
       "account-recovery-request-policy",
       "account-recovery-browser",

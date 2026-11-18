@@ -130,7 +130,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/accounts/)" },
       to: {
-        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|settings-client-api|feature-flags|profile-privacy-copy|auth-password-api-copy|auth-session-api-copy|auth-sessions-api-copy|auth-login-api-copy|auth-password-reset-api-copy|auth-register-api-copy|auth-context-api-copy|session-revocation|account-recovery-request-policy|account-recovery-browser|session-cookie|profile-change-history-contract|profile-privacy-contract|private-change-history-query|private-change-history-copy|retention-activation-windows|security-activity|private-change-history-download|user-platform-api|public-profile-activity-server|ad-preference)\\.ts$)",
+        path: "^site/src/features/accounts/(?!(?:auth|controls|settings|context|profile|change-history|profile-change-history|profile-pagination|developer-experience|settings-client-api|feature-flags|profile-privacy-copy|auth-password-api-copy|auth-session-api-copy|auth-sessions-api-copy|auth-login-api-copy|auth-password-reset-api-copy|auth-register-api-copy|auth-context-api-copy|auth-email-verification-api-copy|session-revocation|account-recovery-request-policy|account-recovery-browser|session-cookie|profile-change-history-contract|profile-privacy-contract|private-change-history-query|private-change-history-copy|retention-activation-windows|security-activity|private-change-history-download|user-platform-api|public-profile-activity-server|ad-preference)\\.ts$)",
       },
     },
     {
