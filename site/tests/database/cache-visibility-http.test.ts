@@ -231,7 +231,7 @@ describe("HTTP cache visibility contract", () => {
     const result = await getSearch(request("/api/search?q=nexus&limit=10"));
     expect(result.status).toBe(200);
     expect(result.headers.get("Cache-Control")).toBe("no-store");
-    expect(mocks.search).toHaveBeenCalledWith("nexus", 10, undefined);
+    expect(mocks.search).toHaveBeenCalledWith("nexus", 10, undefined, "en");
   });
 
   it("keeps the official MTA directory explicitly public-cacheable", async () => {

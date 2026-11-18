@@ -175,6 +175,39 @@ describe("discovery search results and pagination", () => {
     expect(sources.organizations).not.toHaveBeenCalled();
   });
 
+  it("uses bilingual serverDetail.serverFallback when server description is empty", async () => {
+    sources.servers.mockResolvedValue([
+      {
+        id: "bare",
+        name: "Bare",
+        slug: "bare",
+        ipAddress: "203.0.113.10",
+        port: 22003,
+        gameMode: "RP",
+      },
+      {
+        id: "mode-less",
+        name: "ModeLess",
+        slug: "mode-less",
+        ipAddress: "203.0.113.11",
+        port: 22003,
+      },
+    ]);
+    sources.directory.mockResolvedValue({ isStale: false, servers: [] });
+
+    const english = await discoveryService.search("Bare", 2, "server", "en");
+    expect(english).toMatchObject([
+      { id: "bare", description: "RP MTA server" },
+      { id: "mode-less", description: "MTA server" },
+    ]);
+
+    const russian = await discoveryService.search("Bare", 2, "server", "ru");
+    expect(russian).toMatchObject([
+      { id: "bare", description: "RP Сервер MTA" },
+      { id: "mode-less", description: "Сервер MTA" },
+    ]);
+  });
+
   it("does not let a full product page hide other matching categories", async () => {
     sources.products.mockResolvedValue(
       Array.from({ length: 5 }, (_, index) => ({

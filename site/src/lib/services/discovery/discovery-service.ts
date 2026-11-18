@@ -13,6 +13,7 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import type { DiscoverQuery } from "../../../features/discovery/discover-query";
 import { DISCOVER_CONTENT_TYPES } from "../../../features/discovery/discover-query";
 import type { DiscoveryStreamQuery } from "../../../features/discovery/discovery-stream-contract";
+import { getDictionary, type Locale } from "../../i18n";
 import { productService } from "../commerce/product-service";
 import {
   indexMtaObservations,
@@ -126,12 +127,18 @@ class DiscoveryService {
       })),
     };
   }
-  async search(query: string, limit = 50, type?: SearchResultType): Promise<SearchResultItem[]> {
+  async search(
+    query: string,
+    limit = 50,
+    type?: SearchResultType,
+    locale: Locale = "en",
+  ): Promise<SearchResultItem[]> {
     const normalizedQuery = query.trim();
     if (normalizedQuery.length === 0) {
       return [];
     }
 
+    const serverFallback = getDictionary(locale).serverDetail.serverFallback;
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
     // Each category is filtered before its own LIMIT. A full product category
     // must not hide server matches from a player using the global search.
@@ -165,7 +172,9 @@ class DiscoveryService {
         id: s.id,
         type: "server",
         title: s.name,
-        description: s.description?.slice(0, 100) || `${s.gameMode || "MTA"} Server`,
+        description:
+          s.description?.slice(0, 100) ||
+          (s.gameMode ? `${s.gameMode} ${serverFallback}` : serverFallback),
         url: `/servers/${s.slug}`,
       })),
       articles.map((a) => ({

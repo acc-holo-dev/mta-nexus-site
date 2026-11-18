@@ -1,6 +1,7 @@
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -97,7 +98,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const results = await discoveryService.search(query, limit, type || undefined);
+    const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+    const results = await discoveryService.search(query, limit, type || undefined, locale);
 
     return Response.json(
       {

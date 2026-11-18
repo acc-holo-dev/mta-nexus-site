@@ -41,7 +41,7 @@ Contrast gate: `site/tests/unit/design-token-contrast.test.ts`. Keep accent blue
 | `BrandMark` | NX tile + wordmark for navbar/footer shell   |
 | `Rise`      | Staggered presence motion for hero hierarchy |
 
-Shell chrome lives in `features/shell` (Slices 4/6/7). Topology / Shell 2027 honesty polish through Wave 61 is complete on tip; remaining work is F/ops external gates — not another chrome absorb.
+Shell chrome lives in `features/shell` (Slices 4/6/7). Topology / Shell 2027 honesty polish through Wave 62 is complete on tip; Wave 63 localized discovery search `serverFallback` via `nexus_locale`. Remaining program work is API envelope localization (owner-directed) or F/ops external gates — not another chrome absorb.
 
 ## Proof bar
 

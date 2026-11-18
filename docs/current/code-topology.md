@@ -206,6 +206,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 62 done:** hygiene — drop stale public-guest `market.provenance.sha256-label` allowlist; sync design-direction with exhausted Shell 2027 honesty queue. No further Wave-class TOPO/i18n slice without a new program (API envelope localization or F/ops).
 
+**Wave 63 done:** `/api/search` passes `nexus_locale` into `discoveryService.search`; empty server descriptions use `serverDetail.serverFallback` (same composition as server detail metadata).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -308,8 +310,10 @@ Live tracker на момент измерения: 19 карточек, почт
 | A/C | Wave 61 — provenance.hash + UX-05 theme/typography verification locks                                             | RU/EN honesty + UX-05            | **done** |
 | D/E | Scoreboard sync после Wave 61                                                                                     | docs honesty                     | **done** |
 | D/E | Wave 62 — stale public-guest allowlist purge + design-direction sync                                              | docs / inventory honesty         | **done** |
+| A   | Wave 63 — discovery search serverFallback via nexus_locale                                                        | API RU/EN honesty                | **done** |
+| D/E | Scoreboard sync после Wave 63                                                                                     | docs honesty                     | **done** |
 
-Дальше: honesty/topology Wave-класс **exhausted**. F только как локальный ops prep / external gates. Новые TOPO ID в `planning/tasks.json` не заводить.
+Дальше: topology Wave-класс исчерпан; следующий крупный срез — API envelope localization (по указанию владельца) или F/ops gates. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
