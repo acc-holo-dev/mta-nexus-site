@@ -90,6 +90,8 @@ export const publishing = {
     organizationsLoading: "Checking organizations you manage...",
     organizationsUnavailable:
       "Organizations are temporarily unavailable. You can still register a personal server.",
+    organizationsUnavailableHint:
+      "Retry reloads organization options only. A temporary load failure is not a missing personal-scope registration.",
     organizationSelectionUnavailable:
       "The selected organization is no longer available. Refresh this page and try again.",
     slugTaken: "This server URL is already in use. Choose another slug.",

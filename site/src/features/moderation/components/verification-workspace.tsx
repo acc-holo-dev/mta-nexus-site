@@ -377,6 +377,7 @@ export function VerificationWorkspace({
         <ErrorState
           id="verification-workspace-unavailable"
           title={readError}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"

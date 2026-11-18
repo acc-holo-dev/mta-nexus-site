@@ -290,6 +290,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           {organizationsFailed ? (
             <ErrorState
               title={copy.organizationsUnavailable}
+              description={copy.organizationsUnavailableHint}
               className="items-stretch py-4"
               action={
                 <Button
