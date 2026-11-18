@@ -140,7 +140,7 @@ export function ServerHistoryPanel({
                   ? copy.intervalSixHours
                   : copy.intervalDay}
             </span>
-            <span>UTC</span>
+            <span>{copy.timezoneUtc}</span>
           </div>
           <ol
             className="flex h-32 items-end gap-1 overflow-x-auto rounded-lg border border-base bg-inset px-3 pb-2 pt-4"

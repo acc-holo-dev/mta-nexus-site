@@ -148,6 +148,7 @@ export const servers = {
     emptyHint:
       "History appears after the NEXUS collector records confirmed master-list observations. Missing observations do not mean the server was offline.",
     window: "Recorded interval",
+    timezoneUtc: "UTC",
     chartLabel: "Recorded peak players by interval",
     playerCountUnknown: "player count unknown",
     players: "players",

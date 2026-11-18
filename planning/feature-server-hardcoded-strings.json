@@ -1,0 +1,277 @@
+{
+  "allowlist": [
+    {
+      "id": "library.collection-history.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/library/server/collection-history-page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "library.collection-receipt.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/library/server/collection-receipt-page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "library.collections-history-view.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/library/server/library-collections-history-view.tsx",
+      "text": "—"
+    },
+    {
+      "id": "library.selection-batch.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/library/server/library-selection-batch-screen.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.build-screen.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/server/build-screen.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.market-page.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/server/market-page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.delivery-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/server/resource-delivery-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.review-report.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/server/resource-review-report-screen.tsx",
+      "text": "—"
+    },
+    {
+      "id": "resources.versions-page.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/resources/server/versions-page.tsx",
+      "text": "—"
+    },
+    {
+      "id": "servers.review-panel.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/servers/components/server-review-panel.tsx",
+      "text": "—"
+    },
+    {
+      "id": "servers.history-panel.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "path": "site/src/features/servers/server/server-history-panel.tsx",
+      "text": "—"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "library.collection-history.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 264,
+      "path": "site/src/features/library/server/collection-history-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.collection-history.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 267,
+      "path": "site/src/features/library/server/collection-history-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.collection-receipt.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 161,
+      "path": "site/src/features/library/server/collection-receipt-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.collection-receipt.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 164,
+      "path": "site/src/features/library/server/collection-receipt-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.collections-history-view.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 92,
+      "path": "site/src/features/library/server/library-collections-history-view.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.collections-history-view.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 95,
+      "path": "site/src/features/library/server/library-collections-history-view.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.selection-batch.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 129,
+      "path": "site/src/features/library/server/library-selection-batch-screen.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "library.selection-batch.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 133,
+      "path": "site/src/features/library/server/library-selection-batch-screen.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 126,
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 127,
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 128,
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 143,
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-package-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 155,
+      "path": "site/src/features/resources/components/build-package-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-screen.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 149,
+      "path": "site/src/features/resources/server/build-screen.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.build-screen.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 153,
+      "path": "site/src/features/resources/server/build-screen.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.market-page.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 87,
+      "path": "site/src/features/resources/server/market-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.delivery-evidence.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 27,
+      "path": "site/src/features/resources/server/resource-delivery-evidence.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.review-report.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 130,
+      "path": "site/src/features/resources/server/resource-review-report-screen.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "resources.versions-page.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 28,
+      "path": "site/src/features/resources/server/versions-page.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "servers.review-panel.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 364,
+      "path": "site/src/features/servers/components/server-review-panel.tsx",
+      "text": "—"
+    },
+    {
+      "allowlist_id": "servers.history-panel.unknown-marker-dash",
+      "kind": "unknown-marker",
+      "line": 14,
+      "path": "site/src/features/servers/server/server-history-panel.tsx",
+      "text": "—"
+    }
+  ],
+  "scan_roots": [
+    "site/src/features/accounts/server",
+    "site/src/features/commerce/server",
+    "site/src/features/community/server",
+    "site/src/features/discovery/server",
+    "site/src/features/library/server",
+    "site/src/features/moderation/server",
+    "site/src/features/notifications/server",
+    "site/src/features/organizations/server",
+    "site/src/features/resources/server",
+    "site/src/features/servers/server",
+    "site/src/features/shell/server",
+    "site/src/features/support/server",
+    "site/src/features/trust/server",
+    "site/src/features/community/components/community-report-groups.tsx",
+    "site/src/features/community/components/community-report-history.tsx",
+    "site/src/features/community/components/discussion-comment-actions.tsx",
+    "site/src/features/community/components/object-mute-controls.tsx",
+    "site/src/features/community/components/report-evidence-links.tsx",
+    "site/src/features/resources/components/admin-resource-qa-report-actions.tsx",
+    "site/src/features/resources/components/author-resource-forms.tsx",
+    "site/src/features/resources/components/build-package-evidence.tsx",
+    "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
+    "site/src/features/resources/components/resource-cart-review-evidence.tsx",
+    "site/src/features/resources/components/resource-copy-metadata.tsx",
+    "site/src/features/resources/components/resource-moderation-controls.tsx",
+    "site/src/features/resources/components/resource-publication-readiness-panel.tsx",
+    "site/src/features/resources/components/resource-publisher-filters.tsx",
+    "site/src/features/resources/components/resource-publisher-workspace-nav.tsx",
+    "site/src/features/resources/components/resource-qa-report-form.tsx",
+    "site/src/features/resources/components/resource-release-watch-batch-controls.tsx",
+    "site/src/features/resources/components/resource-requirements-report-body.tsx",
+    "site/src/features/resources/components/resource-submission-success.tsx",
+    "site/src/features/resources/components/resource-variants-form.tsx",
+    "site/src/features/servers/components/server-claim-control-panel.tsx",
+    "site/src/features/servers/components/server-observation-period-controls.tsx",
+    "site/src/features/servers/components/server-review-panel.tsx",
+    "site/src/features/servers/components/server-statistics-export-button.tsx",
+    "site/src/features/servers/components/server-workspace-nav.tsx",
+    "site/src/features/support/components/support-case-actions.tsx",
+    "site/src/features/support/components/support-status-history.tsx",
+    "site/src/features/trust/components/public-user-trust.tsx"
+  ],
+  "scope": "Git-tracked feature server/ RSC screens plus residual interactive components not covered by shell-home / public-guest / workspace-member inventories — hard-coded member/staff-facing literals + locale copy ternaries.",
+  "source_sha": "a20b9e97f2c9046ed86bf006d8418f9ab0b8ccba",
+  "summary": {
+    "allowlisted": 21,
+    "findings": 21,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 118,
+    "unallowlisted": 0
+  }
+}

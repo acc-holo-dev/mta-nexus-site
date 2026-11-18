@@ -282,7 +282,11 @@ export async function DirectoryResults({
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
               <p className="font-semibold text-primary">{copy.activeFilters}</p>
               <ul className="list-inside list-disc space-y-1">
-                {state.query ? <li>q: {state.query}</li> : null}
+                {state.query ? (
+                  <li>
+                    {copy.query}: {state.query}
+                  </li>
+                ) : null}
                 {state.verified ? <li>{copy.verified}</li> : null}
                 {state.sort === "name" ? <li>{copy.name}</li> : null}
                 {state.language ? (

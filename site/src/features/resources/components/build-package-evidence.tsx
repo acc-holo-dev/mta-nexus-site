@@ -118,7 +118,9 @@ export function BuildPackageEvidencePanel({
           {manifest && (
             <section className="space-y-4 rounded-lg border border-base p-4 text-sm">
               <p className="break-words font-code">{manifest.path}</p>
-              <code className="block break-all text-xs">SHA-256: {manifest.sha256Hash}</code>
+              <code className="block break-all text-xs">
+                {copy.sha256Label}: {manifest.sha256Hash}
+              </code>
               <h3 className="font-semibold">{copy.minimum}</h3>
               <p className="break-words">
                 {copy.server}: {manifest.minimumMta?.server || "—"} · {copy.client}:{" "}

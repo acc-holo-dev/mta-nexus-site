@@ -185,6 +185,11 @@ Scope: `app/workspace`, `app/admin`, `app/settings`, `app/auth`, `app/security`;
 
 **Slice 53 done:** `HonestLoadingShell` gains `headingLevel` (nested h2 panels); settings context-switcher loading chrome composes it; C residual auth/settings + invalid-filter/forbidden recovery descriptions — verify-email / reset-password, settings notice (`loadFailedHint`), downloads/deliveries/receipts/order-terms/statistics `invalidHint`, community-report + support forbidden/queryInvalid/notFound hints.
 
+**Slice 54 done:** feature-server hard-coded string inventory (A/B) — [`planning/feature-server-hardcoded-strings.json`](../../planning/feature-server-hardcoded-strings.json).  
+Регенерация: `python3 planning/tools/inventory_feature_server_i18n.py --output planning/feature-server-hardcoded-strings.json`  
+Проверка: `python3 planning/tools/inventory_feature_server_i18n.py --check planning/feature-server-hardcoded-strings.json`  
+Scope: all `features/*/server` RSC screens + residual interactive components outside shell-home/public-guest/workspace-member inventories. Moved discovery active-filter query label, server-history `timezoneUtc`, and build-package `sha256Label` into dictionaries; unknown-marker `—` allowlisted. `unallowlisted: 0`.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (i18n barrel/server, observability, postgres-error; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `platform/i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -270,6 +275,8 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Slice 52                                                                                    | docs honesty                     | **done** |
 | T/C | Slice 53 — HonestLoadingShell `headingLevel` + auth/settings/invalid-filter recovery descriptions                 | читаемость + journey honesty     | **done** |
 | D/E | Scoreboard sync после Slice 53                                                                                    | docs honesty                     | **done** |
+| A/B | Slice 54 — feature-server (+ residual component) i18n inventory                                                   | честность RU/EN                  | **done** |
+| D/E | Scoreboard sync после Slice 54                                                                                    | docs honesty                     | **done** |
 
 Дальше чередовать T (topology) → A/B (shell/i18n) → C (journey honesty) → D/E (tests/docs); F только как локальный ops prep. Новые TOPO ID в `planning/tasks.json` не заводить.
 

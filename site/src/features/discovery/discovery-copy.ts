@@ -30,6 +30,7 @@ const en = {
   emptyFiltered:
     "Nothing matches these filters in this catalog type. The empty list is a confirmed result, not a loading failure.",
   activeFilters: "Active filters",
+  query: "Search",
   unavailable: "The directory is temporarily unavailable. Please try again.",
   unavailableHint:
     "Retry reloads this directory page only. A temporary load failure is not an empty catalog result.",
@@ -71,6 +72,7 @@ const ru: Record<keyof typeof en, string> = {
   emptyFiltered:
     "По этим фильтрам в выбранном типе каталога ничего нет. Пустой список — подтверждённый результат, а не сбой загрузки.",
   activeFilters: "Активные фильтры",
+  query: "Поиск",
   unavailable: "Каталог временно недоступен. Попробуйте ещё раз.",
   unavailableHint:
     "Повтор обновляет только эту страницу каталога. Временный сбой загрузки — не пустой результат поиска.",
