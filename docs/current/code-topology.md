@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1584 |
+| `site/tests` files         |                           1585 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -56,11 +56,11 @@ site/
 | community     |   127 | 584185 |
 | discovery     |     7 |  32895 |
 | library       |    86 | 401782 |
-| moderation    |    32 | 152946 |
+| moderation    |    32 | 152991 |
 | notifications |    21 | 131020 |
 | organizations |    49 | 185690 |
 | resources     |   165 | 722595 |
-| servers       |    82 | 310265 |
+| servers       |    82 | 310327 |
 | shell         |    60 |  99104 |
 | support       |    22 | 108927 |
 | trust         |    15 |  59635 |
