@@ -34,20 +34,6 @@
       "text": "v"
     },
     {
-      "allowlist_id": "market.provenance.sha256-label",
-      "kind": "jsx-text",
-      "line": 69,
-      "path": "site/src/features/resources/components/build-provenance-details.tsx",
-      "text": "SHA-256"
-    },
-    {
-      "allowlist_id": "market.provenance.sha256-label",
-      "kind": "jsx-text",
-      "line": 120,
-      "path": "site/src/features/resources/components/build-provenance-details.tsx",
-      "text": "SHA-256"
-    },
-    {
       "allowlist_id": "market.product-card.version-prefix",
       "kind": "jsx-text",
       "line": 133,
@@ -112,10 +98,10 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "86bbad2732bd41c6dcdc68b303ae72dea589e4b0",
+  "source_sha": "8d208ab346cc5d6e0056f159ae25103ffd8a7ee8",
   "summary": {
-    "allowlisted": 5,
-    "findings": 5,
+    "allowlisted": 3,
+    "findings": 3,
     "locale_copy_ternaries": 0,
     "scanned_files": 100,
     "unallowlisted": 0
