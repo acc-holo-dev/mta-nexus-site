@@ -59,7 +59,7 @@
     {
       "allowlist_id": "acquire.version-prefix",
       "kind": "jsx-text",
-      "line": 330,
+      "line": 331,
       "path": "site/src/app/acquire/page.tsx",
       "text": "v"
     },
@@ -191,7 +191,7 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "8f25fec6a5ff2f924e3aa4c9fa72e9d27723aa16",
+  "source_sha": "ecc8cd678621e5a87f3ede27fd3c7140d6fd8836",
   "summary": {
     "allowlisted": 12,
     "findings": 12,
