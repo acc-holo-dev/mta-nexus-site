@@ -82,6 +82,7 @@ const features = [
       "feature-flags",
       "profile-privacy-copy",
       "auth-password-api-copy",
+      "auth-session-api-copy",
       "session-revocation",
       "account-recovery-request-policy",
       "account-recovery-browser",

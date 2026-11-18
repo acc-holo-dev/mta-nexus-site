@@ -1,12 +1,14 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { authSessionApiCopy } from "../../../../features/accounts/auth-session-api-copy";
 import {
   SESSION_COOKIE_NAME,
   sessionCookieOptions,
 } from "../../../../features/accounts/session-cookie";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -39,6 +41,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = authSessionApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -56,25 +59,22 @@ export async function GET(request: NextRequest) {
       status: 503,
       error,
     });
-    return json(context, { error: "Could not check session" }, 503);
+    return json(context, { error: copy.checkUnavailable }, 503);
   }
 }
 
 export const DELETE = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authSessionApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = token ? await authService.getSession(token) : null;
     if (token && user) {
       const parsed = logoutSchema.safeParse(await readAuthJson(request));
-      if (!parsed.success) return json(context, { error: "Invalid sign out request" }, 400);
+      if (!parsed.success) return json(context, { error: copy.invalidSignOut }, 400);
       if (parsed.data.expectedActorId !== user.id) {
-        return json(
-          context,
-          { error: "Account changed. Reload and try again.", code: "ACTOR_CHANGED" },
-          409,
-        );
+        return json(context, { error: copy.accountChanged, code: "ACTOR_CHANGED" }, 409);
       }
       await authService.logout(token);
     } else if (token) {
@@ -110,7 +110,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Could not confirm sign out. Please try again.",
+        error: copy.signOutUnavailable,
       },
       503,
     );
