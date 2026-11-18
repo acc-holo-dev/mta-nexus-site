@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `e12e27d5` (`dev`, Wave 70 tip).
+**source_sha:** `8c34f0b6` (`dev`, Wave 71 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `e12e27d5` |
+| Область                    |             Факт на `8c34f0b6` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1611 |
+| `site/tests` files         |                           1613 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -51,7 +51,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    48 | 154300 |
+| accounts      |    49 | 155470 |
 | commerce      |    70 | 330120 |
 | community     |   127 | 591755 |
 | discovery     |     8 |  33815 |
@@ -341,6 +341,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 70 — `/api/auth/login` errors via authLoginApiCopy                                                           | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 70                                                                                     | docs honesty                     | **done** |
 | A   | Wave 71 — `/api/auth/password-reset` errors via authPasswordResetApiCopy                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 71                                                                                     | docs honesty                     | **done** |
 
 Дальше: API-envelope localization continues. Next: auth `context` / `register` / `email-verification` English residuals. F/ops remains external. Новые TOPO ID не заводить.
 
