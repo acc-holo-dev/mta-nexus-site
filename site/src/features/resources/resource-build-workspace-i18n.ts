@@ -179,6 +179,7 @@ export function resourceBuildWorkspaceError(locale: string, code: unknown): stri
     case "ACTOR_ID_REQUIRED":
     case "ACTOR_CHANGED":
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return labels.failed;
     default:
       return labels.failed;

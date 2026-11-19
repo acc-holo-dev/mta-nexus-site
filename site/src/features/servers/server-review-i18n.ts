@@ -139,7 +139,7 @@ export function serverReviewError(locale: Locale, code?: string) {
   if (code === "REVIEW_MODERATED") return copy.moderated;
   if (code === "REVIEW_INVALID" || code === "VALIDATION_ERROR") return copy.invalid;
   if (code === "NOT_FOUND") return copy.missing;
-  if (code === "RATE_LIMIT_EXCEEDED") return copy.limited;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.limited;
   if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.unknown;
   return copy.unknown;
 }

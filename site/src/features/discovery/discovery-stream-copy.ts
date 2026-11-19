@@ -29,6 +29,6 @@ export const discoveryStreamCopy = (locale: Locale) => (locale === "ru" ? ru : e
 export const discoveryStreamError = (locale: Locale, code: unknown) =>
   code === "INVALID_CURSOR" || code === "VALIDATION_ERROR"
     ? discoveryStreamCopy(locale).invalid
-    : code === "RATE_LIMIT_EXCEEDED"
+    : code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED"
       ? discoveryCopy(locale).rate
       : discoveryCopy(locale).unavailable;

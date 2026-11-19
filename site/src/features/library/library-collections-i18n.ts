@@ -294,6 +294,6 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   if (code === "ACTOR_CHANGED") return c.conflict;
   if (code === "NOT_FOUND" || code === "FORBIDDEN" || code === "COLLECTION_ACCESS_CHANGED")
     return c.forbidden;
-  if (code === "RATE_LIMIT_EXCEEDED") return c.retry;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return c.retry;
   return c.retry;
 }

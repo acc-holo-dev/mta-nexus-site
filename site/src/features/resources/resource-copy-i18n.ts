@@ -192,6 +192,7 @@ export function resourceCopyError(locale: Locale, code: unknown) {
     case "RESOURCE_COPY_TERMS_UNKNOWN":
       return c.unavailable;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return c.slow;
     default:
       return c.retry;

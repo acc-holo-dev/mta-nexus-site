@@ -22,6 +22,7 @@ export function adminActionClientError(locale: Locale, code: unknown, fallback: 
     case "INVALID_ACTION":
       return copy.invalidAction;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.rate;
     case "UNSUPPORTED_MEDIA_TYPE":
       return copy.unsupportedMediaType;

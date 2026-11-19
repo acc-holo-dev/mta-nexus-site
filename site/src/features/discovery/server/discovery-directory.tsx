@@ -153,7 +153,7 @@ export async function DirectoryResults({
     const code = failure instanceof AppError ? failure.code : "INTERNAL_ERROR";
     loadError = stream
       ? discoveryStreamError(locale, code)
-      : code === "RATE_LIMIT_EXCEEDED"
+      : code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED"
         ? copy.rate
         : code === "INVALID_CURSOR" || code === "VALIDATION_ERROR"
           ? copy.invalid

@@ -54,6 +54,7 @@ export function getResourceSubmissionErrorMessage(
     case "ACTOR_CHANGED":
       return messages.authenticationRequired;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return messages.uploadRateLimited;
     case "NOT_FOUND":
       return messages.resourceNotFound;

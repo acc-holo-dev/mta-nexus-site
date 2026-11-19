@@ -34,14 +34,14 @@ function responseError(
   if (fieldErrors.length) return fieldErrors.join(" ");
   if (registering) {
     const copy = authRegisterApiCopy(locale);
-    if (data.code === "RATE_LIMIT_EXCEEDED") return copy.rate;
+    if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
     if (data.code === "VALIDATION_ERROR") return copy.validationFailed;
     if (data.code === "UNAUTHORIZED") return copy.unauthorized;
     if (data.code === "CONFLICT") return copy.conflict;
     return copy.failed || fallback;
   }
   const copy = authLoginApiCopy(locale);
-  if (data.code === "RATE_LIMIT_EXCEEDED") return copy.rate;
+  if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
   if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS") return copy.unauthorized;
   return copy.failed || fallback;
 }

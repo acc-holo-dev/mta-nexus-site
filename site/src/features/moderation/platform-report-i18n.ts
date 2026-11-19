@@ -156,6 +156,6 @@ export function platformReportError(locale: Locale, code: string | null | undefi
   if (code === "ACTOR_CHANGED") return text.identityUnavailable;
   if (code === "FORBIDDEN" || code === "NOT_FOUND") return text.reportFailed;
   if (code === "VALIDATION_ERROR") return text.reportFailed;
-  if (code === "RATE_LIMIT_EXCEEDED") return text.reportFailed;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return text.reportFailed;
   return text.reportFailed;
 }
