@@ -54,6 +54,12 @@ export function AuthorPublicationRestore({
     [notice, setNotice] = useState(""),
     [saved, setSaved] = useState(false),
     [blocked, setBlocked] = useState(false);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const pending = useRef(false),
     mounted = useRef(true),
     controller = useRef<AbortController | null>(null);
@@ -116,12 +122,7 @@ export function AuthorPublicationRestore({
       router.refresh();
     } catch (failure) {
       if (mounted.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setNotice(
-          [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(message)
-            ? message
-            : copy.uncertain,
-        );
+        setNotice(safeMessage(failure, copy.uncertain));
       }
     } finally {
       pending.current = false;

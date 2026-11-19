@@ -34,6 +34,10 @@ export function NotificationInbox({
 }) {
   const { locale } = useNexusLocale(),
     copy = notificationInboxCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const [page, setPage] = useState(initialPage),
     [selected, setSelected] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
@@ -146,8 +150,7 @@ export function NotificationInbox({
       setBlocked(false);
     } catch (failure) {
       if (mounted.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setError(Object.values(copy).includes(message) ? message : copy.unavailable);
+        setError(safeMessage(failure, copy.unavailable));
         setBlocked(true);
       }
     } finally {
@@ -238,9 +241,9 @@ export function NotificationInbox({
       if (mounted.current) {
         // Keep last confirmed unreadCount; do not present a false zero after a failed write.
         setSelected([]);
-        const message = failure instanceof Error ? failure.message : "";
+        const message = safeMessage(failure, "");
         setError(
-          !confirmed && Object.values(copy).includes(message) && message !== copy.uncertain
+          !confirmed && message && message !== copy.uncertain
             ? `${message} ${copy.uncertain}`
             : copy.uncertain,
         );

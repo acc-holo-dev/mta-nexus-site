@@ -77,6 +77,10 @@ export function SettingsPageClient() {
   const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -257,7 +261,7 @@ export function SettingsPageClient() {
 
       setNotice({
         error: true,
-        text: error instanceof SettingsRequestError ? error.message : copy.requestUnconfirmed,
+        text: safeMessage(error, copy.requestUnconfirmed),
       });
     } finally {
       actionInFlight.current = false;

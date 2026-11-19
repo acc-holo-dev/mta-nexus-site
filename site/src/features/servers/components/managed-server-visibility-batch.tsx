@@ -48,7 +48,7 @@ export function ManagedServerVisibilityBatch({
     };
   }, []);
   const path = "/api/workspace/servers/visibility";
-  function message(failure: unknown, fallback: string) {
+  function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
     return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
       ? text
@@ -98,7 +98,7 @@ export function ManagedServerVisibilityBatch({
       setCommitAcknowledged(false);
     } catch (failure) {
       if (mounted.current) {
-        const result = message(failure, copy.unavailable);
+        const result = safeMessage(failure, copy.unavailable);
         setError(result);
         if (result === copy.changed || result === copy.forbidden) {
           locked.current = true;
@@ -165,7 +165,7 @@ export function ManagedServerVisibilityBatch({
     } catch (failure) {
       if (mounted.current) {
         setPreview(null);
-        const result = message(failure, copy.uncertain);
+        const result = safeMessage(failure, copy.uncertain);
         setError(
           [
             copy.unavailable,

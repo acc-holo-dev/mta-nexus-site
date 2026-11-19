@@ -32,6 +32,16 @@ export function VerificationApplicationAmend({
     copy = verificationApplicationsCopy(locale),
     labels = verificationCopy(locale),
     formErrorHint = getDictionary(locale).errors.formErrorHint;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(labels),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [proof, setProof] = useState(proofUrl ?? ""),
     [explanation, setExplanation] = useState(notes ?? ""),
     [busy, setBusy] = useState(false),
@@ -92,18 +102,7 @@ export function VerificationApplicationAmend({
       setNotice(copy.saved);
       router.refresh();
     } catch (failure) {
-      if (alive.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setNotice(
-          [
-            ...Object.values(copy),
-            ...Object.values(labels),
-            ...Object.values(getUserPlatformCopy(locale)),
-          ].includes(message)
-            ? message
-            : copy.uncertain,
-        );
-      }
+      if (alive.current) setNotice(safeMessage(failure, copy.uncertain));
     } finally {
       pending.current = false;
       if (alive.current) setBusy(false);
