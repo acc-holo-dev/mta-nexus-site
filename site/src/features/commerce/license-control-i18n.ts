@@ -110,6 +110,9 @@ const copy = {
         "Server proof, permissions or resource availability no longer meet the requirements.",
       LICENSE_SERVER_CHANGED:
         "The bound server's endpoint or organization changed. The saved binding cannot be moved.",
+      LICENSE_CHECK_DENIED:
+        "License check denied. Recheck with a valid runtime token and server binding.",
+      LICENSE_CHECK_FAILED: "License check could not be completed. Retry shortly.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
       RATE_LIMITED: "Too many requests. Try again shortly.",
       UNAUTHORIZED: "Sign in again.",
@@ -233,6 +236,9 @@ const copy = {
         "Доказательство контроля, права или доступность ресурса больше не соответствуют требованиям.",
       LICENSE_SERVER_CHANGED:
         "У привязанного сервера изменился адрес или организация. Перенос сохранённой привязки недоступен.",
+      LICENSE_CHECK_DENIED:
+        "Проверка лицензии отклонена. Повторите с действующим runtime-токеном и привязкой сервера.",
+      LICENSE_CHECK_FAILED: "Не удалось выполнить проверку лицензии. Повторите чуть позже.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите немного позже.",
       RATE_LIMITED: "Слишком много запросов. Повторите немного позже.",
       UNAUTHORIZED: "Войдите в аккаунт снова.",
