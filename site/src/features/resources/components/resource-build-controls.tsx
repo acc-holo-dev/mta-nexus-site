@@ -6,7 +6,10 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { privateRequest } from "../private-request";
-import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
+import {
+  getResourceBuildWorkspaceCopy,
+  resourceBuildWorkspaceError,
+} from "../resource-build-workspace-i18n";
 import { confirmedBuildCommand } from "../resource-build-workspace-response";
 
 const textareaClass =
@@ -83,7 +86,20 @@ export function ResourceBuildControls({
       const body: unknown = await response.json().catch(() => null);
       const confirmed = confirmedBuildCommand(response.status, body, current, input);
       if (!confirmed) {
-        setMessage(response.status === 409 ? copy.conflict : copy.failed);
+        const payload =
+          body && typeof body === "object" && "code" in body
+            ? (body as { code?: unknown }).code
+            : undefined;
+        setMessage(
+          resourceBuildWorkspaceError(
+            locale,
+            typeof payload === "string"
+              ? payload
+              : response.status === 409
+                ? "CONFLICT"
+                : "UNCONFIRMED",
+          ),
+        );
         setUncertain(true);
         return;
       }

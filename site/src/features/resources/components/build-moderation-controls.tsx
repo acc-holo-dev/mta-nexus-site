@@ -5,6 +5,7 @@ import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
@@ -87,7 +88,19 @@ export function BuildModerationControls({
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, buildId, action)) {
-        setError(response.status === 409 ? versionCopy.conflict : copy.buildFailed);
+        setError(
+          adminActionClientError(
+            locale,
+            typeof data?.code === "string"
+              ? data.code
+              : response.status === 409
+                ? "CONFLICT"
+                : response.status === 429
+                  ? "RATE_LIMIT_EXCEEDED"
+                  : undefined,
+            response.status === 409 ? versionCopy.conflict : copy.buildFailed,
+          ),
+        );
         if (response.status !== 429) setUncertain(true);
         return;
       }
