@@ -121,6 +121,9 @@ const copy = {
         "This order has payment or financial records. Provider reconciliation is required.",
       ORDER_REQUEST_CONFLICT:
         "This request identifier was already used with different cancellation details.",
+      UNAUTHORIZED: "Sign in again to continue.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       FORBIDDEN: "You no longer have permission for this operation.",
       NOT_FOUND: "This item is unavailable.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
@@ -248,6 +251,9 @@ const copy = {
       ORDER_RECONCILIATION_REQUIRED:
         "У заказа есть платёжные или финансовые записи. Требуется сверка с провайдером.",
       ORDER_REQUEST_CONFLICT: "Идентификатор запроса уже использован с другими данными отмены.",
+      UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       FORBIDDEN: "У вас больше нет прав на эту операцию.",
       NOT_FOUND: "Запись недоступна.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Попробуйте немного позже.",

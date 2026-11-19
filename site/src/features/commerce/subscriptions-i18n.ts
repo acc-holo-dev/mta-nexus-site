@@ -199,6 +199,10 @@ export function subscriptionError(locale: Locale, code: unknown) {
       return c.unavailable;
     case "UNAUTHORIZED":
       return c.signInRequired;
+    case "ACTOR_ID_REQUIRED":
+      return c.signInRequired;
+    case "ACTOR_CHANGED":
+      return c.stateChanged;
     case "RATE_LIMIT_EXCEEDED":
       return c.rateLimited;
     default:
