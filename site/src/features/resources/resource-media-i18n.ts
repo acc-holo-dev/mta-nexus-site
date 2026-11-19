@@ -60,6 +60,11 @@ const copies = {
       PRODUCT_STATE_CHANGED: "This resource is read-only in its current state.",
       NOT_FOUND: "The resource or your management access is unavailable.",
       UNAUTHORIZED: "Sign in again before continuing.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
+      FORBIDDEN: "You do not have permission to manage this gallery.",
+      VALIDATION_ERROR:
+        "Use a valid static PNG, JPEG or WebP and a single-line caption of up to 160 characters.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Retry later.",
     },
   },
@@ -124,8 +129,20 @@ const copies = {
       PRODUCT_STATE_CHANGED: "В текущем состоянии ресурс доступен только для чтения.",
       NOT_FOUND: "Ресурс или права управления недоступны.",
       UNAUTHORIZED: "Войдите снова перед продолжением.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
+      FORBIDDEN: "У вас нет прав управлять этой галереей.",
+      VALIDATION_ERROR:
+        "Нужен корректный статичный PNG, JPEG или WebP и однострочная подпись до 160 символов.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите позже.",
     },
   },
 };
 export const resourceMediaCopy = (locale: "ru" | "en") => copies[locale];
+
+export function resourceMediaError(locale: "ru" | "en", code: unknown) {
+  const copy = resourceMediaCopy(locale);
+  return typeof code === "string" && Object.hasOwn(copy.errors, code)
+    ? copy.errors[code as keyof typeof copy.errors]
+    : copy.error;
+}
