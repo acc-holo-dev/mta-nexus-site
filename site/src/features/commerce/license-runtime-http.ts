@@ -2,12 +2,14 @@ import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/doma
 import { consumeRateLimit, digestLicenseRuntimeToken } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "../../lib/http/bounded-json";
+import { resolveLocale } from "../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/platform/observability";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
+import { licenseControlError } from "./license-control-i18n";
 
 /** Shared bearer-only runtime boundary; cookies never replace a runtime token. */
 export async function licenseRuntimeRequest(
@@ -15,6 +17,7 @@ export async function licenseRuntimeRequest(
   operation: (digest: string) => Promise<unknown | null>,
 ) {
   const context = createRequestLogContext(request);
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
   const respond = (body: unknown, status = 200) =>
     jsonWithRequestId(context, body, {
       status,
@@ -24,6 +27,8 @@ export async function licenseRuntimeRequest(
         "X-Content-Type-Options": "nosniff",
       },
     });
+  const denied = (code: string, status: number) =>
+    respond({ valid: false, code, error: licenseControlError(locale, code) }, status);
   try {
     requireServerJsonContentType(request);
     const authorization = request.headers.get("authorization"),
@@ -37,11 +42,10 @@ export async function licenseRuntimeRequest(
     )
       throw new RateLimitExceededError();
     const result = await operation(digest);
-    return result ? respond(result) : respond({ valid: false, code: "LICENSE_CHECK_DENIED" }, 401);
+    return result ? respond(result) : denied("LICENSE_CHECK_DENIED", 401);
   } catch (error) {
-    if (error instanceof AppError)
-      return respond({ valid: false, code: error.code }, error.statusCode);
+    if (error instanceof AppError) return denied(error.code, error.statusCode);
     logRequestEvent({ level: "error", event: "license.check_failed", context, status: 500, error });
-    return respond({ valid: false, code: "LICENSE_CHECK_FAILED" }, 500);
+    return denied("LICENSE_CHECK_FAILED", 500);
   }
 }
