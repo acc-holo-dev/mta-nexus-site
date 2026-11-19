@@ -16,7 +16,12 @@ import {
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
 } from "../../support/support-retry";
-import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../order-case-i18n";
+import {
+  orderCaseActionLabel,
+  orderCaseCopy,
+  orderCaseError,
+  orderCaseKindLabel,
+} from "../order-case-i18n";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
@@ -92,11 +97,14 @@ export function OrderCaseCreateForm({
           pending.current = null;
         }
         setError(
-          result?.code === "ORDER_CASE_EXISTS"
-            ? copy.exists
-            : response.status >= 400 && response.status < 500
-              ? copy.failed
-              : copy.uncertain,
+          orderCaseError(
+            locale,
+            typeof result?.code === "string"
+              ? result.code
+              : response.status >= 400 && response.status < 500
+                ? "FORBIDDEN"
+                : "UNCONFIRMED",
+          ),
         );
         return;
       }
@@ -325,11 +333,16 @@ export function OrderCaseReviewForm({
         return;
       }
       setMessage(
-        response.status === 409
-          ? copy.conflict
-          : response.status >= 400 && response.status < 500
-            ? copy.failed
-            : copy.uncertain,
+        orderCaseError(
+          locale,
+          typeof data?.code === "string"
+            ? data.code
+            : response.status === 409
+              ? "CONFLICT"
+              : response.status >= 400 && response.status < 500
+                ? "FORBIDDEN"
+                : "UNCONFIRMED",
+        ),
       );
       setSealed(true);
     } catch {
