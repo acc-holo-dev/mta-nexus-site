@@ -308,6 +308,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 134–140 done:** Settings signed-out detection accepts RU/EN `authenticationRequired` (not wrong-password 401); `SettingsRequestError` optionally carries `code`; `noticeStoredTitles` folds resource-release + license-term titles; community staff create-notice uses `newCommunityReport` when `job.community`; defense remappers for release/license slash titles without `data`; `newArticleComment` locked as remapping-only residual. Route.ts AppError English `error.message` passthrough queue treated exhausted.
 
+**Waves 141–147 (local, hold push):** Dynamic Web Push bodies for license-term UTC, resource-release `title · version`, and server publication `server: title` use bilingual slash helpers; inbox remappers take English segment / localize license title-only UTC stamps; honesty locks extended.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -496,6 +498,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 120–123 — auth + notification AppError envelope localization                                                | API envelope RU/EN               | **done** |
 | A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
 | A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done** |
+| A   | Waves 141–147 — bilingual dynamic Web Push bodies (license/release/server) + remapper fallbacks                   | notification storage/push RU/EN  | **local** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
