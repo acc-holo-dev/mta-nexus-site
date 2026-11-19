@@ -56,7 +56,7 @@ it("locks content preferences and stores a status-only notice with a safe target
     expect.arrayContaining([
       "author",
       "Publication reaction / Реакция на публикацию",
-      "A reader reacted to your publication. (Guide)",
+      "A reader reacted to your publication. (Guide) / Читатель оставил реакцию на вашу публикацию. (Guide)",
       "/articles/guide",
       JSON.stringify({
         kind: "content_reaction",

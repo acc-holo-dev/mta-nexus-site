@@ -4,7 +4,11 @@ import type {
   PublicationActivityEvent,
   PublicationActivityNotificationData,
 } from "@nexus/domain";
-import { noticeStoredTitles } from "@nexus/domain";
+import {
+  noticeStoredMessages,
+  noticeStoredTitles,
+  withBilingualParenthetical,
+} from "@nexus/domain";
 import { eq, inArray } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications, organizations, servers } from "../schema";
@@ -13,18 +17,10 @@ import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery"
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-const ACTIVITY_MESSAGE_EN: Record<PublicationActivityEvent, string> = {
-  created: "A publication was created in your context.",
-  edited: "The publication changed. Editorial content returned to moderation.",
-  published: "A moderator published the material.",
-  archived: "The publication was archived.",
-  restored: "The publication was restored to a draft and remains private.",
-};
-
-function withPublicationTitle(message: string, title: string) {
-  const trimmed = title.trim().slice(0, 200);
-  if (!trimmed) return message;
-  return `${message} (${trimmed})`;
+function activityMessage(event: PublicationActivityEvent, title: string) {
+  const base = noticeStoredMessages.publicationActivity[event];
+  const [en, ru] = base.split(" / ");
+  return withBilingualParenthetical(en, ru, title);
 }
 
 /** Author and actual context owners receive status-only notices. At most three recipients. */
@@ -88,7 +84,7 @@ export async function publicationNotice(
     contentTitle: item.title,
     contentSlug: item.slug,
   };
-  const message = withPublicationTitle(ACTIVITY_MESSAGE_EN[event], item.title);
+  const message = activityMessage(event, item.title);
   for (const recipientId of ids) {
     if (disabled.has(recipientId)) continue;
     const id = `ntf_publication_${createHash("sha256")
