@@ -13,7 +13,7 @@ import {
   userRepository,
   users,
 } from "@nexus/db";
-import { eq, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
 
 const id = (prefix: string) => `${prefix}_${randomUUID().replaceAll("-", "")}`;
@@ -92,20 +92,31 @@ async function fixture() {
 type Fixture = Awaited<ReturnType<typeof fixture>>;
 async function snapshot(f: Fixture) {
   return {
-    cases: await db.select().from(supportCases).where(eq(supportCases.requesterId, f.owner.userId)),
+    cases: await db
+      .select()
+      .from(supportCases)
+      .where(eq(supportCases.requesterId, f.owner.userId))
+      .orderBy(asc(supportCases.id)),
     messages: await db
       .select()
       .from(supportCaseMessages)
-      .where(eq(supportCaseMessages.caseId, f.caseId)),
+      .where(eq(supportCaseMessages.caseId, f.caseId))
+      .orderBy(asc(supportCaseMessages.id)),
     requests: await db
       .select()
       .from(supportMutationRequests)
-      .where(eq(supportMutationRequests.actorId, f.owner.userId)),
-    audits: await db.select().from(auditEvents).where(eq(auditEvents.targetId, f.caseId)),
+      .where(eq(supportMutationRequests.actorId, f.owner.userId))
+      .orderBy(asc(supportMutationRequests.requestKey)),
+    audits: await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.targetId, f.caseId))
+      .orderBy(asc(auditEvents.id)),
     notices: await db
       .select()
       .from(notifications)
-      .where(eq(notifications.recipientId, f.owner.userId)),
+      .where(eq(notifications.recipientId, f.owner.userId))
+      .orderBy(asc(notifications.id)),
   };
 }
 function create(f: Fixture, token: string, requestKey = randomUUID()) {
