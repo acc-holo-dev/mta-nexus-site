@@ -35,6 +35,10 @@ Feature объединяет существующие представления
 | `library-watches-server.ts`                 | `LibraryWatchesScreen`; server-only watch-лист                |
 | `library-watch-history-server.ts`           | `LibraryWatchHistoryScreen`; server-only история watch        |
 | `library-reviews-server.ts`                 | `LibraryReviewsScreen`; server-only свои отзывы               |
+| `library-versions-server.ts`                | `LibraryVersionsScreen`; server-only версии ресурса           |
+| `collection-watches-server.ts`              | `CollectionWatchesScreen`; server-only watch коллекции        |
+| `library-download-detail-server.ts`         | `LibraryDownloadDetailPage`; server-only квитанция выдачи     |
+| `library-review-editor-server.ts`           | `LibraryReviewEditorPage`; server-only редактор отзыва         |
 | `collections-server.ts`                     | `LibraryCollectionsScreen`; server-only экран коллекций       |
 | `collection-command.ts`                     | Клиентская форма команды коллекции                            |
 | `collection-batch.ts`                       | Клиентская форма пакетной команды                             |

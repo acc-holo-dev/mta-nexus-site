@@ -12,7 +12,7 @@ const pages: Array<[string, string]> = [
   ["site/src/app/workspace/licenses/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/licenses/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/licenses/[id]/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/library/downloads/[id]/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/library/server/library-download-detail-page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/deliveries/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/variants/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/sales/report/[id]/page.tsx", "c.loadUnavailableHint"],

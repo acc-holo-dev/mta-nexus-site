@@ -78,8 +78,8 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     "site/src/features/library/server/library-watches-screen.tsx",
     "site/src/features/library/server/library-watch-history-screen.tsx",
     "site/src/features/library/server/library-reviews-screen.tsx",
-    "site/src/app/workspace/library/review/[id]/page.tsx",
-    "site/src/app/workspace/library/[id]/versions/page.tsx",
+    "site/src/features/library/server/library-review-editor-page.tsx",
+    "site/src/features/library/server/library-versions-screen.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
@@ -98,7 +98,9 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
   expect(read("site/src/features/library/server/library-reviews-screen.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/app/workspace/library/[id]/versions/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/library/server/library-versions-screen.tsx")).toContain(
+    "EmptyState",
+  );
   for (const loading of [
     "site/src/app/workspace/library/watches/loading.tsx",
     "site/src/app/workspace/library/watches/history/loading.tsx",

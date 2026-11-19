@@ -21,7 +21,7 @@ const pages: Array<[string, string]> = [
   ["site/src/app/workspace/page.tsx", "dictionary.workspace.libraryUnavailableHint"],
   ["site/src/app/workspace/page.tsx", "dictionary.workspace.serversUnavailableHint"],
   [
-    "site/src/app/workspace/library/collections/[id]/watches/page.tsx",
+    "site/src/features/library/server/collection-watches-screen.tsx",
     "copy.loadUnavailableDescription",
   ],
   ["site/src/app/admin/licenses/maintenance/page.tsx", "copy.loadUnavailableHint"],

@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const source = readFileSync(
-  join(root, "site/src/app/workspace/library/collections/[id]/watches/page.tsx"),
+  join(root, "site/src/features/library/server/collection-watches-screen.tsx"),
   "utf8",
 );
 

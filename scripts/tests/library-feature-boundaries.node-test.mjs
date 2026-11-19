@@ -63,6 +63,16 @@ const serverPorts = [
   "collection-history-page",
   "collection-inventory-page",
   "resource-collections-page",
+  "library-page",
+  "library-updates",
+  "library-downloads",
+  "library-watches",
+  "library-watch-history",
+  "library-reviews",
+  "library-versions",
+  "collection-watches",
+  "library-download-detail",
+  "library-review-editor",
 ];
 const safeLib =
   /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:library-collection-receipts-i18n|http\/private-api-request)\.ts$)/u;

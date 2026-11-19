@@ -344,7 +344,7 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Domains cutover done:** `RESOURCES` / `COMMUNITY` / `SERVERS-ORGS` / `TRUST-STAFF` → `docs/current/domains/*` with root redirect stubs; mainline policy expects the four domain files.
 
-**Library residual pages absorb done:** thick `workspace/library` pages (index, updates, downloads, watches, watch history, reviews) → `features/library` server screens + `*-server` ports; `userLibraryService` wraps `userLibraryRepository` (workspace dashboard uses the same service).
+**Library residual pages absorb done:** thick `workspace/library` pages (index, updates, downloads, watches, watch history, reviews, versions, collection watches, download receipt, review editor) → `features/library` server screens + `*-server` ports; `userLibraryService` wraps `userLibraryRepository` (workspace dashboard uses the same service).
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
