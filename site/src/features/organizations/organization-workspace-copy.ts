@@ -194,9 +194,18 @@ export function organizationError(locale: Locale, code: unknown) {
     case "MEMBER_NOT_FOUND":
       return copy.errorMember;
     case "MEMBER_PROTECTED":
+    case "FORBIDDEN":
       return copy.errorProtected;
     case "SLUG_CONFLICT":
       return copy.errorSlug;
+    case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
+      return copy.restoreFailed;
+    case "ACTOR_CHANGED":
+      return copy.profileActorChanged;
+    case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
+      return copy.resultCheckFailed;
     default:
       return userPlatformError(locale, code);
   }

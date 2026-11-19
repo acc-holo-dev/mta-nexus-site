@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { userPlatformError } from "../community/user-platform-copy";
+import { organizationError } from "./organization-workspace-copy";
 export const organizationContentCopy = (locale: Locale) =>
   locale === "ru"
     ? {
@@ -36,5 +36,5 @@ export const organizationContentCopy = (locale: Locale) =>
 export function organizationContentMutationError(locale: Locale, code: unknown) {
   return code === "INTERNAL_ERROR" || code === "UNCONFIRMED"
     ? organizationContentCopy(locale).uncertain
-    : userPlatformError(locale, code);
+    : organizationError(locale, code);
 }
