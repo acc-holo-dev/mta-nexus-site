@@ -120,6 +120,7 @@ const copy = {
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       VALIDATION_ERROR: "Check the selected release and request details.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
+      RATE_LIMITED: "Too many requests. Try again shortly.",
       fallback: "The result could not be confirmed. Reload the current state before retrying.",
       actionErrorDescription:
         "The result may be unknown. Retry the same request or reload the current state.",
@@ -242,6 +243,7 @@ const copy = {
       ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       VALIDATION_ERROR: "Проверьте выбранный выпуск и параметры запроса.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Попробуйте немного позже.",
+      RATE_LIMITED: "Слишком много запросов. Попробуйте немного позже.",
       fallback: "Результат не удалось подтвердить. Обновите состояние перед повтором.",
       actionErrorDescription:
         "Результат может быть неизвестен. Повторите тот же запрос или обновите текущее состояние.",
