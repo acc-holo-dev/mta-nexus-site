@@ -203,3 +203,37 @@ export function orderCaseThreadLabel(locale: string, value: SupportCaseStatus) {
     closed: ["Closed by staff", "Закрыта сотрудником"],
   }[value][locale === "ru" ? 1 : 0];
 }
+
+/** Client remapper for purchase-case API codes; keeps envelope shape unchanged. */
+export function orderCaseError(locale: string, code: unknown): string {
+  const copy = orderCaseCopy(locale);
+  switch (code) {
+    case "ORDER_CASE_EXISTS":
+      return copy.exists;
+    case "ORDER_CASE_REQUEST_CONFLICT":
+    case "ORDER_CASE_REVISION_CONFLICT":
+    case "ORDER_CASE_EVIDENCE_CHANGED":
+    case "ORDER_CASE_THREAD_CHANGED":
+    case "CONFLICT":
+      return copy.conflict;
+    case "ORDER_CASE_AMOUNT_INVALID":
+    case "ORDER_CASE_QUERY_INVALID":
+    case "VALIDATION_ERROR":
+    case "UNSUPPORTED_MEDIA_TYPE":
+    case "REQUEST_BODY_TOO_LARGE":
+      return copy.invalid;
+    case "ORDER_CASE_RECONCILIATION_REQUIRED":
+      return copy.recommendationBlocked;
+    case "ORDER_CASE_REFUND_NOT_REQUESTED":
+    case "ORDER_CASE_REVIEW_REQUIRED":
+    case "FORBIDDEN":
+    case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
+    case "ACTOR_CHANGED":
+      return copy.failed;
+    case "RATE_LIMIT_EXCEEDED":
+      return copy.uncertain;
+    default:
+      return copy.uncertain;
+  }
+}
