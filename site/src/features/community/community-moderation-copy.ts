@@ -111,7 +111,10 @@ export const moderationError = (locale: Locale, code: unknown) => {
     case "FORBIDDEN":
       return copy.denied;
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
       return copy.signIn;
+    case "ACTOR_CHANGED":
+      return copy.changed;
     case "VALIDATION_ERROR":
     case "INVALID_CURSOR":
       return copy.invalid;
