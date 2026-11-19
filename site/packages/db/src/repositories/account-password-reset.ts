@@ -105,7 +105,7 @@ export class AccountPasswordResetRepository {
         await tx.insert(notifications).values({
           id: input.notificationId,
           recipientId: proof.userId,
-          title: "Password reset completed",
+          title: "Password reset completed / Пароль восстановлен",
           message: "Your password was reset and all existing sessions were signed out.",
           link: "/auth/login",
           type: "security",

@@ -57,4 +57,14 @@ describe("notification residual inbox copy honesty", () => {
       message: "Пароль сброшен, все существующие сессии завершены.",
     });
   });
+
+  it("accepts bilingual slash password-reset titles for Web Push storage", () => {
+    const notice = {
+      title: "Password reset completed / Пароль восстановлен",
+      message: "Your password was reset and all existing sessions were signed out.",
+      data: null,
+    };
+    expect(formatNotification(notice, reviewCopy, "ru").title).toBe("Пароль восстановлен");
+    expect(formatNotification(notice, reviewCopy, "en").title).toBe("Password reset completed");
+  });
 });

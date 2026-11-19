@@ -329,6 +329,12 @@ function noticeLocale(locale: Locale): "ru" | "en" {
   return locale === "ru" ? "ru" : "en";
 }
 
+/** Stored notices may keep EN-only titles or bilingual `EN / RU` slash titles for Web Push. */
+export function canonicalNoticeTitle(title: string) {
+  const cut = title.indexOf(" / ");
+  return cut === -1 ? title : title.slice(0, cut);
+}
+
 /** Localize structured review notices; older notifications keep their stored text. */
 export function formatNotification(
   notification: Pick<Notification, "title" | "message" | "data">,
@@ -340,8 +346,9 @@ export function formatNotification(
   const releaseNotice = resourceReleaseNotification(notification.data, locale);
   if (releaseNotice) return releaseNotice;
   const c = noticeCopy[noticeLocale(locale)];
+  const noticeTitle = canonicalNoticeTitle(notification.title);
   if (
-    notification.title === "Discussion moderation" &&
+    noticeTitle === "Discussion moderation" &&
     /^Comment ([a-zA-Z0-9_-]{1,128}): removed\.$/u.test(notification.message)
   )
     return { title: c.discussionModeration.title, message: c.discussionModeration.message };
@@ -349,8 +356,8 @@ export function formatNotification(
     const events = c.publicationActivity.events;
     return Object.hasOwn(events, event) ? events[event as keyof typeof events] : undefined;
   };
-  const withContentTitle = (message: string, title: unknown) => {
-    const trimmed = typeof title === "string" ? title.trim().slice(0, 200) : "";
+  const withContentTitle = (message: string, contentTitle: unknown) => {
+    const trimmed = typeof contentTitle === "string" ? contentTitle.trim().slice(0, 200) : "";
     return trimmed ? `${message} (${trimmed})` : message;
   };
   if (notification.data?.kind === "content_reaction") {
@@ -369,12 +376,12 @@ export function formatNotification(
     }
   }
   if (
-    notification.title === "Publication reaction" &&
+    noticeTitle === "Publication reaction" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)
   )
     return { title: c.publicationReaction.title, message: c.publicationReaction.message };
   const publication =
-    notification.title === "Publication activity" &&
+    noticeTitle === "Publication activity" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived|restored)\.$/u.exec(
       notification.message,
     );
@@ -400,19 +407,19 @@ export function formatNotification(
     }
   }
   const supportActivity =
-    notification.title === "Support case activity" &&
+    noticeTitle === "Support case activity" &&
     /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);
   if (supportActivity) {
     const message = supportActivityMessages(supportActivity[2]);
     if (message) return { title: c.supportActivity.title, message };
   }
   if (
-    notification.title === "New support case" &&
+    noticeTitle === "New support case" &&
     notification.message === "A support case is awaiting review."
   )
     return { title: c.newSupportCase.title, message: c.newSupportCase.message };
   if (
-    notification.title === "Support case updated" &&
+    noticeTitle === "Support case updated" &&
     notification.message === "A support case has a new requester message."
   )
     return { title: c.supportCaseUpdated.title, message: c.supportCaseUpdated.message };
@@ -436,7 +443,7 @@ export function formatNotification(
     }
   }
   const organizationAccess =
-    notification.title === "Organization access changed" &&
+    noticeTitle === "Organization access changed" &&
     /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(
       notification.message,
     );
@@ -449,8 +456,7 @@ export function formatNotification(
   );
   if (
     serverOwnership &&
-    (notification.title === "Verification approved" ||
-      notification.title === "Verification rejected")
+    (noticeTitle === "Verification approved" || noticeTitle === "Verification rejected")
   ) {
     const approved = serverOwnership[1] === "approved";
     return {
@@ -465,7 +471,7 @@ export function formatNotification(
   if (
     verification &&
     ["user", "developer", "organization", "server"].includes(verification[1]) &&
-    notification.title === `Verification ${verification[3]}`
+    noticeTitle === `Verification ${verification[3]}`
   ) {
     const kindKey = verification[1] as keyof typeof c.verificationKinds;
     const approved = verification[3] === "approved";
@@ -478,7 +484,7 @@ export function formatNotification(
     };
   }
   if (
-    notification.title === "Server ownership proof requires review" &&
+    noticeTitle === "Server ownership proof requires review" &&
     notification.message === "A verified server control proof is awaiting review."
   )
     return { title: c.serverProofReview.title, message: c.serverProofReview.message };
@@ -486,7 +492,7 @@ export function formatNotification(
     /^(user|developer|organization|server) verification requested for ([a-zA-Z0-9_-]{1,128})$/u.exec(
       notification.message,
     );
-  if (notification.title === "New verification request" && requested) {
+  if (noticeTitle === "New verification request" && requested) {
     if (locale === "ru") {
       const kindKey = requested[1] as keyof typeof c.newVerificationRequest.kinds;
       return {
@@ -500,7 +506,7 @@ export function formatNotification(
     // English keeps the stored title/message for staff request notices.
   }
   if (
-    notification.title === "New verification request" &&
+    noticeTitle === "New verification request" &&
     notification.message === "A verification request is awaiting review."
   ) {
     return {
@@ -508,11 +514,11 @@ export function formatNotification(
       message: c.newVerificationRequest.awaitingReview,
     };
   }
-  if (notification.title === "New server update") {
+  if (noticeTitle === "New server update") {
     return { title: c.newServerUpdate.title, message: notification.message };
   }
   if (
-    notification.title === "Password reset completed" &&
+    noticeTitle === "Password reset completed" &&
     notification.message === "Your password was reset and all existing sessions were signed out."
   ) {
     return {
@@ -521,31 +527,25 @@ export function formatNotification(
     };
   }
   if (
-    notification.title === "New community report" &&
+    noticeTitle === "New community report" &&
     notification.message === "A community report is awaiting review."
   )
     return { title: c.newCommunityReport.title, message: c.newCommunityReport.message };
-  if (
-    notification.title === "New report" &&
-    notification.message === "A report is awaiting review."
-  )
+  if (noticeTitle === "New report" && notification.message === "A report is awaiting review.")
     return { title: c.newReport.title, message: c.newReport.message };
   const reportStatus =
-    (notification.title === "Community report status" ||
-      notification.title === "Platform report status") &&
+    (noticeTitle === "Community report status" || noticeTitle === "Platform report status") &&
     /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
   if (reportStatus) {
     const statusKey = reportStatus[1] as keyof typeof c.reportStatuses;
     return {
       title:
-        notification.title === "Platform report status"
-          ? c.platformReportStatus
-          : c.communityReportStatus,
+        noticeTitle === "Platform report status" ? c.platformReportStatus : c.communityReportStatus,
       message: c.reportStatuses[statusKey],
     };
   }
   if (
-    notification.title === "New discussion reply" &&
+    noticeTitle === "New discussion reply" &&
     [
       "A publication you follow has a new reply.",
       "A discussion you participate in has a new reply.",
@@ -573,7 +573,7 @@ export function formatNotification(
     };
   }
   const follower =
-    notification.title === "New Follower" &&
+    noticeTitle === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);
   if (follower)
     return {
@@ -583,7 +583,7 @@ export function formatNotification(
   // These notices predate structured review payloads; localize their bounded,
   // server-generated template without changing persisted notification contracts.
   const comment =
-    notification.title === "New article comment" &&
+    noticeTitle === "New article comment" &&
     /^@([a-zA-Z0-9_-]{1,80}) commented on “([\s\S]{1,200})”\.$/u.exec(notification.message);
   if (comment)
     return {

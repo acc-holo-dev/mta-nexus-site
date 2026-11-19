@@ -16,6 +16,7 @@ it("locks notification notice copy to a dictionary without inline RU/EN user lit
   expect(source).toContain("newServerUpdate:");
   expect(source).toContain("awaitingReview:");
   expect(source).toContain("passwordResetCompleted:");
+  expect(source).toContain("canonicalNoticeTitle");
   expect(source).not.toMatch(/title:\s*locale === "ru" \?/u);
   expect(source).not.toMatch(/message:\s*locale === "ru" \?/u);
 });
