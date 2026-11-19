@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `0d9bec51` (`dev`, Wave 96 tip).
+**source_sha:** `e9e88ceb` (`dev`, Wave 98 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `0d9bec51` |
+| Область                    |             Факт на `e9e88ceb` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1656 |
+| `site/tests` files         |                           1663 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -53,13 +53,13 @@ site/
 | ------------- | ----: | -----: |
 | accounts      |    52 | 158691 |
 | commerce      |    71 | 330627 |
-| community     |   128 | 592282 |
+| community     |   128 | 594001 |
 | discovery     |     8 |  33815 |
 | library       |    86 | 409749 |
-| moderation    |    34 | 157176 |
+| moderation    |    35 | 158575 |
 | notifications |    25 | 136481 |
 | organizations |    49 | 187199 |
-| resources     |   169 | 742643 |
+| resources     |   171 | 747623 |
 | servers       |    87 | 318668 |
 | shell         |    67 | 111009 |
 | support       |    22 | 110720 |
@@ -448,6 +448,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 96                                                                                     | docs honesty                     | **done** |
 | A   | Wave 97 — product builds upload errors via productBuildsApiCopy                                                   | API envelope RU/EN               | **done** |
 | A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Waves 97–98                                                                                 | docs honesty                     | **done** |
 
 Дальше: API-envelope localization major route clusters exhausted (support* already RU). Residual AppError English passthrough is intentional. F/ops remains external. Новые TOPO ID не заводить.
 
