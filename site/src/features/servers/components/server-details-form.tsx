@@ -102,6 +102,10 @@ export function ServerDetailsForm({
   const router = useRouter();
   const { dictionary } = useNexusLocale();
   const copy = dictionary.serverManagement;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const formErrorHint = dictionary.errors.formErrorHint;
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -302,8 +306,7 @@ export function ServerDetailsForm({
         if (!responseReceived) setNeedsCheck(true);
         setNotice({
           error: true,
-          text:
-            caught instanceof Error && caught.message ? caught.message : copy.unexpectedSaveError,
+          text: safeMessage(caught, copy.unexpectedSaveError),
         });
       }
     } finally {

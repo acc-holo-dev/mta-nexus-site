@@ -17,6 +17,10 @@ const nativeLabelClass = "block font-label uppercase text-secondary";
 export function RegisterServerForm({ actorId }: { actorId: string }) {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.serverRegistration;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const [organizationsLoading, setOrganizationsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -98,7 +102,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
       }
       setRecoveryMessage(copy.listingNotConfirmed);
     } catch (error) {
-      setRecoveryMessage(error instanceof Error ? error.message : copy.resultCheckFailedShort);
+      setRecoveryMessage(safeMessage(error, copy.resultCheckFailedShort));
     } finally {
       busyRef.current = false;
       setLoading(false);
