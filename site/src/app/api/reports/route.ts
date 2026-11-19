@@ -6,6 +6,7 @@ import type { NextRequest } from "next/server";
 import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -143,7 +144,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     ) {
       return privateJson(
         context,
-        { error: error.message, code: error.code },
+        {
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.submitFailed,
+            },
+            { REPORT_OWN_TARGET: copy.cannotReportSelf },
+          ),
+          code: error.code,
+        },
         { status: error.statusCode },
       );
     }

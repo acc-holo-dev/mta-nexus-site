@@ -2,6 +2,12 @@ import type { Locale } from "../../lib/i18n";
 
 const en = {
   unauthorized: "Unauthorized",
+  forbidden: "Forbidden",
+  notFound: "Report target was not found",
+  unsupportedMediaType: "Request must use application/json",
+  requestBodyTooLarge: "Request body is too large",
+  invalidBodyLength: "Request body length is invalid",
+  requestBodyTimeout: "Request body timed out",
   invalidPageOrView: "Invalid report page or view",
   listFailed: "Failed to load reports",
   authenticationRequired: "Authentication required to submit report",
@@ -15,6 +21,12 @@ const en = {
 
 const ru: Record<keyof typeof en, string> = {
   unauthorized: "Нет доступа",
+  forbidden: "Запрещено",
+  notFound: "Цель жалобы не найдена",
+  unsupportedMediaType: "Запрос должен использовать application/json",
+  requestBodyTooLarge: "Тело запроса слишком большое",
+  invalidBodyLength: "Некорректная длина тела запроса",
+  requestBodyTimeout: "Истекло время ожидания тела запроса",
   invalidPageOrView: "Некорректная страница или вид жалоб",
   listFailed: "Не удалось загрузить жалобы",
   authenticationRequired: "Чтобы отправить жалобу, требуется вход",
