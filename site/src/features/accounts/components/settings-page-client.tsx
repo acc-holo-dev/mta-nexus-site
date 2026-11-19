@@ -19,6 +19,7 @@ import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-f
 import { PublicProfileForm } from "../profile";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
 import {
+  isSettingsSignedOutError,
   type SettingsRecoveryEmail,
   SettingsRequestError,
   type SettingsSession,
@@ -244,11 +245,7 @@ export function SettingsPageClient() {
     try {
       await action();
     } catch (error: unknown) {
-      if (
-        error instanceof SettingsRequestError &&
-        error.status === 401 &&
-        error.message === "Authentication required"
-      ) {
+      if (error instanceof SettingsRequestError && isSettingsSignedOutError(error)) {
         setSignedOut(true);
         setSessionSnapshot(null);
         setPreferences(null);
