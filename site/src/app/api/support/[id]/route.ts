@@ -1,4 +1,3 @@
-import { supportCaseRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
@@ -16,12 +15,13 @@ import { parseBoundedJson } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import { createRequestLogContext } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
+import { supportCaseService } from "../../../../lib/services/support/support-case-service";
 
 async function loadAuthorizedCase(currentToken: string | undefined, id: string) {
   const user = currentToken ? await authService.getSession(currentToken) : null;
   if (!user) return { user: null, supportCase: null, staff: false };
 
-  const supportCase = await supportCaseRepository.findById(id);
+  const supportCase = await supportCaseService.findById(id);
   if (!supportCase) return { user, supportCase: null, staff: false };
 
   const staff = can(user, "admin.moderation");
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (values.length > 1 || (values.length === 1 && !/^[1-9]\d{0,6}$/u.test(values[0] ?? "")))
       throw new AppError("Invalid message page", 400, "VALIDATION_ERROR");
     if (!(await consumeRateLimit("search", user.id)).success) throw new RateLimitExceededError();
-    const access = await supportCaseRepository.authorizedThread(
+    const access = await supportCaseService.authorizedThread(
       id,
       user.id,
       values[0] ? Number(values[0]) : 1,
@@ -145,7 +145,7 @@ export const POST = withBrowserMutation(
         operation: "reply" as const,
         fingerprint,
       };
-      const previous = await supportCaseRepository.findMutationReplay(scope, currentToken);
+      const previous = await supportCaseService.findMutationReplay(scope, currentToken);
       if (previous.kind === "key_conflict") {
         return supportPrivateJson(
           context,
@@ -199,7 +199,7 @@ export const POST = withBrowserMutation(
 
       const authorRole = access.supportCase.requesterId === access.user.id ? "requester" : "staff";
       const messageId = generateId("spm");
-      const result = await supportCaseRepository.addIdempotentMessage(
+      const result = await supportCaseService.addIdempotentMessage(
         {
           id: messageId,
           caseId: id,
@@ -237,7 +237,7 @@ export const POST = withBrowserMutation(
       }
 
       if (result.kind === "stale") {
-        const current = await supportCaseRepository.findById(id);
+        const current = await supportCaseService.findById(id);
         const closed = current?.status === "closed";
         return supportPrivateJson(
           context,
@@ -336,7 +336,7 @@ export const PATCH = withBrowserMutation(
         );
       }
 
-      const supportCase = await supportCaseRepository.updateStatus(
+      const supportCase = await supportCaseService.updateStatus(
         id,
         parsed.data.status,
         {

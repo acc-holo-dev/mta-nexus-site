@@ -1,4 +1,3 @@
-import { supportCaseRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
@@ -16,6 +15,7 @@ import { parseBoundedJson } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
 import { createRequestLogContext } from "../../../lib/platform/observability";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { supportCaseService } from "../../../lib/services/support/support-case-service";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       ...(filters.q ? { query: filters.q } : {}),
     };
     if (staff) {
-      const result = await supportCaseRepository.pageStaff(
+      const result = await supportCaseService.pageStaff(
         filters.page,
         25,
         selection,
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         total: result.total,
       });
     }
-    const result = await supportCaseRepository.pageByRequester(
+    const result = await supportCaseService.pageByRequester(
       user.id,
       filters.page,
       25,
@@ -149,7 +149,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       operation: "case" as const,
       fingerprint,
     };
-    const existing = await supportCaseRepository.findMutationReplay(scope, currentToken);
+    const existing = await supportCaseService.findMutationReplay(scope, currentToken);
     if (existing.kind === "key_conflict") {
       return supportPrivateJson(
         context,
@@ -177,7 +177,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const caseId = generateId("sup");
     const messageId = generateId("spm");
-    const result = await supportCaseRepository.createIdempotentCase(
+    const result = await supportCaseService.createIdempotentCase(
       {
         id: caseId,
         requesterId: user.id,

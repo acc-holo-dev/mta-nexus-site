@@ -346,6 +346,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Library residual pages absorb done:** thick `workspace/library` pages (index, updates, downloads, watches, watch history, reviews, versions, collection watches, download receipt, review editor) → `features/library` server screens + `*-server` ports; `userLibraryService` wraps `userLibraryRepository` (workspace dashboard uses the same service).
 
+**HTTP_DB burn-down (support cases) done:** `/api/support` + `/api/support/[id]` call `supportCaseService` instead of `supportCaseRepository`; both patterns removed from `HTTP_DB_SERVICE_REQUIRED`.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
