@@ -33,6 +33,17 @@ export function AuthorContentForm({
   server?: { id: string; name: string };
 }) {
   const copy = getUserPlatformCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(authorPublicationDeskCopy(locale)),
+      ...Object.values(organizationContentCopy(locale)),
+      ...Object.values(serverContentCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [saved, setSaved] = useState(initial);
@@ -154,7 +165,7 @@ export function AuthorContentForm({
       setNotice({ text: copy.saved, error: false });
       setPreview(null);
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
@@ -191,7 +202,7 @@ export function AuthorContentForm({
         throw new Error(copy.UNCONFIRMED);
       setLatest(next);
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
@@ -249,7 +260,7 @@ export function AuthorContentForm({
       setNotice({ text: copy.archivedNote, error: false });
       router.refresh();
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
