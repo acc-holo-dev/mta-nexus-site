@@ -4,6 +4,7 @@ import {
   LICENSE_EXPIRING_DAYS,
   LICENSE_MAINTENANCE_BATCH_LIMIT,
   type LicenseMaintenanceResult,
+  licenseTermUtcNoticeMessage,
   noticeStoredTitles,
 } from "@nexus/domain";
 import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
@@ -182,7 +183,7 @@ export class LicenseMaintenanceRepository {
               event === "expired"
                 ? noticeStoredTitles.licenseExpired
                 : noticeStoredTitles.licenseExpiresSoon,
-            message: `UTC: ${license.expiresAt.toISOString()}`,
+            message: licenseTermUtcNoticeMessage(license.expiresAt.toISOString()),
             link: `/workspace/licenses/${encodeURIComponent(license.id)}`,
             data: { kind: "license_term", event, expiresAt: license.expiresAt.toISOString() },
             isRead: false,
