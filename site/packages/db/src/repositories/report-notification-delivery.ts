@@ -85,8 +85,12 @@ export class ReportNotificationDeliveryRepository {
                   .update(JSON.stringify([job.reportId, recipient.id]))
                   .digest("hex")}`,
                 recipientId: recipient.id,
-                title: noticeStoredTitles.newReport,
-                message: noticeStoredMessages.newReport,
+                title: job.community
+                  ? noticeStoredTitles.newCommunityReport
+                  : noticeStoredTitles.newReport,
+                message: job.community
+                  ? noticeStoredMessages.newCommunityReport
+                  : noticeStoredMessages.newReport,
                 link: job.community
                   ? `/admin/reports/${encodeURIComponent(job.reportId)}`
                   : `/admin?reportView=pending&reportId=${encodeURIComponent(job.reportId)}#report-${encodeURIComponent(job.reportId)}`,
