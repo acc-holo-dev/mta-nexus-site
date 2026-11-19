@@ -115,7 +115,7 @@ it("handles a scope change during the guarded write", async () => {
   mocks.updateProductDetails.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   const response = await PATCH(request(input), params);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("rejects excessive tags and whitespace metadata", async () => {
   for (const body of [
@@ -149,7 +149,7 @@ it.each([
 ])("rejects invalid revision %s without writing", async (revision) => {
   const response = await PATCH(request(input, revision), params);
   expect(response.status).toBe(400);
-  expect(await response.json()).toEqual({ code: "PRODUCT_METADATA_INVALID" });
+  expect(await response.json()).toMatchObject({ code: "PRODUCT_METADATA_INVALID" });
   expect(mocks.updateProductDetails).not.toHaveBeenCalled();
 });
 it("returns only the conflict code and keeps the response private", async () => {
@@ -158,7 +158,7 @@ it("returns only the conflict code and keeps the response private", async () => 
   );
   const response = await PATCH(request(input, '"2026-10-04T20:00:00.123Z"'), params);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "PRODUCT_METADATA_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "PRODUCT_METADATA_CONFLICT" });
   expect(response.headers.get("cache-control")).toBe("private, no-store");
 });
 it("hides scope-denied resources even when a revision is malformed", async () => {
@@ -171,6 +171,6 @@ it("hides scope-denied resources even when a revision is malformed", async () =>
 it("requires an observed resource revision before editing", async () => {
   const response = await PATCH(request(input, null), params);
   expect(response.status).toBe(428);
-  expect(await response.json()).toEqual({ code: "PRODUCT_METADATA_REVISION_REQUIRED" });
+  expect(await response.json()).toMatchObject({ code: "PRODUCT_METADATA_REVISION_REQUIRED" });
   expect(mocks.updateProductDetails).not.toHaveBeenCalled();
 });

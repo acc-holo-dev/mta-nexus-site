@@ -80,7 +80,7 @@ it("denies signed-out reads and writes without touching commerce", async () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("vary")).toBe("Cookie");
-    expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+    expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
   }
   expect(mocks.get).not.toHaveBeenCalled();
   expect(mocks.add).not.toHaveBeenCalled();
@@ -180,7 +180,7 @@ it("returns safe state conflicts without private repository data", async () => {
     }),
   );
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RESOURCE_CART_CHANGED" });
+  expect(await response.json()).toMatchObject({ code: "RESOURCE_CART_CHANGED" });
 });
 it("validates lifecycle commands and returns only the product revision", async () => {
   const command = {

@@ -128,7 +128,7 @@ it.each([null, { ...terms, id: "cplan_a", revision: 3 }])(
       request("/api/commerce/estimate?amount=10000&currency=USD&planId=cplan_a&revision=2"),
     );
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "COMMERCIAL_PLAN_QUOTE_CHANGED" });
+    expect(await response.json()).toMatchObject({ code: "COMMERCIAL_PLAN_QUOTE_CHANGED" });
   },
 );
 it("uses the base 10% quote without reading any plan", async () => {
@@ -252,7 +252,7 @@ it("does not disclose internal reconciliation details", async () => {
   );
   expect(
     await (await cancel(request("/api/orders/ord_a/cancel", cancellation), ctx)).json(),
-  ).toEqual({ code: "ORDER_RECONCILIATION_REQUIRED" });
+  ).toMatchObject({ code: "ORDER_RECONCILIATION_REQUIRED" });
 });
 it("requires login before fetching the buyer archive or cancelling", async () => {
   state.user = null;

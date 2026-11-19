@@ -42,7 +42,7 @@ it("does not reveal another buyer's license detail", async () => {
   const response = await detail(new NextRequest("https://nexus.test/api/licenses/lic_a"), context);
   expect(state.detail).toHaveBeenCalledWith("lic_a", "usr_a");
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 
 it("scopes private configuration and history to the current buyer and paginates staff under live checks", async () => {

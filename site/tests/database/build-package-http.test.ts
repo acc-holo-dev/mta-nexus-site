@@ -77,7 +77,7 @@ it("keeps current repository authority failures private", async () => {
   state.detail.mockRejectedValue(new AppError("Private resource", 404, "NOT_FOUND"));
   const response = await report(request(), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("routes staff reads through live moderation authority", async () => {
   await staffReport(

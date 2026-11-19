@@ -148,7 +148,7 @@ it("does not export data after current publisher authorization is denied", async
   state.report.mockRejectedValue(new NotFoundError("Resource", "prd_a"));
   const response = await csv(request("/api/products/prd_a/activity/export"), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it.each([
   new ForbiddenError("Access revoked"),

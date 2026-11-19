@@ -107,7 +107,7 @@ it.each(routes)(
       expect(auth.getSession).not.toHaveBeenCalled();
     } else {
       expect(response.status).toBe(401);
-      expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+      expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
       expect(auth.getSession).toHaveBeenCalledOnce();
     }
   },

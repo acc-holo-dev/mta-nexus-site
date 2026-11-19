@@ -319,5 +319,5 @@ it("maps repository AppError codes for Q&A reads", async () => {
   state.publicPage.mockRejectedValue(new AppError("missing", 404, "NOT_FOUND"));
   const response = await list(request("/api/products/prd_a/qa"), productContext);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });

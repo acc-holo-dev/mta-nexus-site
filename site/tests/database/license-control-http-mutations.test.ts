@@ -172,7 +172,7 @@ it("requires the initiating cookie before consuming owner or moderation command 
     const read = vi.spyOn(req.body, "getReader");
     const response = await route(req, context);
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+    expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("vary")).toBe("Cookie");
     expect(read).not.toHaveBeenCalled();

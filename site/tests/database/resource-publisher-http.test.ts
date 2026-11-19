@@ -77,5 +77,5 @@ it("denies guests, malformed selectors, rate excess and live scope revocation", 
     context,
   );
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
 });

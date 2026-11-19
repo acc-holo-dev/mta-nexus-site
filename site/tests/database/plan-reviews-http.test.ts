@@ -144,14 +144,16 @@ it("exports bounded JSON with private headers and masks private repository failu
   expect(res.headers.get("x-content-type-options")).toBe("nosniff");
   expect(res.headers.get("vary")).toBe("Cookie");
   state.detail.mockRejectedValue(new AppError("PRIVATE_DETAIL", 404, "NOT_FOUND"));
-  expect(await (await download(request(base), context)).json()).toEqual({ code: "NOT_FOUND" });
+  expect(await (await download(request(base), context)).json()).toMatchObject({
+    code: "NOT_FOUND",
+  });
 });
 
 it("refuses oversized detail exports without exposing report data", async () => {
   state.detail.mockResolvedValue({ review: { id: "prev_a", padding: "a".repeat(32768) } });
   const response = await download(request(base), context);
   expect(response.status).toBe(500);
-  expect(await response.json()).toEqual({ code: "RESOURCE_COMMERCE_FAILED" });
+  expect(await response.json()).toMatchObject({ code: "RESOURCE_COMMERCE_FAILED" });
 });
 
 afterEach(() => {

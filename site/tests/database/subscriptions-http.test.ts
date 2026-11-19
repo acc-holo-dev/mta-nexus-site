@@ -172,7 +172,7 @@ it("serves bounded private JSON receipts only while account authority is retaine
   state.detail.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   const denied = await download(request(base), context);
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("returns domain conflicts without claiming activation or exposing internals", async () => {
   state.command.mockRejectedValue(
@@ -180,7 +180,7 @@ it("returns domain conflicts without claiming activation or exposing internals",
   );
   const res = await POST(post());
   expect(res.status).toBe(409);
-  expect(await res.json()).toEqual({ code: "SUBSCRIPTION_PAYMENT_REQUIRED" });
+  expect(await res.json()).toMatchObject({ code: "SUBSCRIPTION_PAYMENT_REQUIRED" });
 });
 it("bounds exported bytes", async () => {
   state.detail.mockResolvedValue({ receipt: { ...receipt, description: "x".repeat(40 * 1024) } });

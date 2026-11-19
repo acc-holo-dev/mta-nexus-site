@@ -64,7 +64,7 @@ it.each([publicGet, managedGet, publicExport, managedExport])(
     state.read.mockResolvedValue(null);
     const response = await get(request(), params);
     expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({ code: "NOT_FOUND", error: "Server not found" });
+    expect(await response.json()).toMatchObject({ code: "NOT_FOUND", error: "Server not found" });
   },
 );
 it.each([

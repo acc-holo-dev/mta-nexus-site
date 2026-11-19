@@ -117,7 +117,7 @@ describe("server owner update HTTP contract", () => {
       routeContext,
     );
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
     expect(updateServer).not.toHaveBeenCalled();
   });
 

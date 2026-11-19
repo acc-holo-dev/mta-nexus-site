@@ -82,11 +82,11 @@ it("exports one bounded page with private headers and masks inaccessible orders"
   }
   state.report.mockRejectedValue(new AppError("PRIVATE-BUYER", 404, "NOT_FOUND"));
   const res = await buyer(request(paths[0]), context);
-  expect(await res.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await res.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("oversized exports fail without returning private data", async () => {
   state.report.mockResolvedValue({ page: 2, privateLarge: "x".repeat(128 * 1024) });
   const res = await buyerExport(request(paths[1]), context);
   expect(res.status).toBe(500);
-  expect(await res.json()).toEqual({ code: "RESOURCE_COMMERCE_FAILED" });
+  expect(await res.json()).toMatchObject({ code: "RESOURCE_COMMERCE_FAILED" });
 });

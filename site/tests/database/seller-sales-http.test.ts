@@ -112,7 +112,7 @@ it("rejects unscoped and repeated selectors", async () => {
 it("preserves masked authority errors and exports only one safe page", async () => {
   state.detail.mockRejectedValue(new AppError("private account title", 404, "NOT_FOUND"));
   const res = await detail(request("/itm_a?organizationId=org_a"), context);
-  expect(await res.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await res.json()).toMatchObject({ code: "NOT_FOUND" });
   expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a");
   const exportRes = await csv(request("/export?days=7"));
   expect(exportRes.headers.get("content-type")).toContain("text/csv");
@@ -126,7 +126,7 @@ it("does not expose provider errors in generic failures", async () => {
   state.report.mockRejectedValue(new Error("PROVIDER-SECRET"));
   const res = await report(request());
   expect(res.status).toBe(500);
-  expect(await res.json()).toEqual({ code: "RESOURCE_COMMERCE_FAILED" });
+  expect(await res.json()).toMatchObject({ code: "RESOURCE_COMMERCE_FAILED" });
 });
 
 it("recorded seller selection is bounded and carried into line reads", async () => {

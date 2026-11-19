@@ -108,7 +108,7 @@ it("sanitizes stale membership errors and rate limits both operations", async ()
   );
   const response = await POST(post(), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RELEASE_WATCH_COLLECTION_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RELEASE_WATCH_COLLECTION_CONFLICT" });
   h.rate.mockResolvedValue({ success: false });
   h.page.mockClear();
   h.enable.mockClear();

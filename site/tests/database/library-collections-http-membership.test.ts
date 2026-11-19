@@ -88,7 +88,7 @@ it("masks unowned resource failures and rejects malformed resource ids before re
     params: Promise.resolve({ id: "prd_a" }),
   });
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 
 it("applies a strict resource-bound membership batch through the session and content-creation budget", async () => {

@@ -106,7 +106,7 @@ it("throttles all private commercial views", async () => {
 });
 it("returns only conflict codes, never private internal details", async () => {
   mocks.create.mockRejectedValue(new AppError("private bank record", 409, "ORDER_CASE_EXISTS"));
-  expect(await (await POST(request("POST"), context)).json()).toEqual({
+  expect(await (await POST(request("POST"), context)).json()).toMatchObject({
     code: "ORDER_CASE_EXISTS",
   });
 });

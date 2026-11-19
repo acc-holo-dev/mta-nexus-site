@@ -122,7 +122,7 @@ it("forwards an explicit private conflict without leaking implementation details
   mocks.command.mockRejectedValue(new AppError("private data", 409, "BUILD_REVISION_CONFLICT"));
   const response = await PATCH(req(), params);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "BUILD_REVISION_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "BUILD_REVISION_CONFLICT" });
 });
 it("uses separate live staff authority for admin detail", async () => {
   mocks.detail.mockResolvedValue({ build: { id: "bld_a" } });

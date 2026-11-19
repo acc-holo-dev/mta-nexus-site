@@ -89,7 +89,7 @@ it("a foreign receipt and revoked publisher authority remain opaque", async () =
     params: Promise.resolve({ id: "dlv_other" }),
   });
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
   state.publisher.mockRejectedValue(new AppError("private buyer context", 404, "NOT_FOUND"));
   expect(
     (

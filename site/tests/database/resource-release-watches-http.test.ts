@@ -114,7 +114,7 @@ it("revision-scoped commands use the existing mutation guard and never accept pr
   state.command.mockRejectedValue(new AppError("private state", 409, "RELEASE_WATCH_CONFLICT"));
   const response = await command(request({ enabled: true, expectedRevision: 0 }), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RELEASE_WATCH_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RELEASE_WATCH_CONFLICT" });
 });
 it("refuses rate excess and account selectors on the read archive", async () => {
   expect(

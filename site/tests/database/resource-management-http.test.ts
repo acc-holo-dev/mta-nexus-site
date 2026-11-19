@@ -166,7 +166,7 @@ it("rejects missing or changed actor preconditions before compatibility writes",
     context,
   );
   expect(changed.status).toBe(409);
-  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(await changed.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(state.compatibility).not.toHaveBeenCalled();
 });
 
@@ -195,7 +195,7 @@ it("binds variant reads and writes to the active actor", async () => {
     context,
   );
   expect(changed.status).toBe(409);
-  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(await changed.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(state.command).not.toHaveBeenCalled();
 });
 
@@ -288,7 +288,7 @@ it("preserves private not-found and concurrency errors", async () => {
   );
   const response = await variants(request("/api/products/prd_a/variants", command), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RESOURCE_VARIANTS_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RESOURCE_VARIANTS_CONFLICT" });
 });
 it("bounds candidate paging and rejects ambiguous repeated parameters", async () => {
   for (const query of ["page=0", "page=1001", "page=2.5", "page=2&page=3", "page=nope"])

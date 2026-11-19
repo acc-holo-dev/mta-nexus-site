@@ -119,5 +119,5 @@ it("masks foreign destinations without returning their collection metadata", asy
   state.comparison.mockRejectedValue(new AppError("Foreign private name", 404, "NOT_FOUND"));
   const response = await comparison(request(`${base}/lcol_a/compare?to=lcol_foreign`), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });

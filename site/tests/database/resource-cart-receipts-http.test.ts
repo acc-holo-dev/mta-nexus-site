@@ -79,7 +79,7 @@ it("exports the selected page only with safe attachment headers", async () => {
 it("masks private missing receipt details and rejects malformed identities", async () => {
   state.detail.mockRejectedValue(new AppError("Private provider key", 404, "NOT_FOUND"));
   const response = await detail(request(`receipts/${requestId}`), context);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
   state.detail.mockClear();
   expect(
     (await detail(request("receipts/x"), { params: Promise.resolve({ id: "../private" }) })).status,

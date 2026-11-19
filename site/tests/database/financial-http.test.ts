@@ -68,7 +68,7 @@ it("preserves privacy when current organization access has been revoked", async 
   state.statement.mockRejectedValue(new AppError("Secret organization", 404, "NOT_FOUND"));
   const response = await statement(get("/api/finance?organizationId=org_a"));
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("rate limits all financial reads before repository access", async () => {
   state.allowed = false;

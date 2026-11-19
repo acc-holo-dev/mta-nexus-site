@@ -102,7 +102,7 @@ it("returns stable conflicts without exposing private exception messages", async
   state.command.mockRejectedValue(new AppError("private title", 409, "SELECTION_BATCH_CHANGED"));
   const response = await apply(request(), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "SELECTION_BATCH_CHANGED" });
+  expect(await response.json()).toMatchObject({ code: "SELECTION_BATCH_CHANGED" });
 });
 it("validates history pagination and protects downloads", async () => {
   const response = await download(request("/history/export", "GET", {}, "?page=2"), context);

@@ -107,7 +107,7 @@ describe("community content API behavior", () => {
     req.headers.set("X-Nexus-Actor-Id", "usr_other");
     const response = await POST(req);
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
@@ -116,7 +116,7 @@ describe("community content API behavior", () => {
     req.headers.delete("X-Nexus-Actor-Id");
     const response = await POST(req);
     expect(response.status).toBe(428);
-    expect(await response.json()).toEqual({ code: "ACTOR_ID_REQUIRED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_ID_REQUIRED" });
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 

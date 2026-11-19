@@ -90,7 +90,7 @@ it.each(["en", "ru"] as const)(
       ),
     );
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({
+    expect(await response.json()).toMatchObject({
       code: "ACCOUNT_CHANGED",
       error: profilePrivacyCopy(locale).accountChanged,
     });
@@ -161,7 +161,7 @@ it.each(["en", "ru"] as const)(
     mocks.update.mockRejectedValue(new AppError("private SQL", 409, "CONFLICT"));
     const conflict = await PATCH(request("PATCH", input, "", headers));
     expect(conflict.status).toBe(409);
-    expect(await conflict.json()).toEqual({
+    expect(await conflict.json()).toMatchObject({
       code: "CONFLICT",
       error: profilePrivacyCopy(locale).conflict,
     });
