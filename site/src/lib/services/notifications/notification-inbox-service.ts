@@ -1,4 +1,4 @@
-import { notificationRepository } from "@nexus/db";
+import { notificationRepository, webPushSubscriptionRepository } from "@nexus/db";
 import { AppError, type Notification } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
@@ -112,6 +112,22 @@ class NotificationInboxService {
     currentToken: string,
   ) {
     return notificationRepository.updatePreferences(userId, changes, currentToken);
+  }
+
+  listWebPushForSession(userId: string, sessionId: string) {
+    return webPushSubscriptionRepository.listForSession(userId, sessionId);
+  }
+
+  upsertWebPushAuthenticated(
+    ...args: Parameters<typeof webPushSubscriptionRepository.upsertAuthenticated>
+  ) {
+    return webPushSubscriptionRepository.upsertAuthenticated(...args);
+  }
+
+  removeWebPushAuthenticated(
+    ...args: Parameters<typeof webPushSubscriptionRepository.removeAuthenticated>
+  ) {
+    return webPushSubscriptionRepository.removeAuthenticated(...args);
   }
 }
 export const notificationInboxService = new NotificationInboxService();

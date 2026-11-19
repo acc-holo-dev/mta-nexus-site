@@ -76,6 +76,11 @@ export function createContextSwitchingAuthMock() {
       getSession: contextSwitchingMocks.getSession,
       getSessionIdentity: contextSwitchingMocks.getSessionIdentity,
       switchContext: contextSwitchingMocks.switchContext,
+      listOwnedOrganizations: contextSwitchingMocks.owned,
+      listUserMemberships: contextSwitchingMocks.memberships,
+      findOrganizationById: contextSwitchingMocks.findOrganization,
+      findOrganizationSummariesByIds: contextSwitchingMocks.findSummaries,
+      findUserOrganizationContext: contextSwitchingMocks.findUserContext,
     },
   };
 }

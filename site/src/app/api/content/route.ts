@@ -1,4 +1,3 @@
-import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createContentSchema } from "@nexus/validation";
@@ -17,6 +16,7 @@ import {
 import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { contentService } from "../../../lib/services/community/content-service";
 import { serverService } from "../../../lib/services/servers/server-service";
 
 const privateHeaders = {
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     const limit = Number.isFinite(requestedLimit)
       ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 50;
-    const content = await contentRepository.listPublished(limit);
+    const content = await contentService.listPublished(limit);
 
     // Visibility of associated servers and resources can change at any time.
     return Response.json({ content, limit }, { headers: publicHeaders });
@@ -129,7 +129,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.productId) {
-      const linkedProduct = await productRepository.findById(parsed.data.productId);
+      const linkedProduct = await productService.getProductById(parsed.data.productId);
       if (!linkedProduct) {
         return privateJson(
           context,
@@ -152,7 +152,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.organizationId) {
-      const organization = await organizationRepository.findById(parsed.data.organizationId);
+      const organization = await authService.findOrganizationById(parsed.data.organizationId);
       if (!organization) {
         return privateJson(
           context,
@@ -163,7 +163,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         );
       }
 
-      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const memberships = await authService.listUserMemberships(user.id);
       const membership = memberships.find(
         (item) => item.organizationId === parsed.data.organizationId,
       );
@@ -191,7 +191,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         : "draft";
 
     const contentId = generateId("cnt");
-    const contentItem = await contentRepository.createWithAudit(
+    const contentItem = await contentService.createWithAudit(
       {
         ...parsed.data,
         status,

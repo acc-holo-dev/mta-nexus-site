@@ -299,6 +299,14 @@ export class ContentService {
       recentArticles,
     };
   }
+
+  listPublished(limit: number) {
+    return contentRepository.listPublished(limit);
+  }
+
+  createWithAudit(...args: Parameters<typeof contentRepository.createWithAudit>) {
+    return contentRepository.createWithAudit(...args);
+  }
 }
 
 export const contentService = new ContentService();

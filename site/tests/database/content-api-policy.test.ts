@@ -22,19 +22,18 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
-  authService: { getSession: vi.fn(async () => state.user) },
+  authService: {
+    getSession: vi.fn(async () => state.user),
+    findOrganizationById: mocks.findOrganization,
+    listUserMemberships: mocks.memberships,
+  },
 }));
 
-vi.mock("@nexus/db", () => ({
-  contentRepository: {
+vi.mock("../../src/lib/services/community/content-service", () => ({
+  contentService: {
     listPublished: mocks.listPublished,
     createWithAudit: mocks.createWithAudit,
   },
-  organizationRepository: {
-    findById: mocks.findOrganization,
-    listUserMemberships: mocks.memberships,
-  },
-  productRepository: { findById: mocks.findProduct },
 }));
 
 vi.mock("../../src/lib/services/servers/server-service", () => ({
@@ -45,7 +44,10 @@ vi.mock("../../src/lib/services/servers/server-service", () => ({
 }));
 
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
-  productService: { canManageProduct: vi.fn() },
+  productService: {
+    canManageProduct: vi.fn(),
+    getProductById: mocks.findProduct,
+  },
 }));
 
 vi.mock("@nexus/security", () => ({

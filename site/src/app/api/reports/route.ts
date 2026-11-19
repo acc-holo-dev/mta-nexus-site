@@ -1,4 +1,3 @@
-import { reportRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createReportSchema } from "@nexus/validation";
@@ -15,6 +14,7 @@ import {
 } from "../../../lib/platform/observability";
 import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       return privateJson(context, { error: copy.invalidPageOrView }, { status: 400 });
     }
     const page = Number(rawPage);
-    const result = await reportRepository.listPage(view as "pending" | "history", page);
+    const result = await platformReportService.listPage(view as "pending" | "history", page);
     return privateJson(context, { ...result, page, view });
   } catch (error: unknown) {
     logRequestEvent({
@@ -94,7 +94,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     const reportId = generateId("rpt");
-    const result = await reportRepository.createWithAudit(
+    const result = await platformReportService.createWithAudit(
       {
         id: reportId,
         reporterId: user.id,

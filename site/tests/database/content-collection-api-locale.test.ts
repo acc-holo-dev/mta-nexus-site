@@ -12,12 +12,10 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("@nexus/db", () => ({
-  contentRepository: {
+vi.mock("../../src/lib/services/community/content-service", () => ({
+  contentService: {
     listPublished: mocks.listPublished,
   },
-  organizationRepository: {},
-  productRepository: {},
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({

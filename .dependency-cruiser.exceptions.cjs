@@ -24,12 +24,7 @@ const HTTP_DB_ALLOWED_READ_HEALTH = Object.freeze([
 const HTTP_DB_SERVICE_REQUIRED = Object.freeze([
   "^(?:apps/web|site)/src/app/api/admin/actions/",
   "^(?:apps/web|site)/src/app/api/admin/builds/",
-  "^(?:apps/web|site)/src/app/api/auth/context/",
-  "^(?:apps/web|site)/src/app/api/content/route\\.ts$",
-  "^(?:apps/web|site)/src/app/api/notifications/push/",
   "^(?:apps/web|site)/src/app/api/products/[^/]+/download/",
-  "^(?:apps/web|site)/src/app/api/reports/",
-  "^(?:apps/web|site)/src/app/api/verification/",
 ]);
 
 module.exports = {

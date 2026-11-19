@@ -22,11 +22,11 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  webPushSubscriptionRepository: {
-    listForSession: mocks.listForSession,
-    upsertAuthenticated: mocks.upsertAuthenticated,
-    removeAuthenticated: mocks.removeAuthenticated,
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
+  notificationInboxService: {
+    listWebPushForSession: mocks.listForSession,
+    upsertWebPushAuthenticated: mocks.upsertAuthenticated,
+    removeWebPushAuthenticated: mocks.removeAuthenticated,
   },
 }));
 

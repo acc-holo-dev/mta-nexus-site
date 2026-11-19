@@ -10,12 +10,6 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "aud_a",
 }));
 vi.mock("@nexus/db", () => ({
-  verificationRepository: {
-    listByRequester: vi.fn(),
-    findPendingForTarget: vi.fn(),
-    createRequest: vi.fn(),
-  },
-  organizationRepository: { findById: vi.fn(), listUserMemberships: vi.fn() },
   userRepository: { listModeratorIds: vi.fn() },
 }));
 vi.mock("../../src/lib/services/notifications/notification-dispatch-service", () => ({
@@ -27,6 +21,11 @@ vi.mock("../../src/lib/services/moderation/verification-workspace-service", () =
     apply: vi.fn(),
     application: vi.fn(),
     amend: vi.fn(),
+    listByRequester: vi.fn(),
+    findPendingForTarget: vi.fn(),
+    createRequest: vi.fn(),
+    findOrganizationById: vi.fn(),
+    listUserMemberships: vi.fn(),
   },
 }));
 

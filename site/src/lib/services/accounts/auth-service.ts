@@ -5,6 +5,7 @@ import {
   authRepository,
   getPinnedAccountMailProducerCipher,
   getPinnedAccountRecoveryAbuseKey,
+  organizationRepository,
   sessionRepository,
   userRepository,
 } from "@nexus/db";
@@ -429,6 +430,26 @@ class AuthService {
       currentToken,
     });
     return toPublicUser(updated);
+  }
+
+  listOwnedOrganizations(userId: string, limit = 50) {
+    return organizationRepository.listOwnedByUser(userId, limit);
+  }
+
+  listUserMemberships(userId: string) {
+    return organizationRepository.listUserMemberships(userId);
+  }
+
+  findOrganizationSummariesByIds(ids: string[]) {
+    return organizationRepository.findSummariesByIds(ids);
+  }
+
+  findUserOrganizationContext(organizationId: string, userId: string) {
+    return organizationRepository.findUserContext(organizationId, userId);
+  }
+
+  findOrganizationById(id: string) {
+    return organizationRepository.findById(id);
   }
 
   async getUserById(id: string): Promise<User | null> {

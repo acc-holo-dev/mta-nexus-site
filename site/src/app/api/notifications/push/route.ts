@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { readWebPushVapidConfig } from "@nexus/config";
-import { webPushSubscriptionRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
@@ -17,6 +16,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 import { parseWebPushEndpoint } from "../../../../lib/services/notifications/web-push-endpoint-policy";
 
 const privateHeaders = {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     const key = publicKey();
     let subscribed = false;
     if (endpointHash) {
-      const active = await webPushSubscriptionRepository.listForSession(
+      const active = await notificationInboxService.listWebPushForSession(
         authenticated.user.id,
         authenticated.sessionId,
       );
@@ -169,7 +169,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const stored = await webPushSubscriptionRepository.upsertAuthenticated(
+    const stored = await notificationInboxService.upsertWebPushAuthenticated(
       {
         id: generateId("wps"),
         userId: authenticated.user.id,
@@ -293,7 +293,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: copy.invalidEndpoint }, 400);
     }
 
-    const removed = await webPushSubscriptionRepository.removeAuthenticated(
+    const removed = await notificationInboxService.removeWebPushAuthenticated(
       authenticated.user.id,
       authenticated.sessionId,
       authenticated.token,

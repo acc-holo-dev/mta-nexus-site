@@ -27,8 +27,8 @@ vi.mock("@nexus/security", () => ({
   generateId: mocks.generateId,
 }));
 
-vi.mock("@nexus/db", () => ({
-  reportRepository: {
+vi.mock("../../src/lib/services/moderation/platform-report-service", () => ({
+  platformReportService: {
     listPage: mocks.listPage,
     createWithAudit: mocks.createWithAudit,
   },

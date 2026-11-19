@@ -1,4 +1,3 @@
-import { organizationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
@@ -52,8 +51,8 @@ export async function GET(request: NextRequest) {
     }
 
     const [ownedOrganizations, memberships] = await Promise.all([
-      organizationRepository.listOwnedByUser(user.id, 50),
-      organizationRepository.listUserMemberships(user.id),
+      authService.listOwnedOrganizations(user.id, 50),
+      authService.listUserMemberships(user.id),
     ]);
 
     const contextsById = new Map<
@@ -82,7 +81,7 @@ export async function GET(request: NextRequest) {
       .slice(0, Math.max(0, 50 - contextsById.size));
 
     const memberOrganizations = remainingMemberships.length
-      ? await organizationRepository.findSummariesByIds(
+      ? await authService.findOrganizationSummariesByIds(
           remainingMemberships.map((membership) => membership.organizationId),
         )
       : [];
@@ -105,7 +104,7 @@ export async function GET(request: NextRequest) {
 
     const requestedActiveContextId = user.activeContextId ?? "personal";
     if (requestedActiveContextId !== "personal" && !contextsById.has(requestedActiveContextId)) {
-      const active = await organizationRepository.findUserContext(
+      const active = await authService.findUserOrganizationContext(
         requestedActiveContextId,
         user.id,
       );

@@ -22,15 +22,10 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
     getSession: mocks.getSession,
     getSessionIdentity: mocks.getSessionIdentity,
     switchContext: mocks.switchContext,
-  },
-}));
-
-vi.mock("@nexus/db", () => ({
-  organizationRepository: {
-    listOwnedByUser: mocks.listOwnedByUser,
+    listOwnedOrganizations: mocks.listOwnedByUser,
     listUserMemberships: mocks.listUserMemberships,
-    findSummariesByIds: mocks.findSummariesByIds,
-    findUserContext: mocks.findUserContext,
+    findOrganizationSummariesByIds: mocks.findSummariesByIds,
+    findUserOrganizationContext: mocks.findUserContext,
   },
 }));
 

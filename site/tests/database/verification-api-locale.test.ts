@@ -23,14 +23,12 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  verificationRepository: {
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {
     listByRequester: mocks.listByRequester,
     findPendingForTarget: mocks.findPendingForTarget,
     createRequest: mocks.createRequest,
-  },
-  organizationRepository: {
-    findById: mocks.findById,
+    findOrganizationById: mocks.findById,
     listUserMemberships: mocks.listUserMemberships,
   },
 }));

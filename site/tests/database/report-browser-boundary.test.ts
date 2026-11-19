@@ -11,7 +11,6 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "rpt_a",
 }));
 vi.mock("@nexus/db", () => ({
-  reportRepository: { listPage: vi.fn(), createWithAudit: vi.fn() },
   productRepository: { findById: vi.fn() },
   serverRepository: { findById: vi.fn() },
   contentRepository: { findById: vi.fn(), findCommentById: vi.fn() },
@@ -23,6 +22,9 @@ vi.mock("../../src/lib/services/notifications/notification-dispatch-service", ()
 }));
 vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: { page: vi.fn(), submit: vi.fn() },
+}));
+vi.mock("../../src/lib/services/moderation/platform-report-service", () => ({
+  platformReportService: { listPage: vi.fn(), createWithAudit: vi.fn() },
 }));
 
 import { POST as createPublicReport } from "../../src/app/api/reports/route";

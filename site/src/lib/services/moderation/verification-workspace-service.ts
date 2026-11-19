@@ -1,5 +1,6 @@
 import {
   developerProfileRepository,
+  organizationRepository,
   verificationRepository,
   verificationWorkspaceRepository,
 } from "@nexus/db";
@@ -221,6 +222,26 @@ class VerificationWorkspaceService {
     );
     if (!row) throw new AppError("Application changed", 409, "VERIFICATION_STATE_CHANGED");
     return { id: row.id, status: row.status };
+  }
+
+  listByRequester(requesterId: string) {
+    return verificationRepository.listByRequester(requesterId);
+  }
+
+  findPendingForTarget(...args: Parameters<typeof verificationRepository.findPendingForTarget>) {
+    return verificationRepository.findPendingForTarget(...args);
+  }
+
+  createRequest(...args: Parameters<typeof verificationRepository.createRequest>) {
+    return verificationRepository.createRequest(...args);
+  }
+
+  findOrganizationById(id: string) {
+    return organizationRepository.findById(id);
+  }
+
+  listUserMemberships(userId: string) {
+    return organizationRepository.listUserMemberships(userId);
   }
 }
 export const verificationWorkspaceService = new VerificationWorkspaceService();

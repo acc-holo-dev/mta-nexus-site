@@ -42,6 +42,14 @@ class PlatformReportService {
       targetPreview: targets.get(`${report.targetType}:${report.targetId}`) ?? null,
     };
   }
+
+  listPage(view: "pending" | "history", page: number) {
+    return reportRepository.listPage(view, page);
+  }
+
+  createWithAudit(...args: Parameters<typeof reportRepository.createWithAudit>) {
+    return reportRepository.createWithAudit(...args);
+  }
 }
 
 export const platformReportService = new PlatformReportService();

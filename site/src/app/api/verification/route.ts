@@ -1,4 +1,3 @@
-import { organizationRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { externalWebUrlSchema } from "@nexus/validation";
@@ -17,6 +16,7 @@ import {
 } from "../../../lib/platform/observability";
 import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       return json(context, { error: copy.unauthorized }, 401);
     }
 
-    const requests = await verificationRepository.listByRequester(user.id);
+    const requests = await verificationWorkspaceService.listByRequester(user.id);
     return json(context, { requests });
   } catch (error) {
     logRequestEvent({
@@ -134,7 +134,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       // Identity and experience use separate live flags in the repository.
       targetIsVerified = parsed.data.targetType === "user" && user.isVerified;
     } else {
-      const organization = await organizationRepository.findById(parsed.data.targetId);
+      const organization = await verificationWorkspaceService.findOrganizationById(
+        parsed.data.targetId,
+      );
       if (!organization) {
         return json(
           context,
@@ -145,7 +147,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         );
       }
 
-      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const memberships = await verificationWorkspaceService.listUserMemberships(user.id);
       const membership = memberships.find(
         (candidate) => candidate.organizationId === organization.id,
       );
@@ -176,7 +178,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const duplicate = await verificationRepository.findPendingForTarget(
+    const duplicate = await verificationWorkspaceService.findPendingForTarget(
       user.id,
       parsed.data.targetType,
       parsed.data.targetId,
@@ -194,7 +196,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     // Moderator inbox fanout is committed with the request as
     // verification_notification_deliveries; the push worker pages recipients.
-    const verificationRequest = await verificationRepository.createRequest(
+    const verificationRequest = await verificationWorkspaceService.createRequest(
       {
         requesterId: user.id,
         currentToken: token,
