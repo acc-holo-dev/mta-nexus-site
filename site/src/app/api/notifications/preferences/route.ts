@@ -3,8 +3,10 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { notificationPreferencesApiCopy } from "../../../../features/notifications/notification-preferences-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -27,13 +29,16 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = notificationPreferencesApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     const preferences = await notificationRepository.getPreferences(user.id);
@@ -49,7 +54,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error: "Failed to fetch notification preferences",
+        error: copy.fetchFailed,
       },
       500,
     );
@@ -58,12 +63,15 @@ export async function GET(request: NextRequest) {
 
 export const PATCH = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = notificationPreferencesApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     requireServerJsonContentType(request);
@@ -72,7 +80,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many preference updates. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -80,7 +88,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
 
     const body = await readBoundedJson(request, 4 * 1024);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return json(context, { error: "Invalid notification preferences" }, 400);
+      return json(context, { error: copy.invalidPreferences }, 400);
     }
     const { expectedActorId, ...changes } = body as Record<string, unknown>;
     if (
@@ -89,21 +97,17 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       expectedActorId.length > 128 ||
       expectedActorId.trim() !== expectedActorId
     ) {
-      return json(context, { error: "Invalid notification preferences" }, 400);
+      return json(context, { error: copy.invalidPreferences }, 400);
     }
     if (expectedActorId !== user.id) {
-      return json(
-        context,
-        { error: "Account changed. Reload settings.", code: "ACTOR_CHANGED" },
-        409,
-      );
+      return json(context, { error: copy.accountChanged, code: "ACTOR_CHANGED" }, 409);
     }
     const parsed = notificationPreferencesSchema.safeParse(changes);
     if (!parsed.success) {
       return json(
         context,
         {
-          error: "Invalid notification preferences",
+          error: copy.invalidPreferences,
           details: parsed.error.format(),
         },
         400,
@@ -139,7 +143,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Failed to update notification preferences",
+        error: copy.updateFailed,
       },
       500,
     );
