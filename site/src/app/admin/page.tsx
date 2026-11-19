@@ -16,6 +16,7 @@ import {
   SectionHeader,
 } from "@nexus/ui";
 import { FileText, ShieldAlert } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -43,6 +44,12 @@ import { authService } from "../../lib/services/accounts/auth-service";
 import { adminService } from "../../lib/services/moderation/admin-service";
 
 export const dynamic = "force-dynamic";
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).admin.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function AdminPage({
   searchParams,

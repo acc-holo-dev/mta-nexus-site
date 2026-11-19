@@ -31,6 +31,7 @@ const en = {
   invalid: "Check the selection and visibility.",
   changed: "Server details or management rights changed. Reload and review the selection again.",
   unavailable: "Server management is temporarily unavailable.",
+  managementDocumentTitle: "Server management",
   unavailableHint:
     "Retry reloads this managed-server list only. A temporary load failure is not an empty managed-server page.",
   uncertain: "The save result could not be confirmed. Reload before making another change.",
@@ -95,6 +96,7 @@ const ru: typeof en = {
   changed:
     "Данные сервера или права управления изменились. Перезагрузите страницу и проверьте выбор заново.",
   unavailable: "Управление серверами временно недоступно.",
+  managementDocumentTitle: "Управление сервером",
   unavailableHint:
     "Повтор обновляет только этот список управляемых серверов. Временный сбой загрузки — не пустая страница управления.",
   uncertain:

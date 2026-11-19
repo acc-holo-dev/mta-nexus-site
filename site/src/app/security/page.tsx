@@ -1,5 +1,6 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { securityActivityLabelKey } from "../../features/accounts/security-activity";
@@ -12,6 +13,12 @@ import { authService } from "../../lib/services/accounts/auth-service";
 import { securityCenterService } from "../../lib/services/accounts/security-center-service";
 
 export const dynamic = "force-dynamic";
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).securityCenter.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "min-w-0 max-w-4xl space-y-8 overflow-x-clip";
 const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";

@@ -15,7 +15,11 @@ import { getRequestLocale } from "../../lib/i18n/server";
 import { commercialPlanService } from "../../lib/services/commerce/commercial-plan-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Subscriptions and commissions | MTA NEXUS" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).catalog} | MTA NEXUS`,
+  };
+}
 
 const shellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const linkClass =

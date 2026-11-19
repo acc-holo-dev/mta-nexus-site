@@ -31,10 +31,17 @@ describe("workspace document title honesty surface", () => {
       "site/src/app/admin/commerce",
       "site/src/app/admin/licenses",
       "site/src/app/admin/resources",
+      "site/src/app/admin/storage",
+      "site/src/app/auth",
+      "site/src/app/security",
+      "site/src/app/market",
+      "site/src/app/servers",
+      "site/src/app/subscriptions",
+      "site/src/app/community/new",
     ].map((p) => resolve(process.cwd(), p));
 
     const pages = roots.flatMap(collectPages);
-    expect(pages.length).toBeGreaterThan(55);
+    expect(pages.length).toBeGreaterThan(60);
 
     const staticEnglishTitle = /export const metadata(?:: Metadata)? = \{[\s\S]*?title:\s*"[^"]+"/;
     const offenders = pages.filter((path) => staticEnglishTitle.test(readFileSync(path, "utf8")));
@@ -43,6 +50,6 @@ describe("workspace document title honesty surface", () => {
     const withGenerate = pages.filter((path) =>
       readFileSync(path, "utf8").includes("generateMetadata"),
     );
-    expect(withGenerate.length).toBeGreaterThan(55);
+    expect(withGenerate.length).toBeGreaterThan(60);
   });
 });

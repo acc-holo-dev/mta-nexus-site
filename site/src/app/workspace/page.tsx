@@ -24,10 +24,12 @@ import {
 } from "../../lib/services/servers/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Workspace | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "min-w-0 space-y-8 overflow-x-clip";
 const primaryCtaClass = `inline-flex min-h-11 items-center gap-1.5 rounded-md bg-accent px-4 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] ${platformSignInFocusClass}`;

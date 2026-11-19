@@ -86,7 +86,7 @@ vi.mock("../../src/features/resources/components/resource-download-button", asyn
   };
 });
 
-import ReleasePage, { metadata } from "../../src/app/market/[slug]/versions/page";
+import ReleasePage, { generateMetadata } from "../../src/app/market/[slug]/versions/page";
 import { getReleaseHistoryCopy } from "../../src/features/resources/public-release-history";
 import { getDictionary } from "../../src/lib/i18n";
 
@@ -236,7 +236,7 @@ describe("public safely published version archive", () => {
     expect(html).toContain('href="/market/safe-release/versions?page=3"');
     expect(html).toContain("overflow-x-clip");
     expect(html).toContain("min-h-11");
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
     await page(["1", "2"]);
     expect(state.history).toHaveBeenLastCalledWith("prd_release", 1);
   });

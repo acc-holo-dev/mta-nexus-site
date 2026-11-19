@@ -29,7 +29,9 @@ vi.mock("../../src/features/resources/release-watch", () => ({
   ),
 }));
 
-import Page, { generateMetadata } from "../../src/app/workspace/library/collections/[id]/watches/page";
+import Page, {
+  generateMetadata,
+} from "../../src/app/workspace/library/collections/[id]/watches/page";
 import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>

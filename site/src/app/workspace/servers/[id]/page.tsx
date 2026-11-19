@@ -7,19 +7,21 @@ import { notFound } from "next/navigation";
 import { ServerClaimStatusPanel } from "../../../../features/servers/claim-status-server";
 import { ServerDetailsForm } from "../../../../features/servers/details-controls";
 import { getManagedServerCopy } from "../../../../features/servers/managed-server-view";
+import { serverWorkspaceCopy } from "../../../../features/servers/server-workspace-copy";
 import { PlatformSignIn } from "../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../features/shell/session-error";
-
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n/server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { serverService } from "../../../../lib/services/servers/server-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Server management | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${serverWorkspaceCopy(await getRequestLocale()).managementDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
