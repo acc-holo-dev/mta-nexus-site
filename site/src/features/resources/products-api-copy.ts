@@ -17,6 +17,11 @@ const en = {
   createFailed: "Could not create resource",
   notFound: "Product not found",
   detailsUnavailable: "Resource details are temporarily unavailable",
+  rateLimitExceeded: "Too many operations. Wait a little and try again.",
+  metadataRevisionRequired: "Reload the resource before saving; an observed revision is required.",
+  metadataConflict: "The resource changed. Reload the page and review the current state.",
+  metadataInvalid: "Invalid resource details",
+  updateFailed: "Could not update resource",
 };
 
 const ru: Record<keyof typeof en, string> = {
@@ -36,6 +41,11 @@ const ru: Record<keyof typeof en, string> = {
   createFailed: "Не удалось создать ресурс",
   notFound: "Продукт не найден",
   detailsUnavailable: "Детали ресурса временно недоступны",
+  rateLimitExceeded: "Слишком много операций. Подождите немного и повторите попытку.",
+  metadataRevisionRequired: "Обновите ресурс перед сохранением; требуется зафиксированная ревизия.",
+  metadataConflict: "Ресурс изменился. Обновите страницу и проверьте текущее состояние.",
+  metadataInvalid: "Некорректные данные ресурса",
+  updateFailed: "Не удалось обновить ресурс",
 };
 
 export const productsApiCopy = (locale: Locale) => (locale === "ru" ? ru : en);
