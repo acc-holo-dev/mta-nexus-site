@@ -40,6 +40,10 @@ export function SupportCaseThread({
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(workspaceCopy).includes(text) ? text : fallback;
+  }
   const [capabilities, setCapabilities] = useState({ staff: false, requester: false });
   const [success, setSuccess] = useState("");
   const [supportCase, setSupportCase] = useState<SupportCaseData | null>(null);
@@ -230,7 +234,7 @@ export function SupportCaseThread({
       setReply("");
     } catch (caught) {
       // Keep the composed reply so a lost response can retry with the same key.
-      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
+      setError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       mutationInFlight.current = false;
       setSending(false);
@@ -283,7 +287,7 @@ export function SupportCaseThread({
       setSupportCase(confirmed);
       setSuccess(workspaceCopy.saved);
     } catch (caught) {
-      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
+      setError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       mutationInFlight.current = false;
       setUpdatingStatus(false);
