@@ -86,6 +86,9 @@ describe("D2c account mail dispatcher", () => {
     const sent = f.sent();
     expect(sent).toBeTruthy();
     if (!sent) throw new Error("Expected one outbound account mail");
+    expect(sent.subject).toContain("Reset your MTA NEXUS password");
+    expect(sent.subject).toContain("Сбросьте пароль MTA NEXUS");
+    expect(sent.text).toContain("Используйте ссылку, чтобы сбросить пароль MTA NEXUS");
     expect(sent.text).toContain(
       "https://nexus-mta.test/auth/reset-password?challenge=ach_test#token=",
     );
@@ -95,6 +98,34 @@ describe("D2c account mail dispatcher", () => {
     expect(url.searchParams.get("challenge")).toBe("ach_test");
     expect(url.search).not.toContain(prepared.token);
     expect(url.hash).toContain(prepared.token);
+  });
+
+  it("uses bilingual slash subjects for email verification mail", async () => {
+    const verifyPrepared: PreparedAccountMail = Object.freeze({
+      ...prepared,
+      purpose: "email_verify",
+    });
+    let sent: AccountMailTransportInput | undefined;
+    const w = workerFixture();
+    w.worker.prepare = async () => verifyPrepared;
+    const dispatcher = new AccountMailDispatcher({
+      worker: w.worker,
+      cipher,
+      transport: {
+        send: async (input: AccountMailTransportInput) => {
+          sent = input;
+          return { outcome: "accepted", uncertain: false, stage: "final_reply" };
+        },
+      },
+      appUrl: "https://nexus-mta.test",
+    });
+    await dispatcher.runBatch();
+    expect(sent?.subject).toContain("Confirm your MTA NEXUS email");
+    expect(sent?.subject).toContain("Подтвердите email MTA NEXUS");
+    expect(sent?.text).toContain("Подтвердите этот email для аккаунта MTA NEXUS");
+    expect(sent?.text).toContain(
+      "https://nexus-mta.test/auth/verify-email?challenge=ach_test#token=",
+    );
   });
 
   it("turns prepare failures into an explicit retry without exposing plaintext", async () => {

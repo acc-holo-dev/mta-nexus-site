@@ -13,7 +13,7 @@ import {
   userRepository,
   users,
 } from "@nexus/db";
-import { eq, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import type { ResourceTransaction } from "../../packages/db/src/transaction";
 
@@ -105,8 +105,13 @@ async function state(f: Fixture) {
     selections: await db
       .select()
       .from(resourceLibrarySelections)
-      .where(eq(resourceLibrarySelections.userId, f.userId)),
-    audits: await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.userId)),
+      .where(eq(resourceLibrarySelections.userId, f.userId))
+      .orderBy(asc(resourceLibrarySelections.id)),
+    audits: await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.actorId, f.userId))
+      .orderBy(asc(auditEvents.id)),
   };
 }
 function deferred<T>() {

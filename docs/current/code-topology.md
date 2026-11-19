@@ -290,6 +290,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 104 done:** inbox `formatNotification` localizes `Password reset completed` security notices; DB notice contract stays English.
 
+**Wave 105 done:** account mail dispatcher subjects/bodies use bilingual slash copy (no recipient locale column yet); challenge URL/token placement unchanged.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -467,8 +469,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 102 — `/api/support` always-localize envelopes + ACTOR_* mapping                                             | API envelope RU/EN               | **done** |
 | A   | Wave 103 — inbox formatNotification server-update + verification awaiting-review gaps                             | notification display RU/EN       | **done** |
 | A   | Wave 104 — inbox formatNotification password-reset completed security notice                                      | notification display RU/EN       | **done** |
+| A   | Wave 105 — account mail dispatcher bilingual slash subjects/bodies                                                | account mail RU/EN               | **done** |
 
-Дальше: Static EN document titles, API route envelopes, and known static inbox titles largely exhausted; residual AppError English passthrough intentional. Remaining inbox work is structured `data.kind` producers / push payload locale. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: Static EN document titles, API route envelopes, and known static inbox titles largely exhausted; residual AppError English passthrough intentional. Web Push payload locale still needs a preference column. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
