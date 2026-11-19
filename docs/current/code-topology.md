@@ -507,7 +507,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done**  |
 | A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done**  |
 | A   | Waves 159–169 — media/moderation/claim/publishing remappers + VALIDATION/FORBIDDEN fills + release-watch          | client remapper RU/EN            | **done**  |
-| A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper              | client remapper RU/EN            | **local** |
+| A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper                  | client remapper RU/EN            | **local** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 

@@ -5,8 +5,8 @@ import { commercialError } from "../../src/features/commerce/commercial-i18n";
 import { licenseControlError } from "../../src/features/commerce/license-control-i18n";
 import { planReviewError } from "../../src/features/commerce/plan-reviews-i18n";
 import { subscriptionError } from "../../src/features/commerce/subscriptions-i18n";
-import { followError } from "../../src/features/community/follow-workspace-copy";
 import { moderationError } from "../../src/features/community/community-moderation-copy";
+import { followError } from "../../src/features/community/follow-workspace-copy";
 import { libraryCollectionError } from "../../src/features/library/library-collections-i18n";
 import { resourceReleaseControlError } from "../../src/features/library/resource-release-control-i18n";
 import { platformReportError } from "../../src/features/moderation/platform-report-i18n";
@@ -159,7 +159,9 @@ it("maps bare CONFLICT and residual VALIDATION_ERROR without English code passth
     expect(resourceMediaError(locale, "CONFLICT")).toBe(
       resourceMediaError(locale, "RESOURCE_MEDIA_CONFLICT"),
     );
-    expect(resourceQaError(locale, "CONFLICT")).toBe(resourceQaError(locale, "RESOURCE_QA_CHANGED"));
+    expect(resourceQaError(locale, "CONFLICT")).toBe(
+      resourceQaError(locale, "RESOURCE_QA_CHANGED"),
+    );
     expect(resourceReleaseControlError(locale, "CONFLICT")).toBe(
       resourceReleaseControlError(locale, "LIBRARY_RELEASE_CONFLICT"),
     );
@@ -181,9 +183,7 @@ it("maps bare CONFLICT and residual VALIDATION_ERROR without English code passth
     expect(resourceReviewError(locale, "CONFLICT")).toBe(
       resourceReviewError(locale, "REVIEW_CHANGED"),
     );
-    expect(serverReviewError(locale, "CONFLICT")).toBe(
-      serverReviewError(locale, "REVIEW_CHANGED"),
-    );
+    expect(serverReviewError(locale, "CONFLICT")).toBe(serverReviewError(locale, "REVIEW_CHANGED"));
     expect(serverStatisticsError(locale, "CONFLICT")).toBe(
       serverStatisticsError(locale, "ACTOR_CHANGED"),
     );
