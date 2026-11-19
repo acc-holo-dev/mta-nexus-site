@@ -54,7 +54,7 @@ it("locks content preferences and stores a status-only notice with the author di
     expect.arrayContaining([
       "author",
       "Discussion moderation / Модерация обсуждения",
-      "Comment comment: removed.",
+      "Comment comment: removed. / Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены.",
       "/workspace/discussions/comment",
     ]),
   );
@@ -97,7 +97,12 @@ it.each(["en", "ru"] as const)(
   "localizes the bounded persisted moderation template in %s",
   (locale) => {
     const result = formatNotification(
-      { title: "Discussion moderation / Модерация обсуждения", message: "Comment comment: removed.", data: undefined },
+      {
+        title: "Discussion moderation / Модерация обсуждения",
+        message:
+          "Comment comment: removed. / Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены.",
+        data: undefined,
+      },
       { approved: "", rejected: "", version: "", notes: "" },
       locale,
     );
