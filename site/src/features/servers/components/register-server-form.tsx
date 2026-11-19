@@ -235,7 +235,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
       window.addEventListener("pagehide", () => sessionStorage.removeItem(slot), { once: true });
       window.location.assign(`/workspace/servers/${encodeURIComponent(serverId)}`);
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
+      setError(safeMessage(caught, copy.unexpectedError));
       setLoading(false);
       busyRef.current = false;
     }
