@@ -2,12 +2,14 @@ import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "../../lib/http/bounded-json";
+import { resolveLocale } from "../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
+import { resourceCommerceError } from "./resource-commerce-i18n";
 
 export async function resourceCommerceRequest(
   request: NextRequest,
@@ -81,7 +83,13 @@ export async function resourceCommerceRequest(
     }
     return respond(result);
   } catch (error) {
-    if (error instanceof AppError) return respond({ code: error.code }, error.statusCode);
+    const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+    if (error instanceof AppError) {
+      return respond(
+        { code: error.code, error: resourceCommerceError(locale, error.code) },
+        error.statusCode,
+      );
+    }
     logRequestEvent({
       level: "error",
       event: "resource.commerce_failed",
@@ -89,6 +97,12 @@ export async function resourceCommerceRequest(
       status: 500,
       error,
     });
-    return respond({ code: "RESOURCE_COMMERCE_FAILED" }, 500);
+    return respond(
+      {
+        code: "RESOURCE_COMMERCE_FAILED",
+        error: resourceCommerceError(locale, "RESOURCE_COMMERCE_FAILED"),
+      },
+      500,
+    );
   }
 }
