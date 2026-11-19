@@ -24,10 +24,12 @@ import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Recorded financial evidence | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getFinancialCopy(await getRequestLocale()).evidenceDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function ReconciliationDetail({
   params,
   searchParams,

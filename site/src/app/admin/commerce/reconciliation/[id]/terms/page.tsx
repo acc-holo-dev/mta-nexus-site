@@ -15,10 +15,12 @@ import { getRequestLocale } from "../../../../../../lib/i18n/server";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../../../../lib/services/commerce/order-terms-service";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Order terms | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function TermsPage({
   params,
   searchParams,

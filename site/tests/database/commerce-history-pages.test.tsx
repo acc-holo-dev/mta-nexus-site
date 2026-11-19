@@ -45,10 +45,12 @@ vi.mock("next/link", async () => {
 });
 
 import LicensesLoading from "../../src/app/workspace/licenses/loading";
-import Licenses, { metadata as licensesMeta } from "../../src/app/workspace/licenses/page";
+import Licenses, { generateMetadata as licensesMeta } from "../../src/app/workspace/licenses/page";
 import PurchasesLoading from "../../src/app/workspace/purchases/loading";
-import Purchases, { metadata as purchasesMeta } from "../../src/app/workspace/purchases/page";
-import Sales, { metadata as salesMeta } from "../../src/app/workspace/sales/page";
+import Purchases, {
+  generateMetadata as purchasesMeta,
+} from "../../src/app/workspace/purchases/page";
+import Sales, { generateMetadata as salesMeta } from "../../src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 import { getDictionary } from "../../src/lib/i18n";
@@ -266,9 +268,9 @@ describe("private legacy commerce pages", () => {
     expect(state.buyer).toHaveBeenCalledWith("usr_current", 1);
   });
 
-  it("keeps all historical pages out of search engines", () => {
+  it("keeps all historical pages out of search engines", async () => {
     for (const metadata of [purchasesMeta, licensesMeta, salesMeta]) {
-      expect(metadata.robots).toMatchObject({ index: false, follow: false });
+      expect((await metadata()).robots).toMatchObject({ index: false, follow: false });
     }
   });
 

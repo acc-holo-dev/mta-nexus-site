@@ -26,10 +26,12 @@ import { authService } from "../../../../lib/services/accounts/auth-service";
 import { resourceModerationService } from "../../../../lib/services/resources/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Moderation decision | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).decisionDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function ResourceModerationDetail({
   params,
   searchParams,

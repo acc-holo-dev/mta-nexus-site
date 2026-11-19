@@ -56,7 +56,9 @@ import Plans from "../../src/app/admin/commerce/plans/page";
 import CatalogLoading from "../../src/app/subscriptions/loading";
 import Catalog from "../../src/app/subscriptions/page";
 import OperationsLoading from "../../src/app/workspace/purchases/[id]/operations/loading";
-import Operations, { metadata } from "../../src/app/workspace/purchases/[id]/operations/page";
+import Operations, {
+  generateMetadata,
+} from "../../src/app/workspace/purchases/[id]/operations/page";
 import { getCommercialCopy } from "../../src/features/commerce/commercial-i18n";
 import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
@@ -219,7 +221,7 @@ it("masks unknown attempt states, keeps private metadata out, and blocks cancell
   expect(html).not.toContain("PRIVATE-");
   expect(html).not.toContain("unrecognized-private-state");
   expect(html).not.toContain("<textarea");
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it("provides reason and confirmation controls only for a currently cancellable unpaid order", async () => {
   state.detail.mockResolvedValue({

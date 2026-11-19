@@ -40,7 +40,9 @@ vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
 
-import History, { metadata as historyMeta } from "../../src/app/workspace/acquisitions/page";
+import History, {
+  generateMetadata as historyMeta,
+} from "../../src/app/workspace/acquisitions/page";
 import Activity, {
   generateMetadata as activityMetadata,
 } from "../../src/app/workspace/resources/[id]/activity/page";
@@ -135,7 +137,7 @@ it("keeps acquisition history private and paginated without rendering withdrawn 
   expect(html).toContain("source=cart&amp;page=1");
   expect(html).not.toContain("PRIVATE-");
   expect(html).not.toContain("/market/private-draft");
-  expect(historyMeta.robots).toEqual({ index: false, follow: false });
+  expect((await historyMeta()).robots).toEqual({ index: false, follow: false });
 });
 it("renders only escaped publisher aggregates and bounded period/export links", async () => {
   const html = renderToStaticMarkup(await Activity(activityInput));

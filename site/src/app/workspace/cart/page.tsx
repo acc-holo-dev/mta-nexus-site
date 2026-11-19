@@ -12,10 +12,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Resource cart | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceCommerceCopy(await getRequestLocale()).cart} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const retryLinkClass =

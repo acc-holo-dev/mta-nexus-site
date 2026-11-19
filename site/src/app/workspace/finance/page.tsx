@@ -21,10 +21,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Financial statements | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getFinancialCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
 const linkClass =

@@ -280,6 +280,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 99 done (large):** workspace `library` / `resources` / `subscriptions` document titles move from static EN `metadata` to `generateMetadata` + existing locale copy/`getDictionary` (37 pages); AppError passthrough unchanged.
 
+**Wave 100 done (large):** workspace commerce (`purchases`/`acquisitions`/`licenses`/`cart`/`finance`/`sales`) + admin (`commerce`/`licenses`/`resources`) document titles via `generateMetadata` (24 pages); AppError passthrough unchanged.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -452,8 +454,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Waves 97–98                                                                                 | docs honesty                     | **done** |
 | A   | Wave 99 — workspace library/resources/subscriptions bilingual document titles                                     | document metadata RU/EN          | **done** |
+| A   | Wave 100 — workspace commerce + admin commerce/licenses/resources bilingual document titles                       | document metadata RU/EN          | **done** |
 
-Дальше: Remaining workspace/public static EN document titles outside library/resources/subscriptions; residual AppError English passthrough intentional. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: Remaining public-guest / workspace hub static EN document titles; residual AppError English passthrough intentional. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

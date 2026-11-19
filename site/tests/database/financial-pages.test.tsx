@@ -41,7 +41,7 @@ import Detail from "../../src/app/admin/commerce/reconciliation/[id]/page";
 import ReviewLoading from "../../src/app/admin/commerce/reconciliation/loading";
 import Review from "../../src/app/admin/commerce/reconciliation/page";
 import FinanceLoading from "../../src/app/workspace/finance/loading";
-import Statement, { metadata } from "../../src/app/workspace/finance/page";
+import Statement, { generateMetadata } from "../../src/app/workspace/finance/page";
 import { getFinancialCopy } from "../../src/features/commerce/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
@@ -123,7 +123,7 @@ it("authenticates before reading statements", async () => {
   state.user = null;
   expect(renderToStaticMarkup(await Statement(input))).toContain("/auth/login");
   expect(state.statement).not.toHaveBeenCalled();
-  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "renders exact currency amounts, with availability unknown in %s",

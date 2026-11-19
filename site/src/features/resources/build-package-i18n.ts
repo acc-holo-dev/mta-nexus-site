@@ -5,6 +5,7 @@ const copy = {
     loadUnavailableHint:
       "Retry reloads this package inventory only. A temporary load failure is not an empty file list.",
     inventory: "Package files and version comparison",
+    reviewDocumentTitle: "Review package files",
     back: "Back to version",
     all: "All",
     recorded: "Recorded file",
@@ -88,6 +89,7 @@ const copy = {
     loadUnavailableHint:
       "Повтор обновляет только этот перечень файлов пакета. Временный сбой загрузки — не пустой список файлов.",
     inventory: "Файлы пакета и сравнение версий",
+    reviewDocumentTitle: "Проверка файлов пакета",
     back: "Вернуться к версии",
     all: "Все",
     recorded: "Записанный файл",

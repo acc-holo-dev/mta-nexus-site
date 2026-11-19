@@ -37,7 +37,7 @@ vi.mock("../../src/lib/services/commerce/seller-sales-service", () => ({
 import DetailLoading from "../../src/app/workspace/sales/report/[id]/loading";
 import Detail from "../../src/app/workspace/sales/report/[id]/page";
 import ReportLoading from "../../src/app/workspace/sales/report/loading";
-import Page, { metadata } from "../../src/app/workspace/sales/report/page";
+import Page, { generateMetadata } from "../../src/app/workspace/sales/report/page";
 import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
@@ -108,7 +108,7 @@ it("does not read reports when signed out and disables indexing", async () => {
   ).toContain('href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%2Fitm_a"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "renders %s filters and accurate per-currency records without private payment data",

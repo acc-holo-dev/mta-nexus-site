@@ -44,10 +44,12 @@ function hasNonDefaultLicenseFilters(filters: ReturnType<typeof licenseArchiveQu
 }
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "License history | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommerceHistoryCopy(await getRequestLocale()).licensesTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function LicensesHistoryPage({
   searchParams,

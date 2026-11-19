@@ -24,10 +24,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "License moderation | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function LicensesModerationPage({
   searchParams,
 }: {

@@ -19,6 +19,7 @@ export const commerceHistoryCopy = {
     emptyPurchasesHint:
       "Historical purchases appear here after an order is stored for your account. An empty list is not a load failure.",
     orderNumber: "Order",
+    orderDetailsTitle: "Order details",
     details: "View order details",
     backToPurchases: "Back to purchase history",
     lineItems: "Historical order items",
@@ -107,6 +108,7 @@ export const commerceHistoryCopy = {
     emptyPurchasesHint:
       "Исторические покупки появляются здесь после сохранения заказа для аккаунта. Пустой список — это не сбой загрузки.",
     orderNumber: "Заказ",
+    orderDetailsTitle: "Состав заказа",
     details: "Посмотреть состав заказа",
     backToPurchases: "Вернуться к истории покупок",
     lineItems: "Сохранённые позиции заказа",

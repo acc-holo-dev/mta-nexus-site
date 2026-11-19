@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-/** Wave 99: workspace library/resources/subscriptions document titles use generateMetadata + locale copy. */
+/** Waves 99–100: workspace/admin commerce document titles use generateMetadata + locale copy. */
 function collectPages(root: string): string[] {
   const out: string[] = [];
   const walk = (dir: string) => {
@@ -17,15 +17,24 @@ function collectPages(root: string): string[] {
 }
 
 describe("workspace document title honesty surface", () => {
-  it("keeps library/resources/subscriptions pages off static English metadata titles", () => {
+  it("keeps waved workspace/admin trees off static English metadata titles", () => {
     const roots = [
       "site/src/app/workspace/library",
       "site/src/app/workspace/resources",
       "site/src/app/workspace/subscriptions",
+      "site/src/app/workspace/purchases",
+      "site/src/app/workspace/acquisitions",
+      "site/src/app/workspace/licenses",
+      "site/src/app/workspace/cart",
+      "site/src/app/workspace/finance",
+      "site/src/app/workspace/sales",
+      "site/src/app/admin/commerce",
+      "site/src/app/admin/licenses",
+      "site/src/app/admin/resources",
     ].map((p) => resolve(process.cwd(), p));
 
     const pages = roots.flatMap(collectPages);
-    expect(pages.length).toBeGreaterThan(40);
+    expect(pages.length).toBeGreaterThan(55);
 
     const staticEnglishTitle = /export const metadata(?:: Metadata)? = \{[\s\S]*?title:\s*"[^"]+"/;
     const offenders = pages.filter((path) => staticEnglishTitle.test(readFileSync(path, "utf8")));
@@ -34,6 +43,6 @@ describe("workspace document title honesty surface", () => {
     const withGenerate = pages.filter((path) =>
       readFileSync(path, "utf8").includes("generateMetadata"),
     );
-    expect(withGenerate.length).toBeGreaterThan(45);
+    expect(withGenerate.length).toBeGreaterThan(55);
   });
 });

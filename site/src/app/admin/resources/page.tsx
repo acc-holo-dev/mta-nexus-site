@@ -22,10 +22,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceModerationService } from "../../../lib/services/resources/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Resource moderation | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
 export default async function ResourceModerationPage({
   searchParams,

@@ -35,7 +35,7 @@ vi.mock("../../src/lib/services/commerce/order-terms-service", () => ({
 import TermsLoading from "../../src/app/admin/commerce/reconciliation/[id]/terms/loading";
 import Admin from "../../src/app/admin/commerce/reconciliation/[id]/terms/page";
 import BuyerTermsLoading from "../../src/app/workspace/purchases/[id]/terms/loading";
-import Buyer, { metadata } from "../../src/app/workspace/purchases/[id]/terms/page";
+import Buyer, { generateMetadata } from "../../src/app/workspace/purchases/[id]/terms/page";
 import { orderTermsCopy } from "../../src/features/commerce/order-terms-i18n";
 
 const input = {
@@ -112,7 +112,7 @@ it("signed-out buyers and non-admin staff cannot request terms pages", async () 
   state.actor = { id: "usr_a", role: "moderator" };
   await expect(Admin(input)).rejects.toThrow("NOT_FOUND");
   expect(state.report).not.toHaveBeenCalled();
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "renders %s snapshots, unknown history and bounded pagination without simulated payments",

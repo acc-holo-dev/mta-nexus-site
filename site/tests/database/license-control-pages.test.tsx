@@ -55,7 +55,7 @@ import MaintenancePage from "../../src/app/admin/licenses/maintenance/page";
 import QueuePage from "../../src/app/admin/licenses/page";
 import WorkspaceLicenseHistoryLoading from "../../src/app/workspace/licenses/[id]/history/loading";
 import OwnerLicenseLoading from "../../src/app/workspace/licenses/[id]/loading";
-import OwnerPage, { metadata } from "../../src/app/workspace/licenses/[id]/page";
+import OwnerPage, { generateMetadata } from "../../src/app/workspace/licenses/[id]/page";
 import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import {
   LicenseHistoryPage,
@@ -132,7 +132,7 @@ it("requires sign-in and does not load private license data for guests", async (
   state.user = null;
   expect(renderToStaticMarkup(await OwnerPage(params))).toContain("Sign in");
   expect(state.detail).not.toHaveBeenCalled();
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it("hides missing or foreign licenses", async () => {
   state.detail.mockResolvedValue(null);

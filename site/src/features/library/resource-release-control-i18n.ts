@@ -6,6 +6,7 @@ const copy = {
     updatesLoading: "Loading library updates…",
     versions: "Choose a download version",
     moderation: "Resource moderation",
+    decisionDocumentTitle: "Moderation decision",
     moderationLoading: "Loading resource moderation…",
     loadUnavailable: "Resource moderation is temporarily unavailable. Please try again.",
     loadUnavailableHint:
@@ -124,6 +125,7 @@ const copy = {
     updatesLoading: "Загрузка обновлений библиотеки…",
     versions: "Выбор версии для скачивания",
     moderation: "Модерация ресурсов",
+    decisionDocumentTitle: "Решение модерации",
     moderationLoading: "Загрузка модерации ресурсов…",
     loadUnavailable: "Модерация ресурсов временно недоступна. Попробуйте ещё раз.",
     loadUnavailableHint:

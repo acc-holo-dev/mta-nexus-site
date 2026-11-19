@@ -10,10 +10,12 @@ import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Create commercial plan | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).createDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function NewCommercialPlan() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getCommercialCopy(locale);

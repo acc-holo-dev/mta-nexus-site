@@ -19,10 +19,12 @@ import { authService } from "../../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../../lib/services/commerce/commercial-plan-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Commercial plans | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).admin} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export default async function CommercialPlansAdmin({

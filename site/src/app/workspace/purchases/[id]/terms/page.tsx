@@ -15,10 +15,12 @@ import { getRequestLocale } from "../../../../../lib/i18n/server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../../../lib/services/commerce/order-terms-service";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Order terms | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
