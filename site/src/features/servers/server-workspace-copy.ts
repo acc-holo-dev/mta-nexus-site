@@ -140,8 +140,11 @@ export function serverWorkspaceError(locale: Locale, code: unknown) {
   if (code === "NOT_FOUND") return copy.missing;
   if (["SERVER_BATCH_CHANGED", "SERVER_METADATA_CONFLICT", "CONFLICT"].includes(String(code)))
     return copy.changed;
-  if (code === "SERVER_BATCH_INVALID") return copy.invalid;
+  if (code === "SERVER_BATCH_INVALID" || code === "VALIDATION_ERROR") return copy.invalid;
   if (["INVALID_CURSOR", "SERVER_HISTORY_FILTER_INVALID"].includes(String(code)))
     return copy.historyInvalid;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED" || code === "ACTOR_CHANGED")
+    return copy.changed;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.historyUnavailable;
   return userPlatformError(locale, code);
 }

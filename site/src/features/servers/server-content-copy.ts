@@ -1,5 +1,5 @@
 import type { Locale } from "../../lib/i18n";
-import { userPlatformError } from "../community/user-platform-copy";
+import { serverWorkspaceError } from "./server-workspace-copy";
 export const serverContentCopy = (locale: Locale) =>
   locale === "ru"
     ? {
@@ -41,5 +41,5 @@ export const serverContentCopy = (locale: Locale) =>
 export function serverContentMutationError(locale: Locale, code: unknown) {
   return code === "INTERNAL_ERROR" || code === "UNCONFIRMED"
     ? serverContentCopy(locale).uncertain
-    : userPlatformError(locale, code);
+    : serverWorkspaceError(locale, code);
 }
