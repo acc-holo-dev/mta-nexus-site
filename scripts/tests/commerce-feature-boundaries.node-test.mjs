@@ -39,6 +39,7 @@ const utilPorts = [
   "plan-reviews-query",
   "seller-sales-query",
   "subscriptions-query",
+  "checkout-api-copy",
 ];
 const clientPorts = [
   "workspace-history",

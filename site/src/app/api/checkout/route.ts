@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
+import { checkoutApiCopy } from "../../../features/commerce/checkout-api-copy";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../lib/i18n";
 import { createRequestLogContext, jsonWithRequestId } from "../../../lib/platform/observability";
 
 /**
@@ -8,10 +10,11 @@ import { createRequestLogContext, jsonWithRequestId } from "../../../lib/platfor
  */
 export const POST = withBrowserMutation(async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = checkoutApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   return jsonWithRequestId(
     context,
     {
-      error: "Paid checkout is not available during the open free beta.",
+      error: copy.disabled,
       code: "CHECKOUT_DISABLED",
     },
     {

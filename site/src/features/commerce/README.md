@@ -53,6 +53,7 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `plan-reviews-query.ts`           | util port `plan-reviews-query`                                                         |
 | `seller-sales-query.ts`           | util port `seller-sales-query`                                                         |
 | `subscriptions-query.ts`          | util port `subscriptions-query`                                                        |
+| `checkout-api-copy.ts`            | util port `checkout-api-copy`                                                          |
 | `commercial-public-http.ts`       | util port `commercial-public-http`                                                     |
 | `license-runtime-http.ts`         | util port `license-runtime-http`                                                       |
 
