@@ -70,4 +70,31 @@ describe("notification residual inbox copy honesty", () => {
     expect(formatNotification(notice, reviewCopy, "ru").title).toBe("Пароль восстановлен");
     expect(formatNotification(notice, reviewCopy, "en").title).toBe("Password reset completed");
   });
+
+  it("keeps English segment for bilingual server publication bodies", () => {
+    const notice = {
+      title: "New server update / Новость сервера",
+      message: "Neon Drift: Patch notes / Neon Drift: Patch notes",
+      data: null,
+    };
+    expect(formatNotification(notice, reviewCopy, "ru")).toEqual({
+      title: "Новость сервера",
+      message: "Neon Drift: Patch notes",
+    });
+  });
+
+  it("localizes license title-only remappers from UTC slash stamps", () => {
+    const notice = {
+      title: "License expired / Срок лицензии истёк",
+      message: "UTC: 2026-11-19T12:00:00.000Z / UTC: 2026-11-19T12:00:00.000Z",
+      data: null,
+    };
+    const ru = formatNotification(notice, reviewCopy, "ru");
+    expect(ru.title).toBe("Срок лицензии истёк");
+    expect(ru.message).toContain("Учётный срок лицензии закончился");
+    expect(ru.message).toContain("UTC:");
+    const en = formatNotification(notice, reviewCopy, "en");
+    expect(en.title).toBe("License expired");
+    expect(en.message).toContain("The recorded license term ended");
+  });
 });
