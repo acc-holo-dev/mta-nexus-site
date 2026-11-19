@@ -307,6 +307,7 @@ export function followError(locale: Locale, code: unknown) {
     case "FORBIDDEN":
       return copy.forbidden;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.rate;
     case "UNCONFIRMED":
       return copy.unconfirmed;

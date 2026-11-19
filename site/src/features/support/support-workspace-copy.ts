@@ -130,6 +130,7 @@ export function supportWorkspaceError(locale: Locale, code: unknown) {
     case 415:
       return c.media;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
     case 429:
       return c.rate;
     case "SUPPORT_IDEMPOTENCY_CONFLICT":

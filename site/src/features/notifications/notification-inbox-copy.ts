@@ -195,6 +195,7 @@ export function notificationInboxError(locale: Locale, code: unknown) {
     case "INVALID_CURSOR":
       return copy.invalid;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.limited;
     case "EXPORT_FAILED":
       return copy.exportFailed;

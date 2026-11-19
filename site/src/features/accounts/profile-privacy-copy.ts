@@ -116,6 +116,7 @@ export function profilePrivacyError(locale: Locale, code: unknown, mutation = fa
     case "PRIVACY_SAVE_RETRY":
       return copy.retry;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.rate;
     case "VALIDATION_ERROR":
     case "VALIDATION_FAILED":

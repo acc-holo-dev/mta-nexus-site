@@ -126,6 +126,7 @@ export const moderationError = (locale: Locale, code: unknown) => {
     case "CONTENT_REVIEW_TOO_LARGE":
       return copy.large;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.rate;
     case "UNCONFIRMED":
       return copy.uncertain;
