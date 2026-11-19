@@ -28,7 +28,10 @@ describe("resourceBuildWorkspaceError honesty surface", () => {
       "utf8",
     );
     const moderation = readFileSync(
-      resolve(process.cwd(), "site/src/features/resources/components/build-moderation-controls.tsx"),
+      resolve(
+        process.cwd(),
+        "site/src/features/resources/components/build-moderation-controls.tsx",
+      ),
       "utf8",
     );
     expect(buildControls).toContain("resourceBuildWorkspaceError");
