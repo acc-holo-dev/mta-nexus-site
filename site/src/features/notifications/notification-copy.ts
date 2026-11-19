@@ -519,7 +519,7 @@ export function formatNotification(
     };
   }
   if (noticeTitle === "New server update") {
-    return { title: c.newServerUpdate.title, message: notification.message };
+    return { title: c.newServerUpdate.title, message: noticeMessage };
   }
   if (
     noticeTitle === "Password reset completed" &&
@@ -533,19 +533,26 @@ export function formatNotification(
   if (noticeTitle === "Resource version published") {
     return {
       title: resourceReleaseWatchesCopy(locale).published,
-      message: notification.message,
+      message: noticeMessage,
     };
   }
-  if (noticeTitle === "License expired") {
+  if (noticeTitle === "License expired" || noticeTitle === "License expires soon") {
+    const licenseCopy = getLicenseMaintenanceCopy(locale);
+    const utc = /^UTC: (.+)$/u.exec(noticeMessage);
+    const stamped =
+      utc && Number.isFinite(Date.parse(utc[1]))
+        ? `\nUTC: ${new Intl.DateTimeFormat(locale, {
+            dateStyle: "medium",
+            timeStyle: "short",
+            timeZone: "UTC",
+          }).format(new Date(utc[1]))}`
+        : noticeMessage
+          ? `\n${noticeMessage}`
+          : "";
     return {
-      title: getLicenseMaintenanceCopy(locale).expiredTitle,
-      message: notification.message,
-    };
-  }
-  if (noticeTitle === "License expires soon") {
-    return {
-      title: getLicenseMaintenanceCopy(locale).expiringTitle,
-      message: notification.message,
+      title:
+        noticeTitle === "License expired" ? licenseCopy.expiredTitle : licenseCopy.expiringTitle,
+      message: `${noticeTitle === "License expired" ? licenseCopy.expiredMessage : licenseCopy.expiringMessage}${stamped}`,
     };
   }
   if (
