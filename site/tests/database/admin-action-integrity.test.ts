@@ -1,5 +1,6 @@
 import { AppError, NotFoundError } from "@nexus/domain";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { adminActionsApiCopy } from "../../src/features/moderation/admin-actions-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -157,7 +158,7 @@ describe("moderation action integrity", () => {
       expect(response.status).toBe(404);
       expectPrivate(response);
       expect(await response.json()).toEqual({
-        error: "Product not found",
+        error: adminActionsApiCopy("en").productNotFound,
       });
       expect(product.updateWithAudit).toHaveBeenCalledWith(
         "prd_missing",
@@ -212,7 +213,7 @@ describe("moderation action integrity", () => {
     const missing = await POST(request("report", "rpt_missing", "resolve"));
     expect(missing.status).toBe(404);
     expect(await missing.json()).toEqual({
-      error: "Report not found",
+      error: adminActionsApiCopy("en").reportNotFound,
     });
 
     report.findById.mockResolvedValueOnce({

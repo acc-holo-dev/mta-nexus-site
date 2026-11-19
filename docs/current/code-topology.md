@@ -276,6 +276,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 97 done:** `/api/products/[id]/builds` POST route-authored errors use bilingual `productBuildsApiCopy` via `nexus_locale`; `AppError` body passthrough remains English; codes/`Retry-After` unchanged.
 
+**Wave 98 done (large):** remaining major EN API envelopes — `/api/content` GET+POST extends `contentApiCopy`; `/api/admin/builds/[buildId]/download` via `adminBuildDownloadApiCopy`; `/api/admin/actions` via `adminActionsApiCopy`; AppError message passthrough stays English where previously passthrough.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -445,8 +447,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 96 — notifications list 500 via notificationsApiCopy                                                         | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 96                                                                                     | docs honesty                     | **done** |
 | A   | Wave 97 — product builds upload errors via productBuildsApiCopy                                                   | API envelope RU/EN               | **done** |
+| A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: content GET 503 or admin build download (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization major route clusters exhausted (support* already RU). Residual AppError English passthrough is intentional. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

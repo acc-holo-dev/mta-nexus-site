@@ -2,6 +2,7 @@ import { productRepository, serverRepository, sessionRepository, userRepository 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../../src/app/api/content/route";
+import { contentApiCopy } from "../../src/features/community/content-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -112,7 +113,7 @@ describe("linked content target authorization integration", () => {
     );
     expect(foreignServer.status).toBe(403);
     expect(await foreignServer.json()).toEqual({
-      error: "You do not manage the linked server",
+      error: contentApiCopy("en").linkedServerNotManaged,
     });
 
     const foreignProduct = await POST(
@@ -126,7 +127,7 @@ describe("linked content target authorization integration", () => {
     );
     expect(foreignProduct.status).toBe(403);
     expect(await foreignProduct.json()).toEqual({
-      error: "You do not manage the linked resource",
+      error: contentApiCopy("en").linkedResourceNotManaged,
     });
 
     const owned = await POST(

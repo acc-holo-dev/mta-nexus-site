@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { contentApiCopy } from "../../src/features/community/content-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -250,7 +251,7 @@ describe("community content API behavior", () => {
 
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({
-      error: "You do not manage this organization",
+      error: contentApiCopy("en").organizationNotManaged,
     });
     expect(mocks.memberships).toHaveBeenCalledWith("usr_writer");
     expect(mocks.createWithAudit).not.toHaveBeenCalled();

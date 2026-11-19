@@ -11,8 +11,10 @@ import { resourceModerationCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { adminActionsApiCopy } from "../../../../features/moderation/admin-actions-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../lib/services/commerce/product-service";
@@ -81,12 +83,13 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = adminActionsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user || !can(user, "admin.moderation")) {
-      return json({ error: "Forbidden: Admin or moderator privilege required" }, 403);
+      return json({ error: copy.forbidden }, 403);
     }
 
     requireServerJsonContentType(request);
@@ -96,12 +99,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     // Admin actions are rate limited
     const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
-      return json({ error: "Too many admin actions" }, 429);
+      return json({ error: copy.rate }, 429);
     }
 
     const parsed = adminActionSchema.safeParse(await readBoundedJson(request, 32768));
     if (!parsed.success) {
-      return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400);
+      return json({ error: copy.invalidAction, details: parsed.error.format() }, 400);
     }
     if (
       parsed.data.targetType === "build" &&
@@ -132,7 +135,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     if (targetType === "product") {
       if (action === "feature" || action === "unfeature") {
-        if (!token) return json({ error: "Authentication required" }, 401);
+        if (!token) return json({ error: copy.authenticationRequired }, 401);
         const updated = await productRepository.updateWithAudit(
           targetId,
           { isFeatured: action === "feature" },
@@ -140,7 +143,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           token,
         );
         if (!updated) {
-          return json({ error: "Product not found" }, 404);
+          return json({ error: copy.productNotFound }, 404);
         }
       } else {
         const command = resourceModerationCommandSchema.safeParse({
@@ -154,12 +157,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             400,
             "RESOURCE_MODERATION_INVALID",
           );
-        if (!token) return json({ error: "Authentication required" }, 401);
+        if (!token) return json({ error: copy.authenticationRequired }, 401);
         await resourceModerationService.command(user, targetId, command.data, token);
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
-        if (!token) return json({ error: "Authentication required" }, 401);
+        if (!token) return json({ error: copy.authenticationRequired }, 401);
         const resolved = await reportRepository.resolve(
           targetId,
           action === "resolve" ? "resolved" : "dismissed",
@@ -170,7 +173,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         if (!resolved) {
           const current = await reportRepository.findById(targetId);
           if (!current) {
-            return json({ error: "Report not found" }, 404);
+            return json({ error: copy.reportNotFound }, 404);
           }
           throw new AppError(
             "Report state changed before moderation completed",
@@ -182,7 +185,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     } else if (targetType === "verification") {
       // Verification can only be granted through the moderation workflow
       if (action === "approve" || action === "reject") {
-        if (!token) return json({ error: "Authentication required" }, 401);
+        if (!token) return json({ error: copy.authenticationRequired }, 401);
         const resolved = await verificationRepository.resolveRequest(
           {
             id: targetId,
@@ -197,7 +200,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         if (!resolved) {
           const current = await verificationRepository.findById(targetId);
           if (!current) {
-            return json({ error: "Verification request not found" }, 404);
+            return json({ error: copy.verificationNotFound }, 404);
           }
           throw new AppError(
             "Verification request state changed before moderation completed",
@@ -207,7 +210,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         }
       }
     } else if (targetType === "build") {
-      if (!token) return json({ error: "Authentication required" }, 401);
+      if (!token) return json({ error: copy.authenticationRequired }, 401);
       if (action === "approve" || action === "reject") {
         await productService.reviewBuild(
           {
@@ -241,7 +244,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         );
       }
     } else if (targetType === "content") {
-      if (!token) return json({ error: "Authentication required" }, 401);
+      if (!token) return json({ error: copy.authenticationRequired }, 401);
       // Server-follower fanout enqueues in the moderation transaction; no after().
       await contentService.moderateContent(
         targetId,
@@ -265,6 +268,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json({ error: "Failed to execute administrative action" }, 500);
+    return json({ error: copy.executeFailed }, 500);
   }
 });
