@@ -380,6 +380,7 @@ export function ContentDiscussion({
           "COMMENT_PARENT_NOT_FOUND",
           "ACTOR_ID_REQUIRED",
           "RATE_LIMIT_EXCEEDED",
+          "RATE_LIMITED",
         ].includes(String(caught.code))
       ) {
         pendingIntent.current = null;

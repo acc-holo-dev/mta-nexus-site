@@ -273,6 +273,7 @@ export function OrganizationProfileForm({
           "REQUEST_BODY_TOO_LARGE",
           "UNSUPPORTED_MEDIA_TYPE",
           "RATE_LIMIT_EXCEEDED",
+          "RATE_LIMITED",
         ].includes(String(caught.code))
       ) {
         try {
