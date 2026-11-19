@@ -291,7 +291,6 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             !firstAttempt
               ? copy.creationUnconfirmed
               : getResourceSubmissionErrorMessage(productData?.code, publishingErrorMessages) ||
-                  productData?.error ||
                   copy.createError,
           );
         }
@@ -348,7 +347,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         throw new Error(
           !firstAttempt
             ? copy.buildUnconfirmed
-            : publishingMessage || buildData?.error || copy.buildError,
+            : publishingMessage || copy.buildError,
         );
       }
 

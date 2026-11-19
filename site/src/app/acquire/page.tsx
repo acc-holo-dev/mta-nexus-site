@@ -8,6 +8,7 @@ import { Suspense, useEffect, useId, useState } from "react";
 import { licenseModelLabel } from "../../features/commerce/license-model-i18n";
 import { getResourceActivityCopy } from "../../features/resources/resource-activity-i18n";
 import { confirmedResourceClaim } from "../../features/resources/resource-commerce-confirmation";
+import { resourceClaimApiCopy } from "../../features/resources/resource-claim-api-copy";
 import { authEntryHref } from "../../features/shell/auth-return";
 import { GuestAuthLinks } from "../../features/shell/guest-auth";
 import { HonestLoadingShell } from "../../features/shell/honest-loading";
@@ -38,6 +39,7 @@ function AcquireContent() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
   const authCopy = dictionary.auth;
+  const claimCopy = resourceClaimApiCopy(locale);
   const activityCopy = getResourceActivityCopy(locale);
   const summaryHeadingId = useId();
   const accessHeadingId = useId();
@@ -127,7 +129,17 @@ function AcquireContent() {
       }
       const confirmed = confirmedResourceClaim(data, product.id);
       if (!response.ok || !confirmed) {
-        throw new Error(data?.error || copy.claimFailed);
+        throw new Error(
+          data?.code === "RATE_LIMIT_EXCEEDED"
+            ? claimCopy.rate
+            : data?.code === "FORBIDDEN"
+              ? claimCopy.forbidden
+              : data?.code === "NOT_FOUND"
+                ? claimCopy.notFound
+                : data?.code === "VALIDATION_ERROR"
+                  ? claimCopy.invalidClaim
+                  : claimCopy.claimFailed || copy.claimFailed,
+        );
       }
 
       setClaimedAccess(confirmed);
