@@ -7,6 +7,7 @@ import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
 import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function DiscussionCommentActions({
   comment,
   own,
@@ -33,6 +34,12 @@ export function DiscussionCommentActions({
   editable?: boolean;
 }) {
   const copy = getDiscussionCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [mode, setMode] = useState<"edit" | "remove" | null>(null),
     [text, setText] = useState(comment.text);
   // A refresh may replace the row while a draft/confirmation is open.
@@ -91,7 +98,7 @@ export function DiscussionCommentActions({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : copy.writeUnavailable);
+        setError(safeMessage(failure, copy.writeUnavailable));
       }
     } finally {
       busy.current = false;
