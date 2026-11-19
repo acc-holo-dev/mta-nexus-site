@@ -63,6 +63,7 @@ const copies = {
       ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       FORBIDDEN: "You do not have permission to manage this gallery.",
+      CONFLICT: "The resource changed. Reload the gallery before continuing.",
       VALIDATION_ERROR:
         "Use a valid static PNG, JPEG or WebP and a single-line caption of up to 160 characters.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Retry later.",
@@ -132,6 +133,7 @@ const copies = {
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
       ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       FORBIDDEN: "У вас нет прав управлять этой галереей.",
+      CONFLICT: "Ресурс изменился. Обновите галерею перед продолжением.",
       VALIDATION_ERROR:
         "Нужен корректный статичный PNG, JPEG или WebP и однострочная подпись до 160 символов.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите позже.",

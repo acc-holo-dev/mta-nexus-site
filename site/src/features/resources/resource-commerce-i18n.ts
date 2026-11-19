@@ -84,6 +84,7 @@ const copy = {
       ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       FORBIDDEN: "You do not have permission to perform this action.",
+      CONFLICT: "The resource changed. Reload the page and review the current state.",
       RATE_LIMIT_EXCEEDED: "Too many operations. Wait a little and try again.",
       PRODUCT_METADATA_REVISION_REQUIRED:
         "Reload the resource before saving; an observed revision is required.",
@@ -182,6 +183,7 @@ const copy = {
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
       ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       FORBIDDEN: "У вас нет прав на это действие.",
+      CONFLICT: "Ресурс изменился. Перезагрузите страницу и проверьте текущее состояние.",
       RATE_LIMIT_EXCEEDED: "Слишком много операций. Подождите немного и повторите попытку.",
       PRODUCT_METADATA_REVISION_REQUIRED:
         "Обновите ресурс перед сохранением: требуется прочитанная ревизия.",
