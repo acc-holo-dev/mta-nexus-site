@@ -40,8 +40,9 @@ describe("product builds API copy honesty surface", () => {
     expect(route).toContain("copy.scanLimitExceeded");
     expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain("copy.publishFailed");
-    expect(route).toContain("error.message");
+    expect(route).toContain("localeAppErrorText");
     expect(route).toContain("error.code");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Build upload requires multipart/form-data"');
     expect(route).not.toContain('"Build was rejected by the malware scanner"');

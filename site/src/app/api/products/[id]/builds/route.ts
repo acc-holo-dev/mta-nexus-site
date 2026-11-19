@@ -15,6 +15,7 @@ import {
   parseMultipartFormDataWithLimit,
 } from "../../../../../lib/http/bounded-multipart";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -357,7 +358,32 @@ export const POST = withBrowserMutation(
       if (error instanceof AppError) {
         return privateJson(
           context,
-          { error: error.message, code: error.code },
+          {
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                conflict: copy.actorChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.publishFailed,
+              },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                BUILD_PACKAGE_INSPECTOR_BUSY: copy.inspectorBusy,
+                MALWARE_DETECTED: copy.malwareDetected,
+                SCAN_LIMIT_EXCEEDED: copy.scanLimitExceeded,
+                SCANNER_UNAVAILABLE: copy.scannerUnavailable,
+                FILE_TYPE_NOT_ALLOWED: copy.fileTypeNotAllowed,
+                CONTENT_MISMATCH: copy.contentMismatch,
+              },
+            ),
+            code: error.code,
+          },
           {
             status: error.statusCode,
             ...(error.code === "BUILD_PACKAGE_INSPECTOR_BUSY"
