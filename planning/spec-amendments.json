@@ -665,6 +665,14 @@
       "value_sha256": "0dbd9acb056d88b3d97e63ff58ba9585725e5df4f06a08e2a9588c052bc29d81",
       "commit": "7f6773b3cd88df2d9ecb963cbd46cce97a87c1d9",
       "reason": "Точное значение действующей спецификации из принятого main; frozen baseline сохранён."
+    },
+    {
+      "id": "DOC-05",
+      "field": "scope_files",
+      "baseline_sha256": "e5ee5c5394aa5dd2de1bd2ccd3150a1185a072527966e3960e76caf8ea1c4f3c",
+      "value_sha256": "c39931e0336b165fbc105b90745f26d9db66d072b3b263485dbcaf8042663288",
+      "commit": "b5cc25bd90598ade354c79784e2b408f07619643",
+      "reason": "Domains path cutover: DOC-05 planned subject contracts moved to docs/current/domains/* with root redirect stubs."
     }
   ]
 }
