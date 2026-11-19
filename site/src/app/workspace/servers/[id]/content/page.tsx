@@ -11,12 +11,10 @@ import {
   parseContentPage,
   writerTypes,
 } from "../../../../../features/community/user-platform-contract";
-import {
-  getUserPlatformCopy,
-  userPlatformError,
-} from "../../../../../features/community/user-platform-copy";
+import { getUserPlatformCopy } from "../../../../../features/community/user-platform-copy";
 import { serverContentId } from "../../../../../features/servers/server-content-api";
 import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
+import { serverWorkspaceError } from "../../../../../features/servers/server-workspace-copy";
 import { serverPublicationHistoryCopy } from "../../../../../features/servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../../features/shell/session-error";
@@ -68,7 +66,7 @@ export default async function ServerPublications({
     .then(() => serverContentService.page(serverContentId(id), actor, filters))
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError ? serverWorkspaceError(locale, error.code) : copy.unavailable;
       return null;
     });
   return (
