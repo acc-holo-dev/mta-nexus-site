@@ -101,6 +101,10 @@ export function SupportCenter({
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(workspaceCopy).includes(text) ? text : fallback;
+  }
   const [cases, setCases] = useState<SupportCaseSummary[]>([]);
   const [page, setPage] = useState(initialFilters.page);
   const [totalPages, setTotalPages] = useState(1);
@@ -274,9 +278,7 @@ export function SupportCenter({
       if (!(await loadCases())) setFormError(workspaceCopy.savedRefresh);
     } catch (caught) {
       // Keep subject/message/context so a lost response can retry with the same intent.
-      setFormError(
-        caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain,
-      );
+      setFormError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       creatingRef.current = false;
       setCreating(false);
