@@ -78,6 +78,7 @@ Feature объединяет клиентское обсуждение публ�
 | `user-platform-copy.ts`                        | util port `user-platform-copy`                                                |
 | `user-platform-contract.ts`                    | util port `user-platform-contract`                                            |
 | `user-platform-client.ts`                      | util port `user-platform-client`                                              |
+| `content-api-copy.ts`                          | util port `content-api-copy`                                                  |
 | `community-report-api.ts`                      | util port `community-report-api`                                              |
 | `community-report-history-http.ts`             | util port `community-report-history-http`                                     |
 | `moderated-discussion-api.ts`                  | util port `moderated-discussion-api`                                          |
