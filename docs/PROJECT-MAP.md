@@ -127,10 +127,10 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Как начать и выбрать задачу               | [AGENT.md](AGENT.md), [AGENTS.md](../AGENTS.md)                                                                    |
 | Что подтверждено сейчас                   | [CURRENT-STATE.md](CURRENT-STATE.md)                                                                               |
 | Что строим / ближайший выпуск             | [PRODUCT.md](PRODUCT.md)                                                                                           |
-| Ресурсы / библиотека / публикация         | [RESOURCES.md](RESOURCES.md)                                                                                       |
-| Сообщество / identity                     | [COMMUNITY.md](COMMUNITY.md)                                                                                       |
-| Серверы / организации                     | [SERVERS-ORGS.md](SERVERS-ORGS.md)                                                                                 |
-| Доверие / staff / аккаунт                 | [TRUST-STAFF.md](TRUST-STAFF.md)                                                                                   |
+| Ресурсы / библиотека / публикация         | [current/domains/RESOURCES.md](current/domains/RESOURCES.md)                                                                                       |
+| Сообщество / identity                     | [COMMUNITY.md](current/domains/COMMUNITY.md)                                                                                       |
+| Серверы / организации                     | [SERVERS-ORGS.md](current/domains/SERVERS-ORGS.md)                                                                                 |
+| Доверие / staff / аккаунт                 | [TRUST-STAFF.md](current/domains/TRUST-STAFF.md)                                                                                   |
 | Коммерция / DRM (будущее)                 | [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md)                                                                       |
 | Решения (NX + указатель baseline)         | [DECISIONS.md](DECISIONS.md)                                                                                       |
 | Полный реестр decision ID                 | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), `planning/decision-baseline.json`                     |

@@ -1,6 +1,6 @@
 # Архитектура MTA NEXUS
 
-Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
+Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](current/domains/RESOURCES.md), [COMMUNITY](current/domains/COMMUNITY.md), [SERVERS-ORGS](current/domains/SERVERS-ORGS.md), [TRUST-STAFF](current/domains/TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
 
 Доменная модель и правила storage/scanner объединены здесь и в предметных контрактах. Исторические главы доступны в Git; карта переноса — в [DOCS-MIGRATION](DOCS-MIGRATION.md).
 
@@ -148,7 +148,7 @@ workers остаются в своих слоях.
 
 Ключевые сущности и связи: Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `site/packages/db`; факты runtime — код.
 
-Цели и границы storage, scanner, observability и production mounts — в [OPERATIONS](OPERATIONS.md); Security Center и quarantine admin — в [TRUST-STAFF](TRUST-STAFF.md).
+Цели и границы storage, scanner, observability и production mounts — в [OPERATIONS](OPERATIONS.md); Security Center и quarantine admin — в [TRUST-STAFF](current/domains/TRUST-STAFF.md).
 
 ## Граница продукта
 

@@ -3,7 +3,7 @@
 **Статус:** перенос начат (волна 1). **Дата:** 16 ноября 2026 (Europe/Moscow).  
 **Цель:** один самодостаточный контур документации без обязательных цепочек «прочитайте ещё пять файлов», с проверяемыми фактами и минимальным числом автоматически поддерживаемых представлений.
 
-Волна 1 уже перенесла: `current/system.md`, `current/development.md`, `issues/constraints.md`, `future/*` topic owners, `archive/migrations|pilots`. Корневые прежние имена временно остаются **redirect stubs**. Ещё впереди: `current/domains/*`, `operations` path cutover, перенос `planning/` → `docs/planning/`, удаление stubs, generated overview/status.
+Волна 1 уже перенесла: `current/system.md`, `current/development.md`, `issues/constraints.md`, `future/*` topic owners, `archive/migrations|pilots`. Волна domains: `current/domains/{RESOURCES,COMMUNITY,SERVERS-ORGS,TRUST-STAFF}.md`; корневые прежние имена остаются **redirect stubs**. Ещё впереди: `operations` path cutover, перенос `planning/` → `docs/planning/`, удаление stubs, generated overview/status.
 
 ## 1. Дерево целевого состояния
 

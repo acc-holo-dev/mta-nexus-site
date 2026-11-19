@@ -1160,10 +1160,10 @@ Release applicability: after_semantic_migration_and_consumer_checks.
 
 - `docs/handbook`
 - `planned: docs/PRODUCT.md`
-- `planned: docs/RESOURCES.md`
-- `planned: docs/COMMUNITY.md`
-- `planned: docs/SERVERS-ORGS.md`
-- `planned: docs/TRUST-STAFF.md`
+- `planned: docs/current/domains/RESOURCES.md`
+- `planned: docs/current/domains/COMMUNITY.md`
+- `planned: docs/current/domains/SERVERS-ORGS.md`
+- `planned: docs/current/domains/TRUST-STAFF.md`
 - `planned: docs/COMMERCIAL-FUTURE.md`
 
 ### Приёмка
