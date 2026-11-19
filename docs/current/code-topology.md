@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `170e3e4e` (`dev`, Waves 189–197 local tip).  
+**source_sha:** `765b6bff` (`dev`, Waves 189–197 tip + inventory fix).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -318,7 +318,7 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 179–188 done:** admin action clients remap by code; auth recovery/verify pages drop `data?.error`; acquire + new-resource prefer code remappers; settings client requires locale messages (no EN defaults); honesty locks.
 
-**Waves 189–197 done (local tip):** AuthForm code remap; serverMutationErrorMessage drops payload.error; content-comment drops payload.error; CONFLICT/RATE residual remappers; honesty locks. Hold push until `651cf8d4` CI CLEAN.
+**Waves 189–197 done:** AuthForm code remap; serverMutationErrorMessage drops payload.error; content-comment drops payload.error; CONFLICT/RATE residual remappers; honesty locks.
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
@@ -371,149 +371,149 @@ Live tracker на момент измерения: 19 карточек, почт
 
 ### Очередь slices (program control)
 
-| #   | Slice                                                                                                             | Ось                              | Статус    |
-| --- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | --------- |
-| 1   | Topology scoreboard (этот документ + inventory)                                                                   | скорость разработки / понятность | **done**  |
-| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)                                                          | babysitting tax                  | **done**  |
-| 3   | Design direction + `@nexus/ui` tokens/primitives                                                                  | shell 2027                       | **done**  |
-| 4   | Structural absorb #1 — shell nav/footer → `features/shell`                                                        | читаемость + путь гостя          | **done**  |
-| 5   | i18n inventory automation (shell+home hard-coded strings)                                                         | честность RU/EN                  | **done**  |
-| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                          | brand honesty + guest path       | **done**  |
-| 7   | Footer credit line → `footer.creditLine` i18n                                                                     | честность RU/EN                  | **done**  |
-| 44  | i18n inventory automation (public-guest discover/servers/articles)                                                | честность RU/EN                  | **done**  |
-| 45  | i18n inventory coverage (public-guest market/community/orgs/users/support/…)                                      | честность RU/EN                  | **done**  |
-| T   | services-domain — `lib/services/<domain>/`                                                                        | читаемость service layer         | **done**  |
-| T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                 | очистка `lib/` root              | **done**  |
-| T   | Slice 42 — Shell `home-personal-changes` server port                                                              | читаемость + Shell ownership     | **done**  |
-| T   | Slice 43 — Accounts `parseProfilePage` into `profile-pagination` port                                             | читаемость + Accounts ownership  | **done**  |
-| D/E | Scoreboard sync после http/platform + services domains                                                            | docs honesty                     | **done**  |
-| C   | Journey honesty — load/session/empty/recovery program complete; write/form ErrorStates intentionally out of scope | честность user journey           | **done**  |
-| D/E | Scoreboard sync после residual honesty + Slice 42/43                                                              | docs honesty                     | **done**  |
-| D/E | Scoreboard sync после Slice 44/45 public-guest i18n + journey C close                                             | docs honesty                     | **done**  |
-| T   | Slice 46 — Shell `HonestLoadingShell` + large `loading.tsx` absorb                                                | читаемость + loading honesty     | **done**  |
-| T   | Slice 47 — residual admin/workspace/global `loading.tsx` → `HonestLoadingShell`                                   | читаемость + loading honesty     | **done**  |
-| D/E | Scoreboard sync после Slice 47                                                                                    | docs honesty                     | **done**  |
-| A/B | Slice 48 — workspace-member i18n inventory + form placeholder dictionary move                                     | честность RU/EN                  | **done**  |
-| D/E | Scoreboard sync после Slice 48                                                                                    | docs honesty                     | **done**  |
-| T   | Slice 49 — server statistics/observations + platform-reports loaders → `HonestLoadingShell`                       | читаемость + loading honesty     | **done**  |
-| D/E | Scoreboard sync после Slice 49                                                                                    | docs honesty                     | **done**  |
-| T/A | Slice 50 — settings/support client loaders + residual version placeholders                                        | loading honesty + RU/EN          | **done**  |
-| D/E | Scoreboard sync после Slice 50                                                                                    | docs honesty                     | **done**  |
-| T/A | Slice 51 — Shell `global-error-copy` + acquire HonestLoadingShell fallbacks                                       | читаемость + RU/EN + loading     | **done**  |
-| D/E | Scoreboard sync после Slice 51                                                                                    | docs honesty                     | **done**  |
-| T/C | Slice 52 — Shell `offline-cache-policy` absorb + residual retry ErrorState descriptions                           | читаемость + journey honesty     | **done**  |
-| D/E | Scoreboard sync после Slice 52                                                                                    | docs honesty                     | **done**  |
-| T/C | Slice 53 — HonestLoadingShell `headingLevel` + auth/settings/invalid-filter recovery descriptions                 | читаемость + journey honesty     | **done**  |
-| D/E | Scoreboard sync после Slice 53                                                                                    | docs honesty                     | **done**  |
-| A/B | Slice 54 — feature-server (+ residual component) i18n inventory                                                   | честность RU/EN                  | **done**  |
-| D/E | Scoreboard sync после Slice 54                                                                                    | docs honesty                     | **done**  |
-| T   | Slice 55 — collapse `lib/platform/i18n*` into `lib/i18n`                                                          | читаемость lib ownership         | **done**  |
-| D/E | Scoreboard sync после Slice 55                                                                                    | docs honesty                     | **done**  |
-| C   | Wave 56 — write/form + residual ErrorState honesty (~50 commits, one CI tip)                                      | journey honesty (бывший OOS)     | **done**  |
-| A/C | Wave 57 — formatUnknown adoption + unknown-marker allowlist purge + policy                                        | честность RU/EN + unknown        | **done**  |
-| T   | Wave 57 — `lib/platform/{observability,postgres-error}/` folder modules                                           | читаемость lib ownership         | **done**  |
-| D/E | Scoreboard sync после Wave 56/57 (single squash tip)                                                              | docs honesty                     | **done**  |
-| A/C | Wave 58 — SW offline document i18n + resource MTA/SHA-256 labels                                                  | честность RU/EN + PWA honesty    | **done**  |
-| D/E | Scoreboard sync после Wave 58                                                                                     | docs honesty                     | **done**  |
-| A/C | Wave 59 — Home hero budget + plan-review/quarantine micro honesty                                                 | Shell 2027 + RU/EN honesty       | **done**  |
-| D/E | Scoreboard sync после Wave 59                                                                                     | docs honesty                     | **done**  |
-| A/C | Wave 60 — SW offline theme tokens + bilingual push fallback                                                       | PWA honesty + Shell 2027         | **done**  |
-| D/E | Scoreboard sync после Wave 60                                                                                     | docs honesty                     | **done**  |
-| A/C | Wave 61 — provenance.hash + UX-05 theme/typography verification locks                                             | RU/EN honesty + UX-05            | **done**  |
-| D/E | Scoreboard sync после Wave 61                                                                                     | docs honesty                     | **done**  |
-| D/E | Wave 62 — stale public-guest allowlist purge + design-direction sync                                              | docs / inventory honesty         | **done**  |
-| A   | Wave 63 — discovery search serverFallback via nexus_locale                                                        | API RU/EN honesty                | **done**  |
-| D/E | Wave 64 — scoreboard sync (`code-topology.md` ↔ tip inventory)                                                    | docs honesty                     | **done**  |
-| A   | Wave 65 — `/api/search` error envelope via discoverySearchApiCopy                                                 | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 65                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 66 — `/api/servers/directory` errors via serversDirectoryApiCopy                                             | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 66                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 67 — `/api/auth/password` errors via authPasswordApiCopy                                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 67                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 68 — `/api/auth/session` errors via authSessionApiCopy                                                       | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 68                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 69 — `/api/auth/sessions` errors via authSessionsApiCopy                                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 69                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 70 — `/api/auth/login` errors via authLoginApiCopy                                                           | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 70                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 71 — `/api/auth/password-reset` errors via authPasswordResetApiCopy                                          | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 71                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 72 — `/api/auth/register` errors via authRegisterApiCopy                                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 72                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 73 — `/api/auth/context` errors via authContextApiCopy                                                       | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 73                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 74 — `/api/auth/email-verification` errors via authEmailVerificationApiCopy                                  | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 74                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 75 — `/api/reports` errors via reportsApiCopy                                                                | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 75                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 76 — `/api/resources/claim` errors via resourceClaimApiCopy                                                  | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 76                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 77 — servers claim-challenge (+ verify) errors via serverClaimApiCopy                                        | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 77                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 78 — `/api/resources/inspect-meta` errors via resourceInspectMetaApiCopy                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 78                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 79 — workspace platform-reports (+ detail) errors via platformReportsApiCopy                                 | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 79                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 80 — workspace server-organizations errors via serverOrganizationsApiCopy                                    | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 80                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 81 — claim-challenge success instruction via serverClaimApiCopy                                              | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 81                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 82 — inspect-meta success note via resourceInspectMetaApiCopy                                                | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 82                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 83 — `/api/servers` collection errors via serversApiCopy                                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 83                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 84 — `/api/mta/servers` 503 via serversDirectoryApiCopy.mtaUnavailable                                       | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 84                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 85 — servers history errors via serverHistoryApiCopy                                                         | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 85                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 86 — `/api/content/[slug]` errors via contentApiCopy                                                         | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 86                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 87 — notifications mark-read errors via notificationMarkReadApiCopy                                          | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 87                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 88 — notifications preferences errors via notificationPreferencesApiCopy                                     | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 88                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 89 — checkout disabled envelope via checkoutApiCopy                                                          | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 89                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 90 — servers/[id] PATCH errors via serversApiCopy                                                            | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 90                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 91 — notifications push errors via notificationPushApiCopy                                                   | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 91                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 92 — verification collection errors via verificationApiCopy                                                  | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 92                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 93 — products collection errors via productsApiCopy                                                          | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 93                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 94 — products/[id] GET errors via productsApiCopy                                                            | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 94                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 95 — product download errors via productDownloadApiCopy                                                      | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 95                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 96 — notifications list 500 via notificationsApiCopy                                                         | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Wave 96                                                                                     | docs honesty                     | **done**  |
-| A   | Wave 97 — product builds upload errors via productBuildsApiCopy                                                   | API envelope RU/EN               | **done**  |
-| A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done**  |
-| D/E | Scoreboard sync после Waves 97–98                                                                                 | docs honesty                     | **done**  |
-| A   | Wave 99 — workspace library/resources/subscriptions bilingual document titles                                     | document metadata RU/EN          | **done**  |
-| A   | Wave 100 — workspace commerce + admin commerce/licenses/resources bilingual document titles                       | document metadata RU/EN          | **done**  |
-| A   | Wave 101 — residual hubs/auth/admin/public document titles + Wave 99 format fix                                   | document metadata RU/EN          | **done**  |
-| A   | Wave 102 — `/api/support` always-localize envelopes + ACTOR_* mapping                                             | API envelope RU/EN               | **done**  |
-| A   | Wave 103 — inbox formatNotification server-update + verification awaiting-review gaps                             | notification display RU/EN       | **done**  |
-| A   | Wave 104 — inbox formatNotification password-reset completed security notice                                      | notification display RU/EN       | **done**  |
-| A   | Wave 105 — account mail dispatcher bilingual slash subjects/bodies                                                | account mail RU/EN               | **done**  |
-| A   | Wave 106 — order more DB session snapshot selects                                                                 | CI stability                     | **done**  |
-| A   | Wave 107 — SMTP test receiver SMTPUTF8/8BITMIME for bilingual mail                                                | account mail CI                  | **done**  |
-| A   | Wave 108 — canonical bilingual notice titles + password-reset Web Push slash title                                | notification display/push RU/EN  | **done**  |
-| A   | Wave 109 — `noticeStoredTitles` slash pack across Web Push producers                                              | notification storage/push RU/EN  | **done**  |
-| D/E | Wave 110 — i18n inventory SHA stamp + `newArticleComment` stored title                                            | docs honesty / notice catalog    | **done**  |
-| A   | Wave 111 — `noticeStoredMessages` slash pack for static Web Push bodies                                           | notification storage/push RU/EN  | **done**  |
-| A   | Waves 112–119 — templated bilingual Web Push bodies + canonical message matchers                                  | notification storage/push RU/EN  | **done**  |
-| A   | Waves 120–123 — auth + notification AppError envelope localization                                                | API envelope RU/EN               | **done**  |
-| A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done**  |
-| A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done**  |
-| A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done**  |
-| A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done**  |
-| A   | Waves 159–169 — media/moderation/claim/publishing remappers + VALIDATION/FORBIDDEN fills + release-watch          | client remapper RU/EN            | **done**  |
-| A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper                  | client remapper RU/EN            | **done**  |
-| A   | Waves 179–188 — admin/auth/acquire/settings drop body.error passthrough                                           | client remapper RU/EN            | **done**  |
-| A   | Waves 189–197 — AuthForm/mutation/comment body.error drop + residual CONFLICT/RATE aliases                        | client remapper RU/EN            | **local** |
+| #   | Slice                                                                                                             | Ось                              | Статус   |
+| --- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
+| 1   | Topology scoreboard (этот документ + inventory)                                                                   | скорость разработки / понятность | **done** |
+| 2   | Husk & import honesty (`/packages/`, `/apps/` gitignore)                                                          | babysitting tax                  | **done** |
+| 3   | Design direction + `@nexus/ui` tokens/primitives                                                                  | shell 2027                       | **done** |
+| 4   | Structural absorb #1 — shell nav/footer → `features/shell`                                                        | читаемость + путь гостя          | **done** |
+| 5   | i18n inventory automation (shell+home hard-coded strings)                                                         | честность RU/EN                  | **done** |
+| 6   | Sidebar BrandMark absorb (drop duplicate brand literals)                                                          | brand honesty + guest path       | **done** |
+| 7   | Footer credit line → `footer.creditLine` i18n                                                                     | честность RU/EN                  | **done** |
+| 44  | i18n inventory automation (public-guest discover/servers/articles)                                                | честность RU/EN                  | **done** |
+| 45  | i18n inventory coverage (public-guest market/community/orgs/users/support/…)                                      | честность RU/EN                  | **done** |
+| T   | services-domain — `lib/services/<domain>/`                                                                        | читаемость service layer         | **done** |
+| T   | lib-http-platform — `lib/http/` + `lib/platform/`                                                                 | очистка `lib/` root              | **done** |
+| T   | Slice 42 — Shell `home-personal-changes` server port                                                              | читаемость + Shell ownership     | **done** |
+| T   | Slice 43 — Accounts `parseProfilePage` into `profile-pagination` port                                             | читаемость + Accounts ownership  | **done** |
+| D/E | Scoreboard sync после http/platform + services domains                                                            | docs honesty                     | **done** |
+| C   | Journey honesty — load/session/empty/recovery program complete; write/form ErrorStates intentionally out of scope | честность user journey           | **done** |
+| D/E | Scoreboard sync после residual honesty + Slice 42/43                                                              | docs honesty                     | **done** |
+| D/E | Scoreboard sync после Slice 44/45 public-guest i18n + journey C close                                             | docs honesty                     | **done** |
+| T   | Slice 46 — Shell `HonestLoadingShell` + large `loading.tsx` absorb                                                | читаемость + loading honesty     | **done** |
+| T   | Slice 47 — residual admin/workspace/global `loading.tsx` → `HonestLoadingShell`                                   | читаемость + loading honesty     | **done** |
+| D/E | Scoreboard sync после Slice 47                                                                                    | docs honesty                     | **done** |
+| A/B | Slice 48 — workspace-member i18n inventory + form placeholder dictionary move                                     | честность RU/EN                  | **done** |
+| D/E | Scoreboard sync после Slice 48                                                                                    | docs honesty                     | **done** |
+| T   | Slice 49 — server statistics/observations + platform-reports loaders → `HonestLoadingShell`                       | читаемость + loading honesty     | **done** |
+| D/E | Scoreboard sync после Slice 49                                                                                    | docs honesty                     | **done** |
+| T/A | Slice 50 — settings/support client loaders + residual version placeholders                                        | loading honesty + RU/EN          | **done** |
+| D/E | Scoreboard sync после Slice 50                                                                                    | docs honesty                     | **done** |
+| T/A | Slice 51 — Shell `global-error-copy` + acquire HonestLoadingShell fallbacks                                       | читаемость + RU/EN + loading     | **done** |
+| D/E | Scoreboard sync после Slice 51                                                                                    | docs honesty                     | **done** |
+| T/C | Slice 52 — Shell `offline-cache-policy` absorb + residual retry ErrorState descriptions                           | читаемость + journey honesty     | **done** |
+| D/E | Scoreboard sync после Slice 52                                                                                    | docs honesty                     | **done** |
+| T/C | Slice 53 — HonestLoadingShell `headingLevel` + auth/settings/invalid-filter recovery descriptions                 | читаемость + journey honesty     | **done** |
+| D/E | Scoreboard sync после Slice 53                                                                                    | docs honesty                     | **done** |
+| A/B | Slice 54 — feature-server (+ residual component) i18n inventory                                                   | честность RU/EN                  | **done** |
+| D/E | Scoreboard sync после Slice 54                                                                                    | docs honesty                     | **done** |
+| T   | Slice 55 — collapse `lib/platform/i18n*` into `lib/i18n`                                                          | читаемость lib ownership         | **done** |
+| D/E | Scoreboard sync после Slice 55                                                                                    | docs honesty                     | **done** |
+| C   | Wave 56 — write/form + residual ErrorState honesty (~50 commits, one CI tip)                                      | journey honesty (бывший OOS)     | **done** |
+| A/C | Wave 57 — formatUnknown adoption + unknown-marker allowlist purge + policy                                        | честность RU/EN + unknown        | **done** |
+| T   | Wave 57 — `lib/platform/{observability,postgres-error}/` folder modules                                           | читаемость lib ownership         | **done** |
+| D/E | Scoreboard sync после Wave 56/57 (single squash tip)                                                              | docs honesty                     | **done** |
+| A/C | Wave 58 — SW offline document i18n + resource MTA/SHA-256 labels                                                  | честность RU/EN + PWA honesty    | **done** |
+| D/E | Scoreboard sync после Wave 58                                                                                     | docs honesty                     | **done** |
+| A/C | Wave 59 — Home hero budget + plan-review/quarantine micro honesty                                                 | Shell 2027 + RU/EN honesty       | **done** |
+| D/E | Scoreboard sync после Wave 59                                                                                     | docs honesty                     | **done** |
+| A/C | Wave 60 — SW offline theme tokens + bilingual push fallback                                                       | PWA honesty + Shell 2027         | **done** |
+| D/E | Scoreboard sync после Wave 60                                                                                     | docs honesty                     | **done** |
+| A/C | Wave 61 — provenance.hash + UX-05 theme/typography verification locks                                             | RU/EN honesty + UX-05            | **done** |
+| D/E | Scoreboard sync после Wave 61                                                                                     | docs honesty                     | **done** |
+| D/E | Wave 62 — stale public-guest allowlist purge + design-direction sync                                              | docs / inventory honesty         | **done** |
+| A   | Wave 63 — discovery search serverFallback via nexus_locale                                                        | API RU/EN honesty                | **done** |
+| D/E | Wave 64 — scoreboard sync (`code-topology.md` ↔ tip inventory)                                                    | docs honesty                     | **done** |
+| A   | Wave 65 — `/api/search` error envelope via discoverySearchApiCopy                                                 | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 65                                                                                     | docs honesty                     | **done** |
+| A   | Wave 66 — `/api/servers/directory` errors via serversDirectoryApiCopy                                             | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 66                                                                                     | docs honesty                     | **done** |
+| A   | Wave 67 — `/api/auth/password` errors via authPasswordApiCopy                                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 67                                                                                     | docs honesty                     | **done** |
+| A   | Wave 68 — `/api/auth/session` errors via authSessionApiCopy                                                       | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 68                                                                                     | docs honesty                     | **done** |
+| A   | Wave 69 — `/api/auth/sessions` errors via authSessionsApiCopy                                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 69                                                                                     | docs honesty                     | **done** |
+| A   | Wave 70 — `/api/auth/login` errors via authLoginApiCopy                                                           | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 70                                                                                     | docs honesty                     | **done** |
+| A   | Wave 71 — `/api/auth/password-reset` errors via authPasswordResetApiCopy                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 71                                                                                     | docs honesty                     | **done** |
+| A   | Wave 72 — `/api/auth/register` errors via authRegisterApiCopy                                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 72                                                                                     | docs honesty                     | **done** |
+| A   | Wave 73 — `/api/auth/context` errors via authContextApiCopy                                                       | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 73                                                                                     | docs honesty                     | **done** |
+| A   | Wave 74 — `/api/auth/email-verification` errors via authEmailVerificationApiCopy                                  | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 74                                                                                     | docs honesty                     | **done** |
+| A   | Wave 75 — `/api/reports` errors via reportsApiCopy                                                                | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 75                                                                                     | docs honesty                     | **done** |
+| A   | Wave 76 — `/api/resources/claim` errors via resourceClaimApiCopy                                                  | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 76                                                                                     | docs honesty                     | **done** |
+| A   | Wave 77 — servers claim-challenge (+ verify) errors via serverClaimApiCopy                                        | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 77                                                                                     | docs honesty                     | **done** |
+| A   | Wave 78 — `/api/resources/inspect-meta` errors via resourceInspectMetaApiCopy                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 78                                                                                     | docs honesty                     | **done** |
+| A   | Wave 79 — workspace platform-reports (+ detail) errors via platformReportsApiCopy                                 | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 79                                                                                     | docs honesty                     | **done** |
+| A   | Wave 80 — workspace server-organizations errors via serverOrganizationsApiCopy                                    | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 80                                                                                     | docs honesty                     | **done** |
+| A   | Wave 81 — claim-challenge success instruction via serverClaimApiCopy                                              | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 81                                                                                     | docs honesty                     | **done** |
+| A   | Wave 82 — inspect-meta success note via resourceInspectMetaApiCopy                                                | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 82                                                                                     | docs honesty                     | **done** |
+| A   | Wave 83 — `/api/servers` collection errors via serversApiCopy                                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 83                                                                                     | docs honesty                     | **done** |
+| A   | Wave 84 — `/api/mta/servers` 503 via serversDirectoryApiCopy.mtaUnavailable                                       | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 84                                                                                     | docs honesty                     | **done** |
+| A   | Wave 85 — servers history errors via serverHistoryApiCopy                                                         | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 85                                                                                     | docs honesty                     | **done** |
+| A   | Wave 86 — `/api/content/[slug]` errors via contentApiCopy                                                         | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 86                                                                                     | docs honesty                     | **done** |
+| A   | Wave 87 — notifications mark-read errors via notificationMarkReadApiCopy                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 87                                                                                     | docs honesty                     | **done** |
+| A   | Wave 88 — notifications preferences errors via notificationPreferencesApiCopy                                     | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 88                                                                                     | docs honesty                     | **done** |
+| A   | Wave 89 — checkout disabled envelope via checkoutApiCopy                                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 89                                                                                     | docs honesty                     | **done** |
+| A   | Wave 90 — servers/[id] PATCH errors via serversApiCopy                                                            | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 90                                                                                     | docs honesty                     | **done** |
+| A   | Wave 91 — notifications push errors via notificationPushApiCopy                                                   | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 91                                                                                     | docs honesty                     | **done** |
+| A   | Wave 92 — verification collection errors via verificationApiCopy                                                  | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 92                                                                                     | docs honesty                     | **done** |
+| A   | Wave 93 — products collection errors via productsApiCopy                                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 93                                                                                     | docs honesty                     | **done** |
+| A   | Wave 94 — products/[id] GET errors via productsApiCopy                                                            | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 94                                                                                     | docs honesty                     | **done** |
+| A   | Wave 95 — product download errors via productDownloadApiCopy                                                      | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 95                                                                                     | docs honesty                     | **done** |
+| A   | Wave 96 — notifications list 500 via notificationsApiCopy                                                         | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 96                                                                                     | docs honesty                     | **done** |
+| A   | Wave 97 — product builds upload errors via productBuildsApiCopy                                                   | API envelope RU/EN               | **done** |
+| A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Waves 97–98                                                                                 | docs honesty                     | **done** |
+| A   | Wave 99 — workspace library/resources/subscriptions bilingual document titles                                     | document metadata RU/EN          | **done** |
+| A   | Wave 100 — workspace commerce + admin commerce/licenses/resources bilingual document titles                       | document metadata RU/EN          | **done** |
+| A   | Wave 101 — residual hubs/auth/admin/public document titles + Wave 99 format fix                                   | document metadata RU/EN          | **done** |
+| A   | Wave 102 — `/api/support` always-localize envelopes + ACTOR_* mapping                                             | API envelope RU/EN               | **done** |
+| A   | Wave 103 — inbox formatNotification server-update + verification awaiting-review gaps                             | notification display RU/EN       | **done** |
+| A   | Wave 104 — inbox formatNotification password-reset completed security notice                                      | notification display RU/EN       | **done** |
+| A   | Wave 105 — account mail dispatcher bilingual slash subjects/bodies                                                | account mail RU/EN               | **done** |
+| A   | Wave 106 — order more DB session snapshot selects                                                                 | CI stability                     | **done** |
+| A   | Wave 107 — SMTP test receiver SMTPUTF8/8BITMIME for bilingual mail                                                | account mail CI                  | **done** |
+| A   | Wave 108 — canonical bilingual notice titles + password-reset Web Push slash title                                | notification display/push RU/EN  | **done** |
+| A   | Wave 109 — `noticeStoredTitles` slash pack across Web Push producers                                              | notification storage/push RU/EN  | **done** |
+| D/E | Wave 110 — i18n inventory SHA stamp + `newArticleComment` stored title                                            | docs honesty / notice catalog    | **done** |
+| A   | Wave 111 — `noticeStoredMessages` slash pack for static Web Push bodies                                           | notification storage/push RU/EN  | **done** |
+| A   | Waves 112–119 — templated bilingual Web Push bodies + canonical message matchers                                  | notification storage/push RU/EN  | **done** |
+| A   | Waves 120–123 — auth + notification AppError envelope localization                                                | API envelope RU/EN               | **done** |
+| A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
+| A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done** |
+| A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done** |
+| A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done** |
+| A   | Waves 159–169 — media/moderation/claim/publishing remappers + VALIDATION/FORBIDDEN fills + release-watch          | client remapper RU/EN            | **done** |
+| A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper                  | client remapper RU/EN            | **done** |
+| A   | Waves 179–188 — admin/auth/acquire/settings drop body.error passthrough                                           | client remapper RU/EN            | **done** |
+| A   | Waves 189–197 — AuthForm/mutation/comment body.error drop + residual CONFLICT/RATE aliases                        | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
