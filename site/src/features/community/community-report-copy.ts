@@ -222,9 +222,13 @@ export function communityReportError(locale: Locale, code: unknown) {
   )
     return copy.invalid;
   if (code === "REPORT_OWN_TARGET") return copy.ownTarget;
-  if (code === "REPORT_STATE_CHANGED") return copy.changed;
+  if (code === "REPORT_STATE_CHANGED" || code === "CONFLICT") return copy.changed;
   if (code === "COMMENT_CHANGED") return copy.commentChanged;
   if (code === "REPORT_TARGET_UNAVAILABLE") return copy.targetUnavailable;
+  if (code === "FORBIDDEN") return copy.forbidden;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
+  if (code === "ACTOR_CHANGED") return copy.changed;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.unavailable;
   if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED") return copy.unavailable;
   return userPlatformError(locale, code);
 }

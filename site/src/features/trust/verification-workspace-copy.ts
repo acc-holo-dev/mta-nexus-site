@@ -212,6 +212,10 @@ export function verificationError(locale: Locale, code: unknown) {
   if (code === "VERIFICATION_STATE_CHANGED") return copy.stateChanged;
   if (code === "VERIFICATION_APPLICATION_CHANGED") return copy.stateChanged;
   if (code === "CONFLICT") return copy.changed;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
+  if (code === "ACTOR_CHANGED") return copy.changed;
+  if (code === "FORBIDDEN") return copy.authorityChanged;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.unavailable;
   if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED") return copy.unavailable;
   return userPlatformError(locale, code);
 }
