@@ -1,6 +1,7 @@
 import { AppError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -93,7 +94,7 @@ describe("comment abuse reporting", () => {
     const response = await POST(request("cmt_missing"));
     expect(response.status).toBe(404);
     expect(await response.json()).toMatchObject({
-      error: "Report target not found",
+      error: reportsApiCopy("en").notFound,
     });
     expect(mocks.createWithAudit).toHaveBeenCalledOnce();
   });
@@ -104,7 +105,10 @@ describe("comment abuse reporting", () => {
     );
     const response = await POST(request());
     expect(response.status).toBe(422);
-    expect(await response.json()).toMatchObject({ error: "Own target", code: "REPORT_OWN_TARGET" });
+    expect(await response.json()).toMatchObject({
+      error: reportsApiCopy("en").cannotReportSelf,
+      code: "REPORT_OWN_TARGET",
+    });
   });
 
   it("rejects unsupported target types before target lookup", async () => {

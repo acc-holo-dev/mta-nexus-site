@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -142,7 +143,7 @@ describe("server claim challenge issue HTTP contract", () => {
       });
       expect(response.status).toBe(409);
       expect(await response.json()).toEqual({
-        error: "Claim changed",
+        error: serverClaimApiCopy("en").claimChanged,
         code,
       });
     },

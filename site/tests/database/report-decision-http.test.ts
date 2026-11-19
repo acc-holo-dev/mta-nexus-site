@@ -1,6 +1,7 @@
 import { ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { adminActionsApiCopy } from "../../src/features/moderation/admin-actions-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -132,7 +133,16 @@ describe("report decisions over HTTP", () => {
       expect(response.status).toBe(error.statusCode);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(response.headers.get("Vary")).toBe("Cookie");
-      expect(await response.json()).toEqual({ error: error.message, code: error.code });
+      const copy = adminActionsApiCopy("en");
+      expect(await response.json()).toEqual({
+        error:
+          error.code === "UNAUTHORIZED"
+            ? copy.authenticationRequired
+            : error.code === "FORBIDDEN"
+              ? copy.forbidden
+              : copy.executeFailed,
+        code: error.code,
+      });
       expect(mocks.findById).not.toHaveBeenCalled();
     });
   }

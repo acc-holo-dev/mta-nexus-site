@@ -122,6 +122,8 @@ export const POST = withBrowserMutation(
               {
                 ACTOR_REQUIRED: copy.actorRequired,
                 VALIDATION_ERROR: copy.invalidProof,
+                SERVER_CLAIM_SCOPE_CHANGED: copy.claimChanged,
+                SERVER_CLAIM_AUTHORITY_CHANGED: copy.claimChanged,
               },
             ),
             code: error.code,

@@ -90,7 +90,11 @@ export const POST = withBrowserMutation(
                 requestBodyTimeout: copy.requestBodyTimeout,
                 failed: copy.createFailed,
               },
-              { ACTOR_REQUIRED: copy.actorRequired },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                SERVER_CLAIM_SCOPE_CHANGED: copy.claimChanged,
+                SERVER_CLAIM_AUTHORITY_CHANGED: copy.claimChanged,
+              },
             ),
             code: error.code,
           },

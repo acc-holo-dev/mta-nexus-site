@@ -3,7 +3,7 @@ import type { Locale } from "../../lib/i18n";
 const en = {
   unauthorized: "Unauthorized",
   forbidden: "Forbidden",
-  notFound: "Report target was not found",
+  notFound: "Report target not found",
   unsupportedMediaType: "Request must use application/json",
   requestBodyTooLarge: "Request body is too large",
   invalidBodyLength: "Request body length is invalid",
