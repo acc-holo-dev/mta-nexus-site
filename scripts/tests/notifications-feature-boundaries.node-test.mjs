@@ -20,6 +20,7 @@ const utilPorts = [
   "notification-inbox-contract",
   "notification-mark-read-api-copy",
   "notification-preferences-api-copy",
+  "notification-push-api-copy",
 ];
 const serverPorts = ["center"];
 const safeLib =

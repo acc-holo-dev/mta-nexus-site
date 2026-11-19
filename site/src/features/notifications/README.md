@@ -19,6 +19,7 @@ Feature объединяет существующие колокольчик, in
 | `notification-inbox-contract.ts`           | util port `notification-inbox-contract`                             |
 | `notification-mark-read-api-copy.ts`       | util port `notification-mark-read-api-copy`                         |
 | `notification-preferences-api-copy.ts`     | util port `notification-preferences-api-copy`                       |
+| `notification-push-api-copy.ts`            | util port `notification-push-api-copy`                              |
 | `web-push-subscription.ts`                 | util port `web-push-subscription`                                   |
 
 Inbox, вкладки и Web Push являются внутренними компонентами feature. Внешний
