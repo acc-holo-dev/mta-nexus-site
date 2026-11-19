@@ -30,8 +30,11 @@ describe("resource inspect-meta API copy honesty surface", () => {
     expect(route).toContain("copy.rate");
     expect(route).toContain("copy.textPlainRequired");
     expect(route).toContain("copy.exceedsLimit");
+    expect(route).toContain("copy.forbiddenXmlFeature");
     expect(route).toContain("copy.inspectFailed");
     expect(route).toContain("copy.note");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Developer access required"');
     expect(route).not.toContain('"Too many resource inspections. Please try again shortly."');

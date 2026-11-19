@@ -6,6 +6,9 @@ const en = {
   rate: "Too many resource inspections. Please try again shortly.",
   textPlainRequired: "Send meta.xml as text/plain",
   exceedsLimit: "meta.xml exceeds the inspection limit",
+  forbiddenXmlFeature: "meta.xml uses a forbidden XML feature",
+  invalidBodyLength: "Request body length is invalid",
+  requestBodyTimeout: "Request body timed out",
   inspectFailed: "Could not inspect meta.xml",
   note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
 };
@@ -16,6 +19,9 @@ const ru: Record<keyof typeof en, string> = {
   rate: "Слишком много проверок meta.xml. Попробуйте чуть позже.",
   textPlainRequired: "Отправьте meta.xml как text/plain",
   exceedsLimit: "meta.xml превышает лимит проверки",
+  forbiddenXmlFeature: "meta.xml использует запрещённую возможность XML",
+  invalidBodyLength: "Некорректная длина тела запроса",
+  requestBodyTimeout: "Истекло время ожидания тела запроса",
   inspectFailed: "Не удалось проверить meta.xml",
   note: "Только статическая проверка манифеста. Этот результат не является вердиктом о malware, доверии или целостности архива.",
 };

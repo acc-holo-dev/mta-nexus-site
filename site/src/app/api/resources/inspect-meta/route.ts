@@ -9,6 +9,7 @@ import {
 import { resourceInspectMetaApiCopy } from "../../../../features/resources/resource-inspect-meta-api-copy";
 import { readBoundedText } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -93,13 +94,32 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           413,
         );
       }
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: localeAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            forbidden: copy.developerRequired,
+            invalidBodyLength: copy.invalidBodyLength,
+            requestBodyTimeout: copy.requestBodyTimeout,
+            requestBodyTooLarge: copy.exceedsLimit,
+            failed: copy.inspectFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     if (error instanceof MetaInspectionInputError) {
       return json(
         context,
         {
-          error: error.message,
+          error:
+            error.code === "META_TOO_LARGE"
+              ? copy.exceedsLimit
+              : error.code === "META_FORBIDDEN_XML_FEATURE"
+                ? copy.forbiddenXmlFeature
+                : copy.inspectFailed,
           code: error.code,
           maxBytes: metaInspectionLimits.maxBytes,
         },
