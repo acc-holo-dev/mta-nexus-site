@@ -111,6 +111,7 @@ const copy = {
       LICENSE_SERVER_CHANGED:
         "The bound server's endpoint or organization changed. The saved binding cannot be moved.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
+      RATE_LIMITED: "Too many requests. Try again shortly.",
       UNAUTHORIZED: "Sign in again.",
       ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
@@ -233,6 +234,7 @@ const copy = {
       LICENSE_SERVER_CHANGED:
         "У привязанного сервера изменился адрес или организация. Перенос сохранённой привязки недоступен.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите немного позже.",
+      RATE_LIMITED: "Слишком много запросов. Повторите немного позже.",
       UNAUTHORIZED: "Войдите в аккаунт снова.",
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
       ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
