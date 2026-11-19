@@ -6,6 +6,7 @@ import { consumeRateLimit } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { resourceMediaIdSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { resolveLocale } from "../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -13,10 +14,12 @@ import {
 } from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
+import { resourceMediaError } from "./resource-media-i18n";
 
 let activeReads = 0;
 export async function resourceMediaImage(request: NextRequest, mediaId: string) {
   const context = createRequestLogContext(request);
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
   const headers = {
     "Cache-Control": "private, no-store",
     Vary: "Cookie",
@@ -89,11 +92,12 @@ export async function resourceMediaImage(request: NextRequest, mediaId: string) 
     });
   } catch (error) {
     const status = error instanceof AppError ? error.statusCode : 503;
+    const code = error instanceof AppError ? error.code : "RESOURCE_MEDIA_UNAVAILABLE";
     if (!(error instanceof AppError))
       logRequestEvent({ level: "error", event: "resource.image_failed", context, status, error });
     return jsonWithRequestId(
       context,
-      { code: error instanceof AppError ? error.code : "RESOURCE_MEDIA_UNAVAILABLE" },
+      { code, error: resourceMediaError(locale, code) },
       { status, headers: { ...headers, ...(status === 503 ? { "Retry-After": "5" } : {}) } },
     );
   } finally {
