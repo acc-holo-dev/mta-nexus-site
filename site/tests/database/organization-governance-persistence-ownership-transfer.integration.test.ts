@@ -61,8 +61,8 @@ describe("organization governance persistence: ownership transfer", () => {
     const orgName = f.org.name;
     expect(notices.map((notice) => notice.message)).toEqual(
       expect.arrayContaining([
-        `Organization ownership was transferred to you. (${orgName})`,
-        `You transferred organization ownership. (${orgName})`,
+        `Organization ownership was transferred to you. (${orgName}) / Вам передано владение организацией. (${orgName})`,
+        `You transferred organization ownership. (${orgName}) / Вы передали владение организацией. (${orgName})`,
       ]),
     );
     expect(notices.every((notice) => !String(notice.message).includes(f.org.id))).toBe(true);
