@@ -93,5 +93,25 @@ class NotificationInboxService {
     if (!parsed.success) throw new AppError("Invalid selection", 400, "VALIDATION_ERROR");
     return notificationRepository.setInboxReadState(actorId, parsed.data);
   }
+
+  markAsRead(id: string, recipientId: string) {
+    return notificationRepository.markAsRead(id, recipientId);
+  }
+
+  markAllAsRead(recipientId: string) {
+    return notificationRepository.markAllAsRead(recipientId);
+  }
+
+  getPreferences(userId: string) {
+    return notificationRepository.getPreferences(userId);
+  }
+
+  updatePreferences(
+    userId: string,
+    changes: Parameters<typeof notificationRepository.updatePreferences>[1],
+    currentToken?: string,
+  ) {
+    return notificationRepository.updatePreferences(userId, changes, currentToken);
+  }
 }
 export const notificationInboxService = new NotificationInboxService();

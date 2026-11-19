@@ -1,4 +1,3 @@
-import { notificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { notificationPreferencesSchema } from "@nexus/validation";
@@ -15,6 +14,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       return json(context, { error: copy.authenticationRequired }, 401);
     }
 
-    const preferences = await notificationRepository.getPreferences(user.id);
+    const preferences = await notificationInboxService.getPreferences(user.id);
     return json(context, { actorId: user.id, preferences });
   } catch (error) {
     logRequestEvent({
@@ -115,7 +115,11 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const preferences = await notificationRepository.updatePreferences(user.id, parsed.data, token);
+    const preferences = await notificationInboxService.updatePreferences(
+      user.id,
+      parsed.data,
+      token,
+    );
     return json(context, {
       success: true,
       actorId: user.id,

@@ -1,4 +1,4 @@
-import { followWorkspaceRepository } from "@nexus/db";
+import { followWorkspaceRepository, socialRepository } from "@nexus/db";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../../../features/community/content-discussion-contract";
 import type {
@@ -46,6 +46,20 @@ class FollowWorkspaceService {
 
   muteState(actorId: string, targetType: FollowTargetType, targetId: string) {
     return followWorkspaceRepository.muteState(actorId, targetType, targetId);
+  }
+
+  contentStates(actorId: string, targetIds: readonly string[]) {
+    return followWorkspaceRepository.contentStates(actorId, targetIds);
+  }
+
+  isFollowing(followerId: string, targetType: string, targetId: string) {
+    return socialRepository.isFollowing(followerId, targetType, targetId);
+  }
+
+  setFollowingAuthenticated(
+    ...args: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>
+  ) {
+    return followWorkspaceRepository.setFollowingAuthenticated(...args);
   }
 
   setObjectMute(

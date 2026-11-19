@@ -1,4 +1,3 @@
-import { authorContentRepository } from "@nexus/db";
 import { RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
@@ -10,7 +9,7 @@ import { authorContentService } from "../../../../lib/services/organizations/aut
 
 export function GET(request: NextRequest) {
   return userPlatformApi(request, (user) =>
-    authorContentRepository.pageByAuthor(user.id, parseContentPage(request.nextUrl.searchParams)),
+    authorContentService.pageByAuthor(user.id, parseContentPage(request.nextUrl.searchParams)),
   );
 }
 export const POST = withBrowserMutation((request: NextRequest) => {

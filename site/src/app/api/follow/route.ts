@@ -1,4 +1,3 @@
-import { followWorkspaceRepository, socialRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
@@ -14,6 +13,7 @@ import {
   logRequestEvent,
 } from "../../../lib/platform/observability";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     let mutedUntil: string | null = null;
     if (actor) {
       if (parsed.data.targetType === "content") {
-        const [state] = await followWorkspaceRepository.contentStates(actor.id, [
+        const [state] = await followWorkspaceService.contentStates(actor.id, [
           parsed.data.targetId,
         ]);
         following = !!state;
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         muted = !!state?.mutedUntil;
         mutedUntil = state?.mutedUntil ?? null;
         if (!state) {
-          const mute = await followWorkspaceRepository.muteState(
+          const mute = await followWorkspaceService.muteState(
             actor.id,
             "content",
             parsed.data.targetId,
@@ -55,13 +55,13 @@ export async function GET(request: NextRequest) {
           mutedUntil = mute.mutedUntil;
         }
       } else {
-        following = await socialRepository.isFollowing(
+        following = await followWorkspaceService.isFollowing(
           actor.id,
           parsed.data.targetType,
           parsed.data.targetId,
         );
         notifyComments = following;
-        const mute = await followWorkspaceRepository.muteState(
+        const mute = await followWorkspaceService.muteState(
           actor.id,
           parsed.data.targetType,
           parsed.data.targetId,
@@ -119,7 +119,7 @@ function mutation(request: NextRequest, following: boolean) {
         throw new AppError("Account changed", 409, "ACTOR_CHANGED");
       const { targetType, targetId, notifyComments } = parsed.data;
       // Follower inbox notice commits in the same follow transaction; no after().
-      const result = await followWorkspaceRepository.setFollowingAuthenticated(
+      const result = await followWorkspaceService.setFollowingAuthenticated(
         actor.id,
         targetType,
         targetId,

@@ -1,4 +1,3 @@
-import { notificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
@@ -14,6 +13,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -59,7 +59,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: copy.accountChanged, code: "ACCOUNT_CHANGED" }, 409);
 
     if (target.scope === "single") {
-      const updated = await notificationRepository.markAsRead(target.id, user.id);
+      const updated = await notificationInboxService.markAsRead(target.id, user.id);
       if (!updated) {
         return json(
           context,
@@ -76,7 +76,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       });
     }
 
-    await notificationRepository.markAllAsRead(user.id);
+    await notificationInboxService.markAllAsRead(user.id);
     return json(context, {
       success: true,
       scope: "all",

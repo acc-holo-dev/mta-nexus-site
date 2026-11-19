@@ -26,14 +26,10 @@ const HTTP_DB_SERVICE_REQUIRED = Object.freeze([
   "^(?:apps/web|site)/src/app/api/admin/builds/",
   "^(?:apps/web|site)/src/app/api/auth/context/",
   "^(?:apps/web|site)/src/app/api/content/route\\.ts$",
-  "^(?:apps/web|site)/src/app/api/follow/",
-  "^(?:apps/web|site)/src/app/api/notifications/mark-read/",
-  "^(?:apps/web|site)/src/app/api/notifications/preferences/",
   "^(?:apps/web|site)/src/app/api/notifications/push/",
   "^(?:apps/web|site)/src/app/api/products/[^/]+/download/",
   "^(?:apps/web|site)/src/app/api/reports/",
   "^(?:apps/web|site)/src/app/api/verification/",
-  "^(?:apps/web|site)/src/app/api/workspace/content/route\\.ts$",
 ]);
 
 module.exports = {

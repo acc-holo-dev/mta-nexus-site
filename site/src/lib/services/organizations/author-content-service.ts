@@ -297,5 +297,12 @@ class AuthorContentService {
         | [undefined, string]),
     );
   }
+
+  pageByAuthor(
+    authorId: string,
+    filters: Parameters<typeof authorContentRepository.pageByAuthor>[1] = {},
+  ) {
+    return authorContentRepository.pageByAuthor(authorId, filters);
+  }
 }
 export const authorContentService = new AuthorContentService();

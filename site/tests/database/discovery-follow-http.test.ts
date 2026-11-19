@@ -42,7 +42,13 @@ vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { page: mocks.discover },
 }));
 vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
-  followWorkspaceService: { page: mocks.follows },
+  followWorkspaceService: {
+    page: mocks.follows,
+    setFollowingAuthenticated: mocks.setFollowing,
+    contentStates: mocks.contentStates,
+    muteState: mocks.muteState,
+    isFollowing: mocks.isFollowing,
+  },
 }));
 vi.mock("../../src/lib/services/notifications/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.notifications,
