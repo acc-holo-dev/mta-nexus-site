@@ -1,5 +1,9 @@
 import type { AuditEvent, Build } from "@nexus/domain";
-import { classifyBuildAvailability, unavailableBuildSupportHref } from "@nexus/domain";
+import {
+  classifyBuildAvailability,
+  noticeStoredTitles,
+  unavailableBuildSupportHref,
+} from "@nexus/domain";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, buildIncidentNotificationDeliveries, builds, products } from "../schema";
@@ -206,7 +210,7 @@ export async function quarantinePublishedAndRefreshProduct(
     await notifyProductManagersWithin(tx, {
       authorId: parent.authorId,
       organizationId: parent.organizationId,
-      title: "Resource build quarantined",
+      title: noticeStoredTitles.resourceBuildQuarantined,
       message:
         "A published build was quarantined after a security review. Open the build in your workspace for the current delivery state.",
       link: publisherBuildHref(quarantined.productId, quarantined.id),
@@ -326,7 +330,7 @@ export async function restoreQuarantinedAndRefreshProduct(
     await notifyProductManagersWithin(tx, {
       authorId: parent.authorId,
       organizationId: parent.organizationId,
-      title: "Resource build restored",
+      title: noticeStoredTitles.resourceBuildRestored,
       message:
         "A quarantined build was restored to publication. Open the build in your workspace for the current delivery state.",
       link: publisherBuildHref(restored.productId, restored.id),

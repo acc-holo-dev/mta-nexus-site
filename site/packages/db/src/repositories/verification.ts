@@ -3,6 +3,7 @@ import {
   AppError,
   ConflictError,
   ForbiddenError,
+  noticeStoredTitles,
   serverClaimMatchesOwnershipScope,
   UnauthorizedError,
 } from "@nexus/domain";
@@ -636,7 +637,10 @@ export class VerificationRepository {
         .values({
           id: `ntf_verification_resolution_${request.id}`,
           recipientId: request.requesterId,
-          title: input.decision === "approved" ? "Verification approved" : "Verification rejected",
+          title:
+            input.decision === "approved"
+              ? noticeStoredTitles.verificationApproved
+              : noticeStoredTitles.verificationRejected,
           message: serverResolution
             ? `Server ownership verification was ${decisionLabel}.`
             : `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,

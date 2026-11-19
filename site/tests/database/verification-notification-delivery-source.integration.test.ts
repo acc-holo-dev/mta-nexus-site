@@ -44,7 +44,7 @@ it("delivers verification inbox through the shared worker repository without lea
   expect(stored).toEqual([
     expect.objectContaining({
       recipientId: moderator,
-      title: "New verification request",
+      title: "New verification request / Новая заявка на верификацию",
       message: "A verification request is awaiting review.",
       link: pendingLink(request.id),
       type: "security",
@@ -121,7 +121,7 @@ it("uses current roles and the fixed account horizon", async () => {
   expect(await notices(request.id)).toMatchObject([
     {
       recipientId: promoted,
-      title: "New verification request",
+      title: "New verification request / Новая заявка на верификацию",
       message: "A verification request is awaiting review.",
       link: pendingLink(request.id),
     },

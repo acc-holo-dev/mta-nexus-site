@@ -8,7 +8,7 @@ it.each(["asked", "answered", "resolved", "removed"] as const)(
   (event) => {
     const en = formatNotification(
       {
-        title: "New resource question",
+        title: "New resource question / Новый вопрос по ресурсу",
         message: "Someone asked about Physics Pack.",
         data: {
           kind: "resource_qa",
@@ -24,7 +24,7 @@ it.each(["asked", "answered", "resolved", "removed"] as const)(
     );
     const ru = formatNotification(
       {
-        title: "New resource question",
+        title: "New resource question / Новый вопрос по ресурсу",
         message: "Someone asked about Physics Pack.",
         data: {
           kind: "resource_qa",

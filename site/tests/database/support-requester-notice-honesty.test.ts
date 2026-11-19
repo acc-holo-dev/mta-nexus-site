@@ -22,7 +22,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const notice = formatNotification(
       {
-        title: "Support case activity",
+        title: "Support case activity / Обновление обращения",
         message: "Support replied to your case. (Billing help)",
         data: {
           kind: "support_requester",
@@ -43,7 +43,7 @@ it.each(["en", "ru"] as const)(
 it("keeps legacy Support case id: event. rows localized without echoing the id", () => {
   const notice = formatNotification(
     {
-      title: "Support case activity",
+      title: "Support case activity / Обновление обращения",
       message: `Support case ${caseId}: closed.`,
       data: null,
     },

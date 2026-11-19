@@ -186,7 +186,7 @@ it("commits a private security outcome and push job with the decision, preservin
   const [notice] = await db.select().from(notifications).where(eq(notifications.id, expectedId));
   expect(notice).toMatchObject({
     recipientId: f.reporter.id,
-    title: "Community report status",
+    title: "Community report status / Статус жалобы",
     message: "Report status: under_review.",
     link: `/workspace/reports/${report.id}`,
     category: "security",

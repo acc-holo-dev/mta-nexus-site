@@ -9,7 +9,7 @@ describe("server publication notification copy", () => {
         { title: "Season update", slug: "season-update" },
       ),
     ).toEqual({
-      title: "New server update",
+      title: "New server update / Новость сервера",
       message: "Nexus Racing: Season update",
       link: "/articles/season-update",
       type: "server",

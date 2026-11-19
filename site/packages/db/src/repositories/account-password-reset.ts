@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@nexus/domain";
+import { noticeStoredTitles, UnauthorizedError } from "@nexus/domain";
 import { and, eq, sql } from "drizzle-orm";
 import { authChallenges } from "../account-recovery-schema";
 import { db } from "../client";
@@ -105,7 +105,7 @@ export class AccountPasswordResetRepository {
         await tx.insert(notifications).values({
           id: input.notificationId,
           recipientId: proof.userId,
-          title: "Password reset completed / Пароль восстановлен",
+          title: noticeStoredTitles.passwordResetCompleted,
           message: "Your password was reset and all existing sessions were signed out.",
           link: "/auth/login",
           type: "security",

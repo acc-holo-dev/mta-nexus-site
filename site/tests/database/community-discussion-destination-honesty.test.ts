@@ -43,7 +43,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const result = formatNotification(
       {
-        title: "Discussion moderation",
+        title: "Discussion moderation / Модерация обсуждения",
         message: "Comment cmt_a: removed.",
         data: undefined,
       },

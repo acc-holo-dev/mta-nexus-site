@@ -36,7 +36,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const quarantined = formatNotification(
       {
-        title: "Resource build quarantined",
+        title: "Resource build quarantined / Сборка ресурса в карантине",
         message: "stored",
         data: {
           kind: "build_lifecycle",
@@ -52,7 +52,7 @@ it.each(["en", "ru"] as const)(
     );
     const restored = formatNotification(
       {
-        title: "Resource build restored",
+        title: "Resource build restored / Сборка ресурса восстановлена",
         message: "stored",
         data: {
           kind: "build_lifecycle",

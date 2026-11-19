@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { Notification, NotificationCategory, NotificationPreferences } from "@nexus/domain";
-import { AppError, NotFoundError, UnauthorizedError } from "@nexus/domain";
+import { AppError, NotFoundError, noticeStoredTitles, UnauthorizedError } from "@nexus/domain";
 import { and, asc, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications, users } from "../schema";
@@ -474,7 +474,7 @@ export class NotificationRepository {
       {
         id: source.id,
         recipientId: input.recipientId,
-        title: "New discussion reply",
+        title: noticeStoredTitles.newDiscussionReply,
         message:
           category === "follow"
             ? "A publication you follow has a new reply."

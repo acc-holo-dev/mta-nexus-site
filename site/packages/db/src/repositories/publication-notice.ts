@@ -4,6 +4,7 @@ import type {
   PublicationActivityEvent,
   PublicationActivityNotificationData,
 } from "@nexus/domain";
+import { noticeStoredTitles } from "@nexus/domain";
 import { eq, inArray } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications, organizations, servers } from "../schema";
@@ -96,7 +97,7 @@ export async function publicationNotice(
     await tx.insert(notifications).values({
       id,
       recipientId,
-      title: "Publication activity",
+      title: noticeStoredTitles.publicationActivity,
       message,
       link: recipients.get(recipientId),
       type: "content",

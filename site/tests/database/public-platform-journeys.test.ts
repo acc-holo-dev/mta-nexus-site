@@ -99,7 +99,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     const notification = await notificationRepository.create({
       id: `not_${Date.now()}`,
       recipientId: devUser.id,
-      title: "New Follower",
+      title: "New Follower / Новый подписчик",
       message: `@${playerUser.username} followed your updates.`,
       type: "system",
       link: `/users/${playerUser.username}`,

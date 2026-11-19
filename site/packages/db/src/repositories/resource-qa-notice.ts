@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredTitles } from "@nexus/domain";
 import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { db } from "../client";
 import {
@@ -32,22 +33,22 @@ function copyFor(kind: ResourceQaNoticeKind, productTitle: string) {
   switch (kind) {
     case "asked":
       return {
-        title: "New resource question",
+        title: noticeStoredTitles.newResourceQuestion,
         message: `Someone asked about ${productTitle}.`,
       };
     case "answered":
       return {
-        title: "Resource question answered",
+        title: noticeStoredTitles.resourceQuestionAnswered,
         message: `There is a new answer for a question on ${productTitle}.`,
       };
     case "resolved":
       return {
-        title: "Resource question resolved",
+        title: noticeStoredTitles.resourceQuestionResolved,
         message: `A useful answer was marked for a question on ${productTitle}.`,
       };
     case "removed":
       return {
-        title: "Resource question removed",
+        title: noticeStoredTitles.resourceQuestionRemoved,
         message: `A question on ${productTitle} was removed by staff or the publisher.`,
       };
   }

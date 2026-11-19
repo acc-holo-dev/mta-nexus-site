@@ -93,7 +93,7 @@ it("provides matching RU/EN actions, filters and errors", () => {
 it("localizes persisted follower notifications without interpreting arbitrary messages", () => {
   const copy = { approved: "", rejected: "", version: "", notes: "" };
   const notice = {
-    title: "New Follower",
+    title: "New Follower / Новый подписчик",
     message: "@member started following your activity.",
     data: null,
   };
@@ -147,9 +147,16 @@ it.each(["follow", "participant"])(
       kind === "follow"
         ? "A publication you follow has a new reply."
         : "A discussion you participate in has a new reply.";
-    const notice = { title: "New discussion reply", message, data: null };
+    const notice = {
+      title: "New discussion reply / Новый ответ в обсуждении",
+      message,
+      data: null,
+    };
     const copy = { approved: "", rejected: "", version: "", notes: "" };
-    expect(formatNotification(notice, copy, "en")).toEqual({ title: notice.title, message });
+    expect(formatNotification(notice, copy, "en")).toEqual({
+      title: "New discussion reply",
+      message,
+    });
     expect(formatNotification(notice, copy, "ru").title).toBe("Новый ответ в обсуждении");
     expect(formatNotification(notice, copy, "ru").message).not.toBe(message);
   },

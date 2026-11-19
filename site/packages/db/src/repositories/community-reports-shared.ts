@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { AppError } from "@nexus/domain";
+import { AppError, noticeStoredTitles } from "@nexus/domain";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { db } from "../client";
 import { comments, content, users } from "../schema";
@@ -89,7 +89,7 @@ export async function persistDecisionNotice(
         .update(JSON.stringify([input.auditId, input.reporterId]))
         .digest("hex")}`,
       recipientId: input.reporterId,
-      title: "Community report status",
+      title: noticeStoredTitles.communityReportStatus,
       message: `Report status: ${input.status}.`,
       link: `/workspace/reports/${encodeURIComponent(input.id)}`,
       type: "security",

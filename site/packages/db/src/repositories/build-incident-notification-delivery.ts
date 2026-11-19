@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredTitles } from "@nexus/domain";
 import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { buildIncidentNotificationDeliveries, resourceDeliveryReceipts } from "../schema";
@@ -88,7 +89,7 @@ export class BuildIncidentNotificationDeliveryRepository {
                   .update(JSON.stringify([job.buildId, recipient.id]))
                   .digest("hex")}`,
                 recipientId: recipient.id,
-                title: "Security notice for a downloaded build",
+                title: noticeStoredTitles.securityDownloadedBuild,
                 message:
                   "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
                 link: buildIncidentDownloaderLink(job.productId),

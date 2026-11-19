@@ -44,7 +44,7 @@ describe("content reaction persistence: writes, counts, pagination, and cleanup"
       .where(
         and(
           eq(notifications.recipientId, author.id),
-          eq(notifications.title, "Publication reaction"),
+          eq(notifications.title, "Publication reaction / Реакция на публикацию"),
         ),
       );
     expect(notices).toHaveLength(1);

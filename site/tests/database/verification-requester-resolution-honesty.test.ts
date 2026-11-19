@@ -22,7 +22,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const result = formatNotification(
       {
-        title: "Verification approved",
+        title: "Verification approved / Верификация одобрена",
         message: "developer verification for usr_secret was approved.",
       },
       reviewCopy,

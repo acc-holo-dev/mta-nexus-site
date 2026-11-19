@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredTitles } from "@nexus/domain";
 import { eq } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
@@ -35,7 +36,7 @@ export async function discussionModerationNotice(
     .values({
       id,
       recipientId: input.authorId,
-      title: "Discussion moderation",
+      title: noticeStoredTitles.discussionModeration,
       message: `Comment ${input.commentId}: removed.`,
       link: authorDiscussionHref(input.commentId),
       type: "content",

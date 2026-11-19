@@ -156,7 +156,7 @@ it("commits status-only moderator notices with deletion/audit and respects recip
     id: `ntf_discussion_${createHash("sha256")
       .update(JSON.stringify([input.auditId, author.id]))
       .digest("hex")}`,
-    title: "Discussion moderation",
+    title: "Discussion moderation / Модерация обсуждения",
     message: `Comment ${message.id}: removed.`,
     link: `/workspace/discussions/${message.id}`,
     category: "content",

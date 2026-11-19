@@ -118,7 +118,7 @@ describe("server follower publication notification integration", () => {
     expect(enabledNotifications[0]).toMatchObject({
       type: "server",
       category: "server",
-      title: "New server update",
+      title: "New server update / Новость сервера",
       message: "Notification Integration Server: Integration update",
       link: `/articles/server-update-${suffix}`,
     });

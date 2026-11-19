@@ -26,7 +26,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const notice = formatNotification(
       {
-        title: "Organization access changed",
+        title: "Organization access changed / Доступ к организации изменён",
         message: "You were added to the team. (Northwind)",
         data: {
           kind: "organization_access",
@@ -48,7 +48,7 @@ it.each(["en", "ru"] as const)(
 it("keeps legacy Organization id: event. rows localized without echoing the id", () => {
   const notice = formatNotification(
     {
-      title: "Organization access changed",
+      title: "Organization access changed / Доступ к организации изменён",
       message: "Organization org_legacy: removed.",
       data: null,
     },

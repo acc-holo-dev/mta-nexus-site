@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { OrganizationAccessChange, OrganizationAccessNotificationData } from "@nexus/domain";
+import { noticeStoredTitles } from "@nexus/domain";
 import type { db } from "../client";
 import { notifications } from "../schema";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
@@ -42,7 +43,7 @@ export async function storeOrganizationAccessNotice(
   await tx.insert(notifications).values({
     id,
     recipientId,
-    title: "Organization access changed",
+    title: noticeStoredTitles.organizationAccessChanged,
     message: withOrganizationName(ACCESS_MESSAGE_EN[change], organization.name),
     link:
       change === "removed" || change === "left"

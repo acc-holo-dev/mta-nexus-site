@@ -3,6 +3,7 @@ import type {
   SupportRequesterActivityEvent,
   SupportRequesterNotificationData,
 } from "@nexus/domain";
+import { noticeStoredTitles } from "@nexus/domain";
 import { eq } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
@@ -49,7 +50,7 @@ export async function supportRequesterNotice(
   await tx.insert(notifications).values({
     id,
     recipientId: supportCase.requesterId,
-    title: "Support case activity",
+    title: noticeStoredTitles.supportCaseActivity,
     message: withSubject(ACTIVITY_MESSAGE_EN[event], supportCase.subject),
     link: `/support/${encodeURIComponent(supportCase.id)}`,
     type: "system",

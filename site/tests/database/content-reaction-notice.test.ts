@@ -55,7 +55,7 @@ it("locks content preferences and stores a status-only notice with a safe target
   expect(insert()?.params).toEqual(
     expect.arrayContaining([
       "author",
-      "Publication reaction",
+      "Publication reaction / Реакция на публикацию",
       "A reader reacted to your publication. (Guide)",
       "/articles/guide",
       JSON.stringify({
@@ -108,7 +108,11 @@ it.each(["en", "ru"] as const)(
   "localizes the bounded persisted reaction template in %s",
   (locale) => {
     const legacy = formatNotification(
-      { title: "Publication reaction", message: "Publication content: reaction.", data: undefined },
+      {
+        title: "Publication reaction / Реакция на публикацию",
+        message: "Publication content: reaction.",
+        data: undefined,
+      },
       { approved: "", rejected: "", version: "", notes: "" },
       locale,
     );
@@ -120,7 +124,7 @@ it.each(["en", "ru"] as const)(
     expect(legacy.message).not.toContain("content");
     const structured = formatNotification(
       {
-        title: "Publication reaction",
+        title: "Publication reaction / Реакция на публикацию",
         message: "stored",
         data: {
           kind: "content_reaction",

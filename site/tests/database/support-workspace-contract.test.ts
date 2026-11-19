@@ -138,7 +138,7 @@ it.each(["ru", "en"] as const)(
     );
     const copy = { approved: "", rejected: "", version: "", notes: "" };
     const legacy = formatNotification(
-      { title: "Support case activity", message: `Support case ${id}: reply.`, data: undefined },
+      { title: "Support case activity / Обновление обращения", message: `Support case ${id}: reply.`, data: undefined },
       copy,
       locale,
     );
@@ -149,7 +149,7 @@ it.each(["ru", "en"] as const)(
     ).toBe(true);
     const structured = formatNotification(
       {
-        title: "Support case activity",
+        title: "Support case activity / Обновление обращения",
         message: "stored",
         data: {
           kind: "support_requester",

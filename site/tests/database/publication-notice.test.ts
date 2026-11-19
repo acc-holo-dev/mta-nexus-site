@@ -142,7 +142,7 @@ it.each(["created", "edited", "published", "archived", "restored"])(
   "localizes template %s in RU and EN while leaving unrelated notices intact",
   (event) => {
     const copy = { approved: "", rejected: "", version: "", notes: "" },
-      notice = { title: "Publication activity", message: `Publication item: ${event}.` };
+      notice = { title: "Publication activity / Обновление публикации", message: `Publication item: ${event}.` };
     expect(formatNotification(notice, copy, "ru").title).toBe("Обновление публикации");
     expect(formatNotification(notice, copy, "ru").message).not.toContain("Publication");
     expect(formatNotification(notice, copy, "en").message).not.toBe(notice.message);
@@ -161,7 +161,7 @@ it("notifies the current context owner of an author's restore using only a priva
     "The publication was restored to a draft and remains private. (Guide)",
   );
   const notice = {
-      title: "Publication activity",
+      title: "Publication activity / Обновление публикации",
       message: "The publication was restored to a draft and remains private. (Guide)",
       data: {
         kind: "publication_activity" as const,

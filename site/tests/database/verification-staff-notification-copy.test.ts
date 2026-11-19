@@ -22,7 +22,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const staff = formatNotification(
       {
-        title: "Server ownership proof requires review",
+        title: "Server ownership proof requires review / Доказательство контроля сервера требует проверки",
         message: "A verified server control proof is awaiting review.",
       },
       reviewCopy,
@@ -30,7 +30,7 @@ it.each(["en", "ru"] as const)(
     );
     const approved = formatNotification(
       {
-        title: "Verification approved",
+        title: "Verification approved / Верификация одобрена",
         message: "Server ownership verification was approved.",
       },
       reviewCopy,

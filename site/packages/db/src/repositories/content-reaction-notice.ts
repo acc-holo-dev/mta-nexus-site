@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { ContentReactionNotificationData } from "@nexus/domain";
+import { noticeStoredTitles } from "@nexus/domain";
 import { eq } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
@@ -40,7 +41,7 @@ export async function contentReactionNotice(
     .values({
       id,
       recipientId: item.authorId,
-      title: "Publication reaction",
+      title: noticeStoredTitles.publicationReaction,
       message,
       link: `/articles/${encodeURIComponent(item.slug)}`,
       type: "content",

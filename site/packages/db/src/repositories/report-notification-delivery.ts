@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredTitles } from "@nexus/domain";
 import { and, asc, eq, gt, isNull, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { reportNotificationDeliveries, users } from "../schema";
@@ -84,7 +85,7 @@ export class ReportNotificationDeliveryRepository {
                   .update(JSON.stringify([job.reportId, recipient.id]))
                   .digest("hex")}`,
                 recipientId: recipient.id,
-                title: "New report",
+                title: noticeStoredTitles.newReport,
                 message: "A report is awaiting review.",
                 link: job.community
                   ? `/admin/reports/${encodeURIComponent(job.reportId)}`

@@ -6,7 +6,7 @@ const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 it("localizes staff and reporter platform report notices in RU/EN", () => {
   const staff = formatNotification(
     {
-      title: "New report",
+      title: "New report / Новая жалоба",
       message: "A report is awaiting review.",
     },
     reviewCopy,
@@ -17,7 +17,7 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
 
   const status = formatNotification(
     {
-      title: "Platform report status",
+      title: "Platform report status / Статус жалобы платформы",
       message: "Report status: resolved.",
     },
     reviewCopy,
@@ -28,7 +28,7 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
 
   const en = formatNotification(
     {
-      title: "Platform report status",
+      title: "Platform report status / Статус жалобы платформы",
       message: "Report status: dismissed.",
     },
     reviewCopy,

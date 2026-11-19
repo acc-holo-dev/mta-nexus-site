@@ -135,7 +135,7 @@ it.each(["ru", "en"] as const)(
     expect(
       formatNotification(
         {
-          title: "Verification approved",
+          title: "Verification approved / Верификация одобрена",
           message: "developer verification for usr_dev was approved.",
           data: null,
         },

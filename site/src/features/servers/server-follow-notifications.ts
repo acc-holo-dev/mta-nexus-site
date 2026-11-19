@@ -1,4 +1,4 @@
-import type { Content, Notification, Server } from "@nexus/domain";
+import { type Content, type Notification, noticeStoredTitles, type Server } from "@nexus/domain";
 
 export type ServerPublicationNotification = Pick<
   Notification,
@@ -10,7 +10,7 @@ export function buildServerPublicationNotification(
   content: Pick<Content, "title" | "slug">,
 ): ServerPublicationNotification {
   return Object.freeze({
-    title: "New server update",
+    title: noticeStoredTitles.newServerUpdate,
     message: `${server.name}: ${content.title}`,
     link: `/articles/${content.slug}`,
     type: "server",

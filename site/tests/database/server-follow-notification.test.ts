@@ -9,7 +9,7 @@ describe("server publication notification", () => {
     );
 
     expect(notification).toEqual({
-      title: "New server update",
+      title: "New server update / Новость сервера",
       message: "Nexus Racing: Season 4 changelog",
       link: "/articles/season-4-changelog",
       type: "server",

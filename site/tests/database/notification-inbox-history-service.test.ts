@@ -10,7 +10,7 @@ import { notificationInboxService } from "../../src/lib/services/notifications/n
 const filters = { query: "", state: "all" as const, category: "all" as const };
 const item = {
   id: "one",
-  title: "Publication reaction",
+  title: "Publication reaction / Реакция на публикацию",
   message: "Publication post: reaction.",
   link: "/articles/post",
   data: null,

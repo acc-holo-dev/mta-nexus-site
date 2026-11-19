@@ -79,7 +79,7 @@ it("delivers served-receipt recipients idempotently with generic security copy",
     recipientId: first,
     type: "security",
     category: "security",
-    title: "Security notice for a downloaded build",
+    title: "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
     message:
       "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
     link: `/workspace/library/${encodeURIComponent(productId)}/versions`,
@@ -101,7 +101,7 @@ it("delivers served-receipt recipients idempotently with generic security copy",
   });
   for (const row of stored) {
     expect(row).toMatchObject({
-      title: "Security notice for a downloaded build",
+      title: "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
       link: `/workspace/library/${encodeURIComponent(productId)}/versions`,
       type: "security",
       category: "security",
