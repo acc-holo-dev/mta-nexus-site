@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { productsApiCopy } from "../../src/features/resources/products-api-copy";
 
-/** Wave 93: /api/products GET/POST errors use bilingual productsApiCopy. */
+/** Waves 93/94: /api/products collection + detail GET errors use bilingual productsApiCopy. */
 describe("products API copy honesty surface", () => {
   it("keeps RU/EN keys and wires the products route through nexus_locale", () => {
     const en = productsApiCopy("en");
@@ -13,6 +13,8 @@ describe("products API copy honesty surface", () => {
     expect(ru.catalogUnavailable).toContain("недоступен");
     expect(en.paidDisabled).toContain("Paid resources are disabled");
     expect(ru.createFailed).toContain("создать ресурс");
+    expect(en.notFound).toBe("Product not found");
+    expect(ru.detailsUnavailable).toContain("временно недоступны");
 
     const route = readFileSync(
       resolve(process.cwd(), "site/src/app/api/products/route.ts"),
@@ -41,5 +43,19 @@ describe("products API copy honesty surface", () => {
     );
     expect(route).not.toContain('"A resource with this slug already exists"');
     expect(route).not.toContain('"Could not create resource"');
+  });
+
+  it("wires /api/products/[id] GET through nexus_locale", () => {
+    const route = readFileSync(
+      resolve(process.cwd(), "site/src/app/api/products/[id]/route.ts"),
+      "utf8",
+    );
+    expect(route).toContain("productsApiCopy");
+    expect(route).toContain("resolveLocale");
+    expect(route).toContain("nexus_locale");
+    expect(route).toContain("copy.notFound");
+    expect(route).toContain("copy.detailsUnavailable");
+    expect(route).not.toContain('"Product not found"');
+    expect(route).not.toContain('"Resource details are temporarily unavailable"');
   });
 });

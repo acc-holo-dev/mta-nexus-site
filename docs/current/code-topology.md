@@ -268,6 +268,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 93 done:** `/api/products` GET/POST errors use bilingual `productsApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` body passthrough remains English).
 
+**Wave 94 done:** `/api/products/[id]` GET errors extend bilingual `productsApiCopy` via `nexus_locale`; PATCH remains code-only.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -430,8 +432,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 92                                                                                     | docs honesty                     | **done** |
 | A   | Wave 93 — products collection errors via productsApiCopy                                                          | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 93                                                                                     | docs honesty                     | **done** |
+| A   | Wave 94 — products/[id] GET errors via productsApiCopy                                                            | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: `/api/notifications` inbox 500 or product download/detail (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: `/api/products/[id]/download` or `/api/notifications` inbox 500 (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

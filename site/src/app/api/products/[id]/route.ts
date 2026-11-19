@@ -2,8 +2,10 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { editProductDetailsSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { productsApiCopy } from "../../../../features/resources/products-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -38,6 +40,7 @@ export async function GET(
   },
 ) {
   const context = createRequestLogContext(request);
+  const copy = productsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const { id } = await params;
@@ -46,7 +49,7 @@ export async function GET(
     if (!product) {
       return jsonWithRequestId(
         context,
-        { error: "Product not found" },
+        { error: copy.notFound },
         {
           status: 404,
           headers: noStoreHeaders,
@@ -79,7 +82,7 @@ export async function GET(
     return jsonWithRequestId(
       context,
       {
-        error: "Resource details are temporarily unavailable",
+        error: copy.detailsUnavailable,
       },
       {
         status: 503,
