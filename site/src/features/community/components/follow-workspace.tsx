@@ -17,6 +17,7 @@ import { ObjectMuteControls } from "../object-mute-controls";
 import { publicationHref } from "../publication-feed-contract";
 import { publicationCopy } from "../publication-feed-copy";
 import { platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -46,6 +47,12 @@ export function FollowWorkspace({
   const [history, setHistory] = useState<(string | null)[]>([]);
   const alive = useRef(true);
   const controller = useRef<AbortController | null>(null);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -105,7 +112,7 @@ export function FollowWorkspace({
       cursor.current = next;
       setPage(parsed.data);
     } catch (failure) {
-      if (alive.current) setError(failure instanceof Error ? failure.message : copy.pageError);
+      if (alive.current) setError(safeMessage(failure, copy.pageError));
     } finally {
       busy.current = false;
       if (alive.current) setPending("");
@@ -150,7 +157,7 @@ export function FollowWorkspace({
       );
       setSuccess(copy.removed);
     } catch (failure) {
-      if (alive.current) setError(failure instanceof Error ? failure.message : copy.unconfirmed);
+      if (alive.current) setError(safeMessage(failure, copy.unconfirmed));
     } finally {
       busy.current = false;
       if (alive.current) setPending("");
