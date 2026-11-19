@@ -76,7 +76,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(context, {
       inspection,
       securityVerdict: null,
-      note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
+      note: copy.note,
     });
   } catch (error: unknown) {
     if (

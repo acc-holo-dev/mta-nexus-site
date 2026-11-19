@@ -236,13 +236,15 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 77 done:** `/api/servers/[id]/claim-challenge` (+ `/verify`) POST errors use bilingual `serverClaimApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` passthrough remains English; success `instruction` localized in Wave 81).
 
-**Wave 78 done:** `/api/resources/inspect-meta` POST errors use bilingual `resourceInspectMetaApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError`/`MetaInspectionInputError` passthrough and success `note` remain English).
+**Wave 78 done:** `/api/resources/inspect-meta` POST errors use bilingual `resourceInspectMetaApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError`/`MetaInspectionInputError` passthrough remains English; success `note` localized in Wave 82).
 
 **Wave 79 done:** `/api/workspace/platform-reports` (+ `/[id]`) GET errors use bilingual `platformReportsApiCopy` via `nexus_locale`; JSON shape unchanged.
 
 **Wave 80 done:** `/api/workspace/server-organizations` GET errors use bilingual `serverOrganizationsApiCopy` via `nexus_locale`; JSON shape unchanged.
 
 **Wave 81 done:** `/api/servers/[id]/claim-challenge` success `instruction` uses bilingual `serverClaimApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` passthrough remains English).
+
+**Wave 82 done:** `/api/resources/inspect-meta` success `note` uses bilingual `resourceInspectMetaApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError`/`MetaInspectionInputError` passthrough remains English).
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
@@ -382,8 +384,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 80                                                                                     | docs honesty                     | **done** |
 | A   | Wave 81 — claim-challenge success instruction via serverClaimApiCopy                                              | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 81                                                                                     | docs honesty                     | **done** |
+| A   | Wave 82 — inspect-meta success note via resourceInspectMetaApiCopy                                                | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: inspect-meta success `note`. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues — scout next guest/staff/workspace error or success strings still hard-coded in English. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

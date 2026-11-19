@@ -80,4 +80,20 @@ describe("resource inspect-meta API locale envelope", () => {
       error: resourceInspectMetaApiCopy("en").textPlainRequired,
     });
   });
+
+  it("returns bilingual success note from nexus_locale", async () => {
+    const enOk = await POST(postRequest("en"));
+    expect(enOk.status).toBe(200);
+    expect(await enOk.json()).toMatchObject({
+      securityVerdict: null,
+      note: resourceInspectMetaApiCopy("en").note,
+    });
+
+    const ruOk = await POST(postRequest("ru"));
+    expect(ruOk.status).toBe(200);
+    expect(await ruOk.json()).toMatchObject({
+      securityVerdict: null,
+      note: resourceInspectMetaApiCopy("ru").note,
+    });
+  });
 });

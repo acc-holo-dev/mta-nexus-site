@@ -7,6 +7,7 @@ const en = {
   textPlainRequired: "Send meta.xml as text/plain",
   exceedsLimit: "meta.xml exceeds the inspection limit",
   inspectFailed: "Could not inspect meta.xml",
+  note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
 };
 
 const ru: Record<keyof typeof en, string> = {
@@ -16,6 +17,7 @@ const ru: Record<keyof typeof en, string> = {
   textPlainRequired: "Отправьте meta.xml как text/plain",
   exceedsLimit: "meta.xml превышает лимит проверки",
   inspectFailed: "Не удалось проверить meta.xml",
+  note: "Только статическая проверка манифеста. Этот результат не является вердиктом о malware, доверии или целостности архива.",
 };
 
 export const resourceInspectMetaApiCopy = (locale: Locale) => (locale === "ru" ? ru : en);
