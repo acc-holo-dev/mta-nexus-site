@@ -32,6 +32,8 @@ describe("product download API copy honesty surface", () => {
     expect(route).toContain("copy.artifactMismatch");
     expect(route).toContain("copy.fileUnavailable");
     expect(route).toContain("copy.deliverFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Authentication required to download resource builds"');
     expect(route).not.toContain('"Too many download requests"');
     expect(route).not.toContain('"Resource not found"');

@@ -2,6 +2,7 @@ import type { Locale } from "../../lib/i18n";
 
 const en = {
   authenticationRequired: "Authentication required to download resource builds",
+  forbidden: "Forbidden",
   rate: "Too many download requests",
   notFound: "Resource not found",
   libraryRequired: "Add this resource to your library before downloading it",
@@ -16,6 +17,7 @@ const en = {
 
 const ru: Record<keyof typeof en, string> = {
   authenticationRequired: "Для загрузки сборок ресурса требуется вход",
+  forbidden: "Запрещено",
   rate: "Слишком много запросов на загрузку",
   notFound: "Ресурс не найден",
   libraryRequired: "Добавьте ресурс в библиотеку перед загрузкой",

@@ -16,6 +16,7 @@ import { productDownloadApiCopy } from "../../../../../features/resources/produc
 import { resourceAttachmentFileName } from "../../../../../features/resources/resource-attachment-filename";
 import { resourceDeliveryStream } from "../../../../../features/resources/resource-delivery-stream";
 import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
+import { localeAppErrorText } from "../../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -231,7 +232,29 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     if (error instanceof AppError)
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              failed: copy.deliverFailed,
+            },
+            {
+              BUILD_ID_INVALID: copy.invalidBuild,
+              LIBRARY_REQUIRED: copy.libraryRequired,
+              NO_PUBLISHED_BUILD: copy.noPublishedBuild,
+              BUILD_NOT_CLEARED: copy.notCleared,
+              DOWNLOAD_CANCELLED: copy.cancelled,
+            },
+          ),
+          code: error.code,
+        },
+        error.statusCode,
+      );
 
     logRequestEvent({
       level: "error",

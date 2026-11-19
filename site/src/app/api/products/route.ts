@@ -7,6 +7,7 @@ import { parseMarketQuery } from "../../../features/resources/model";
 import { productsApiCopy } from "../../../features/resources/products-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -242,7 +243,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: error.message,
+          error: localeAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            forbidden: copy.forbidden,
+            notFound: copy.notFound,
+            conflict: copy.actorChanged,
+            unsupportedMediaType: copy.unsupportedMediaType,
+            requestBodyTooLarge: copy.requestBodyTooLarge,
+            invalidBodyLength: copy.invalidBodyLength,
+            requestBodyTimeout: copy.requestBodyTimeout,
+            failed: copy.createFailed,
+          }),
           code: error.code,
         },
         error.statusCode,

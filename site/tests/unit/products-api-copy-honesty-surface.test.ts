@@ -32,6 +32,8 @@ describe("products API copy honesty surface", () => {
     expect(route).toContain("copy.paidDisabled");
     expect(route).toContain("copy.slugExists");
     expect(route).toContain("copy.createFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Resource catalog is temporarily unavailable"');
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Actor precondition required"');
