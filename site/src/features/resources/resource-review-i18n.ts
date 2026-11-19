@@ -219,6 +219,8 @@ export function resourceReviewError(locale: Locale, code: unknown) {
   if (["REVIEW_INVALID", "REVIEW_REPORT_INVALID", "REPORT_OWN_TARGET"].includes(String(code)))
     return copy.invalid;
   if (code === "RATE_LIMIT_EXCEEDED") return copy.limited;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.failure;
+  if (code === "ACTOR_CHANGED") return copy.changed;
   return copy.failure;
 }
 export function resourceReviewState(locale: Locale, state: string) {

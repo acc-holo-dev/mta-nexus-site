@@ -134,10 +134,11 @@ export function serverReviewState(locale: Locale, status: "published" | "withdra
 export function serverReviewError(locale: Locale, code?: string) {
   const copy = serverReviewCopy(locale);
   if (code === "REVIEW_ACCESS_REQUIRED") return copy.denied;
-  if (code === "REVIEW_CHANGED") return copy.changed;
+  if (code === "REVIEW_CHANGED" || code === "ACTOR_CHANGED") return copy.changed;
   if (code === "REVIEW_MODERATED") return copy.moderated;
   if (code === "REVIEW_INVALID") return copy.invalid;
   if (code === "NOT_FOUND") return copy.missing;
   if (code === "RATE_LIMIT_EXCEEDED") return copy.limited;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.unknown;
   return copy.unknown;
 }

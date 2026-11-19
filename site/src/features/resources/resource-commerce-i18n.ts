@@ -79,6 +79,8 @@ const copy = {
       VALIDATION_FAILED:
         "A selected resource cannot be acquired. Refresh the cart and remove unavailable items.",
       UNAUTHORIZED: "Your session expired. Sign in and try again.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       FORBIDDEN: "You do not have permission to perform this action.",
       RATE_LIMIT_EXCEEDED: "Too many operations. Wait a little and try again.",
       PRODUCT_METADATA_REVISION_REQUIRED:
@@ -173,6 +175,8 @@ const copy = {
       VALIDATION_FAILED:
         "Один из ресурсов нельзя получить. Обновите корзину и уберите недоступные позиции.",
       UNAUTHORIZED: "Сессия истекла. Войдите и повторите попытку.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       FORBIDDEN: "У вас нет прав на это действие.",
       RATE_LIMIT_EXCEEDED: "Слишком много операций. Подождите немного и повторите попытку.",
       PRODUCT_METADATA_REVISION_REQUIRED:

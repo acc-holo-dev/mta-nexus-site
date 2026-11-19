@@ -182,7 +182,10 @@ export function resourceCopyError(locale: Locale, code: unknown) {
     case "FORBIDDEN":
       return c.forbidden;
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
       return c.signInRequired;
+    case "ACTOR_CHANGED":
+      return c.changed;
     case "NOT_FOUND":
     case "RESOURCE_COPY_TERMS_UNKNOWN":
       return c.unavailable;

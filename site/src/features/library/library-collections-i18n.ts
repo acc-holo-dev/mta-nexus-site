@@ -284,7 +284,8 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   if (code === "COLLECTION_ITEM_LIMIT") return `${c.fullCollection} ${c.itemLimitNext}`;
   if (code === "COLLECTION_LIMIT") return `${c.quota} ${c.collectionLimitNext}`;
   if (code === "COLLECTION_HISTORY_LIMIT") return c.quota;
-  if (code === "UNAUTHORIZED") return c.signInRequired;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return c.signInRequired;
+  if (code === "ACTOR_CHANGED") return c.conflict;
   if (code === "NOT_FOUND" || code === "FORBIDDEN" || code === "COLLECTION_ACCESS_CHANGED")
     return c.forbidden;
   return c.retry;

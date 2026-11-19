@@ -114,6 +114,9 @@ const copy = {
       PRODUCT_STATE_CHANGED: "This action is unavailable in the current resource state.",
       NOT_FOUND: "The resource or your current access is unavailable.",
       FORBIDDEN: "Your current permissions do not allow this action.",
+      UNAUTHORIZED: "Sign in again to continue.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
       fallback: "The result could not be confirmed. Reload the current state before retrying.",
       actionErrorDescription:
@@ -231,6 +234,9 @@ const copy = {
       PRODUCT_STATE_CHANGED: "Действие недоступно в текущем состоянии ресурса.",
       NOT_FOUND: "Ресурс или ваш действующий доступ недоступен.",
       FORBIDDEN: "Ваши действующие права не разрешают это действие.",
+      UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Попробуйте немного позже.",
       fallback: "Результат не удалось подтвердить. Обновите состояние перед повтором.",
       actionErrorDescription:

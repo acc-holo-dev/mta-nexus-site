@@ -145,7 +145,8 @@ const copy = {
 export const planReviewsCopy = (locale: Locale) => copy[locale];
 export function planReviewError(locale: Locale, code: unknown) {
   const c = copy[locale];
-  if (code === "UNAUTHORIZED") return c.signInRequired;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return c.signInRequired;
+  if (code === "ACTOR_CHANGED") return c.conflict;
   if (code === "FORBIDDEN" || code === "NOT_FOUND") return c.access;
   if (code === "RATE_LIMIT_EXCEEDED") return c.rate;
   return code === "PLAN_REVIEW_CONFLICT"

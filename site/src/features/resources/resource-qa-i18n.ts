@@ -86,6 +86,8 @@ const copy = {
     unknown: "The last action could not be confirmed. Reload and try again.",
     errors: {
       UNAUTHORIZED: "Sign in and try again.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
       FORBIDDEN: "You do not have permission for that Q&A action.",
       NOT_FOUND: "That question is no longer available.",
       RESOURCE_QA_INVALID: "Check the question or answer and try again.",
@@ -180,6 +182,8 @@ const copy = {
     unknown: "Последнее действие не подтверждено. Обновите страницу и попробуйте снова.",
     errors: {
       UNAUTHORIZED: "Войдите и попробуйте снова.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
       FORBIDDEN: "Недостаточно прав для этого действия Q&A.",
       NOT_FOUND: "Этот вопрос больше недоступен.",
       RESOURCE_QA_INVALID: "Проверьте текст вопроса или ответа и попробуйте снова.",
