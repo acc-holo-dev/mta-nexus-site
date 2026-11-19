@@ -90,7 +90,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 }));
 
 import Versions from "../../src/app/workspace/library/[id]/versions/page";
-import Updates, { metadata } from "../../src/app/workspace/library/updates/page";
+import Updates, { generateMetadata } from "../../src/app/workspace/library/updates/page";
 import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const input = {
@@ -255,7 +255,7 @@ it("requires sign-in before reading the buyer library", async () => {
   );
   expect(state.updates).not.toHaveBeenCalled();
   expect(state.versions).not.toHaveBeenCalled();
-  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "a withdrawn fixed version offers management without silent replacement in %s",

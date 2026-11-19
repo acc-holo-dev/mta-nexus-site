@@ -26,7 +26,7 @@ vi.mock("../../../../features/resources/create-controls", () => ({
   },
 }));
 
-import Page, { metadata } from "./page";
+import Page, { generateMetadata } from "./page";
 
 beforeEach(() => {
   mocks.actor = { id: "author" };
@@ -35,7 +35,7 @@ beforeEach(() => {
 it("passes authenticated actor identity to the publishing form and disables indexing", async () => {
   renderToStaticMarkup(await Page());
   expect(mocks.forms).toHaveBeenCalledWith({ actorId: "author" });
-  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s", async (locale) => {
   mocks.actor = null;

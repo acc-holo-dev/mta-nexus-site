@@ -1,12 +1,17 @@
+import type { Metadata } from "next";
 import { LibraryCollectionsScreen } from "../../../../../../features/library/collections-server";
+import { libraryCollectionHistoryCopy } from "../../../../../../features/library/library-collection-history-i18n";
+import { getRequestLocale } from "../../../../../../lib/i18n/server";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
 
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Collection history | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryCollectionHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
   params: Promise<{ id: string }>;

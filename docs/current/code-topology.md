@@ -278,6 +278,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 98 done (large):** remaining major EN API envelopes — `/api/content` GET+POST extends `contentApiCopy`; `/api/admin/builds/[buildId]/download` via `adminBuildDownloadApiCopy`; `/api/admin/actions` via `adminActionsApiCopy`; AppError message passthrough stays English where previously passthrough.
 
+**Wave 99 done (large):** workspace `library` / `resources` / `subscriptions` document titles move from static EN `metadata` to `generateMetadata` + existing locale copy/`getDictionary` (37 pages); AppError passthrough unchanged.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -449,8 +451,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 97 — product builds upload errors via productBuildsApiCopy                                                   | API envelope RU/EN               | **done** |
 | A   | Wave 98 — content collection + admin download + admin actions (large remaining EN clusters)                       | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Waves 97–98                                                                                 | docs honesty                     | **done** |
+| A   | Wave 99 — workspace library/resources/subscriptions bilingual document titles                                     | document metadata RU/EN          | **done** |
 
-Дальше: API-envelope localization major route clusters exhausted (support* already RU). Residual AppError English passthrough is intentional. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: Remaining workspace/public static EN document titles outside library/resources/subscriptions; residual AppError English passthrough intentional. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

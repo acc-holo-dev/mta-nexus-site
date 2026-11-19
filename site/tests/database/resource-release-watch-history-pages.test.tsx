@@ -21,7 +21,7 @@ vi.mock("../../src/lib/services/resources/resource-release-watches-service", () 
   resourceReleaseWatchesService: { history: h.history },
 }));
 
-import Page, { metadata } from "../../src/app/workspace/library/watches/history/page";
+import Page, { generateMetadata } from "../../src/app/workspace/library/watches/history/page";
 import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>
@@ -79,7 +79,7 @@ it.each(["en", "ru"])(
     expect(html).not.toContain("/versions");
     expect(html).not.toContain("/api/library/watches/disable");
     expect(html).toContain("source=batch&amp;productId=prd_a");
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it("shows a current accessible title and management link without rewriting history", async () => {

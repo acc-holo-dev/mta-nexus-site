@@ -54,7 +54,7 @@ vi.mock("../../../../features/resources/lifecycle-controls", () => ({
 }));
 
 import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
-import Page, { metadata } from "./page";
+import Page, { generateMetadata } from "./page";
 
 const input = {
   params: Promise.resolve({ id: "resource" }),
@@ -118,7 +118,7 @@ it.each(["en", "ru"] as const)(
     expect(mocks.forms.mock.calls[0][0].actorId).toBe("author");
     expect(mocks.forms.mock.calls[0][0].product.updatedAt).toBe("2026-10-04T00:00:00.000Z");
     expect(html).toContain("?page=3");
-    expect(metadata.robots).toMatchObject({ index: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false });
   },
 );
 it("shows an honest recovery state when managed resource data fails", async () => {

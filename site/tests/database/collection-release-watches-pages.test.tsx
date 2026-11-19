@@ -29,7 +29,7 @@ vi.mock("../../src/features/resources/release-watch", () => ({
   ),
 }));
 
-import Page, { metadata } from "../../src/app/workspace/library/collections/[id]/watches/page";
+import Page, { generateMetadata } from "../../src/app/workspace/library/collections/[id]/watches/page";
 import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>
@@ -89,7 +89,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('data-watch="prd_b"');
     expect(html).toContain('href="/market/root-core"');
     expect(html).not.toContain("/market/PRIVATE");
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it("leaves archived collections inspectable without enrollment controls", async () => {

@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { ResourceRequirementsScreen } from "../../../../../features/resources/requirements-server";
+import { resourceRequirementsCopy } from "../../../../../features/resources/resource-requirements-i18n";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 export const dynamic = "force-dynamic";
-export const metadata = { robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceRequirementsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Page({
   params,
   searchParams,

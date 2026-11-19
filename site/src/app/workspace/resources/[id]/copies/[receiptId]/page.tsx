@@ -28,10 +28,12 @@ const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Recorded draft copy | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceCopyCopy(await getRequestLocale()).recorded} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function ResourceCopyDetailPage({
   params,
   searchParams,

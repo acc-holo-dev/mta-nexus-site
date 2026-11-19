@@ -1,4 +1,5 @@
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,10 +15,12 @@ import { authService } from "../../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../../lib/services/commerce/product-service";
 
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Resource compatibility | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceManagementCopy(await getRequestLocale()).compatibility} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =

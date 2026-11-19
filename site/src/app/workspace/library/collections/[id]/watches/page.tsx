@@ -1,5 +1,6 @@
 import { AppError, RESOURCE_RELEASE_WATCH_LIMIT } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,7 +17,6 @@ import { resourceReleaseWatchesCopy } from "../../../../../../features/resources
 import { resourceReleaseWatchesQuery } from "../../../../../../features/resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../../../features/shell/session-error";
-
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n/server";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
@@ -27,7 +27,12 @@ const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const dynamic = "force-dynamic";
-export const metadata = { robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceReleaseWatchesCopy(await getRequestLocale()).collectionTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Page({
   params,
   searchParams,

@@ -9,10 +9,12 @@ import { getRequestLocale } from "../../../../lib/i18n/server";
 import { authService } from "../../../../lib/services/accounts/auth-service";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Submit resource | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).publishing.resourceTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function NewResourcePage() {
   const locale = await getRequestLocale();

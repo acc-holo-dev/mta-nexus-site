@@ -21,10 +21,12 @@ import { planReviewsService } from "../../../../../lib/services/commerce/plan-re
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Review a plan | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${planReviewsCopy(await getRequestLocale()).newReview} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function NewPlanReview({
   searchParams,
 }: {

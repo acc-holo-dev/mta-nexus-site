@@ -63,7 +63,7 @@ vi.mock("../../src/features/resources/download", async () => {
 });
 
 import LibraryLoading from "../../src/app/workspace/library/loading";
-import LibraryPage, { metadata } from "../../src/app/workspace/library/page";
+import LibraryPage, { generateMetadata } from "../../src/app/workspace/library/page";
 import { getLibraryCopy } from "../../src/features/library/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
@@ -211,7 +211,7 @@ describe("private resource library", () => {
     expect(html).toContain(copy.emptyHint);
     expect(html).not.toContain(copy.emptyFilterHint);
     expect(copy.emptyHint).not.toBe(copy.subtitle);
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 
     state.page.mockResolvedValueOnce({
       items: [],

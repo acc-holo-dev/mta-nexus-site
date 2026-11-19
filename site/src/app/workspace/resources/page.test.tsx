@@ -23,7 +23,7 @@ vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
-import Page, { metadata } from "./page";
+import Page, { generateMetadata } from "./page";
 
 beforeEach(() => {
   mocks.actor = { id: "author" };
@@ -63,7 +63,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(
       locale === "ru" ? 'aria-label="Мои ресурсы"' : 'aria-label="My resources"',
     );
-    expect(metadata.robots).toMatchObject({ index: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false });
   },
 );
 it("does not query private resources when signed out", async () => {

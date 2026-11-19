@@ -13,6 +13,7 @@ export const workspace = {
     loadUnavailableHint:
       "A load failure is not an empty inventory. Retry to fetch the latest private publisher state.",
     back: "Back to my resources",
+    manageDocumentTitle: "Manage resource",
     edit: "Resource details",
     save: "Save details",
     saving: "Saving…",

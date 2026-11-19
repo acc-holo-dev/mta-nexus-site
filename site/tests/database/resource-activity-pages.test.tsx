@@ -42,7 +42,7 @@ vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
 
 import History, { metadata as historyMeta } from "../../src/app/workspace/acquisitions/page";
 import Activity, {
-  metadata as activityMeta,
+  generateMetadata as activityMetadata,
 } from "../../src/app/workspace/resources/[id]/activity/page";
 import { getResourceActivityCopy } from "../../src/features/resources/resource-activity-i18n";
 import {
@@ -146,7 +146,7 @@ it("renders only escaped publisher aggregates and bounded period/export links", 
   expect(html).toContain("/activity/export?days=7");
   expect(html).toContain("Daily activity (UTC)");
   expect(html).toContain('scope="col"');
-  expect(activityMeta.robots).toEqual({ index: false, follow: false });
+  expect((await activityMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it.each(["ru", "en"] as const)("supports %s acquisition and publisher copy", async (locale) => {
   state.locale = locale;

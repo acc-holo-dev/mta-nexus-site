@@ -23,10 +23,12 @@ const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Library updates | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).updates} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function LibraryUpdatesPage({
   searchParams,
 }: {

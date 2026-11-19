@@ -62,7 +62,7 @@ vi.mock("../../src/features/resources/compatibility-controls", () => ({
 }));
 
 import CompatibilityPage from "../../src/app/workspace/resources/[id]/compatibility/page";
-import VariantsPage, { metadata } from "../../src/app/workspace/resources/[id]/variants/page";
+import VariantsPage, { generateMetadata } from "../../src/app/workspace/resources/[id]/variants/page";
 import { ResourceVariantChoices } from "../../src/features/resources/components/resource-variant-choices";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
@@ -129,7 +129,7 @@ it.each(["en", "ru"] as const)(
       suspended: false,
     });
     expect(variantHtml + compatibilityHtml).not.toContain("must-not-serialize");
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
   },
 );
 it("shows an honest recovery state when variant management fails", async () => {

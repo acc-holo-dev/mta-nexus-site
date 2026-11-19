@@ -3,6 +3,7 @@ const en = {
   loadUnavailableDescription:
     "A load failure is not an empty collection view. Retry to fetch the latest private collection state.",
   title: "My resource collections",
+  detailTitle: "Resource collection",
   library: "Resource library",
   resourceCollections: "Collections containing this resource",
   membershipNote:
@@ -138,6 +139,7 @@ const ru: typeof en = {
   loadUnavailableDescription:
     "Ошибка загрузки — это не пустой список коллекций. Повторите запрос, чтобы получить актуальное состояние.",
   title: "Мои коллекции ресурсов",
+  detailTitle: "Коллекция ресурсов",
   library: "Библиотека ресурсов",
   resourceCollections: "Коллекции с этим ресурсом",
   membershipNote:

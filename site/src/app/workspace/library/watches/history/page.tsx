@@ -4,6 +4,7 @@ import {
   RESOURCE_RELEASE_WATCH_HISTORY_SOURCES,
 } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,7 +13,6 @@ import { resourceReleaseWatchHistoryCopy } from "../../../../../features/resourc
 import { resourceReleaseWatchHistoryQuery } from "../../../../../features/resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
 import { PlatformSessionError } from "../../../../../features/shell/session-error";
-
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
 import { authService } from "../../../../../lib/services/accounts/auth-service";
@@ -26,7 +26,12 @@ const selectClass =
 const labelClass = "block font-label uppercase text-secondary";
 
 export const dynamic = "force-dynamic";
-export const metadata = { robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceReleaseWatchHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Page({
   searchParams,
 }: {
