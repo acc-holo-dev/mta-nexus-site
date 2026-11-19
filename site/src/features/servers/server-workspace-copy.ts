@@ -138,7 +138,7 @@ export function serverWorkspaceError(locale: Locale, code: unknown) {
   const copy = serverWorkspaceCopy(locale);
   if (code === "FORBIDDEN") return copy.forbidden;
   if (code === "NOT_FOUND") return copy.missing;
-  if (["SERVER_BATCH_CHANGED", "SERVER_METADATA_CONFLICT"].includes(String(code)))
+  if (["SERVER_BATCH_CHANGED", "SERVER_METADATA_CONFLICT", "CONFLICT"].includes(String(code)))
     return copy.changed;
   if (code === "SERVER_BATCH_INVALID") return copy.invalid;
   if (["INVALID_CURSOR", "SERVER_HISTORY_FILTER_INVALID"].includes(String(code)))

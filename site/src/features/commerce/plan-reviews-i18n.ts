@@ -149,7 +149,7 @@ export function planReviewError(locale: Locale, code: unknown) {
   if (code === "ACTOR_CHANGED") return c.conflict;
   if (code === "FORBIDDEN" || code === "NOT_FOUND") return c.access;
   if (code === "RATE_LIMIT_EXCEEDED") return c.rate;
-  return code === "PLAN_REVIEW_CONFLICT"
+  return code === "PLAN_REVIEW_CONFLICT" || code === "CONFLICT"
     ? c.conflict
     : code === "PLAN_REVIEW_PLAN_CHANGED"
       ? c.planChanged

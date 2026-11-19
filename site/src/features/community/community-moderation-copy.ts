@@ -119,6 +119,7 @@ export const moderationError = (locale: Locale, code: unknown) => {
     case "INVALID_CURSOR":
       return copy.invalid;
     case "CONTENT_STATE_CHANGED":
+    case "CONFLICT":
       return copy.changed;
     case "CONTENT_ALREADY_IN_STATE":
       return copy.already;

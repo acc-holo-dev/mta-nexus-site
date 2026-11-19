@@ -283,7 +283,8 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   if (
     code === "COLLECTION_CONFLICT" ||
     code === "COLLECTION_REQUEST_REUSED" ||
-    code === "COLLECTION_ARCHIVED"
+    code === "COLLECTION_ARCHIVED" ||
+    code === "CONFLICT"
   )
     return c.conflict;
   if (code === "COLLECTION_ITEM_LIMIT") return `${c.fullCollection} ${c.itemLimitNext}`;
@@ -293,5 +294,6 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   if (code === "ACTOR_CHANGED") return c.conflict;
   if (code === "NOT_FOUND" || code === "FORBIDDEN" || code === "COLLECTION_ACCESS_CHANGED")
     return c.forbidden;
+  if (code === "RATE_LIMIT_EXCEEDED") return c.retry;
   return c.retry;
 }

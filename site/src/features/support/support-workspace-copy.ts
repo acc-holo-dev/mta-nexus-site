@@ -138,6 +138,7 @@ export function supportWorkspaceError(locale: Locale, code: unknown) {
       return c.closed;
     case "SUPPORT_MESSAGE_CONFLICT":
     case "SUPPORT_STATUS_CONFLICT":
+    case "CONFLICT":
     case "ACTOR_CHANGED":
     case 409:
       return c.conflict;
