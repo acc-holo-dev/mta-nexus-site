@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `local` (`dev`, Waves 179–188 local tip).  
+**source_sha:** `c5cd2f94` (`dev`, Waves 179–188 local tip).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -510,7 +510,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done**  |
 | A   | Waves 159–169 — media/moderation/claim/publishing remappers + VALIDATION/FORBIDDEN fills + release-watch          | client remapper RU/EN            | **done**  |
 | A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper                  | client remapper RU/EN            | **done**  |
-| A   | Waves 179–188 — admin/auth/acquire/settings drop body.error passthrough                                       | client remapper RU/EN            | **local** |
+| A   | Waves 179–188 — admin/auth/acquire/settings drop body.error passthrough                                           | client remapper RU/EN            | **local** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
