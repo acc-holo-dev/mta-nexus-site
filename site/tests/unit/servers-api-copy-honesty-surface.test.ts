@@ -54,6 +54,7 @@ describe("servers API copy honesty surface", () => {
     expect(route).toContain("copy.updateLimitExceeded");
     expect(route).toContain("copy.invalidServerDetails");
     expect(route).toContain("copy.updateFailed");
+    expect(route).toContain("copy.serverManagerRequired");
     expect(route).toContain("localeAppErrorText");
     expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Authentication required"');

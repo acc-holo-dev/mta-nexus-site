@@ -142,7 +142,7 @@ export const PATCH = withBrowserMutation(
                 appError,
                 {
                   unauthorized: copy.authenticationRequired,
-                  forbidden: copy.forbidden,
+                  forbidden: copy.serverManagerRequired,
                   notFound: copy.notFound,
                   conflict: copy.actorChanged,
                   unsupportedMediaType: copy.unsupportedMediaType,
