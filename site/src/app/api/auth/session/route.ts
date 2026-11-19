@@ -1,7 +1,6 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authSessionApiCopy } from "../../../../features/accounts/auth-session-api-copy";
 import {
   SESSION_COOKIE_NAME,
@@ -100,7 +99,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         "REQUEST_BODY_TIMEOUT",
       ].includes(error.code)
     )
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(context, { error: copy.invalidSignOut, code: error.code }, error.statusCode);
     logRequestEvent({
       level: "error",
       event: "auth.session.logout_failed",
