@@ -40,6 +40,16 @@ function AcquireContent() {
   const copy = dictionary.checkout;
   const authCopy = dictionary.auth;
   const claimCopy = resourceClaimApiCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(claimCopy),
+      ...Object.values(dictionary.product.downloadErrors),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const activityCopy = getResourceActivityCopy(locale);
   const summaryHeadingId = useId();
   const accessHeadingId = useId();
@@ -130,7 +140,7 @@ function AcquireContent() {
       const confirmed = confirmedResourceClaim(data, product.id);
       if (!response.ok || !confirmed) {
         throw new Error(
-          data?.code === "RATE_LIMIT_EXCEEDED"
+          data?.code === "RATE_LIMIT_EXCEEDED" || data?.code === "RATE_LIMITED"
             ? claimCopy.rate
             : data?.code === "FORBIDDEN"
               ? claimCopy.forbidden
@@ -145,7 +155,7 @@ function AcquireContent() {
       setClaimedAccess(confirmed);
       setClaimedProductId(product.id);
     } catch (caught: unknown) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpected);
+      setError(safeMessage(caught, copy.unexpected));
     } finally {
       setLoading(false);
     }
