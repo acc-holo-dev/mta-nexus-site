@@ -300,6 +300,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 110 done:** Stamped guest/member/feature-server/shell-home i18n inventories to tip; extended `noticeStoredTitles` with `newArticleComment` for legacy comment remapping.
 
+**Wave 111 done:** `noticeStoredMessages` bilingual slash bodies for static Web Push producers; `formatNotification` matches on English message segment.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -483,8 +485,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 108 — canonical bilingual notice titles + password-reset Web Push slash title                                | notification display/push RU/EN  | **done** |
 | A   | Wave 109 — `noticeStoredTitles` slash pack across Web Push producers                                              | notification storage/push RU/EN  | **done** |
 | D/E | Wave 110 — i18n inventory SHA stamp + `newArticleComment` stored title                                            | docs honesty / notice catalog    | **done** |
+| A   | Wave 111 — `noticeStoredMessages` slash pack for static Web Push bodies                                           | notification storage/push RU/EN  | **done** |
 
-Дальше: Static EN document titles, API route envelopes, and known static inbox titles largely exhausted; residual AppError English passthrough intentional. Remaining gaps: dynamic AppError English passthrough; F/ops external. Новые TOPO ID не заводить.
+Дальше: Static EN document titles, API route envelopes, and known static inbox titles largely exhausted; residual AppError English passthrough intentional. Remaining gaps: dynamic/templated notice bodies (follower/comment regex), AppError English passthrough; F/ops external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

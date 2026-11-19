@@ -23,7 +23,7 @@ it.each(["en", "ru"] as const)(
     const staff = formatNotification(
       {
         title: "Server ownership proof requires review / Доказательство контроля сервера требует проверки",
-        message: "A verified server control proof is awaiting review.",
+        message: "A verified server control proof is awaiting review. / Проверенное доказательство контроля сервера ожидает рассмотрения.",
       },
       reviewCopy,
       locale,

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { noticeStoredTitles } from "@nexus/domain";
+import { noticeStoredMessages, noticeStoredTitles } from "@nexus/domain";
 import { and, asc, eq, gt, isNull, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { supportNotificationDeliveries, users } from "../schema";
@@ -104,8 +104,8 @@ export class SupportNotificationDeliveryRepository {
                     : noticeStoredTitles.supportCaseUpdated,
                 message:
                   job.event === "case_created"
-                    ? "A support case is awaiting review."
-                    : "A support case has a new requester message.",
+                    ? noticeStoredMessages.newSupportCase
+                    : noticeStoredMessages.supportCaseUpdated,
                 link: supportStaffCaseLink(job.caseId),
                 type: "system",
                 category: "system",

@@ -38,7 +38,7 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     type: "system",
     category: "system",
     title: "New support case / Новое обращение",
-    message: "A support case is awaiting review.",
+    message: "A support case is awaiting review. / Обращение ожидает рассмотрения.",
     isRead: true,
     createdAt: originalTime,
   });
@@ -57,7 +57,7 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
   for (const row of stored.slice(1)) {
     expect(row).toMatchObject({
       title: "New support case / Новое обращение",
-      message: "A support case is awaiting review.",
+      message: "A support case is awaiting review. / Обращение ожидает рассмотрения.",
       link: staffCaseLink(f.caseId),
       category: "system",
     });
@@ -149,7 +149,7 @@ it("uses current roles and the fixed horizon, excluding the requester on replies
     {
       recipientId: promoted,
       title: "Support case updated / Новое сообщение в обращении",
-      message: "A support case has a new requester message.",
+      message: "A support case has a new requester message. / Пользователь добавил сообщение в обращение.",
       link: staffCaseLink(f.caseId),
     },
   ]);

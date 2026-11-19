@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { noticeStoredTitles } from "@nexus/domain";
+import { noticeStoredMessages, noticeStoredTitles } from "@nexus/domain";
 import { expect, it } from "vitest";
 import { canonicalNoticeTitle } from "../../src/features/notifications/notification-copy";
 
@@ -17,4 +17,10 @@ it("keeps bilingual slash titles with English canonical segments for remapping",
     "Verification approved",
   );
   expect(canonicalNoticeTitle(noticeStoredTitles.newArticleComment)).toBe("New article comment");
+  expect(canonicalNoticeTitle(noticeStoredMessages.passwordResetCompleted)).toBe(
+    "Your password was reset and all existing sessions were signed out.",
+  );
+  expect(canonicalNoticeTitle(noticeStoredMessages.discussionReplyFollowed)).toBe(
+    "A publication you follow has a new reply.",
+  );
 });

@@ -7,7 +7,7 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
   const staff = formatNotification(
     {
       title: "New report / Новая жалоба",
-      message: "A report is awaiting review.",
+      message: "A report is awaiting review. / Жалоба ожидает рассмотрения.",
     },
     reviewCopy,
     "ru",

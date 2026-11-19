@@ -29,7 +29,8 @@ describe("notification residual inbox copy honesty", () => {
   it("localizes generic staff verification awaiting-review notices", () => {
     const notice = {
       title: "New verification request",
-      message: "A verification request is awaiting review.",
+      message:
+        "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
       data: null,
     };
     expect(formatNotification(notice, reviewCopy, "en")).toEqual({
@@ -45,7 +46,8 @@ describe("notification residual inbox copy honesty", () => {
   it("localizes password-reset completed security notices", () => {
     const notice = {
       title: "Password reset completed",
-      message: "Your password was reset and all existing sessions were signed out.",
+      message:
+        "Your password was reset and all existing sessions were signed out. / Пароль сброшен, все существующие сессии завершены.",
       data: null,
     };
     expect(formatNotification(notice, reviewCopy, "en")).toEqual({
@@ -61,7 +63,8 @@ describe("notification residual inbox copy honesty", () => {
   it("accepts bilingual slash password-reset titles for Web Push storage", () => {
     const notice = {
       title: "Password reset completed / Пароль восстановлен",
-      message: "Your password was reset and all existing sessions were signed out.",
+      message:
+        "Your password was reset and all existing sessions were signed out. / Пароль сброшен, все существующие сессии завершены.",
       data: null,
     };
     expect(formatNotification(notice, reviewCopy, "ru").title).toBe("Пароль восстановлен");

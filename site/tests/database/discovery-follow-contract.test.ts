@@ -143,21 +143,25 @@ it("checks paired latest-comment selectors in paged saved discussions", () => {
 it.each(["follow", "participant"])(
   "localizes fixed generic %s reply notifications in RU/EN",
   (kind) => {
-    const message =
+    const stored =
+      kind === "follow"
+        ? "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ."
+        : "A discussion you participate in has a new reply. / В обсуждении, в котором вы участвуете, появился новый ответ.";
+    const enMessage =
       kind === "follow"
         ? "A publication you follow has a new reply."
         : "A discussion you participate in has a new reply.";
     const notice = {
       title: "New discussion reply / Новый ответ в обсуждении",
-      message,
+      message: stored,
       data: null,
     };
     const copy = { approved: "", rejected: "", version: "", notes: "" };
     expect(formatNotification(notice, copy, "en")).toEqual({
       title: "New discussion reply",
-      message,
+      message: enMessage,
     });
     expect(formatNotification(notice, copy, "ru").title).toBe("Новый ответ в обсуждении");
-    expect(formatNotification(notice, copy, "ru").message).not.toBe(message);
+    expect(formatNotification(notice, copy, "ru").message).not.toBe(enMessage);
   },
 );

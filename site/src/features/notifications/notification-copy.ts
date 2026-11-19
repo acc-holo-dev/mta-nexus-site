@@ -329,10 +329,10 @@ function noticeLocale(locale: Locale): "ru" | "en" {
   return locale === "ru" ? "ru" : "en";
 }
 
-/** Stored notices may keep EN-only titles or bilingual `EN / RU` slash titles for Web Push. */
-export function canonicalNoticeTitle(title: string) {
-  const cut = title.indexOf(" / ");
-  return cut === -1 ? title : title.slice(0, cut);
+/** Stored notices may keep EN-only text or bilingual `EN / RU` slash text for Web Push. */
+export function canonicalNoticeTitle(value: string) {
+  const cut = value.indexOf(" / ");
+  return cut === -1 ? value : value.slice(0, cut);
 }
 
 /** Localize structured review notices; older notifications keep their stored text. */
@@ -347,6 +347,7 @@ export function formatNotification(
   if (releaseNotice) return releaseNotice;
   const c = noticeCopy[noticeLocale(locale)];
   const noticeTitle = canonicalNoticeTitle(notification.title);
+  const noticeMessage = canonicalNoticeTitle(notification.message);
   if (
     noticeTitle === "Discussion moderation" &&
     /^Comment ([a-zA-Z0-9_-]{1,128}): removed\.$/u.test(notification.message)
@@ -413,14 +414,11 @@ export function formatNotification(
     const message = supportActivityMessages(supportActivity[2]);
     if (message) return { title: c.supportActivity.title, message };
   }
-  if (
-    noticeTitle === "New support case" &&
-    notification.message === "A support case is awaiting review."
-  )
+  if (noticeTitle === "New support case" && noticeMessage === "A support case is awaiting review.")
     return { title: c.newSupportCase.title, message: c.newSupportCase.message };
   if (
     noticeTitle === "Support case updated" &&
-    notification.message === "A support case has a new requester message."
+    noticeMessage === "A support case has a new requester message."
   )
     return { title: c.supportCaseUpdated.title, message: c.supportCaseUpdated.message };
   const organizationAccessMessages = (event: string): string | undefined => {
@@ -485,7 +483,7 @@ export function formatNotification(
   }
   if (
     noticeTitle === "Server ownership proof requires review" &&
-    notification.message === "A verified server control proof is awaiting review."
+    noticeMessage === "A verified server control proof is awaiting review."
   )
     return { title: c.serverProofReview.title, message: c.serverProofReview.message };
   const requested =
@@ -507,7 +505,7 @@ export function formatNotification(
   }
   if (
     noticeTitle === "New verification request" &&
-    notification.message === "A verification request is awaiting review."
+    noticeMessage === "A verification request is awaiting review."
   ) {
     return {
       title: c.newVerificationRequest.title,
@@ -519,7 +517,7 @@ export function formatNotification(
   }
   if (
     noticeTitle === "Password reset completed" &&
-    notification.message === "Your password was reset and all existing sessions were signed out."
+    noticeMessage === "Your password was reset and all existing sessions were signed out."
   ) {
     return {
       title: c.passwordResetCompleted.title,
@@ -528,10 +526,10 @@ export function formatNotification(
   }
   if (
     noticeTitle === "New community report" &&
-    notification.message === "A community report is awaiting review."
+    noticeMessage === "A community report is awaiting review."
   )
     return { title: c.newCommunityReport.title, message: c.newCommunityReport.message };
-  if (noticeTitle === "New report" && notification.message === "A report is awaiting review.")
+  if (noticeTitle === "New report" && noticeMessage === "A report is awaiting review.")
     return { title: c.newReport.title, message: c.newReport.message };
   const reportStatus =
     (noticeTitle === "Community report status" || noticeTitle === "Platform report status") &&
@@ -549,12 +547,12 @@ export function formatNotification(
     [
       "A publication you follow has a new reply.",
       "A discussion you participate in has a new reply.",
-    ].includes(notification.message)
+    ].includes(noticeMessage)
   )
     return {
       title: c.discussionReply.title,
       message:
-        notification.message === "A publication you follow has a new reply."
+        noticeMessage === "A publication you follow has a new reply."
           ? c.discussionReply.followed
           : c.discussionReply.participating,
     };

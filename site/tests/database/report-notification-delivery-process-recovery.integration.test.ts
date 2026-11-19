@@ -34,7 +34,7 @@ it("resumes bounded pages across concurrent workers, deduplicating without chang
     type: "security",
     category: "security",
     title: "New report / Новая жалоба",
-    message: "A report is awaiting review.",
+    message: "A report is awaiting review. / Жалоба ожидает рассмотрения.",
     isRead: true,
     createdAt: originalTime,
   });
@@ -54,7 +54,7 @@ it("resumes bounded pages across concurrent workers, deduplicating without chang
   for (const row of stored.filter((row) => row.id !== existingId)) {
     expect(row).toMatchObject({
       title: "New report / Новая жалоба",
-      message: "A report is awaiting review.",
+      message: "A report is awaiting review. / Жалоба ожидает рассмотрения.",
       link: `/admin/reports/${f.reportId}`,
       category: "security",
     });

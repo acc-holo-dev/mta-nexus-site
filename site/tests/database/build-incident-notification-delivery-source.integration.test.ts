@@ -81,7 +81,7 @@ it("delivers served-receipt recipients idempotently with generic security copy",
     category: "security",
     title: "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
     message:
-      "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
+      "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library. / Сборка, которую вы загрузили, помещена в карантин после проверки безопасности. Прекратите использовать эту версию и проверьте наличие обновления в библиотеке.",
     link: `/workspace/library/${encodeURIComponent(productId)}/versions`,
     isRead: true,
     createdAt: originalTime,
