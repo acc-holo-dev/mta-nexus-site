@@ -66,7 +66,7 @@ it("deduplicates original author and actual owner, excludes the actor, locks pre
   expect(inserts()[0].params).toContain("/workspace/content/item");
   expect(inserts()[1].params).toContain("/workspace/organizations/org/content/item");
   expect(inserts()[0].params).toContain(
-    "The publication changed. Editorial content returned to moderation. (Guide)",
+    "The publication changed. Editorial content returned to moderation. (Guide) / Публикация изменена. Статьи и новости возвращены на модерацию. (Guide)",
   );
   expect(inserts()[0].params.join(" ")).not.toMatch(/Publication item:/u);
   expect(inserts()[0].params).toContain(
@@ -161,11 +161,12 @@ it("notifies the current context owner of an author's restore using only a priva
   expect(inserts()).toHaveLength(1);
   expect(inserts()[0].params).toContain("/workspace/organizations/org/content/item");
   expect(inserts()[0].params).toContain(
-    "The publication was restored to a draft and remains private. (Guide)",
+    "The publication was restored to a draft and remains private. (Guide) / Публикация восстановлена в черновик и остаётся непубличной. (Guide)",
   );
   const notice = {
       title: "Publication activity / Обновление публикации",
-      message: "The publication was restored to a draft and remains private. (Guide)",
+      message:
+        "The publication was restored to a draft and remains private. (Guide) / Публикация восстановлена в черновик и остаётся непубличной. (Guide)",
       data: {
         kind: "publication_activity" as const,
         event: "restored" as const,

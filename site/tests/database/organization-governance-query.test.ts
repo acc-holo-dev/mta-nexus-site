@@ -281,7 +281,9 @@ it("records access notices in the same transaction for team changes and uses saf
     "unit-token",
   );
   const notice = writes("notifications")[0];
-  expect(notice.params).toContain("You were added to the team. (Team)");
+  expect(notice.params).toContain(
+    "You were added to the team. (Team) / Вас добавили в команду. (Team)",
+  );
   expect(notice.params.join(" ")).not.toMatch(/Organization org:/u);
   expect(notice.params).toContain("/workspace/organizations/org");
   expect(notice.params.join(" ")).not.toContain("permissions");
