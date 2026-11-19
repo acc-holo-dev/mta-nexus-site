@@ -1,7 +1,13 @@
 import type { Notification } from "@nexus/domain";
 import type { Locale } from "../../lib/i18n";
-import { licenseTermNotification } from "../commerce/license-maintenance-i18n";
-import { resourceReleaseNotification } from "../resources/resource-release-watches-i18n";
+import {
+  getLicenseMaintenanceCopy,
+  licenseTermNotification,
+} from "../commerce/license-maintenance-i18n";
+import {
+  resourceReleaseNotification,
+  resourceReleaseWatchesCopy,
+} from "../resources/resource-release-watches-i18n";
 
 const noticeCopy = {
   en: {
@@ -522,6 +528,24 @@ export function formatNotification(
     return {
       title: c.passwordResetCompleted.title,
       message: c.passwordResetCompleted.message,
+    };
+  }
+  if (noticeTitle === "Resource version published") {
+    return {
+      title: resourceReleaseWatchesCopy(locale).published,
+      message: notification.message,
+    };
+  }
+  if (noticeTitle === "License expired") {
+    return {
+      title: getLicenseMaintenanceCopy(locale).expiredTitle,
+      message: notification.message,
+    };
+  }
+  if (noticeTitle === "License expires soon") {
+    return {
+      title: getLicenseMaintenanceCopy(locale).expiringTitle,
+      message: notification.message,
     };
   }
   if (

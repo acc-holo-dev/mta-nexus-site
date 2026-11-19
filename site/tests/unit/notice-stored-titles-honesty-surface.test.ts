@@ -17,10 +17,18 @@ it("keeps bilingual slash titles with English canonical segments for remapping",
     "Verification approved",
   );
   expect(canonicalNoticeTitle(noticeStoredTitles.newArticleComment)).toBe("New article comment");
+  expect(canonicalNoticeTitle(noticeStoredTitles.resourceVersionPublished)).toBe(
+    "Resource version published",
+  );
+  expect(canonicalNoticeTitle(noticeStoredTitles.licenseExpired)).toBe("License expired");
+  expect(canonicalNoticeTitle(noticeStoredTitles.licenseExpiresSoon)).toBe("License expires soon");
   expect(canonicalNoticeTitle(noticeStoredMessages.passwordResetCompleted)).toBe(
     "Your password was reset and all existing sessions were signed out.",
   );
   expect(canonicalNoticeTitle(noticeStoredMessages.discussionReplyFollowed)).toBe(
     "A publication you follow has a new reply.",
   );
+  // newArticleComment remains remapping-only; live discussion fanout uses newDiscussionReply.
+  expect(source).toContain("newArticleComment:");
+  expect(source).toContain("newDiscussionReply:");
 });
