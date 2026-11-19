@@ -27,12 +27,12 @@ it("maps AppError codes to locale copy without English passthrough", () => {
   expect(localeAppErrorText(new AppError("Denied", 403, "FORBIDDEN"), copy)).toBe(copy.forbidden);
   expect(localeAppErrorText(new AppError("Missing", 404, "NOT_FOUND"), copy)).toBe(copy.notFound);
   expect(localeAppErrorText(new AppError("Clash", 409, "CONFLICT"), copy)).toBe(copy.conflict);
-  expect(
-    localeAppErrorText(new AppError("Bad type", 415, "UNSUPPORTED_MEDIA_TYPE"), copy),
-  ).toBe(copy.unsupportedMediaType);
-  expect(
-    localeAppErrorText(new AppError("Too big", 413, "REQUEST_BODY_TOO_LARGE"), copy),
-  ).toBe(copy.requestBodyTooLarge);
+  expect(localeAppErrorText(new AppError("Bad type", 415, "UNSUPPORTED_MEDIA_TYPE"), copy)).toBe(
+    copy.unsupportedMediaType,
+  );
+  expect(localeAppErrorText(new AppError("Too big", 413, "REQUEST_BODY_TOO_LARGE"), copy)).toBe(
+    copy.requestBodyTooLarge,
+  );
   expect(localeAppErrorText(new AppError("Weird", 500, "INTERNAL_ERROR"), copy)).toBe(copy.failed);
   expect(
     localeAppErrorText(new AppError("Own target", 400, "REPORT_OWN_TARGET"), copy, {
