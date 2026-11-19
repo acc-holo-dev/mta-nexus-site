@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `2a1c7d53` (`dev`, Waves 154–157 tip).  
+**source_sha:** `b520ec8d` (`dev`, Waves 154–158 tip).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -310,7 +310,7 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 141–153 done:** Dynamic Web Push bodies for license-term UTC, resource-release `title · version`, and server publication `server: title`; remapper fallbacks; CI fix for community report delivery fixture; bilingual browser CSRF envelopes; ACTOR_* client remappers (follow/platform/inbox/commerce); QA/build/security title-only remappers.
 
-**Waves 154–157 (local, hold push):** ACTOR_* client remappers across resource/plan/review/library, accounts privacy/history, platform-report, server-statistics; honesty lock.
+**Waves 154–158 done:** ACTOR_* client remappers across resource/plan/review/library, accounts privacy/history, platform-report, server-statistics; honesty lock.
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
@@ -501,7 +501,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
 | A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done** |
 | A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done** |
-| A   | Waves 154–157 — ACTOR_* remappers across resource/library/accounts/moderation/servers                             | client remapper RU/EN            | **local** |
+| A   | Waves 154–157 — ACTOR_* remappers across resource/library/accounts/moderation/servers                             | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
