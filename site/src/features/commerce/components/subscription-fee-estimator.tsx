@@ -64,7 +64,7 @@ export function SubscriptionFeeEstimator({
     }
   }
   function subscriptionErrorForEstimate(code: unknown) {
-    if (code === "RATE_LIMIT_EXCEEDED") return c.rateLimited;
+    if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return c.rateLimited;
     if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return c.signInRequired;
     if (code === "ACTOR_CHANGED" || code === "CONFLICT") return c.stateChanged;
     if (code === "VALIDATION_ERROR" || code === "SUBSCRIPTION_INVALID") return c.invalid;
