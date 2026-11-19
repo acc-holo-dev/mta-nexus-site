@@ -42,14 +42,16 @@ const serverUpdateSchema = updateServerSchema
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
+  const copy = serversApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    if (!user) return json(context, { code: "UNAUTHORIZED" }, 401);
+    if (!user)
+      return json(context, { code: "UNAUTHORIZED", error: copy.authenticationRequired }, 401);
     if (!(await consumeRateLimit("resourceInspection", user.id)).success)
-      return json(context, { code: "RATE_LIMIT_EXCEEDED" }, 429);
+      return json(context, { code: "RATE_LIMIT_EXCEEDED", error: copy.updateLimitExceeded }, 429);
     const { id } = await params;
     const server = await serverService.getManagedServerDetails(id, user);
-    if (!server) return json(context, { code: "NOT_FOUND" }, 404);
+    if (!server) return json(context, { code: "NOT_FOUND", error: copy.notFound }, 404);
     return json(context, {
       actorId: user.id,
       server: {
@@ -82,7 +84,25 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       status: appError?.statusCode ?? 500,
       error,
     });
-    return json(context, { code: appError?.code ?? "INTERNAL_ERROR" }, appError?.statusCode ?? 500);
+    return json(
+      context,
+      {
+        code: appError?.code ?? "INTERNAL_ERROR",
+        error: appError
+          ? localeAppErrorText(appError, {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.updateFailed,
+            })
+          : copy.updateFailed,
+      },
+      appError?.statusCode ?? 500,
+    );
   }
 }
 
@@ -99,7 +119,7 @@ export const PATCH = withBrowserMutation(
 
       const expectedActor = request.headers.get("x-nexus-actor-id");
       if (expectedActor && expectedActor !== user.id)
-        return json(context, { code: "ACTOR_CHANGED" }, 409);
+        return json(context, { code: "ACTOR_CHANGED", error: copy.actorChanged }, 409);
 
       const rateLimit = await consumeRateLimit("serverMutation", user.id);
       if (!rateLimit.success) {
