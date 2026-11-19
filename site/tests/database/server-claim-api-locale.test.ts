@@ -105,4 +105,25 @@ describe("server claim API locale envelope", () => {
     });
     expect(mocks.verifyChallenge).not.toHaveBeenCalled();
   });
+
+  it("returns bilingual create success instruction from nexus_locale", async () => {
+    mocks.issueChallenge.mockResolvedValue({
+      challengeId: "ch_1",
+      token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
+      expiresAt: "2099-01-01T00:00:00.000Z",
+    });
+
+    const enIssued = await createChallenge(createRequest("en", "usr_claim"), { params });
+    expect(enIssued.status).toBe(201);
+    expect(await enIssued.json()).toMatchObject({
+      instruction: serverClaimApiCopy("en").instruction,
+    });
+
+    const ruIssued = await createChallenge(createRequest("ru", "usr_claim"), { params });
+    expect(ruIssued.status).toBe(201);
+    expect(await ruIssued.json()).toMatchObject({
+      instruction: serverClaimApiCopy("ru").instruction,
+    });
+    expect(mocks.issueChallenge).toHaveBeenCalledTimes(2);
+  });
 });

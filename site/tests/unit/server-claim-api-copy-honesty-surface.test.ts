@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { serverClaimApiCopy } from "../../src/features/servers/server-claim-api-copy";
 
-/** Wave 77: claim-challenge (+ verify) errors use bilingual serverClaimApiCopy. */
+/** Wave 77 errors + Wave 81 success instruction: claim-challenge via bilingual serverClaimApiCopy. */
 describe("server claim API copy honesty surface", () => {
   it("keeps RU/EN keys and wires claim-challenge routes through nexus_locale", () => {
     const en = serverClaimApiCopy("en");
@@ -15,6 +15,8 @@ describe("server claim API copy honesty surface", () => {
     expect(ru.invalidProof).toContain("доказательство");
     expect(en.createFailed).toContain("Could not create");
     expect(ru.verifyFailed).toContain("проверить контроль");
+    expect(en.instruction).toContain("Temporarily add the exact token");
+    expect(ru.instruction).toContain("точный токен");
 
     for (const relative of [
       "site/src/app/api/servers/[id]/claim-challenge/route.ts",
@@ -43,7 +45,9 @@ describe("server claim API copy honesty surface", () => {
       "utf8",
     );
     expect(create).toContain("copy.createFailed");
+    expect(create).toContain("copy.instruction");
     expect(create).not.toContain('"Could not create server control challenge"');
+    expect(create).not.toContain('"Temporarily add the exact token');
 
     const verify = readFileSync(
       resolve(process.cwd(), "site/src/app/api/servers/[id]/claim-challenge/verify/route.ts"),

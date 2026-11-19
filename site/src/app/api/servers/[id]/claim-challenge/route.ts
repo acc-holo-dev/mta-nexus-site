@@ -65,8 +65,7 @@ export const POST = withBrowserMutation(
         context,
         {
           challenge,
-          instruction:
-            "Temporarily add the exact token to the MTA server name, keep the server visible in the official master-list, then verify control before the challenge expires.",
+          instruction: copy.instruction,
         },
         201,
       );
