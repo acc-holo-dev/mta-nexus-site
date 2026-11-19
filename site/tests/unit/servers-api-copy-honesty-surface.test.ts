@@ -1,0 +1,40 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { serversApiCopy } from "../../src/features/servers/servers-api-copy";
+
+/** Wave 83: /api/servers GET/POST errors use bilingual serversApiCopy. */
+describe("servers API copy honesty surface", () => {
+  it("keeps RU/EN keys and wires the servers collection route through nexus_locale", () => {
+    const en = serversApiCopy("en");
+    const ru = serversApiCopy("ru");
+    expect(Object.keys(ru)).toEqual(Object.keys(en));
+    expect(en.authenticationRequired).toBe("Authentication required");
+    expect(ru.authenticationRequired).toBe("Требуется вход");
+    expect(en.listingsUnavailable).toContain("temporarily unavailable");
+    expect(ru.listingsUnavailable).toContain("недоступен");
+    expect(en.registerFailed).toContain("Could not register");
+    expect(ru.registerFailed).toContain("зарегистрировать");
+
+    const route = readFileSync(resolve(process.cwd(), "site/src/app/api/servers/route.ts"), "utf8");
+    expect(route).toContain("serversApiCopy");
+    expect(route).toContain("resolveLocale");
+    expect(route).toContain("nexus_locale");
+    expect(route).toContain("copy.listingsUnavailable");
+    expect(route).toContain("copy.registrationLimitExceeded");
+    expect(route).toContain("copy.authenticationRequired");
+    expect(route).toContain("copy.actorRequired");
+    expect(route).toContain("copy.actorChanged");
+    expect(route).toContain("copy.invalidCreationNonce");
+    expect(route).toContain("copy.invalidServerDetails");
+    expect(route).toContain("copy.registerFailed");
+    expect(route).not.toContain('"Server listings are temporarily unavailable"');
+    expect(route).not.toContain('"Server registration limit exceeded"');
+    expect(route).not.toContain('"Authentication required"');
+    expect(route).not.toContain('"Actor precondition required"');
+    expect(route).not.toContain('"Actor changed"');
+    expect(route).not.toContain('"Invalid creation nonce"');
+    expect(route).not.toContain('"Invalid server details"');
+    expect(route).not.toContain('"Could not register server"');
+  });
+});

@@ -2,9 +2,11 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { createServerSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { serversApiCopy } from "../../../features/servers/servers-api-copy";
 import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -41,6 +43,7 @@ function privateJson(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = serversApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "100");
@@ -98,7 +101,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "Server listings are temporarily unavailable",
+        error: copy.listingsUnavailable,
       },
       {
         status: 503,
@@ -110,6 +113,7 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = serversApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("serverMutation", ip);
@@ -117,7 +121,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Server registration limit exceeded",
+          error: copy.registrationLimitExceeded,
         },
         429,
       );
@@ -126,23 +130,19 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user || !token) {
-      return privateJson(context, { error: "Authentication required" }, 401);
+      return privateJson(context, { error: copy.authenticationRequired }, 401);
     }
 
     const expectedActor = request.headers.get("x-nexus-actor-id");
     if (!expectedActor)
-      return privateJson(
-        context,
-        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
-        428,
-      );
+      return privateJson(context, { error: copy.actorRequired, code: "ACTOR_ID_REQUIRED" }, 428);
     if (expectedActor !== user.id)
-      return privateJson(context, { error: "Actor changed", code: "ACTOR_CHANGED" }, 409);
+      return privateJson(context, { error: copy.actorChanged, code: "ACTOR_CHANGED" }, 409);
     const nonce = request.headers.get("x-nexus-creation-nonce");
     if (!nonce || !/^[a-f0-9]{32}$/u.test(nonce))
       return privateJson(
         context,
-        { error: "Invalid creation nonce", code: "INVALID_CREATION_NONCE" },
+        { error: copy.invalidCreationNonce, code: "INVALID_CREATION_NONCE" },
         400,
       );
 
@@ -152,7 +152,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Invalid server details",
+          error: copy.invalidServerDetails,
           details: parsed.error.format(),
         },
         400,
@@ -181,7 +181,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return privateJson(
       context,
       {
-        error: appError?.message || "Could not register server",
+        error: appError?.message || copy.registerFailed,
         ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,
