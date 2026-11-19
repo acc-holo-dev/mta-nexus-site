@@ -207,3 +207,25 @@ export function verificationResolutionNoticeMessage(input: {
     `Подтверждение ${input.targetType} для ${input.targetId}: ${decisionRu}.`,
   );
 }
+
+/** Web Push body for finite license term notices; inbox remaps via `data.kind`. */
+export function licenseTermUtcNoticeMessage(expiresAtIso: string) {
+  const iso = expiresAtIso.trim();
+  return bilingualNoticeMessage(`UTC: ${iso}`, `UTC: ${iso}`);
+}
+
+/** Web Push body for resource release watches; inbox remaps via `data.kind`. */
+export function resourceReleaseNoticeMessage(resourceTitle: string, version: string) {
+  const title = resourceTitle.trim().slice(0, 200);
+  const ver = version.trim().slice(0, 64);
+  const line = `${title} · ${ver}`;
+  return bilingualNoticeMessage(line, line);
+}
+
+/** Web Push body for server publication fanout; inbox keeps the English segment. */
+export function serverPublicationNoticeMessage(serverName: string, publicationTitle: string) {
+  const server = serverName.trim().slice(0, 200);
+  const title = publicationTitle.trim().slice(0, 200);
+  const line = `${server}: ${title}`;
+  return bilingualNoticeMessage(line, line);
+}

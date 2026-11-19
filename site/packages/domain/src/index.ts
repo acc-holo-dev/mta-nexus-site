@@ -19,10 +19,13 @@ export * from "./mta-endpoint-audit";
 export {
   bilingualNoticeMessage,
   discussionModerationRemovedMessage,
+  licenseTermUtcNoticeMessage,
   newFollowerNoticeMessage,
   noticeStoredMessages,
   publicationReactionNoticeMessage,
   resourceQaNoticeMessage,
+  resourceReleaseNoticeMessage,
+  serverPublicationNoticeMessage,
   verificationResolutionNoticeMessage,
   withBilingualParenthetical,
 } from "./notice-stored-messages";
