@@ -154,11 +154,15 @@ export function ResourceReleaseWatchBatchControls({
         setError(
           body?.code === "RELEASE_WATCH_LIMIT"
             ? copy.maximum
-            : body?.code === "RELEASE_WATCH_UNAVAILABLE"
+            : body?.code === "RELEASE_WATCH_UNAVAILABLE" || body?.code === "FORBIDDEN"
               ? copy.access
-              : response.status === 409
-                ? copy.conflict
-                : copy.failed,
+              : body?.code === "UNAUTHORIZED" ||
+                  body?.code === "ACTOR_ID_REQUIRED" ||
+                  response.status === 401
+                ? copy.signInRequired
+                : response.status === 409 || body?.code === "ACTOR_CHANGED"
+                  ? copy.conflict
+                  : copy.failed,
         );
         if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
           settled.current = true;
