@@ -240,7 +240,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/notifications/)" },
       to: {
-        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract|web-push-subscription|notification-inbox-export-client)\\.ts$)",
+        path: "^site/src/features/notifications/(?!(?:bell|preferences|center-server|notification-inbox-events|visible-polling|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract|notification-mark-read-api-copy|web-push-subscription|notification-inbox-export-client)\\.ts$)",
       },
     },
     {
@@ -253,7 +253,7 @@ module.exports = {
       name: "notifications-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract|notification-mark-read-api-copy)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/(?!notifications/resources/resource-release-watches-i18n\\.ts$|servers/server-statistics-export.ts$|resources/resource-activity-csv.ts$|community/publication-feed-view.ts$|trust/verification-workspace-api.ts$|commerce/commercial-public-http.ts$|resources/resource-commerce-http.ts$|trust/public-user-trust-contract.ts$|servers/server-workspace-contract.ts$|moderation/report-batch-contract.ts$|library/library-collections-query.ts$|accounts/profile-privacy-contract.ts$|shell/home-personal-changes-types.ts$|moderation/platform-report-i18n.ts$|community/publication-feed-copy.ts$|community/content-reaction-copy.ts$|community/community-report-copy.ts$|servers/server-statistics-export.ts$|trust/verification-workspace-copy.ts$|trust/verification-workspace-api.ts$|trust/public-context-trust-copy.ts$|commerce/commerce-history-format.ts$|discovery/discovery-stream-copy.ts$||shell/(?:locale|session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|confirm-action|action-confirm-checkbox)\\.ts$)|features/notifications/(?:server/|center-server\\.ts$)|lib/(?!(?:(?:i18n(?:\\.ts$|/))|(?:notification-copy|license-maintenance-i18n|http/private-api-request|content-discussion-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -263,7 +263,7 @@ module.exports = {
       name: "notifications-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract)\\.ts$|components/)",
+        path: "^site/src/features/notifications/(?:(?:bell|preferences|notification-inbox-events|visible-polling|notification-inbox-export-client|notification-inbox-copy|notification-read|notification-preferences-confirmation|notification-copy|notification-inbox-contract|notification-mark-read-api-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

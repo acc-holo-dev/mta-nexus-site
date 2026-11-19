@@ -254,6 +254,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 86 done:** `/api/content/[slug]` GET errors use bilingual `contentApiCopy` via `nexus_locale`; JSON shape unchanged.
 
+**Wave 87 done:** `/api/notifications/mark-read` POST errors use bilingual `notificationMarkReadApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` body passthrough remains English).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -402,8 +404,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | D/E | Scoreboard sync после Wave 85                                                                                     | docs honesty                     | **done** |
 | A   | Wave 86 — `/api/content/[slug]` errors via contentApiCopy                                                         | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 86                                                                                     | docs honesty                     | **done** |
+| A   | Wave 87 — notifications mark-read errors via notificationMarkReadApiCopy                                          | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: `/api/support` (+ detail) or `/api/notifications/mark-read`. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: `/api/support` (+ detail) or `/api/notifications/preferences`. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
