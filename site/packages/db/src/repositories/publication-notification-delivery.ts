@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { noticeStoredTitles } from "@nexus/domain";
+import { noticeStoredTitles, serverPublicationNoticeMessage } from "@nexus/domain";
 import { and, asc, desc, eq, isNull, lte, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { content, follows, publicationNotificationDeliveries, servers } from "../schema";
@@ -168,7 +168,7 @@ class PublicationNotificationDeliveryRepository {
                   .digest("hex")}`,
                 recipientId: recipient.recipientId,
                 title: noticeStoredTitles.newServerUpdate,
-                message: `${server.name}: ${publication.title}`,
+                message: serverPublicationNoticeMessage(server.name, publication.title),
                 link: `/articles/${publication.slug}`,
                 type: "server",
                 category: "server",
