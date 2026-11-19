@@ -13,7 +13,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import type { LibraryCollectionCommand } from "@nexus/domain";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { expect, it } from "vitest";
 
 // Requires disposable PostgreSQL migrated through 0067. Never disable guards
@@ -968,7 +968,11 @@ it("rolls back every membership, revision, child/parent receipt and audit when t
     .select()
     .from(libraryCollectionReceipts)
     .where(eq(libraryCollectionReceipts.userId, f.userId));
-  const auditsBefore = await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.userId));
+  const auditsBefore = await db
+    .select()
+    .from(auditEvents)
+    .where(eq(auditEvents.actorId, f.userId))
+    .orderBy(asc(auditEvents.id));
   await expect(f.apply(existing.id)).rejects.toThrow();
   expect(
     await db
@@ -976,9 +980,13 @@ it("rolls back every membership, revision, child/parent receipt and audit when t
       .from(libraryCollectionReceipts)
       .where(eq(libraryCollectionReceipts.userId, f.userId)),
   ).toEqual(receiptsBefore);
-  expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.userId))).toEqual(
-    auditsBefore,
-  );
+  expect(
+    await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.actorId, f.userId))
+      .orderBy(asc(auditEvents.id)),
+  ).toEqual(auditsBefore);
   expect((await collections.detail(f.userId, f.source)).collection.revision).toBe(2);
   expect((await collections.detail(f.userId, f.source)).total).toBe(1);
   expect((await collections.detail(f.userId, f.destination)).collection.revision).toBe(1);

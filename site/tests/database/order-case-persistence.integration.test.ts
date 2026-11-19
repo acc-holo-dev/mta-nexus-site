@@ -6,7 +6,7 @@ import {
   sessions,
   userRepository,
 } from "@nexus/db";
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, asc, count, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
 import {
   auditEvents,
@@ -242,14 +242,28 @@ async function reviewState(f: Awaited<ReturnType<typeof fixture>>) {
     cases: await db
       .select()
       .from(commerceOrderCases)
-      .where(eq(commerceOrderCases.caseId, f.input.caseId)),
-    tickets: await db.select().from(supportCases).where(eq(supportCases.id, f.input.caseId)),
+      .where(eq(commerceOrderCases.caseId, f.input.caseId))
+      .orderBy(asc(commerceOrderCases.caseId)),
+    tickets: await db
+      .select()
+      .from(supportCases)
+      .where(eq(supportCases.id, f.input.caseId))
+      .orderBy(asc(supportCases.id)),
     messages: await db
       .select()
       .from(supportCaseMessages)
-      .where(eq(supportCaseMessages.caseId, f.input.caseId)),
-    audits: await db.select().from(auditEvents).where(eq(auditEvents.targetId, f.input.caseId)),
-    notices: await db.select().from(notifications).where(eq(notifications.recipientId, f.buyerId)),
+      .where(eq(supportCaseMessages.caseId, f.input.caseId))
+      .orderBy(asc(supportCaseMessages.id)),
+    audits: await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.targetId, f.input.caseId))
+      .orderBy(asc(auditEvents.id)),
+    notices: await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.recipientId, f.buyerId))
+      .orderBy(asc(notifications.id)),
   };
 }
 it("rejects a revoked staff session after waiting for the order lock", async () => {
