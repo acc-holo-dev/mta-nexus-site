@@ -350,7 +350,7 @@ export function formatNotification(
   const noticeMessage = canonicalNoticeTitle(notification.message);
   if (
     noticeTitle === "Discussion moderation" &&
-    /^Comment ([a-zA-Z0-9_-]{1,128}): removed\.$/u.test(notification.message)
+    /^Comment ([a-zA-Z0-9_-]{1,128}): removed\.$/u.test(noticeMessage)
   )
     return { title: c.discussionModeration.title, message: c.discussionModeration.message };
   const publicationActivityMessages = (event: string): string | undefined => {
@@ -378,13 +378,13 @@ export function formatNotification(
   }
   if (
     noticeTitle === "Publication reaction" &&
-    /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)
+    /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(noticeMessage)
   )
     return { title: c.publicationReaction.title, message: c.publicationReaction.message };
   const publication =
     noticeTitle === "Publication activity" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived|restored)\.$/u.exec(
-      notification.message,
+      noticeMessage,
     );
   if (publication) {
     const message = publicationActivityMessages(publication[2]);
@@ -409,7 +409,7 @@ export function formatNotification(
   }
   const supportActivity =
     noticeTitle === "Support case activity" &&
-    /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);
+    /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(noticeMessage);
   if (supportActivity) {
     const message = supportActivityMessages(supportActivity[2]);
     if (message) return { title: c.supportActivity.title, message };
@@ -443,14 +443,14 @@ export function formatNotification(
   const organizationAccess =
     noticeTitle === "Organization access changed" &&
     /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(
-      notification.message,
+      noticeMessage,
     );
   if (organizationAccess) {
     const message = organizationAccessMessages(organizationAccess[2]);
     if (message) return { title: c.organizationAccess.title, message };
   }
   const serverOwnership = /^Server ownership verification was (approved|rejected)\.$/u.exec(
-    notification.message,
+    noticeMessage,
   );
   if (
     serverOwnership &&
@@ -464,7 +464,7 @@ export function formatNotification(
   }
   const verification =
     /^([a-z]+) verification for ([a-zA-Z0-9_-]{1,128}) was (approved|rejected)\.$/u.exec(
-      notification.message,
+      noticeMessage,
     );
   if (
     verification &&
@@ -488,7 +488,7 @@ export function formatNotification(
     return { title: c.serverProofReview.title, message: c.serverProofReview.message };
   const requested =
     /^(user|developer|organization|server) verification requested for ([a-zA-Z0-9_-]{1,128})$/u.exec(
-      notification.message,
+      noticeMessage,
     );
   if (noticeTitle === "New verification request" && requested) {
     if (locale === "ru") {
@@ -533,7 +533,7 @@ export function formatNotification(
     return { title: c.newReport.title, message: c.newReport.message };
   const reportStatus =
     (noticeTitle === "Community report status" || noticeTitle === "Platform report status") &&
-    /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
+    /^Report status: (under_review|resolved|dismissed)\.$/u.exec(noticeMessage);
   if (reportStatus) {
     const statusKey = reportStatus[1] as keyof typeof c.reportStatuses;
     return {
@@ -572,7 +572,7 @@ export function formatNotification(
   }
   const follower =
     noticeTitle === "New Follower" &&
-    /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);
+    /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(noticeMessage);
   if (follower)
     return {
       title: c.newFollower.title,
@@ -582,7 +582,7 @@ export function formatNotification(
   // server-generated template without changing persisted notification contracts.
   const comment =
     noticeTitle === "New article comment" &&
-    /^@([a-zA-Z0-9_-]{1,80}) commented on “([\s\S]{1,200})”\.$/u.exec(notification.message);
+    /^@([a-zA-Z0-9_-]{1,80}) commented on “([\s\S]{1,200})”\.$/u.exec(noticeMessage);
   if (comment)
     return {
       title: c.newComment.title,
