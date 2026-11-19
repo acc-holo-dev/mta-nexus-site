@@ -324,6 +324,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 205–209 done (local tip):** comment client validation uses `discussionError` when locale is set (form passes locale); domain remapper aliases for report/verification/org/discussion/reaction/author-desk/server workspace so `FORBIDDEN`/`ACTOR_*`/`RATE_*`/`CONFLICT` stop falling through to publication `userPlatformError` wording; honesty lock.
 
+**Waves 210–214 done (local tip):** catch-path allowlists on org team directory/batch, follow workspace, discussion comment actions, and moderated discussion removal — only dictionary copy reaches the UI.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -520,6 +522,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 189–197 — AuthForm/mutation/comment body.error drop + residual CONFLICT/RATE aliases                        | client remapper RU/EN            | **done** |
 | A   | Waves 198–204 — history unknownMarker + orderCase/build workspace code remappers                                  | client remapper RU/EN            | **done** |
 | A   | Waves 205–209 — comment locale validation + domain remapper alias fills                                           | client remapper RU/EN            | **done** |
+| A   | Waves 210–214 — catch-path allowlists for org/follow/discussion failure.message                                   | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
