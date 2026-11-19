@@ -170,7 +170,8 @@ const ru: typeof en = {
 export const serverStatisticsCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function serverStatisticsError(locale: Locale, code: unknown) {
   const copy = serverStatisticsCopy(locale);
-  if (code === "UNAUTHORIZED") return copy.signIn;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
+  if (code === "ACTOR_CHANGED") return copy.unavailable;
   if (code === "NOT_FOUND") return copy.notFound;
   if (code === "FORBIDDEN") return copy.forbidden;
   if (code === "RATE_LIMITED" || code === "RATE_LIMIT_EXCEEDED") return copy.limit;
