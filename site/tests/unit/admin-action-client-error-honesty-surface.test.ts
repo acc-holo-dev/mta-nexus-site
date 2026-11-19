@@ -51,7 +51,7 @@ it("stops admin/auth/acquire clients from assigning data?.error English bodies",
     "utf8",
   );
   expect(authForm).not.toMatch(/data\.error\s*\?\?/u);
-  expect(authForm).not.toContain("typeof data.error === \"string\"");
+  expect(authForm).not.toContain('typeof data.error === "string"');
   expect(authForm).toContain("authLoginApiCopy");
   expect(authForm).toContain("authRegisterApiCopy");
 

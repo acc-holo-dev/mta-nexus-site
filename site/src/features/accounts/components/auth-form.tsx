@@ -42,8 +42,7 @@ function responseError(
   }
   const copy = authLoginApiCopy(locale);
   if (data.code === "RATE_LIMIT_EXCEEDED") return copy.rate;
-  if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS")
-    return copy.unauthorized;
+  if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS") return copy.unauthorized;
   return copy.failed || fallback;
 }
 
