@@ -7,6 +7,7 @@ import { z } from "zod";
 import { verificationApiCopy } from "../../../features/trust/verification-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -229,7 +230,27 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: error.message,
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              conflict: copy.conflict,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.submitFailed,
+            },
+            {
+              VALIDATION_ERROR: copy.invalidRequest,
+              VERIFICATION_ALREADY_VERIFIED: copy.alreadyVerified,
+              VERIFICATION_PROFILE_REQUIRED: copy.invalidRequest,
+              VERIFICATION_AUTHORITY_CHANGED: copy.conflict,
+              VERIFICATION_PROFILE_CHANGED: copy.conflict,
+            },
+          ),
           code: error.code,
         },
         error.statusCode,

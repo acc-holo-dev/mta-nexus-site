@@ -2,6 +2,13 @@ import type { Locale } from "../../lib/i18n";
 
 const en = {
   unauthorized: "Unauthorized",
+  forbidden: "Forbidden",
+  notFound: "Verification target was not found",
+  conflict: "Verification state changed",
+  unsupportedMediaType: "Request must use application/json",
+  requestBodyTooLarge: "Request body is too large",
+  invalidBodyLength: "Request body length is invalid",
+  requestBodyTimeout: "Request body timed out",
   loadFailed: "Failed to load verification requests",
   authenticationRequired: "Authentication required",
   rate: "Too many verification requests. Please try again tomorrow.",
@@ -18,6 +25,13 @@ const en = {
 
 const ru: Record<keyof typeof en, string> = {
   unauthorized: "Нет доступа",
+  forbidden: "Запрещено",
+  notFound: "Цель верификации не найдена",
+  conflict: "Состояние верификации изменилось",
+  unsupportedMediaType: "Запрос должен использовать application/json",
+  requestBodyTooLarge: "Тело запроса слишком большое",
+  invalidBodyLength: "Некорректная длина тела запроса",
+  requestBodyTimeout: "Истекло время ожидания тела запроса",
   loadFailed: "Не удалось загрузить запросы на верификацию",
   authenticationRequired: "Требуется вход",
   rate: "Слишком много запросов на верификацию. Попробуйте завтра.",

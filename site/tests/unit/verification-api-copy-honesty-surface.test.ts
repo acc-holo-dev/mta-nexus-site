@@ -36,6 +36,8 @@ describe("verification API copy honesty surface", () => {
     expect(route).toContain("copy.alreadyPending");
     expect(route).toContain("copy.retry");
     expect(route).toContain("copy.submitFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Unauthorized"');
     expect(route).not.toContain('"Failed to load verification requests"');
     expect(route).not.toContain('"Authentication required"');
