@@ -1,6 +1,12 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { noticeStoredMessages, noticeStoredTitles } from "@nexus/domain";
+import {
+  licenseTermUtcNoticeMessage,
+  noticeStoredMessages,
+  noticeStoredTitles,
+  resourceReleaseNoticeMessage,
+  serverPublicationNoticeMessage,
+} from "@nexus/domain";
 import { expect, it } from "vitest";
 import { canonicalNoticeTitle } from "../../src/features/notifications/notification-copy";
 
@@ -27,6 +33,15 @@ it("keeps bilingual slash titles with English canonical segments for remapping",
   );
   expect(canonicalNoticeTitle(noticeStoredMessages.discussionReplyFollowed)).toBe(
     "A publication you follow has a new reply.",
+  );
+  expect(canonicalNoticeTitle(licenseTermUtcNoticeMessage("2026-11-19T12:00:00.000Z"))).toBe(
+    "UTC: 2026-11-19T12:00:00.000Z",
+  );
+  expect(canonicalNoticeTitle(resourceReleaseNoticeMessage("Grid Kit", "1.2.0"))).toBe(
+    "Grid Kit · 1.2.0",
+  );
+  expect(canonicalNoticeTitle(serverPublicationNoticeMessage("Apex RP", "Patch notes"))).toBe(
+    "Apex RP: Patch notes",
   );
   // newArticleComment remains remapping-only; live discussion fanout uses newDiscussionReply.
   expect(source).toContain("newArticleComment:");
