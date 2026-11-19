@@ -5,6 +5,8 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
+import { authLoginApiCopy } from "../auth-login-api-copy";
+import { authRegisterApiCopy } from "../auth-register-api-copy";
 
 type AuthMode = "login" | "register";
 
@@ -12,9 +14,17 @@ const pageShellClass = "mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip px-4 
 const navLinkClass =
   "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-function responseError(value: unknown, fallback: string): string {
+function responseError(
+  value: unknown,
+  locale: Locale,
+  registering: boolean,
+  fallback: string,
+): string {
   if (!value || typeof value !== "object") return fallback;
-  const data = value as { error?: unknown; details?: Record<string, { _errors?: unknown }> };
+  const data = value as {
+    code?: unknown;
+    details?: Record<string, { _errors?: unknown }>;
+  };
   const fieldErrors = ["email", "username", "password", "displayName"].flatMap((field) => {
     const errors = data.details?.[field]?._errors;
     return Array.isArray(errors)
@@ -22,7 +32,19 @@ function responseError(value: unknown, fallback: string): string {
       : [];
   });
   if (fieldErrors.length) return fieldErrors.join(" ");
-  return typeof data.error === "string" ? data.error : fallback;
+  if (registering) {
+    const copy = authRegisterApiCopy(locale);
+    if (data.code === "RATE_LIMIT_EXCEEDED") return copy.rate;
+    if (data.code === "VALIDATION_ERROR") return copy.validationFailed;
+    if (data.code === "UNAUTHORIZED") return copy.unauthorized;
+    if (data.code === "CONFLICT") return copy.conflict;
+    return copy.failed || fallback;
+  }
+  const copy = authLoginApiCopy(locale);
+  if (data.code === "RATE_LIMIT_EXCEEDED") return copy.rate;
+  if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS")
+    return copy.unauthorized;
+  return copy.failed || fallback;
 }
 
 export function AuthForm({
@@ -69,7 +91,7 @@ export function AuthForm({
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(responseError(data, copy.genericError));
+        setError(responseError(data, locale, registering, copy.genericError));
         setLoading(false);
         return;
       }
