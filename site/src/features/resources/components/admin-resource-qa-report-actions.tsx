@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { communityReportCopy } from "../../community/community-report-copy";
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
 import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
@@ -93,7 +94,7 @@ export function AdminResourceQaReportActions({
       });
       const decidePayload = await decideResponse.json().catch(() => null);
       if (!confirmsAdminAction(decideResponse.status, decidePayload, reportId, "resolve")) {
-        setError(decidePayload?.error || admin.reportDecisionFailed);
+        setError(adminActionClientError(locale, decidePayload?.code, admin.reportDecisionFailed));
         return;
       }
       router.refresh();

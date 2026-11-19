@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
 import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
@@ -66,7 +67,7 @@ export function BuildQuarantineControls({
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, buildId, action)) {
-        setError(data?.error || copy.quarantineBuildFailed);
+        setError(adminActionClientError(locale, data?.code, copy.quarantineBuildFailed));
         return;
       }
       setReason("");

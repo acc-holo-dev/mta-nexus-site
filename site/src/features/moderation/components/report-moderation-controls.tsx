@@ -7,6 +7,7 @@ import { useState } from "react";
 import { communityReportCopy } from "../../community/community-report-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { adminActionClientError } from "../admin-action-client-error";
 import { confirmsAdminAction } from "../admin-action-confirmation";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {
@@ -51,7 +52,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, reportId, action)) {
-        setError(data?.error || copy.reportDecisionFailed);
+        setError(adminActionClientError(locale, data?.code, copy.reportDecisionFailed));
         return;
       }
       setNotes("");
