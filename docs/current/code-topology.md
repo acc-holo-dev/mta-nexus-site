@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `bfc75108` (`dev`, Wave 80 tip).
+**source_sha:** `2ea7ace9` (`dev`, Wave 81 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `bfc75108` |
+| Область                    |             Факт на `2ea7ace9` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -60,7 +60,7 @@ site/
 | notifications |    21 | 131398 |
 | organizations |    49 | 187199 |
 | resources     |   167 | 738584 |
-| servers       |    85 | 315716 |
+| servers       |    85 | 316182 |
 | shell         |    67 | 111009 |
 | support       |    22 | 110720 |
 | trust         |    15 |  60377 |
@@ -381,6 +381,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 80 — workspace server-organizations errors via serverOrganizationsApiCopy                                    | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 80                                                                                     | docs honesty                     | **done** |
 | A   | Wave 81 — claim-challenge success instruction via serverClaimApiCopy                                              | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 81                                                                                     | docs honesty                     | **done** |
 
 Дальше: API-envelope localization continues. Next: inspect-meta success `note`. F/ops remains external. Новые TOPO ID не заводить.
 
