@@ -101,7 +101,8 @@ it("delivers served-receipt recipients idempotently with generic security copy",
   });
   for (const row of stored) {
     expect(row).toMatchObject({
-      title: "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
+      title:
+        "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
       link: `/workspace/library/${encodeURIComponent(productId)}/versions`,
       type: "security",
       category: "security",

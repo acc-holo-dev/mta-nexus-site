@@ -45,7 +45,8 @@ it("delivers verification inbox through the shared worker repository without lea
     expect.objectContaining({
       recipientId: moderator,
       title: "New verification request / Новая заявка на верификацию",
-      message: "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
+      message:
+        "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
       link: pendingLink(request.id),
       type: "security",
       category: "security",
@@ -122,7 +123,8 @@ it("uses current roles and the fixed account horizon", async () => {
     {
       recipientId: promoted,
       title: "New verification request / Новая заявка на верификацию",
-      message: "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
+      message:
+        "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
       link: pendingLink(request.id),
     },
   ]);

@@ -82,7 +82,10 @@ describe("verification resolution notifications", () => {
       const notificationId = `ntf_verification_resolution_${request.id}`;
       await expect(notificationRepository.findById(notificationId)).resolves.toMatchObject({
         recipientId: requesterId,
-        title: decision === "approved" ? "Verification approved / Верификация одобрена" : "Verification rejected / Верификация отклонена",
+        title:
+          decision === "approved"
+            ? "Verification approved / Верификация одобрена"
+            : "Verification rejected / Верификация отклонена",
         type: "security",
         category: "security",
         isRead: false,

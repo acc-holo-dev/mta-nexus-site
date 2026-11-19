@@ -138,7 +138,11 @@ it.each(["ru", "en"] as const)(
     );
     const copy = { approved: "", rejected: "", version: "", notes: "" };
     const legacy = formatNotification(
-      { title: "Support case activity / Обновление обращения", message: `Support case ${id}: reply.`, data: undefined },
+      {
+        title: "Support case activity / Обновление обращения",
+        message: `Support case ${id}: reply.`,
+        data: undefined,
+      },
       copy,
       locale,
     );

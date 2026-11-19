@@ -37,7 +37,8 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     type: "security",
     category: "security",
     title: "New verification request / Новая заявка на верификацию",
-    message: "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
+    message:
+      "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
     link: pendingLink(request.id),
     isRead: true,
     createdAt: originalTime,
@@ -54,7 +55,8 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
   for (const row of stored.slice(1)) {
     expect(row).toMatchObject({
       title: "New verification request / Новая заявка на верификацию",
-      message: "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
+      message:
+        "A verification request is awaiting review. / Заявка на верификацию ожидает рассмотрения.",
       link: pendingLink(request.id),
       category: "security",
     });

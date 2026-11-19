@@ -24,7 +24,8 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const notice = formatNotification(
       {
-        title: "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
+        title:
+          "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
         message:
           "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
         data: {

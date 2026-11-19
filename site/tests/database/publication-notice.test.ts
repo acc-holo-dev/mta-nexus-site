@@ -142,7 +142,10 @@ it.each(["created", "edited", "published", "archived", "restored"])(
   "localizes template %s in RU and EN while leaving unrelated notices intact",
   (event) => {
     const copy = { approved: "", rejected: "", version: "", notes: "" },
-      notice = { title: "Publication activity / Обновление публикации", message: `Publication item: ${event}.` };
+      notice = {
+        title: "Publication activity / Обновление публикации",
+        message: `Publication item: ${event}.`,
+      };
     expect(formatNotification(notice, copy, "ru").title).toBe("Обновление публикации");
     expect(formatNotification(notice, copy, "ru").message).not.toContain("Publication");
     expect(formatNotification(notice, copy, "en").message).not.toBe(notice.message);

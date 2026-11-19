@@ -42,7 +42,8 @@ const data = {
   id: "ntf_reply_stable",
   recipientId: "reader",
   title: "New discussion reply / Новый ответ в обсуждении",
-  message: "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ.",
+  message:
+    "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ.",
   type: "content",
   category: "follow",
   link: "/articles/current?comment=reply#comment-reply",

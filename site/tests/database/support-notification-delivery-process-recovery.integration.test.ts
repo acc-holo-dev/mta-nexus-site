@@ -149,7 +149,8 @@ it("uses current roles and the fixed horizon, excluding the requester on replies
     {
       recipientId: promoted,
       title: "Support case updated / Новое сообщение в обращении",
-      message: "A support case has a new requester message. / Пользователь добавил сообщение в обращение.",
+      message:
+        "A support case has a new requester message. / Пользователь добавил сообщение в обращение.",
       link: staffCaseLink(f.caseId),
     },
   ]);
