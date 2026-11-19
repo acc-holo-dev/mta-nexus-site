@@ -1,3 +1,6 @@
+import type { Locale } from "../../lib/i18n";
+import { unknownMarker } from "../../lib/i18n/unknown";
+
 export type ServerHistorySlot = Readonly<{
   bucketAt: string;
   observationCount: number;
@@ -53,8 +56,8 @@ export function serverHistoryBarPercent(value: number | null, peak: number | nul
   return Math.min(100, Math.max(0, Math.round((value / peak) * 100)));
 }
 
-export function formatHistoryIntervalUtc(value: string): string {
+export function formatHistoryIntervalUtc(value: string, locale: Locale = "en"): string {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Unknown time";
+  if (Number.isNaN(date.getTime())) return unknownMarker(locale);
   return `${date.toISOString().slice(0, 16).replace("T", " ")} UTC`;
 }

@@ -149,7 +149,7 @@ export function ServerHistoryPanel({
           >
             {points.map((point) => {
               const percent = serverHistoryBarPercent(point.peakPlayers, peak);
-              const label = formatHistoryIntervalUtc(point.bucketAt);
+              const label = formatHistoryIntervalUtc(point.bucketAt, locale);
               return (
                 <li key={point.bucketAt} className="flex h-full min-w-0 flex-1 items-end">
                   <div className="flex h-full w-full items-end">
@@ -182,8 +182,8 @@ export function ServerHistoryPanel({
       )}
       {points.length > 0 && history.summary.observationCount > 0 && (
         <p className="flex flex-wrap justify-between gap-2 text-[11px] text-faint">
-          <span>{formatHistoryIntervalUtc(history.windowStart)}</span>
-          <span>{formatHistoryIntervalUtc(history.windowEnd)}</span>
+          <span>{formatHistoryIntervalUtc(history.windowStart, locale)}</span>
+          <span>{formatHistoryIntervalUtc(history.windowEnd, locale)}</span>
         </p>
       )}
     </section>
