@@ -170,6 +170,12 @@ export function discussionError(locale: Locale, code: unknown) {
     return getDiscussionCopy(locale).invalidParent;
   if (code === "INVALID_CURSOR") return getDiscussionCopy(locale).invalidCursor;
   if (code === "VALIDATION_ERROR") return getDiscussionCopy(locale).invalid;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED")
+    return getDiscussionCopy(locale).signIn;
+  if (code === "ACTOR_CHANGED") return getDiscussionCopy(locale).identityUnavailable;
+  if (code === "FORBIDDEN" || code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED")
+    return getDiscussionCopy(locale).writeUnavailable;
+  if (code === "CONFLICT") return getDiscussionCopy(locale).changed;
   return userPlatformError(locale, code);
 }
 export function discussionMutationError(locale: Locale, code: unknown) {

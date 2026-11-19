@@ -124,6 +124,9 @@ export function authorPublicationDeskError(locale: Locale, code: unknown) {
   if (code === "VALIDATION_ERROR" || code === "INVALID_CURSOR") return copy.invalid;
   if (code === "PUBLICATION_RESTORE_DENIED") return copy.restoreDenied;
   if (code === "CONFLICT") return copy.conflict;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED" || code === "ACTOR_CHANGED")
+    return copy.unavailable;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.unavailable;
   if (code === "INTERNAL_ERROR") return copy.unavailable;
   return userPlatformError(locale, code);
 }

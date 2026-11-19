@@ -95,5 +95,9 @@ export function reactionError(locale: Locale, code: unknown) {
   if (code === "REACTION_SELF") return reactionCopy(locale).own;
   if (code === "UNCONFIRMED") return reactionCopy(locale).uncertain;
   if (code === "INTERNAL_ERROR") return reactionCopy(locale).unavailable;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return reactionCopy(locale).signIn;
+  if (code === "ACTOR_CHANGED" || code === "CONFLICT") return reactionCopy(locale).uncertain;
+  if (code === "FORBIDDEN" || code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED")
+    return reactionCopy(locale).unavailable;
   return userPlatformError(locale, code);
 }
