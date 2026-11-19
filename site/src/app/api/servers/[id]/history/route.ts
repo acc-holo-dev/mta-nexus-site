@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { serverHistoryApiCopy } from "../../../../../features/servers/server-history-api-copy";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   serverHistoryService,
   serverHistoryWindows,
@@ -12,13 +14,14 @@ const historyQuerySchema = z.object({
 });
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const copy = serverHistoryApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   const parsed = historyQuerySchema.safeParse({
     window: request.nextUrl.searchParams.get("window") ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json(
       {
-        error: "Invalid history window",
+        error: copy.invalidWindow,
         allowedWindows: Object.keys(serverHistoryWindows),
       },
       {
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const history = await serverHistoryService.getHistory(id, parsed.data.window);
     if (!history) {
       return NextResponse.json(
-        { error: "Server not found" },
+        { error: copy.serverNotFound },
         {
           status: 404,
           headers: { "Cache-Control": "no-store" },
@@ -47,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch {
     return NextResponse.json(
-      { error: "Server history is temporarily unavailable" },
+      { error: copy.unavailable },
       {
         status: 503,
         headers: {
