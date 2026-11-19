@@ -284,6 +284,10 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 101 done (large):** residual document titles — workspace hub/server detail, public subscriptions/market/servers/versions, auth+settings layouts, admin hub/storage/requirements, security; format fix for Wave 99 test imports; AppError passthrough unchanged.
 
+**Wave 102 done:** `/api/support` always remaps `error` via `supportPrivateJson` + `supportWorkspaceError` for both locales; `ACTOR_*` codes mapped; route-authored English placeholders cleared; AppError message passthrough elsewhere unchanged.
+
+**Wave 103 done:** inbox `formatNotification` localizes staff `New verification request` awaiting-review notices and `New server update` titles (stored body kept); DB notice contracts stay English.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -458,8 +462,10 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 99 — workspace library/resources/subscriptions bilingual document titles                                     | document metadata RU/EN          | **done** |
 | A   | Wave 100 — workspace commerce + admin commerce/licenses/resources bilingual document titles                       | document metadata RU/EN          | **done** |
 | A   | Wave 101 — residual hubs/auth/admin/public document titles + Wave 99 format fix                                   | document metadata RU/EN          | **done** |
+| A   | Wave 102 — `/api/support` always-localize envelopes + ACTOR_* mapping                                             | API envelope RU/EN               | **done** |
+| A   | Wave 103 — inbox formatNotification server-update + verification awaiting-review gaps                             | notification display RU/EN       | **done** |
 
-Дальше: Static EN document titles largely exhausted; residual AppError English passthrough intentional. Optional `/api/support` ApiCopy normalize. F/ops remains external. Новые TOPO ID не заводить.
+Дальше: Static EN document titles and API route envelopes largely exhausted; residual AppError English passthrough intentional. Remaining inbox gaps are structured `data.kind` producers only. F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 

@@ -79,6 +79,10 @@ const noticeCopy = {
         server: "server control",
       },
       message: (kind: string, id: string) => `${kind} verification requested for ${id}`,
+      awaitingReview: "A verification request is awaiting review.",
+    },
+    newServerUpdate: {
+      title: "New server update",
     },
     newCommunityReport: {
       title: "New community report",
@@ -231,6 +235,10 @@ const noticeCopy = {
         server: "контроля сервера",
       },
       message: (kind: string, id: string) => `Подтверждение ${kind}: ${id}.`,
+      awaitingReview: "Заявка на верификацию ожидает рассмотрения.",
+    },
+    newServerUpdate: {
+      title: "Новость сервера",
     },
     newCommunityReport: {
       title: "Новая жалоба сообщества",
@@ -482,6 +490,18 @@ export function formatNotification(
       };
     }
     // English keeps the stored title/message for staff request notices.
+  }
+  if (
+    notification.title === "New verification request" &&
+    notification.message === "A verification request is awaiting review."
+  ) {
+    return {
+      title: c.newVerificationRequest.title,
+      message: c.newVerificationRequest.awaitingReview,
+    };
+  }
+  if (notification.title === "New server update") {
+    return { title: c.newServerUpdate.title, message: notification.message };
   }
   if (
     notification.title === "New community report" &&

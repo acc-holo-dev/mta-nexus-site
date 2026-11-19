@@ -13,6 +13,8 @@ it("locks notification notice copy to a dictionary without inline RU/EN user lit
   expect(source).toContain("discussionModeration:");
   expect(source).toContain("buildLifecycle:");
   expect(source).toContain("resourceQa:");
+  expect(source).toContain("newServerUpdate:");
+  expect(source).toContain("awaitingReview:");
   expect(source).not.toMatch(/title:\s*locale === "ru" \?/u);
   expect(source).not.toMatch(/message:\s*locale === "ru" \?/u);
 });
