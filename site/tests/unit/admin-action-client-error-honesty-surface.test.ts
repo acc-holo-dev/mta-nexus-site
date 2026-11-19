@@ -45,4 +45,25 @@ it("stops admin/auth/acquire clients from assigning data?.error English bodies",
   expect(settings).not.toContain("Account settings are temporarily unavailable.");
   expect(settings).not.toContain("The server returned an unreadable response.");
   expect(settings).toContain("requires locale unavailable/unreadable messages");
+
+  const authForm = readFileSync(
+    resolve(process.cwd(), "site/src/features/accounts/components/auth-form.tsx"),
+    "utf8",
+  );
+  expect(authForm).not.toMatch(/data\.error\s*\?\?/u);
+  expect(authForm).not.toContain("typeof data.error === \"string\"");
+  expect(authForm).toContain("authLoginApiCopy");
+  expect(authForm).toContain("authRegisterApiCopy");
+
+  const mutation = readFileSync(
+    resolve(process.cwd(), "site/src/features/servers/server-mutation-errors.ts"),
+    "utf8",
+  );
+  expect(mutation).not.toContain("payload.error");
+
+  const comment = readFileSync(
+    resolve(process.cwd(), "site/src/features/community/content-comment-client.ts"),
+    "utf8",
+  );
+  expect(comment).not.toContain('typeof (payload as Record<string, unknown>).error === "string"');
 });

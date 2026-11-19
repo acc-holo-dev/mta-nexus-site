@@ -194,5 +194,17 @@ it("maps bare CONFLICT and residual VALIDATION_ERROR without English code passth
     expect(platformReportError(locale, "VALIDATION_ERROR")).toBe(
       platformReportError(locale, "UNKNOWN_CODE"),
     );
+    expect(libraryCollectionError(locale, "CONFLICT")).toBe(
+      libraryCollectionError(locale, "COLLECTION_CONFLICT"),
+    );
+    expect(planReviewError(locale, "CONFLICT")).toBe(
+      planReviewError(locale, "PLAN_REVIEW_CONFLICT"),
+    );
+    expect(resourceQaError(locale, "RATE_LIMIT_EXCEEDED")).toBe(
+      resourceQaError(locale, "RATE_LIMITED"),
+    );
+    expect(moderationError(locale, "CONFLICT")).toBe(
+      moderationError(locale, "CONTENT_STATE_CHANGED"),
+    );
   }
 });
