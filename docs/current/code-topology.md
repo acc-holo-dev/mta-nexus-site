@@ -310,6 +310,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 141–153 done:** Dynamic Web Push bodies for license-term UTC, resource-release `title · version`, and server publication `server: title`; remapper fallbacks; CI fix for community report delivery fixture; bilingual browser CSRF envelopes; ACTOR_* client remappers (follow/platform/inbox/commerce); QA/build/security title-only remappers.
 
+**Waves 154–157 (local, hold push):** ACTOR_* client remappers across resource/plan/review/library, accounts privacy/history, platform-report, server-statistics; honesty lock.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -499,6 +501,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
 | A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done** |
 | A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done** |
+| A   | Waves 154–157 — ACTOR_* remappers across resource/library/accounts/moderation/servers                             | client remapper RU/EN            | **local** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
