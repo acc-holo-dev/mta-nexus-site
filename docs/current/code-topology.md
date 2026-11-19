@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `be5f1720` (`dev`, Wave 91 tip).
+**source_sha:** `fde5013b` (`dev`, Wave 92 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `be5f1720` |
+| Область                    |             Факт на `fde5013b` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1647 |
+| `site/tests` files         |                           1649 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -63,7 +63,7 @@ site/
 | servers       |    87 | 318668 |
 | shell         |    67 | 111009 |
 | support       |    22 | 110720 |
-| trust         |    15 |  60377 |
+| trust         |    16 |  62612 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
@@ -425,6 +425,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 91 — notifications push errors via notificationPushApiCopy                                                   | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 91                                                                                     | docs honesty                     | **done** |
 | A   | Wave 92 — verification collection errors via verificationApiCopy                                                  | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 92                                                                                     | docs honesty                     | **done** |
 
 Дальше: API-envelope localization continues. Next: `/api/notifications` inbox 500 or `/api/products` (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
 

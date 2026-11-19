@@ -58,8 +58,8 @@
       "files": 22
     },
     "trust": {
-      "bytes": 60377,
-      "files": 15
+      "bytes": 62612,
+      "files": 16
     }
   },
   "husks": {
@@ -96,8 +96,8 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "be5f172076172a59cf0048e75f98ababa4e260d4",
+  "source_sha": "fde5013b1c75a0f8e417f06081eed8eb09dc5dd6",
   "tests": {
-    "site_tests_files": 1647
+    "site_tests_files": 1649
   }
 }
