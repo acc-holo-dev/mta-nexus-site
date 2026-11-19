@@ -47,7 +47,7 @@ it("accepts only bearer runtime credentials; cookie sessions and legacy keys can
       ),
     );
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ valid: false, code: "UNAUTHORIZED" });
+    expect(await response.json()).toMatchObject({ valid: false, code: "UNAUTHORIZED" });
   }
   expect(state.verify).not.toHaveBeenCalled();
 });
@@ -89,7 +89,7 @@ it("uses one denial for revoked, expired, moved or invalid runtime bindings", as
     ),
   );
   expect(response.status).toBe(401);
-  expect(await response.json()).toEqual({ valid: false, code: "LICENSE_CHECK_DENIED" });
+  expect(await response.json()).toMatchObject({ valid: false, code: "LICENSE_CHECK_DENIED" });
 });
 
 it("bounds and strictly validates runtime bodies before querying a license", async () => {
@@ -178,7 +178,7 @@ it("denies cookie-only release checks, invalid bodies, unsafe extensions and una
     request("/api/licenses/check-release", release, { authorization }),
   );
   expect(denied.status).toBe(401);
-  expect(await denied.json()).toEqual({ valid: false, code: "LICENSE_CHECK_DENIED" });
+  expect(await denied.json()).toMatchObject({ valid: false, code: "LICENSE_CHECK_DENIED" });
   state.allowed = false;
   expect(
     (await checkRelease(request("/api/licenses/check-release", release, { authorization }))).status,

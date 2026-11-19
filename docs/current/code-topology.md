@@ -340,6 +340,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 282–286 done (local tip):** additive `{error}` on media upload/image helpers + commercial public helper via existing remappers; honesty lock; inventory restamp.
 
+**Waves 287–290 done (local tip):** additive `{error}` on license bearer runtime checks (`valid`+`code` preserved); `LICENSE_CHECK_*` dictionary keys; honesty lock.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -544,8 +546,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 258–268 — commerce/library RATE_LIMITED + support catch allowlists                                          | client remapper RU/EN            | **done** |
 | A   | Waves 269–281 — additive `{error}` on code-only product/commerce API envelopes                                    | API envelope RU/EN               | **done** |
 | A   | Waves 282–286 — media upload/image + commercial public additive `{error}` helpers                                 | API envelope RU/EN               | **done** |
+| A   | Waves 287–290 — license bearer check/check-release additive `{error}`                                             | API envelope RU/EN               | **done** |
 
-Дальше: License bearer machine envelopes (owner-gated); F/ops external. AppError English message passthrough exhausted. Новые TOPO ID не заводить.
+Дальше: F/ops external. API envelope RU/EN (code-only + AppError message + license bearer) exhausted. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
