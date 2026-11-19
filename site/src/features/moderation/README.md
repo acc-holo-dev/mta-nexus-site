@@ -16,6 +16,7 @@
 | `verification-applications-copy.ts`                                              | util port `verification-applications-copy`                                |
 | `storage-maintenance-query.ts`                                                   | util port `storage-maintenance-query`                                     |
 | `admin-action-confirmation.ts`                                                   | util port `admin-action-confirmation`                                     |
+| `admin-action-client-error.ts`                                                   | util port `admin-action-client-error`                                     |
 | `platform-report-i18n.ts`                                                        | util port `platform-report-i18n`                                          |
 | `report-batch-contract.ts`                                                       | util port `report-batch-contract`                                         |
 | `community-moderation-contract.ts`                                               | util port `community-moderation-contract`                                 |

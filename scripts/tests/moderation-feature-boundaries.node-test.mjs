@@ -14,6 +14,7 @@ const utilPorts = [
   "verification-applications-copy",
   "storage-maintenance-query",
   "admin-action-confirmation",
+  "admin-action-client-error",
   "platform-report-i18n",
   "report-batch-contract",
   "community-moderation-contract",
