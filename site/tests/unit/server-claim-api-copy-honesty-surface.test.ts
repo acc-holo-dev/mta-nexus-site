@@ -32,6 +32,8 @@ describe("server claim API copy honesty surface", () => {
       expect(route).toContain("copy.rate");
       expect(route).toContain("copy.serverNotFound");
       expect(route).toContain("copy.retry");
+      expect(route).toContain("localeAppErrorText");
+      expect(route).not.toContain("error.message");
       expect(route).not.toContain('"Authentication required"');
       expect(route).not.toContain('"Actor precondition required"');
       expect(route).not.toContain('"Account changed"');

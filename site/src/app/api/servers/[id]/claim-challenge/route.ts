@@ -3,6 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -76,7 +77,21 @@ export const POST = withBrowserMutation(
         return json(
           context,
           {
-            error: error.message,
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.serverNotFound,
+                conflict: copy.accountChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.createFailed,
+              },
+              { ACTOR_REQUIRED: copy.actorRequired },
+            ),
             code: error.code,
           },
           error.statusCode,
