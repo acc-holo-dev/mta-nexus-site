@@ -19,6 +19,10 @@ const nativeLabelClass = "block font-label uppercase text-secondary";
 export function PublicProfileForm() {
   const { locale, dictionary } = useNexusLocale();
   const copy = getUserPlatformCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const router = useRouter();
   const [profile, setProfile] = useState<EditableProfile | null>(null);
   const [revision, setRevision] = useState(0);
@@ -57,7 +61,7 @@ export function PublicProfileForm() {
       .catch((error) => {
         if (!controller.signal.aborted)
           setNotice({
-            text: error instanceof Error ? error.message : copy.unavailable,
+            text: safeMessage(error, copy.unavailable),
             error: true,
           });
       })
@@ -111,10 +115,10 @@ export function PublicProfileForm() {
         setProfile(null);
         setLatest(null);
         setRecoveryRequired(false);
-        setNotice({ text: error.message, error: true });
+        setNotice({ text: safeMessage(error, copy.unavailable), error: true });
         return;
       }
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
       setRecoveryRequired(true);
     } finally {
       pending.current = false;
@@ -142,7 +146,7 @@ export function PublicProfileForm() {
       setLatest(next);
       setNotice(null);
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setLoading(false);

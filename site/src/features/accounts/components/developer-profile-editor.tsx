@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -34,6 +35,12 @@ export function DeveloperProfileEditor({
 }) {
   const copy = verificationCopy(locale),
     [profile, setProfile] = useState(initial);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [specialties, setSpecialties] = useState(initial?.specialties.join("\n") ?? ""),
     [github, setGithub] = useState(initial?.githubUrl ?? ""),
     [discord, setDiscord] = useState(initial?.discordTag ?? "");
@@ -75,7 +82,7 @@ export function DeveloperProfileEditor({
         throw new Error(copy.unavailable);
       apply(parsed.data);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
@@ -126,7 +133,7 @@ export function DeveloperProfileEditor({
       apply(response.data);
       setSaved(true);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+      setError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       setPending(false);

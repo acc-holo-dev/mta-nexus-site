@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { PlatformRequestError, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import {
   confirmedPrivacyUpdate,
@@ -40,6 +41,12 @@ export function ProfilePrivacyEditor({
   );
   const guard = useRef(false),
     controller = useRef<AbortController | null>(null);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => () => controller.current?.abort(), []);
 
   function apply(saved: EditablePrivacy) {
@@ -82,7 +89,7 @@ export function ProfilePrivacyEditor({
         );
     } catch (error) {
       if (!requestController.signal.aborted)
-        setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+        setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       guard.current = false;
       if (!requestController.signal.aborted) setPending(false);
@@ -124,10 +131,10 @@ export function ProfilePrivacyEditor({
         setProfile(null);
         setActivity(true);
         setContacts(true);
-        setNotice({ text: error.message, error: true });
+        setNotice({ text: safeMessage(error, copy.unavailable), error: true });
         return;
       }
-      const text = error instanceof Error ? error.message : copy.uncertain;
+      const text = safeMessage(error, copy.uncertain);
       setNotice({ text, error: true });
       if (text === copy.conflict) {
         try {
