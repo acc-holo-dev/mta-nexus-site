@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `2bf47d59` (`dev`, Wave 95 tip).
+**source_sha:** `0d9bec51` (`dev`, Wave 96 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `2bf47d59` |
+| Область                    |             Факт на `0d9bec51` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1654 |
+| `site/tests` files         |                           1656 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             54 |
 | `@nexus/db` src files      |                            201 |
@@ -57,7 +57,7 @@ site/
 | discovery     |     8 |  33815 |
 | library       |    86 | 409749 |
 | moderation    |    34 | 157176 |
-| notifications |    24 | 136037 |
+| notifications |    25 | 136481 |
 | organizations |    49 | 187199 |
 | resources     |   169 | 742643 |
 | servers       |    87 | 318668 |
@@ -441,8 +441,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 95 — product download errors via productDownloadApiCopy                                                      | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 95                                                                                     | docs honesty                     | **done** |
 | A   | Wave 96 — notifications list 500 via notificationsApiCopy                                                         | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 96                                                                                     | docs honesty                     | **done** |
 
-Дальше: API-envelope localization continues. Next: builds upload or remaining product builds envelopes (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: builds upload via productBuildsApiCopy (or content GET 503 XS) (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
