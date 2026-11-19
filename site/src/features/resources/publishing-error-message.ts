@@ -49,6 +49,9 @@ export function getResourceSubmissionErrorMessage(
     case "BUILD_SCANNER_UNAVAILABLE":
       return messages.scannerUnavailable;
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
+      return messages.authenticationRequired;
+    case "ACTOR_CHANGED":
       return messages.authenticationRequired;
     case "RATE_LIMIT_EXCEEDED":
       return messages.uploadRateLimited;
