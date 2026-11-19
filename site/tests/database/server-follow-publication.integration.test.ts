@@ -119,7 +119,8 @@ describe("server follower publication notification integration", () => {
       type: "server",
       category: "server",
       title: "New server update / Новость сервера",
-      message: "Notification Integration Server: Integration update",
+      message:
+        "Notification Integration Server: Integration update / Notification Integration Server: Integration update",
       link: `/articles/server-update-${suffix}`,
     });
     expect(disabledNotifications).toHaveLength(0);
