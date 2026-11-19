@@ -48,7 +48,8 @@ describe("content API copy honesty surface", () => {
     expect(collection).toContain("copy.organizationNotManaged");
     expect(collection).toContain("copy.creationRetry");
     expect(collection).toContain("copy.createFailed");
-    expect(collection).toContain("error.message");
+    expect(collection).toContain("localeAppErrorText");
+    expect(collection).not.toContain("error.message");
     expect(collection).not.toContain('"Published content is temporarily unavailable"');
     expect(collection).not.toContain('"Authentication required"');
     expect(collection).not.toContain('"Failed to create content"');

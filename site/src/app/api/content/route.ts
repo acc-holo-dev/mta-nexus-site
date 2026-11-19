@@ -6,6 +6,7 @@ import type { NextRequest } from "next/server";
 import { contentApiCopy } from "../../../features/community/content-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -242,7 +243,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return privateJson(context, { error: error.message, code: error.code }, error.statusCode);
+      return privateJson(
+        context,
+        {
+          error: localeAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            forbidden: copy.forbidden,
+            notFound: copy.notFound,
+            unsupportedMediaType: copy.unsupportedMediaType,
+            requestBodyTooLarge: copy.requestBodyTooLarge,
+            invalidBodyLength: copy.invalidBodyLength,
+            requestBodyTimeout: copy.requestBodyTimeout,
+            failed: copy.createFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
