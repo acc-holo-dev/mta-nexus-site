@@ -16,4 +16,5 @@ it("keeps bilingual slash titles with English canonical segments for remapping",
   expect(canonicalNoticeTitle(noticeStoredTitles.verificationApproved)).toBe(
     "Verification approved",
   );
+  expect(canonicalNoticeTitle(noticeStoredTitles.newArticleComment)).toBe("New article comment");
 });

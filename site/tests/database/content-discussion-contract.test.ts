@@ -149,14 +149,19 @@ it.each(["en", "ru"] as const)(
     expect(discussionError(locale, "COMMENT_PARENT_NOT_FOUND")).toBe(
       getDiscussionCopy(locale).invalidParent,
     );
-    const notice = formatNotification(
-      { title: "New article comment", message: "@writer commented on “Article”." },
-      getDictionary(locale).buildReviewNotifications,
-      locale,
-    );
-    expect(notice.title).toBe(locale === "ru" ? "Новый комментарий" : "New comment");
-    expect(notice.message).toContain("@writer");
-    expect(notice.message).toContain("Article");
+    for (const title of [
+      "New article comment",
+      "New article comment / Новый комментарий",
+    ] as const) {
+      const notice = formatNotification(
+        { title, message: "@writer commented on “Article”." },
+        getDictionary(locale).buildReviewNotifications,
+        locale,
+      );
+      expect(notice.title).toBe(locale === "ru" ? "Новый комментарий" : "New comment");
+      expect(notice.message).toContain("@writer");
+      expect(notice.message).toContain("Article");
+    }
   },
 );
 it("does not confirm a different comment id even if all other fields match", async () => {

@@ -30,6 +30,7 @@ export const noticeStoredTitles = {
   resourceQuestionResolved: "Resource question resolved / Вопрос по ресурсу решён",
   resourceQuestionRemoved: "Resource question removed / Вопрос по ресурсу удалён",
   newFollower: "New Follower / Новый подписчик",
+  newArticleComment: "New article comment / Новый комментарий",
   resourceBuildQuarantined: "Resource build quarantined / Сборка ресурса в карантине",
   resourceBuildRestored: "Resource build restored / Сборка ресурса восстановлена",
 } as const;
