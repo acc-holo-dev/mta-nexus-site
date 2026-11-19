@@ -10,15 +10,15 @@
   },
   "features": {
     "accounts": {
-      "bytes": 160581,
+      "bytes": 160664,
       "files": 53
     },
     "commerce": {
-      "bytes": 332402,
+      "bytes": 332870,
       "files": 71
     },
     "community": {
-      "bytes": 595897,
+      "bytes": 595980,
       "files": 128
     },
     "discovery": {
@@ -26,11 +26,11 @@
       "files": 8
     },
     "library": {
-      "bytes": 410628,
+      "bytes": 410870,
       "files": 86
     },
     "moderation": {
-      "bytes": 160274,
+      "bytes": 160328,
       "files": 35
     },
     "notifications": {
@@ -42,11 +42,11 @@
       "files": 49
     },
     "resources": {
-      "bytes": 752339,
+      "bytes": 755096,
       "files": 171
     },
     "servers": {
-      "bytes": 320721,
+      "bytes": 321363,
       "files": 87
     },
     "shell": {
@@ -54,7 +54,7 @@
       "files": 67
     },
     "support": {
-      "bytes": 110744,
+      "bytes": 110741,
       "files": 22
     },
     "trust": {
@@ -83,7 +83,7 @@
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
-    "tree_bytes": 559320,
+    "tree_bytes": 559350,
     "tree_files": 128
   },
   "packages_src_files": {
@@ -96,7 +96,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "b520ec8d23a2ae8f66e8b4bec078ed12760722d1",
+  "source_sha": "128ccc82b42cedeee23e1cdb16d45e4349d7a9cf",
   "tests": {
     "site_tests_files": 1673
   }
