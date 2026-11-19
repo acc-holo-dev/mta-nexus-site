@@ -23,25 +23,20 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user || !token)
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      return supportPrivateJson(context, request, { error: "" }, { status: 401 });
     const filters = supportQuery(request.nextUrl.searchParams, true);
     if (!filters)
       return supportPrivateJson(
         context,
         request,
-        { error: "Invalid support queue filters", code: "VALIDATION_ERROR" },
+        { error: "", code: "VALIDATION_ERROR" },
         { status: 400 },
       );
     const staff = request.nextUrl.searchParams.get("scope") === "staff";
     if (staff && !can(user, "admin.moderation"))
-      return supportPrivateJson(context, request, { error: "Forbidden" }, { status: 403 });
+      return supportPrivateJson(context, request, { error: "" }, { status: 403 });
     if (!(await consumeRateLimit("search", user.id)).success)
-      return supportPrivateJson(context, request, { error: "Too many requests" }, { status: 429 });
+      return supportPrivateJson(context, request, { error: "" }, { status: 429 });
     const selection = {
       ...(filters.status ? { status: filters.status } : {}),
       ...(filters.category ? { category: filters.category } : {}),
@@ -92,12 +87,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const currentToken = request.cookies.get("nexus_session")?.value;
     const user = currentToken ? await authService.getSession(currentToken) : null;
     if (!user || !currentToken) {
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      return supportPrivateJson(context, request, { error: "" }, { status: 401 });
     }
 
     const expectedActor = request.headers.get("x-nexus-actor-id");
@@ -105,14 +95,14 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return supportPrivateJson(
         context,
         request,
-        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+        { error: "", code: "ACTOR_ID_REQUIRED" },
         { status: 428 },
       );
     if (expectedActor !== user.id)
       return supportPrivateJson(
         context,
         request,
-        { error: "Account changed", code: "ACTOR_CHANGED" },
+        { error: "", code: "ACTOR_CHANGED" },
         { status: 409 },
       );
     supportMutationGuard(request);
@@ -121,7 +111,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return supportPrivateJson(
         context,
         request,
-        { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+        { error: "", code: "SUPPORT_BODY_TOO_LARGE" },
         { status: 413 },
       );
     }
@@ -131,7 +121,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return supportPrivateJson(
         context,
         request,
-        { error: "Invalid support case", code: "VALIDATION_ERROR" },
+        { error: "", code: "VALIDATION_ERROR" },
         { status: 400 },
       );
     }
@@ -141,7 +131,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return supportPrivateJson(
         context,
         request,
-        { error: "A valid idempotency key is required", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
+        { error: "", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
         { status: 400 },
       );
     }
@@ -165,7 +155,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         context,
         request,
         {
-          error: "Idempotency key was already used for a different request",
+          error: "",
           code: "SUPPORT_IDEMPOTENCY_CONFLICT",
         },
         { status: 409 },
@@ -182,12 +172,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const limit = await consumeRateLimit("supportCase", user.id);
     if (!limit.success) {
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Too many support cases" },
-        { status: 429 },
-      );
+      return supportPrivateJson(context, request, { error: "" }, { status: 429 });
     }
 
     const caseId = generateId("sup");
@@ -227,7 +212,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         context,
         request,
         {
-          error: "Idempotency key was already used for a different request",
+          error: "",
           code: "SUPPORT_IDEMPOTENCY_CONFLICT",
         },
         { status: 409 },

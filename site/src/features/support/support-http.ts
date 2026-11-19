@@ -17,9 +17,7 @@ export function supportPrivateJson(
     body && typeof body === "object" && "error" in body
       ? {
           ...body,
-          ...(locale === "ru"
-            ? { error: supportWorkspaceError(locale, "code" in body ? body.code : init.status) }
-            : {}),
+          error: supportWorkspaceError(locale, "code" in body ? body.code : init.status),
         }
       : body;
   const headers = new Headers(init.headers);

@@ -38,23 +38,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params;
     if (!/^sup_[a-f0-9]{24}$/.test(id)) {
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Support case not found" },
-        { status: 404 },
-      );
+      return supportPrivateJson(context, request, { error: "" }, { status: 404 });
     }
 
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user || !token) {
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      return supportPrivateJson(context, request, { error: "" }, { status: 401 });
     }
     const values = request.nextUrl.searchParams.getAll("messagePage");
     if (values.length > 1 || (values.length === 1 && !/^[1-9]\d{0,6}$/u.test(values[0] ?? "")))
@@ -89,44 +79,29 @@ export const POST = withBrowserMutation(
     try {
       const { id } = await params;
       if (!/^sup_[a-f0-9]{24}$/u.test(id))
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Support case not found" },
-          { status: 404 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 404 });
       const currentToken = request.cookies.get("nexus_session")?.value;
       const access = await loadAuthorizedCase(currentToken, id);
       if (!access.user || !currentToken) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Authentication required" },
-          { status: 401 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 401 });
       }
       const expectedActor = request.headers.get("x-nexus-actor-id");
       if (!expectedActor)
         return supportPrivateJson(
           context,
           request,
-          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { error: "", code: "ACTOR_ID_REQUIRED" },
           { status: 428 },
         );
       if (expectedActor !== access.user.id)
         return supportPrivateJson(
           context,
           request,
-          { error: "Account changed", code: "ACTOR_CHANGED" },
+          { error: "", code: "ACTOR_CHANGED" },
           { status: 409 },
         );
       if (!access.supportCase) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Support case not found" },
-          { status: 404 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 404 });
       }
 
       supportMutationGuard(request);
@@ -135,19 +110,14 @@ export const POST = withBrowserMutation(
         return supportPrivateJson(
           context,
           request,
-          { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+          { error: "", code: "SUPPORT_BODY_TOO_LARGE" },
           { status: 413 },
         );
       }
 
       const parsed = createSupportMessageSchema.safeParse(body.ok ? body.value : null);
       if (!parsed.success) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Invalid support message" },
-          { status: 400 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 400 });
       }
 
       const requestKey = parseSupportIdempotencyKey(request.headers.get("Idempotency-Key"));
@@ -155,7 +125,7 @@ export const POST = withBrowserMutation(
         return supportPrivateJson(
           context,
           request,
-          { error: "A valid idempotency key is required", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
+          { error: "", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
           { status: 400 },
         );
       }
@@ -181,7 +151,7 @@ export const POST = withBrowserMutation(
           context,
           request,
           {
-            error: "Idempotency key was already used for a different request",
+            error: "",
             code: "SUPPORT_IDEMPOTENCY_CONFLICT",
           },
           { status: 409 },
@@ -224,12 +194,7 @@ export const POST = withBrowserMutation(
 
       const limit = await consumeRateLimit("supportMessage", access.user.id);
       if (!limit.success) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Too many support messages" },
-          { status: 429 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 429 });
       }
 
       const authorRole = access.supportCase.requesterId === access.user.id ? "requester" : "staff";
@@ -264,7 +229,7 @@ export const POST = withBrowserMutation(
           context,
           request,
           {
-            error: "Idempotency key was already used for a different request",
+            error: "",
             code: "SUPPORT_IDEMPOTENCY_CONFLICT",
           },
           { status: 409 },
@@ -311,44 +276,29 @@ export const PATCH = withBrowserMutation(
     try {
       const { id } = await params;
       if (!/^sup_[a-f0-9]{24}$/u.test(id))
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Support case not found" },
-          { status: 404 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 404 });
       const currentToken = request.cookies.get("nexus_session")?.value;
       const access = await loadAuthorizedCase(currentToken, id);
       if (!access.user || !currentToken) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Authentication required" },
-          { status: 401 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 401 });
       }
       const expectedActor = request.headers.get("x-nexus-actor-id");
       if (!expectedActor)
         return supportPrivateJson(
           context,
           request,
-          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { error: "", code: "ACTOR_ID_REQUIRED" },
           { status: 428 },
         );
       if (expectedActor !== access.user.id)
         return supportPrivateJson(
           context,
           request,
-          { error: "Account changed", code: "ACTOR_CHANGED" },
+          { error: "", code: "ACTOR_CHANGED" },
           { status: 409 },
         );
       if (!access.supportCase) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Support case not found" },
-          { status: 404 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 404 });
       }
       supportMutationGuard(request);
       const body = await parseBoundedJson(request);
@@ -356,19 +306,14 @@ export const PATCH = withBrowserMutation(
         return supportPrivateJson(
           context,
           request,
-          { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+          { error: "", code: "SUPPORT_BODY_TOO_LARGE" },
           { status: 413 },
         );
       }
 
       const parsed = updateSupportCaseStatusSchema.safeParse(body.ok ? body.value : null);
       if (!parsed.success) {
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Invalid support status" },
-          { status: 400 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 400 });
       }
 
       if (
@@ -377,21 +322,16 @@ export const PATCH = withBrowserMutation(
           access.supportCase.status === "closed" ||
           parsed.data.status === "closed")
       )
-        return supportPrivateJson(context, request, { error: "Forbidden" }, { status: 403 });
+        return supportPrivateJson(context, request, { error: "" }, { status: 403 });
       if (!(await consumeRateLimit("supportMessage", access.user.id)).success)
-        return supportPrivateJson(
-          context,
-          request,
-          { error: "Too many requests" },
-          { status: 429 },
-        );
+        return supportPrivateJson(context, request, { error: "" }, { status: 429 });
       // Reject a stale staff view before the no-op shortcut. The DB conditional
       // update below also protects a race occurring after this read.
       if (access.supportCase.status !== parsed.data.expectedStatus) {
         return supportPrivateJson(
           context,
           request,
-          { error: "Support case changed concurrently", code: "SUPPORT_STATUS_CONFLICT" },
+          { error: "", code: "SUPPORT_STATUS_CONFLICT" },
           { status: 409 },
         );
       }
@@ -419,7 +359,7 @@ export const PATCH = withBrowserMutation(
         return supportPrivateJson(
           context,
           request,
-          { error: "Support case changed concurrently", code: "SUPPORT_STATUS_CONFLICT" },
+          { error: "", code: "SUPPORT_STATUS_CONFLICT" },
           { status: 409 },
         );
       }
