@@ -11,6 +11,7 @@ import {
   platformFieldClass,
   platformRequest,
 } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -51,6 +52,12 @@ export function VerificationWorkspace({
 }) {
   const copy = verificationCopy(locale),
     dictionary = getDictionary(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [overview, setOverview] = useState(initial),
     [teams, setTeams] = useState(initialTeams);
   const [target, setTarget] = useState<Target | null>(null),
@@ -193,7 +200,7 @@ export function VerificationWorkspace({
     try {
       await read();
     } catch (caught) {
-      setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+      setReadError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
@@ -334,7 +341,7 @@ export function VerificationWorkspace({
         setWriteError(copy.pendingExists);
         return;
       }
-      setWriteError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+      setWriteError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       setPending(false);

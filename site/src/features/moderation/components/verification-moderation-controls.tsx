@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {
@@ -27,6 +28,17 @@ export function VerificationModerationControls({
   const router = useRouter();
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.admin;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    const labels = verificationCopy(locale);
+    return [
+      ...Object.values(copy),
+      ...Object.values(labels),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -92,9 +104,7 @@ export function VerificationModerationControls({
       router.refresh();
     } catch (caught) {
       if (!alive.current) return;
-      setError(
-        caught instanceof Error ? caught.message : verificationCopy(locale).decisionUnavailable,
-      );
+      setError(safeMessage(caught, verificationCopy(locale).decisionUnavailable));
     } finally {
       guard.current = false;
       if (alive.current) setPending(null);
