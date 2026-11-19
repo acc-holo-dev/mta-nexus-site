@@ -3,6 +3,7 @@ import {
   noticeStoredTitles,
   RESOURCE_RELEASE_WORKER_LIMIT,
   type ResourceReleaseWorkerResult,
+  resourceReleaseNoticeMessage,
 } from "@nexus/domain";
 import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { db } from "../client";
@@ -143,7 +144,7 @@ class ResourceReleaseWorkerRepository {
             type: "system",
             category: "commerce",
             title: noticeStoredTitles.resourceVersionPublished,
-            message: `${product.title} · ${event.version}`,
+            message: resourceReleaseNoticeMessage(product.title, event.version),
             link: `/workspace/library/${encodeURIComponent(product.id)}/versions`,
             data: {
               kind: "resource_release",
