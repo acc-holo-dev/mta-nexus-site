@@ -51,6 +51,10 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
   const router = useRouter();
   const { dictionary } = useNexusLocale();
   const copy = dictionary.community;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const formErrorId = useId();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,8 +112,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
       }
       setError(null);
     } catch (caught) {
-      if (alive.current)
-        setError(caught instanceof Error ? caught.message : copy.topicIdentityError);
+      if (alive.current) setError(safeMessage(caught, copy.topicIdentityError));
     } finally {
       lock.current = false;
       if (alive.current) setRestoring(false);
