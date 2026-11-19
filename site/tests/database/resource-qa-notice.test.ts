@@ -63,8 +63,8 @@ it("notifies the publisher about a new question with a content-category inbox ro
   expect(insert?.params).toEqual(
     expect.arrayContaining([
       "usr_publisher",
-      "New resource question",
-      "Someone asked about Physics Pack.",
+      "New resource question / Новый вопрос по ресурсу",
+      "Someone asked about Physics Pack. / По ресурсу «Physics Pack» задали новый публичный вопрос.",
       "/market/physics-pack?qa=rqt_a#resource-qa",
       "content",
       "content",

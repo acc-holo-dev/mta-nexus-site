@@ -31,7 +31,7 @@ it.each(["en", "ru"] as const)(
     const approved = formatNotification(
       {
         title: "Verification approved / Верификация одобрена",
-        message: "Server ownership verification was approved.",
+        message: "Server ownership verification was approved. / Подтверждение контроля сервера одобрено.",
       },
       reviewCopy,
       locale,

@@ -1,6 +1,7 @@
 import type { AuditEvent, Build } from "@nexus/domain";
 import {
   classifyBuildAvailability,
+  noticeStoredMessages,
   noticeStoredTitles,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
@@ -211,8 +212,7 @@ export async function quarantinePublishedAndRefreshProduct(
       authorId: parent.authorId,
       organizationId: parent.organizationId,
       title: noticeStoredTitles.resourceBuildQuarantined,
-      message:
-        "A published build was quarantined after a security review. Open the build in your workspace for the current delivery state.",
+      message: noticeStoredMessages.resourceBuildQuarantined,
       link: publisherBuildHref(quarantined.productId, quarantined.id),
       data: {
         kind: "build_lifecycle",
@@ -331,8 +331,7 @@ export async function restoreQuarantinedAndRefreshProduct(
       authorId: parent.authorId,
       organizationId: parent.organizationId,
       title: noticeStoredTitles.resourceBuildRestored,
-      message:
-        "A quarantined build was restored to publication. Open the build in your workspace for the current delivery state.",
+      message: noticeStoredMessages.resourceBuildRestored,
       link: publisherBuildHref(restored.productId, restored.id),
       data: {
         kind: "build_lifecycle",
