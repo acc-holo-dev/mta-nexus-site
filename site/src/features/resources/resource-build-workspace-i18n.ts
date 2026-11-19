@@ -156,3 +156,31 @@ const copy = {
 export function getResourceBuildWorkspaceCopy(locale: string) {
   return copy[locale === "ru" ? "ru" : "en"];
 }
+
+/** Client remapper for version-workspace mutation codes. */
+export function resourceBuildWorkspaceError(locale: string, code: unknown): string {
+  const labels = getResourceBuildWorkspaceCopy(locale);
+  switch (code) {
+    case "BUILD_REVISION_CONFLICT":
+    case "BUILD_STATE_CHANGED":
+    case "BUILD_TRANSITION_INVALID":
+    case "PRODUCT_STATE_CHANGED":
+    case "CONFLICT":
+      return labels.conflict;
+    case "BUILD_COMMAND_INVALID":
+    case "BUILD_REVISION_REQUIRED":
+    case "BUILD_SCAN_NOT_CLEAN":
+    case "VALIDATION_ERROR":
+    case "UNSUPPORTED_MEDIA_TYPE":
+    case "REQUEST_BODY_TOO_LARGE":
+      return labels.failed;
+    case "FORBIDDEN":
+    case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
+    case "ACTOR_CHANGED":
+    case "RATE_LIMIT_EXCEEDED":
+      return labels.failed;
+    default:
+      return labels.failed;
+  }
+}
