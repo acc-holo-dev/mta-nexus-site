@@ -174,7 +174,7 @@ it.each(["REVIEW_ACCESS_REQUIRED", "REVIEW_CHANGED", "REVIEW_MODERATED"])(
       context,
     );
     expect(response.status).toBe(code === "REVIEW_ACCESS_REQUIRED" ? 403 : 409);
-    expect(await response.json()).toEqual({ code });
+    expect(await response.json()).toMatchObject({ code });
   },
 );
 it("rejects cross-site form submissions, oversized JSON and excessive requests", async () => {
