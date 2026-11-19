@@ -18,8 +18,11 @@ import { notificationInboxError } from "../../src/features/notifications/notific
 import { resourceCommerceError } from "../../src/features/resources/resource-commerce-i18n";
 import { resourceManagementError } from "../../src/features/resources/resource-management-i18n";
 import { resourceMediaError } from "../../src/features/resources/resource-media-i18n";
+import { commercialError } from "../../src/features/commerce/commercial-i18n";
+import { licenseControlError } from "../../src/features/commerce/license-control-i18n";
+import { resourceReleaseControlError } from "../../src/features/library/resource-release-control-i18n";
 
-/** Waves 205–209 / 215–217 / 234–257: domain remappers must not fall through to publication editor wording. */
+/** Waves 205–209 / 215–217 / 234–268: domain remappers must not fall through to publication editor wording. */
 describe("domain remapper alias honesty surface", () => {
   it("keeps FORBIDDEN/ACTOR/RATE/CONFLICT on domain copy for both locales", () => {
     for (const locale of ["en", "ru"] as const) {
@@ -88,7 +91,44 @@ describe("domain remapper alias honesty surface", () => {
       expect(resourceMediaError(locale, "RATE_LIMITED")).toBe(
         resourceMediaError(locale, "RATE_LIMIT_EXCEEDED"),
       );
+      expect(commercialError(locale, "RATE_LIMITED")).toBe(
+        commercialError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
+      expect(licenseControlError(locale, "RATE_LIMITED")).toBe(
+        licenseControlError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
+      expect(resourceReleaseControlError(locale, "RATE_LIMITED")).toBe(
+        resourceReleaseControlError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
     }
+  });
+
+  it("clears recovery drafts on RATE_LIMITED like rate-exceeded", () => {
+    for (const path of [
+      "site/src/features/organizations/components/organization-profile-form.tsx",
+      "site/src/features/community/components/content-discussion.tsx",
+      "site/src/features/moderation/components/verification-workspace.tsx",
+    ]) {
+      const source = readFileSync(resolve(process.cwd(), path), "utf8");
+      expect(source).toContain('"RATE_LIMITED"');
+      expect(source).toContain('"RATE_LIMIT_EXCEEDED"');
+    }
+  });
+
+  it("aliases RATE_LIMITED in fee-estimator and author resource forms", () => {
+    const fee = readFileSync(
+      resolve(
+        process.cwd(),
+        "site/src/features/commerce/components/subscription-fee-estimator.tsx",
+      ),
+      "utf8",
+    );
+    const author = readFileSync(
+      resolve(process.cwd(), "site/src/features/resources/components/author-resource-forms.tsx"),
+      "utf8",
+    );
+    expect(fee).toContain('code === "RATE_LIMITED"');
+    expect(author).toContain('body?.code === "RATE_LIMITED"');
   });
 
   it("localizes comment client validation when locale is supplied", () => {

@@ -17,6 +17,7 @@ describe("orderCaseError honesty surface", () => {
       );
       expect(orderCaseError(locale, "FORBIDDEN")).toBe(copy.failed);
       expect(orderCaseError(locale, "RATE_LIMIT_EXCEEDED")).toBe(copy.uncertain);
+      expect(orderCaseError(locale, "RATE_LIMITED")).toBe(copy.uncertain);
       expect(orderCaseError(locale, "UNKNOWN_CODE")).toBe(copy.uncertain);
     }
     expect(orderCaseError("en", "CONFLICT")).not.toEqual(orderCaseError("ru", "CONFLICT"));

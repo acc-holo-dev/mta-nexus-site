@@ -203,6 +203,21 @@ it("maps bare CONFLICT and residual VALIDATION_ERROR without English code passth
     expect(resourceQaError(locale, "RATE_LIMIT_EXCEEDED")).toBe(
       resourceQaError(locale, "RATE_LIMITED"),
     );
+    expect(subscriptionError(locale, "RATE_LIMITED")).toBe(
+      subscriptionError(locale, "RATE_LIMIT_EXCEEDED"),
+    );
+    expect(planReviewError(locale, "RATE_LIMITED")).toBe(
+      planReviewError(locale, "RATE_LIMIT_EXCEEDED"),
+    );
+    expect(commercialError(locale, "RATE_LIMITED")).toBe(
+      commercialError(locale, "RATE_LIMIT_EXCEEDED"),
+    );
+    expect(licenseControlError(locale, "RATE_LIMITED")).toBe(
+      licenseControlError(locale, "RATE_LIMIT_EXCEEDED"),
+    );
+    expect(resourceReleaseControlError(locale, "RATE_LIMITED")).toBe(
+      resourceReleaseControlError(locale, "RATE_LIMIT_EXCEEDED"),
+    );
     expect(moderationError(locale, "CONFLICT")).toBe(
       moderationError(locale, "CONTENT_STATE_CHANGED"),
     );
