@@ -33,4 +33,7 @@ export const noticeStoredTitles = {
   newArticleComment: "New article comment / Новый комментарий",
   resourceBuildQuarantined: "Resource build quarantined / Сборка ресурса в карантине",
   resourceBuildRestored: "Resource build restored / Сборка ресурса восстановлена",
+  resourceVersionPublished: "Resource version published / Опубликована версия ресурса",
+  licenseExpired: "License expired / Срок лицензии истёк",
+  licenseExpiresSoon: "License expires soon / Лицензия скоро истечёт",
 } as const;
