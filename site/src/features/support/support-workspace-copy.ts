@@ -142,7 +142,7 @@ export function supportWorkspaceError(locale: Locale, code: unknown) {
     case 409:
       return c.conflict;
     case "ACTOR_ID_REQUIRED":
-      return c.invalid;
+      return c.auth;
     default:
       return c.unavailable;
   }

@@ -15,7 +15,7 @@ describe("support API copy honesty surface", () => {
     expect(supportWorkspaceError("en", "UNAUTHORIZED")).toBe(en.auth);
     expect(supportWorkspaceError("ru", "UNAUTHORIZED")).toBe(ru.auth);
     expect(supportWorkspaceError("en", "ACTOR_CHANGED")).toBe(en.conflict);
-    expect(supportWorkspaceError("ru", "ACTOR_ID_REQUIRED")).toBe(ru.invalid);
+    expect(supportWorkspaceError("ru", "ACTOR_ID_REQUIRED")).toBe(ru.auth);
     expect(en.auth).not.toEqual(ru.auth);
   });
 
