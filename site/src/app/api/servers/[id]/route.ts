@@ -3,8 +3,10 @@ import { consumeRateLimit } from "@nexus/security";
 import { updateServerSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { serversApiCopy } from "../../../../features/servers/servers-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -86,11 +88,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export const PATCH = withBrowserMutation(
   async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const context = createRequestLogContext(request);
+    const copy = serversApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
     try {
       const token = request.cookies.get("nexus_session")?.value;
       const user = await authService.getSession(token);
       if (!user) {
-        return json(context, { error: "Authentication required" }, 401);
+        return json(context, { error: copy.authenticationRequired }, 401);
       }
 
       const expectedActor = request.headers.get("x-nexus-actor-id");
@@ -99,7 +102,7 @@ export const PATCH = withBrowserMutation(
 
       const rateLimit = await consumeRateLimit("serverMutation", user.id);
       if (!rateLimit.success) {
-        return json(context, { error: "Server update limit exceeded" }, 429);
+        return json(context, { error: copy.updateLimitExceeded }, 429);
       }
 
       requireServerJsonContentType(request);
@@ -108,7 +111,7 @@ export const PATCH = withBrowserMutation(
         return json(
           context,
           {
-            error: "Invalid server details",
+            error: copy.invalidServerDetails,
             details: parsed.error.format(),
           },
           400,
@@ -133,7 +136,7 @@ export const PATCH = withBrowserMutation(
       return json(
         context,
         {
-          error: appError?.message || "Could not update server",
+          error: appError?.message || copy.updateFailed,
           ...(appError ? { code: appError.code } : {}),
         },
         appError?.statusCode || 500,

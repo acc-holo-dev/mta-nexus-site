@@ -260,6 +260,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Wave 89 done:** `/api/checkout` POST disabled envelope uses bilingual `checkoutApiCopy` via `nexus_locale`; JSON shape unchanged (`code: CHECKOUT_DISABLED`).
 
+**Wave 90 done:** `/api/servers/[id]` PATCH errors extend bilingual `serversApiCopy` via `nexus_locale`; JSON shape unchanged (`AppError` message passthrough remains English).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -413,8 +415,10 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 88 — notifications preferences errors via notificationPreferencesApiCopy                                     | API envelope RU/EN               | **done** |
 | D/E | Scoreboard sync после Wave 88                                                                                     | docs honesty                     | **done** |
 | A   | Wave 89 — checkout disabled envelope via checkoutApiCopy                                                          | API envelope RU/EN               | **done** |
+| D/E | Scoreboard sync после Wave 89                                                                                     | docs honesty                     | **done** |
+| A   | Wave 90 — servers/[id] PATCH errors via serversApiCopy                                                            | API envelope RU/EN               | **done** |
 
-Дальше: API-envelope localization continues. Next: `/api/notifications` inbox 500 or `/api/notifications/push` (skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
+Дальше: API-envelope localization continues. Next: `/api/notifications/push` (then verification; skip `/api/support*` — already RU via `supportPrivateJson`). F/ops remains external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
