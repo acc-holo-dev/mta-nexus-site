@@ -58,9 +58,7 @@ describe("integrated J4 build upload safety contract", () => {
     expect(malicious).toBeGreaterThan(-1);
     expect(unavailable).toBeGreaterThan(malicious);
     expect(storage).toBeGreaterThan(unavailable);
-    expect(route).toContain(
-      "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
-    );
+    expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain('status: 503, headers: { "Retry-After": "30" }');
   });
 

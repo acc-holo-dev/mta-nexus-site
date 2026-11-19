@@ -29,9 +29,7 @@ describe("current-dev build upload reconciliation", () => {
     const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     expect(route).toContain('event: "resource.build.scanner_unavailable"');
-    expect(route).toContain(
-      '"Malware scanning is temporarily unavailable. No build was stored; retry the upload later."',
-    );
+    expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain('{ status: 503, headers: { "Retry-After": "30" } }');
     expect(route).not.toContain("NextResponse.json(");
     expect(route).toContain("jsonWithRequestId(");

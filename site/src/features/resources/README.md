@@ -100,6 +100,7 @@ Services и repositories не дублируются и не переносят�
 | `resource-inspect-meta-api-copy.ts`            | util port `resource-inspect-meta-api-copy`                                                                  |
 | `products-api-copy.ts`                         | util port `products-api-copy`                                                                               |
 | `product-download-api-copy.ts`                 | util port `product-download-api-copy`                                                                       |
+| `product-builds-api-copy.ts`                   | util port `product-builds-api-copy`                                                                         |
 | `resource-requirements-i18n.ts`                | util port `resource-requirements-i18n`                                                                      |
 | `resource-requirements-query.ts`               | util port `resource-requirements-query`                                                                     |
 | `resource-review-i18n.ts`                      | util port `resource-review-i18n`                                                                            |

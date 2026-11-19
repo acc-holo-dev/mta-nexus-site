@@ -144,6 +144,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "resource-inspect-meta-api-copy",
     "products-api-copy",
     "product-download-api-copy",
+    "product-builds-api-copy",
     "resource-release-control-query",
     "build-download-selection",
     "resource-download-sha256",
@@ -330,6 +331,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/resource-inspect-meta-api-copy.ts", "resources-view-isolation"],
     ["features/resources/products-api-copy.ts", "resources-view-isolation"],
     ["features/resources/product-download-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/product-builds-api-copy.ts", "resources-view-isolation"],
     ["features/resources/resource-release-control-query.ts", "resources-view-isolation"],
     ["features/resources/build-download-selection.ts", "resources-view-isolation"],
     ["features/resources/resource-download-sha256.ts", "resources-view-isolation"],
@@ -445,6 +447,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/resource-inspect-meta-api-copy.ts",
     "app/products-api-copy.ts",
     "app/product-download-api-copy.ts",
+    "app/product-builds-api-copy.ts",
     "app/resource-release-control-query.ts",
     "app/build-download-selection.ts",
     "app/resource-download-sha256.ts",
@@ -554,6 +557,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/resource-inspect-meta-api-copy.ts",
     "site/src/features/resources/products-api-copy.ts",
     "site/src/features/resources/product-download-api-copy.ts",
+    "site/src/features/resources/product-builds-api-copy.ts",
     "site/src/features/resources/resource-release-control-query.ts",
     "site/src/features/resources/build-download-selection.ts",
     "site/src/features/resources/resource-download-sha256.ts",
@@ -743,6 +747,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/resource-inspect-meta-api-copy.ts");
   visit("site/src/features/resources/products-api-copy.ts");
   visit("site/src/features/resources/product-download-api-copy.ts");
+  visit("site/src/features/resources/product-builds-api-copy.ts");
   visit("site/src/features/resources/resource-release-control-query.ts");
   visit("site/src/features/resources/build-download-selection.ts");
   visit("site/src/features/resources/resource-download-sha256.ts");

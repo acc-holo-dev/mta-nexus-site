@@ -17,7 +17,7 @@ describe("build scanner fail-closed upload flow", () => {
     expect(scanLimits).toBeGreaterThan(malicious);
     expect(unavailable).toBeGreaterThan(scanLimits);
     expect(storage).toBeGreaterThan(unavailable);
-    expect(route).toContain("No build was stored; retry the upload later.");
+    expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain('status: 503, headers: { "Retry-After": "30" }');
   });
 

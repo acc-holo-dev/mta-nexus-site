@@ -114,7 +114,7 @@ describe("build upload hardening", () => {
     );
 
     expect(route).toContain("hasExpectedBuildFileFormat");
-    expect(route).toContain("Build content does not match its file extension");
+    expect(route).toContain("copy.contentMismatch");
     expect(route).toContain("const fileBytes = new Uint8Array(await file.arrayBuffer())");
     expect(route).toContain("BUILD_MIME_TYPES");
     expect(route).toContain("BUILD_FILE_SIZE_LIMIT_MB");

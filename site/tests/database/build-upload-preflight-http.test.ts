@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { productBuildsApiCopy } from "../../src/features/resources/product-builds-api-copy";
 import packageFixtures from "../fixtures/build-packages.json";
 import {
   browserMutationHeaders,
@@ -192,7 +193,7 @@ describe("build upload authorization HTTP preflight", () => {
 
     expect(response.status).toBe(415);
     expect(await response.json()).toMatchObject({
-      error: "Build upload requires multipart/form-data",
+      error: productBuildsApiCopy("en").multipartRequired,
       code: "BUILD_MULTIPART_REQUIRED",
     });
     expect(preflight).toHaveBeenCalledTimes(1);
