@@ -7,11 +7,14 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationContentService } from "../../../lib/services/organizations/organization-content-service";
 import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { organizationContentId } from "../organization-content-api";
-import { organizationContentCopy } from "../organization-content-copy";
+import {
+  organizationContentCopy,
+  organizationContentMutationError,
+} from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
@@ -61,7 +64,9 @@ export async function OrganizationContentEditorPage({
     })
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError
+          ? organizationContentMutationError(locale, error.code)
+          : copy.unavailable;
       return null;
     });
   const initial = result?.content ? parseEditableContent(result.content) : null;

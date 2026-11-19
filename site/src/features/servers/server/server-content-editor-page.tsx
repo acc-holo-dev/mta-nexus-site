@@ -9,12 +9,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverContentService } from "../../../lib/services/servers/server-content-service";
 import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 
 import { serverContentId } from "../server-content-api";
-import { serverContentCopy } from "../server-content-copy";
+import { serverContentCopy, serverContentMutationError } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
@@ -61,7 +61,9 @@ export async function ServerContentEditorPage({
     })
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError
+          ? serverContentMutationError(locale, error.code)
+          : copy.unavailable;
       return null;
     });
   const initial = result?.content ? parseEditableContent(result.content) : null;

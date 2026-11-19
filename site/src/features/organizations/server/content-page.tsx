@@ -11,11 +11,12 @@ import {
   parseContentPage,
   writerTypes,
 } from "../../community/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { organizationContentId } from "../organization-content-api";
 import { organizationContentCopy } from "../organization-content-copy";
+import { organizationError } from "../organization-workspace-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
@@ -62,7 +63,7 @@ export default async function OrganizationPublications({
     .then(() => organizationContentService.page(organizationContentId(id), actor, filters))
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError ? organizationError(locale, error.code) : copy.unavailable;
       return null;
     });
   return (
