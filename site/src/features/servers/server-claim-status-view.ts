@@ -38,6 +38,9 @@ const en = {
     CONFLICT:
       "The server or request changed. Refresh the page to check its status before starting a new challenge.",
     FORBIDDEN: "You do not currently manage this server's organization.",
+    UNAUTHORIZED: "Sign in again before continuing.",
+    ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+    ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
     UNSUPPORTED_MEDIA_TYPE: "The request could not be read. Refresh the page and retry.",
     REQUEST_BODY_TOO_LARGE: "The request is too large. Refresh the page and retry.",
   },
@@ -78,6 +81,9 @@ const ru: typeof en = {
     CONFLICT:
       "Сервер или заявка изменились. Обновите страницу и проверьте статус перед новой проверкой.",
     FORBIDDEN: "У вас сейчас нет прав управления организацией этого сервера.",
+    UNAUTHORIZED: "Войдите снова перед продолжением.",
+    ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+    ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
     UNSUPPORTED_MEDIA_TYPE: "Не удалось прочитать запрос. Обновите страницу и повторите попытку.",
     REQUEST_BODY_TOO_LARGE: "Запрос слишком большой. Обновите страницу и повторите попытку.",
   },
