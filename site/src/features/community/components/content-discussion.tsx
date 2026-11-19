@@ -29,6 +29,7 @@ import {
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { followCopy } from "../follow-workspace-copy";
 import { platformFieldClass } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
@@ -91,6 +92,12 @@ export function ContentDiscussion({
   initialError?: string;
 }) {
   const copy = getDiscussionCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const workspaceCopy = getDictionary(locale).workspace;
   const pathname = usePathname();
   const [page, setPage] = useState<DiscussionPage | null>(initial);
@@ -281,7 +288,7 @@ export function ContentDiscussion({
       return true;
     } catch (caught) {
       if (alive.current && !controller.signal.aborted) {
-        setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+        setReadError(safeMessage(caught, copy.unavailable));
         if (focusId) setFocusedId(focusId);
       }
       return false;
@@ -381,7 +388,7 @@ export function ContentDiscussion({
       // Keep draft + frozen intent so a lost-response retry reuses one key.
       // Guest 401 / auth return must keep text for the author without auto-publish.
       persistComposeDraft(normalized, reply);
-      setWriteError(caught instanceof Error ? caught.message : copy.unavailable);
+      setWriteError(safeMessage(caught, copy.unavailable));
       setWriteNeedsSignIn(
         caught instanceof ContentCommentSubmitError && discussionWriteNeedsSignIn(caught.code),
       );
