@@ -5,11 +5,23 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { createCommentIntentKey, submitContentCommentRequest } from "../content-comment-client";
+import { getDiscussionCopy } from "../content-discussion-copy";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
   const router = useRouter();
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.articles;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(getDiscussionCopy(locale)),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +53,7 @@ export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: s
       setText("");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.commentError);
+      setError(safeMessage(caught, copy.commentError));
     } finally {
       setSubmitting(false);
     }
