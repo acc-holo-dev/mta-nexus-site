@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   type AuditEvent,
   ForbiddenError,
+  noticeStoredMessages,
   noticeStoredTitles,
   type Report,
   UnauthorizedError,
@@ -246,7 +247,7 @@ export class ReportRepository {
             .digest("hex")}`,
           recipientId: resolved.reporterId,
           title: noticeStoredTitles.platformReportStatus,
-          message: `Report status: ${status}.`,
+          message: noticeStoredMessages.reportStatuses[status],
           link: `/workspace/platform-reports/${encodeURIComponent(resolved.id)}`,
           type: "security",
           category: "security",

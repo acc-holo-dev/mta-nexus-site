@@ -187,7 +187,7 @@ it("commits a private security outcome and push job with the decision, preservin
   expect(notice).toMatchObject({
     recipientId: f.reporter.id,
     title: "Community report status / Статус жалобы",
-    message: "Report status: under_review.",
+    message: "Report status: under_review. / Жалоба рассматривается.",
     link: `/workspace/reports/${report.id}`,
     category: "security",
     type: "security",

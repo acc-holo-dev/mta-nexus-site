@@ -18,7 +18,7 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
   const status = formatNotification(
     {
       title: "Platform report status / Статус жалобы платформы",
-      message: "Report status: resolved.",
+      message: "Report status: resolved. / Жалоба решена.",
     },
     reviewCopy,
     "ru",
@@ -29,7 +29,7 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
   const en = formatNotification(
     {
       title: "Platform report status / Статус жалобы платформы",
-      message: "Report status: dismissed.",
+      message: "Report status: dismissed. / Жалоба отклонена.",
     },
     reviewCopy,
     "en",

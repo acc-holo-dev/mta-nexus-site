@@ -108,14 +108,20 @@ it.each(["en", "ru"] as const)(
     expect(communityReportMutationError(locale, "UNCONFIRMED")).toBe(copy.mutationUnavailable);
     expect(communityReportDecisionError(locale, "INTERNAL_ERROR")).toBe(copy.decisionUnavailable);
     const notice = formatNotification(
-      { title: "Community report status / Статус жалобы", message: "Report status: resolved." },
+      {
+        title: "Community report status / Статус жалобы",
+        message: "Report status: resolved. / Жалоба решена.",
+      },
       getDictionary(locale).buildReviewNotifications,
       locale,
     );
     expect(notice.message).toBe(locale === "ru" ? "Жалоба решена." : "Report status: resolved.");
     expect(
       formatNotification(
-        { title: "New community report / Новая жалоба сообщества", message: "A community report is awaiting review." },
+        {
+          title: "New community report / Новая жалоба сообщества",
+          message: "A community report is awaiting review.",
+        },
         getDictionary(locale).buildReviewNotifications,
         locale,
       ).title,
