@@ -232,6 +232,7 @@ export function orderCaseError(locale: string, code: unknown): string {
     case "ACTOR_CHANGED":
       return copy.failed;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return copy.uncertain;
     default:
       return copy.uncertain;
