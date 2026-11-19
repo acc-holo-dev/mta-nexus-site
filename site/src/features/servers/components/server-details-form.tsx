@@ -278,8 +278,13 @@ export function ServerDetailsForm({
             data,
             {
               SERVER_METADATA_CONFLICT: copy.concurrentEdit,
+              CONFLICT: copy.concurrentEdit,
               SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
               FORBIDDEN: copy.forbiddenEdit,
+              UNAUTHORIZED: copy.saveError,
+              ACTOR_ID_REQUIRED: copy.saveError,
+              ACTOR_CHANGED: copy.saveError,
+              VALIDATION_ERROR: copy.saveError,
               REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
               REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
             },
