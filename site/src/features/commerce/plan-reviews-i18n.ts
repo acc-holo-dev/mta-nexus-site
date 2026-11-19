@@ -155,7 +155,7 @@ export function planReviewError(locale: Locale, code: unknown) {
       ? c.planChanged
       : code === "PLAN_REVIEW_LIMIT"
         ? c.limit
-        : code === "PLAN_REVIEW_INVALID"
+        : code === "PLAN_REVIEW_INVALID" || code === "VALIDATION_ERROR"
           ? c.invalid
           : c.retry;
 }

@@ -216,7 +216,11 @@ export function resourceReviewError(locale: Locale, code: unknown) {
     return copy.denied;
   if (code === "REVIEW_MODERATED") return copy.moderator;
   if (code === "NOT_FOUND") return copy.missing;
-  if (["REVIEW_INVALID", "REVIEW_REPORT_INVALID", "REPORT_OWN_TARGET"].includes(String(code)))
+  if (
+    ["REVIEW_INVALID", "REVIEW_REPORT_INVALID", "REPORT_OWN_TARGET", "VALIDATION_ERROR"].includes(
+      String(code),
+    )
+  )
     return copy.invalid;
   if (code === "RATE_LIMIT_EXCEEDED") return copy.limited;
   if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.failure;

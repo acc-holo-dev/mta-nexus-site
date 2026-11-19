@@ -78,6 +78,8 @@ const copy = {
       NOT_FOUND: "The resource is unavailable or you no longer have access.",
       VALIDATION_FAILED:
         "A selected resource cannot be acquired. Refresh the cart and remove unavailable items.",
+      VALIDATION_ERROR:
+        "A selected resource cannot be acquired. Refresh the cart and remove unavailable items.",
       UNAUTHORIZED: "Your session expired. Sign in and try again.",
       ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
@@ -173,6 +175,8 @@ const copy = {
       RESOURCE_UNAVAILABLE: "Ресурс больше недоступен. Обновите корзину.",
       NOT_FOUND: "Ресурс недоступен или у вас больше нет прав на него.",
       VALIDATION_FAILED:
+        "Один из ресурсов нельзя получить. Обновите корзину и уберите недоступные позиции.",
+      VALIDATION_ERROR:
         "Один из ресурсов нельзя получить. Обновите корзину и уберите недоступные позиции.",
       UNAUTHORIZED: "Сессия истекла. Войдите и повторите попытку.",
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",

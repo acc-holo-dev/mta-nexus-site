@@ -273,7 +273,12 @@ export function libraryCollectionsCopy(locale: "ru" | "en") {
 }
 export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   const c = libraryCollectionsCopy(locale);
-  if (code === "COLLECTION_INVALID" || code === "INVALID_JSON" || code === "BODY_TOO_LARGE")
+  if (
+    code === "COLLECTION_INVALID" ||
+    code === "INVALID_JSON" ||
+    code === "BODY_TOO_LARGE" ||
+    code === "VALIDATION_ERROR"
+  )
     return c.invalid;
   if (
     code === "COLLECTION_CONFLICT" ||

@@ -117,6 +117,7 @@ const copy = {
       UNAUTHORIZED: "Sign in again to continue.",
       ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
       ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
+      VALIDATION_ERROR: "Check the selected release and request details.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
       fallback: "The result could not be confirmed. Reload the current state before retrying.",
       actionErrorDescription:
@@ -237,6 +238,7 @@ const copy = {
       UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
       ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
+      VALIDATION_ERROR: "Проверьте выбранный выпуск и параметры запроса.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Попробуйте немного позже.",
       fallback: "Результат не удалось подтвердить. Обновите состояние перед повтором.",
       actionErrorDescription:
