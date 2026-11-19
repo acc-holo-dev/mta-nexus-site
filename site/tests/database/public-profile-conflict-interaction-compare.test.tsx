@@ -47,7 +47,7 @@ it("keeps the current draft on read failure and closes it if the actor changes",
   await save(render());
   harness.request.mockRejectedValueOnce(new Error("unauthorized"));
   (findTestButton(render(), copy.profileCompare).props.onClick as () => void)();
-  await vi.waitFor(() => expect(harness.slots[3]).toMatchObject({ text: "unauthorized" }));
+  await vi.waitFor(() => expect(harness.slots[3]).toMatchObject({ text: copy.unavailable }));
   expect(render().some((node) => node.type === "form")).toBe(true);
   expect(findTestButton(render(), copy.save).props.disabled).toBe(true);
   harness.request.mockResolvedValueOnce({ profile: { ...latest, id: "usr_2", username: "other" } });

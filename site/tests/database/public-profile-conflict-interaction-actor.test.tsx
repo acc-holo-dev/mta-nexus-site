@@ -45,8 +45,10 @@ it.each(["en", "ru"] as const)(
   async (locale) => {
     harness.locale = locale;
     const cleanup = await load();
-    const message = locale === "en" ? "Account changed" : "Аккаунт изменился";
-    harness.request.mockRejectedValueOnce(new PlatformRequestError(message, "ACCOUNT_CHANGED"));
+    const message = getUserPlatformCopy(locale).profileAccountChanged;
+    harness.request.mockRejectedValueOnce(
+      new PlatformRequestError(getUserPlatformCopy(locale).ACCOUNT_CHANGED, "ACCOUNT_CHANGED"),
+    );
     await save(render());
     expect(harness.request.mock.calls[1]?.[3]).toMatchObject({
       expectedActorId: original.id,

@@ -131,7 +131,7 @@ export function ProfilePrivacyEditor({
         setProfile(null);
         setActivity(true);
         setContacts(true);
-        setNotice({ text: safeMessage(error, copy.unavailable), error: true });
+        setNotice({ text: copy.accountChanged, error: true });
         return;
       }
       const text = safeMessage(error, copy.uncertain);

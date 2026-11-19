@@ -115,7 +115,7 @@ export function PublicProfileForm() {
         setProfile(null);
         setLatest(null);
         setRecoveryRequired(false);
-        setNotice({ text: safeMessage(error, copy.unavailable), error: true });
+        setNotice({ text: copy.profileAccountChanged, error: true });
         return;
       }
       setNotice({ text: safeMessage(error, copy.unavailable), error: true });
