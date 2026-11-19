@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { loginSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authLoginApiCopy } from "../../../../features/accounts/auth-login-api-copy";
 import {
   SESSION_COOKIE_NAME,
@@ -79,7 +80,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.unauthorized,
+            failed: copy.failed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
 
     logRequestEvent({

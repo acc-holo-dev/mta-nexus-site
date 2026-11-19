@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { changePasswordSchema } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authPasswordApiCopy } from "../../../../features/accounts/auth-password-api-copy";
 import {
   SESSION_COOKIE_NAME,
@@ -58,7 +59,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.unauthorized,
+            freshAuthRequired: copy.freshAuthRequired,
+            conflict: copy.accountChanged,
+            failed: copy.unavailable,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     // SQL errors may include bound values: never log passwords, hashes or tokens.
     logRequestEvent({
