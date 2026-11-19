@@ -97,4 +97,44 @@ describe("notification residual inbox copy honesty", () => {
     expect(en.title).toBe("License expired");
     expect(en.message).toContain("The recorded license term ended");
   });
+
+  it("localizes QA/build title-only remappers when data.kind is absent", () => {
+    expect(
+      formatNotification(
+        {
+          title: "New resource question / Новый вопрос по ресурсу",
+          message: "Someone asked about Grid. / По ресурсу «Grid» задали новый публичный вопрос.",
+          data: null,
+        },
+        reviewCopy,
+        "ru",
+      ),
+    ).toEqual({
+      title: "Новый вопрос по ресурсу",
+      message: "По ресурсу задали новый публичный вопрос.",
+    });
+    expect(
+      formatNotification(
+        {
+          title: "Resource build quarantined / Сборка ресурса в карантине",
+          message: "plain / plain",
+          data: null,
+        },
+        reviewCopy,
+        "ru",
+      ).title,
+    ).toBe("Сборка ресурса в карантине");
+    expect(
+      formatNotification(
+        {
+          title:
+            "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
+          message: "stored / stored",
+          data: null,
+        },
+        reviewCopy,
+        "ru",
+      ).title,
+    ).toBe("Уведомление безопасности о загруженной сборке");
+  });
 });

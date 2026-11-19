@@ -555,6 +555,41 @@ export function formatNotification(
       message: `${noticeTitle === "License expired" ? licenseCopy.expiredMessage : licenseCopy.expiringMessage}${stamped}`,
     };
   }
+  // Defense remappers when structured data.kind is absent; data-backed branches below win first.
+  if (
+    noticeTitle === "Security notice for a downloaded build" &&
+    notification.data?.kind !== "build_incident"
+  ) {
+    return { title: c.buildIncident.title, message: c.buildIncident.message };
+  }
+  if (
+    noticeTitle === "Resource build quarantined" &&
+    notification.data?.kind !== "build_lifecycle"
+  ) {
+    return {
+      title: c.buildLifecycle.quarantined.title,
+      message: c.buildLifecycle.quarantined.plain,
+    };
+  }
+  if (noticeTitle === "Resource build restored" && notification.data?.kind !== "build_lifecycle") {
+    return {
+      title: c.buildLifecycle.restored.title,
+      message: c.buildLifecycle.restored.plain,
+    };
+  }
+  const resourceQaByTitle = {
+    "New resource question": "asked",
+    "Resource question answered": "answered",
+    "Resource question resolved": "resolved",
+    "Resource question removed": "removed",
+  } as const;
+  const resourceQaEvent = resourceQaByTitle[noticeTitle as keyof typeof resourceQaByTitle];
+  if (resourceQaEvent && notification.data?.kind !== "resource_qa") {
+    return {
+      title: c.resourceQa.titles[resourceQaEvent],
+      message: c.resourceQa.messages[resourceQaEvent](null),
+    };
+  }
   if (
     noticeTitle === "New community report" &&
     noticeMessage === "A community report is awaiting review."
