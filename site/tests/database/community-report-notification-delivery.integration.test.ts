@@ -321,7 +321,11 @@ it.each(["comment", "content"] as const)(
       .from(notifications)
       .where(inArray(notifications.recipientId, [f.reporter.id, second.id]));
     expect(notices).toHaveLength(2);
-    expect(notices.every((notice) => notice.message === "Report status: resolved.")).toBe(true);
+    expect(
+      notices.every(
+        (notice) => notice.message === "Report status: resolved. / Жалоба решена.",
+      ),
+    ).toBe(true);
     expect(JSON.stringify(notices)).not.toContain("Private batch notes");
   },
 );
