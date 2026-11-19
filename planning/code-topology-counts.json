@@ -75,11 +75,19 @@
       "apps/web"
     ],
     "note": "Canonical packages live under site/packages/*. Root packages/* and apps/web are not workspace members and must stay untracked; host leftovers vary by machine.",
-    "workspace_members": ["site", "site/packages/*"]
+    "workspace_members": [
+      "site",
+      "site/packages/*"
+    ]
   },
   "lib": {
     "i18n_modules": 0,
-    "root_dirs": ["http", "i18n", "platform", "services"],
+    "root_dirs": [
+      "http",
+      "i18n",
+      "platform",
+      "services"
+    ],
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
@@ -96,7 +104,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "79554e78b3419e9fdf52f73afb922bbb5b546a0a",
+  "source_sha": "1f1f06d215c5c6958fd9e7860b30866af4c4a0a8",
   "tests": {
     "site_tests_files": 1664
   }
