@@ -157,7 +157,7 @@ it("commits status-only moderator notices with deletion/audit and respects recip
       .update(JSON.stringify([input.auditId, author.id]))
       .digest("hex")}`,
     title: "Discussion moderation / Модерация обсуждения",
-    message: `Comment ${message.id}: removed.`,
+    message: `Comment ${message.id}: removed. / Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены.`,
     link: `/workspace/discussions/${message.id}`,
     category: "content",
   });
