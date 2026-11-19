@@ -67,6 +67,7 @@ const copies = {
       VALIDATION_ERROR:
         "Use a valid static PNG, JPEG or WebP and a single-line caption of up to 160 characters.",
       RATE_LIMIT_EXCEEDED: "Too many requests. Retry later.",
+      RATE_LIMITED: "Too many requests. Retry later.",
     },
   },
   ru: {
@@ -137,6 +138,7 @@ const copies = {
       VALIDATION_ERROR:
         "Нужен корректный статичный PNG, JPEG или WebP и однострочная подпись до 160 символов.",
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите позже.",
+      RATE_LIMITED: "Слишком много запросов. Повторите позже.",
     },
   },
 };
