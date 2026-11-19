@@ -23,6 +23,12 @@ describe("catch-path allowlist honesty surface", () => {
     "site/src/features/accounts/components/public-profile-form.tsx",
     "site/src/features/accounts/components/developer-profile-editor.tsx",
     "site/src/features/accounts/components/profile-privacy-editor.tsx",
+    "site/src/features/community/components/content-comment-form.tsx",
+    "site/src/features/community/components/community-topic-form.tsx",
+    "site/src/features/servers/components/register-server-form.tsx",
+    "site/src/features/servers/components/server-details-form.tsx",
+    "site/src/features/resources/components/new-resource-form.tsx",
+    "site/src/features/resources/components/resource-cart-controls.tsx",
   ])("%s allowlists failure messages", (path) => {
     const source = readFileSync(resolve(process.cwd(), path), "utf8");
     expect(source).toContain("function safeMessage");
