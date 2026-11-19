@@ -345,9 +345,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           publishingErrorMessages,
         );
         throw new Error(
-          !firstAttempt
-            ? copy.buildUnconfirmed
-            : publishingMessage || copy.buildError,
+          !firstAttempt ? copy.buildUnconfirmed : publishingMessage || copy.buildError,
         );
       }
 
