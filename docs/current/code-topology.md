@@ -501,7 +501,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
 | A   | Waves 134–140 — settings signed-out locale match + notice catalog/producer gaps                                   | settings/notices RU/EN           | **done** |
 | A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done** |
-| A   | Waves 154–157 — ACTOR_* remappers across resource/library/accounts/moderation/servers                             | client remapper RU/EN            | **done** |
+| A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
