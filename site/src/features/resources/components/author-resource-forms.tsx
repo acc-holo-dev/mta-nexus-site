@@ -270,7 +270,7 @@ export function AuthorResourceForms({
               ? publishing.authenticationRequired
               : body?.code === "NOT_FOUND"
                 ? publishing.buildForbidden
-                : body?.code === "RATE_LIMIT_EXCEEDED"
+                : body?.code === "RATE_LIMIT_EXCEEDED" || body?.code === "RATE_LIMITED"
                   ? publishing.uploadRateLimited
                   : copy.failed,
         );
