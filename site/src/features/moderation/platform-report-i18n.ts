@@ -154,5 +154,6 @@ export function platformReportError(locale: Locale, code: string | null | undefi
   if (code === "REPORT_EXISTS" || code === "CONFLICT") return text.reportExists;
   if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return text.reportSignIn;
   if (code === "ACTOR_CHANGED") return text.identityUnavailable;
+  if (code === "FORBIDDEN") return text.reportFailed;
   return text.reportFailed;
 }

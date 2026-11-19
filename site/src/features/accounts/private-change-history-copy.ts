@@ -154,6 +154,7 @@ export function privateChangeHistoryError(locale: Locale, code: unknown) {
     return copy.expired;
   if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
   if (code === "ACTOR_CHANGED") return copy.unavailable;
+  if (code === "FORBIDDEN") return copy.unavailable;
   if (code === "RATE_LIMIT_EXCEEDED") return copy.rateLimited;
   return copy.unavailable;
 }
