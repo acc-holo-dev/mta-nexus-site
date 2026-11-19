@@ -1,4 +1,4 @@
-import { serverRepository, userLibraryRepository } from "@nexus/db";
+import { serverRepository } from "@nexus/db";
 import { EmptyState, ErrorState, SectionHeader, StatCard } from "@nexus/ui";
 import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import type { Metadata } from "next";
@@ -17,6 +17,7 @@ import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n/server";
 import { formatUnknown } from "../../lib/i18n/unknown";
 import { authService } from "../../lib/services/accounts/auth-service";
+import { userLibraryService } from "../../lib/services/library/user-library-service";
 import {
   indexMtaObservations,
   mtaLiveStatus,
@@ -65,7 +66,7 @@ export default async function WorkspacePage() {
   if (!user) return <PlatformSignIn locale={locale} returnPath="/workspace" />;
 
   const [library, serverBundle] = await Promise.all([
-    userLibraryRepository.pageByUser(user.id, 1, "all", 4).catch(() => null),
+    userLibraryService.pageByUser(user.id, 1, "all", 4).catch(() => null),
     serverRepository
       .pageManagedByUser(user.id, 1, {}, 4)
       .then(async (serverPage) => ({

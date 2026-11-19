@@ -36,7 +36,7 @@ const REQUIRED_SURFACES = [
 const WAVE57_DASH_REPLACEMENT_CANDIDATES = [
   "site/src/app/page.tsx",
   "site/src/app/workspace/page.tsx",
-  "site/src/app/workspace/library/reviews/page.tsx",
+  "site/src/features/library/server/library-reviews-screen.tsx",
   "site/src/app/admin/storage/objects/[id]/page.tsx",
   "site/src/app/servers/[slug]/page.tsx",
   "site/src/features/servers/components/server-card.tsx",

@@ -1,9 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
-import { getDictionary } from "../../src/lib/i18n";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
@@ -75,9 +75,9 @@ it.each(["en", "ru"] as const)(
 
 it("locks library watches honesty page sources to ErrorState/EmptyState chrome", () => {
   const pages = [
-    "site/src/app/workspace/library/watches/page.tsx",
-    "site/src/app/workspace/library/watches/history/page.tsx",
-    "site/src/app/workspace/library/reviews/page.tsx",
+    "site/src/features/library/server/library-watches-screen.tsx",
+    "site/src/features/library/server/library-watch-history-screen.tsx",
+    "site/src/features/library/server/library-reviews-screen.tsx",
     "site/src/app/workspace/library/review/[id]/page.tsx",
     "site/src/app/workspace/library/[id]/versions/page.tsx",
   ];
@@ -89,9 +89,15 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("site/src/app/workspace/library/watches/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/library/watches/history/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/library/reviews/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/library/server/library-watches-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/library-watch-history-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/library-reviews-screen.tsx")).toContain(
+    "EmptyState",
+  );
   expect(read("site/src/app/workspace/library/[id]/versions/page.tsx")).toContain("EmptyState");
   for (const loading of [
     "site/src/app/workspace/library/watches/loading.tsx",

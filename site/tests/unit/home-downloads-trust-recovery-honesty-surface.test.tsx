@@ -19,7 +19,7 @@ it("locks Home panel load-unavailable ErrorStates to recovery hints", () => {
 });
 
 it("locks downloads/trust/verification/author/mta-directory recovery hints", () => {
-  expect(read("site/src/app/workspace/library/downloads/page.tsx")).toMatch(
+  expect(read("site/src/features/library/server/library-downloads-screen.tsx")).toMatch(
     /title=\{copy\.loadUnavailable\}\s*\n\s*description=\{copy\.loadUnavailableHint\}/u,
   );
   expect(read("site/src/app/users/[username]/trust/page.tsx")).toMatch(

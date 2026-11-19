@@ -29,6 +29,12 @@ Feature объединяет существующие представления
 | `collection-history-page-server.ts`         | Серверная история команд                                      |
 | `collection-inventory-page-server.ts`       | Серверный инвентарь коллекций                                 |
 | `resource-collections-page-server.ts`       | Серверные коллекции ресурса                                   |
+| `library-page-server.ts`                    | `LibraryPageScreen`; server-only главная библиотека           |
+| `library-updates-server.ts`                 | `LibraryUpdatesScreen`; server-only обновления                |
+| `library-downloads-server.ts`               | `LibraryDownloadsScreen`; server-only выдачи                  |
+| `library-watches-server.ts`                 | `LibraryWatchesScreen`; server-only watch-лист                |
+| `library-watch-history-server.ts`           | `LibraryWatchHistoryScreen`; server-only история watch        |
+| `library-reviews-server.ts`                 | `LibraryReviewsScreen`; server-only свои отзывы               |
 | `collections-server.ts`                     | `LibraryCollectionsScreen`; server-only экран коллекций       |
 | `collection-command.ts`                     | Клиентская форма команды коллекции                            |
 | `collection-batch.ts`                       | Клиентская форма пакетной команды                             |

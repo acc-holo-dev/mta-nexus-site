@@ -13,8 +13,11 @@ const pages: Array<[string, string]> = [
   ["site/src/app/workspace/acquisitions/receipts/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/acquisitions/receipts/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/finance/page.tsx", "copy.statementsLoadUnavailableHint"],
-  ["site/src/app/workspace/library/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/library/updates/page.tsx", "copy.updatesLoadUnavailableHint"],
+  ["site/src/features/library/server/library-page-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/library/server/library-updates-screen.tsx",
+    "copy.updatesLoadUnavailableHint",
+  ],
   ["site/src/app/workspace/page.tsx", "dictionary.workspace.libraryUnavailableHint"],
   ["site/src/app/workspace/page.tsx", "dictionary.workspace.serversUnavailableHint"],
   [

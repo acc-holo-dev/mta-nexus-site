@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/workspace/library/page.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/library/server/library-page-screen.tsx"),
+  "utf8",
+);
 
 /** Honesty lock for library item unavailableReason notice. */
 it("locks library unavailableReason to ErrorState", () => {
