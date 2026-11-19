@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authSessionsApiCopy } from "../../../../features/accounts/auth-sessions-api-copy";
 import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
@@ -138,7 +139,18 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.updateUnavailable,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
 
     logRequestEvent({

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authSessionApiCopy } from "../../../../features/accounts/auth-session-api-copy";
 import {
   SESSION_COOKIE_NAME,

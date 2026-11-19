@@ -4,6 +4,7 @@ import {
   requestRecoveryEmailVerificationSchema,
 } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authEmailVerificationApiCopy } from "../../../../features/accounts/auth-email-verification-api-copy";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
@@ -76,7 +77,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     );
   } catch (error: unknown) {
     if (error instanceof AppError)
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            freshAuthRequired: copy.validationFailed,
+            conflict: copy.accountChanged,
+            failed: copy.startFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     // Configuration/DB/queue failures may contain secret-bearing context.
     logRequestEvent({
       level: "error",
@@ -108,7 +120,17 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     return json({ success: true, email: result.email, verifiedAt: result.verifiedAt });
   } catch (error: unknown) {
     if (error instanceof AppError)
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.confirmFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     logRequestEvent({
       level: "error",
       event: "auth.recovery_email.confirm_failed",

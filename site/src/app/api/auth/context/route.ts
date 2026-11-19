@@ -3,6 +3,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { authContextApiCopy } from "../../../../features/accounts/auth-context-api-copy";
 import { readAuthJson } from "../../../../lib/http/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
@@ -207,7 +208,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: error.message,
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.switchFailed,
+          }),
           code: error.code,
         },
         error.statusCode,
