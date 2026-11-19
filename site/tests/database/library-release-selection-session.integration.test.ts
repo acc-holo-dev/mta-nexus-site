@@ -106,7 +106,7 @@ async function state(f: Fixture) {
       .select()
       .from(resourceLibrarySelections)
       .where(eq(resourceLibrarySelections.userId, f.userId))
-      .orderBy(asc(resourceLibrarySelections.id)),
+      .orderBy(asc(resourceLibrarySelections.productId)),
     audits: await db
       .select()
       .from(auditEvents)

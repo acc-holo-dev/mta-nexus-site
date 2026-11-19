@@ -80,7 +80,12 @@ export function assertDecisionState(status: string, expected: string, action: st
 
 export async function persistDecisionNotice(
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
-  input: { auditId: string; id: string; reporterId: string; status: Status },
+  input: {
+    auditId: string;
+    id: string;
+    reporterId: string;
+    status: Exclude<Status, "open">;
+  },
 ) {
   const result = await notificationRepository.createWithPushOutboxWithin(
     tx,
