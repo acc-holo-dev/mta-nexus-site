@@ -29,6 +29,10 @@ export default function ResetPasswordPage() {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
   const apiCopy = authPasswordResetApiCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(apiCopy)].includes(text) ? text : fallback;
+  }
   const [state, setState] = useState<State>({ kind: "loading" });
   const [passwords, setPasswords] = useState({ next: "", confirm: "" });
 
@@ -83,7 +87,7 @@ export default function ResetPasswordPage() {
       setState({
         kind: "error",
         proof,
-        message: error instanceof Error && error.message ? error.message : copy.resetFailed,
+        message: safeMessage(error, copy.resetFailed),
       });
     }
   }

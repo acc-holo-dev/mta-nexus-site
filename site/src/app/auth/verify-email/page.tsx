@@ -31,6 +31,10 @@ export default function VerifyEmailPage() {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
   const apiCopy = authEmailVerificationApiCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(apiCopy)].includes(text) ? text : fallback;
+  }
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
@@ -69,7 +73,7 @@ export default function VerifyEmailPage() {
       setState({
         kind: "error",
         proof,
-        message: error instanceof Error && error.message ? error.message : copy.verifyFailed,
+        message: safeMessage(error, copy.verifyFailed),
       });
     }
   }

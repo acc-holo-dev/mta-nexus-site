@@ -16,6 +16,10 @@ export default function ForgotPasswordPage() {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
   const apiCopy = authPasswordResetApiCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(apiCopy)].includes(text) ? text : fallback;
+  }
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<{
@@ -39,7 +43,7 @@ export default function ForgotPasswordPage() {
         throw new Error(
           data?.code === "VALIDATION_ERROR" || data?.code === "INVALID_BODY_LENGTH"
             ? apiCopy.invalidBody
-            : data?.code === "RATE_LIMIT_EXCEEDED"
+            : data?.code === "RATE_LIMIT_EXCEEDED" || data?.code === "RATE_LIMITED"
               ? apiCopy.requestUnavailable
               : copy.unavailable,
         );
@@ -48,7 +52,7 @@ export default function ForgotPasswordPage() {
     } catch (error: unknown) {
       setNotice({
         error: true,
-        text: error instanceof Error && error.message ? error.message : copy.unavailable,
+        text: safeMessage(error, copy.unavailable),
       });
     } finally {
       setPending(false);
