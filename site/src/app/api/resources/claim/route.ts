@@ -6,6 +6,7 @@ import { resourceClaimApiCopy } from "../../../../features/resources/resource-cl
 import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -74,12 +75,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     return json(context, result, result.alreadyClaimed ? 200 : 201);
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error && "statusCode" in error
-        ? (error as Error & {
-            statusCode: number;
-          })
-        : null;
+    const appError = error instanceof AppError ? error : null;
     logRequestEvent({
       level: "error",
       event: "resource.claim_failed",
@@ -90,7 +86,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: appError?.message || copy.claimFailed,
+        error: appError
+          ? localeAppErrorText(
+              appError,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.claimFailed,
+              },
+              { VALIDATION_ERROR: copy.invalidClaim },
+            )
+          : copy.claimFailed,
+        ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,
     );

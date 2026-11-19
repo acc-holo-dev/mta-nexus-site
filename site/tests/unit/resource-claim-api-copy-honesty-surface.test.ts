@@ -27,6 +27,8 @@ describe("resource claim API copy honesty surface", () => {
     expect(route).toContain("copy.authenticationRequired");
     expect(route).toContain("copy.invalidClaim");
     expect(route).toContain("copy.claimFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Too many resource claims. Please try again later."');
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Invalid resource claim"');
