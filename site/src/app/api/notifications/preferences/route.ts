@@ -3,6 +3,7 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { notificationPreferencesApiCopy } from "../../../../features/notifications/notification-preferences-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
@@ -131,7 +132,18 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.updateFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",

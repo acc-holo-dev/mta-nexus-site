@@ -4,6 +4,7 @@ import { webPushSubscriptionRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
 import { notificationPushApiCopy } from "../../../../features/notifications/notification-push-api-copy";
 import { parseWebPushSubscription } from "../../../../features/notifications/web-push-subscription";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
@@ -211,7 +212,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.identityChanged,
+            failed: copy.registerFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
@@ -305,7 +317,18 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.identityChanged,
+            failed: copy.removeFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",

@@ -86,7 +86,14 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       error instanceof AppError &&
       ["INVALID_BODY_LENGTH", "REQUEST_BODY_TOO_LARGE", "REQUEST_BODY_TIMEOUT"].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: copy.invalidTarget,
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
