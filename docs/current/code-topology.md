@@ -322,6 +322,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 198–204 done (local tip):** history interval invalid labels → `unknownMarker`; `orderCaseError` + create/review form code remap; `resourceBuildWorkspaceError` + build controls; staff build moderation uses `adminActionClientError`; honesty locks. Depcruise util-port for `admin-action-client-error` + topology restamp landed on tip before this pack.
 
+**Waves 205–209 done (local tip):** comment client validation uses `discussionError` when locale is set (form passes locale); domain remapper aliases for report/verification/org/discussion/reaction/author-desk/server workspace so `FORBIDDEN`/`ACTOR_*`/`RATE_*`/`CONFLICT` stop falling through to publication `userPlatformError` wording; honesty lock.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -517,6 +519,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 179–188 — admin/auth/acquire/settings drop body.error passthrough                                           | client remapper RU/EN            | **done** |
 | A   | Waves 189–197 — AuthForm/mutation/comment body.error drop + residual CONFLICT/RATE aliases                        | client remapper RU/EN            | **done** |
 | A   | Waves 198–204 — history unknownMarker + orderCase/build workspace code remappers                                  | client remapper RU/EN            | **done** |
+| A   | Waves 205–209 — comment locale validation + domain remapper alias fills                                           | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
