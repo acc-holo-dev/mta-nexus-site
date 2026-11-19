@@ -332,6 +332,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 234–245 done (local tip):** register create-catch allowlist; org/server content RSC remappers; safeMessage normalize on amend/visibility/restore/inbox/settings; `RATE_LIMITED` aliases; honesty lock.
 
+**Waves 246–257 done (local tip):** server content listing RSC remapper; auth verify/reset/forgot + acquire catch allowlists; broader `RATE_LIMITED` alias sweep (auth/discovery/admin/resource/library + dictionary keys).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -532,6 +534,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 215–226 — publication/trust/org remapper aliases + report/discussion/verification/org/account allowlists    | client remapper RU/EN            | **done** |
 | A   | Waves 227–233 — comment/topic/server/resource catch-path allowlists                                               | client remapper RU/EN            | **done** |
 | A   | Waves 234–245 — RSC content remappers + safeMessage normalize + RATE_LIMITED aliases                              | client remapper RU/EN            | **done** |
+| A   | Waves 246–257 — server listing RSC + auth/acquire allowlists + RATE_LIMITED sweep                                 | client remapper RU/EN            | **done** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 

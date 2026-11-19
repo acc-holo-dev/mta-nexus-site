@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-/** Waves 210–245: catch paths only surface allowlisted locale copy. */
+/** Waves 210–257: catch paths only surface allowlisted locale copy. */
 describe("catch-path allowlist honesty surface", () => {
   it.each([
     "site/src/features/organizations/components/organization-team-directory.tsx",
@@ -35,6 +35,10 @@ describe("catch-path allowlist honesty surface", () => {
     "site/src/features/community/components/discussion-report-batch.tsx",
     "site/src/features/notifications/components/notification-inbox.tsx",
     "site/src/features/accounts/components/settings-page-client.tsx",
+    "site/src/app/auth/verify-email/page.tsx",
+    "site/src/app/auth/reset-password/page.tsx",
+    "site/src/app/auth/forgot-password/page.tsx",
+    "site/src/app/acquire/page.tsx",
   ])("%s allowlists failure messages", (path) => {
     const source = readFileSync(resolve(process.cwd(), path), "utf8");
     expect(source).toContain("function safeMessage");

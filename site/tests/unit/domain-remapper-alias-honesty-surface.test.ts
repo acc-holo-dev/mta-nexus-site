@@ -15,8 +15,11 @@ import { trustError } from "../../src/features/trust/public-user-trust-copy";
 import { verificationError } from "../../src/features/trust/verification-workspace-copy";
 import { followError } from "../../src/features/community/follow-workspace-copy";
 import { notificationInboxError } from "../../src/features/notifications/notification-inbox-copy";
+import { resourceCommerceError } from "../../src/features/resources/resource-commerce-i18n";
+import { resourceManagementError } from "../../src/features/resources/resource-management-i18n";
+import { resourceMediaError } from "../../src/features/resources/resource-media-i18n";
 
-/** Waves 205–209 / 215–217 / 234–245: domain remappers must not fall through to publication editor wording. */
+/** Waves 205–209 / 215–217 / 234–257: domain remappers must not fall through to publication editor wording. */
 describe("domain remapper alias honesty surface", () => {
   it("keeps FORBIDDEN/ACTOR/RATE/CONFLICT on domain copy for both locales", () => {
     for (const locale of ["en", "ru"] as const) {
@@ -64,9 +67,27 @@ describe("domain remapper alias honesty surface", () => {
       "site/src/features/organizations/server/content-page.tsx",
       "site/src/features/organizations/server/organization-content-editor-page.tsx",
       "site/src/features/servers/server/server-content-editor-page.tsx",
+      "site/src/app/workspace/servers/[id]/content/page.tsx",
     ]) {
       const source = readFileSync(resolve(process.cwd(), path), "utf8");
       expect(source).not.toContain("userPlatformError(locale, error.code)");
+    }
+  });
+
+  it("aliases RATE_LIMITED onto RATE_LIMIT_EXCEEDED for key remappers", () => {
+    for (const locale of ["en", "ru"] as const) {
+      expect(userPlatformError(locale, "RATE_LIMITED")).toBe(
+        userPlatformError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
+      expect(resourceCommerceError(locale, "RATE_LIMITED")).toBe(
+        resourceCommerceError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
+      expect(resourceManagementError(locale, "RATE_LIMITED")).toBe(
+        resourceManagementError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
+      expect(resourceMediaError(locale, "RATE_LIMITED")).toBe(
+        resourceMediaError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
     }
   });
 
