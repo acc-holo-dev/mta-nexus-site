@@ -7,12 +7,16 @@ import { discussionError } from "../../src/features/community/content-discussion
 import { reactionError } from "../../src/features/community/content-reaction-copy";
 import { publicationError } from "../../src/features/community/publication-feed-copy";
 import { userPlatformError } from "../../src/features/community/user-platform-copy";
+import { organizationContentMutationError } from "../../src/features/organizations/organization-content-copy";
 import { organizationError } from "../../src/features/organizations/organization-workspace-copy";
+import { serverContentMutationError } from "../../src/features/servers/server-content-copy";
 import { serverWorkspaceError } from "../../src/features/servers/server-workspace-copy";
 import { trustError } from "../../src/features/trust/public-user-trust-copy";
 import { verificationError } from "../../src/features/trust/verification-workspace-copy";
+import { followError } from "../../src/features/community/follow-workspace-copy";
+import { notificationInboxError } from "../../src/features/notifications/notification-inbox-copy";
 
-/** Waves 205–209 / 215–217: domain remappers must not fall through to publication editor wording. */
+/** Waves 205–209 / 215–217 / 234–245: domain remappers must not fall through to publication editor wording. */
 describe("domain remapper alias honesty surface", () => {
   it("keeps FORBIDDEN/ACTOR/RATE/CONFLICT on domain copy for both locales", () => {
     for (const locale of ["en", "ru"] as const) {
@@ -26,6 +30,12 @@ describe("domain remapper alias honesty surface", () => {
       expect(verificationError(locale, "FORBIDDEN")).not.toBe(publicationForbidden);
       expect(publicationError(locale, "FORBIDDEN")).not.toBe(publicationForbidden);
       expect(trustError(locale, "FORBIDDEN")).not.toBe(publicationForbidden);
+      expect(organizationContentMutationError(locale, "FORBIDDEN")).not.toBe(publicationForbidden);
+      expect(serverContentMutationError(locale, "FORBIDDEN")).not.toBe(publicationForbidden);
+      expect(followError(locale, "RATE_LIMITED")).toBe(followError(locale, "RATE_LIMIT_EXCEEDED"));
+      expect(notificationInboxError(locale, "RATE_LIMITED")).toBe(
+        notificationInboxError(locale, "RATE_LIMIT_EXCEEDED"),
+      );
       expect(organizationError(locale, "VALIDATION_ERROR")).toBe(
         organizationError(locale, "VALIDATION_ERROR"),
       );
@@ -46,6 +56,17 @@ describe("domain remapper alias honesty surface", () => {
       expect(reactionError(locale, "UNAUTHORIZED")).toBe(
         reactionError(locale, "ACTOR_ID_REQUIRED"),
       );
+    }
+  });
+
+  it("keeps org/server content RSC catches off publication userPlatformError", () => {
+    for (const path of [
+      "site/src/features/organizations/server/content-page.tsx",
+      "site/src/features/organizations/server/organization-content-editor-page.tsx",
+      "site/src/features/servers/server/server-content-editor-page.tsx",
+    ]) {
+      const source = readFileSync(resolve(process.cwd(), path), "utf8");
+      expect(source).not.toContain("userPlatformError(locale, error.code)");
     }
   });
 

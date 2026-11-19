@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-/** Waves 210–214 / 218–225: catch paths only surface allowlisted locale copy. */
+/** Waves 210–245: catch paths only surface allowlisted locale copy. */
 describe("catch-path allowlist honesty surface", () => {
   it.each([
     "site/src/features/organizations/components/organization-team-directory.tsx",
@@ -29,11 +29,20 @@ describe("catch-path allowlist honesty surface", () => {
     "site/src/features/servers/components/server-details-form.tsx",
     "site/src/features/resources/components/new-resource-form.tsx",
     "site/src/features/resources/components/resource-cart-controls.tsx",
+    "site/src/features/moderation/components/verification-application-amend.tsx",
+    "site/src/features/servers/components/managed-server-visibility-batch.tsx",
+    "site/src/features/community/components/author-publication-restore.tsx",
+    "site/src/features/community/components/discussion-report-batch.tsx",
+    "site/src/features/notifications/components/notification-inbox.tsx",
+    "site/src/features/accounts/components/settings-page-client.tsx",
   ])("%s allowlists failure messages", (path) => {
     const source = readFileSync(resolve(process.cwd(), path), "utf8");
     expect(source).toContain("function safeMessage");
     expect(source).not.toMatch(
       /setError\(\s*(?:failure|caught) instanceof Error \? (?:failure|caught)\.message/,
+    );
+    expect(source).not.toMatch(
+      /setError\(\s*caught instanceof Error && caught\.message \? caught\.message/,
     );
     expect(source).not.toMatch(/setReadError\(\s*caught instanceof Error \? caught\.message/);
     expect(source).not.toMatch(/setWriteError\(\s*caught instanceof Error \? caught\.message/);
