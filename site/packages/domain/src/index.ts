@@ -16,7 +16,16 @@ export * from "./license-control";
 export * from "./license-maintenance";
 export * from "./mta-endpoint";
 export * from "./mta-endpoint-audit";
-export { noticeStoredMessages } from "./notice-stored-messages";
+export {
+  bilingualNoticeMessage,
+  discussionModerationRemovedMessage,
+  newFollowerNoticeMessage,
+  noticeStoredMessages,
+  publicationReactionNoticeMessage,
+  resourceQaNoticeMessage,
+  verificationResolutionNoticeMessage,
+  withBilingualParenthetical,
+} from "./notice-stored-messages";
 export { noticeStoredTitles } from "./notice-stored-titles";
 export * from "./order-cases";
 export * from "./order-terms";
