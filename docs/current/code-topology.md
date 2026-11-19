@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `585d3e57` (`dev`, Waves 159–169 tip).  
+**source_sha:** `02790eec` (`dev`, Waves 170–178 local tip).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -314,6 +314,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 159–169 done:** resource-media / moderation / publishing / server-claim ACTOR remappers; FORBIDDEN + VALIDATION_ERROR aliases across management/commerce/QA/review/collections; support `ACTOR_ID_REQUIRED` → auth; locale/auth AppError helpers; release-watch auth/actor remaps; honesty locks.
 
+**Waves 170–178 done (local tip):** bare CONFLICT aliases on commerce/resource dict remappers; thin CONFLICT/VALIDATION fills; server mutation form maps; subscription fee estimator; gallery editor uses `resourceMediaError`; honesty locks. Hold push until `585d3e57` CI CLEAN.
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -505,6 +507,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 141–153 — dynamic notice bodies, browser CSRF, ACTOR_* remappers, CI community-report fixture               | API/notice/client RU/EN          | **done**  |
 | A   | Waves 154–158 — ACTOR_* remappers + bilingual server-publication integration fix                                  | client remapper RU/EN            | **done**  |
 | A   | Waves 159–169 — media/moderation/claim/publishing remappers + VALIDATION/FORBIDDEN fills + release-watch          | client remapper RU/EN            | **done**  |
+| A   | Waves 170–178 — CONFLICT/VALIDATION remapper fills + server forms + fee estimator + media helper              | client remapper RU/EN            | **local** |
 
 Дальше: Optional additive `error` on code-only commerce/product envelopes (owner-gated); F/ops external. Новые TOPO ID не заводить.
 
