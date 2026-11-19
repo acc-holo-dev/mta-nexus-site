@@ -49,15 +49,20 @@ export async function submitContentCommentRequest(
   fetchImpl: ContentCommentFetch = fetch,
 ): Promise<string> {
   const normalized = input.text.trim();
+  const reject = (code: "VALIDATION_ERROR" | "ACTOR_ID_REQUIRED", english: string): never => {
+    throw new ContentCommentSubmitError(
+      input.locale ? discussionError(input.locale, code) : english,
+      code,
+    );
+  };
   if (normalized.length < 2 || normalized.length > 5000) {
-    throw new RangeError("Comment text must contain 2..5000 characters");
+    reject("VALIDATION_ERROR", "Comment text must contain 2..5000 characters");
   }
   if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(input.expectedActorId))
-    throw new RangeError("Expected actor is required");
-  const intentKey = parseCommentIntentKey(input.intentKey);
-  if (!intentKey) {
-    throw new RangeError("Comment intent key must be a UUIDv4 Idempotency-Key");
-  }
+    reject("ACTOR_ID_REQUIRED", "Expected actor is required");
+  const intentKey =
+    parseCommentIntentKey(input.intentKey) ??
+    reject("VALIDATION_ERROR", "Comment intent key must be a UUIDv4 Idempotency-Key");
 
   const response = await fetchImpl(`/api/content/${encodeURIComponent(input.slug)}/comments`, {
     method: "POST",

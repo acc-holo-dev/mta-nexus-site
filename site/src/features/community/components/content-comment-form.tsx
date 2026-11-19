@@ -8,7 +8,7 @@ import { createCommentIntentKey, submitContentCommentRequest } from "../content-
 
 export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.articles;
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -33,6 +33,7 @@ export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: s
         text: normalized,
         intentKey: frozen.key,
         expectedActorId: actorId,
+        locale,
         fallbackError: copy.commentError,
       });
 
