@@ -102,6 +102,7 @@ export function profilePrivacyError(locale: Locale, code: unknown, mutation = fa
   const copy = profilePrivacyCopy(locale);
   switch (code) {
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
       return copy.signIn;
     case "FORBIDDEN":
       return copy.forbidden;
@@ -110,6 +111,7 @@ export function profilePrivacyError(locale: Locale, code: unknown, mutation = fa
     case "CONFLICT":
       return copy.conflict;
     case "ACCOUNT_CHANGED":
+    case "ACTOR_CHANGED":
       return copy.accountChanged;
     case "PRIVACY_SAVE_RETRY":
       return copy.retry;
