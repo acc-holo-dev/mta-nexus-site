@@ -94,7 +94,9 @@ it("maps VALIDATION_ERROR aliases and FORBIDDEN fills without English code passt
     expect(resourceManagementError(locale, "FORBIDDEN")).not.toBe(
       resourceManagementError(locale, "UNKNOWN_CODE"),
     );
-    expect(planReviewError(locale, "VALIDATION_ERROR")).toBe(planReviewError(locale, "PLAN_REVIEW_INVALID"));
+    expect(planReviewError(locale, "VALIDATION_ERROR")).toBe(
+      planReviewError(locale, "PLAN_REVIEW_INVALID"),
+    );
     expect(resourceReviewError(locale, "VALIDATION_ERROR")).toBe(
       resourceReviewError(locale, "REVIEW_INVALID"),
     );
