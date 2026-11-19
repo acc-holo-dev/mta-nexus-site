@@ -5,6 +5,7 @@ import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { recoveryJsonRequest } from "../../../features/accounts/account-recovery-browser";
+import { authPasswordResetApiCopy } from "../../../features/accounts/auth-password-reset-api-copy";
 import { useNexusLocale } from "../../../features/shell/locale";
 
 const pageShellClass = "mx-auto min-w-0 max-w-md overflow-x-clip py-12";
@@ -12,8 +13,9 @@ const navLinkClass =
   "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function ForgotPasswordPage() {
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
+  const apiCopy = authPasswordResetApiCopy(locale);
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<{
@@ -34,7 +36,13 @@ export default function ForgotPasswordPage() {
       );
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.accepted !== true) {
-        throw new Error(data?.error || copy.unavailable);
+        throw new Error(
+          data?.code === "VALIDATION_ERROR" || data?.code === "INVALID_BODY_LENGTH"
+            ? apiCopy.invalidBody
+            : data?.code === "RATE_LIMIT_EXCEEDED"
+              ? apiCopy.requestUnavailable
+              : copy.unavailable,
+        );
       }
       setNotice({ error: false, text: copy.accepted });
     } catch (error: unknown) {

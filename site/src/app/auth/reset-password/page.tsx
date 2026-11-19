@@ -9,6 +9,7 @@ import {
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
 } from "../../../features/accounts/account-recovery-browser";
+import { authPasswordResetApiCopy } from "../../../features/accounts/auth-password-reset-api-copy";
 import { useNexusLocale } from "../../../features/shell/locale";
 
 type Proof = AccountRecoveryProof;
@@ -25,8 +26,9 @@ const navLinkClass =
   "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function ResetPasswordPage() {
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
+  const apiCopy = authPasswordResetApiCopy(locale);
   const [state, setState] = useState<State>({ kind: "loading" });
   const [passwords, setPasswords] = useState({ next: "", confirm: "" });
 
@@ -68,7 +70,11 @@ export default function ResetPasswordPage() {
           setState({ kind: "invalid" });
           return;
         }
-        throw new Error(data?.error || copy.resetFailed);
+        throw new Error(
+          data?.code === "VALIDATION_ERROR" || data?.code === "INVALID_BODY_LENGTH"
+            ? apiCopy.invalidBody
+            : apiCopy.confirmUnavailable || copy.resetFailed,
+        );
       }
 
       setPasswords({ next: "", confirm: "" });

@@ -9,6 +9,7 @@ import {
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
 } from "../../../features/accounts/account-recovery-browser";
+import { authEmailVerificationApiCopy } from "../../../features/accounts/auth-email-verification-api-copy";
 import { useNexusLocale } from "../../../features/shell/locale";
 
 type Proof = AccountRecoveryProof;
@@ -27,8 +28,9 @@ const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function VerifyEmailPage() {
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
+  const apiCopy = authEmailVerificationApiCopy(locale);
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
@@ -51,7 +53,15 @@ export default function VerifyEmailPage() {
           setState({ kind: "invalid" });
           return;
         }
-        throw new Error(data?.error || copy.verifyFailed);
+        throw new Error(
+          data?.code === "UNAUTHORIZED" || data?.code === "ACTOR_ID_REQUIRED"
+            ? apiCopy.authenticationRequired
+            : data?.code === "ACTOR_CHANGED" || data?.code === "ACCOUNT_CHANGED"
+              ? apiCopy.accountChanged
+              : data?.code === "VALIDATION_ERROR"
+                ? apiCopy.validationFailed
+                : apiCopy.confirmFailed || copy.verifyFailed,
+        );
       }
 
       setState({ kind: "success", email: data.email });
