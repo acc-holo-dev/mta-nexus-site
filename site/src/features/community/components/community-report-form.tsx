@@ -11,6 +11,7 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
 import { platformFieldClass } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function CommunityReportForm({
   targetType,
   targetId,
@@ -24,6 +25,12 @@ export function CommunityReportForm({
 }) {
   const pathname = usePathname();
   const copy = communityReportCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const dictionary = getDictionary(locale);
   const workspace = dictionary.workspace;
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
@@ -193,7 +200,7 @@ export function CommunityReportForm({
       setEvidence("");
     } catch (caught) {
       if (requestEpoch === identityEpoch.current)
-        setError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+        setError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       if (requestEpoch === identityEpoch.current) setPending(false);

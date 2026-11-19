@@ -20,6 +20,7 @@ import { reportHistoryCopy } from "../community-report-history-copy";
 import { discussionReportsCopy } from "../discussion-reports-copy";
 import { ReportEvidenceLinks } from "../report-evidence-links";
 import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({
@@ -35,6 +36,12 @@ export function CommunityReportDetailView({
 }) {
   const copy = communityReportCopy(locale),
     path = `${staff ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(id)}`;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [report, setReport] = useState(initial),
     [notes, setNotes] = useState("");
   const [pending, setPending] = useState(false),
@@ -70,7 +77,7 @@ export function CommunityReportDetailView({
       setReport(await read());
       setNeedsReload(false);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
@@ -141,7 +148,7 @@ export function CommunityReportDetailView({
     } catch (caught) {
       setConfirmation(null);
       setNeedsReload(true);
-      setError(caught instanceof Error ? caught.message : copy.decisionUnavailable);
+      setError(safeMessage(caught, copy.decisionUnavailable));
     } finally {
       guard.current = false;
       setPending(false);

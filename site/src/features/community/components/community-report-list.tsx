@@ -12,6 +12,7 @@ import {
 } from "../community-report-contract";
 import { communityReportCopy, communityReportError } from "../community-report-copy";
 import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -29,6 +30,12 @@ export function CommunityReportList({
 }) {
   const copy = communityReportCopy(locale),
     path = staff ? "/admin/reports" : "/workspace/reports";
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [page, setPage] = useState(initial),
     [pending, setPending] = useState(false),
     [error, setError] = useState(initial ? "" : copy.unavailable);
@@ -65,7 +72,7 @@ export function CommunityReportList({
         throw new Error(copy.unavailable);
       setPage(result.data);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
