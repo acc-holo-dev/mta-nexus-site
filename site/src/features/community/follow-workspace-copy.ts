@@ -72,6 +72,8 @@ const en = {
   forbidden: "This action is unavailable.",
   rate: "Too many follow requests. Please try again shortly.",
   unconfirmed: "The result could not be confirmed. Refresh the state before trying again.",
+  actorRequired: "Reload this page and confirm your account before continuing.",
+  actorChanged: "The signed-in account changed. Reload before continuing.",
   errorHint: "Retry reloads the saved follow state. It does not invent a follow or mute.",
   discover: "Discover profiles and servers",
   refreshing: "Refreshing…",
@@ -151,6 +153,8 @@ const ru: Record<keyof typeof en, string> = {
   forbidden: "Это действие недоступно.",
   rate: "Слишком много действий с подписками. Попробуйте чуть позже.",
   unconfirmed: "Результат не подтверждён. Обновите состояние перед повторной попыткой.",
+  actorRequired: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+  actorChanged: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
   errorHint: "Повтор загружает сохранённое состояние подписки. Он не создаёт подписку или mute.",
   discover: "Найти профили и серверы",
   refreshing: "Обновление…",
@@ -306,6 +310,10 @@ export function followError(locale: Locale, code: unknown) {
       return copy.rate;
     case "UNCONFIRMED":
       return copy.unconfirmed;
+    case "ACTOR_ID_REQUIRED":
+      return copy.actorRequired;
+    case "ACTOR_CHANGED":
+      return copy.actorChanged;
     case "VALIDATION_ERROR":
     case "UNSUPPORTED_MEDIA_TYPE":
     case "REQUEST_BODY_TOO_LARGE":

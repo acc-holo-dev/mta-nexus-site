@@ -81,6 +81,9 @@ const en = {
     "Retry reloads this catalog only. A temporary load failure is not an empty articles or community list.",
   UNAUTHORIZED: "Sign in again to continue.",
   ACCOUNT_CHANGED: "The signed-in account changed. Reload the profile before editing.",
+  ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+  ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
+  VALIDATION_ERROR: "Check the fields and their length. Image links must use HTTP or HTTPS.",
   FORBIDDEN: "You no longer have permission to edit this publication.",
   NOT_FOUND: "The item was not found or is unavailable to your account.",
   VALIDATION_FAILED: "Check the fields and their length. Image links must use HTTP or HTTPS.",
@@ -176,6 +179,10 @@ const ru: typeof en = {
     "Повтор обновляет только этот каталог. Временный сбой загрузки — не пустой список статей или обсуждений.",
   UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
   ACCOUNT_CHANGED: "Аккаунт изменился. Загрузите профиль заново перед редактированием.",
+  ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+  ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
+  VALIDATION_ERROR:
+    "Проверьте поля и длину текста. Ссылки на изображения должны использовать HTTP или HTTPS.",
   FORBIDDEN: "У вас больше нет прав на редактирование этой публикации.",
   NOT_FOUND: "Запись не найдена или недоступна вашему аккаунту.",
   VALIDATION_FAILED:

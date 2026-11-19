@@ -80,6 +80,8 @@ const en = {
   forbidden: "This notification update is not allowed.",
   missing: "A selected notification is no longer available.",
   limited: "Too many requests. Try again shortly.",
+  actorRequired: "Reload this page and confirm your account before continuing.",
+  actorChanged: "The signed-in account changed. Reload the inbox before continuing.",
   formErrorHint:
     "The inbox was not updated. Reload the saved page before changing reading status again.",
 };
@@ -164,6 +166,8 @@ const ru: typeof en = {
   forbidden: "Это изменение уведомлений запрещено.",
   missing: "Одно из выбранных уведомлений больше недоступно.",
   limited: "Слишком много запросов. Попробуйте немного позже.",
+  actorRequired: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+  actorChanged: "Вошедший аккаунт изменился. Обновите входящие перед продолжением.",
   formErrorHint:
     "Список не обновлён. Загрузите сохранённую страницу перед следующим изменением прочитанного состояния.",
 };
@@ -179,6 +183,10 @@ export function notificationInboxError(locale: Locale, code: unknown) {
       return copy.missing;
     case "NOTIFICATION_STATE_CHANGED":
       return copy.changed;
+    case "ACTOR_ID_REQUIRED":
+      return copy.actorRequired;
+    case "ACTOR_CHANGED":
+      return copy.actorChanged;
     case "UNSUPPORTED_MEDIA_TYPE":
     case "REQUEST_BODY_TOO_LARGE":
     case "INVALID_BODY_LENGTH":
