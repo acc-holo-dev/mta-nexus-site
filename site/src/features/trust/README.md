@@ -18,5 +18,6 @@
 | `public-verification-history-contract.ts` | util port `public-verification-history-contract`                                                        |
 | `verification-workspace-contract.ts`      | util port `verification-workspace-contract`                                                             |
 | `verification-workspace-api.ts`           | util port `verification-workspace-api`                                                                  |
+| `verification-api-copy.ts`                | util port `verification-api-copy`                                                                       |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser и `scripts/tests/trust-feature-boundaries.node-test.mjs`.

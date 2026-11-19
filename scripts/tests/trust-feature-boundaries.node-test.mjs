@@ -18,6 +18,7 @@ const utilPorts = [
   "verification-applications-contract",
   "public-verification-history-contract",
   "verification-workspace-contract",
+  "verification-api-copy",
 ];
 const clientPorts = ["public-user-trust"];
 const serverPorts = ["public-context-trust-page"];

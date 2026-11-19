@@ -66,7 +66,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/trust/)" },
       to: {
-        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract|verification-workspace-api)\\.ts$)",
+        path: "^site/src/features/trust/(?!(?:public-user-trust|public-context-trust-page|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract|verification-workspace-api|verification-api-copy)\\.ts$)",
       },
     },
     {
@@ -79,7 +79,7 @@ module.exports = {
       name: "trust-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract|verification-api-copy)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/trust/(?:server/)|lib/(?!(?:(?:i18n(?:\\.ts$|/))|(?:content-discussion-contract|public-user-trust-contract)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -89,7 +89,7 @@ module.exports = {
       name: "trust-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract)\\.ts$|components/)",
+        path: "^site/src/features/trust/(?:(?:public-user-trust|public-user-trust-copy|public-verification-history-copy|public-context-trust-copy|verification-workspace-copy|public-context-trust-contract|public-user-trust-contract|verification-applications-contract|public-verification-history-contract|verification-workspace-contract|verification-api-copy)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },
