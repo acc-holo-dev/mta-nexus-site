@@ -64,13 +64,12 @@ export function SubscriptionFeeEstimator({
     }
   }
   function subscriptionErrorForEstimate(code: unknown) {
-    return code === "RATE_LIMIT_EXCEEDED"
-      ? c.rateLimited
-      : code === "UNAUTHORIZED"
-        ? c.signInRequired
-        : code === "NOT_FOUND" || code === "FORBIDDEN"
-          ? c.unavailable
-          : c.estimateFailed;
+    if (code === "RATE_LIMIT_EXCEEDED") return c.rateLimited;
+    if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return c.signInRequired;
+    if (code === "ACTOR_CHANGED" || code === "CONFLICT") return c.stateChanged;
+    if (code === "VALIDATION_ERROR" || code === "SUBSCRIPTION_INVALID") return c.invalid;
+    if (code === "NOT_FOUND" || code === "FORBIDDEN") return c.unavailable;
+    return c.estimateFailed;
   }
   return (
     <form className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" onSubmit={submit}>
