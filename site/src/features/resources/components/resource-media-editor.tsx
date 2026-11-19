@@ -7,7 +7,7 @@ import {
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
-import { resourceMediaCopy } from "../resource-media-i18n";
+import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
 
 export function ResourceMediaEditor({
@@ -55,7 +55,7 @@ export function ResourceMediaEditor({
       const payload = await response.json();
       controller.signal.throwIfAborted();
       if (!response.ok) {
-        setError(copy.errors[payload.code as keyof typeof copy.errors] ?? copy.error);
+        setError(resourceMediaError(locale, payload.code));
         return;
       }
       if (!payload.product?.updatedAt || !Array.isArray(payload.items))
