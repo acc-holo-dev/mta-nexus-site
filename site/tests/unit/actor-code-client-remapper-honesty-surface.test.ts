@@ -4,10 +4,13 @@ import { profilePrivacyError } from "../../src/features/accounts/profile-privacy
 import { commercialError } from "../../src/features/commerce/commercial-i18n";
 import { licenseControlError } from "../../src/features/commerce/license-control-i18n";
 import { planReviewError } from "../../src/features/commerce/plan-reviews-i18n";
+import { subscriptionError } from "../../src/features/commerce/subscriptions-i18n";
+import { followError } from "../../src/features/community/follow-workspace-copy";
 import { moderationError } from "../../src/features/community/community-moderation-copy";
 import { libraryCollectionError } from "../../src/features/library/library-collections-i18n";
 import { resourceReleaseControlError } from "../../src/features/library/resource-release-control-i18n";
 import { platformReportError } from "../../src/features/moderation/platform-report-i18n";
+import { notificationInboxError } from "../../src/features/notifications/notification-inbox-copy";
 import { getResourceSubmissionErrorMessage } from "../../src/features/resources/publishing-error-message";
 import { resourceCommerceError } from "../../src/features/resources/resource-commerce-i18n";
 import { resourceCopyError } from "../../src/features/resources/resource-copy-i18n";
@@ -139,4 +142,57 @@ it("maps ACTOR_* in publishing and server-claim remappers", () => {
   }
   expect(getServerClaimStatusCopy("en").errors.ACTOR_ID_REQUIRED).toContain("Reload");
   expect(getServerClaimStatusCopy("ru").errors.ACTOR_CHANGED).toContain("аккаунт");
+});
+
+it("maps bare CONFLICT and residual VALIDATION_ERROR without English code passthrough", () => {
+  for (const locale of ["en", "ru"] as const) {
+    expect(commercialError(locale, "CONFLICT")).not.toBe(commercialError(locale, "UNKNOWN_CODE"));
+    expect(licenseControlError(locale, "CONFLICT")).toBe(
+      licenseControlError(locale, "LICENSE_CONFLICT"),
+    );
+    expect(resourceCommerceError(locale, "CONFLICT")).toBe(
+      resourceCommerceError(locale, "PRODUCT_METADATA_CONFLICT"),
+    );
+    expect(resourceManagementError(locale, "CONFLICT")).toBe(
+      resourceManagementError(locale, "PRODUCT_METADATA_CONFLICT"),
+    );
+    expect(resourceMediaError(locale, "CONFLICT")).toBe(
+      resourceMediaError(locale, "RESOURCE_MEDIA_CONFLICT"),
+    );
+    expect(resourceQaError(locale, "CONFLICT")).toBe(resourceQaError(locale, "RESOURCE_QA_CHANGED"));
+    expect(resourceReleaseControlError(locale, "CONFLICT")).toBe(
+      resourceReleaseControlError(locale, "LIBRARY_RELEASE_CONFLICT"),
+    );
+    expect(resourceCopyError(locale, "VALIDATION_ERROR")).toBe(
+      resourceCopyError(locale, "RESOURCE_COPY_INVALID"),
+    );
+    expect(resourceCopyError(locale, "CONFLICT")).toBe(
+      resourceCopyError(locale, "RESOURCE_COPY_REQUEST_CONFLICT"),
+    );
+    expect(subscriptionError(locale, "VALIDATION_ERROR")).toBe(
+      subscriptionError(locale, "SUBSCRIPTION_INVALID"),
+    );
+    expect(subscriptionError(locale, "CONFLICT")).toBe(
+      subscriptionError(locale, "SUBSCRIPTION_REQUEST_CONFLICT"),
+    );
+    expect(notificationInboxError(locale, "CONFLICT")).toBe(
+      notificationInboxError(locale, "NOTIFICATION_STATE_CHANGED"),
+    );
+    expect(resourceReviewError(locale, "CONFLICT")).toBe(
+      resourceReviewError(locale, "REVIEW_CHANGED"),
+    );
+    expect(serverReviewError(locale, "CONFLICT")).toBe(
+      serverReviewError(locale, "REVIEW_CHANGED"),
+    );
+    expect(serverStatisticsError(locale, "CONFLICT")).toBe(
+      serverStatisticsError(locale, "ACTOR_CHANGED"),
+    );
+    expect(privateChangeHistoryError(locale, "CONFLICT")).toBe(
+      privateChangeHistoryError(locale, "FORBIDDEN"),
+    );
+    expect(followError(locale, "CONFLICT")).toBe(followError(locale, "UNKNOWN_CODE"));
+    expect(platformReportError(locale, "VALIDATION_ERROR")).toBe(
+      platformReportError(locale, "UNKNOWN_CODE"),
+    );
+  }
 });
