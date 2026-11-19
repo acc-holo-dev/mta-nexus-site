@@ -26,15 +26,15 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
+    listOwnedOrganizations: mocks.ownedOrganizations,
+    listUserMemberships: mocks.memberships,
+    findOrganizationById: mocks.findOrganization,
+    findOrganizationSummariesByIds: vi.fn(async () => []),
+    findUserOrganizationContext: vi.fn(async () => null),
   },
 }));
 
 vi.mock("@nexus/db", () => ({
-  organizationRepository: {
-    listOwnedByUser: mocks.ownedOrganizations,
-    listUserMemberships: mocks.memberships,
-    findById: mocks.findOrganization,
-  },
   notificationRepository: {
     getPreferences: mocks.preferences,
     listByUser: mocks.notifications,
@@ -46,6 +46,7 @@ vi.mock("@nexus/db", () => ({
   productRepository: {
     findById: vi.fn(),
   },
+  webPushSubscriptionRepository: {},
 }));
 
 vi.mock("../../src/lib/services/servers/server-service", () => ({

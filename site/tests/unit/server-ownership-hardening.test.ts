@@ -66,7 +66,7 @@ describe("server ownership hardening surface", () => {
     // Duplicate pending requests are detected per requester before enqueue;
     // cross-requester pending state stays available on the repository for
     // moderation-side checks.
-    expect(route).toContain("verificationRepository.findPendingForTarget(");
+    expect(route).toContain("verificationWorkspaceService.findPendingForTarget(");
     expect(route).toContain("error instanceof AppError");
   });
 
