@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { RESOURCE_RELEASE_WORKER_LIMIT, type ResourceReleaseWorkerResult } from "@nexus/domain";
+import {
+  noticeStoredTitles,
+  RESOURCE_RELEASE_WORKER_LIMIT,
+  type ResourceReleaseWorkerResult,
+} from "@nexus/domain";
 import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
@@ -138,7 +142,7 @@ class ResourceReleaseWorkerRepository {
             recipientId: user.id,
             type: "system",
             category: "commerce",
-            title: "Resource version published / Опубликована версия ресурса",
+            title: noticeStoredTitles.resourceVersionPublished,
             message: `${product.title} · ${event.version}`,
             link: `/workspace/library/${encodeURIComponent(product.id)}/versions`,
             data: {
