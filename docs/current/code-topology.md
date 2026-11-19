@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `e9e88ceb` (`dev`, Wave 98 tip).
+**source_sha:** `b04e2e90` (`dev`, Waves 124–133 tip).
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -304,6 +304,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 112–123 done:** Expanded templated Web Push bodies (follower, moderation, support/org/publication activity, report status, verification, builds, Q&A); regex matchers use English slash segment; auth + notification AppError envelopes localize via `authAppErrorText` / locale copy.
 
+**Waves 124–133 done:** CI follow-ups for bilingual stored notice assertions + `auth-app-error` public API; shared `localeAppErrorText`; AppError envelopes localized for reports, verification, products (+download/+builds), content collection, servers register/PATCH, claim-challenge, resource claim, admin actions, inspect-meta (including `MetaInspectionInputError`).
+
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.
 
 **Slice lib-http-platform done:** remaining `lib/` root kernels moved into `lib/http/` (browser/bounded/private/public adapters) and `lib/platform/` (observability, postgres-error; i18n barrels → `lib/i18n` Slice 55; `offline-cache` → Shell Slice 52; `home-personal-changes` → Shell Slice 42; `profile-pagination` → Accounts Slice 43); `support-response.test.ts` → `site/tests/unit/`; depcruise + boundary `safeLib` allow `i18n` and `http/private-api-request`; `lib_root_files` → 0; `lib/` root dirs = `http`, `i18n`, `platform`, `services`.
@@ -490,8 +492,9 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Wave 111 — `noticeStoredMessages` slash pack for static Web Push bodies                                           | notification storage/push RU/EN  | **done** |
 | A   | Waves 112–119 — templated bilingual Web Push bodies + canonical message matchers                                  | notification storage/push RU/EN  | **done** |
 | A   | Waves 120–123 — auth + notification AppError envelope localization                                                | API envelope RU/EN               | **done** |
+| A   | Waves 124–133 — `localeAppErrorText` + product/moderation/server AppError envelopes                               | API envelope RU/EN               | **done** |
 
-Дальше: Residual AppError English passthrough on a few non-auth routes; New article comment producer still legacy; F/ops external. Новые TOPO ID не заводить.
+Дальше: Remaining niche AppError passthrough if any; New article comment producer still legacy; settings 401 sentinel; F/ops external. Новые TOPO ID не заводить.
 
 ## Связанные входы
 
