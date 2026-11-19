@@ -115,8 +115,12 @@ const ru: Record<keyof typeof en, string> = {
 };
 export const publicationCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function publicationError(locale: Locale, code: unknown) {
-  if (code === "VALIDATION_ERROR" || code === "INVALID_CURSOR")
-    return publicationCopy(locale).invalid;
-  if (code === "UNCONFIRMED" || code === "INTERNAL_ERROR") return publicationCopy(locale).error;
+  const copy = publicationCopy(locale);
+  if (code === "VALIDATION_ERROR" || code === "INVALID_CURSOR") return copy.invalid;
+  if (code === "UNCONFIRMED" || code === "INTERNAL_ERROR") return copy.error;
+  if (code === "FORBIDDEN" || code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED")
+    return copy.signIn;
+  if (code === "ACTOR_CHANGED" || code === "CONFLICT") return copy.error;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.loadUnavailable;
   return userPlatformError(locale, code);
 }

@@ -82,9 +82,20 @@ const ru: Record<keyof typeof en, string> = {
   source: "Источник: записи аккаунта и верификации NEXUS",
 };
 export const trustCopy = (locale: Locale) => (locale === "ru" ? ru : en);
-export const trustError = (locale: Locale, code: unknown) =>
-  code === "INTERNAL_ERROR"
-    ? trustCopy(locale).unavailable
-    : code === "NOT_FOUND"
-      ? trustCopy(locale).notFound
-      : userPlatformError(locale, code);
+export const trustError = (locale: Locale, code: unknown) => {
+  const copy = trustCopy(locale);
+  if (code === "INTERNAL_ERROR") return copy.unavailable;
+  if (code === "NOT_FOUND") return copy.notFound;
+  if (
+    code === "FORBIDDEN" ||
+    code === "UNAUTHORIZED" ||
+    code === "ACTOR_ID_REQUIRED" ||
+    code === "ACTOR_CHANGED" ||
+    code === "VALIDATION_ERROR" ||
+    code === "CONFLICT" ||
+    code === "RATE_LIMIT_EXCEEDED" ||
+    code === "RATE_LIMITED"
+  )
+    return copy.unavailable;
+  return userPlatformError(locale, code);
+};

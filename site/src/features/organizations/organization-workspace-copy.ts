@@ -206,6 +206,8 @@ export function organizationError(locale: Locale, code: unknown) {
     case "RATE_LIMIT_EXCEEDED":
     case "RATE_LIMITED":
       return copy.resultCheckFailed;
+    case "VALIDATION_ERROR":
+      return copy.invalid;
     default:
       return userPlatformError(locale, code);
   }
