@@ -29,7 +29,8 @@ describe("admin actions API copy honesty surface", () => {
     expect(route).toContain("copy.reportNotFound");
     expect(route).toContain("copy.verificationNotFound");
     expect(route).toContain("copy.executeFailed");
-    expect(route).toContain("error.message");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Forbidden: Admin or moderator privilege required"');
     expect(route).not.toContain('"Too many admin actions"');
     expect(route).not.toContain('"Invalid moderation action"');

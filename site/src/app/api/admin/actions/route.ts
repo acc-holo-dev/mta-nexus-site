@@ -14,6 +14,7 @@ import { z } from "zod";
 import { adminActionsApiCopy } from "../../../../features/moderation/admin-actions-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../lib/i18n";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
@@ -259,7 +260,31 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json({ success: true, action, targetId });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              conflict: copy.conflict,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.executeFailed,
+            },
+            {
+              REPORT_STATE_CHANGED: copy.conflict,
+              VALIDATION_ERROR: copy.invalidAction,
+              VERIFICATION_APPLICATION_CHANGED: copy.conflict,
+            },
+          ),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
