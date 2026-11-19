@@ -87,15 +87,8 @@ export async function submitContentCommentRequest(
         (payload?.comment?.parentId ?? undefined) === input.parentId));
   if (!id || !confirmed) {
     const code = readCommentSubmitCode(payload);
-    const message =
-      payload &&
-      typeof payload === "object" &&
-      !Array.isArray(payload) &&
-      typeof (payload as Record<string, unknown>).error === "string"
-        ? (payload as Record<string, string>).error
-        : input.fallbackError;
     throw new ContentCommentSubmitError(
-      input.locale ? discussionError(input.locale, code) : message,
+      input.locale ? discussionError(input.locale, code) : input.fallbackError,
       code,
     );
   }
