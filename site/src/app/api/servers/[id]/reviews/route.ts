@@ -3,10 +3,15 @@ import { consumeRateLimit } from "@nexus/security";
 import { serverReviewCommandSchema, serverReviewCreateSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import {
+  serverReviewCopy,
+  serverReviewError,
+} from "../../../../../features/servers/server-review-i18n";
 import { serverReviewQuery } from "../../../../../features/servers/server-review-query";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { readBoundedJson } from "../../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -17,6 +22,8 @@ import { serverReviewService } from "../../../../../lib/services/servers/server-
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "no-store" };
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+  const copy = serverReviewCopy(locale);
   try {
     const query = serverReviewQuery(request.nextUrl.searchParams);
     const ip = getTrustedRequestIp(request);
@@ -35,12 +42,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error instanceof AppError) {
       return jsonWithRequestId(
         context,
-        { code: error.code },
+        { code: error.code, error: serverReviewError(locale, error.code) },
         { status: error.statusCode, headers },
       );
     }
     if (error instanceof Error && /Ambiguous|Invalid review page/u.test(error.message)) {
-      return jsonWithRequestId(context, { code: "REVIEW_INVALID" }, { status: 400, headers });
+      return jsonWithRequestId(
+        context,
+        { code: "REVIEW_INVALID", error: serverReviewError(locale, "REVIEW_INVALID") },
+        { status: 400, headers },
+      );
     }
     logRequestEvent({
       level: "error",
@@ -49,7 +60,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       status: 503,
       error,
     });
-    return jsonWithRequestId(context, { code: "REVIEWS_UNAVAILABLE" }, { status: 503, headers });
+    return jsonWithRequestId(
+      context,
+      { code: "REVIEWS_UNAVAILABLE", error: copy.loadUnavailable },
+      { status: 503, headers },
+    );
   }
 }
 

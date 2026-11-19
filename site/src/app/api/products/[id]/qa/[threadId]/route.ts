@@ -1,7 +1,12 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import {
+  resourceQaCopy,
+  resourceQaError,
+} from "../../../../../../features/resources/resource-qa-i18n";
 import { getTrustedRequestIp } from "../../../../../../features/shell/request-client-ip";
+import { resolveLocale } from "../../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -16,6 +21,8 @@ export async function GET(
 ) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "no-store", Vary: "Cookie" };
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+  const copy = resourceQaCopy(locale);
   try {
     const ip = getTrustedRequestIp(request);
     if (ip !== "unknown" && !(await consumeRateLimit("resourceInspection", `qa-ip:${ip}`)).success)
@@ -29,7 +36,7 @@ export async function GET(
     if (error instanceof AppError)
       return jsonWithRequestId(
         context,
-        { code: error.code },
+        { code: error.code, error: resourceQaError(locale, error.code) },
         { status: error.statusCode, headers },
       );
     logRequestEvent({
@@ -41,7 +48,7 @@ export async function GET(
     });
     return jsonWithRequestId(
       context,
-      { code: "RESOURCE_QA_UNAVAILABLE" },
+      { code: "RESOURCE_QA_UNAVAILABLE", error: copy.unavailable },
       { status: 503, headers },
     );
   }

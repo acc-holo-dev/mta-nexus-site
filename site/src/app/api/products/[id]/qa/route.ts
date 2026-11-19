@@ -3,10 +3,15 @@ import { consumeRateLimit } from "@nexus/security";
 import { resourceQaAskSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import {
+  resourceQaCopy,
+  resourceQaError,
+} from "../../../../../features/resources/resource-qa-i18n";
 import { resourceQaQuery } from "../../../../../features/resources/resource-qa-query";
 import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { readBoundedJson } from "../../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -18,6 +23,8 @@ import { resourceQaService } from "../../../../../lib/services/resources/resourc
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "no-store", Vary: "Cookie" };
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+  const copy = resourceQaCopy(locale);
   try {
     const query = resourceQaQuery(request.nextUrl.searchParams);
     const ip = getTrustedRequestIp(request);
@@ -33,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error instanceof AppError)
       return jsonWithRequestId(
         context,
-        { code: error.code },
+        { code: error.code, error: resourceQaError(locale, error.code) },
         { status: error.statusCode, headers },
       );
     logRequestEvent({
@@ -45,7 +52,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
     return jsonWithRequestId(
       context,
-      { code: "RESOURCE_QA_UNAVAILABLE" },
+      { code: "RESOURCE_QA_UNAVAILABLE", error: copy.unavailable },
       { status: 503, headers },
     );
   }
