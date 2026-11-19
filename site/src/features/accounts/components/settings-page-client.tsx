@@ -14,6 +14,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
+import { authPasswordApiCopy } from "../auth-password-api-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
 import { PublicProfileForm } from "../profile";
@@ -79,7 +80,9 @@ export function SettingsPageClient() {
   const copy = dictionary.settings;
   function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
-    return Object.values(copy).includes(text) ? text : fallback;
+    return [...Object.values(copy), ...Object.values(authPasswordApiCopy(locale))].includes(text)
+      ? text
+      : fallback;
   }
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionSnapshot | null>(null);
