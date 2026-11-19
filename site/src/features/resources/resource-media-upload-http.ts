@@ -6,6 +6,7 @@ import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
 } from "../../lib/http/bounded-multipart";
+import { resolveLocale } from "../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -13,8 +14,10 @@ import {
 } from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
 import { resourceMediaService } from "../../lib/services/resources/resource-media-service";
+import { resourceMediaError } from "./resource-media-i18n";
 export async function resourceMediaUpload(request: NextRequest, productId: string) {
   const context = createRequestLogContext(request);
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
   const respond = (body: unknown, status = 200) =>
     jsonWithRequestId(context, body, {
       status,
@@ -24,6 +27,7 @@ export async function resourceMediaUpload(request: NextRequest, productId: strin
         ...(status === 503 ? { "Retry-After": "5" } : {}),
       },
     });
+  const codeBody = (code: string) => ({ code, error: resourceMediaError(locale, code) });
   try {
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
     if (!actor) throw new AppError("Sign in", 401, "UNAUTHORIZED");
@@ -79,8 +83,8 @@ export async function resourceMediaUpload(request: NextRequest, productId: strin
     );
   } catch (error) {
     if (error instanceof MultipartBodyTooLargeError)
-      return respond({ code: "RESOURCE_MEDIA_LIMIT" }, 413);
-    if (error instanceof AppError) return respond({ code: error.code }, error.statusCode);
+      return respond(codeBody("RESOURCE_MEDIA_LIMIT"), 413);
+    if (error instanceof AppError) return respond(codeBody(error.code), error.statusCode);
     logRequestEvent({
       level: "error",
       event: "resource.media_upload_failed",
@@ -88,6 +92,6 @@ export async function resourceMediaUpload(request: NextRequest, productId: strin
       status: 503,
       error,
     });
-    return respond({ code: "RESOURCE_MEDIA_UNAVAILABLE" }, 503);
+    return respond(codeBody("RESOURCE_MEDIA_UNAVAILABLE"), 503);
   }
 }
