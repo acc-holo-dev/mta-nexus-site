@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import {
   confirmOwnershipTransfer,
@@ -39,6 +40,16 @@ export function OrganizationOwnershipTransfer({
 }) {
   const copy = organizationGovernanceCopy(locale),
     teamCopy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(teamCopy),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [slug, setSlug] = useState(""),
     [currentPassword, setCurrentPassword] = useState(""),
     [formerRole, setFormerRole] = useState<"member" | "admin">("member"),
@@ -98,7 +109,7 @@ export function OrganizationOwnershipTransfer({
       onSaved(result);
     } catch (caught) {
       setCurrentPassword("");
-      setError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+      setError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       onBusyChange(false);

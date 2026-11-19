@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -40,6 +41,12 @@ export function OrganizationWorkspacePanel({
   query: string;
 }) {
   const copy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const governanceCopy = organizationGovernanceCopy(locale);
   const router = useRouter();
   const [data, setData] = useState(initial);
@@ -114,7 +121,7 @@ export function OrganizationWorkspacePanel({
       router.refresh();
       return true;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
       return false;
     } finally {
       guard.current = false;
@@ -160,7 +167,7 @@ export function OrganizationWorkspacePanel({
       router.push("/workspace/organizations");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setBusy(false);

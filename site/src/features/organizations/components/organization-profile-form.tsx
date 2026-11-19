@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
@@ -38,6 +39,12 @@ export function OrganizationProfileForm({
   onBusyChange?: (busy: boolean) => void;
 }) {
   const copy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [fields, setFields] = useState({
@@ -275,7 +282,7 @@ export function OrganizationProfileForm({
           /* Keep recovery locked if storage is unavailable. */
         }
       }
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
       if (base) setNeedsCheck(true);
     } finally {
       guard.current = false;
@@ -332,7 +339,7 @@ export function OrganizationProfileForm({
       setChecked(result.data.organization);
       setError("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setBusy(false);
