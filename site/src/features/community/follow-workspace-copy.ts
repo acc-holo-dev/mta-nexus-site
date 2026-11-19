@@ -314,6 +314,8 @@ export function followError(locale: Locale, code: unknown) {
       return copy.actorRequired;
     case "ACTOR_CHANGED":
       return copy.actorChanged;
+    case "CONFLICT":
+      return copy.error;
     case "VALIDATION_ERROR":
     case "UNSUPPORTED_MEDIA_TYPE":
     case "REQUEST_BODY_TOO_LARGE":

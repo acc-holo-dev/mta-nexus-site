@@ -180,6 +180,7 @@ export function subscriptionError(locale: Locale, code: unknown) {
   const c = subscriptionsCopy(locale);
   switch (code) {
     case "SUBSCRIPTION_INVALID":
+    case "VALIDATION_ERROR":
       return c.invalid;
     case "SUBSCRIPTION_PLAN_CHANGED":
       return c.changed;
@@ -188,6 +189,7 @@ export function subscriptionError(locale: Locale, code: unknown) {
     case "SUBSCRIPTION_PAYMENT_REQUIRED":
       return c.paymentRequired;
     case "SUBSCRIPTION_REQUEST_CONFLICT":
+    case "CONFLICT":
       return c.conflict;
     case "SUBSCRIPTION_STATE_CHANGED":
       return c.stateChanged;

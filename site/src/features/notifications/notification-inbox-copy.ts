@@ -182,6 +182,7 @@ export function notificationInboxError(locale: Locale, code: unknown) {
     case "NOT_FOUND":
       return copy.missing;
     case "NOTIFICATION_STATE_CHANGED":
+    case "CONFLICT":
       return copy.changed;
     case "ACTOR_ID_REQUIRED":
       return copy.actorRequired;

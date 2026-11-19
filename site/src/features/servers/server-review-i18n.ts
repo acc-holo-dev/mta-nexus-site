@@ -134,7 +134,8 @@ export function serverReviewState(locale: Locale, status: "published" | "withdra
 export function serverReviewError(locale: Locale, code?: string) {
   const copy = serverReviewCopy(locale);
   if (code === "REVIEW_ACCESS_REQUIRED" || code === "FORBIDDEN") return copy.denied;
-  if (code === "REVIEW_CHANGED" || code === "ACTOR_CHANGED") return copy.changed;
+  if (code === "REVIEW_CHANGED" || code === "ACTOR_CHANGED" || code === "CONFLICT")
+    return copy.changed;
   if (code === "REVIEW_MODERATED") return copy.moderated;
   if (code === "REVIEW_INVALID" || code === "VALIDATION_ERROR") return copy.invalid;
   if (code === "NOT_FOUND") return copy.missing;

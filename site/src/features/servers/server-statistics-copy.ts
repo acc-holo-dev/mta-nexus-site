@@ -171,7 +171,7 @@ export const serverStatisticsCopy = (locale: Locale) => (locale === "ru" ? ru : 
 export function serverStatisticsError(locale: Locale, code: unknown) {
   const copy = serverStatisticsCopy(locale);
   if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
-  if (code === "ACTOR_CHANGED") return copy.unavailable;
+  if (code === "ACTOR_CHANGED" || code === "CONFLICT") return copy.unavailable;
   if (code === "NOT_FOUND") return copy.notFound;
   if (code === "FORBIDDEN") return copy.forbidden;
   if (code === "RATE_LIMITED" || code === "RATE_LIMIT_EXCEEDED") return copy.limit;

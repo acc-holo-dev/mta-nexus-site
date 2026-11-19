@@ -211,7 +211,8 @@ const ru: typeof en = {
 export const resourceReviewCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function resourceReviewError(locale: Locale, code: unknown) {
   const copy = resourceReviewCopy(locale);
-  if (["REVIEW_CHANGED", "REVIEW_REPORT_CHANGED"].includes(String(code))) return copy.changed;
+  if (["REVIEW_CHANGED", "REVIEW_REPORT_CHANGED", "CONFLICT"].includes(String(code)))
+    return copy.changed;
   if (["FORBIDDEN", "REVIEW_ACCESS_REQUIRED", "REVIEW_SELF_MODERATION"].includes(String(code)))
     return copy.denied;
   if (code === "REVIEW_MODERATED") return copy.moderator;

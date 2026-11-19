@@ -165,10 +165,12 @@ export function resourceCopyError(locale: Locale, code: unknown) {
   const c = resourceCopyCopy(locale);
   switch (code) {
     case "RESOURCE_COPY_INVALID":
+    case "VALIDATION_ERROR":
       return c.invalid;
     case "RESOURCE_COPY_SOURCE_CHANGED":
       return c.changed;
     case "RESOURCE_COPY_REQUEST_CONFLICT":
+    case "CONFLICT":
       return c.conflict;
     case "RESOURCE_COPY_SLUG_TAKEN":
       return c.taken;
