@@ -34,6 +34,15 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   const intentKey = resourceIntentKey(actorId);
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy).filter((value): value is string => typeof value === "string"),
+      ...Object.values(buildPackageCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const maxFileSizeMb = String(MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024));
   const buildFileTooLarge = copy.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb);
   const buildFileRequirements = copy.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb);
@@ -360,7 +369,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
       setCreatedProduct(null);
       setResultId(product.id);
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
+      setError(safeMessage(caught, copy.unexpectedError));
     } finally {
       setLoading(false);
       lock.current = false;

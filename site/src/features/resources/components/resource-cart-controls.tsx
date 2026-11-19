@@ -110,6 +110,15 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale),
     receiptCopy = resourceCartReceiptsCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    const known = [
+      ...Object.values(copy).filter((value): value is string => typeof value === "string"),
+      ...Object.values(copy.errors),
+      ...Object.values(receiptCopy),
+    ];
+    return known.includes(text) ? text : fallback;
+  }
   const [cart, setCart] = useState(initialCart),
     [review, setReview] = useState<ResourceCartReview | null>(null);
   const [busy, setBusy] = useState(false),
@@ -151,8 +160,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
     try {
       await action(controller.signal);
     } catch (caught) {
-      if (current(controller.signal))
-        setError(caught instanceof Error ? caught.message : copy.errors.fallback);
+      if (current(controller.signal)) setError(safeMessage(caught, copy.errors.fallback));
     } finally {
       if (current(controller.signal)) {
         active.current = null;
