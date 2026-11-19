@@ -6,6 +6,7 @@ import { z } from "zod";
 import { serversApiCopy } from "../../../../features/servers/servers-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -136,7 +137,26 @@ export const PATCH = withBrowserMutation(
       return json(
         context,
         {
-          error: appError?.message || copy.updateFailed,
+          error: appError
+            ? localeAppErrorText(
+                appError,
+                {
+                  unauthorized: copy.authenticationRequired,
+                  forbidden: copy.forbidden,
+                  notFound: copy.notFound,
+                  conflict: copy.actorChanged,
+                  unsupportedMediaType: copy.unsupportedMediaType,
+                  requestBodyTooLarge: copy.requestBodyTooLarge,
+                  invalidBodyLength: copy.invalidBodyLength,
+                  requestBodyTimeout: copy.requestBodyTimeout,
+                  failed: copy.updateFailed,
+                },
+                {
+                  ACTOR_REQUIRED: copy.actorRequired,
+                  VALIDATION_ERROR: copy.invalidServerDetails,
+                },
+              )
+            : copy.updateFailed,
           ...(appError ? { code: appError.code } : {}),
         },
         appError?.statusCode || 500,

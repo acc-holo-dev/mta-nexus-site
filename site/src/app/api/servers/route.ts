@@ -6,6 +6,7 @@ import { serversApiCopy } from "../../../features/servers/servers-api-copy";
 import { getTrustedRequestIp } from "../../../features/shell/request-client-ip";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
 import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
@@ -181,7 +182,27 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return privateJson(
       context,
       {
-        error: appError?.message || copy.registerFailed,
+        error: appError
+          ? localeAppErrorText(
+              appError,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                conflict: copy.actorChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.registerFailed,
+              },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                INVALID_CREATION_NONCE: copy.invalidCreationNonce,
+                VALIDATION_ERROR: copy.invalidServerDetails,
+              },
+            )
+          : copy.registerFailed,
         ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,

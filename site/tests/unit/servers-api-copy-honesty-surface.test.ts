@@ -30,6 +30,8 @@ describe("servers API copy honesty surface", () => {
     expect(route).toContain("copy.invalidCreationNonce");
     expect(route).toContain("copy.invalidServerDetails");
     expect(route).toContain("copy.registerFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Server listings are temporarily unavailable"');
     expect(route).not.toContain('"Server registration limit exceeded"');
     expect(route).not.toContain('"Authentication required"');
@@ -52,6 +54,8 @@ describe("servers API copy honesty surface", () => {
     expect(route).toContain("copy.updateLimitExceeded");
     expect(route).toContain("copy.invalidServerDetails");
     expect(route).toContain("copy.updateFailed");
+    expect(route).toContain("localeAppErrorText");
+    expect(route).not.toContain("error.message");
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Server update limit exceeded"');
     expect(route).not.toContain('"Invalid server details"');
