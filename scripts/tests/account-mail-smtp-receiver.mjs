@@ -42,8 +42,12 @@ const server = tls.createServer({ cert, key }, (socket) => {
         continue;
       }
       if (/^EHLO /i.test(line)) {
+        // Advertise UTF-8 / 8-bit body so bilingual account-mail subjects and
+        // bodies can be exercised by check-account-mail-smtp.ts.
         reply("250-nexus-test");
         reply("250-AUTH PLAIN");
+        reply("250-8BITMIME");
+        reply("250-SMTPUTF8");
         reply("250 SIZE 32768");
       } else if (/^AUTH PLAIN /i.test(line)) {
         const encoded = line.slice("AUTH PLAIN ".length).trim();
