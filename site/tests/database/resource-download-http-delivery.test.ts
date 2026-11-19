@@ -58,6 +58,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { GET } from "../../src/app/api/products/[id]/download/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 import {
   resourceDownloadHttpAuditRecord as auditRecord,
   resourceDownloadHttpContext as context,
@@ -121,7 +122,7 @@ it("returns 404 when access exists but no published build is available", async (
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
   expect(await response.json()).toEqual({
-    error: "No published build is available",
+    error: productDownloadApiCopy("en").noPublishedBuild,
   });
   expect(downloadStream).not.toHaveBeenCalled();
 });
@@ -138,7 +139,7 @@ it("fails closed when a published build has no trusted scan provenance", async (
 
   expect(response.status).toBe(409);
   expect(await response.json()).toEqual({
-    error: "Published build is not cleared for delivery",
+    error: productDownloadApiCopy("en").notCleared,
   });
   expect(downloadStream).not.toHaveBeenCalled();
   expect(auditRecord).not.toHaveBeenCalled();

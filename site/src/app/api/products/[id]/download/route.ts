@@ -12,9 +12,11 @@ import {
   BuildArtifactMismatchError,
 } from "../../../../../features/resources/build-download-metadata";
 import { parseDownloadBuildSelection } from "../../../../../features/resources/build-download-selection";
+import { productDownloadApiCopy } from "../../../../../features/resources/product-download-api-copy";
 import { resourceAttachmentFileName } from "../../../../../features/resources/resource-attachment-filename";
 import { resourceDeliveryStream } from "../../../../../features/resources/resource-delivery-stream";
 import { decideResourceDownloadAccess } from "../../../../../features/resources/resource-download-policy";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -48,6 +50,7 @@ function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
+  const copy = productDownloadApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const { id: productId } = await params;
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "Authentication required to download resource builds",
+          error: copy.authenticationRequired,
         },
         401,
       );
@@ -66,12 +69,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
-      return json(context, { error: "Too many download requests" }, 429);
+      return json(context, { error: copy.rate }, 429);
     }
 
     const product = await productRepository.findById(productId);
     if (!product) {
-      return json(context, { error: "Resource not found" }, 404);
+      return json(context, { error: copy.notFound }, 404);
     }
 
     const isPrivileged =
@@ -87,12 +90,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (!access.allowed) {
       if (access.reason === "resource_not_published") {
-        return json(context, { error: "Resource not found" }, 404);
+        return json(context, { error: copy.notFound }, 404);
       }
       return json(
         context,
         {
-          error: "Add this resource to your library before downloading it",
+          error: copy.libraryRequired,
         },
         403,
       );
@@ -100,7 +103,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const selection = parseDownloadBuildSelection(request.nextUrl.searchParams);
     if (selection.kind === "invalid") {
-      return json(context, { error: "Invalid requested build", code: "BUILD_ID_INVALID" }, 400);
+      return json(context, { error: copy.invalidBuild, code: "BUILD_ID_INVALID" }, 400);
     }
     const selectedBuild =
       selection.kind === "pinned"
@@ -110,7 +113,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "No published build is available",
+          error: copy.noPublishedBuild,
         },
         404,
       );
@@ -124,7 +127,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "Published build is not cleared for delivery",
+          error: copy.notCleared,
         },
         409,
       );
@@ -199,7 +202,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "Download cancelled",
+          error: copy.cancelled,
           code: "DOWNLOAD_CANCELLED",
         },
         499,
@@ -210,7 +213,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "Build file does not match its recorded metadata",
+          error: copy.artifactMismatch,
           code: "BUILD_ARTIFACT_MISMATCH",
         },
         409,
@@ -221,7 +224,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(
         context,
         {
-          error: "Resource build file is not available",
+          error: copy.fileUnavailable,
         },
         404,
       );
@@ -240,7 +243,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return json(
       context,
       {
-        error: "Failed to deliver resource build",
+        error: copy.deliverFailed,
       },
       500,
     );

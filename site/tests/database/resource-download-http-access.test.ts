@@ -55,6 +55,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { GET } from "../../src/app/api/products/[id]/download/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 import {
   resourceDownloadHttpContext as context,
   resourceDownloadHttpDownloadStream as downloadStream,
@@ -75,7 +76,7 @@ it("returns 401 for an anonymous download", async () => {
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
   expect(await response.json()).toEqual({
-    error: "Authentication required to download resource builds",
+    error: productDownloadApiCopy("en").authenticationRequired,
   });
   expect(downloadStream).not.toHaveBeenCalled();
 });
@@ -94,7 +95,7 @@ it("returns 404 for an unpublished resource even with entitlement", async () => 
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
   expect(await response.json()).toEqual({
-    error: "Resource not found",
+    error: productDownloadApiCopy("en").notFound,
   });
   expect(downloadStream).not.toHaveBeenCalled();
 });
@@ -109,7 +110,7 @@ it("returns 403 for a published resource without entitlement", async () => {
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
   expect(await response.json()).toEqual({
-    error: "Add this resource to your library before downloading it",
+    error: productDownloadApiCopy("en").libraryRequired,
   });
   expect(downloadStream).not.toHaveBeenCalled();
 });

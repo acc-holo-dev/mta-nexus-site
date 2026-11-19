@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GET as downloadResource } from "../../src/app/api/products/[id]/download/route";
 import { POST as claimResource } from "../../src/app/api/resources/claim/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -165,7 +166,7 @@ describe("J5 free resource claim-to-download journey", () => {
       const afterSuspension = await downloadResource(downloadRequest(), downloadContext);
       expect(afterSuspension.status).toBe(404);
       expect(await afterSuspension.json()).toEqual({
-        error: "Resource not found",
+        error: productDownloadApiCopy("en").notFound,
       });
     } finally {
       await storageService.deleteAsset(asset.key);

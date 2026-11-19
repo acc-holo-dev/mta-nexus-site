@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { afterAll, describe, expect, it } from "vitest";
 import { GET as downloadResource } from "../../src/app/api/products/[id]/download/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 
 describe("resource download HTTP integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -180,7 +181,7 @@ describe("resource download HTTP integration", () => {
     const noBuild = await downloadResource(noBuildInput.request, noBuildInput.context);
     expect(noBuild.status).toBe(404);
     expect(await noBuild.json()).toEqual({
-      error: "No published build is available",
+      error: productDownloadApiCopy("en").noPublishedBuild,
     });
   });
 
