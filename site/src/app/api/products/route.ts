@@ -4,8 +4,10 @@ import { createProductSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 import { parseMarketQuery } from "../../../features/resources/model";
+import { productsApiCopy } from "../../../features/resources/products-api-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -60,6 +62,7 @@ function matchesCreateRequest(
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = productsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const params = request.nextUrl.searchParams;
@@ -106,7 +109,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "Resource catalog is temporarily unavailable",
+        error: copy.catalogUnavailable,
       },
       {
         status: 503,
@@ -118,6 +121,7 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = productsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -126,7 +130,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Authentication required",
+          error: copy.authenticationRequired,
           code: "UNAUTHORIZED",
         },
         401,
@@ -135,13 +139,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const expectedActor = request.headers.get("x-nexus-actor-id");
     if (!expectedActor)
-      return privateJson(
-        context,
-        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
-        428,
-      );
+      return privateJson(context, { error: copy.actorRequired, code: "ACTOR_ID_REQUIRED" }, 428);
     if (expectedActor !== user.id)
-      return privateJson(context, { error: "Actor changed", code: "ACTOR_CHANGED" }, 409);
+      return privateJson(context, { error: copy.actorChanged, code: "ACTOR_CHANGED" }, 409);
     requireServerJsonContentType(request);
 
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
@@ -149,7 +149,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Resource creation limit exceeded",
+          error: copy.creationLimitExceeded,
           code: "RATE_LIMIT_EXCEEDED",
         },
         429,
@@ -161,7 +161,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Invalid resource details",
+          error: copy.invalidDetails,
           code: "PRODUCT_METADATA_INVALID",
           details: parsed.error.format(),
         },
@@ -173,7 +173,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Paid resources are disabled until a payment provider is configured",
+          error: copy.paidDisabled,
           code: "PAID_RESOURCES_DISABLED",
         },
         422,
@@ -231,7 +231,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "A resource with this slug already exists",
+          error: copy.slugExists,
           code: "PRODUCT_SLUG_EXISTS",
         },
         409,
@@ -259,7 +259,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return privateJson(
       context,
       {
-        error: "Could not create resource",
+        error: copy.createFailed,
         code: "RESOURCE_CREATION_FAILED",
       },
       500,
