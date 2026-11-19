@@ -1,5 +1,7 @@
 import { notificationRepository } from "@nexus/db";
 import type { NextRequest } from "next/server";
+import { notificationsApiCopy } from "../../../features/notifications/notifications-api-copy";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -22,6 +24,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = notificationsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -60,6 +63,6 @@ export async function GET(request: NextRequest) {
       status: 500,
       error,
     });
-    return json(context, { error: "Failed to fetch notifications" }, 500);
+    return json(context, { error: copy.fetchFailed }, 500);
   }
 }

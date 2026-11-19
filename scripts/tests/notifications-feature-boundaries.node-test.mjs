@@ -21,6 +21,7 @@ const utilPorts = [
   "notification-mark-read-api-copy",
   "notification-preferences-api-copy",
   "notification-push-api-copy",
+  "notifications-api-copy",
 ];
 const serverPorts = ["center"];
 const safeLib =
