@@ -206,6 +206,7 @@ export function subscriptionError(locale: Locale, code: unknown) {
     case "ACTOR_CHANGED":
       return c.stateChanged;
     case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
       return c.rateLimited;
     default:
       return c.retry;
