@@ -8,6 +8,7 @@ import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
@@ -56,6 +57,16 @@ export function OrganizationTeamBatch({
     guard = useRef(false),
     copy = organizationBatchCopy(locale),
     team = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(team),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -126,7 +137,7 @@ export function OrganizationTeamBatch({
         }
       }
     } catch (failure) {
-      if (alive.current) onFailure(failure instanceof Error ? failure.message : copy.uncertain);
+      if (alive.current) onFailure(safeMessage(failure, copy.uncertain));
     } finally {
       guard.current = false;
       if (alive.current) setStage("idle");

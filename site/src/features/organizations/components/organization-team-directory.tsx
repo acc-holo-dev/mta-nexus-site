@@ -17,6 +17,7 @@ import {
   organizationTeamHref,
   organizationTeamPageSchema,
 } from "../organization-team-contract";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -45,7 +46,19 @@ export function OrganizationTeamDirectory({
     alive = useRef(true),
     controller = useRef<AbortController | null>(null),
     copy = organizationTeamCopy(locale),
-    team = getOrganizationCopy(locale);
+    team = getOrganizationCopy(locale),
+    batch = organizationBatchCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(team),
+      ...Object.values(batch),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -104,7 +117,7 @@ export function OrganizationTeamDirectory({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : copy.uncertain);
+        setError(safeMessage(failure, copy.uncertain));
       }
       return false;
     } finally {
@@ -166,7 +179,16 @@ export function OrganizationTeamDirectory({
           onFailure={(problem) => {
             if (alive.current) {
               setBlocked(true);
-              setError(problem);
+              setError(
+                [
+                  ...Object.values(copy),
+                  ...Object.values(team),
+                  ...Object.values(batch),
+                  ...Object.values(getUserPlatformCopy(locale)),
+                ].includes(problem)
+                  ? problem
+                  : copy.uncertain,
+              );
             }
           }}
           onCommitted={async (organization, signal) => {
