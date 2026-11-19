@@ -13,6 +13,7 @@ export function authAppErrorText(
 ): string {
   switch (error.code) {
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
       return copy.unauthorized ?? copy.failed;
     case "FRESH_AUTH_REQUIRED":
       return copy.freshAuthRequired ?? copy.failed;

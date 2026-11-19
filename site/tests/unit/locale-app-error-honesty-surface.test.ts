@@ -24,6 +24,12 @@ it("maps AppError codes to locale copy without English passthrough", () => {
   expect(localeAppErrorText(new UnauthorizedError("Invalid email or password"), copy)).toBe(
     copy.unauthorized,
   );
+  expect(localeAppErrorText(new AppError("Actor missing", 428, "ACTOR_ID_REQUIRED"), copy)).toBe(
+    copy.unauthorized,
+  );
+  expect(localeAppErrorText(new AppError("Actor changed", 409, "ACTOR_CHANGED"), copy)).toBe(
+    copy.conflict,
+  );
   expect(localeAppErrorText(new AppError("Denied", 403, "FORBIDDEN"), copy)).toBe(copy.forbidden);
   expect(localeAppErrorText(new AppError("Missing", 404, "NOT_FOUND"), copy)).toBe(copy.notFound);
   expect(localeAppErrorText(new AppError("Clash", 409, "CONFLICT"), copy)).toBe(copy.conflict);

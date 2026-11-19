@@ -17,6 +17,9 @@ it("maps auth AppError codes to locale copy without English passthrough", () => 
   expect(authAppErrorText(new UnauthorizedError("Invalid email or password"), copy)).toBe(
     copy.unauthorized,
   );
+  expect(authAppErrorText(new AppError("Actor missing", 428, "ACTOR_ID_REQUIRED"), copy)).toBe(
+    copy.unauthorized,
+  );
   expect(
     authAppErrorText(
       new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED"),

@@ -26,6 +26,7 @@ export function localeAppErrorText(
 
   switch (error.code) {
     case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
       return copy.unauthorized ?? copy.failed;
     case "FORBIDDEN":
       return copy.forbidden ?? copy.failed;
