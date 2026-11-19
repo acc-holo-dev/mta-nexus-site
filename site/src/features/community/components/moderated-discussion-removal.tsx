@@ -12,6 +12,7 @@ import {
 } from "../moderated-discussion-contract";
 import { moderatedDiscussionCopy, moderatedDiscussionError } from "../moderated-discussion-copy";
 import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function ModeratedDiscussionRemoval({
   contentId,
   commentId,
@@ -34,6 +35,16 @@ export function ModeratedDiscussionRemoval({
     router = useRouter(),
     copy = moderatedDiscussionCopy(locale),
     general = moderationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(general),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -83,7 +94,7 @@ export function ModeratedDiscussionRemoval({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : general.uncertain);
+        setError(safeMessage(failure, general.uncertain));
       }
     } finally {
       guard.current = false;
