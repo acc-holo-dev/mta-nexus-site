@@ -84,6 +84,10 @@ const noticeCopy = {
     newServerUpdate: {
       title: "New server update",
     },
+    passwordResetCompleted: {
+      title: "Password reset completed",
+      message: "Your password was reset and all existing sessions were signed out.",
+    },
     newCommunityReport: {
       title: "New community report",
       message: "A community report is awaiting review.",
@@ -239,6 +243,10 @@ const noticeCopy = {
     },
     newServerUpdate: {
       title: "Новость сервера",
+    },
+    passwordResetCompleted: {
+      title: "Пароль восстановлен",
+      message: "Пароль сброшен, все существующие сессии завершены.",
     },
     newCommunityReport: {
       title: "Новая жалоба сообщества",
@@ -502,6 +510,15 @@ export function formatNotification(
   }
   if (notification.title === "New server update") {
     return { title: c.newServerUpdate.title, message: notification.message };
+  }
+  if (
+    notification.title === "Password reset completed" &&
+    notification.message === "Your password was reset and all existing sessions were signed out."
+  ) {
+    return {
+      title: c.passwordResetCompleted.title,
+      message: c.passwordResetCompleted.message,
+    };
   }
   if (
     notification.title === "New community report" &&

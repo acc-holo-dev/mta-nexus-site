@@ -8,8 +8,8 @@ const reviewCopy = {
   notes: "Notes",
 };
 
-/** Wave 103: staff/server publication notices localize through formatNotification. */
-describe("notification server update and verification awaiting honesty", () => {
+/** Waves 103–104: residual inbox title/message gaps localize through formatNotification. */
+describe("notification residual inbox copy honesty", () => {
   it("localizes New server update titles while keeping the stored body", () => {
     const notice = {
       title: "New server update",
@@ -39,6 +39,22 @@ describe("notification server update and verification awaiting honesty", () => {
     expect(formatNotification(notice, reviewCopy, "ru")).toEqual({
       title: "Новая заявка на верификацию",
       message: "Заявка на верификацию ожидает рассмотрения.",
+    });
+  });
+
+  it("localizes password-reset completed security notices", () => {
+    const notice = {
+      title: "Password reset completed",
+      message: "Your password was reset and all existing sessions were signed out.",
+      data: null,
+    };
+    expect(formatNotification(notice, reviewCopy, "en")).toEqual({
+      title: "Password reset completed",
+      message: "Your password was reset and all existing sessions were signed out.",
+    });
+    expect(formatNotification(notice, reviewCopy, "ru")).toEqual({
+      title: "Пароль восстановлен",
+      message: "Пароль сброшен, все существующие сессии завершены.",
     });
   });
 });
