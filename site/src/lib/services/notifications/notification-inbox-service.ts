@@ -109,7 +109,7 @@ class NotificationInboxService {
   updatePreferences(
     userId: string,
     changes: Parameters<typeof notificationRepository.updatePreferences>[1],
-    currentToken?: string,
+    currentToken: string,
   ) {
     return notificationRepository.updatePreferences(userId, changes, currentToken);
   }
