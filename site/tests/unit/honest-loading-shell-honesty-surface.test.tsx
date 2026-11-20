@@ -25,15 +25,33 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/workspace/purchases/loading.tsx",
     "site/src/app/auth/login/loading.tsx",
     "site/src/app/users/[username]/loading.tsx",
-    "site/src/app/admin/loading.tsx",
-    "site/src/app/workspace/content/loading.tsx",
     "site/src/app/workspace/servers/new/loading.tsx",
-    "site/src/app/workspace/platform-reports/loading.tsx",
     "site/src/app/workspace/platform-reports/[id]/loading.tsx",
   ]) {
     const source = read(relative);
     expect(source).toContain("features/shell/honest-loading");
     expect(source).toContain("<HonestLoadingShell");
+  }
+
+  for (const relative of [
+    "site/src/app/admin/loading.tsx",
+    "site/src/app/workspace/content/loading.tsx",
+    "site/src/app/workspace/platform-reports/loading.tsx",
+  ]) {
+    const source = read(relative);
+    expect(source).toContain("features/shell/route-honest-loading-server");
+    expect(source).toMatch(
+      /<(Dictionary|Route)HonestLoading|DictionaryRouteLoading|RouteHonestLoading/,
+    );
+  }
+
+  {
+    const port = read("site/src/features/shell/route-honest-loading-server.ts");
+    expect(port).toContain("DictionaryRouteLoading");
+    expect(port).toContain("RouteHonestLoading");
+    expect(read("site/src/features/shell/server/route-honest-loading.tsx")).toContain(
+      "<HonestLoadingShell",
+    );
   }
 
   {
