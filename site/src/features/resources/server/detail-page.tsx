@@ -46,9 +46,7 @@ import { safeResourceImageUrl } from "../resource-image-url";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -174,7 +172,7 @@ export async function ProductDetailPage({
           title={copy.detailUnavailable}
           description={copy.detailUnavailableDescription}
           action={
-            <Link href={`/market/${encodeURIComponent(slug)}`} className={actionLinkClass}>
+            <Link href={`/market/${encodeURIComponent(slug)}`} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -689,7 +687,7 @@ export async function ProductDetailPage({
                 action={
                   <Link
                     href={`/market/${encodeURIComponent(product.slug)}`}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {dictionary.errors.retry}
                   </Link>
@@ -708,7 +706,7 @@ export async function ProductDetailPage({
             {reviewPage && (
               <Link
                 href={`/market/${encodeURIComponent(product.slug)}/reviews`}
-                className={actionLinkClass}
+                className={linkAccentSmRounded}
               >
                 {reviewCopy.all} ({reviewPage.total})
               </Link>
@@ -716,7 +714,7 @@ export async function ProductDetailPage({
             {reviewPage && user && (
               <Link
                 href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-                className={`${actionLinkClass} ml-4`}
+                className={`${linkAccentSmRounded} ml-4`}
               >
                 {reviewCopy.write}
               </Link>

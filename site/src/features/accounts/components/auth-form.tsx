@@ -10,10 +10,8 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
 
+import { linkAccentSemibold } from "../../shell/link-shell";
 type AuthMode = "login" | "register";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function responseError(
   value: unknown,
@@ -208,14 +206,14 @@ export function AuthForm({
       <div className="space-y-2 text-sm text-muted">
         {!registering && (
           <p>
-            <Link href="/auth/forgot-password" className={navLinkClass}>
+            <Link href="/auth/forgot-password" className={linkAccentSemibold}>
               {copy.forgot}
             </Link>
           </p>
         )}
         <p>
           {registering ? `${copy.already} ` : `${copy.newUser} `}
-          <Link href={alternateHref} className={navLinkClass}>
+          <Link href={alternateHref} className={linkAccentSemibold}>
             {registering ? copy.signIn : copy.create}
           </Link>
         </p>

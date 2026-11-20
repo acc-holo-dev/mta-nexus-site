@@ -2,7 +2,7 @@ import type { OrderTermsReport } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { formatFinancialMinor } from "../financial-i18n";
@@ -38,11 +38,9 @@ export function OrderTermsReportView({
   const flags = (
     ["amountMismatch", "currencyMismatch", "negativeValues", "unsupportedCurrency"] as const
   ).filter((key) => report.summary[key]);
-  const linkClass =
-    "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
     <div className={pageShellMax5xl}>
-      <Link href={base} className={linkClass}>
+      <Link href={base} className={linkAccentSmRounded}>
         {c.back}
       </Link>
       <header className="min-w-0 space-y-3">
@@ -104,7 +102,7 @@ export function OrderTermsReportView({
           ))}
         </ul>
       </section>
-      <a href={`${api}/export?page=${report.page}`} className={linkClass}>
+      <a href={`${api}/export?page=${report.page}`} className={linkAccentSmRounded}>
         {c.export}
       </a>
       {report.lines.length ? (
@@ -171,7 +169,7 @@ export function OrderTermsReportView({
       {report.totalPages > 1 ? (
         <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
           {report.page > 1 ? (
-            <Link href={`${base}/terms?page=${report.page - 1}`} className={linkClass}>
+            <Link href={`${base}/terms?page=${report.page - 1}`} className={linkAccentSmRounded}>
               {c.previous}
             </Link>
           ) : null}
@@ -179,7 +177,7 @@ export function OrderTermsReportView({
             {c.page} {report.page} {c.of} {report.totalPages}
           </span>
           {report.page < report.totalPages ? (
-            <Link href={`${base}/terms?page=${report.page + 1}`} className={linkClass}>
+            <Link href={`${base}/terms?page=${report.page + 1}`} className={linkAccentSmRounded}>
               {c.next}
             </Link>
           ) : null}

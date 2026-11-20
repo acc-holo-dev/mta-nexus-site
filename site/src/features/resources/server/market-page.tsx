@@ -12,6 +12,7 @@ import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from 
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
 
+import { linkAccentSm } from "../../shell/link-shell";
 const CATEGORIES = [
   { id: "all", key: "all" },
   ...PRODUCT_TYPES.map((id) => ({ id, key: PRODUCT_CATEGORY_KEYS[id] })),
@@ -22,9 +23,6 @@ const SORTS = [
   { id: "newest", key: "newest" },
   { id: "rating", key: "rating" },
 ] as const;
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function marketMetadata(): Promise<Metadata> {
   return {
@@ -119,7 +117,7 @@ export async function MarketPage({
             {dictionary.market.searchButton}
           </Button>
           {query ? (
-            <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
+            <Link href={buildHref(type, sort, "")} className={linkAccentSm}>
               {dictionary.market.clearQuery}
             </Link>
           ) : null}
@@ -177,7 +175,7 @@ export async function MarketPage({
           title={dictionary.market.loadUnavailable}
           description={dictionary.market.loadUnavailableHint}
           action={
-            <Link href={catalogHref} className={actionLinkClass}>
+            <Link href={catalogHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -236,16 +234,16 @@ export async function MarketPage({
                   </Link>
                 ) : null}
                 {query ? (
-                  <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
+                  <Link href={buildHref(type, sort, "")} className={linkAccentSm}>
                     {dictionary.market.clearQuery}
                   </Link>
                 ) : null}
                 {type !== "all" ? (
-                  <Link href={buildHref("all", sort, query)} className={actionLinkClass}>
+                  <Link href={buildHref("all", sort, query)} className={linkAccentSm}>
                     {dictionary.market.clearCategory}
                   </Link>
                 ) : null}
-                <Link href="/market" className={actionLinkClass}>
+                <Link href="/market" className={linkAccentSm}>
                   {dictionary.market.clear}
                 </Link>
               </div>

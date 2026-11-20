@@ -13,9 +13,7 @@ import { ProfilePrivacyEditor } from "../profile";
 import { editablePrivacySchema } from "../profile-privacy-contract";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function settingsPrivacyMetadata(): Promise<Metadata> {
   return {
     title: profilePrivacyCopy(await getRequestLocale()).title,
@@ -49,7 +47,7 @@ export async function SettingsPrivacyScreen() {
     <div className={pageShellClass}>
       <ProfileChangeHistoryLink locale={locale} />
       <header className="space-y-2">
-        <Link href="/settings" className={navLinkClass}>
+        <Link href="/settings" className={linkAccentSm}>
           {copy.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
@@ -57,7 +55,7 @@ export async function SettingsPrivacyScreen() {
       </header>
       <ProfilePrivacyEditor key={actor.id} initial={initial} locale={locale} />
       {["developer", "admin"].includes(actor.role) && (
-        <Link href="/settings/developer" className={navLinkClass}>
+        <Link href="/settings/developer" className={linkAccentSm}>
           {copy.professional}
         </Link>
       )}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentXs } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
@@ -20,9 +20,6 @@ import { publicationHref } from "../publication-feed-contract";
 import { publicationCopy } from "../publication-feed-copy";
 import { platformRequest } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function FollowWorkspace({
   initial,
@@ -203,7 +200,7 @@ export function FollowWorkspace({
           >
             {copy.submit}
           </Button>
-          <Link href={href(type, "")} className={actionLinkClass}>
+          <Link href={href(type, "")} className={linkAccentSm}>
             {copy.clear}
           </Link>
           <Button
@@ -245,11 +242,11 @@ export function FollowWorkspace({
           description={type || query ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             type || query ? (
-              <Link href={href(undefined, "")} className={actionLinkClass}>
+              <Link href={href(undefined, "")} className={linkAccentSm}>
                 {copy.clear}
               </Link>
             ) : (
-              <Link href="/discover" className={actionLinkClass}>
+              <Link href="/discover" className={linkAccentSm}>
                 {copy.discover}
               </Link>
             )

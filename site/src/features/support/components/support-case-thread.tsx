@@ -4,7 +4,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
@@ -453,7 +453,7 @@ export function SupportCaseThread({
             </p>
             <Link
               href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
-              className="mt-2 inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={`mt-2 ${linkAccentXs}`}
             >
               {supportMessageCopy(locale).link}
             </Link>

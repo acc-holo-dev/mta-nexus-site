@@ -25,6 +25,7 @@ import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
 
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,
@@ -37,8 +38,6 @@ const secondaryCtaClass = `inline-flex min-h-11 items-center gap-1.5 rounded-md 
 const navChipClass = `inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`;
 const historyNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-4 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary";
-const retryLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const sectionLinkClass =
   "inline-flex min-h-11 items-center text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -200,7 +199,7 @@ export async function WorkspaceHubPage() {
             title={dictionary.workspace.libraryUnavailable}
             description={dictionary.workspace.libraryUnavailableHint}
             action={
-              <Link href="/workspace" className={retryLinkClass}>
+              <Link href="/workspace" className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -243,7 +242,7 @@ export async function WorkspaceHubPage() {
             title={dictionary.workspace.emptyLibrary}
             description={dictionary.workspace.emptyLibraryHint}
             action={
-              <Link href="/market?maxPrice=0" className={retryLinkClass}>
+              <Link href="/market?maxPrice=0" className={linkAccentSmRounded}>
                 {dictionary.workspace.browseResources}
               </Link>
             }
@@ -272,7 +271,7 @@ export async function WorkspaceHubPage() {
             title={dictionary.workspace.serversUnavailable}
             description={dictionary.workspace.serversUnavailableHint}
             action={
-              <Link href="/workspace" className={retryLinkClass}>
+              <Link href="/workspace" className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -297,7 +296,7 @@ export async function WorkspaceHubPage() {
             title={dictionary.workspace.noServers}
             description={dictionary.workspace.noServersHint}
             action={
-              <Link href="/workspace/servers/new" className={retryLinkClass}>
+              <Link href="/workspace/servers/new" className={linkAccentSmRounded}>
                 {dictionary.workspace.registerServer}
               </Link>
             }

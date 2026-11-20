@@ -11,13 +11,11 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
 } from "./private-change-history-controls";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ProfileChangeHistoryView({
   data,
@@ -46,7 +44,7 @@ export function ProfileChangeHistoryView({
         <p className="text-xs text-muted">{copy.privacy}</p>
         <p className="text-xs text-muted">{copy.recorded}</p>
       </header>
-      <Link href="/settings" className={navLinkClass}>
+      <Link href="/settings" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <PrivateChangeHistoryFilters
@@ -60,7 +58,10 @@ export function ProfileChangeHistoryView({
           title={error ?? copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <Link href={changeHistoryHref(path, filters, { fresh: true })} className={navLinkClass}>
+            <Link
+              href={changeHistoryHref(path, filters, { fresh: true })}
+              className={linkAccentSmRounded}
+            >
               {copy.reload}
             </Link>
           }
@@ -73,7 +74,7 @@ export function ProfileChangeHistoryView({
               href={changeHistoryHref("/api/account/profile/history/export", filters, {
                 until: data.until,
               })}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.export}
             </a>
@@ -85,7 +86,7 @@ export function ProfileChangeHistoryView({
               description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
               action={
                 filtered ? (
-                  <Link href={path} className={navLinkClass}>
+                  <Link href={path} className={linkAccentSmRounded}>
                     {copy.reset}
                   </Link>
                 ) : undefined
@@ -128,13 +129,16 @@ export function ProfileChangeHistoryView({
       )}
       <nav aria-label={copy.profileTitle} className="flex flex-wrap gap-4 text-sm">
         {(filters.cursor || filters.until || !data) && (
-          <Link className={navLinkClass} href={changeHistoryHref(path, filters, { fresh: true })}>
+          <Link
+            className={linkAccentSmRounded}
+            href={changeHistoryHref(path, filters, { fresh: true })}
+          >
             {copy.latest}
           </Link>
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className={navLinkClass}
+            className={linkAccentSmRounded}
             href={changeHistoryHref(path, filters, { cursor: data.nextCursor })}
           >
             {copy.older}

@@ -7,9 +7,7 @@ import { pageShellStack4 } from "../../shell/page-shell";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 export function ResourceReviewList({
   reviews,
   productId,
@@ -36,7 +34,7 @@ export function ResourceReviewList({
               {review.author && (
                 <Link
                   href={`/users/${encodeURIComponent(review.author.username)}`}
-                  className={actionLinkClass}
+                  className={linkAccent}
                 >
                   {review.author.displayName || review.author.username}
                 </Link>
@@ -96,7 +94,7 @@ export function ResourceReviewPager({
       className="flex min-w-0 items-center gap-4 overflow-x-clip text-sm"
     >
       {page > 1 && (
-        <Link href={href(page - 1)} className={actionLinkClass}>
+        <Link href={href(page - 1)} className={linkAccent}>
           {copy.previous}
         </Link>
       )}
@@ -104,7 +102,7 @@ export function ResourceReviewPager({
         {page}/{totalPages}
       </span>
       {page < totalPages && (
-        <Link href={href(page + 1)} className={actionLinkClass}>
+        <Link href={href(page + 1)} className={linkAccent}>
           {copy.next}
         </Link>
       )}

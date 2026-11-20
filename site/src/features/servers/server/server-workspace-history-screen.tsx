@@ -21,9 +21,7 @@ import {
 } from "../server-workspace-contract";
 import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function serverWorkspaceHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getServerActivityCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -98,7 +96,7 @@ export async function ServerWorkspaceHistoryScreen({
   return (
     <div className={pageShellClass}>
       <header className="space-y-2">
-        <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
           {history.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{history.title}</h1>
@@ -140,7 +138,7 @@ export async function ServerWorkspaceHistoryScreen({
         <Button type="submit" variant="outline" className="min-h-11 text-accent">
           {copy.apply}
         </Button>
-        <Link href={base} className={navLinkClass}>
+        <Link href={base} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </form>
@@ -149,7 +147,7 @@ export async function ServerWorkspaceHistoryScreen({
           title={failure || copy.historyUnavailable}
           description={copy.historyUnavailableHint}
           action={
-            <Link href={serverWorkspaceHistoryHref(id, query)} className={navLinkClass}>
+            <Link href={serverWorkspaceHistoryHref(id, query)} className={linkAccentSmRounded}>
               {copy.reload}
             </Link>
           }
@@ -157,7 +155,7 @@ export async function ServerWorkspaceHistoryScreen({
       ) : (
         <>
           <div className="space-y-2">
-            <a href={exportPath} className={navLinkClass}>
+            <a href={exportPath} className={linkAccentSmRounded}>
               {copy.export}
             </a>
             <p className="text-xs text-muted">{copy.exportHelp}</p>
@@ -168,7 +166,7 @@ export async function ServerWorkspaceHistoryScreen({
               description={filtered ? copy.historyEmptyHint : copy.historyEmptyNeverHint}
               action={
                 filtered ? (
-                  <Link href={base} className={navLinkClass}>
+                  <Link href={base} className={linkAccentSmRounded}>
                     {copy.reset}
                   </Link>
                 ) : undefined
@@ -202,7 +200,7 @@ export async function ServerWorkspaceHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
@@ -227,7 +225,7 @@ export async function ServerWorkspaceHistoryScreen({
             <Link
               prefetch={false}
               href={serverWorkspaceHistoryHref(id, query)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {history.latest}
             </Link>
@@ -235,7 +233,7 @@ export async function ServerWorkspaceHistoryScreen({
               <Link
                 prefetch={false}
                 href={serverWorkspaceHistoryHref(id, query, data.nextCursor)}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {history.older}
               </Link>

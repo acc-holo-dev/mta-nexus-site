@@ -32,8 +32,7 @@ import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function serverObservationBrowserMetadata() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return {
@@ -69,7 +68,7 @@ export async function ServerObservationBrowserPage({
           text === copy.unavailable || text === stats.unavailable ? copy.unavailableHint : undefined
         }
         action={
-          <a href={href} className={navLinkClass}>
+          <a href={href} className={linkAccentSmRounded}>
             {stats.retry}
           </a>
         }
@@ -177,7 +176,7 @@ function ServerObservationBrowserPanel({
   return (
     <div className={pageShellClass}>
       <header className="space-y-3">
-        <Link href={base} className={navLinkClass}>
+        <Link href={base} className={linkAccentSmRounded}>
           {managed ? stats.management : stats.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
@@ -189,7 +188,7 @@ function ServerObservationBrowserPanel({
             window: report.window,
             end: report.windowEnd,
           })}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {copy.statistics}
         </Link>
@@ -262,7 +261,7 @@ function ServerObservationBrowserPanel({
                 password: "all",
                 responding: "all",
               })}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.reset}
             </Link>
@@ -284,7 +283,7 @@ function ServerObservationBrowserPanel({
                   password: "all",
                   responding: "all",
                 })}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {copy.reset}
               </Link>
@@ -345,14 +344,14 @@ function ServerObservationBrowserPanel({
         </section>
       )}
       <nav aria-label={stats.navigation} className="flex flex-wrap gap-4">
-        <a href={serverObservationBrowserHref(path, state)} className={navLinkClass}>
+        <a href={serverObservationBrowserHref(path, state)} className={linkAccentSmRounded}>
           {copy.latest}
         </a>
         {report.previousCursor && (
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.previousCursor)}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {copy.newer}
           </Link>
@@ -361,7 +360,7 @@ function ServerObservationBrowserPanel({
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.nextCursor)}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {copy.older}
           </Link>

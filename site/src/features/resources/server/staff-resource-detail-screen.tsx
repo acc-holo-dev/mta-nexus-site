@@ -98,11 +98,9 @@ export async function StaffResourceDetailScreen({
     );
   }
   const product = result.product;
-  const linkClass =
-    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/resources" className={linkClass}>
+      <Link href="/admin/resources" className={linkAccentSm}>
         {copy.moderation}
       </Link>
       <h1 className="break-words font-display text-primary">{product.title}</h1>
@@ -113,12 +111,12 @@ export async function StaffResourceDetailScreen({
         {copy.moderationNote}
       </p>
       <div className="flex min-w-0 flex-wrap gap-4">
-        <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className={linkClass}>
+        <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className={linkAccentSm}>
           {resourceMediaCopy(locale).title}
         </Link>
         <Link
           href={`/admin/resources/${encodeURIComponent(id)}/requirements`}
-          className={linkClass}
+          className={linkAccentSm}
         >
           {resourceRequirementsCopy(locale).title}
         </Link>
@@ -156,7 +154,7 @@ export async function StaffResourceDetailScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -164,7 +162,7 @@ export async function StaffResourceDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

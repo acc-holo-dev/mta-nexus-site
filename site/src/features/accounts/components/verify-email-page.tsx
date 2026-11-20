@@ -14,6 +14,7 @@ import {
 } from "../account-recovery-browser";
 import { authEmailVerificationApiCopy } from "../auth-email-verification-api-copy";
 
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }
@@ -23,8 +24,6 @@ type State =
   | { kind: "success"; email: string }
   | { kind: "error"; proof?: Proof; message: string };
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -100,7 +99,7 @@ export function VerifyEmailPage() {
             title={copy.invalidVerification}
             description={copy.invalidVerificationHint}
             action={
-              <Link href="/settings" className={navLinkClass}>
+              <Link href="/settings" className={linkAccentSmSemibold}>
                 {copy.backToSettings}
               </Link>
             }
@@ -141,7 +140,7 @@ export function VerifyEmailPage() {
                 ) : undefined
               }
             />
-            <Link href="/settings" className={navLinkClass}>
+            <Link href="/settings" className={linkAccentSmSemibold}>
               {copy.backToSettings}
             </Link>
           </>
@@ -153,7 +152,7 @@ export function VerifyEmailPage() {
               {copy.verifiedPrefix} {state.email}
             </p>
             <p className="text-xs text-muted">{copy.confirmationConsumed}</p>
-            <Link href="/settings" className={navLinkClass}>
+            <Link href="/settings" className={linkAccentSmSemibold}>
               {copy.backToSettings}
             </Link>
           </>

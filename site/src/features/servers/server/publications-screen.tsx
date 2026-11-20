@@ -23,8 +23,7 @@ import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 import { serverWorkspaceError } from "../server-workspace-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export async function serverPublicationsMetadata(): Promise<Metadata> {
   return {
     title: serverContentCopy(await getRequestLocale()).title,
@@ -70,7 +69,7 @@ export async function ServerPublicationsScreen({
     });
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={navLinkClass}>
+      <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {team.back}
       </Link>
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -96,7 +95,7 @@ export async function ServerPublicationsScreen({
           title={failure}
           description={copy.unavailableHint}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={path} className={linkAccentSm}>
               {copy.retry}
             </Link>
           }
@@ -139,19 +138,19 @@ export async function ServerPublicationsScreen({
                     <span>
                       {copy.comments}: {item.commentCount}
                     </span>
-                    <Link href={`${path}/${encodeURIComponent(item.id)}`} className={navLinkClass}>
+                    <Link href={`${path}/${encodeURIComponent(item.id)}`} className={linkAccentSm}>
                       {copy.edit}
                     </Link>
                     <Link
                       href={`${path}/${encodeURIComponent(item.id)}/history`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {serverPublicationHistoryCopy(locale).history}
                     </Link>
                     {item.status === "published" && (
                       <Link
                         href={`/articles/${encodeURIComponent(item.slug)}`}
-                        className={navLinkClass}
+                        className={linkAccentSm}
                       >
                         {copy.publicView}
                       </Link>
@@ -166,11 +165,11 @@ export async function ServerPublicationsScreen({
               description={contentPageFiltered(filters) ? team.emptyFilteredHint : team.emptyHint}
               action={
                 contentPageFiltered(filters) ? (
-                  <Link href={path} className={navLinkClass}>
+                  <Link href={path} className={linkAccentSm}>
                     {copy.reset}
                   </Link>
                 ) : (
-                  <Link href={`${path}/new`} className={navLinkClass}>
+                  <Link href={`${path}/new`} className={linkAccentSm}>
                     {team.new}
                   </Link>
                 )

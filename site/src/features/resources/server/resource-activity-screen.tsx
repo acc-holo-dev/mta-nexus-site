@@ -16,8 +16,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccent } from "../../shell/link-shell";
 export async function resourceActivityMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceActivityCopy(await getRequestLocale()).analytics} | MTA NEXUS`,
@@ -72,14 +71,14 @@ export async function ResourceActivityScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccent}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -93,7 +92,7 @@ export async function ResourceActivityScreen({
   return (
     <div className={pageShellClass}>
       <header className="space-y-3">
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccent}>
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">{copy.analytics}</h1>
@@ -163,7 +162,7 @@ export async function ResourceActivityScreen({
       <div className="space-y-2">
         <a
           href={`/api/products/${encodeURIComponent(id)}/activity/export?days=${result.days}`}
-          className={navLinkClass}
+          className={linkAccent}
         >
           {copy.export}
         </a>

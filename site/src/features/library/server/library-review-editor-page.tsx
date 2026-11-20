@@ -14,9 +14,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function libraryReviewEditorMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).write} | MTA NEXUS`,
@@ -52,14 +50,14 @@ export async function LibraryReviewEditorPage({ params }: { params: Promise<{ id
   if (!detail) {
     return (
       <section className={pageShellClass}>
-        <Link href="/workspace/library/reviews" className={navLinkClass}>
+        <Link href="/workspace/library/reviews" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -69,7 +67,7 @@ export async function LibraryReviewEditorPage({ params }: { params: Promise<{ id
   }
   return (
     <section className={pageShellClass}>
-      <Link href="/workspace/library/reviews" className={navLinkClass}>
+      <Link href="/workspace/library/reviews" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <h1 className="min-w-0 break-words font-display">{copy.write}</h1>

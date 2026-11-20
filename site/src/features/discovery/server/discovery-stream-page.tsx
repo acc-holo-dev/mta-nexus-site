@@ -15,9 +15,7 @@ import {
 } from "../discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function discoveryStreamMetadata(): Promise<Metadata> {
   const copy = discoveryStreamCopy(await getRequestLocale());
   return {
@@ -58,7 +56,7 @@ export async function DiscoveryStreamPage({
       <header className="space-y-2">
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <Link href={discoverHref(state ?? fallback)} className={actionLinkClass}>
+        <Link href={discoverHref(state ?? fallback)} className={linkAccentSm}>
           {copy.paged}
         </Link>
       </header>
@@ -68,7 +66,7 @@ export async function DiscoveryStreamPage({
             key={type}
             aria-current={state?.type === type ? "page" : undefined}
             href={discoveryStreamHref({ ...fallback, type, query: state?.query ?? "" })}
-            className={actionLinkClass}
+            className={linkAccentSm}
           >
             {dictionary.discover[type]}
           </Link>
@@ -80,7 +78,7 @@ export async function DiscoveryStreamPage({
           title={error}
           description={discoveryCopy(locale).unavailableHint}
           action={
-            <Link href={discoveryStreamHref(state ?? fallback)} className={actionLinkClass}>
+            <Link href={discoveryStreamHref(state ?? fallback)} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }

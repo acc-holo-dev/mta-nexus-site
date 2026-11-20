@@ -21,9 +21,7 @@ import {
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionReceiptsCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -77,7 +75,7 @@ export default async function Page({
             title={r.loadUnavailable}
             description={r.loadUnavailableDescription}
             action={
-              <Link href={collectionReceiptHref(id)} className={navLinkClass}>
+              <Link href={collectionReceiptHref(id)} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -89,10 +87,10 @@ export default async function Page({
     return (
       <div className={pageShellClass}>
         <nav className="flex min-w-0 flex-wrap gap-4">
-          <Link href="/workspace/library/collections/history" className={navLinkClass}>
+          <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
             {c.history}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
         </nav>
@@ -106,7 +104,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/receipts/${encodeURIComponent(report.id)}/export`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {r.export}
         </a>
@@ -150,7 +148,10 @@ export default async function Page({
             {report.currentCollection && (
               <p>
                 {r.current}:{" "}
-                <Link href={collectionHref(report.currentCollection.id)} className={navLinkClass}>
+                <Link
+                  href={collectionHref(report.currentCollection.id)}
+                  className={linkAccentSmRounded}
+                >
                   {report.currentCollection.name}
                 </Link>{" "}
                 · {c[report.currentCollection.status]} · {c.revision}{" "}
@@ -234,7 +235,7 @@ export default async function Page({
           title={libraryCollectionError(typedLocale, error.code)}
           description={r.loadUnavailableDescription}
           action={
-            <Link href={collectionHref()} className={navLinkClass}>
+            <Link href={collectionHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

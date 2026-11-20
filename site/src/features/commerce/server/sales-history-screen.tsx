@@ -21,9 +21,7 @@ import { getFinancialCopy } from "../financial-i18n";
 import { sellerSalesCopy } from "../seller-sales-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function salesHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).salesTitle} | MTA NEXUS`,
@@ -71,7 +69,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
             title={copy.salesLoadUnavailable}
             description={copy.salesLoadUnavailableHint}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -84,10 +82,10 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   return (
     <div className={pageShellClass}>
       <HistoryShell copy={copy} area="sales">
-        <Link href="/workspace/sales/report" className={navLinkClass}>
+        <Link href="/workspace/sales/report" className={linkAccentSmRounded}>
           {sellerSalesCopy(typedLocale).title}
         </Link>
-        <Link href="/workspace/finance" className={navLinkClass}>
+        <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {getFinancialCopy(typedLocale).title}
         </Link>
         <p role="note" className="text-sm text-muted">

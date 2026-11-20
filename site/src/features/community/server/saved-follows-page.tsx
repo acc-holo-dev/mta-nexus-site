@@ -13,9 +13,7 @@ import { FollowWorkspace } from "../follow";
 import { FOLLOW_TYPES, type FollowTargetType } from "../follow-workspace-contract";
 import { followCopy } from "../follow-workspace-copy";
 
-const retryLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function savedFollowsMetadata(): Promise<Metadata> {
   const copy = followCopy(await getRequestLocale());
   return {
@@ -76,7 +74,7 @@ export async function SavedFollowsScreen({
           title={copy.pageError}
           description={copy.pageErrorHint}
           action={
-            <Link href={returnPath} className={retryLinkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

@@ -20,9 +20,7 @@ import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-stat
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function serverStatisticsMetadata(): Promise<Metadata> {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return {
@@ -85,7 +83,7 @@ export async function ServerStatisticsPage({
           title={copy.invalid}
           description={copy.invalidHint}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={path} className={linkAccentSm}>
               {copy.refresh}
             </Link>
           }
@@ -110,12 +108,12 @@ export async function ServerStatisticsPage({
           description={title === copy.unavailable ? copy.unavailableHint : undefined}
           action={
             <nav className="flex flex-wrap justify-center gap-4 text-sm">
-              <Link href={serverStatisticsHref(path, query)} className={navLinkClass}>
+              <Link href={serverStatisticsHref(path, query)} className={linkAccentSm}>
                 {copy.retry}
               </Link>
               <Link
                 href={serverStatisticsHref(path, { window: query.window })}
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.refresh}
               </Link>

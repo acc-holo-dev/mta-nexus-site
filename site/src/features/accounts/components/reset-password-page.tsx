@@ -14,6 +14,7 @@ import {
 } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
 
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }
@@ -22,9 +23,6 @@ type State =
   | { kind: "invalid" }
   | { kind: "error"; proof?: Proof; message: string }
   | { kind: "success" };
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ResetPasswordPage() {
   const { dictionary, locale } = useNexusLocale();
@@ -119,7 +117,7 @@ export function ResetPasswordPage() {
             title={copy.invalidReset}
             description={copy.invalidResetHint}
             action={
-              <Link href="/auth/forgot-password" className={navLinkClass}>
+              <Link href="/auth/forgot-password" className={linkAccentSmSemibold}>
                 {copy.requestNew}
               </Link>
             }
@@ -186,7 +184,7 @@ export function ResetPasswordPage() {
             <p role="status" className="text-sm text-success">
               {copy.resetSuccess}
             </p>
-            <Link href="/auth/login" className={navLinkClass}>
+            <Link href="/auth/login" className={linkAccentSmSemibold}>
               {copy.signIn}
             </Link>
           </>

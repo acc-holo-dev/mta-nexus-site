@@ -16,9 +16,7 @@ import { ResourceRequirementsReportBody } from "../components/resource-requireme
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../resource-requirements-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 function requirementsAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -37,14 +35,14 @@ function ResourceRequirementsLoadError({
     dictionary = getDictionary(locale);
   return (
     <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -135,7 +133,7 @@ export async function ResourceRequirementsScreen({
         : `/api/admin/resources/${encodeURIComponent(productId)}/requirements`;
   return (
     <div className={pageShellClass}>
-      <Link href={back} className={navLinkClass}>
+      <Link href={back} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>

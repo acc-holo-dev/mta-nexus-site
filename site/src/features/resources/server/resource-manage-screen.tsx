@@ -18,9 +18,7 @@ import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n"
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function resourceManageMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).authorResources.manageDocumentTitle} | MTA NEXUS`,
@@ -69,14 +67,14 @@ export async function ResourceManageScreen({
   if (!loaded) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/resources" className={navLinkClass}>
+        <Link href="/workspace/resources" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={publisherCopy.loadUnavailable}
           description={publisherCopy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -89,7 +87,7 @@ export async function ResourceManageScreen({
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/resources" className={navLinkClass}>
+      <Link href="/workspace/resources" className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -97,7 +95,7 @@ export async function ResourceManageScreen({
         <p className="text-secondary">
           {copy.statusLabels[product.status]} · {product.currentVersion}
         </p>
-        <Link href={`/market/${product.slug}`} className={navLinkClass}>
+        <Link href={`/market/${product.slug}`} className={linkAccentSm}>
           {copy.preview}
         </Link>
       </header>
@@ -231,7 +229,7 @@ export async function ResourceManageScreen({
                   )}
                 <Link
                   href={`/workspace/resources/${id}/builds/${build.id}`}
-                  className={navLinkClass}
+                  className={linkAccentSm}
                 >
                   {buildCopy.manage}
                 </Link>
@@ -242,7 +240,7 @@ export async function ResourceManageScreen({
         {history.totalPages > 1 && (
           <nav aria-label={copy.page} className="flex gap-4 text-sm">
             {history.page > 1 && (
-              <Link href={`?page=${history.page - 1}`} className={navLinkClass}>
+              <Link href={`?page=${history.page - 1}`} className={linkAccentSm}>
                 {copy.previous}
               </Link>
             )}
@@ -250,7 +248,7 @@ export async function ResourceManageScreen({
               {copy.page} {history.page} {copy.of} {history.totalPages}
             </span>
             {history.page < history.totalPages && (
-              <Link href={`?page=${history.page + 1}`} className={navLinkClass}>
+              <Link href={`?page=${history.page + 1}`} className={linkAccentSm}>
                 {copy.next}
               </Link>
             )}

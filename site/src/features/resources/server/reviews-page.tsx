@@ -16,9 +16,7 @@ import { ResourceReviewList, ResourceReviewPager } from "../components/resource-
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 export async function publicResourceReviewsMetadata(): Promise<Metadata> {
   return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
 }
@@ -54,7 +52,7 @@ export async function PublicResourceReviewsPage({
           action={
             <Link
               href={`/market/${encodeURIComponent(target.slug)}/reviews`}
-              className={actionLinkClass}
+              className={linkAccent}
             >
               {dictionary.errors.retry}
             </Link>
@@ -86,7 +84,7 @@ export async function PublicResourceReviewsPage({
   if (!result) {
     return (
       <section className={pageShellClass}>
-        <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
+        <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
           {copy.back}
         </Link>
         <h1 className="font-display">
@@ -97,7 +95,7 @@ export async function PublicResourceReviewsPage({
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
           action={
-            <Link href={reviewsPath} className={actionLinkClass}>
+            <Link href={reviewsPath} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -108,7 +106,7 @@ export async function PublicResourceReviewsPage({
 
   return (
     <section className={pageShellClass}>
-      <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
+      <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">
@@ -121,7 +119,7 @@ export async function PublicResourceReviewsPage({
           title={copy.sessionUnavailable}
           description={copy.sessionUnavailableDescription}
           action={
-            <Link href={reviewsPath} className={actionLinkClass}>
+            <Link href={reviewsPath} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -129,7 +127,7 @@ export async function PublicResourceReviewsPage({
       ) : actor ? (
         <Link
           href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-          className={actionLinkClass}
+          className={linkAccent}
         >
           {copy.write}
         </Link>

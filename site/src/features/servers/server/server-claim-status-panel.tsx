@@ -7,6 +7,7 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
 
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 export function ServerClaimStatusPanel({
   serverId,
   serverName,
@@ -66,7 +67,7 @@ export function ServerClaimStatusPanel({
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(serverId)}`}
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSmSemibold}
           >
             {copy.refresh}
           </Link>

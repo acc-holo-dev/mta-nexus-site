@@ -15,9 +15,7 @@ import { AuthorContentForm } from "../author-content-form";
 import { parseEditableContent } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -51,7 +49,7 @@ export default async function EditPublicationPage({ params }: { params: Promise<
   const initial = item ? parseEditableContent(JSON.parse(JSON.stringify(item))) : null;
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/content" className={navLinkClass}>
+      <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.edit}</h1>
@@ -62,7 +60,7 @@ export default async function EditPublicationPage({ params }: { params: Promise<
           title={copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }

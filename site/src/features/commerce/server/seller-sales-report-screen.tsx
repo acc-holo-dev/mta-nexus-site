@@ -15,9 +15,7 @@ import { sellerSalesCopy } from "../seller-sales-i18n";
 import { sellerSalesPageQuery } from "../seller-sales-query";
 import { SellerSalesReportView } from "./seller-sales-report";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 type Query = Record<string, string | string[] | undefined>;
 
 export async function sellerSalesReportMetadata(): Promise<Metadata> {
@@ -68,14 +66,14 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
     if (!report || !scopes) {
       return (
         <div className={pageShellMax6xl}>
-          <Link href="/workspace/sales" className={linkClass}>
+          <Link href="/workspace/sales" className={linkAccentSmRounded}>
             {c.back}
           </Link>
           <ErrorState
             title={c.loadUnavailable}
             description={c.loadUnavailableHint}
             action={
-              <Link href={returnPath} className={linkClass}>
+              <Link href={returnPath} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -96,7 +94,7 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
             title={c.invalid}
             description={c.invalidDescription}
             action={
-              <Link href="/workspace/sales/report" className={linkClass}>
+              <Link href="/workspace/sales/report" className={linkAccentSmRounded}>
                 {c.reset}
               </Link>
             }
@@ -105,14 +103,14 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
       );
     return (
       <div className={pageShellMax6xl}>
-        <Link href="/workspace/sales" className={linkClass}>
+        <Link href="/workspace/sales" className={linkAccentSmRounded}>
           {c.back}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={linkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

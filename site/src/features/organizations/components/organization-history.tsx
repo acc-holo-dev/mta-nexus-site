@@ -18,8 +18,7 @@ import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export function OrganizationHistoryView({
   data,
   id,
@@ -55,7 +54,7 @@ export function OrganizationHistoryView({
         <p className="text-sm text-muted">{copy.historyDescription}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
-      <Link className={navLinkClass} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
+      <Link className={linkAccentSm} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
         {copy.back}
       </Link>
       <PrivateChangeHistoryFilters
@@ -74,7 +73,7 @@ export function OrganizationHistoryView({
               filters,
               { until: data.until },
             )}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {journal.export}
           </a>
@@ -86,7 +85,7 @@ export function OrganizationHistoryView({
           title={error ?? copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={path} className={linkAccentSm}>
               {copy.reload}
             </Link>
           }
@@ -98,7 +97,7 @@ export function OrganizationHistoryView({
           description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             filtered ? (
-              <Link href={path} className={navLinkClass}>
+              <Link href={path} className={linkAccentSm}>
                 {journal.reset}
               </Link>
             ) : undefined
@@ -166,13 +165,13 @@ export function OrganizationHistoryView({
       ))}
       <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
         {(before || filters.cursor || filters.until || !data) && (
-          <Link className={navLinkClass} href={changeHistoryHref(path, filters, { fresh: true })}>
+          <Link className={linkAccentSm} href={changeHistoryHref(path, filters, { fresh: true })}>
             {copy.latest}
           </Link>
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className={navLinkClass}
+            className={linkAccentSm}
             href={
               data.until
                 ? changeHistoryHref(path, filters, { cursor: data.nextCursor })

@@ -20,6 +20,7 @@ import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
+import { linkAccentSm } from "../../shell/link-shell";
 type BuildOption = { id: string; version: string };
 
 type PagePayload = {
@@ -37,8 +38,6 @@ type DetailPayload = {
 const shellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const textActionClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function readCode(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
@@ -450,7 +449,7 @@ export function ResourceQaPanel({
         <div className={pageShellStack4}>
           <button
             type="button"
-            className={textActionClass}
+            className={linkAccentSm}
             onClick={() => {
               setSelectedId(null);
               setDetail(null);
@@ -550,7 +549,7 @@ export function ResourceQaPanel({
                     {canResolve && detail.thread.status !== "resolved" ? (
                       <button
                         type="button"
-                        className={textActionClass}
+                        className={linkAccentSm}
                         disabled={busy}
                         onClick={() => void onResolve(item.id)}
                       >
@@ -560,7 +559,7 @@ export function ResourceQaPanel({
                     {canModerate ? (
                       <button
                         type="button"
-                        className={textActionClass}
+                        className={linkAccentSm}
                         disabled={busy}
                         onClick={() => void onRemoveAnswer(item.id, item.body)}
                       >
@@ -715,7 +714,7 @@ export function ResourceQaPanel({
                   <p className="break-words text-sm text-secondary">{thread.body}</p>
                   <button
                     type="button"
-                    className={`mt-2 ${textActionClass}`}
+                    className={`mt-2 ${linkAccentSm}`}
                     onClick={() => void loadThread(thread.id)}
                   >
                     {copy.loadThread}

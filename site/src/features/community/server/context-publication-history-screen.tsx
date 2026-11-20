@@ -27,9 +27,7 @@ import { organizationPublicationHistorySchema } from "../organization-publicatio
 import { serverPublicationHistorySchema } from "../server-publication-history-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -99,7 +97,7 @@ export async function ContextPublicationHistoryScreen({
   const emptyDescription = copy.historyEmptyHint;
   return (
     <div className={pageShellClass}>
-      <Link href={base} className={navLinkClass}>
+      <Link href={base} className={linkAccentSmRounded}>
         {workspaceTitle}
       </Link>
       <header className="space-y-2">
@@ -116,7 +114,7 @@ export async function ContextPublicationHistoryScreen({
           title={failure || copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <a href={path} className={navLinkClass}>
+            <a href={path} className={linkAccentSmRounded}>
               {history.reload}
             </a>
           }
@@ -126,7 +124,7 @@ export async function ContextPublicationHistoryScreen({
           <p className="text-sm text-muted">
             {labels.status}: {labels[data.item.status]}
           </p>
-          <Link href={`${base}/${encodeURIComponent(contentId)}`} className={navLinkClass}>
+          <Link href={`${base}/${encodeURIComponent(contentId)}`} className={linkAccentSmRounded}>
             {labels.edit}
           </Link>
           {data.item.recoverable && (
@@ -141,7 +139,7 @@ export async function ContextPublicationHistoryScreen({
           {data.item.status === "archived" && !data.item.recoverable && (
             <section className={panelSpace2P4}>
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
-              <Link href={publicationSupportHref(data.item.title)} className={navLinkClass}>
+              <Link href={publicationSupportHref(data.item.title)} className={linkAccentSmRounded}>
                 {history.support}
               </Link>
             </section>
@@ -169,7 +167,7 @@ export async function ContextPublicationHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
@@ -186,14 +184,14 @@ export async function ContextPublicationHistoryScreen({
             </ol>
           )}
           <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <Link prefetch={false} href={path} className={navLinkClass}>
+            <Link prefetch={false} href={path} className={linkAccentSmRounded}>
               {history.historyLatest}
             </Link>
             {data.olderCursor && (
               <Link
                 prefetch={false}
                 href={`${path}?${new URLSearchParams({ cursor: data.olderCursor })}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {history.historyOlder}
               </Link>

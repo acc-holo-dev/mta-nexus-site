@@ -13,7 +13,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkMuted } from "../../shell/link-shell";
+import { linkAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -201,13 +201,11 @@ export function OrganizationWorkspacePanel({
       setServers(false);
     }
   }
-  const navLinkClass =
-    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
     <div className={pageShellStack6}>
       <Link
         href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {organizationTeamCopy(locale).title}
       </Link>
@@ -236,7 +234,7 @@ export function OrganizationWorkspacePanel({
       />
       {manageable && (
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
         >
           {organizationContentCopy(locale).title}
@@ -244,7 +242,7 @@ export function OrganizationWorkspacePanel({
       )}
       {manageable && (
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
         >
           {governanceCopy.history}
@@ -436,7 +434,7 @@ export function OrganizationWorkspacePanel({
         >
           {data.page > 1 ? (
             <Link
-              className={navLinkClass}
+              className={linkAccentSm}
               href={teamHref(data.organization.id, data.page - 1, query)}
             >
               {copy.previous}
@@ -449,7 +447,7 @@ export function OrganizationWorkspacePanel({
           </span>
           {data.hasMore && (
             <Link
-              className={navLinkClass}
+              className={linkAccentSm}
               href={teamHref(data.organization.id, data.page + 1, query)}
             >
               {copy.next}

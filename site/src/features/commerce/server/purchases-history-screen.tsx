@@ -22,9 +22,7 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).purchasesTitle} | MTA NEXUS`,
@@ -78,7 +76,7 @@ export async function PurchasesHistoryScreen({
             title={copy.purchasesLoadUnavailable}
             description={copy.purchasesLoadUnavailableHint}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -91,10 +89,10 @@ export async function PurchasesHistoryScreen({
   return (
     <div className={pageShellClass}>
       <HistoryShell copy={copy} area="purchases">
-        <Link href="/subscriptions" className={navLinkClass}>
+        <Link href="/subscriptions" className={linkAccentSmRounded}>
           {getCommercialCopy(typedLocale).catalog}
         </Link>
-        <Link href="/workspace/order-cases" className={navLinkClass}>
+        <Link href="/workspace/order-cases" className={linkAccentSmRounded}>
           {orderCaseCopy(typedLocale).buyerCases}
         </Link>
         {result.orders.length === 0 ? (
@@ -133,7 +131,7 @@ export async function PurchasesHistoryScreen({
                 </dl>
                 <Link
                   href={`/workspace/purchases/${encodeURIComponent(order.id)}`}
-                  className={navLinkClass}
+                  className={linkAccentSmRounded}
                 >
                   {copy.details}
                 </Link>

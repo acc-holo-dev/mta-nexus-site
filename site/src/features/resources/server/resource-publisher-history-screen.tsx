@@ -10,15 +10,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourcePublisherService } from "../../../lib/services/resources/resource-publisher-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { publisherSearchParams, resourcePublisherHistoryQuery } from "../resource-publisher-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function resourcePublisherHistoryMetadata(): Promise<Metadata> {
   return {
@@ -81,14 +78,14 @@ export async function ResourcePublisherHistoryScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentRounded}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -100,7 +97,7 @@ export async function ResourcePublisherHistoryScreen({
     `?${new URLSearchParams({ kind, page: String(page) })}`;
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentRounded}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.history}</h1>
@@ -154,7 +151,7 @@ export async function ResourcePublisherHistoryScreen({
           description={query.kind !== "all" ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             query.kind !== "all" ? (
-              <Link href={href(1, "all")} className={navLinkClass}>
+              <Link href={href(1, "all")} className={linkAccentRounded}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -164,7 +161,7 @@ export async function ResourcePublisherHistoryScreen({
       {result.totalPages > 1 && (
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.page}>
           {result.page > 1 && (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentRounded}>
               {copy.previous}
             </Link>
           )}
@@ -172,7 +169,7 @@ export async function ResourcePublisherHistoryScreen({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentRounded}>
               {copy.next}
             </Link>
           )}

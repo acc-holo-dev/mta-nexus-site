@@ -32,9 +32,6 @@ import {
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { platformFieldClass } from "../user-platform-client";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 function ModeratedDiscussionLoadError({
   locale,
   retryHref,
@@ -51,7 +48,7 @@ function ModeratedDiscussionLoadError({
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSm}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -109,7 +106,7 @@ export async function ModeratedDiscussionScreen({
           title={general.denied}
           description={general.deniedHint}
           action={
-            <Link href="/admin" className={navLinkClass}>
+            <Link href="/admin" className={linkAccentSm}>
               {dictionary.admin.title}
             </Link>
           }
@@ -158,10 +155,10 @@ export async function ModeratedDiscussionScreen({
           description={copy.loadUnavailableHint}
           action={
             <div className="flex flex-wrap justify-center gap-4">
-              <a href={href} className={navLinkClass}>
+              <a href={href} className={linkAccentSm}>
                 {general.reload}
               </a>
-              <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
+              <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
                 {copy.back}
               </Link>
             </div>
@@ -281,7 +278,7 @@ export async function ModeratedDiscussionScreen({
               description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
               action={
                 emptyFiltered ? (
-                  <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
+                  <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
                     {general.reset}
                   </Link>
                 ) : undefined

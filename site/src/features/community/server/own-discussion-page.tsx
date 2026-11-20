@@ -13,9 +13,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
 
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata() {
   return {
     title: ownDiscussionCopy(await getRequestLocale()).open,
@@ -49,7 +47,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
   });
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/discussions" className={linkClass}>
+      <Link href="/workspace/discussions" className={linkAccentSm}>
         {copy.back}
       </Link>
       {initial ? (
@@ -63,7 +61,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
           title={copy.failed}
           description={copy.loadUnavailableHint}
           action={
-            <a href={returnPath} className={linkClass}>
+            <a href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </a>
           }

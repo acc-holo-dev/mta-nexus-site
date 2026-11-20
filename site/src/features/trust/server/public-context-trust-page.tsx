@@ -14,12 +14,11 @@ import {
 } from "../public-context-trust-contract";
 import { contextTrustCopy, contextTrustError } from "../public-context-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
+import { linkAccentSm } from "../../shell/link-shell";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function contextTrustMetadata(kind: ContextKind, props: ContextTrustPageProps) {
   const { slug } = await props.params,
     copy = contextTrustCopy(await getRequestLocale());
@@ -60,7 +59,7 @@ export async function PublicContextTrustPage({
   const base = `/${kind === "organization" ? "organizations" : "servers"}/${encodeURIComponent(slug)}`;
   return (
     <div className={pageShellClass}>
-      <Link href={base} className={actionLinkClass}>
+      <Link href={base} className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className={panelClipSpace3P6}>
@@ -132,7 +131,7 @@ export async function PublicContextTrustPage({
           </dl>
           <Link
             href={`${base}/${kind === "organization" ? "activity" : "updates"}`}
-            className={actionLinkClass}
+            className={linkAccentSm}
           >
             {copy.activity}
           </Link>
@@ -141,7 +140,7 @@ export async function PublicContextTrustPage({
       <section className={pageShellStack4}>
         <h2 className="font-heading text-primary">{copy.history}</h2>
         <p className="text-sm text-muted">{approvals.scope}</p>
-        <a href={latest} className={actionLinkClass}>
+        <a href={latest} className={linkAccentSm}>
           {copy.latest}
         </a>
         {error && (
@@ -149,7 +148,7 @@ export async function PublicContextTrustPage({
             title={error}
             description={approvals.unavailableHint}
             action={
-              <a href={latest} className={actionLinkClass}>
+              <a href={latest} className={linkAccentSm}>
                 {dictionary.errors.retry}
               </a>
             }
@@ -177,7 +176,7 @@ export async function PublicContextTrustPage({
           <Link
             prefetch={false}
             href={contextTrustHref(kind, slug, page.nextCursor)}
-            className={actionLinkClass}
+            className={linkAccentSm}
           >
             {copy.older}
           </Link>

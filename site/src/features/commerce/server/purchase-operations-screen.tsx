@@ -20,9 +20,7 @@ import {
 import { getCommercialCopy } from "../commercial-i18n";
 import { OrderCancellationForm } from "../order-cancellation";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function purchaseOperationsMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).paymentOperations} | MTA NEXUS`,
@@ -75,14 +73,17 @@ export async function PurchaseOperationsScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
+        <Link
+          href={`/workspace/purchases/${encodeURIComponent(id)}`}
+          className={linkAccentSmRounded}
+        >
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -105,7 +106,7 @@ export async function PurchaseOperationsScreen({
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
+      <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.paymentOperations}</h1>
@@ -168,7 +169,7 @@ export async function PurchaseOperationsScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           ) : null}
@@ -176,7 +177,7 @@ export async function PurchaseOperationsScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           ) : null}

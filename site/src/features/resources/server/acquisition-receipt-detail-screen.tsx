@@ -18,9 +18,7 @@ import { ResourceDownloadButton } from "../download";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../resource-cart-receipts-query";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function acquisitionReceiptDetailMetadata(): Promise<Metadata> {
   return {
     title: `${resourceCartReceiptsCopy(await getRequestLocale()).receipt} | MTA NEXUS`,
@@ -67,14 +65,14 @@ export async function AcquisitionReceiptDetailScreen({
   if (!receipt) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+        <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
           {copy.title}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={linkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -84,7 +82,7 @@ export async function AcquisitionReceiptDetailScreen({
   }
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+      <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -139,7 +137,7 @@ export async function AcquisitionReceiptDetailScreen({
               {item.downloadable ? (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className={linkClass}
+                  className={linkAccentSmRounded}
                   prefetch={false}
                 >
                   {copy.versions}
@@ -149,7 +147,7 @@ export async function AcquisitionReceiptDetailScreen({
           ))}
         </ol>
       )}
-      <Link href="/workspace/library" className={linkClass}>
+      <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.library}
       </Link>
     </div>

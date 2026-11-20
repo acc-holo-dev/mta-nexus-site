@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
@@ -15,8 +15,6 @@ import { planReviewsCopy } from "../plan-reviews-i18n";
 import { subscriptionsCopy } from "../subscriptions-i18n";
 
 const shellClass = pageShellMax5xl;
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const scopeLinkClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -54,7 +52,7 @@ export async function PublicSubscriptionsScreen({
           title={copy.loadUnavailable}
           description={subscriptions.notice}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -74,10 +72,10 @@ export async function PublicSubscriptionsScreen({
     <div className={shellClass}>
       <h1 className="font-display text-primary">{copy.catalog}</h1>
       <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.catalog}>
-        <Link href="/workspace/subscriptions" className={linkClass}>
+        <Link href="/workspace/subscriptions" className={linkAccentSm}>
           {subscriptions.title}
         </Link>
-        <Link href="/workspace/subscriptions/reviews" className={linkClass}>
+        <Link href="/workspace/subscriptions/reviews" className={linkAccentSm}>
           {reviews.history}
         </Link>
       </nav>
@@ -122,7 +120,7 @@ export async function PublicSubscriptionsScreen({
               {plan.price === 0 ? (
                 <Link
                   href={`/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
-                  className={linkClass}
+                  className={linkAccentSm}
                 >
                   {subscriptions.activate}
                 </Link>
@@ -139,7 +137,7 @@ export async function PublicSubscriptionsScreen({
               )}
               <Link
                 href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
-                className={linkClass}
+                className={linkAccentSm}
               >
                 {reviews.newReview}
               </Link>
@@ -153,7 +151,7 @@ export async function PublicSubscriptionsScreen({
           icon={<CreditCard className="h-6 w-6" aria-hidden="true" />}
           action={
             pageNumber > 1 ? (
-              <Link href={`/subscriptions?scope=${scope}`} className={linkClass}>
+              <Link href={`/subscriptions?scope=${scope}`} className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : undefined
@@ -163,7 +161,7 @@ export async function PublicSubscriptionsScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={linkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -171,7 +169,7 @@ export async function PublicSubscriptionsScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={linkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

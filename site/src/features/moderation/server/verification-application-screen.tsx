@@ -13,13 +13,11 @@ import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationApplicationAmend } from "../verification-amend";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
 } from "../verification-applications-copy";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function verificationApplicationMetadata(): Promise<Metadata> {
   return {
@@ -80,7 +78,7 @@ export async function VerificationApplicationScreen({
         <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
         <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
       </header>
-      <Link href="/workspace/verification/history" className={navLinkClass}>
+      <Link href="/workspace/verification/history" className={linkAccentSm}>
         {copy.title}
       </Link>
       {error ? (
@@ -88,7 +86,7 @@ export async function VerificationApplicationScreen({
           title={error}
           description={labels.unavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -120,7 +118,7 @@ export async function VerificationApplicationScreen({
                 href={application.proofUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {labels.proof}
               </a>
@@ -146,7 +144,7 @@ export async function VerificationApplicationScreen({
                   ]
                 }
               </p>
-              <Link href="/settings/developer" className={navLinkClass}>
+              <Link href="/settings/developer" className={linkAccentSm}>
                 {labels.editProfile}
               </Link>
             </section>

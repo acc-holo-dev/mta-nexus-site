@@ -15,9 +15,7 @@ import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseControlPanel } from "../license-controls";
 import { LicenseDetailView } from "../license-detail";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function licenseModerationDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
@@ -59,14 +57,14 @@ export async function LicenseModerationDetailScreen({
   } catch {
     return (
       <div className={pageShellClass}>
-        <Link href="/admin/licenses" className={navLinkClass}>
+        <Link href="/admin/licenses" className={linkAccentSmRounded}>
           {copy.moderation}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -77,7 +75,7 @@ export async function LicenseModerationDetailScreen({
   if (!license) notFound();
   return (
     <div className={pageShellClass}>
-      <Link href="/admin/licenses" className={navLinkClass}>
+      <Link href="/admin/licenses" className={linkAccentSmRounded}>
         {copy.moderation}
       </Link>
       <LicenseDetailView license={license} locale={locale} />
@@ -96,7 +94,10 @@ export async function LicenseModerationDetailScreen({
           expiresAt: license.expiresAt?.toISOString() ?? null,
         }}
       />
-      <Link href={`/admin/licenses/${encodeURIComponent(id)}/history`} className={navLinkClass}>
+      <Link
+        href={`/admin/licenses/${encodeURIComponent(id)}/history`}
+        className={linkAccentSmRounded}
+      >
         {copy.fullHistory}
       </Link>
     </div>

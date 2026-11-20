@@ -8,7 +8,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceActivityService } from "../../../lib/services/resources/resource-activity-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -20,8 +20,6 @@ import {
 } from "../resource-activity-view";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const filterLinkClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-4 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white";
 
@@ -74,7 +72,7 @@ export async function PublisherAcquisitionsScreen({
     return (
       <div className={pageShellClass}>
         <header className="space-y-3">
-          <Link href="/workspace/library" className={navLinkClass}>
+          <Link href="/workspace/library" className={linkAccentSmRounded}>
             {copy.library}
           </Link>
           <h1 className="font-display text-primary">{copy.history}</h1>
@@ -83,7 +81,7 @@ export async function PublisherAcquisitionsScreen({
           title={copy.historyLoadUnavailable}
           description={copy.historyLoadUnavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -94,11 +92,11 @@ export async function PublisherAcquisitionsScreen({
   return (
     <div className={pageShellClass}>
       <header className="space-y-3">
-        <Link href="/workspace/library" className={navLinkClass}>
+        <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}
         </Link>
         <h1 className="font-display text-primary">{copy.history}</h1>
-        <Link href="/workspace/acquisitions/receipts" className={navLinkClass}>
+        <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
           {resourceCartReceiptsCopy(locale).title}
         </Link>
         <p className="max-w-3xl text-sm text-secondary" role="note">
@@ -123,7 +121,7 @@ export async function PublisherAcquisitionsScreen({
           description={copy.historyNote}
           action={
             result.filter !== "all" ? (
-              <Link href={acquisitionHistoryHref("all", 1)} className={navLinkClass}>
+              <Link href={acquisitionHistoryHref("all", 1)} className={linkAccentSmRounded}>
                 {dictionary.articles.clearFilters}
               </Link>
             ) : undefined
@@ -151,7 +149,7 @@ export async function PublisherAcquisitionsScreen({
                     : copy.unavailable}
               </p>
               {item.downloadable && item.slug ? (
-                <Link href={`/market/${item.slug}`} className={navLinkClass}>
+                <Link href={`/market/${item.slug}`} className={linkAccentSmRounded}>
                   {copy.open}
                 </Link>
               ) : null}
@@ -167,7 +165,7 @@ export async function PublisherAcquisitionsScreen({
           {result.page > 1 ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page - 1)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.previous}
             </Link>
@@ -178,7 +176,7 @@ export async function PublisherAcquisitionsScreen({
           {result.page < result.totalPages ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page + 1)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.next}
             </Link>

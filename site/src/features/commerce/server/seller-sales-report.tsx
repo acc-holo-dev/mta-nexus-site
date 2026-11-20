@@ -9,6 +9,7 @@ import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
 
+import { linkAccentSmRounded } from "../../shell/link-shell";
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({
   report,
@@ -22,8 +23,6 @@ export function SellerSalesReportView({
   locale: Locale;
 }) {
   const c = sellerSalesCopy(locale);
-  const linkClass =
-    "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   const resetHref = sellerSalesUrl({
     page: 1,
     days: "all",
@@ -247,7 +246,7 @@ export function SellerSalesReportView({
           description={query.attribution === "recorded" ? c.recordedNotice : c.notice}
           action={
             filtered ? (
-              <Link href={resetHref} className={linkClass}>
+              <Link href={resetHref} className={linkAccentSmRounded}>
                 {c.reset}
               </Link>
             ) : undefined

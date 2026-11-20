@@ -16,9 +16,7 @@ import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 type Query = Record<string, string | string[] | undefined>;
 
 export async function sellerSalesReportDetailMetadata(): Promise<Metadata> {
@@ -91,7 +89,7 @@ export async function SellerSalesReportDetailScreen({
             organizationId,
             attribution,
           })}
-          className={linkClass}
+          className={linkAccentSmRounded}
         >
           {c.back}
         </Link>
@@ -99,7 +97,7 @@ export async function SellerSalesReportDetailScreen({
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={linkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -119,7 +117,7 @@ export async function SellerSalesReportDetailScreen({
           organizationId,
           attribution,
         })}
-        className={linkClass}
+        className={linkAccentSmRounded}
       >
         {c.back}
       </Link>
@@ -151,7 +149,7 @@ export async function SellerSalesReportDetailScreen({
       {sale.inCurrentPortfolio !== false ? (
         <Link
           href={`/workspace/resources/${encodeURIComponent(sale.productId)}`}
-          className={linkClass}
+          className={linkAccentSmRounded}
         >
           {c.manage}
         </Link>

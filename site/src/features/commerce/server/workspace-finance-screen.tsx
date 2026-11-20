@@ -15,9 +15,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function workspaceFinanceMetadata(): Promise<Metadata> {
   return {
     title: `${getFinancialCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -90,14 +88,14 @@ export async function WorkspaceFinanceScreen({
   if (!result || !scopes) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/sales" className={linkClass}>
+        <Link href="/workspace/sales" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.statementsLoadUnavailable}
           description={copy.statementsLoadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -114,7 +112,7 @@ export async function WorkspaceFinanceScreen({
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/sales" className={linkClass}>
+      <Link href="/workspace/sales" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
@@ -123,7 +121,7 @@ export async function WorkspaceFinanceScreen({
         {copy.note}
       </p>
       <nav aria-label={copy.currency} className="flex flex-wrap gap-4 text-sm">
-        <Link href={href(1, null)} className={linkClass}>
+        <Link href={href(1, null)} className={linkAccentSmRounded}>
           {copy.all}
         </Link>
         {["USD", "EUR", "RUB"].map((value) => (
@@ -131,7 +129,7 @@ export async function WorkspaceFinanceScreen({
             key={value}
             href={href(1, value)}
             aria-current={value === currency ? "page" : undefined}
-            className={linkClass}
+            className={linkAccentSmRounded}
           >
             {value}
           </Link>
@@ -215,7 +213,7 @@ export async function WorkspaceFinanceScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={linkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           ) : null}
@@ -223,7 +221,7 @@ export async function WorkspaceFinanceScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={linkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           ) : null}
@@ -231,13 +229,13 @@ export async function WorkspaceFinanceScreen({
       ) : null}
       <section className="space-y-3 border-t border-base pt-5">
         <h2 className="text-lg font-semibold">{copy.organizations}</h2>
-        <Link href="/workspace/finance" className={linkClass}>
+        <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {copy.personal}
         </Link>
         <ul className="flex flex-wrap gap-4">
           {scopes.scopes.map((scope) => (
             <li key={scope.id}>
-              <Link href={href(1, currency, scope.id)} className={linkClass}>
+              <Link href={href(1, currency, scope.id)} className={linkAccentSmRounded}>
                 {scope.name}
               </Link>
             </li>
@@ -248,7 +246,7 @@ export async function WorkspaceFinanceScreen({
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page - 1)}
-                className={linkClass}
+                className={linkAccentSmRounded}
               >
                 {copy.previous}
               </Link>
@@ -259,7 +257,7 @@ export async function WorkspaceFinanceScreen({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page + 1)}
-                className={linkClass}
+                className={linkAccentSmRounded}
               >
                 {copy.next}
               </Link>

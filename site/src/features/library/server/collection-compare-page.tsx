@@ -19,14 +19,12 @@ import {
   libraryCollectionComparisonSuffix,
 } from "../library-collection-comparison-query";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   collectionHref,
   collectionPageParams,
   collectionId as parseCollectionId,
 } from "../library-collections-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -91,7 +89,7 @@ export default async function Page({
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -107,10 +105,10 @@ export default async function Page({
     return (
       <div className={pageShellClass}>
         <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link href={collectionHref(id)} className={navLinkClass}>
+          <Link href={collectionHref(id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
         </nav>
@@ -206,7 +204,10 @@ export default async function Page({
             <section className={panelClipSpace2P5}>
               <h2 className="break-words font-semibold">
                 {c.destination}:{" "}
-                <Link href={collectionHref(comparison.destination.id)} className={navLinkClass}>
+                <Link
+                  href={collectionHref(comparison.destination.id)}
+                  className={linkAccentSmRounded}
+                >
                   {comparison.destination.name}
                 </Link>
               </h2>
@@ -312,7 +313,7 @@ export default async function Page({
                 {comparison.page > 1 && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page - 1)}`}
-                    className={navLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {c.previous}
                   </Link>
@@ -320,7 +321,7 @@ export default async function Page({
                 {comparison.page < comparison.totalPages && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page + 1)}`}
-                    className={navLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {c.next}
                   </Link>
@@ -334,7 +335,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}/compare?${suffix(comparison?.page ?? 1)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {c.json}
         </a>
@@ -349,7 +350,7 @@ export default async function Page({
           title={libraryCollectionError(typedLocale, error.code)}
           description={h.loadUnavailableDescription}
           action={
-            <Link href={collectionHref(id, "compare")} className={navLinkClass}>
+            <Link href={collectionHref(id, "compare")} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

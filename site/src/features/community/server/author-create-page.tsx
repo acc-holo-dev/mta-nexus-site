@@ -9,9 +9,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { AuthorContentForm } from "../author-content-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).create,
@@ -38,7 +36,7 @@ export default async function NewPublicationPage() {
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/content" className={navLinkClass}>
+      <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.create}</h1>

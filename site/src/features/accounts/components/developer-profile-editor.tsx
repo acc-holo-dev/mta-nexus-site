@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -22,8 +23,6 @@ const textareaClass =
 const nativeLabelClass = "block font-label uppercase text-secondary";
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function DeveloperProfileEditor({
   initial,
@@ -221,7 +220,7 @@ export function DeveloperProfileEditor({
           {copy.saved}
         </p>
       )}
-      <Link href="/workspace/verification" className={navLinkClass}>
+      <Link href="/workspace/verification" className={linkAccentSm}>
         {copy.back}
       </Link>
     </div>

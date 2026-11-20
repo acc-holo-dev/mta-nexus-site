@@ -12,9 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
-const retryLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function cartWorkspaceMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceCommerceCopy(await getRequestLocale()).cart} | MTA NEXUS`,
@@ -51,7 +49,7 @@ export async function CartWorkspaceScreen() {
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href="/workspace/cart" className={retryLinkClass}>
+            <Link href="/workspace/cart" className={linkAccentSmRounded}>
               {getDictionary(locale).errors.retry}
             </Link>
           }

@@ -34,6 +34,7 @@ import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-pr
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
 
+import { linkAccentSm } from "../../shell/link-shell";
 type Notice = {
   text: string;
   error: boolean;
@@ -70,8 +71,6 @@ function parseSessionSnapshot(value: unknown): SessionSnapshot | null {
   return { actorId: data.actorId, sessions: data.sessions };
 }
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -591,7 +590,7 @@ export function SettingsPageClient() {
       <ContextSwitcher />
       <PublicProfileForm />
       <ProfileChangeHistoryLink locale={locale} />
-      <Link href="/settings/privacy" className={navLinkClass}>
+      <Link href="/settings/privacy" className={linkAccentSm}>
         {profilePrivacyCopy(locale).title}
       </Link>
 

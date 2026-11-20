@@ -15,13 +15,10 @@ import {
   resourceModerationLabel,
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function resourcePublisherModerationMetadata(): Promise<Metadata> {
   return {
@@ -79,14 +76,14 @@ export async function ResourcePublisherModerationScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -96,7 +93,7 @@ export async function ResourcePublisherModerationScreen({
   }
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.moderationHistory}</h1>
@@ -131,7 +128,7 @@ export async function ResourcePublisherModerationScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -139,7 +136,7 @@ export async function ResourcePublisherModerationScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

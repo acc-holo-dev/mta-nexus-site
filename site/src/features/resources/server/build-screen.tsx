@@ -24,9 +24,7 @@ import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 function buildAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -47,14 +45,14 @@ function ResourceBuildLoadError({
     dictionary = getDictionary(locale);
   return (
     <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -118,7 +116,7 @@ export async function ResourceBuildScreen({
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
     <div className={pageShellClass}>
-      <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={navLinkClass}>
+      <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={linkAccent}>
         {staff ? copy.reviewBack : copy.back}
       </Link>
       <header className="space-y-2">
@@ -131,7 +129,7 @@ export async function ResourceBuildScreen({
       </header>
       <Link
         href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
@@ -145,7 +143,7 @@ export async function ResourceBuildScreen({
       {staff && (
         <Link
           href={`/admin/resources/${encodeURIComponent(productId)}/media`}
-          className={navLinkClass}
+          className={linkAccent}
         >
           {resourceMediaCopy(locale).title}
         </Link>
@@ -200,7 +198,7 @@ export async function ResourceBuildScreen({
       )}
       <Link
         href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {buildPackageCopy(locale).inventory}
       </Link>

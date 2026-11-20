@@ -18,9 +18,7 @@ import { serverContentId } from "../server-content-api";
 import { serverContentCopy, serverContentMutationError } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function serverContentEditorMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -77,7 +75,7 @@ export async function ServerContentEditorPage({
   const path = `/workspace/servers/${encodeURIComponent(id)}/content`;
   return (
     <div className={pageShellClass}>
-      <Link href={path} className={navLinkClass}>
+      <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
@@ -86,7 +84,7 @@ export async function ServerContentEditorPage({
           {contentId && (
             <Link
               href={`${path}/${encodeURIComponent(contentId)}/history`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {serverPublicationHistoryCopy(locale).history}
             </Link>
@@ -105,7 +103,7 @@ export async function ServerContentEditorPage({
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.retry}
             </Link>

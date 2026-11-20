@@ -26,6 +26,7 @@ import {
 } from "../order-case-i18n";
 import { orderCasePageQuery } from "../order-case-query";
 
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());
   return {
@@ -34,8 +35,6 @@ export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   };
 }
 type Query = Record<string, string | string[] | undefined>;
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 function orderCaseAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -55,14 +54,14 @@ function OrderCaseLoadError({
     dictionary = getDictionary(locale);
   return (
     <div className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccentSmRounded}>
         {backLabel}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSmRounded}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -144,7 +143,7 @@ function Pagination({
   return (
     <nav aria-label={copy.page} className="flex gap-4 text-sm">
       {page > 1 && (
-        <Link href={href(page - 1)} className={navLinkClass}>
+        <Link href={href(page - 1)} className={linkAccentSmRounded}>
           {copy.previous}
         </Link>
       )}
@@ -152,7 +151,7 @@ function Pagination({
         {copy.page} {page} / {totalPages}
       </span>
       {page < totalPages && (
-        <Link href={href(page + 1)} className={navLinkClass}>
+        <Link href={href(page + 1)} className={linkAccentSmRounded}>
           {copy.next}
         </Link>
       )}
@@ -201,7 +200,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
   }
   return (
     <div className={pageShellClass}>
-      <Link href={orderPath} className={navLinkClass}>
+      <Link href={orderPath} className={linkAccentSmRounded}>
         {copy.order}: {result.order.orderNumber}
       </Link>
       <h1 className="font-display text-primary">{copy.create}</h1>
@@ -213,7 +212,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       {result.existingCase ? (
         <Link
           href={`/workspace/order-cases/${encodeURIComponent(result.existingCase.id)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {copy.existing} · {orderCaseStatusLabel(locale, result.existingCase.reviewStatus)}
         </Link>
@@ -255,7 +254,7 @@ export async function OrderCaseListPage({
     return (
       <p className="py-8">
         {copy.invalidQuery}{" "}
-        <Link href={base} className={navLinkClass}>
+        <Link href={base} className={linkAccentSmRounded}>
           {copy.clear}
         </Link>
       </p>
@@ -285,7 +284,7 @@ export async function OrderCaseListPage({
   }
   return (
     <div className={pageShellClass}>
-      <Link href={staff ? "/admin" : "/workspace/purchases"} className={navLinkClass}>
+      <Link href={staff ? "/admin" : "/workspace/purchases"} className={linkAccentSmRounded}>
         {staff ? copy.review : copy.order}
       </Link>
       <h1 className="font-display text-primary">{staff ? copy.queue : copy.buyerCases}</h1>
@@ -327,7 +326,7 @@ export async function OrderCaseListPage({
           <Button type="submit" variant="outline" size="touch">
             {copy.apply}
           </Button>
-          <Link href={base} className={navLinkClass}>
+          <Link href={base} className={linkAccentSmRounded}>
             {copy.clear}
           </Link>
         </form>
@@ -338,7 +337,7 @@ export async function OrderCaseListPage({
             <li key={item.id} className={panelSpace2P5}>
               <Link
                 href={`${base}/${encodeURIComponent(item.id)}`}
-                className={`break-words font-semibold ${navLinkClass}`}
+                className={`break-words font-semibold ${linkAccentSmRounded}`}
               >
                 {item.subject}
               </Link>
@@ -367,7 +366,7 @@ export async function OrderCaseListPage({
           description={filtersActive ? copy.clear : copy.financeNote}
           icon={<LifeBuoy className="h-6 w-6" aria-hidden="true" />}
           action={
-            <Link href={base} className={navLinkClass}>
+            <Link href={base} className={linkAccentSmRounded}>
               {copy.clear}
             </Link>
           }
@@ -447,7 +446,7 @@ export async function OrderCaseDetailPage({
     current.disputedRecordCount === 0;
   return (
     <div className={pageShellClass}>
-      <Link href={listBase} className={navLinkClass}>
+      <Link href={listBase} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.case.subject}</h1>
@@ -479,7 +478,7 @@ export async function OrderCaseDetailPage({
       {staff && actor.role === "admin" && (
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(result.order.id)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {copy.reconcile}
         </Link>

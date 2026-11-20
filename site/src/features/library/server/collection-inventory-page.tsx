@@ -15,7 +15,7 @@ import { libraryCollectionsService } from "../../../lib/services/library/library
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -29,9 +29,6 @@ import { libraryCollectionError, libraryCollectionsCopy } from "../library-colle
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -79,7 +76,7 @@ export default async function Page({
       return (
         <div className={pageShellClass}>
           <h1 className="font-display">{v.title}</h1>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
           <ErrorState
@@ -88,7 +85,7 @@ export default async function Page({
             action={
               <Link
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix(query)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {dictionary.errors.retry}
               </Link>
@@ -101,10 +98,10 @@ export default async function Page({
     return (
       <div className={pageShellClass}>
         <nav className="flex flex-wrap gap-4">
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
-          <Link href="/workspace/library" className={navLinkClass}>
+          <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
           </Link>
         </nav>
@@ -113,10 +110,16 @@ export default async function Page({
         <p className="text-sm text-secondary">{v.watchNote}</p>
         {report.collectionId ? (
           <nav className="flex flex-wrap gap-4" aria-label={v.collection}>
-            <Link href={collectionHref(report.collectionId, "releases")} className={navLinkClass}>
+            <Link
+              href={collectionHref(report.collectionId, "releases")}
+              className={linkAccentSmRounded}
+            >
               {v.collectionReleases}
             </Link>
-            <Link href={collectionHref(report.collectionId, "watches")} className={navLinkClass}>
+            <Link
+              href={collectionHref(report.collectionId, "watches")}
+              className={linkAccentSmRounded}
+            >
               {v.collectionWatches}
             </Link>
           </nav>
@@ -196,7 +199,7 @@ export default async function Page({
             <Button type="submit" variant="outline" className="min-h-11 px-3">
               {v.apply}
             </Button>
-            <Link href={collectionInventoryHref()} className={navLinkClass}>
+            <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
               {v.clear}
             </Link>
           </form>
@@ -219,7 +222,7 @@ export default async function Page({
                 key={release}
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
                 aria-current={release === report.release ? "page" : undefined}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {v.releaseFilters[release]} (
                 {
@@ -238,7 +241,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/resources/export?${suffix(report.page)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {v.export}
         </a>
@@ -248,7 +251,7 @@ export default async function Page({
             title={v.empty}
             description={v.emptyHint}
             action={
-              <Link href={collectionInventoryHref()} className={navLinkClass}>
+              <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
                 {v.clear}
               </Link>
             }
@@ -291,7 +294,7 @@ export default async function Page({
                         {release.canReviewRequirements && (
                           <Link
                             href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
-                            className={navLinkClass}
+                            className={linkAccentSmRounded}
                           >
                             {v.preparation}
                           </Link>
@@ -299,7 +302,7 @@ export default async function Page({
                         {release.effective.buildId !== release.latest.buildId && (
                           <Link
                             href={`${resourceHref}/versions/compare?${new URLSearchParams({ from: release.effective.buildId, to: release.latest.buildId })}`}
-                            className={`block ${navLinkClass}`}
+                            className={`block ${linkAccentSmRounded}`}
                           >
                             {v.compareVersions}
                           </Link>
@@ -344,23 +347,23 @@ export default async function Page({
                   {item.slug ? (
                     <Link
                       href={`/market/${encodeURIComponent(item.slug)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {getResourceReleaseControlCopy(locale).open}
                     </Link>
                   ) : null}
-                  <Link href={`${resourceHref}/collections`} className={navLinkClass}>
+                  <Link href={`${resourceHref}/collections`} className={linkAccentSmRounded}>
                     {v.manage}
                   </Link>
                   {item.available && (
-                    <Link href={`${resourceHref}/versions`} className={navLinkClass}>
+                    <Link href={`${resourceHref}/versions`} className={linkAccentSmRounded}>
                       {c.versions}
                     </Link>
                   )}
                   {first && second && (
                     <Link
                       href={collectionHref(first.id, "compare", { to: second.id })}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {v.compare}
                     </Link>
@@ -371,7 +374,7 @@ export default async function Page({
                     <li key={membership.id} className="border-t border-base pt-2">
                       <Link
                         href={collectionHref(membership.id)}
-                        className={`break-words ${navLinkClass}`}
+                        className={`break-words ${linkAccentSmRounded}`}
                       >
                         {membership.name}
                       </Link>{" "}
@@ -391,7 +394,7 @@ export default async function Page({
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.previous}
               </Link>
@@ -402,7 +405,7 @@ export default async function Page({
             {report.page < report.totalPages && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page + 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.next}
               </Link>
@@ -431,7 +434,7 @@ export default async function Page({
                     : c.actionErrorDescription
           }
           action={
-            <Link href={collectionInventoryHref()} className={navLinkClass}>
+            <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

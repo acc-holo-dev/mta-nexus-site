@@ -16,13 +16,11 @@ import {
   resourceDeliveriesUrl,
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white";
 
@@ -75,7 +73,7 @@ export async function LibraryDownloadsScreen({
           title={copy.invalid}
           description={copy.invalidHint}
           action={
-            <Link href="/workspace/library/downloads" className={navLinkClass}>
+            <Link href="/workspace/library/downloads" className={linkAccentSm}>
               {copy.title}
             </Link>
           }
@@ -87,14 +85,14 @@ export async function LibraryDownloadsScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library" className={navLinkClass}>
+        <Link href="/workspace/library" className={linkAccentSm}>
           {copy.library}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={resourceDeliveriesUrl(query)} className={navLinkClass}>
+            <Link href={resourceDeliveriesUrl(query)} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -105,7 +103,7 @@ export async function LibraryDownloadsScreen({
   const href = (page: number) => resourceDeliveriesUrl({ ...query, page });
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library" className={navLinkClass}>
+      <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
@@ -146,7 +144,7 @@ export async function LibraryDownloadsScreen({
         {query.resourceId ? (
           <Link
             href={resourceDeliveriesUrl({ ...query, resourceId: null, page: 1 })}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {copy.reset}
           </Link>
@@ -169,7 +167,7 @@ export async function LibraryDownloadsScreen({
           { ...query, page: result.page },
           "/api/library/downloads/export",
         )}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {copy.export}
       </a>
@@ -188,7 +186,7 @@ export async function LibraryDownloadsScreen({
               <div className="flex flex-wrap gap-4">
                 <Link
                   href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-                  className={navLinkClass}
+                  className={linkAccentSm}
                 >
                   {copy.details}
                 </Link>
@@ -222,7 +220,7 @@ export async function LibraryDownloadsScreen({
                   status: "all",
                   resourceId: null,
                 })}
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.clearFilters}
               </Link>
@@ -233,7 +231,7 @@ export async function LibraryDownloadsScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -241,7 +239,7 @@ export async function LibraryDownloadsScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

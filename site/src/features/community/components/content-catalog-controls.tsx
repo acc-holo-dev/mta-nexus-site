@@ -10,10 +10,8 @@ import {
 } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
+import { linkAccentSm } from "../../shell/link-shell";
 type Filters = ReturnType<typeof parseContentPage>;
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ContentCatalogControls({
   path,
@@ -76,7 +74,7 @@ export function ContentCatalogControls({
         {copy.apply}
       </Button>
       {(filters.query || filters.type || filters.status) && (
-        <Link href={path} className={navLinkClass}>
+        <Link href={path} className={linkAccentSm}>
           {copy.reset}
         </Link>
       )}
@@ -105,7 +103,7 @@ export function ContentPageNavigation({
       className="flex min-w-0 items-center justify-between gap-3 overflow-x-clip text-sm"
     >
       {page > 1 ? (
-        <Link href={contentPageHref(path, filters, page - 1)} rel="prev" className={navLinkClass}>
+        <Link href={contentPageHref(path, filters, page - 1)} rel="prev" className={linkAccentSm}>
           {copy.previous}
         </Link>
       ) : (
@@ -115,7 +113,7 @@ export function ContentPageNavigation({
         {copy.page} {page}
       </span>
       {hasMore ? (
-        <Link href={contentPageHref(path, filters, page + 1)} rel="next" className={navLinkClass}>
+        <Link href={contentPageHref(path, filters, page + 1)} rel="next" className={linkAccentSm}>
           {copy.next}
         </Link>
       ) : (

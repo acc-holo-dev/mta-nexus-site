@@ -20,9 +20,7 @@ import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
 import { ResourceReviewPager } from "../reviews-view";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 function reportAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -45,7 +43,7 @@ function ResourceReviewLoadError({
     dictionary = getDictionary(locale);
   return (
     <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -53,7 +51,7 @@ function ResourceReviewLoadError({
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -126,7 +124,7 @@ export async function ResourceReviewReportScreen({
     }
     return (
       <section className={pageShellClass}>
-        <Link href={base} className={navLinkClass}>
+        <Link href={base} className={linkAccent}>
           {copy.back}
         </Link>
         <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -186,7 +184,7 @@ export async function ResourceReviewReportScreen({
   const alternateView = result.view === "history" ? "pending" : "history";
   return (
     <section className={pageShellClass}>
-      <Link href={listBackHref} className={navLinkClass}>
+      <Link href={listBackHref} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -196,7 +194,7 @@ export async function ResourceReviewReportScreen({
             key={view}
             href={`${base}?view=${view}`}
             aria-current={view === result.view ? "page" : undefined}
-            className={navLinkClass}
+            className={linkAccent}
           >
             {copy[view]}
           </Link>
@@ -205,7 +203,7 @@ export async function ResourceReviewReportScreen({
       {result.items.length ? (
         result.items.map((report) => (
           <article key={report.id} className={panelMinSpace2P4}>
-            <Link href={`${base}/${encodeURIComponent(report.id)}`} className={navLinkClass}>
+            <Link href={`${base}/${encodeURIComponent(report.id)}`} className={linkAccent}>
               {copy.detail} · {resourceReviewState(locale, report.status)}
             </Link>
             <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm">{report.reason}</p>
@@ -217,7 +215,7 @@ export async function ResourceReviewReportScreen({
           description={copy[alternateView]}
           icon={<Flag className="h-6 w-6" aria-hidden="true" />}
           action={
-            <Link href={`${base}?view=${alternateView}`} className={navLinkClass}>
+            <Link href={`${base}?view=${alternateView}`} className={linkAccent}>
               {copy[alternateView]}
             </Link>
           }

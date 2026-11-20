@@ -20,9 +20,7 @@ import {
 import { AuthorPublicationRestore } from "../author-publication-restore";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
@@ -99,7 +97,7 @@ export default async function PublicationHistoryPage({
   const retryHref = filters ? returnPath : path;
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/content" className={navLinkClass}>
+      <Link href="/workspace/content" className={linkAccentSm}>
         {labels.back}
       </Link>
       <header className="min-w-0 space-y-2">
@@ -114,7 +112,7 @@ export default async function PublicationHistoryPage({
           title={error}
           description={copy.unavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -128,7 +126,7 @@ export default async function PublicationHistoryPage({
           <Link
             prefetch={false}
             href={`/workspace/content/${encodeURIComponent(id)}`}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {labels.edit}
           </Link>
@@ -143,12 +141,12 @@ export default async function PublicationHistoryPage({
           {report.item.status === "archived" && !report.item.recoverable && (
             <div className={panelMinSpace2P4}>
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
-              <Link href={publicationSupportHref(report.item.title)} className={navLinkClass}>
+              <Link href={publicationSupportHref(report.item.title)} className={linkAccentSm}>
                 {copy.support}
               </Link>
             </div>
           )}
-          <Link prefetch={false} href={path} className={navLinkClass}>
+          <Link prefetch={false} href={path} className={linkAccentSm}>
             {copy.historyLatest}
           </Link>
           {!report.events.length && (
@@ -187,7 +185,7 @@ export default async function PublicationHistoryPage({
             <Link
               prefetch={false}
               href={`${path}?${new URLSearchParams({ cursor: report.olderCursor })}`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.historyOlder}
             </Link>

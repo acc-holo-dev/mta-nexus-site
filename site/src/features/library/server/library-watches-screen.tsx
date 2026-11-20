@@ -17,13 +17,11 @@ import {
   resourceReleaseWatchesUrl,
 } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -88,7 +86,7 @@ export async function LibraryWatchesScreen({
           title={copy.invalid}
           description={copy.invalidDescription}
           action={
-            <Link href="/workspace/library/watches" className={navLinkClass}>
+            <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
               {copy.title}
             </Link>
           }
@@ -102,7 +100,7 @@ export async function LibraryWatchesScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library" className={navLinkClass}>
+        <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}
         </Link>
         <ErrorState
@@ -111,7 +109,7 @@ export async function LibraryWatchesScreen({
           action={
             <Link
               href={resourceReleaseWatchesUrl(query.filter, query.page, query.query)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -122,11 +120,11 @@ export async function LibraryWatchesScreen({
   }
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library" className={navLinkClass}>
+      <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.library}
       </Link>
       <h1 className="min-w-0 break-words font-display text-primary">{copy.title}</h1>
-      <Link href="/workspace/library/watches/history" className={navLinkClass}>
+      <Link href="/workspace/library/watches/history" className={linkAccentSmRounded}>
         {resourceReleaseWatchHistoryCopy(typedLocale).title}
       </Link>
       <p role="note" className="text-sm text-secondary">
@@ -135,7 +133,7 @@ export async function LibraryWatchesScreen({
       <p className="text-sm text-secondary">
         {copy.pinned} {copy.limit}
       </p>
-      <Link href="/settings" className={navLinkClass}>
+      <Link href="/settings" className={linkAccentSmRounded}>
         {copy.settings}
       </Link>
       <form className="flex min-w-0 flex-wrap items-end gap-3">
@@ -154,7 +152,7 @@ export async function LibraryWatchesScreen({
         </Button>
       </form>
       <a
-        className={navLinkClass}
+        className={linkAccentSmRounded}
         href={`/api/library/watches/export?${new URLSearchParams({ filter: query.filter, page: String(result.page), query: query.query })}`}
       >
         {copy.export}
@@ -229,7 +227,7 @@ export async function LibraryWatchesScreen({
               {watch.available ? (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(watch.productId)}/versions`}
-                  className={navLinkClass}
+                  className={linkAccentSmRounded}
                 >
                   {copy.versions}
                 </Link>
@@ -243,11 +241,11 @@ export async function LibraryWatchesScreen({
           description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilteredHint}
           action={
             result.counts.all === 0 ? (
-              <Link href="/workspace/library" className={navLinkClass}>
+              <Link href="/workspace/library" className={linkAccentSmRounded}>
                 {copy.library}
               </Link>
             ) : (
-              <Link href={resourceReleaseWatchesUrl("all", 1, "")} className={navLinkClass}>
+              <Link href={resourceReleaseWatchesUrl("all", 1, "")} className={linkAccentSmRounded}>
                 {copy.reset}
               </Link>
             )
@@ -259,7 +257,7 @@ export async function LibraryWatchesScreen({
           {result.page > 1 ? (
             <Link
               href={resourceReleaseWatchesUrl(query.filter, result.page - 1, query.query)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.previous}
             </Link>
@@ -270,7 +268,7 @@ export async function LibraryWatchesScreen({
           {result.page < result.totalPages ? (
             <Link
               href={resourceReleaseWatchesUrl(query.filter, result.page + 1, query.query)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.next}
             </Link>

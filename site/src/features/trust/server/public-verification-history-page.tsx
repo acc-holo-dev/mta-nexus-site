@@ -6,14 +6,11 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicVerificationHistoryService } from "../../../lib/services/trust/public-verification-history-service";
-import { linkSecondaryBorder } from "../../shell/link-shell";
+import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P5, panelClipSpace3P6 } from "../../shell/panel-shell";
 import { approvalPageHref, parseApprovalQuery } from "../public-verification-history-contract";
 import { approvalCopy, approvalError } from "../public-verification-history-copy";
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function approvalHistoryMetadata({
   params,
@@ -61,7 +58,7 @@ export async function ApprovalHistoryPage({
     : null;
   return (
     <div className={pageShellClass}>
-      <Link href={`/users/${encodeURIComponent(username)}/trust`} className={actionLinkClass}>
+      <Link href={`/users/${encodeURIComponent(username)}/trust`} className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className={panelClipSpace3P6}>
@@ -117,11 +114,11 @@ export async function ApprovalHistoryPage({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.filter}
         </Button>
-        <Link href={approvalPageHref(username)} className={actionLinkClass}>
+        <Link href={approvalPageHref(username)} className={linkAccentSm}>
           {copy.reset}
         </Link>
       </form>
-      <a href={latest} className={actionLinkClass}>
+      <a href={latest} className={linkAccentSm}>
         {copy.latest}
       </a>
       {error && (
@@ -129,7 +126,7 @@ export async function ApprovalHistoryPage({
           title={error}
           description={copy.unavailableHint}
           action={
-            <a href={latest} className={actionLinkClass}>
+            <a href={latest} className={linkAccentSm}>
               {dictionary.errors.retry}
             </a>
           }
@@ -141,7 +138,7 @@ export async function ApprovalHistoryPage({
           description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             filtered ? (
-              <Link href={approvalPageHref(username)} className={actionLinkClass}>
+              <Link href={approvalPageHref(username)} className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : undefined

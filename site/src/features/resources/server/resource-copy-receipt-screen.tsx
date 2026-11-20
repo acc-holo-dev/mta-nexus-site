@@ -14,14 +14,12 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCopyMetadataView } from "../copy-view";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
+import { linkAccentRounded } from "../../shell/link-shell";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
   resourceCopyId,
 } from "../resource-copy-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function resourceCopyReceiptMetadata(): Promise<Metadata> {
   return {
@@ -74,7 +72,7 @@ export async function ResourceCopyReceiptScreen({
         <section className={pageShellClass}>
           <Link
             href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
-            className={navLinkClass}
+            className={linkAccentRounded}
           >
             {c.history}
           </Link>
@@ -82,7 +80,7 @@ export async function ResourceCopyReceiptScreen({
             title={c.loadUnavailable}
             description={c.loadUnavailableHint}
             action={
-              <Link href={returnPath} className={navLinkClass}>
+              <Link href={returnPath} className={linkAccentRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -143,7 +141,7 @@ export async function ResourceCopyReceiptScreen({
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}
             action={
-              <Link href="/workspace/resources" className={navLinkClass}>
+              <Link href="/workspace/resources" className={linkAccentRounded}>
                 {c.back}
               </Link>
             }

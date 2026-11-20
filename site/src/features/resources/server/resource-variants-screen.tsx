@@ -16,9 +16,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 import { ResourceVariantsForm } from "../variant-controls";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function resourceVariantsMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceManagementCopy(await getRequestLocale()).variants} | MTA NEXUS`,
@@ -54,14 +52,14 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
   if (!managed) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -75,7 +73,7 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
       : null;
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${product.id}`} className={navLinkClass}>
+      <Link href={`/workspace/resources/${product.id}`} className={linkAccentSm}>
         {copy.back}
       </Link>
       <header>
@@ -95,7 +93,7 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
           <p className="text-secondary">{copy.anchorNote}</p>
           <Link
             href={`/workspace/resources/${managed.anchorProductId}/variants`}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {copy.manageAnchor}
           </Link>

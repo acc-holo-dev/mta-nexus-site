@@ -10,9 +10,7 @@ import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import { recoveryJsonRequest } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 export function ForgotPasswordPage() {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;
@@ -104,7 +102,7 @@ export function ForgotPasswordPage() {
           </p>
         ) : null}
 
-        <Link href="/auth/login" className={navLinkClass}>
+        <Link href="/auth/login" className={linkAccentSmSemibold}>
           {copy.backToSignIn}
         </Link>
       </section>

@@ -14,6 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { orderTermsPageQuery } from "../order-terms-query";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function financialReconciliationTermsMetadata(): Promise<Metadata> {
   return {
     title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -63,8 +64,6 @@ export async function FinancialReconciliationTermsScreen({
     const base = `/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`;
     return page ? `${base}?page=${encodeURIComponent(page)}` : base;
   })();
-  const linkClass =
-    "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   try {
     const values = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
@@ -82,7 +81,7 @@ export async function FinancialReconciliationTermsScreen({
             title={c.invalid}
             description={c.invalidHint}
             action={
-              <Link href="/admin/commerce/reconciliation" className={linkClass}>
+              <Link href="/admin/commerce/reconciliation" className={linkAccentSmRounded}>
                 {c.back}
               </Link>
             }
@@ -94,7 +93,7 @@ export async function FinancialReconciliationTermsScreen({
       <section className={pageShellMax5xl}>
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}`}
-          className={linkClass}
+          className={linkAccentSmRounded}
         >
           {c.back}
         </Link>
@@ -102,7 +101,7 @@ export async function FinancialReconciliationTermsScreen({
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

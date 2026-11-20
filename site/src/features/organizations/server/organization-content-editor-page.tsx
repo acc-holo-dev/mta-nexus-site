@@ -20,8 +20,7 @@ import {
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export async function organizationContentEditorMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -81,12 +80,12 @@ export async function OrganizationContentEditorPage({
   const path = `/workspace/organizations/${encodeURIComponent(id)}/content`;
   return (
     <div className={pageShellClass}>
-      <Link href={path} className={navLinkClass}>
+      <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
       {contentId && initial && (
-        <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={navLinkClass}>
+        <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={linkAccentSm}>
           {organizationPublicationHistoryCopy(locale).history}
         </Link>
       )}
@@ -104,7 +103,7 @@ export async function OrganizationContentEditorPage({
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.retry}
             </Link>

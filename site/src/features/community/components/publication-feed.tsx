@@ -15,9 +15,7 @@ import { publicationCopy, publicationError } from "../publication-feed-copy";
 import { platformFieldClass } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export function PublicationFeed({
   initial,
   filters,
@@ -75,7 +73,7 @@ export function PublicationFeed({
           <Link
             prefetch={false}
             href={publicationHref(path, { ...filters, target: undefined, cursor: undefined })}
-            className={actionLinkClass}
+            className={linkAccentSmRounded}
           >
             {copy.clearTarget}
           </Link>
@@ -149,7 +147,7 @@ export function PublicationFeed({
         <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
           {copy.search}
         </Button>
-        <Link href={path} className={actionLinkClass}>
+        <Link href={path} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </FilterBar>
@@ -265,7 +263,7 @@ export function PublicationFeed({
                       target: undefined,
                       cursor: undefined,
                     })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.clearTarget}
                   </Link>
@@ -282,7 +280,7 @@ export function PublicationFeed({
                       tag: undefined,
                       cursor: undefined,
                     })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.reset}
                   </Link>
@@ -291,13 +289,13 @@ export function PublicationFeed({
                   <Link
                     prefetch={false}
                     href={publicationHref(path, { ...filters, cursor: undefined })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.latest}
                   </Link>
                 )}
                 {emptyFollowingHonest && (
-                  <Link href="/discover" className={actionLinkClass}>
+                  <Link href="/discover" className={linkAccentSmRounded}>
                     {copy.discover}
                   </Link>
                 )}
@@ -332,7 +330,7 @@ export function PublicationFeed({
           </Link>
         )}
         {following && (
-          <Link href="/workspace/saved" className={actionLinkClass}>
+          <Link href="/workspace/saved" className={linkAccentSmRounded}>
             {copy.manage}
           </Link>
         )}

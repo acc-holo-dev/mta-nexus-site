@@ -23,9 +23,7 @@ import { platformFieldClass } from "../user-platform-client";
 import { writerTypes } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
@@ -168,7 +166,7 @@ export default async function AuthorContentPage({
           <Button type="submit" className="min-h-11 font-semibold">
             {copy.search}
           </Button>
-          <Link href="/workspace/content" className={navLinkClass}>
+          <Link href="/workspace/content" className={linkAccentSm}>
             {copy.reset}
           </Link>
         </form>
@@ -177,7 +175,7 @@ export default async function AuthorContentPage({
       <Link
         prefetch={false}
         href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {copy.latest}
       </Link>
@@ -186,7 +184,7 @@ export default async function AuthorContentPage({
           title={error}
           description={copy.unavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -198,7 +196,7 @@ export default async function AuthorContentPage({
           description={filteredEmpty ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             filteredEmpty ? (
-              <Link href="/workspace/content" className={navLinkClass}>
+              <Link href="/workspace/content" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : (
@@ -272,14 +270,14 @@ export default async function AuthorContentPage({
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                    className={navLinkClass}
+                    className={linkAccentSm}
                   >
                     {labels.edit}
                   </Link>
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
-                    className={navLinkClass}
+                    className={linkAccentSm}
                   >
                     {copy.history}
                   </Link>
@@ -287,7 +285,7 @@ export default async function AuthorContentPage({
                     <Link
                       prefetch={false}
                       href={`/articles/${encodeURIComponent(item.slug)}`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {labels.publicView}
                     </Link>
@@ -303,7 +301,7 @@ export default async function AuthorContentPage({
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.newerCursor)}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.newer}
             </Link>
@@ -312,7 +310,7 @@ export default async function AuthorContentPage({
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.olderCursor)}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.older}
             </Link>

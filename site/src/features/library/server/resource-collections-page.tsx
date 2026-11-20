@@ -20,9 +20,7 @@ import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n
 import { membershipHistoryHref } from "../library-membership-history-query";
 import { LibraryMembershipBatchForm } from "../membership-batch";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionsCopy(await getRequestLocale()).resourceCollections} | MTA NEXUS`,
@@ -66,7 +64,7 @@ export default async function ResourceCollectionsPage({
     if (!result) {
       return (
         <div className={pageShellClass}>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
           <h1 className="font-display">{c.resourceCollections}</h1>
@@ -76,7 +74,7 @@ export default async function ResourceCollectionsPage({
             action={
               <Link
                 href={`/workspace/library/${encodeURIComponent(id)}/collections`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {dictionary.errors.retry}
               </Link>
@@ -89,22 +87,22 @@ export default async function ResourceCollectionsPage({
     return (
       <div className={pageShellClass}>
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
-          <Link href="/workspace/library" className={navLinkClass}>
+          <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
           </Link>
           <Link
             href={`${membershipHistoryHref()}?productId=${encodeURIComponent(id)}`}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
           {result.resource.available && (
             <Link
               href={`/workspace/library/${encodeURIComponent(id)}/versions`}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {c.versions}
             </Link>
@@ -113,7 +111,7 @@ export default async function ResourceCollectionsPage({
         <h1 className="font-display text-primary">{c.resourceCollections}</h1>
         <Link
           href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {libraryCollectionHistoryCopy(locale).title}
         </Link>
@@ -144,7 +142,7 @@ export default async function ResourceCollectionsPage({
             title={c.empty}
             description={c.emptyHint}
             action={
-              <Link href={collectionHref()} className={navLinkClass}>
+              <Link href={collectionHref()} className={linkAccentSmRounded}>
                 {c.title}
               </Link>
             }
@@ -162,7 +160,7 @@ export default async function ResourceCollectionsPage({
             return (
               <li key={collection.id} className={panelSpace3P5}>
                 <h3 className="break-words font-semibold">
-                  <Link href={collectionHref(collection.id)} className={navLinkClass}>
+                  <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
                     {collection.name}
                   </Link>
                 </h3>
@@ -202,7 +200,10 @@ export default async function ResourceCollectionsPage({
             );
           })}
         </ol>
-        <a href={`/api/library/${encodeURIComponent(id)}/collections`} className={navLinkClass}>
+        <a
+          href={`/api/library/${encodeURIComponent(id)}/collections`}
+          className={linkAccentSmRounded}
+        >
           {c.json}
         </a>
       </div>
@@ -227,7 +228,7 @@ export default async function ResourceCollectionsPage({
                     : c.actionErrorDescription
           }
           action={
-            <Link href={collectionHref()} className={navLinkClass}>
+            <Link href={collectionHref()} className={linkAccentSmRounded}>
               {c.title}
             </Link>
           }

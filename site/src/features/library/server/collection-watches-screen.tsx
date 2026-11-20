@@ -14,16 +14,13 @@ import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-releas
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function collectionWatchesMetadata(): Promise<Metadata> {
   return {
@@ -95,7 +92,7 @@ export async function CollectionWatchesScreen({
       <div className={pageShellClass}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {copy.library}
         </Link>
@@ -103,7 +100,7 @@ export async function CollectionWatchesScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableDescription}
           action={
-            <Link href={href(query.page)} className={navLinkClass}>
+            <Link href={href(query.page)} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -115,7 +112,7 @@ export async function CollectionWatchesScreen({
     <div className={pageShellClass}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {copy.library}
       </Link>
@@ -127,13 +124,16 @@ export async function CollectionWatchesScreen({
       <p>
         {copy.activeCount}: {result.activeWatchCount}/{RESOURCE_RELEASE_WATCH_LIMIT}
       </p>
-      <Link href="/workspace/library/watches" className={navLinkClass}>
+      <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
         {copy.watchCenter}
       </Link>
-      <Link href={collectionHref(path.id, "releases")} className={navLinkClass}>
+      <Link href={collectionHref(path.id, "releases")} className={linkAccentSmRounded}>
         {collectionReleasesCopy(locale).title}
       </Link>
-      <Link href="/workspace/library/watches/history?source=collection" className={navLinkClass}>
+      <Link
+        href="/workspace/library/watches/history?source=collection"
+        className={linkAccentSmRounded}
+      >
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
       {result.collection.status === "archived" && <p role="note">{copy.archivedCollection}</p>}
@@ -158,7 +158,7 @@ export async function CollectionWatchesScreen({
             key={filter}
             href={href(1, filter)}
             aria-current={filter === query.filter ? "page" : undefined}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {copy[filter]} ({result.counts[filter]})
           </Link>
@@ -187,7 +187,7 @@ export async function CollectionWatchesScreen({
           description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilteredHint}
           action={
             result.counts.all !== 0 ? (
-              <Link href={href(1, "all")} className={navLinkClass}>
+              <Link href={href(1, "all")} className={linkAccentSmRounded}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -216,14 +216,17 @@ export async function CollectionWatchesScreen({
               />
               <div className="flex flex-wrap gap-4">
                 {item.slug ? (
-                  <Link href={`/market/${encodeURIComponent(item.slug)}`} className={navLinkClass}>
+                  <Link
+                    href={`/market/${encodeURIComponent(item.slug)}`}
+                    className={linkAccentSmRounded}
+                  >
                     {getResourceReleaseControlCopy(locale).open}
                   </Link>
                 ) : null}
                 {item.available && (
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className={navLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.versions}
                   </Link>
@@ -236,7 +239,7 @@ export async function CollectionWatchesScreen({
       {result.totalPages > 1 && (
         <nav className="flex gap-4" aria-label={copy.page}>
           {result.page > 1 && (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           )}
@@ -244,7 +247,7 @@ export async function CollectionWatchesScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           )}

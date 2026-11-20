@@ -26,9 +26,7 @@ import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 import { HistoryShell } from "../workspace-history";
 import { LicenseArchiveFilters } from "./license-archive-filters";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 type Query = Record<string, string | string[] | undefined>;
 
 function hasNonDefaultLicenseFilters(filters: ReturnType<typeof licenseArchiveQuery>) {
@@ -104,7 +102,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
             title={copy.loadUnavailable}
             description={copy.loadUnavailableHint}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -125,7 +123,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
           {copy.licenseNotice}
         </p>
         {can(user, "admin.moderation") && (
-          <Link href="/admin/licenses" className={navLinkClass}>
+          <Link href="/admin/licenses" className={linkAccentSmRounded}>
             {control.moderation}
           </Link>
         )}
@@ -136,7 +134,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
             icon={<KeyRound className="h-6 w-6" aria-hidden="true" />}
             action={
               filtersActive ? (
-                <Link href="/workspace/licenses" className={navLinkClass}>
+                <Link href="/workspace/licenses" className={linkAccentSmRounded}>
                   {maintenance.clear}
                 </Link>
               ) : undefined
@@ -192,7 +190,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
                     </dd>
                   </div>
                 </dl>
-                <Link href={`/workspace/licenses/${license.id}`} className={navLinkClass}>
+                <Link href={`/workspace/licenses/${license.id}`} className={linkAccentSmRounded}>
                   {control.manage}
                 </Link>
               </li>
@@ -207,7 +205,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
             {result.page > 1 ? (
               <Link
                 href={licenseArchiveUrl({ ...filters, page: result.page - 1 })}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {copy.previous}
               </Link>
@@ -220,7 +218,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
             {result.page < result.totalPages && (
               <Link
                 href={licenseArchiveUrl({ ...filters, page: result.page + 1 })}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {copy.next}
               </Link>

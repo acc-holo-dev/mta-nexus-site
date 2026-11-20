@@ -4,9 +4,7 @@ import Link from "next/link";
 import { licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 
-const filterLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export function LicenseArchiveFilters({
   query,
   page,
@@ -69,10 +67,10 @@ export function LicenseArchiveFilters({
             </select>
           </label>
           <div className="flex min-w-0 flex-wrap items-end gap-4 text-sm">
-            <Button type="submit" variant="ghost" className={`h-auto px-0 ${filterLinkClass}`}>
+            <Button type="submit" variant="ghost" className={`h-auto px-0 ${linkAccentSmRounded}`}>
               {copy.apply}
             </Button>
-            <Link href="/workspace/licenses" className={filterLinkClass}>
+            <Link href="/workspace/licenses" className={linkAccentSmRounded}>
               {copy.clear}
             </Link>
           </div>
@@ -81,7 +79,7 @@ export function LicenseArchiveFilters({
       <p className="text-sm text-muted">{copy.archiveNote}</p>
       <a
         href={licenseArchiveUrl({ ...query, page }, "/api/licenses/export")}
-        className={filterLinkClass}
+        className={linkAccentSmRounded}
       >
         {copy.export}
       </a>

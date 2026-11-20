@@ -9,7 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -22,8 +22,6 @@ import { commercialTerms } from "../commercial-confirmation";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
 
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function commercialPlanAdminDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).versionsDocumentTitle} | MTA NEXUS`,
@@ -85,14 +83,14 @@ export async function CommercialPlanAdminDetailScreen({
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/commerce/plans" className={linkClass}>
+        <Link href="/admin/commerce/plans" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -111,7 +109,7 @@ export async function CommercialPlanAdminDetailScreen({
   };
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/commerce/plans" className={linkClass}>
+      <Link href="/admin/commerce/plans" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">
@@ -159,7 +157,7 @@ export async function CommercialPlanAdminDetailScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -167,7 +165,7 @@ export async function CommercialPlanAdminDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

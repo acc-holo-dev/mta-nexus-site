@@ -1,6 +1,6 @@
-import { linkAccentSmPlain } from "../../shell/link-shell";
+"use client";
 
-("use client");
+import { linkAccentSmPlain } from "../../shell/link-shell";
 
 import { Button, ErrorState, Field } from "@nexus/ui";
 import Link from "next/link";

@@ -8,16 +8,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkSecondaryBorder } from "../../shell/link-shell";
+import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseReactionPage, reactionPageHref } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 import { ReactionRemoval } from "../reaction-removal";
-
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function reactionsPageMetadata(): Promise<Metadata> {
   const copy = reactionCopy(await getRequestLocale());
@@ -73,7 +70,7 @@ export async function ReactionsPageScreen({
   const filtered = Boolean(filters?.cursor || filters?.query || filters?.reaction);
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace" className={linkClass}>
+      <Link href="/workspace" className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className="min-w-0 border-b border-base pb-6">
@@ -110,12 +107,12 @@ export async function ReactionsPageScreen({
           <Button type="submit" className="min-h-11 font-semibold">
             {copy.search}
           </Button>
-          <Link href="/workspace/reactions" className={linkClass}>
+          <Link href="/workspace/reactions" className={linkAccentSm}>
             {copy.reset}
           </Link>
         </form>
       </search>
-      <a href={latest} className={linkClass}>
+      <a href={latest} className={linkAccentSm}>
         {copy.latest}
       </a>
       {error ? (
@@ -123,7 +120,7 @@ export async function ReactionsPageScreen({
           title={error}
           description={copy.unavailableHint}
           action={
-            <a href={latest} className={linkClass}>
+            <a href={latest} className={linkAccentSm}>
               {dictionary.errors.retry}
             </a>
           }
@@ -135,7 +132,7 @@ export async function ReactionsPageScreen({
           description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             filtered ? (
-              <Link href="/workspace/reactions" className={linkClass}>
+              <Link href="/workspace/reactions" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : undefined

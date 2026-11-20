@@ -13,9 +13,7 @@ import { serverStatisticsIntervals } from "../server-statistics-export";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 function StatisticsScrollArea({
   labelledBy,
   children,
@@ -70,7 +68,7 @@ export function ServerStatisticsPanel({
               ? `/workspace/servers/${encodeURIComponent(report.server.id)}`
               : `/servers/${encodeURIComponent(report.server.slug)}`
           }
-          className={`${navLinkClass} font-semibold hover:underline`}
+          className={`${linkAccentSm} font-semibold hover:underline`}
         >
           ← {managed ? copy.management : copy.back}
         </Link>
@@ -199,7 +197,7 @@ export function ServerStatisticsPanel({
         </h2>
         <p className="text-sm text-muted">{copy.observationsScope}</p>
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={serverStatisticsHref(
             `${managed ? `/workspace/servers/${encodeURIComponent(report.server.id)}` : `/servers/${encodeURIComponent(report.server.slug)}`}/observations`,
             state,
@@ -263,14 +261,14 @@ export function ServerStatisticsPanel({
           className="flex min-w-0 flex-wrap gap-4 text-sm font-semibold text-accent"
         >
           {before && (
-            <Link href={serverStatisticsHref(path, state)} className={navLinkClass}>
+            <Link href={serverStatisticsHref(path, state)} className={linkAccentSm}>
               {copy.latest}
             </Link>
           )}
           {report.nextCursor && (
             <Link
               href={serverStatisticsHref(path, { ...state, before: report.nextCursor })}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.earlier} →
             </Link>

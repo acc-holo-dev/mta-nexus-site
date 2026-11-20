@@ -126,7 +126,7 @@ it("locks admin builds quarantine actionable links to min-h-11 touch targets", (
   const source = read(
     "site/src/features/moderation/components/admin-builds-quarantine-section.tsx",
   );
-  expect(source).toContain("touchLinkClass");
+  expect(source).toMatch(/linkAccent|link-shell/);
   expect(source).toMatch(
     /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
   );

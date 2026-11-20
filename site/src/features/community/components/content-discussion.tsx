@@ -9,7 +9,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import {
   ContentCommentSubmitError,
@@ -38,8 +38,6 @@ import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -432,10 +430,10 @@ export function ContentDiscussion({
           }
         />
         <div className="flex flex-wrap gap-4">
-          <Link href="/workspace/saved?type=content" className={navLinkClass}>
+          <Link href="/workspace/saved?type=content" className={linkAccentXs}>
             {followCopy(locale).content}
           </Link>
-          <Link href="/settings#notification-heading" className={navLinkClass}>
+          <Link href="/settings#notification-heading" className={linkAccentXs}>
             {followCopy(locale).notificationSettings}
           </Link>
         </div>
@@ -557,7 +555,7 @@ export function ContentDiscussion({
               title={copy.identityUnavailable}
               description={copy.identityUnavailableDescription}
               action={
-                <Link href={`#discussion`} className={navLinkClass}>
+                <Link href={`#discussion`} className={linkAccentXs}>
                   {copy.retry}
                 </Link>
               }
@@ -655,7 +653,7 @@ export function ContentDiscussion({
               {comment.text}
             </p>
             <Link
-              className={navLinkClass}
+              className={linkAccentXs}
               href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
             >
               {copy.permalink}

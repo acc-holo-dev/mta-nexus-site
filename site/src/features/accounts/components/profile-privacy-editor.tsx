@@ -8,6 +8,7 @@ import { PlatformRequestError, platformRequest } from "../../community/user-plat
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,
@@ -21,8 +22,6 @@ import {
 
 const retryButtonClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ProfilePrivacyEditor({
   initial,
@@ -277,11 +276,11 @@ export function ProfilePrivacyEditor({
           <div className="flex flex-wrap gap-4">
             <Link
               href={`/users/${encodeURIComponent(profile.username)}?preview=guest`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.openGuestPreview}
             </Link>
-            <Link href={`/users/${encodeURIComponent(profile.username)}`} className={navLinkClass}>
+            <Link href={`/users/${encodeURIComponent(profile.username)}`} className={linkAccentSm}>
               {copy.publicProfile}
             </Link>
           </div>

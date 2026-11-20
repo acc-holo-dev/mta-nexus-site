@@ -13,14 +13,12 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,
   resourceCartReceiptUrl,
 } from "../resource-cart-receipts-query";
-
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function acquisitionReceiptsMetadata(): Promise<Metadata> {
   return {
@@ -75,7 +73,7 @@ export async function AcquisitionReceiptsScreen({
           title={copy.invalid}
           description={copy.invalidHint}
           action={
-            <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+            <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
               {copy.title}
             </Link>
           }
@@ -89,10 +87,10 @@ export async function AcquisitionReceiptsScreen({
     return (
       <div className={pageShellClass}>
         <nav className="flex flex-wrap gap-4 text-sm">
-          <Link href="/workspace/cart" className={linkClass}>
+          <Link href="/workspace/cart" className={linkAccentSmRounded}>
             {copy.cart}
           </Link>
-          <Link href="/workspace/acquisitions" className={linkClass}>
+          <Link href="/workspace/acquisitions" className={linkAccentSmRounded}>
             {copy.history}
           </Link>
         </nav>
@@ -100,7 +98,7 @@ export async function AcquisitionReceiptsScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -113,13 +111,13 @@ export async function AcquisitionReceiptsScreen({
   return (
     <div className={pageShellClass}>
       <nav className="flex flex-wrap gap-4 text-sm">
-        <Link href="/workspace/cart" className={linkClass}>
+        <Link href="/workspace/cart" className={linkAccentSmRounded}>
           {copy.cart}
         </Link>
-        <Link href="/workspace/acquisitions" className={linkClass}>
+        <Link href="/workspace/acquisitions" className={linkAccentSmRounded}>
           {copy.history}
         </Link>
-        <Link href="/workspace/library" className={linkClass}>
+        <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}
         </Link>
       </nav>
@@ -163,7 +161,7 @@ export async function AcquisitionReceiptsScreen({
         <Button type="submit" variant="outline" className="text-sm">
           {copy.apply}
         </Button>
-        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+        <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
           {copy.clear}
         </Link>
       </form>
@@ -173,7 +171,7 @@ export async function AcquisitionReceiptsScreen({
           description={copy.note}
           action={
             result.total === 0 && !receiptsFiltered ? undefined : (
-              <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+              <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
                 {copy.clear}
               </Link>
             )
@@ -186,7 +184,7 @@ export async function AcquisitionReceiptsScreen({
               <h2 className="font-semibold">
                 <Link
                   href={resourceCartReceiptUrl(item.requestId)}
-                  className={linkClass}
+                  className={linkAccentSmRounded}
                   prefetch={false}
                 >
                   {copy.receipt}
@@ -210,7 +208,7 @@ export async function AcquisitionReceiptsScreen({
         {result.page > 1 ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page - 1 })}
-            className={linkClass}
+            className={linkAccentSmRounded}
           >
             {copy.previous}
           </Link>
@@ -221,14 +219,14 @@ export async function AcquisitionReceiptsScreen({
         {result.page < result.totalPages ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page + 1 })}
-            className={linkClass}
+            className={linkAccentSmRounded}
           >
             {copy.next}
           </Link>
         ) : null}
         <a
           href={resourceCartReceiptsUrl(current, true).replace("receipts?", "receipts/export?")}
-          className={linkClass}
+          className={linkAccentSmRounded}
         >
           {copy.export}
         </a>

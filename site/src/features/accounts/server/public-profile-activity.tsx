@@ -11,9 +11,7 @@ import { publicationCopy } from "../../community/publication-feed-copy";
 import { publicationFeedView } from "../../community/publication-feed-view";
 import { pageShellStack6 } from "../../shell/page-shell";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function publicProfileMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {
@@ -51,14 +49,14 @@ export async function PublicProfileActivity({
   if (!profile) {
     return (
       <div className={pageShellStack6}>
-        <Link href={profilePath} className={linkClass}>
+        <Link href={profilePath} className={linkAccentSmRounded}>
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={activityPath} className={linkClass}>
+            <Link href={activityPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -73,7 +71,7 @@ export async function PublicProfileActivity({
   return (
     <div className={pageShellStack6}>
       <header className="space-y-2">
-        <Link href={profilePath} className={linkClass}>
+        <Link href={profilePath} className={linkAccentSmRounded}>
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">

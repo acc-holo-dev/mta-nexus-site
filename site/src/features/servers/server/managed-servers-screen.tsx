@@ -11,7 +11,7 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -23,9 +23,6 @@ import {
 } from "../managed-server-view";
 import { serverWorkspaceCopy } from "../server-workspace-copy";
 import { ManagedServerVisibilityBatch } from "../visibility-batch";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function managedServersMetadata(): Promise<Metadata> {
   return {
@@ -74,7 +71,7 @@ export async function ManagedServersScreen({
           title={workspace.unavailable}
           description={workspace.unavailableHint}
           action={
-            <Link href={managedServerHref(filters, page)} className={navLinkClass}>
+            <Link href={managedServerHref(filters, page)} className={linkAccentSm}>
               {workspace.reload}
             </Link>
           }
@@ -95,7 +92,7 @@ export async function ManagedServersScreen({
     <div className={pageShellClass}>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 space-y-2">
-          <Link href="/workspace" className={navLinkClass}>
+          <Link href="/workspace" className={linkAccentSm}>
             ← {copy.back}
           </Link>
           <h1 className="font-display text-primary">{copy.title}</h1>
@@ -169,7 +166,7 @@ export async function ManagedServersScreen({
             {copy.apply}
           </Button>
           {filtered && (
-            <Link href="/workspace/servers" className={navLinkClass}>
+            <Link href="/workspace/servers" className={linkAccentSm}>
               {copy.reset}
             </Link>
           )}
@@ -189,11 +186,11 @@ export async function ManagedServersScreen({
           description={filtered ? copy.emptyFilterHint : copy.emptyHint}
           action={
             filtered ? (
-              <Link href="/workspace/servers" className={navLinkClass}>
+              <Link href="/workspace/servers" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : (
-              <Link href="/workspace/servers/new" className={navLinkClass}>
+              <Link href="/workspace/servers/new" className={linkAccentSm}>
                 {copy.register}
               </Link>
             )
@@ -221,7 +218,7 @@ export async function ManagedServersScreen({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">
           {result.page > 1 && (
-            <Link href={managedServerHref(filters, result.page - 1)} className={navLinkClass}>
+            <Link href={managedServerHref(filters, result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           )}
@@ -229,7 +226,7 @@ export async function ManagedServersScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={managedServerHref(filters, result.page + 1)} className={navLinkClass}>
+            <Link href={managedServerHref(filters, result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           )}

@@ -17,9 +17,7 @@ import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 function licenseHistoryAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -40,14 +38,14 @@ function LicenseHistoryLoadError({
     dictionary = getDictionary(locale);
   return (
     <div className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccentSmRounded}>
         {backLabel}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSmRounded}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -121,7 +119,7 @@ export async function LicenseHistoryPage({
   }
   return (
     <div className={pageShellClass}>
-      <Link href={`${base}/${encodeURIComponent(licenseId)}`} className={navLinkClass}>
+      <Link href={`${base}/${encodeURIComponent(licenseId)}`} className={linkAccentSmRounded}>
         {copy.manage}
       </Link>
       <h1 className="font-display text-primary">{copy.fullHistory}</h1>
@@ -158,7 +156,7 @@ export async function LicenseHistoryPage({
       {result.totalPages > 1 && (
         <nav aria-label={copy.fullHistory} className="flex gap-4 text-sm">
           {result.page > 1 && (
-            <Link href={`?page=${result.page - 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           )}
@@ -166,7 +164,7 @@ export async function LicenseHistoryPage({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           )}

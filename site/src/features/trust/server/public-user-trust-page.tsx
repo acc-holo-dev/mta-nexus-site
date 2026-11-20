@@ -11,8 +11,7 @@ import { panelClipSpace3P6 } from "../../shell/panel-shell";
 import { PublicUserTrustPanel } from "../public-user-trust";
 import { trustCopy } from "../public-user-trust-copy";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 const load = cache((username: string) =>
   publicUserTrustService.get(username).catch((error: unknown) => {
     if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
@@ -49,12 +48,12 @@ export async function TrustPage({ params }: { params: Promise<{ username: string
           title={copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <a href={href} className={actionLinkClass}>
+            <a href={href} className={linkAccentSm}>
               {dictionary.errors.retry}
             </a>
           }
         />
-        <Link href={`/users/${encodeURIComponent(username)}`} className={actionLinkClass}>
+        <Link href={`/users/${encodeURIComponent(username)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
       </div>

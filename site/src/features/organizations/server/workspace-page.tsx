@@ -16,8 +16,7 @@ import { getOrganizationCopy, organizationError } from "../organization-workspac
 import { OrganizationWorkspacePanel } from "../workspace";
 import { organizationReturnPath } from "./organization-return-path";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
@@ -63,7 +62,7 @@ export default async function OrganizationPage({
   const parsed = organizationWorkspaceSchema.safeParse(result);
   return (
     <div className={pageShellClass}>
-      <Link className={navLinkClass} href="/workspace/organizations">
+      <Link className={linkAccentSm} href="/workspace/organizations">
         {copy.back}
       </Link>
       {parsed.success ? (
@@ -83,7 +82,7 @@ export default async function OrganizationPage({
             title={failure}
             description={copy.unavailableHint}
             action={
-              <Link className={navLinkClass} href={returnPath}>
+              <Link className={linkAccentSm} href={returnPath}>
                 {copy.reload}
               </Link>
             }

@@ -14,14 +14,12 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionImport } from "../collection-import";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   collectionHref,
   collectionPageParams,
   collectionId as parseCollectionId,
 } from "../library-collections-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -81,7 +79,7 @@ export default async function Page({
             title={m.loadUnavailable}
             description={m.loadUnavailableDescription}
             action={
-              <Link href={collectionHref(id, "import")} className={navLinkClass}>
+              <Link href={collectionHref(id, "import")} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -93,12 +91,12 @@ export default async function Page({
     return (
       <div className={pageShellClass}>
         <nav className="flex min-w-0 flex-wrap gap-4">
-          <Link href={collectionHref(collection.id)} className={navLinkClass}>
+          <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
           <a
             href={`/api/library/collections/${encodeURIComponent(collection.id)}/export`}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {m.export}
           </a>
@@ -130,7 +128,7 @@ export default async function Page({
           title={libraryCollectionError(typedLocale, error.code)}
           description={m.loadUnavailableDescription}
           action={
-            <Link href={collectionHref()} className={navLinkClass}>
+            <Link href={collectionHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

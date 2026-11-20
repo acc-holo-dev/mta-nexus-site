@@ -7,9 +7,7 @@ import { ArticleCard } from "../../community/article-view";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { pageShellStack4 } from "../../shell/page-shell";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export function ServerUpdatesPanel({
   updates,
   locale = "en",
@@ -39,7 +37,7 @@ export function ServerUpdatesPanel({
         <span className="shrink-0 font-label uppercase text-faint">{copy.moderated}</span>
       </div>
       {serverSlug && (
-        <Link href={`/servers/${encodeURIComponent(serverSlug)}/updates`} className={navLinkClass}>
+        <Link href={`/servers/${encodeURIComponent(serverSlug)}/updates`} className={linkAccentSm}>
           {publicationCopy(locale).allUpdates}
         </Link>
       )}
@@ -50,7 +48,7 @@ export function ServerUpdatesPanel({
           description={copy.unavailableHint}
           action={
             retryHref ? (
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSm}>
                 {dictionary.errors.retry}
               </Link>
             ) : undefined

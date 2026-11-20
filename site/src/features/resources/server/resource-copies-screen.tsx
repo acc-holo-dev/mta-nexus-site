@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCopyService } from "../../../lib/services/resources/resource-copy-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -20,9 +20,6 @@ import {
   resourceCopiesQuery,
   resourceCopyId,
 } from "../resource-copy-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function resourceCopiesMetadata(): Promise<Metadata> {
   return {
@@ -79,14 +76,17 @@ export async function ResourceCopiesScreen({
       if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
       return (
         <section className={pageShellClass}>
-          <Link className={navLinkClass} href={`/workspace/resources/${encodeURIComponent(id)}`}>
+          <Link
+            className={linkAccentRounded}
+            href={`/workspace/resources/${encodeURIComponent(id)}`}
+          >
             {c.back}
           </Link>
           <ErrorState
             title={c.loadUnavailable}
             description={c.loadUnavailableHint}
             action={
-              <Link href={returnPath} className={navLinkClass}>
+              <Link href={returnPath} className={linkAccentRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -99,7 +99,7 @@ export async function ResourceCopiesScreen({
         `${base}?${new URLSearchParams({ page: String(page), days: String(query.days) })}`;
     return (
       <section className={pageShellClass}>
-        <Link className={navLinkClass} href={`/workspace/resources/${encodeURIComponent(id)}`}>
+        <Link className={linkAccentRounded} href={`/workspace/resources/${encodeURIComponent(id)}`}>
           {c.back}
         </Link>
         <h1 className="font-display">
@@ -139,7 +139,7 @@ export async function ResourceCopiesScreen({
             description={query.days === "all" ? c.emptyHint : c.emptyFilteredHint}
             action={
               query.days !== "all" ? (
-                <Link href={base} className={navLinkClass}>
+                <Link href={base} className={linkAccentRounded}>
                   {c.clearPeriod}
                 </Link>
               ) : undefined
@@ -175,7 +175,7 @@ export async function ResourceCopiesScreen({
         )}
         <nav className="flex flex-wrap gap-4" aria-label={c.history}>
           {result.page > 1 && (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentRounded}>
               {c.previous}
             </Link>
           )}
@@ -183,7 +183,7 @@ export async function ResourceCopiesScreen({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentRounded}>
               {c.next}
             </Link>
           )}
@@ -199,7 +199,7 @@ export async function ResourceCopiesScreen({
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}
             action={
-              <Link href="/workspace/resources" className={navLinkClass}>
+              <Link href="/workspace/resources" className={linkAccentRounded}>
                 {c.back}
               </Link>
             }

@@ -16,7 +16,7 @@ import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -24,9 +24,6 @@ import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { LibraryReleaseSelectionControls } from "../release-selection";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function libraryVersionsMetadata(): Promise<Metadata> {
   return {
@@ -78,14 +75,14 @@ export async function LibraryVersionsScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library/updates" className={navLinkClass}>
+        <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
           {copy.updates}
         </Link>
         <ErrorState
           title={copy.versionsLoadUnavailable}
           description={copy.versionsLoadUnavailableDescription}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -100,14 +97,14 @@ export async function LibraryVersionsScreen({
   if (!watch) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library/updates" className={navLinkClass}>
+        <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
           {copy.updates}
         </Link>
         <ErrorState
           title={copy.versionsLoadUnavailable}
           description={copy.versionsLoadUnavailableDescription}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -119,7 +116,7 @@ export async function LibraryVersionsScreen({
   const watchesCopy = resourceReleaseWatchesCopy(typedLocale);
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library/updates" className={navLinkClass}>
+      <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
         {copy.updates}
       </Link>
       <h1 className="min-w-0 break-words font-display text-primary">{copy.versions}</h1>
@@ -127,7 +124,10 @@ export async function LibraryVersionsScreen({
         {result.latest ? (result.product.title ?? copy.privateResource) : copy.privateResource}
       </h2>
       {result.latest && result.product.slug ? (
-        <Link href={`/market/${encodeURIComponent(result.product.slug)}`} className={navLinkClass}>
+        <Link
+          href={`/market/${encodeURIComponent(result.product.slug)}`}
+          className={linkAccentSmRounded}
+        >
           {copy.open}
         </Link>
       ) : null}
@@ -170,13 +170,13 @@ export async function LibraryVersionsScreen({
       ) : null}
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {resourceRequirementsCopy(typedLocale).title}
       </Link>
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/collections`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {libraryCollectionsCopy(typedLocale).resourceCollections}
       </Link>
@@ -203,7 +203,7 @@ export async function LibraryVersionsScreen({
           watch={watch}
           available={Boolean(result.latest)}
         />
-        <Link href="/workspace/library/watches" className={navLinkClass}>
+        <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
           {watchesCopy.title}
         </Link>
       </section>
@@ -221,7 +221,7 @@ export async function LibraryVersionsScreen({
               {current && current.id !== version.id && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(id)}/versions/compare?${new URLSearchParams({ from: current.id, to: version.id, returnPage: String(result.page) })}`}
-                  className={navLinkClass}
+                  className={linkAccentSmRounded}
                 >
                   {libraryReleaseComparisonCopy(typedLocale).title}
                 </Link>
@@ -257,7 +257,7 @@ export async function LibraryVersionsScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           ) : null}
@@ -265,7 +265,7 @@ export async function LibraryVersionsScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           ) : null}

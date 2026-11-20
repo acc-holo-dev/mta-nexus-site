@@ -18,13 +18,11 @@ import {
 } from "../../trust/verification-applications-contract";
 import { VERIFICATION_TYPES } from "../../trust/verification-workspace-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
 } from "../verification-applications-copy";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function verificationHistoryMetadata(): Promise<Metadata> {
   const copy = verificationApplicationsCopy(await getRequestLocale());
@@ -92,7 +90,7 @@ export async function VerificationHistoryScreen({
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
-      <Link href="/workspace/verification" className={navLinkClass}>
+      <Link href="/workspace/verification" className={linkAccentSm}>
         {labels.back}
       </Link>
       <search aria-label={copy.query}>
@@ -144,7 +142,7 @@ export async function VerificationHistoryScreen({
             {copy.search}
           </Button>
           {historyFiltered ? (
-            <Link prefetch={false} href="/workspace/verification/history" className={navLinkClass}>
+            <Link prefetch={false} href="/workspace/verification/history" className={linkAccentSm}>
               {copy.clear}
             </Link>
           ) : null}
@@ -154,7 +152,7 @@ export async function VerificationHistoryScreen({
       <Link
         prefetch={false}
         href={filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {copy.latest}
       </Link>
@@ -163,7 +161,7 @@ export async function VerificationHistoryScreen({
           title={error}
           description={labels.unavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -178,12 +176,12 @@ export async function VerificationHistoryScreen({
               <Link
                 prefetch={false}
                 href="/workspace/verification/history"
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.clear}
               </Link>
             ) : (
-              <Link href="/workspace/verification" className={navLinkClass}>
+              <Link href="/workspace/verification" className={linkAccentSm}>
                 {labels.back}
               </Link>
             )
@@ -219,7 +217,7 @@ export async function VerificationHistoryScreen({
               <Link
                 prefetch={false}
                 href={`/workspace/verification/${encodeURIComponent(item.id)}`}
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.open}
               </Link>
@@ -232,7 +230,7 @@ export async function VerificationHistoryScreen({
           {report.newerCursor ? (
             <Link
               prefetch={false}
-              className={navLinkClass}
+              className={linkAccentSm}
               href={verificationApplicationsHref(filters, report.newerCursor)}
             >
               {copy.newer}
@@ -241,7 +239,7 @@ export async function VerificationHistoryScreen({
           {report.olderCursor ? (
             <Link
               prefetch={false}
-              className={navLinkClass}
+              className={linkAccentSm}
               href={verificationApplicationsHref(filters, report.olderCursor)}
             >
               {copy.older}

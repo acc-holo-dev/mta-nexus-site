@@ -7,9 +7,7 @@ import { panelFlexBetweenP4 } from "../../shell/panel-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
-const touchLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type PendingBuild = {
@@ -102,7 +100,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className={touchLinkClass}
+                        className={linkAccent}
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -116,7 +114,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className={touchLinkClass}
+                      className={linkAccent}
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -145,7 +143,7 @@ export function AdminBuildsQuarantineSection({
                   />
                   <Link
                     href={`/admin/resources/${build.productId}/builds/${build.id}`}
-                    className={`${touchLinkClass} text-xs`}
+                    className={`${linkAccent} text-xs`}
                   >
                     {copy.versionDecisionHistory}
                   </Link>
@@ -163,7 +161,7 @@ export function AdminBuildsQuarantineSection({
         {(buildPage > 1 || moreBuilds) && (
           <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
             {buildPage > 1 && (
-              <Link className={touchLinkClass} href={adminHref({ buildPage: buildPage - 1 })}>
+              <Link className={linkAccent} href={adminHref({ buildPage: buildPage - 1 })}>
                 {copy.previous}
               </Link>
             )}
@@ -171,7 +169,7 @@ export function AdminBuildsQuarantineSection({
               {copy.reportPage} {buildPage}
             </span>
             {moreBuilds && buildPage < 99_999 && (
-              <Link className={touchLinkClass} href={adminHref({ buildPage: buildPage + 1 })}>
+              <Link className={linkAccent} href={adminHref({ buildPage: buildPage + 1 })}>
                 {copy.next}
               </Link>
             )}
@@ -203,7 +201,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className={touchLinkClass}
+                        className={linkAccent}
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -217,7 +215,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className={touchLinkClass}
+                      className={linkAccent}
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -247,7 +245,7 @@ export function AdminBuildsQuarantineSection({
                   {build.scanStatus === "clean" && build.scanner?.trim() && build.scannedAt && (
                     <a
                       href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
-                      className={`${touchLinkClass} text-xs font-semibold`}
+                      className={`${linkAccent} text-xs font-semibold`}
                     >
                       {copy.reviewArtifact}
                     </a>
@@ -270,10 +268,7 @@ export function AdminBuildsQuarantineSection({
         {(riskBuildPage > 1 || moreRiskBuilds) && (
           <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
             {riskBuildPage > 1 && (
-              <Link
-                className={touchLinkClass}
-                href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
-              >
+              <Link className={linkAccent} href={adminHref({ riskBuildPage: riskBuildPage - 1 })}>
                 {copy.previous}
               </Link>
             )}
@@ -281,10 +276,7 @@ export function AdminBuildsQuarantineSection({
               {copy.reportPage} {riskBuildPage}
             </span>
             {moreRiskBuilds && riskBuildPage < 99_999 && (
-              <Link
-                className={touchLinkClass}
-                href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
-              >
+              <Link className={linkAccent} href={adminHref({ riskBuildPage: riskBuildPage + 1 })}>
                 {copy.next}
               </Link>
             )}

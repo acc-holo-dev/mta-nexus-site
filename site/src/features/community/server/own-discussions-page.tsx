@@ -7,15 +7,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkSecondaryBorder } from "../../shell/link-shell";
+import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
-
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function generateMetadata() {
   const copy = ownDiscussionCopy(await getRequestLocale());
@@ -75,7 +72,7 @@ export default async function OwnDiscussionsPage({
   const filtered = Boolean(filters?.cursor || filters?.query || filters?.availability);
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace" className={linkClass}>
+      <Link href="/workspace" className={linkAccentSm}>
         {copy.workspace}
       </Link>
       <header className="min-w-0 space-y-2 border-b border-base pb-6">
@@ -110,12 +107,12 @@ export default async function OwnDiscussionsPage({
           <Button type="submit" className="min-h-11 font-semibold">
             {copy.search}
           </Button>
-          <Link href="/workspace/discussions" className={linkClass}>
+          <Link href="/workspace/discussions" className={linkAccentSm}>
             {copy.reset}
           </Link>
         </form>
       </search>
-      <a href={latest} className={linkClass}>
+      <a href={latest} className={linkAccentSm}>
         {copy.latest}
       </a>
       {error ? (
@@ -123,7 +120,7 @@ export default async function OwnDiscussionsPage({
           title={error}
           description={copy.loadUnavailableHint}
           action={
-            <a href={latest} className={linkClass}>
+            <a href={latest} className={linkAccentSm}>
               {dictionary.errors.retry}
             </a>
           }
@@ -135,7 +132,7 @@ export default async function OwnDiscussionsPage({
           description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             filtered ? (
-              <Link href="/workspace/discussions" className={linkClass}>
+              <Link href="/workspace/discussions" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -160,7 +157,7 @@ export default async function OwnDiscussionsPage({
                 <Link
                   prefetch={false}
                   href={`/workspace/discussions/${encodeURIComponent(item.id)}`}
-                  className={linkClass}
+                  className={linkAccentSm}
                 >
                   {copy.open}
                 </Link>
@@ -168,7 +165,7 @@ export default async function OwnDiscussionsPage({
                   <Link
                     prefetch={false}
                     href={`/articles/${encodeURIComponent(item.slug)}?comment=${encodeURIComponent(item.id)}#comment-${encodeURIComponent(item.id)}`}
-                    className={linkClass}
+                    className={linkAccentSm}
                   >
                     {copy.discussion}
                   </Link>

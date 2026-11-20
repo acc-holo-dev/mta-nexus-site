@@ -15,9 +15,7 @@ import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function libraryReviewsMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).own} | MTA NEXUS`,
@@ -69,14 +67,14 @@ export async function LibraryReviewsScreen({
   if (!result) {
     return (
       <section className={pageShellClass}>
-        <Link href="/workspace/library" className={navLinkClass}>
+        <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -86,12 +84,12 @@ export async function LibraryReviewsScreen({
   }
   return (
     <section className={pageShellClass}>
-      <Link href="/workspace/library" className={navLinkClass}>
+      <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <h1 className="min-w-0 break-words font-display">{copy.own}</h1>
       <p className="text-sm text-secondary">{copy.subtitle}</p>
-      <Link href="/workspace/review-reports" className={navLinkClass}>
+      <Link href="/workspace/review-reports" className={linkAccentSmRounded}>
         {copy.reports}
       </Link>
       {result.items.length ? (
@@ -105,7 +103,7 @@ export async function LibraryReviewsScreen({
             <p className="line-clamp-4 whitespace-pre-wrap break-words text-sm">{review.text}</p>
             <Link
               href={`/workspace/library/review/${encodeURIComponent(review.productId)}`}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.write}
             </Link>
@@ -117,10 +115,10 @@ export async function LibraryReviewsScreen({
           description={copy.ownEmptyHint}
           action={
             <>
-              <Link href="/market?maxPrice=0" className={navLinkClass}>
+              <Link href="/market?maxPrice=0" className={linkAccentSmRounded}>
                 {workspace.browseResources}
               </Link>
-              <Link href="/workspace/review-reports" className={`${navLinkClass} mt-3`}>
+              <Link href="/workspace/review-reports" className={`${linkAccentSmRounded} mt-3`}>
                 {copy.reports}
               </Link>
             </>

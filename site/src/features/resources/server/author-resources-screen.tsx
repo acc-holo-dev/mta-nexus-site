@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourcePublisherService } from "../../../lib/services/resources/resource-publisher-service";
 import { getCommercialCopy } from "../../commerce/commercial-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourcePublisherFilters } from "../publisher-view";
@@ -22,8 +22,6 @@ import {
   resourcePublisherUrl,
 } from "../resource-publisher-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const primaryCtaClass =
   "inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -88,7 +86,7 @@ export async function AuthorResourcesScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -111,7 +109,7 @@ export async function AuthorResourcesScreen({
           {dictionary.workspace.publishResource}
         </Link>
       </header>
-      <Link href="/subscriptions" className={navLinkClass}>
+      <Link href="/subscriptions" className={linkAccentSm}>
         {getCommercialCopy(locale).catalog}
       </Link>
       <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
@@ -121,11 +119,11 @@ export async function AuthorResourcesScreen({
           description={emptyDescription}
           action={
             inventoryTotal > 0 ? (
-              <Link href="/workspace/resources" className={navLinkClass}>
+              <Link href="/workspace/resources" className={linkAccentSm}>
                 {publisherCopy.reset}
               </Link>
             ) : (
-              <Link href="/workspace/resources/new" className={navLinkClass}>
+              <Link href="/workspace/resources/new" className={linkAccentSm}>
                 {dictionary.workspace.publishResource}
               </Link>
             )
@@ -167,7 +165,7 @@ export async function AuthorResourcesScreen({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">
           {result.page > 1 && (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           )}
@@ -175,7 +173,7 @@ export async function AuthorResourcesScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           )}

@@ -9,7 +9,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -81,20 +81,18 @@ export async function FinancialReconciliationDetailScreen({
     return null;
   });
   if (missing) notFound();
-  const linkClass =
-    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/commerce/reconciliation" className={linkClass}>
+        <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -105,13 +103,13 @@ export async function FinancialReconciliationDetailScreen({
 
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/commerce/reconciliation" className={linkClass}>
+      <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.order.orderNumber}</h1>
       <Link
         href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
-        className={linkClass}
+        className={linkAccentSm}
       >
         {orderTermsCopy(locale).title}
       </Link>
@@ -150,7 +148,7 @@ export async function FinancialReconciliationDetailScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -158,7 +156,7 @@ export async function FinancialReconciliationDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

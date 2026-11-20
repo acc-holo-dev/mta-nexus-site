@@ -10,9 +10,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { getManagedServerCopy } from "../managed-server-view";
 import { RegisterServerForm } from "../registration";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function registerServerMetadata(): Promise<Metadata> {
   const copy = getDictionary(await getRequestLocale()).serverRegistration;
   return {
@@ -41,7 +39,7 @@ export async function RegisterServerScreen() {
   const copy = getManagedServerCopy(locale);
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/servers" className={navLinkClass}>
+      <Link href="/workspace/servers" className={linkAccentSm}>
         ← {copy.title}
       </Link>
       <RegisterServerForm key={actor.id} actorId={actor.id} />

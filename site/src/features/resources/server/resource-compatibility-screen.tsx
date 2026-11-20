@@ -15,8 +15,7 @@ import { ProductDependencyList } from "../detail-view";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export async function resourceCompatibilityMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceManagementCopy(await getRequestLocale()).compatibility} | MTA NEXUS`,
@@ -49,14 +48,14 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
   if (!resolution) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -66,7 +65,7 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
   }
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${product.id}`} className={navLinkClass}>
+      <Link href={`/workspace/resources/${product.id}`} className={linkAccentSm}>
         {copy.back}
       </Link>
       <header>
@@ -75,7 +74,7 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
       </header>
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {resourceRequirementsCopy(locale).title}
       </Link>

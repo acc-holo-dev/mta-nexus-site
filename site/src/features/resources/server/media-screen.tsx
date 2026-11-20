@@ -15,9 +15,7 @@ import { ResourceGallery } from "../components/resource-gallery";
 import { ResourceMediaEditor } from "../components/resource-media-editor";
 import { resourceMediaCopy } from "../resource-media-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 function mediaAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -42,14 +40,14 @@ function ResourceMediaLoadError({
     : `/workspace/resources/${encodeURIComponent(productId)}/media`;
   return (
     <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -107,7 +105,7 @@ export async function ResourceMediaScreen({
             ? `/admin/resources/${encodeURIComponent(productId)}`
             : `/workspace/resources/${encodeURIComponent(productId)}`
         }
-        className={navLinkClass}
+        className={linkAccent}
       >
         {copy.back}
       </Link>

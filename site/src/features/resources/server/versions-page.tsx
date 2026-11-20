@@ -18,14 +18,12 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   getReleaseHistoryCopy,
   parseReleaseHistoryPage,
   releaseHistoryHref,
 } from "../public-release-history";
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function formatBuildSize(bytes: number, locale: Locale): string {
   if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
@@ -74,7 +72,7 @@ export async function PublicResourceVersionsPage({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={releaseHistoryHref(slug, requestedPage)} className={actionLinkClass}>
+            <Link href={releaseHistoryHref(slug, requestedPage)} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -100,7 +98,7 @@ export async function PublicResourceVersionsPage({
     return (
       <div className={pageShellClass}>
         <header className="space-y-3 border-b border-base pb-6">
-          <Link href={back} className={actionLinkClass}>
+          <Link href={back} className={linkAccentSmRounded}>
             {copy.back}
           </Link>
           <h1 className="font-display text-primary">
@@ -114,7 +112,7 @@ export async function PublicResourceVersionsPage({
           action={
             <Link
               href={releaseHistoryHref(product.slug, requestedPage)}
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -145,7 +143,7 @@ export async function PublicResourceVersionsPage({
   return (
     <div className={pageShellClass}>
       <header className="space-y-3 border-b border-base pb-6">
-        <Link href={back} className={actionLinkClass}>
+        <Link href={back} className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">
@@ -267,7 +265,7 @@ export async function PublicResourceVersionsPage({
               title={copy.sessionUnavailable}
               description={copy.sessionUnavailableDescription}
               action={
-                <Link href={returnPath} className={actionLinkClass}>
+                <Link href={returnPath} className={linkAccentSmRounded}>
                   {dictionary.errors.retry}
                 </Link>
               }
@@ -275,7 +273,7 @@ export async function PublicResourceVersionsPage({
           ) : user ? (
             <Link
               href={`/acquire?productId=${encodeURIComponent(product.id)}`}
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.acquire}
             </Link>
@@ -297,7 +295,7 @@ export async function PublicResourceVersionsPage({
         >
           {history.page > 1 ? (
             <Link
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
               href={releaseHistoryHref(product.slug, history.page - 1)}
             >
               {copy.previous}
@@ -310,7 +308,7 @@ export async function PublicResourceVersionsPage({
           </span>
           {history.page < history.totalPages ? (
             <Link
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
               href={releaseHistoryHref(product.slug, history.page + 1)}
             >
               {copy.next}

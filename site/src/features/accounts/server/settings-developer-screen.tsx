@@ -15,9 +15,7 @@ import { ProfileChangeHistoryLink } from "../change-history";
 import { DeveloperProfileEditor } from "../profile";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function settingsDeveloperMetadata(): Promise<Metadata> {
   return {
     title: verificationCopy(await getRequestLocale()).profile,
@@ -50,7 +48,7 @@ export async function SettingsDeveloperScreen() {
           title={copy.roleRequired}
           description={copy.profileDescription}
           action={
-            <Link href="/settings" className={navLinkClass}>
+            <Link href="/settings" className={linkAccentSm}>
               {profilePrivacyCopy(locale).back}
             </Link>
           }
@@ -69,7 +67,7 @@ export async function SettingsDeveloperScreen() {
         <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>
       </header>
       <DeveloperProfileEditor key={actor.id} actorId={actor.id} initial={initial} locale={locale} />
-      <Link href="/settings/privacy" className={navLinkClass}>
+      <Link href="/settings/privacy" className={linkAccentSm}>
         {profilePrivacyCopy(locale).title}
       </Link>
     </div>

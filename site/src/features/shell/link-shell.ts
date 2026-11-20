@@ -22,6 +22,12 @@ export const linkMuted = "inline-flex min-h-11 items-center text-muted";
 export const linkAccentXs =
   "inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
+export const linkAccentSmSemibold =
+  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkAccentSemibold =
+  "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const linkAccentSmPlain = "inline-flex min-h-11 items-center text-sm text-accent underline";
 
 export const linkSecondaryBorder =

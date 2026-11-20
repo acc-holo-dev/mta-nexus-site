@@ -16,9 +16,7 @@ import { ServerDetailsForm } from "../details-controls";
 import { getManagedServerCopy } from "../managed-server-view";
 import { serverWorkspaceCopy } from "../server-workspace-copy";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function serverManagementMetadata(): Promise<Metadata> {
   return {
     title: `${serverWorkspaceCopy(await getRequestLocale()).managementDocumentTitle} | MTA NEXUS`,
@@ -61,7 +59,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
   return (
     <div className={pageShellClass}>
       <div className="min-w-0">
-        <Link href="/workspace/servers" className={navLinkClass}>
+        <Link href="/workspace/servers" className={linkAccentSm}>
           ← {serverCopy.title}
         </Link>
         <h1 className="mt-2 break-words text-2xl font-black text-primary">{server.name}</h1>

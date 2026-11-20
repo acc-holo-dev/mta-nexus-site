@@ -14,9 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 function packageAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -35,14 +33,14 @@ function BuildPackageLoadError({
     dictionary = getDictionary(locale);
   return (
     <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+      <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -124,7 +122,7 @@ export async function BuildPackageScreen({
       : detail.candidates;
   return (
     <div className={pageShellClass}>
-      <Link href={base} className={navLinkClass}>
+      <Link href={base} className={linkAccent}>
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -180,7 +178,7 @@ export async function BuildPackageScreen({
         <Button type="submit" disabled={options.length === 0} variant="outline" size="touch">
           {copy.apply}
         </Button>
-        <Link href={pageBase} className={navLinkClass}>
+        <Link href={pageBase} className={linkAccent}>
           {copy.reset}
         </Link>
       </form>
@@ -234,7 +232,7 @@ export async function BuildPackageScreen({
                   filter: "all",
                   page: 1,
                 })}
-                className={navLinkClass}
+                className={linkAccent}
               >
                 {copy.reset}
               </Link>
@@ -246,7 +244,7 @@ export async function BuildPackageScreen({
         <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
           {detail.page > 1 && (
             <Link
-              className={navLinkClass}
+              className={linkAccent}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
@@ -262,7 +260,7 @@ export async function BuildPackageScreen({
           </span>
           {detail.page < detail.totalPages && (
             <Link
-              className={navLinkClass}
+              className={linkAccent}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,

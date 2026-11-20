@@ -39,9 +39,7 @@ import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
 
-const focusLink =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function communityModerationMetadata(): Promise<Metadata> {
   return {
     title: moderationCopy(await getRequestLocale()).title,
@@ -109,7 +107,7 @@ export async function CommunityModerationScreen({
           : getDictionary(locale).errors.sessionRetryHint
       }
       action={
-        <a className={focusLink} href={href}>
+        <a className={linkAccentSm} href={href}>
           {copy.reload}
         </a>
       }
@@ -135,7 +133,7 @@ export async function CommunityModerationScreen({
     if (!parsed.success)
       return (
         <div className={pageShellStack5}>
-          <Link className={focusLink} href="/admin/community">
+          <Link className={linkAccentSm} href="/admin/community">
             {copy.back}
           </Link>
           <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
@@ -145,7 +143,7 @@ export async function CommunityModerationScreen({
     const { item, history, nextCursor } = parsed.data;
     return (
       <div className={pageShellMax4xlTight}>
-        <Link className={focusLink} href="/admin/community">
+        <Link className={linkAccentSm} href="/admin/community">
           {copy.back}
         </Link>
         <header className={panelMinSpace3P5}>
@@ -163,7 +161,7 @@ export async function CommunityModerationScreen({
             {copy.updated}: {date(item.updatedAt)}
           </p>
           {item.status === "published" && (
-            <Link href={`/articles/${encodeURIComponent(item.slug)}`} className={focusLink}>
+            <Link href={`/articles/${encodeURIComponent(item.slug)}`} className={linkAccentSm}>
               {copy.publicPage}
             </Link>
           )}
@@ -198,7 +196,7 @@ export async function CommunityModerationScreen({
           <p className="text-sm text-muted">{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
-            className={focusLink}
+            className={linkAccentSm}
           >
             {moderatedDiscussionCopy(locale).open}
           </Link>
@@ -214,7 +212,7 @@ export async function CommunityModerationScreen({
         <section className="min-w-0 space-y-4">
           <h2 className="font-heading text-primary">{copy.history}</h2>
           <p className="text-sm text-muted">{copy.historyScope}</p>
-          <a className={focusLink} href={moderationDetailHref(id)}>
+          <a className={linkAccentSm} href={moderationDetailHref(id)}>
             {copy.latest}
           </a>
           {!history.length ? (
@@ -246,7 +244,7 @@ export async function CommunityModerationScreen({
           {nextCursor ? (
             <Link
               prefetch={false}
-              className={focusLink}
+              className={linkAccentSm}
               href={moderationDetailHref(id, nextCursor)}
             >
               {copy.older}
@@ -278,7 +276,7 @@ export async function CommunityModerationScreen({
       <header className="min-w-0 space-y-2">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <Link className={focusLink} href="/admin/reports">
+        <Link className={linkAccentSm} href="/admin/reports">
           {copy.reports}
         </Link>
       </header>
@@ -337,7 +335,7 @@ export async function CommunityModerationScreen({
               <Button className="min-h-11" type="submit" variant="primary">
                 {copy.apply}
               </Button>
-              <Link className={focusLink} href="/admin/community">
+              <Link className={linkAccentSm} href="/admin/community">
                 {copy.reset}
               </Link>
             </form>
@@ -349,7 +347,7 @@ export async function CommunityModerationScreen({
               icon={<FileText className="h-6 w-6" aria-hidden="true" />}
               action={
                 filtersActive ? (
-                  <Link className={focusLink} href="/admin/community">
+                  <Link className={linkAccentSm} href="/admin/community">
                     {copy.reset}
                   </Link>
                 ) : undefined
@@ -375,13 +373,13 @@ export async function CommunityModerationScreen({
             </ul>
           )}
           <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <a className={focusLink} href={moderationHref(filters)}>
+            <a className={linkAccentSm} href={moderationHref(filters)}>
               {copy.latest}
             </a>
             {parsed.data.nextCursor ? (
               <Link
                 prefetch={false}
-                className={focusLink}
+                className={linkAccentSm}
                 href={moderationHref(filters, parsed.data.nextCursor)}
               >
                 {copy.older}

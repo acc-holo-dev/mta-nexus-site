@@ -24,9 +24,7 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).orderDetailsTitle} | MTA NEXUS`,
@@ -81,14 +79,14 @@ export async function PurchaseDetailScreen({
   } catch {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/purchases" className={navLinkClass}>
+        <Link href="/workspace/purchases" className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
         <ErrorState
           title={copy.orderLoadUnavailable}
           description={copy.orderLoadUnavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -101,7 +99,7 @@ export async function PurchaseDetailScreen({
   return (
     <div className={pageShellClass}>
       <header className="min-w-0 space-y-3 border-b border-base pb-5">
-        <Link href="/workspace/purchases" className={navLinkClass}>
+        <Link href="/workspace/purchases" className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
         <h1 className="min-w-0 break-words font-display text-primary">
@@ -129,17 +127,20 @@ export async function PurchaseDetailScreen({
       </header>
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {getCommercialCopy(typedLocale).paymentOperations}
       </Link>
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/support`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {orderCaseCopy(typedLocale).title}
       </Link>
-      <Link href={`/workspace/purchases/${encodeURIComponent(id)}/terms`} className={navLinkClass}>
+      <Link
+        href={`/workspace/purchases/${encodeURIComponent(id)}/terms`}
+        className={linkAccentSmRounded}
+      >
         {orderTermsCopy(typedLocale).title}
       </Link>
       <p
@@ -173,12 +174,12 @@ export async function PurchaseDetailScreen({
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>
                 {item.hasCurrentAccess && (
-                  <Link href="/workspace/library" className={navLinkClass}>
+                  <Link href="/workspace/library" className={linkAccentSmRounded}>
                     {getResourceCommerceCopy(typedLocale).library}
                   </Link>
                 )}
                 {item.productSlug && (
-                  <Link href={`/market/${item.productSlug}`} className={navLinkClass}>
+                  <Link href={`/market/${item.productSlug}`} className={linkAccentSmRounded}>
                     {copy.openResource}
                   </Link>
                 )}
@@ -190,7 +191,7 @@ export async function PurchaseDetailScreen({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm text-secondary">
           {result.page > 1 && (
-            <Link href={`?page=${result.page - 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}
             </Link>
           )}
@@ -198,7 +199,7 @@ export async function PurchaseDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`} className={navLinkClass}>
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSmRounded}>
               {copy.next}
             </Link>
           )}

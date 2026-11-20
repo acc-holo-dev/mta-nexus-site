@@ -20,9 +20,7 @@ import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { SupportDownloadHelpLink } from "../../support/download-help";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function libraryDownloadDetailMetadata(): Promise<Metadata> {
   return {
     title: `${resourceDeliveriesCopy(await getRequestLocale()).receipt} | MTA NEXUS`,
@@ -68,7 +66,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
   if (!receipt) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library/downloads" className={navLinkClass}>
+        <Link href="/workspace/library/downloads" className={linkAccentSm}>
           {copy.title}
         </Link>
         <ErrorState
@@ -77,7 +75,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
           action={
             <Link
               href={`/workspace/library/downloads/${encodeURIComponent(id)}`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {dictionary.errors.retry}
             </Link>
@@ -88,7 +86,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
   }
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library/downloads" className={navLinkClass}>
+      <Link href="/workspace/library/downloads" className={linkAccentSm}>
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -128,7 +126,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
           status: "all",
           resourceId: receipt.resourceId,
         })}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {copy.history}
       </Link>

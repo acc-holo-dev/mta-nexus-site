@@ -13,14 +13,12 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCopyForm } from "../copy-controls";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
+import { linkAccentRounded } from "../../shell/link-shell";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
   resourceCopyId,
 } from "../resource-copy-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function resourceCopyCreateMetadata(): Promise<Metadata> {
   return {
@@ -66,7 +64,7 @@ export async function ResourceCopyCreateScreen({
       preview = await resourceCopyService.preview(actor, id);
     return (
       <section className={pageShellClass}>
-        <Link className={navLinkClass} href={`/workspace/resources/${encodeURIComponent(id)}`}>
+        <Link className={linkAccentRounded} href={`/workspace/resources/${encodeURIComponent(id)}`}>
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
@@ -87,7 +85,7 @@ export async function ResourceCopyCreateScreen({
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}
             action={
-              <Link href="/workspace/resources" className={navLinkClass}>
+              <Link href="/workspace/resources" className={linkAccentRounded}>
                 {c.back}
               </Link>
             }
@@ -96,14 +94,17 @@ export async function ResourceCopyCreateScreen({
       );
     return (
       <section className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(path.id)}`} className={navLinkClass}>
+        <Link
+          href={`/workspace/resources/${encodeURIComponent(path.id)}`}
+          className={linkAccentRounded}
+        >
           {c.back}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentRounded}>
               {dictionary.errors.retry}
             </Link>
           }

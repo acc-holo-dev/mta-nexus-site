@@ -15,7 +15,7 @@ import { resourceReleaseWatchesService } from "../../../lib/services/resources/r
 import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import {
   pageShellMax5xl as pageShellClass,
   pageShellStack3,
@@ -25,8 +25,6 @@ import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-s
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const labelClass = "block font-label uppercase text-secondary";
@@ -97,14 +95,14 @@ export async function LibraryWatchHistoryScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library/watches" className={navLinkClass}>
+        <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
           {c.back}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
           description={c.loadUnavailableDescription}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -123,7 +121,7 @@ export async function LibraryWatchHistoryScreen({
   const filtered = result.source !== "all" || Boolean(result.productId) || result.days !== 30;
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library/watches" className={navLinkClass}>
+      <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
         {c.back}
       </Link>
       <h1 className="min-w-0 break-words font-display">{c.title}</h1>
@@ -161,13 +159,13 @@ export async function LibraryWatchHistoryScreen({
         <Button type="submit" variant="secondary" size="touch">
           {c.filter}
         </Button>
-        <Link href="/workspace/library/watches/history" className={navLinkClass}>
+        <Link href="/workspace/library/watches/history" className={linkAccentSmRounded}>
           {c.clear}
         </Link>
       </form>
       <a
         href={`/api/library/watches/history/export?${suffix(result.page)}`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {c.export}
       </a>
@@ -177,7 +175,7 @@ export async function LibraryWatchHistoryScreen({
           description={c.emptyHint}
           action={
             filtered ? (
-              <Link href="/workspace/library/watches/history" className={navLinkClass}>
+              <Link href="/workspace/library/watches/history" className={linkAccentSmRounded}>
                 {c.clear}
               </Link>
             ) : undefined
@@ -221,7 +219,7 @@ export async function LibraryWatchHistoryScreen({
                       {change.currentAvailable && (
                         <Link
                           href={`/workspace/library/${encodeURIComponent(change.productId)}/versions`}
-                          className={navLinkClass}
+                          className={linkAccentSmRounded}
                         >
                           {c.manage}
                         </Link>
@@ -237,7 +235,7 @@ export async function LibraryWatchHistoryScreen({
       {result.totalPages > 1 && (
         <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {c.previous}
             </Link>
           ) : null}
@@ -245,7 +243,7 @@ export async function LibraryWatchHistoryScreen({
             {c.page} {result.page} {c.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSmRounded}>
               {c.next}
             </Link>
           ) : null}

@@ -8,9 +8,7 @@ import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export function OwnDiscussionDetail({
   initial,
   locale,
@@ -29,7 +27,7 @@ export function OwnDiscussionDetail({
         <p role="status" className="text-sm text-success">
           {copy.removed}
         </p>
-        <Link href="/workspace/discussions" className={linkClass}>
+        <Link href="/workspace/discussions" className={linkAccentSm}>
           {copy.back}
         </Link>
       </div>
@@ -66,7 +64,7 @@ export function OwnDiscussionDetail({
         <Link
           prefetch={false}
           href={`/articles/${encodeURIComponent(comment.slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
-          className={linkClass}
+          className={linkAccentSm}
         >
           {copy.discussion}
         </Link>

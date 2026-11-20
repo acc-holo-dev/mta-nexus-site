@@ -15,9 +15,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { StorageCleanupControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 export async function staffStorageObjectMetadata(): Promise<Metadata> {
   return {
     title: `${storageMaintenanceCopy(await getRequestLocale()).detail} | MTA NEXUS`,
@@ -64,14 +62,14 @@ export async function StaffStorageObjectScreen({ params }: { params: Promise<{ i
   if (!item) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/storage" className={linkClass}>
+        <Link href="/admin/storage" className={linkAccentSm}>
           {copy.inventory}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -85,7 +83,7 @@ export async function StaffStorageObjectScreen({ params }: { params: Promise<{ i
       (!item.leaseExpiresAt || item.leaseExpiresAt.getTime() <= Date.now()));
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/storage" className={linkClass}>
+      <Link href="/admin/storage" className={linkAccentSm}>
         {copy.inventory}
       </Link>
       <h1>{copy.detail}</h1>

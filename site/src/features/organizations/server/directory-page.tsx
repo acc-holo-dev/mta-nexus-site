@@ -7,7 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -15,8 +15,6 @@ import { parseOrganizationPage } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
@@ -92,7 +90,7 @@ export default async function OrganizationsPage({
           title={copy.unavailable}
           description={copy.unavailableHint}
           action={
-            <Link href={href(filters.page)} className={navLinkClass}>
+            <Link href={href(filters.page)} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -112,7 +110,7 @@ export default async function OrganizationsPage({
                   </p>
                   <p className="line-clamp-3 text-sm text-secondary">{item.description}</p>
                   <Link
-                    className={navLinkClass}
+                    className={linkAccentSm}
                     href={`/workspace/organizations/${encodeURIComponent(item.id)}`}
                   >
                     {copy.open}
@@ -126,11 +124,11 @@ export default async function OrganizationsPage({
               description={filters.query ? copy.emptyFilteredHint : copy.emptyHint}
               action={
                 filters.query ? (
-                  <Link href="/workspace/organizations" className={navLinkClass}>
+                  <Link href="/workspace/organizations" className={linkAccentSm}>
                     {copy.clearSearch}
                   </Link>
                 ) : (
-                  <Link href="/workspace/organizations/new" className={navLinkClass}>
+                  <Link href="/workspace/organizations/new" className={linkAccentSm}>
                     {copy.create}
                   </Link>
                 )
@@ -139,7 +137,7 @@ export default async function OrganizationsPage({
           )}
           <nav className="flex justify-between text-sm" aria-label={copy.title}>
             {result.page > 1 ? (
-              <Link className={navLinkClass} href={href(result.page - 1)}>
+              <Link className={linkAccentSm} href={href(result.page - 1)}>
                 {copy.previous}
               </Link>
             ) : (
@@ -149,7 +147,7 @@ export default async function OrganizationsPage({
               {copy.page} {result.page}
             </span>
             {result.hasMore && (
-              <Link className={navLinkClass} href={href(result.page + 1)}>
+              <Link className={linkAccentSm} href={href(result.page + 1)}>
                 {copy.next}
               </Link>
             )}

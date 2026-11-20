@@ -14,9 +14,7 @@ import { LicenseControlPanel } from "../components/license-control-panel";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseDetailView } from "./license-detail-view";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function licenseDetailPageMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseControlCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -60,14 +58,14 @@ export async function LicenseDetailPageScreen({ licenseId }: { licenseId: string
   } catch {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/licenses" className={navLinkClass}>
+        <Link href="/workspace/licenses" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -78,7 +76,7 @@ export async function LicenseDetailPageScreen({ licenseId }: { licenseId: string
   if (!license) notFound();
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/licenses" className={navLinkClass}>
+      <Link href="/workspace/licenses" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <LicenseDetailView license={license} locale={locale} />
@@ -101,7 +99,7 @@ export async function LicenseDetailPageScreen({ licenseId }: { licenseId: string
       />
       <Link
         href={`/workspace/licenses/${encodeURIComponent(licenseId)}/history`}
-        className={navLinkClass}
+        className={linkAccentSmRounded}
       >
         {copy.fullHistory}
       </Link>

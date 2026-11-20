@@ -10,16 +10,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { storageMaintenanceService } from "../../../lib/services/moderation/storage-maintenance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { StorageDiscoveryControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { storageQuery } from "../storage-maintenance-query";
-
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function staffStorageMetadata(): Promise<Metadata> {
   return {
@@ -86,14 +83,14 @@ export async function StaffStorageScreen({
   if (!result) {
     return (
       <div className={pageShellMax5xl}>
-        <Link href="/admin" className={linkClass}>
+        <Link href="/admin" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -103,7 +100,7 @@ export async function StaffStorageScreen({
   }
   return (
     <div className={pageShellMax5xl}>
-      <Link href="/admin" className={linkClass}>
+      <Link href="/admin" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>
@@ -119,7 +116,7 @@ export async function StaffStorageScreen({
             key={view}
             href={`?view=${view}`}
             aria-current={query.view === view ? "page" : undefined}
-            className={linkClass}
+            className={linkAccentSm}
           >
             {label}
           </Link>
@@ -129,7 +126,10 @@ export async function StaffStorageScreen({
         <ul className="space-y-3">
           {result.items.map((item) => (
             <li key={item.id} className={panelMinSpace2P4}>
-              <Link href={`/admin/storage/objects/${item.id}`} className={`break-all ${linkClass}`}>
+              <Link
+                href={`/admin/storage/objects/${item.id}`}
+                className={`break-all ${linkAccentSm}`}
+              >
                 {item.storageKey}
               </Link>
               <p>
@@ -149,7 +149,7 @@ export async function StaffStorageScreen({
           icon={<Package className="h-6 w-6" aria-hidden="true" />}
           action={
             filtersActive ? (
-              <Link href="/admin/storage" className={linkClass}>
+              <Link href="/admin/storage" className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : undefined
@@ -159,7 +159,7 @@ export async function StaffStorageScreen({
       {result.totalPages > 1 && (
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.inventory}>
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={linkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -167,7 +167,7 @@ export async function StaffStorageScreen({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={linkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

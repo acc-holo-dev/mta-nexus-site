@@ -19,8 +19,7 @@ import { organizationTeamCopy, organizationTeamError } from "../organization-tea
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../team";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export async function generateMetadata() {
   return {
     title: organizationTeamCopy(await getRequestLocale()).title,
@@ -78,7 +77,7 @@ export default async function TeamPage({
   if (result && !parsed.success) error = copy.unavailable;
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={navLinkClass}>
+      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.workspace}
       </Link>
       <header className="space-y-2">
@@ -137,7 +136,7 @@ export default async function TeamPage({
               <Button type="submit" className="min-h-11 font-semibold">
                 {team.filter}
               </Button>
-              <Link href={organizationTeamHref(id, { query: "" })} className={navLinkClass}>
+              <Link href={organizationTeamHref(id, { query: "" })} className={linkAccentSm}>
                 {copy.reset}
               </Link>
             </form>
@@ -156,7 +155,7 @@ export default async function TeamPage({
           title={error}
           description={copy.unavailableHint}
           action={
-            <a href={organizationTeamHref(id, filters ?? { query: "" })} className={navLinkClass}>
+            <a href={organizationTeamHref(id, filters ?? { query: "" })} className={linkAccentSm}>
               {team.reload}
             </a>
           }

@@ -29,9 +29,7 @@ import {
 import { panelHeroBetween } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm } from "../../shell/link-shell";
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
 export async function generateMetadata({
@@ -102,7 +100,7 @@ export default async function OrganizationProfilePage({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={profileHref} className={actionLinkClass}>
+            <Link href={profileHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -182,10 +180,10 @@ export default async function OrganizationProfilePage({
               targetName={organization.name}
               initial={followInitial}
             />
-            <Link href={`${profileHref}/activity`} className={actionLinkClass}>
+            <Link href={`${profileHref}/activity`} className={linkAccentSm}>
               {publicationCopy(locale).activity}
             </Link>
-            <Link href={`${profileHref}/trust`} className={actionLinkClass}>
+            <Link href={`${profileHref}/trust`} className={linkAccentSm}>
               {contextTrustCopy(locale).title}
             </Link>
             {websiteUrl && (
@@ -213,7 +211,7 @@ export default async function OrganizationProfilePage({
           title={copy.emptyPortfolio}
           description={copy.emptyPortfolioHint}
           action={
-            <Link href="/market?maxPrice=0" className={actionLinkClass}>
+            <Link href="/market?maxPrice=0" className={linkAccentSm}>
               {dictionary.home.browseResources}
             </Link>
           }

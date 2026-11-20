@@ -10,15 +10,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceDeliveriesService } from "../../../lib/services/commerce/resource-deliveries-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import { deliverySearchParams, publisherDeliveriesQuery } from "../resource-deliveries-query";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function publisherDeliveriesMetadata(): Promise<Metadata> {
   return {
@@ -78,7 +75,7 @@ export async function PublisherDeliveriesScreen({
           action={
             <Link
               href={`/workspace/resources/${encodeURIComponent(id)}/deliveries`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.publisherTitle}
             </Link>
@@ -94,14 +91,14 @@ export async function PublisherDeliveriesScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -114,7 +111,7 @@ export async function PublisherDeliveriesScreen({
   const filtered = query.days !== "all";
   return (
     <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.publisherTitle}</h1>
@@ -195,7 +192,7 @@ export async function PublisherDeliveriesScreen({
             filtered && result.counts.all > 0 ? (
               <Link
                 href={`?${new URLSearchParams({ days: "all", page: "1" })}`}
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.clearFilters}
               </Link>
@@ -206,7 +203,7 @@ export async function PublisherDeliveriesScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -214,7 +211,7 @@ export async function PublisherDeliveriesScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}

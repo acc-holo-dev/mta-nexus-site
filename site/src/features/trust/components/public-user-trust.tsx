@@ -7,8 +7,7 @@ import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; locale: Locale }) {
   const copy = trustCopy(locale),
     profile = `/users/${encodeURIComponent(data.user.username)}`;
@@ -21,11 +20,11 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
     });
   return (
     <div className={pageShellClass}>
-      <Link href={profile} className={actionLinkClass}>
+      <Link href={profile} className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className={panelClipSpace3P6}>
-        <Link href={`${profile}/trust/history`} className={actionLinkClass}>
+        <Link href={`${profile}/trust/history`} className={linkAccentSm}>
           {approvalCopy(locale).title}
         </Link>
         <div className="flex min-w-0 items-center gap-3 overflow-x-clip">
@@ -108,7 +107,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         ) : (
           <>
             <p className="font-numeric text-2xl font-bold text-primary">{data.publications}</p>
-            <Link href={`${profile}/activity`} className={actionLinkClass}>
+            <Link href={`${profile}/activity`} className={linkAccentSm}>
               {copy.activity}
             </Link>
           </>
@@ -118,7 +117,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       <section className={panelClipSpace3P5}>
         <h2 className="font-heading text-primary">{copy.limits}</h2>
         <p className="text-sm text-secondary">{copy.limitsDescription}</p>
-        <Link href="/workspace/verification" className={actionLinkClass}>
+        <Link href="/workspace/verification" className={linkAccentSm}>
           {copy.settings}
         </Link>
       </section>

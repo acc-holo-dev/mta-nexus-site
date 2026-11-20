@@ -15,9 +15,7 @@ import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { orderTermsPageQuery } from "../order-terms-query";
 
-const linkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function purchaseTermsMetadata(): Promise<Metadata> {
   return {
     title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -83,7 +81,7 @@ export async function PurchaseTermsScreen({
             title={c.invalid}
             description={c.invalidHint}
             action={
-              <Link href="/workspace/purchases" className={linkClass}>
+              <Link href="/workspace/purchases" className={linkAccentSmRounded}>
                 {c.back}
               </Link>
             }
@@ -92,14 +90,17 @@ export async function PurchaseTermsScreen({
       );
     return (
       <section className={pageShellClass}>
-        <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
+        <Link
+          href={`/workspace/purchases/${encodeURIComponent(id)}`}
+          className={linkAccentSmRounded}
+        >
           {c.back}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
-            <Link href={returnHref} className={linkClass}>
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

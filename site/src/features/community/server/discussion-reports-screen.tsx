@@ -31,9 +31,6 @@ import { discussionReportsCopy } from "../discussion-reports-copy";
 import { moderatedDiscussionHref } from "../moderated-discussion-contract";
 import { platformFieldClass } from "../user-platform-client";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; retryHref: string }) {
   const copy = discussionReportsCopy(locale),
     dictionary = getDictionary(locale);
@@ -44,7 +41,7 @@ function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; ret
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSm}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -103,7 +100,7 @@ export async function DiscussionReportsScreen({
           title={general.denied}
           description={general.deniedHint}
           action={
-            <Link href="/admin" className={navLinkClass}>
+            <Link href="/admin" className={linkAccentSm}>
               {dictionary.admin.title}
             </Link>
           }
@@ -142,7 +139,7 @@ export async function DiscussionReportsScreen({
           title={failure || copy.unavailable}
           description={copy.loadUnavailableHint}
           action={
-            <a href={path} className={navLinkClass}>
+            <a href={path} className={linkAccentSm}>
               {general.reload}
             </a>
           }
@@ -220,7 +217,7 @@ export async function DiscussionReportsScreen({
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             emptyFiltered ? (
-              <Link href={discussionReportsHref(id, commentId)} className={navLinkClass}>
+              <Link href={discussionReportsHref(id, commentId)} className={linkAccentSm}>
                 {copy.clear}
               </Link>
             ) : undefined

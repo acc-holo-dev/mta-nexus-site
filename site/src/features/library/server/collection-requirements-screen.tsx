@@ -18,9 +18,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccent } from "../../shell/link-shell";
 export async function collectionRequirementsMetadata(): Promise<Metadata> {
   return {
     title: `${collectionRequirementsCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -88,7 +86,7 @@ export async function CollectionRequirementsScreen({
       <div className={pageShellClass}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-          className={navLinkClass}
+          className={linkAccent}
         >
           {c.back}
         </Link>
@@ -97,7 +95,7 @@ export async function CollectionRequirementsScreen({
           title={c.loadUnavailable}
           description={c.loadUnavailableDescription}
           action={
-            <Link href={`${requirementsBase}${retrySuffix}`} className={navLinkClass}>
+            <Link href={`${requirementsBase}${retrySuffix}`} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -111,7 +109,7 @@ export async function CollectionRequirementsScreen({
     <div className={pageShellClass}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {c.back}
       </Link>

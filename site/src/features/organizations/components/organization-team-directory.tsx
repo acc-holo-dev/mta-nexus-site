@@ -25,8 +25,7 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { linkAccentSm } from "../../shell/link-shell";
 export function OrganizationTeamDirectory({
   initial,
   filters,
@@ -135,7 +134,7 @@ export function OrganizationTeamDirectory({
           <p className="text-xs text-muted">{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}
-            className={`${navLinkClass} break-words`}
+            className={`${linkAccentSm} break-words`}
           >
             {data.owner.displayName} (@{data.owner.username})
           </Link>
@@ -147,7 +146,7 @@ export function OrganizationTeamDirectory({
       {canManageOrganization(data.role) ? (
         <Link
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
-          className={navLinkClass}
+          className={linkAccentSm}
         >
           {copy.management}
         </Link>
@@ -265,7 +264,7 @@ export function OrganizationTeamDirectory({
               {data.role === "owner" && ["admin", "developer", "member"].includes(member.role) && (
                 <Link
                   href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}?${new URLSearchParams({ q: member.username })}`}
-                  className={`${navLinkClass} text-xs`}
+                  className={`${linkAccentSm} text-xs`}
                 >
                   {copy.transfer}
                 </Link>
@@ -280,7 +279,7 @@ export function OrganizationTeamDirectory({
           action={
             <Link
               href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.reset}
             </Link>
@@ -292,7 +291,7 @@ export function OrganizationTeamDirectory({
           title={error || copy.uncertain}
           description={copy.uncertainHint}
           action={
-            <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
+            <a href={organizationTeamHref(data.organization.id, filters)} className={linkAccentSm}>
               {copy.uncertain}
             </a>
           }
@@ -304,14 +303,14 @@ export function OrganizationTeamDirectory({
         </p>
       )}
       <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-        <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
+        <a href={organizationTeamHref(data.organization.id, filters)} className={linkAccentSm}>
           {copy.latest}
         </a>
         {data.nextCursor && (
           <Link
             prefetch={false}
             href={organizationTeamHref(data.organization.id, filters, data.nextCursor)}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {copy.older}
           </Link>

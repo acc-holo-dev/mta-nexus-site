@@ -11,15 +11,13 @@ import { parseHistoryPage } from "../../commerce/commerce-history-format";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white";
 
@@ -62,14 +60,14 @@ export async function LibraryUpdatesScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <Link href="/workspace/library" className={navLinkClass}>
+        <Link href="/workspace/library" className={linkAccentSm}>
           {copy.library}
         </Link>
         <ErrorState
           title={copy.updatesLoadUnavailable}
           description={copy.updatesLoadUnavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -79,7 +77,7 @@ export async function LibraryUpdatesScreen({
   }
   return (
     <div className={pageShellClass}>
-      <Link href="/workspace/library" className={navLinkClass}>
+      <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.updates}</h1>
@@ -162,7 +160,7 @@ export async function LibraryUpdatesScreen({
                   {item.slug && item.state !== "unavailable" ? (
                     <Link
                       href={`/market/${encodeURIComponent(item.slug)}`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {copy.open}
                     </Link>
@@ -175,14 +173,14 @@ export async function LibraryUpdatesScreen({
                           to: item.latestBuildId,
                         },
                       )}`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {copy.compare}
                     </Link>
                   ) : null}
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className={navLinkClass}
+                    className={linkAccentSm}
                   >
                     {copy.manage}
                   </Link>
@@ -197,7 +195,7 @@ export async function LibraryUpdatesScreen({
           description={result.counts.all === 0 ? copy.emptyInventoryHint : copy.emptyFilteredHint}
           action={
             filter !== "all" && result.counts.all > 0 ? (
-              <Link href={href(1, "all")} className={navLinkClass}>
+              <Link href={href(1, "all")} className={linkAccentSm}>
                 {copy.all}
               </Link>
             ) : undefined
@@ -207,7 +205,7 @@ export async function LibraryUpdatesScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className={navLinkClass}>
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}
             </Link>
           ) : null}
@@ -215,7 +213,7 @@ export async function LibraryUpdatesScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className={navLinkClass}>
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
               {copy.next}
             </Link>
           ) : null}
