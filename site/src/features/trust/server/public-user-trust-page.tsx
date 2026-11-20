@@ -7,7 +7,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicUserTrustService } from "../../../lib/services/trust/public-user-trust-service";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelClipSpace3P6 } from "../../shell/panel-shell";
 import { typeXlBoldPrimary } from "../../shell/type-shell";
 import { PublicUserTrustPanel } from "../public-user-trust";
@@ -41,7 +41,7 @@ export async function TrustPage({ params }: { params: Promise<{ username: string
     href = `/users/${encodeURIComponent(username)}/trust`;
   if (!data)
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xlTight}>
         <header className={panelClipSpace3P6}>
           <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         </header>

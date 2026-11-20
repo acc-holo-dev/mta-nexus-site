@@ -15,7 +15,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { pageShellMax5xl, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -27,6 +27,7 @@ import {
   typeMinBreakDisplay,
   typeMinFlex1,
   typeMinFlex1Space15SmSecondary,
+  typeMinSpace2Clip,
   typeSmMuted,
 } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
@@ -95,7 +96,7 @@ export async function CollectionHistoryPage({
       });
     if (!result) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
@@ -116,7 +117,7 @@ export async function CollectionHistoryPage({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
           <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
             {libraryMembershipHistoryCopy(typedLocale).history}
@@ -295,7 +296,7 @@ export async function CollectionHistoryPage({
                   </>
                 )}
                 {item.resources.length > 0 && (
-                  <ul className="min-w-0 space-y-2 overflow-x-clip">
+                  <ul className={typeMinSpace2Clip}>
                     {item.resources.map((resource) => (
                       <li key={resource.productId} className="space-y-1 border-t border-base pt-2">
                         <p className="break-words">
@@ -349,7 +350,7 @@ export async function CollectionHistoryPage({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={h.loadUnavailableDescription}

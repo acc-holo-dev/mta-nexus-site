@@ -10,7 +10,7 @@ import { serverWorkspaceHistoryService } from "../../../lib/services/servers/ser
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinHAccent } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -102,7 +102,7 @@ async function ServerWorkspaceHistoryScreen({
   const exportPath = `/api/workspace/servers/${encodeURIComponent(id)}/activity/export${exportParams.size ? `?${exportParams}` : ""}`;
   const filtered = query.period !== "all" || query.action !== "all";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <header className="space-y-2">
         <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
           {history.back}

@@ -16,7 +16,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -83,7 +83,7 @@ export async function CollectionInventoryPage({
     });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{v.title}</h1>
           <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
@@ -105,7 +105,7 @@ export async function CollectionInventoryPage({
     }
     const suffix = (page: number) => libraryCollectionInventorySuffix({ ...query, page });
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexWrapGap4}>
           <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
@@ -409,7 +409,7 @@ export async function CollectionInventoryPage({
     if (error.statusCode === 404) notFound();
     const title = libraryCollectionError(locale, error.code);
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={title}
           description={

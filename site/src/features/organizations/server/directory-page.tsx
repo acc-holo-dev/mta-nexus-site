@@ -8,14 +8,16 @@ import { organizationWorkspaceService } from "../../../lib/services/organization
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakHeadingPrimary,
   typeDisplayPrimary,
   typeFlexWrapEndGap3,
   typeFlexWrapStartBetweenGap4,
   typeGrid2Gap4,
+  typeMinFlex1Space1SmSecondary,
   typeMt2SmMuted,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -63,7 +65,7 @@ export async function OrganizationsPage({
     return `/workspace/organizations${params.size ? `?${params}` : ""}`;
   };
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header className={typeFlexWrapStartBetweenGap4}>
         <div>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
@@ -78,7 +80,7 @@ export async function OrganizationsPage({
       </header>
       <search aria-label={copy.search}>
         <form action="/workspace/organizations" className={typeFlexWrapEndGap3}>
-          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinFlex1Space1SmSecondary}>
             <span>{copy.search}</span>
             <input
               className={`${platformFieldClass} min-h-11`}
@@ -109,7 +111,7 @@ export async function OrganizationsPage({
             <div className={typeGrid2Gap4}>
               {result.items.map((item) => (
                 <article className={panelSpace3P5} key={item.id}>
-                  <h2 className="break-words font-heading text-primary">{item.name}</h2>
+                  <h2 className={typeBreakHeadingPrimary}>{item.name}</h2>
                   <p className={typeXsMuted}>
                     @{item.slug} ·{" "}
                     {item.role in copy

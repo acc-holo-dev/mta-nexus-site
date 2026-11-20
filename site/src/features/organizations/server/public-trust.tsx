@@ -1,4 +1,4 @@
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import {
   type ContextTrustPageProps,
   contextTrustMetadata,
@@ -9,7 +9,7 @@ export const organizationTrustMetadata = (props: ContextTrustPageProps) =>
   contextTrustMetadata("organization", props);
 export function OrganizationTrustPage(props: ContextTrustPageProps) {
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <PublicContextTrustPage {...props} kind="organization" />
     </div>
   );

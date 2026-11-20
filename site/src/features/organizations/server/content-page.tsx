@@ -14,10 +14,11 @@ import {
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakHeadingPrimary,
   typeDisplayPrimary,
   typeFlexWrapBetweenGap2,
   typeFlexWrapStartBetweenGap4,
@@ -73,7 +74,7 @@ export async function OrganizationPublications({
       return null;
     });
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {team.back}
       </Link>
@@ -119,7 +120,7 @@ export async function OrganizationPublications({
               {result.items.map((item) => (
                 <article key={item.id} className={panelSpace3P4}>
                   <div className={typeFlexWrapBetweenGap2}>
-                    <h2 className="break-words font-heading text-primary">
+                    <h2 className={typeBreakHeadingPrimary}>
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}
                         className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

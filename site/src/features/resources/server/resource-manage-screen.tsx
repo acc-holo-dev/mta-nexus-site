@@ -10,7 +10,7 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { resourcePublicationReadinessService } from "../../../lib/services/resources/resource-publication-readiness-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xlLoose } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
@@ -77,7 +77,7 @@ export async function ResourceManageScreen({
   ]).catch(() => null);
   if (!loaded) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xlLoose}>
         <Link href="/workspace/resources" className={linkAccentSm}>
           {copy.back}
         </Link>
@@ -97,7 +97,7 @@ export async function ResourceManageScreen({
   const commerceCopy = getResourceCommerceCopy(locale);
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlLoose}>
       <Link href="/workspace/resources" className={linkAccentSm}>
         {copy.back}
       </Link>

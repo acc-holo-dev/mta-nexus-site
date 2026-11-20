@@ -8,7 +8,7 @@ import { organizationTeamService } from "../../../lib/services/organizations/org
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -83,7 +83,7 @@ export async function TeamPage({
   const parsed = organizationTeamPageSchema.safeParse(result);
   if (result && !parsed.success) error = copy.unavailable;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.workspace}
       </Link>

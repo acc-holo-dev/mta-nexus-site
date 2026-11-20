@@ -8,8 +8,6 @@ import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
-const filterNavLinkClass = linkFocusRing;
-
 const controlClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
@@ -129,7 +127,7 @@ export function ResourcePublisherFilters({
               key={status}
               href={resourcePublisherUrl({ ...query, status, page: 1 })}
               aria-current={query.status === status ? "page" : undefined}
-              className={`rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white ${filterNavLinkClass}`}
+              className={`rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white ${linkFocusRing}`}
             >
               {status === "all" ? copy.all : labels.statusLabels[status]} ·{" "}
               {status === "all"

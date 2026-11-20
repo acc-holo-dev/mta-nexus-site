@@ -18,7 +18,7 @@ import {
 } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -91,7 +91,7 @@ export async function LibraryWatchesScreen({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={copy.invalid}
           description={copy.invalidDescription}
@@ -109,7 +109,7 @@ export async function LibraryWatchesScreen({
     .catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}
         </Link>
@@ -129,7 +129,7 @@ export async function LibraryWatchesScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.library}
       </Link>

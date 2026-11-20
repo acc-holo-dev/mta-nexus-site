@@ -10,7 +10,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
-import { typeItemsStretchPy4, typeSmMuted } from "../../shell/type-shell";
+import { typeItemsStretchPy4, typeMaxSmXsSuccess, typeSmMuted } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { FollowTargetType } from "../follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../follow-workspace-copy";
@@ -294,7 +294,7 @@ function FollowControl({
         />
       ) : null}
       {message && state !== "error" ? (
-        <p role="status" className="max-w-sm text-xs text-success">
+        <p role="status" className={typeMaxSmXsSuccess}>
           {message}
         </p>
       ) : null}

@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import packageMetadata from "../../../../../package.json";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { pageShellMax5xlLoose as pageShellClass } from "../page-shell";
+import { pageShellMax5xlLoose } from "../page-shell";
 import { panelClipSpace2P5 } from "../panel-shell";
 import { typeIconAccent } from "../type-shell";
 
@@ -44,7 +44,7 @@ export async function DevelopmentStatusScreen() {
   const emailStatus = config.EMAIL_PROVIDER === "disabled" ? copy.disabled : copy.configured;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlLoose}>
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="flex items-center gap-2.5 font-display text-primary">

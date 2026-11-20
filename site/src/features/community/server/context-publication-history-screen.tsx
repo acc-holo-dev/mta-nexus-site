@@ -17,7 +17,7 @@ import {
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -104,7 +104,7 @@ export async function ContextPublicationHistoryScreen({
   const base = `/workspace/${kind}/${encodeURIComponent(id)}/content`;
   const emptyDescription = copy.historyEmptyHint;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={base} className={linkAccentSmRounded}>
         {workspaceTitle}
       </Link>

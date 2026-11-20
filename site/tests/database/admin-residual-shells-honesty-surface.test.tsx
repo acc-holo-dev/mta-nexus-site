@@ -66,7 +66,7 @@ it("locks admin license detail honesty chrome with ErrorState recovery", () => {
   expectClippedLoadingSource(source);
   expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).toContain("loadUnavailable");
-  expect(source).toContain("pageShellClass");
+  expect(source).toMatch(/pageShell[A-Za-z]\w*/);
   expect(source).not.toContain('role="alert"');
 });
 

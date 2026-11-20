@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LicenseControlPanel } from "../components/license-control-panel";
 import { getLicenseControlCopy } from "../license-control-i18n";
@@ -56,7 +56,7 @@ async function LicenseDetailPageScreen({ licenseId }: { licenseId: string }) {
     }
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/licenses" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
@@ -74,7 +74,7 @@ async function LicenseDetailPageScreen({ licenseId }: { licenseId: string }) {
   }
   if (!license) notFound();
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href="/workspace/licenses" className={linkAccentSmRounded}>
         {copy.back}
       </Link>

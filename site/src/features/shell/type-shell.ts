@@ -188,3 +188,20 @@ export const typeXsSecondaryAnywhere = "text-xs text-secondary [overflow-wrap:an
 export const typeH35W35Shrink = "h-3.5 w-3.5 shrink-0";
 export const typeFlexMinH11CenterGap3SmPrimary =
   "flex min-h-11 items-center gap-3 text-sm text-primary";
+
+export const typeGridGap1Sm = "grid gap-1 text-sm";
+export const typeBreakHeadingPrimary = "break-words font-heading text-primary";
+export const typeBorderTSecondary = "border-t border-base text-secondary";
+export const typeBreakLgSemiboldPrimary = "break-words text-lg font-semibold text-primary";
+export const typeMinFlex1Space1SmSecondary = "min-w-0 flex-1 space-y-1 text-sm text-secondary";
+export const typeMaxSmXsSuccess = "max-w-sm text-xs text-success";
+export const typeFlexMinWrapStartBetweenGap3 =
+  "flex min-w-0 flex-wrap items-start justify-between gap-3";
+export const typeSpace2BorderBPb5 = "space-y-2 border-b border-base pb-5";
+export const typeFlexCursorBetweenGap4Py3 =
+  "flex cursor-pointer items-center justify-between gap-4 py-3";
+export const typeMt05BlockXsMuted = "mt-0.5 block text-xs text-muted";
+export const typeBreakXsPrimary = "break-words text-xs text-primary";
+export const typeMinSpace2Clip = "min-w-0 space-y-2 overflow-x-clip";
+export const typeGridMinCols1Gap6Clip =
+  "grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4";

@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4, typeMl3SurfaceP2 } from "../../shell/type-shell";
@@ -71,7 +71,7 @@ export async function SubscriptionHistoryScreen({
     const href = (page: number) =>
       `/workspace/subscriptions/history?${new URLSearchParams({ page: String(page), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link
           href={subscriptionAccountHref(query.organizationId)}
           className={subscriptionNavLinkClass}
@@ -148,7 +148,7 @@ export async function SubscriptionHistoryScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
@@ -161,7 +161,7 @@ export async function SubscriptionHistoryScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href={subscriptionAccountHref(undefined)} className={subscriptionNavLinkClass}>
           {c.title}
         </Link>

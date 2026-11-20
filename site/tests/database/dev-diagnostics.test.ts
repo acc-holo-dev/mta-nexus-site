@@ -33,7 +33,7 @@ describe("development diagnostics", () => {
     expect(page).toContain('id="dev-app-url-heading"');
     expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(page).toContain("pageShellClass");
+    expect(page).toMatch(/pageShell[A-Za-z]\w*/);
     expect(page).not.toContain('role="alert"');
   });
 

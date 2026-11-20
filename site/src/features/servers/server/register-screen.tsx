@@ -6,7 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax2xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax2xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getManagedServerCopy } from "../managed-server-view";
 import { RegisterServerForm } from "../registration";
@@ -37,7 +37,7 @@ export async function RegisterServerScreen() {
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/servers/new" />;
   const copy = getManagedServerCopy(locale);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax2xl}>
       <Link href="/workspace/servers" className={linkAccentSm}>
         ← {copy.title}
       </Link>

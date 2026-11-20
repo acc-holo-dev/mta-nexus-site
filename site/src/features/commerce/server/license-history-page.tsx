@@ -11,7 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4TextSm } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -44,7 +44,7 @@ function LicenseHistoryLoadError({
   const copy = getLicenseControlCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={backHref} className={linkAccentSmRounded}>
         {backLabel}
       </Link>
@@ -125,7 +125,7 @@ export async function LicenseHistoryPage({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={`${base}/${encodeURIComponent(licenseId)}`} className={linkAccentSmRounded}>
         {copy.manage}
       </Link>

@@ -4,7 +4,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import {
@@ -68,7 +68,7 @@ export async function VerificationWorkspacePage({
       .catch(() => null),
   ]);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className={typeMt2SmMuted}>{copy.description}</p>

@@ -11,7 +11,7 @@ import { resourceDeliveriesService } from "../../../lib/services/commerce/resour
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -20,6 +20,7 @@ import {
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapEndGap3,
+  typeGridGap1Sm,
   typeSmSecondary,
   typeWFullLeftSm,
   typeXsMuted,
@@ -78,7 +79,7 @@ export async function PublisherDeliveriesScreen({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={copy.invalid}
           description={copy.invalidHint}
@@ -100,7 +101,7 @@ export async function PublisherDeliveriesScreen({
   });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
@@ -120,7 +121,7 @@ export async function PublisherDeliveriesScreen({
     `?${new URLSearchParams({ days: query.days, page: String(page) })}`;
   const filtered = query.days !== "all";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>
@@ -130,7 +131,7 @@ export async function PublisherDeliveriesScreen({
         {copy.publisherNote}
       </p>
       <form method="get" className={typeFlexWrapEndGap3}>
-        <label className="grid gap-1 text-sm">
+        <label className={typeGridGap1Sm}>
           {copy.days}
           <select name="days" defaultValue={query.days} className={fieldClass}>
             {["all", "7", "30", "90", "365"].map((days) => (

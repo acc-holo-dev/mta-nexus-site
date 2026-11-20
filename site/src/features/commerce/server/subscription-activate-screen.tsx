@@ -17,8 +17,6 @@ import { SubscriptionControls } from "../subscription-controls";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
 import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
 import { subscriptionActivationQuery, subscriptionPageParams } from "../subscriptions-query";
-
-const pageShellClass = pageShellMax5xl;
 export async function subscriptionActivateMetadata(): Promise<Metadata> {
   return {
     title: `${subscriptionsCopy(await getRequestLocale()).activate} | MTA NEXUS`,
@@ -74,7 +72,7 @@ export async function SubscriptionActivateScreen({
     const href = (page: number) =>
       `/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href="/subscriptions" className={subscriptionNavLinkClass}>
           {c.catalog}
         </Link>
@@ -110,7 +108,7 @@ export async function SubscriptionActivateScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
@@ -123,7 +121,7 @@ export async function SubscriptionActivateScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href="/subscriptions" className={subscriptionNavLinkClass}>
           {c.catalog}
         </Link>

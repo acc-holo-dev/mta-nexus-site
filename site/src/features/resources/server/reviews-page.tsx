@@ -12,7 +12,7 @@ import { resourceReviewService } from "../../../lib/services/resources/resource-
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlCompact } from "../../shell/page-shell";
 import { typeSmSecondary } from "../../shell/type-shell";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { resourceReviewCopy } from "../resource-review-i18n";
@@ -44,7 +44,7 @@ export async function PublicResourceReviewsPage({
     product = await productService.getProductBySlug(target.slug);
   } catch {
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xlCompact}>
         <h1 className="font-display">{copy.title}</h1>
         <ErrorState
           title={copy.pageUnavailable}
@@ -83,7 +83,7 @@ export async function PublicResourceReviewsPage({
 
   if (!result) {
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xlCompact}>
         <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
           {copy.back}
         </Link>
@@ -105,7 +105,7 @@ export async function PublicResourceReviewsPage({
   }
 
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax4xlCompact}>
       <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
         {copy.back}
       </Link>

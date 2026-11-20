@@ -23,7 +23,7 @@ import { ManagedServerCard } from "../../servers/managed-card-server";
 import { getManagedServerCopy } from "../../servers/managed-server-view";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
-import { pageShellStack8 as pageShellClass } from "../page-shell";
+import { pageShellStack8 } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
 import {
   typeDisplayPrimary,
@@ -107,7 +107,7 @@ export async function WorkspaceHubPage() {
       return mtaLiveStatus(observation, false) === "offline" || observation?.players != null;
     });
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellStack8}>
       <header className="flex min-w-0 flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div className="min-w-0">
           <h1 className={typeDisplayPrimary}>{dictionary.workspace.title}</h1>

@@ -8,7 +8,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBorderBPb6 } from "../../shell/surface-shell";
 import { type2xlExtraboldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
@@ -64,7 +64,7 @@ export async function SavedFollowsScreen({
     .catch(() => null);
   if (!initial) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <header className={surfaceBorderBPb6}>
           <h1 id="saved-follows-heading" className={type2xlExtraboldPrimary}>
             {copy.title}
@@ -84,7 +84,7 @@ export async function SavedFollowsScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header className={surfaceBorderBPb6}>
         <h1 id="saved-follows-heading" className={type2xlExtraboldPrimary}>
           {copy.title}

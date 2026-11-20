@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCopyService } from "../../../lib/services/resources/resource-copy-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCopyForm } from "../copy-controls";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
@@ -63,7 +63,7 @@ export async function ResourceCopyCreateScreen({
     const id = resourceCopyId(path.id),
       preview = await resourceCopyService.preview(actor, id);
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xl}>
         <Link className={linkAccentRounded} href={`/workspace/resources/${encodeURIComponent(id)}`}>
           {c.back}
         </Link>
@@ -80,7 +80,7 @@ export async function ResourceCopyCreateScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax4xl}>
           <ErrorState
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}
@@ -93,7 +93,7 @@ export async function ResourceCopyCreateScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xl}>
         <Link
           href={`/workspace/resources/${encodeURIComponent(path.id)}`}
           className={linkAccentRounded}

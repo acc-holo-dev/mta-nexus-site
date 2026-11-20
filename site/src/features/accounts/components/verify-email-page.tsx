@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { linkAccentSmSemibold, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
+import { pageShellMaxLg } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
@@ -85,7 +85,7 @@ export function VerifyEmailPage() {
   }
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMaxLg}>
       <section aria-labelledby="verify-email-heading" className={panelClipSpace5P6Shadow}>
         <div className={typeFlexCenterGap3}>
           <MailCheck className={typeIcon5Accent} aria-hidden="true" />

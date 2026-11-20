@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
@@ -45,7 +45,7 @@ export async function OwnCommentPage({ params }: { params: Promise<{ id: string 
     return null;
   });
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <Link href="/workspace/discussions" className={linkAccentSm}>
         {copy.back}
       </Link>

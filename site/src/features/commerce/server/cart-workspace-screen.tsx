@@ -10,9 +10,9 @@ import { ResourceCartControls } from "../../resources/cart-controls";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeSmSecondary, typeSpace2BorderBPb5 } from "../../shell/type-shell";
 export async function cartWorkspaceMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceCommerceCopy(await getRequestLocale()).cart} | MTA NEXUS`,
@@ -40,8 +40,8 @@ export async function CartWorkspaceScreen() {
   const cart = await commerceService.getResourceCart(actor).catch(() => null);
   if (!cart) {
     return (
-      <div className={pageShellClass}>
-        <header className="space-y-2 border-b border-base pb-5">
+      <div className={pageShellMax4xl}>
+        <header className={typeSpace2BorderBPb5}>
           <h1 className={typeDisplayPrimary}>{copy.cart}</h1>
           <p className={typeSmSecondary}>{copy.subtitle}</p>
         </header>
@@ -58,8 +58,8 @@ export async function CartWorkspaceScreen() {
     );
   }
   return (
-    <div className={pageShellClass}>
-      <header className="space-y-2 border-b border-base pb-5">
+    <div className={pageShellMax4xl}>
+      <header className={typeSpace2BorderBPb5}>
         <h1 className={typeDisplayPrimary}>{copy.cart}</h1>
         <p className={typeSmSecondary}>{copy.subtitle}</p>
       </header>

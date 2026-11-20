@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../lib/services/commerce/order-terms-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
@@ -75,7 +75,7 @@ export async function PurchaseTermsScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={c.invalid}
             description={c.invalidHint}
@@ -88,7 +88,7 @@ export async function PurchaseTermsScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link
           href={`/workspace/purchases/${encodeURIComponent(id)}`}
           className={linkAccentSmRounded}

@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -72,7 +72,7 @@ export async function ResourceCollectionsPage({
     });
     if (!result) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax4xl}>
           <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
@@ -94,7 +94,7 @@ export async function ResourceCollectionsPage({
     }
     const href = `/workspace/library/${encodeURIComponent(id)}/collections`;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <nav className={typeFlexWrapGap4Sm} aria-label={c.library}>
           <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
@@ -222,7 +222,7 @@ export async function ResourceCollectionsPage({
     if (error.statusCode === 404) notFound();
     const title = libraryCollectionError(locale, error.code);
     return (
-      <section className={`${pageShellClass} max-w-xl`}>
+      <section className={`${pageShellMax4xl} max-w-xl`}>
         <ErrorState
           title={title}
           description={

@@ -11,7 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
+import { pageShellMax5xl, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -75,7 +75,7 @@ export async function CollectionReceiptPage({
       });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{r.title}</h1>
           <ErrorState
             title={r.loadUnavailable}
@@ -91,7 +91,7 @@ export async function CollectionReceiptPage({
     }
     const receipt = report.receipt;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexMinWrapGap4}>
           <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
             {c.history}
@@ -236,7 +236,7 @@ export async function CollectionReceiptPage({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={r.loadUnavailableDescription}

@@ -8,12 +8,14 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { securityCenterService } from "../../../lib/services/accounts/security-center-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlRoomy } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakXsPrimary,
   typeFlexCenterGap2,
   typeIcon6Accent,
   typeIconAccent,
+  typeMinSpace2Clip,
   typeMt1XsMuted,
   typeSmSemiboldPrimary,
   typeXsMuted,
@@ -65,7 +67,7 @@ export async function SecurityCenterScreen() {
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xlRoomy}>
       <div className="flex min-w-0 flex-col justify-between gap-4 overflow-x-clip border-b border-base pb-6 sm:flex-row sm:items-start">
         <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2.5 break-words font-display text-primary">
@@ -115,16 +117,14 @@ export async function SecurityCenterScreen() {
           </h2>
         </div>
         <p className={typeXsMuted}>{copy.sessionsDescription}</p>
-        <div className="min-w-0 space-y-2 overflow-x-clip">
+        <div className={typeMinSpace2Clip}>
           {sessions.map((session) => (
             <div
               key={session.id}
               className="flex min-w-0 flex-wrap items-start justify-between gap-3 overflow-x-clip rounded-md border border-base bg-inset px-3 py-3"
             >
               <div className="min-w-0">
-                <p className="break-words text-xs text-primary">
-                  {session.userAgent || copy.deviceUnavailable}
-                </p>
+                <p className={typeBreakXsPrimary}>{session.userAgent || copy.deviceUnavailable}</p>
                 <p className="mt-1 break-words text-xs text-muted">
                   {session.ipAddress || copy.ipUnavailable}
                 </p>

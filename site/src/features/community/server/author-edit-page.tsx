@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xlTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary } from "../../shell/type-shell";
 import { AuthorContentForm } from "../author-content-form";
@@ -48,7 +48,7 @@ export async function EditPublicationPage({ params }: { params: Promise<{ id: st
   });
   const initial = item ? parseEditableContent(JSON.parse(JSON.stringify(item))) : null;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xlTight}>
       <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>

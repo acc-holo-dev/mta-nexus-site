@@ -15,12 +15,13 @@ import {
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
+import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 import { panelFlexWrapEndP4, panelSpace3P5 } from "../../shell/panel-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBorderTSecondary,
   typeFlexWrapGap4,
   typeMinH11Semibold,
   typeSmMuted,
@@ -69,7 +70,7 @@ export async function ServerObservationBrowserPage({
         ? `/servers/${encodeURIComponent(target.slug)}/observations`
         : "/servers";
   const failure = (text: string, href = path) => (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={text}
@@ -183,7 +184,7 @@ function ServerObservationBrowserPanel({
   const flag = (value: boolean | null) =>
     value === null ? stats.unknown : value ? stats.yes : stats.no;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <header className="space-y-3">
         <Link href={base} className={linkAccentSmRounded}>
           {managed ? stats.management : stats.back}
@@ -331,7 +332,7 @@ function ServerObservationBrowserPanel({
             </thead>
             <tbody>
               {report.observations.map((item) => (
-                <tr key={item.id} className="border-t border-base text-secondary">
+                <tr key={item.id} className={typeBorderTSecondary}>
                   <th scope="row" className="whitespace-nowrap p-2 font-normal">
                     <time dateTime={item.observedAt} className="font-mono text-xs">
                       {item.observedAt}

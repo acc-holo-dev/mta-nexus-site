@@ -12,7 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceBuildWorkspaceService } from "../../../lib/services/resources/resource-build-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4 } from "../../shell/surface-shell";
@@ -55,7 +55,7 @@ function ResourceBuildLoadError({
   const copy = getResourceBuildWorkspaceCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax5xl}>
       <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
@@ -126,7 +126,7 @@ export async function ResourceBuildScreen({
   const trustedScan =
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={linkAccent}>
         {staff ? copy.reviewBack : copy.back}
       </Link>

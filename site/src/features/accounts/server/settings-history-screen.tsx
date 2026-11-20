@@ -6,7 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/accounts/profile-change-history-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   privateChangeHistoryCopy,
@@ -56,7 +56,7 @@ export async function SettingsHistoryScreen({
 
   if (!actor) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellClip}>
         <PlatformSignIn locale={locale} returnPath={returnPath} />
       </div>
     );
@@ -74,7 +74,7 @@ export async function SettingsHistoryScreen({
       })
     : null;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <ProfileChangeHistoryView data={data} filters={filters} locale={locale} error={error} />
     </div>
   );

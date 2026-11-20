@@ -5,7 +5,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xlCompact } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary } from "../../shell/type-shell";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -35,7 +35,7 @@ export async function OrganizationCreateScreen() {
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/organizations/new" />;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xlCompact}>
       <Link href="/workspace/organizations" className={linkAccentSm}>
         {copy.back}
       </Link>

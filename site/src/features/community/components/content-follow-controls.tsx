@@ -13,6 +13,7 @@ import { skelH4W4Spin } from "../../shell/skeleton-shell";
 import {
   typeFlexWrapGap2,
   typeItemsStretchPy4,
+  typeMaxSmXsSuccess,
   typeMinH11Xs,
   typeXsMuted,
   typeXsSecondary,
@@ -399,7 +400,7 @@ function ContentFollowControl({
         </div>
       </div>
       {message ? (
-        <p role="status" className="max-w-sm text-xs text-success">
+        <p role="status" className={typeMaxSmXsSuccess}>
           {message}
         </p>
       ) : null}

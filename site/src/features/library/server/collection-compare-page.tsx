@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -93,7 +93,7 @@ export async function CollectionComparePage({
       });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
@@ -113,7 +113,7 @@ export async function CollectionComparePage({
     const writableDestination =
       comparison?.destination.status === "active" && comparison.destination.revision < 2147483647;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
           <Link href={collectionHref(id)} className={linkAccentSmRounded}>
             {c.back}
@@ -355,7 +355,7 @@ export async function CollectionComparePage({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={h.loadUnavailableDescription}

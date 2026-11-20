@@ -13,7 +13,7 @@ import { resourceRequirementsCopy } from "../../resources/resource-requirements-
 import { resourceRequirementsQuery } from "../../resources/resource-requirements-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeItemsStretchPy4 } from "../../shell/type-shell";
@@ -83,7 +83,7 @@ export async function CollectionRequirementsScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
           className={linkAccent}
@@ -106,7 +106,7 @@ export async function CollectionRequirementsScreen({
   const copy = resourceRequirementsCopy(locale);
   const suffix = query.targetMta ? `?${new URLSearchParams({ targetMta: query.targetMta })}` : "";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
         className={linkAccent}

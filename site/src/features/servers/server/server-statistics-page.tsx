@@ -14,7 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
+import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeXlBoldPrimary } from "../../shell/type-shell";
@@ -78,7 +78,7 @@ export async function ServerStatisticsPage({
   const query = parseServerStatisticsQuery(params);
   if (!query)
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax6xl}>
         <ErrorState
           title={copy.invalid}
           description={copy.invalidHint}
@@ -101,7 +101,7 @@ export async function ServerStatisticsPage({
     const code = error instanceof AppError ? error.code : "INTERNAL_ERROR";
     const title = serverStatisticsError(locale, code);
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax6xl}>
         <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         <ErrorState
           title={title}
@@ -125,7 +125,7 @@ export async function ServerStatisticsPage({
   }
   if (!report) notFound();
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <ServerStatisticsPanel
         report={report}
         locale={locale}

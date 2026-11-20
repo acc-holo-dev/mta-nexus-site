@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseControlPanel } from "../license-controls";
@@ -55,7 +55,7 @@ export async function LicenseModerationDetailScreen({
     license = await licenseControlService.moderationDetail(user, id);
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href="/admin/licenses" className={linkAccentSmRounded}>
           {copy.moderation}
         </Link>
@@ -73,7 +73,7 @@ export async function LicenseModerationDetailScreen({
   }
   if (!license) notFound();
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href="/admin/licenses" className={linkAccentSmRounded}>
         {copy.moderation}
       </Link>

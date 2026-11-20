@@ -5,7 +5,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xlTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary } from "../../shell/type-shell";
 import { AuthorContentForm } from "../author-content-form";
@@ -35,7 +35,7 @@ export async function NewPublicationPage() {
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xlTight}>
       <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>

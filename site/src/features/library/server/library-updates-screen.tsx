@@ -12,7 +12,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -68,7 +68,7 @@ export async function LibraryUpdatesScreen({
     `/workspace/library/updates?${new URLSearchParams({ filter: value, page: String(page) })}`;
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/workspace/library" className={linkAccentSm}>
           {copy.library}
         </Link>
@@ -85,7 +85,7 @@ export async function LibraryUpdatesScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>

@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -85,7 +85,7 @@ export async function VerificationApplicationScreen({
     </time>
   );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <header>
         <h1 className={type2xlBoldPrimary}>{copy.detail}</h1>
         <p className={typeMt2SmMuted}>{copy.privacy}</p>

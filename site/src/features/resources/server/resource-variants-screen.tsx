@@ -11,7 +11,7 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { resourceManagementService } from "../../../lib/services/resources/resource-management-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
@@ -51,7 +51,7 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
   });
   if (!managed) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
@@ -72,7 +72,7 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
       ? await resourceManagementService.variantCandidates(product.id, actor, 1).catch(() => null)
       : null;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={`/workspace/resources/${product.id}`} className={linkAccentSm}>
         {copy.back}
       </Link>

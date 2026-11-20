@@ -8,7 +8,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -83,7 +83,7 @@ export async function OwnDiscussionsPage({
     : null;
   const filtered = Boolean(filters?.cursor || filters?.query || filters?.availability);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href="/workspace" className={linkAccentSm}>
         {copy.workspace}
       </Link>

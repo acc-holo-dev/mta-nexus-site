@@ -91,7 +91,7 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   const market = read("site/src/features/resources/server/detail-page.tsx");
   expect(market).toContain("ErrorState");
   expect(market).toContain("EmptyState");
-  expect(market).toContain("pageShellClass");
+  expect(market).toMatch(/pageShell[A-Za-z]\w*/);
   expect(market).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(market).not.toContain('role="alert"');
   expect(market).not.toContain("throw error");

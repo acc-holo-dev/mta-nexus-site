@@ -4,7 +4,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationGovernanceService } from "../../../lib/services/organizations/organization-governance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrganizationHistoryView } from "../history-view";
 import {
@@ -48,7 +48,7 @@ export async function OrganizationHistoryPage({
   }
   if (!actor)
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellClip}>
         <PlatformSignIn locale={locale} returnPath={returnPath} />
       </div>
     );
@@ -74,7 +74,7 @@ export async function OrganizationHistoryPage({
       : null;
   if (!filters) error = organizationGovernanceCopy(locale).invalid;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <OrganizationHistoryView
         id={id}
         data={data}

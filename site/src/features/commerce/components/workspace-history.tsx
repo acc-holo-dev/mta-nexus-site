@@ -1,16 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { linkAccentTight, linkAccentTightSmRounded, linkFocusRing } from "../../shell/link-shell";
+import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap2,
   typeMax2xlSmSecondary,
 } from "../../shell/type-shell";
-
-const filterNavLinkClass = linkFocusRing;
-
-import { linkAccentTight, linkAccentTightSmRounded, linkFocusRing } from "../../shell/link-shell";
-import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
@@ -49,7 +46,7 @@ export function HistoryShell({
             key={key}
             href={`/workspace/${key}`}
             aria-current={key === area ? "page" : undefined}
-            className={`rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary aria-[current=page]:bg-accent aria-[current=page]:text-white ${filterNavLinkClass}`}
+            className={`rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary aria-[current=page]:bg-accent aria-[current=page]:text-white ${linkFocusRing}`}
           >
             {copy.tabs[key]}
           </Link>

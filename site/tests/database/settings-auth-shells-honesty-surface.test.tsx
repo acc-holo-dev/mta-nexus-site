@@ -108,8 +108,8 @@ it("wraps settings history guest and authenticated returns in the clipped page s
   const source = read("site/src/features/accounts/server/settings-history-screen.tsx");
   expect(source).toContain("PlatformSignIn");
   expect(source).toContain("ProfileChangeHistoryView");
-  expect(source).toContain("pageShellClass");
-  expect(source.match(/className=\{pageShellClass\}/gu)?.length).toBeGreaterThanOrEqual(2);
+  expect(source).toMatch(/pageShell[A-Za-z]\w*/);
+  expect(source.match(/className=\{pageShell[A-Za-z]\w*\}/gu)?.length).toBeGreaterThanOrEqual(2);
 });
 
 it.each(["en", "ru"] as const)(

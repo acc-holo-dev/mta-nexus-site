@@ -7,7 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { type2xlBoldPrimary, typeSmMuted } from "../../shell/type-shell";
 import { ProfileChangeHistoryLink } from "../change-history";
@@ -44,7 +44,7 @@ export async function SettingsPrivacyScreen() {
     .then((row) => editablePrivacySchema.parse(row))
     .catch(() => null);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <ProfileChangeHistoryLink locale={locale} />
       <header className="space-y-2">
         <Link href="/settings" className={linkAccentSm}>

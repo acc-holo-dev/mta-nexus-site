@@ -25,9 +25,6 @@ import {
 import { communityReportCopy, communityReportError } from "../community-report-copy";
 import { platformFieldClass, platformRequest } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-const filterNavLinkClass = linkFocusRing;
-
 export function CommunityReportList({
   initial,
   filters,
@@ -97,7 +94,7 @@ export function CommunityReportList({
             key={view}
             href={href({ view, page: 1 })}
             aria-current={filters.view === view ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm ${filterNavLinkClass} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm ${linkFocusRing} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {copy[view]}
           </Link>
@@ -147,7 +144,7 @@ export function CommunityReportList({
             {copy.search}
           </Button>
           <Link
-            className={`inline-flex min-h-11 items-center text-sm text-accent underline ${filterNavLinkClass}`}
+            className={`inline-flex min-h-11 items-center text-sm text-accent underline ${linkFocusRing}`}
             href={path}
           >
             {copy.reset}
@@ -190,7 +187,7 @@ export function CommunityReportList({
             filtersActive ? (
               <Link
                 href={path}
-                className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+                className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               >
                 {copy.reset}
               </Link>
@@ -204,7 +201,7 @@ export function CommunityReportList({
               <article key={report.id} className={panelMinSpace2P4}>
                 <div className="flex min-w-0 flex-wrap justify-between gap-2">
                   <Link
-                    className={`break-words text-sm font-semibold text-accent underline ${filterNavLinkClass}`}
+                    className={`break-words text-sm font-semibold text-accent underline ${linkFocusRing}`}
                     href={`${path}/${encodeURIComponent(report.id)}`}
                   >
                     {copy[report.targetType]} · {copy[report.type]}
@@ -232,7 +229,7 @@ export function CommunityReportList({
         <nav className={typeFlexWrapCenterGap4Sm} aria-label={copy.page}>
           {filters.page > 1 && (
             <Link
-              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               href={href({ page: filters.page - 1 })}
             >
               {copy.previous}
@@ -243,7 +240,7 @@ export function CommunityReportList({
           </span>
           {page?.hasMore && filters.page < 9999 && (
             <Link
-              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               href={href({ page: filters.page + 1 })}
             >
               {copy.next}

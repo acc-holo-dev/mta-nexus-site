@@ -7,6 +7,8 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
+  typeBorderTSecondary,
+  typeBreakLgSemiboldPrimary,
   typeFlexWrapGap3,
   typeLgBoldPrimary,
   typeMinSpace3,
@@ -83,7 +85,7 @@ export function ServerStatisticsPanel({
           ← {managed ? copy.management : copy.back}
         </Link>
         <h1 className="break-words text-2xl font-black text-primary">{copy.title}</h1>
-        <p className="break-words text-lg font-semibold text-primary">{report.server.name}</p>
+        <p className={typeBreakLgSemiboldPrimary}>{report.server.name}</p>
         <p className={typeSmMuted}>{copy.description}</p>
         {managed && <p className={typeXsMuted}>{copy.private}</p>}
         <ServerObservationPeriodControls
@@ -132,7 +134,7 @@ export function ServerStatisticsPanel({
                   [copy.previous, report.previousStart, report.windowStart, report.previousSummary],
                 ] as const
               ).map(([label, from, to, summary]) => (
-                <tr key={label} className="border-t border-base text-secondary">
+                <tr key={label} className={typeBorderTSecondary}>
                   <th scope="row" className="min-w-48 p-2 font-normal">
                     <span className={typeSemiboldPrimary}>{label}</span>
                     <span className="mt-1 block text-xs text-muted">
@@ -242,7 +244,7 @@ export function ServerStatisticsPanel({
               </thead>
               <tbody>
                 {report.observations.map((item) => (
-                  <tr key={item.id} className="border-t border-base text-secondary">
+                  <tr key={item.id} className={typeBorderTSecondary}>
                     <th scope="row" className="whitespace-nowrap p-2 font-normal">
                       <time dateTime={item.observedAt}>{time(item.observedAt)}</time>
                     </th>

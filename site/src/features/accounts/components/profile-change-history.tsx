@@ -7,7 +7,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
-import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xlCompact } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
@@ -46,7 +46,7 @@ export function ProfileChangeHistoryView({
       !!filters.cursor ||
       !!filters.until;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlCompact}>
       <header className="space-y-2">
         <h1 className={typeDisplayPrimary}>{copy.profileTitle}</h1>
         <p className={typeSmMuted}>{copy.profileDescription}</p>

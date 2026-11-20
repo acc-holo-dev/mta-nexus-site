@@ -22,15 +22,12 @@ import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
 import { linkAccentSm } from "../../shell/link-shell";
-import {
-  pageShellStack10 as pageShellClass,
-  pageShellStack4,
-  pageShellStack6,
-} from "../../shell/page-shell";
+import { pageShellStack4, pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
 import {
   typeFlexMinCenterGap5Sm6,
   typeFlexWrapCenterGap2,
+  typeGridMinCols1Gap6Clip,
   typeH35W35Shrink,
   typeHeadingPrimary,
   typeIcon5Success,
@@ -145,7 +142,7 @@ export async function OrganizationProfilePage({
   const portfolioEmpty = resourcePage.total === 0 && articlePage.total === 0;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellStack10}>
       <section className={panelHeroBetween}>
         <div className={typeFlexMinCenterGap5Sm6}>
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
@@ -232,7 +229,7 @@ export async function OrganizationProfilePage({
           <h2 className={typeHeadingPrimary}>
             {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
-          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
+          <div className={typeGridMinCols1Gap6Clip}>
             {products.map((product) => (
               <ProductCard
                 key={product.id}

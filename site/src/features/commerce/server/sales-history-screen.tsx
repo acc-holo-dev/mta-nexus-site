@@ -9,7 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -67,7 +67,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   const result = await orderRepository.pageSellerHistory(user.id, page).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellClip}>
         <HistoryShell copy={copy} area="sales">
           <ErrorState
             title={copy.salesLoadUnavailable}
@@ -84,7 +84,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   }
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <HistoryShell copy={copy} area="sales">
         <Link href="/workspace/sales/report" className={linkAccentSmRounded}>
           {sellerSalesCopy(typedLocale).title}

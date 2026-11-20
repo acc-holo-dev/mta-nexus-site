@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4Sm } from "../../shell/type-shell";
 import { PlanReviewForm } from "../plan-reviews";
@@ -65,7 +65,7 @@ export async function SubscriptionReviewCreateScreen({
     if (!plan) notFound();
     if (plan.revision !== query.revision)
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={c.planChanged}
             description={c.selectionRecoverHint}
@@ -83,7 +83,7 @@ export async function SubscriptionReviewCreateScreen({
     const href = (page: number) =>
       `/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
@@ -123,7 +123,7 @@ export async function SubscriptionReviewCreateScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={c.invalid}
             description={c.selectionRecoverHint}
@@ -136,7 +136,7 @@ export async function SubscriptionReviewCreateScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>

@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentXsBreak } from "../../shell/link-shell";
-import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xlTight } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -99,7 +99,7 @@ export async function AuthorContentPage({
   );
   const retryHref = filters ? returnPath : "/workspace/content";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlTight}>
       <header className={typeFlexWrapStartBetweenGap4}>
         <div className="min-w-0">
           <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>

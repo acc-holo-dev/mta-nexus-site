@@ -7,7 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xlCompact } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeBreakDisplayPrimary, typeDisplayPrimary } from "../../shell/type-shell";
 import {
@@ -61,7 +61,7 @@ export async function OrganizationPage({
       : null;
   const parsed = organizationWorkspaceSchema.safeParse(result);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlCompact}>
       <Link className={linkAccentSm} href="/workspace/organizations">
         {copy.back}
       </Link>

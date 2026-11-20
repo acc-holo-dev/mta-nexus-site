@@ -12,7 +12,7 @@ import { resourceReviewPageQuery } from "../../resources/resource-review-query";
 import { ResourceReviewPager } from "../../resources/reviews-view";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlCompact } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeMinBreakDisplay, typeMinBreakWords, typeSmSecondary } from "../../shell/type-shell";
@@ -66,7 +66,7 @@ export async function LibraryReviewsScreen({
   const result = await resourceReviewService.ownPage(actor, query.page).catch(() => null);
   if (!result) {
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xlCompact}>
         <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
@@ -83,7 +83,7 @@ export async function LibraryReviewsScreen({
     );
   }
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax4xlCompact}>
       <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.back}
       </Link>

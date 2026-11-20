@@ -9,10 +9,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeMinBreakBaseSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapStartBetweenGap3,
+  typeMinBreakBaseSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -70,7 +73,7 @@ export async function PurchasesHistoryScreen({
   const result = await orderRepository.pageBuyerHistory(user.id, page).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellClip}>
         <HistoryShell copy={copy} area="purchases">
           <ErrorState
             title={copy.purchasesLoadUnavailable}
@@ -87,7 +90,7 @@ export async function PurchasesHistoryScreen({
   }
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <HistoryShell copy={copy} area="purchases">
         <Link href="/subscriptions" className={linkAccentSmRounded}>
           {getCommercialCopy(typedLocale).catalog}
@@ -105,7 +108,7 @@ export async function PurchasesHistoryScreen({
           <ol className="space-y-3">
             {result.orders.map((order) => (
               <li key={order.id} className={panelMinSpace3P5}>
-                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                <div className={typeFlexMinWrapStartBetweenGap3}>
                   <h2 className={typeMinBreakBaseSemiboldPrimary}>
                     {copy.orderNumber}: {order.orderNumber}
                   </h2>

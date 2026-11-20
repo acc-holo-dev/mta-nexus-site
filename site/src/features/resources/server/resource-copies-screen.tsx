@@ -11,7 +11,7 @@ import { resourceCopyService } from "../../../lib/services/resources/resource-co
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentRounded, linkAccentTightRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4, typeMl3SurfaceP2 } from "../../shell/type-shell";
@@ -76,7 +76,7 @@ export async function ResourceCopiesScreen({
     } catch (error) {
       if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax4xl}>
           <Link
             className={linkAccentRounded}
             href={`/workspace/resources/${encodeURIComponent(id)}`}
@@ -99,7 +99,7 @@ export async function ResourceCopiesScreen({
       href = (page: number) =>
         `${base}?${new URLSearchParams({ page: String(page), days: String(query.days) })}`;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xl}>
         <Link className={linkAccentRounded} href={`/workspace/resources/${encodeURIComponent(id)}`}>
           {c.back}
         </Link>
@@ -195,7 +195,7 @@ export async function ResourceCopiesScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax4xl}>
           <ErrorState
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}

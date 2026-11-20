@@ -13,7 +13,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlCompact } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4, typePrewrapBreakSm } from "../../shell/type-shell";
@@ -43,7 +43,7 @@ function ResourceReviewLoadError({
   const copy = resourceReviewCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax4xlCompact}>
       <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
@@ -124,7 +124,7 @@ export async function ResourceReviewReportScreen({
       );
     }
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xlCompact}>
         <Link href={base} className={linkAccent}>
           {copy.back}
         </Link>
@@ -184,7 +184,7 @@ export async function ResourceReviewReportScreen({
   }
   const alternateView = result.view === "history" ? "pending" : "history";
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax4xlCompact}>
       <Link href={listBackHref} className={linkAccent}>
         {copy.back}
       </Link>

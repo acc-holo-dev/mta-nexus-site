@@ -2,7 +2,7 @@ import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type2xlExtraboldPrimary,
@@ -27,7 +27,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       timeZone: "UTC",
     });
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xlTight}>
       <Link href={profile} className={linkAccentSm}>
         {copy.back}
       </Link>

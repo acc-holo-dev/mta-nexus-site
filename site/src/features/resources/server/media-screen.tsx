@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceMediaService } from "../../../lib/services/resources/resource-media-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceGallery } from "../components/resource-gallery";
@@ -40,7 +40,7 @@ function ResourceMediaLoadError({
     ? `/admin/resources/${encodeURIComponent(productId)}/media`
     : `/workspace/resources/${encodeURIComponent(productId)}/media`;
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax5xl}>
       <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
@@ -99,7 +99,7 @@ export async function ResourceMediaScreen({
     return <ResourceMediaLoadError locale={locale} staff={staff} productId={productId} />;
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link
         href={
           staff

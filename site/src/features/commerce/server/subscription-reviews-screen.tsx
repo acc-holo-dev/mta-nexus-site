@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4Sm, typeSmSecondary, typeSurfaceBorderP2 } from "../../shell/type-shell";
@@ -71,7 +71,7 @@ export async function SubscriptionReviewsScreen({
     const href = (page: number, scopePage = scopes.page) =>
       `/workspace/subscriptions/reviews?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
@@ -186,7 +186,7 @@ export async function SubscriptionReviewsScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={c.invalid}
             description={c.selectionRecoverHint}
@@ -199,7 +199,7 @@ export async function SubscriptionReviewsScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>

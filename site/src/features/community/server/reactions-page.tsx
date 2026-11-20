@@ -9,11 +9,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
+  typeFlexMinWrapStartBetweenGap3,
   typeMinH11Semibold,
   typeMinSpace3,
   typeMinW40Flex1Space1XsMuted,
@@ -79,7 +80,7 @@ export async function ReactionsPageScreen({
     : null;
   const filtered = Boolean(filters?.cursor || filters?.query || filters?.reaction);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href="/workspace" className={linkAccentSm}>
         {copy.back}
       </Link>
@@ -153,7 +154,7 @@ export async function ReactionsPageScreen({
         <ul className={typeMinSpace3}>
           {page.items.map((item) => (
             <li key={item.contentId} className={panelClipSpace3P5}>
-              <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+              <div className={typeFlexMinWrapStartBetweenGap3}>
                 <div className="min-w-0 flex-1 overflow-x-clip">
                   {item.slug && item.title ? (
                     <Link

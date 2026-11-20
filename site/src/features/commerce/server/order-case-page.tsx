@@ -12,7 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
@@ -64,7 +64,7 @@ function OrderCaseLoadError({
   const copy = orderCaseCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={backHref} className={linkAccentSmRounded}>
         {backLabel}
       </Link>
@@ -210,7 +210,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={orderPath} className={linkAccentSmRounded}>
         {copy.order}: {result.order.orderNumber}
       </Link>
@@ -294,7 +294,7 @@ export async function OrderCaseListPage({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={staff ? "/admin" : "/workspace/purchases"} className={linkAccentSmRounded}>
         {staff ? copy.review : copy.order}
       </Link>
@@ -456,7 +456,7 @@ export async function OrderCaseDetailPage({
     current.refundedRecordCount === 0 &&
     current.disputedRecordCount === 0;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={listBase} className={linkAccentSmRounded}>
         {copy.back}
       </Link>

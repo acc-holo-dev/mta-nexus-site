@@ -24,6 +24,7 @@ import {
   typePrewrapSmLeadingSecondary,
   typeSmSecondary,
   typeSmSuccess,
+  typeSpace2BorderBPb5,
 } from "../../shell/type-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
@@ -377,7 +378,7 @@ export function SupportCaseThread({
         {copy.back}
       </Link>
 
-      <header className="space-y-2 border-b border-base pb-5">
+      <header className={typeSpace2BorderBPb5}>
         <div className={typeFlexWrapStartBetweenGap3}>
           <div>
             <p className={typeLabelUpperMuted}>

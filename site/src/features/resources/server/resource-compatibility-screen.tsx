@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
 import { ResourceCompatibilityForm } from "../compatibility-controls";
@@ -47,7 +47,7 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
   const resolution = await productService.getDependencyResolution(product).catch(() => null);
   if (!resolution) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
@@ -64,7 +64,7 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={`/workspace/resources/${product.id}`} className={linkAccentSm}>
         {copy.back}
       </Link>

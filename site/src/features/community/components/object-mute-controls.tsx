@@ -7,6 +7,7 @@ import type { Locale } from "../../../lib/i18n";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import {
   typeFlexWrapGap2,
+  typeMaxSmXsSuccess,
   typeMinH11Xs,
   typeXsMuted,
   typeXsSecondary,
@@ -163,7 +164,7 @@ function ObjectMuteControl({
         ) : null}
       </div>
       {message ? (
-        <p role="status" className="max-w-sm text-xs text-success">
+        <p role="status" className={typeMaxSmXsSuccess}>
           {message}
         </p>
       ) : null}

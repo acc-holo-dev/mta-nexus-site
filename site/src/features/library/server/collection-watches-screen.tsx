@@ -15,7 +15,7 @@ import { resourceReleaseWatchesCopy } from "../../resources/resource-release-wat
 import { resourceReleaseWatchesQuery } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapEndGap3, typeFlexWrapGap4, typeGrid2Gap4 } from "../../shell/type-shell";
@@ -90,7 +90,7 @@ export async function CollectionWatchesScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
           className={linkAccentSmRounded}
@@ -110,7 +110,7 @@ export async function CollectionWatchesScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
         className={linkAccentSmRounded}

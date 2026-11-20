@@ -10,9 +10,6 @@ import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { typeFlexMinWrapGap4, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
 import { supportActivitySchema } from "../support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
-
-const ghostActionClass = linkGhostAccent;
-
 export function SupportStatusHistory({
   caseId,
   actorId,
@@ -83,7 +80,7 @@ export function SupportStatusHistory({
                 <Button
                   type="button"
                   onClick={() => setRetry((value) => value + 1)}
-                  className={ghostActionClass}
+                  className={linkGhostAccent}
                   variant="ghost"
                 >
                   {copy.reload}
@@ -125,7 +122,7 @@ export function SupportStatusHistory({
               <Button
                 type="button"
                 onClick={() => setBefore(undefined)}
-                className={ghostActionClass}
+                className={linkGhostAccent}
                 variant="ghost"
               >
                 {copy.latest}
@@ -135,7 +132,7 @@ export function SupportStatusHistory({
               <Button
                 type="button"
                 onClick={() => setBefore(data.nextCursor ?? undefined)}
-                className={ghostActionClass}
+                className={linkGhostAccent}
                 variant="ghost"
               >
                 {copy.older}

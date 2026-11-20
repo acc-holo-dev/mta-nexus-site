@@ -17,7 +17,7 @@ import { resourceReleaseWatchesCopy } from "../../resources/resource-release-wat
 import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
+import { pageShellMax4xl, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -82,7 +82,7 @@ export async function LibraryVersionsScreen({
   });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
           {copy.updates}
         </Link>
@@ -104,7 +104,7 @@ export async function LibraryVersionsScreen({
   });
   if (!watch) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
           {copy.updates}
         </Link>
@@ -123,7 +123,7 @@ export async function LibraryVersionsScreen({
   const current = result.selection.mode === "fixed" ? result.selected : result.latest;
   const watchesCopy = resourceReleaseWatchesCopy(typedLocale);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
         {copy.updates}
       </Link>

@@ -10,7 +10,7 @@ import { verificationWorkspaceService } from "../../../lib/services/moderation/v
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -97,7 +97,7 @@ export async function VerificationHistoryScreen({
     }
   })();
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <header>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className={typeMt2SmMuted}>{copy.description}</p>

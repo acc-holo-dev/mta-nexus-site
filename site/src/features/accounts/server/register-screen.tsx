@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { parseAuthReturnPath } from "../../shell/auth-return";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { AuthForm } from "../components/auth-form";
 
 export async function registerMetadata(): Promise<Metadata> {
@@ -26,7 +26,7 @@ export async function RegisterScreen({
         : undefined;
   const initialReturnPath = parseAuthReturnPath(nextRaw);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <AuthForm mode="register" locale={locale} initialReturnPath={initialReturnPath} />
     </div>
   );

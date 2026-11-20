@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { pageShellClip } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionId, collectionPageParams } from "../library-collections-query";
@@ -24,7 +24,7 @@ import {
 } from "./library-collections-screen-shared";
 
 function clipShell(children: ReactNode) {
-  return <div className={pageShellClass}>{children}</div>;
+  return <div className={pageShellClip}>{children}</div>;
 }
 
 export async function libraryCollectionsMetadata(): Promise<Metadata> {

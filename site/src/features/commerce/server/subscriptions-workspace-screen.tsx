@@ -9,7 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeFlexWrapGap3,
@@ -85,7 +85,7 @@ export async function SubscriptionsWorkspaceScreen({
       "/workspace/subscriptions/history",
     );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <h1 className="font-display">{c.title}</h1>
         <SubscriptionRecovery key={actor.id} actorId={actor.id} />
         <nav className={typeFlexWrapGap4}>
@@ -204,7 +204,7 @@ export async function SubscriptionsWorkspaceScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
@@ -217,7 +217,7 @@ export async function SubscriptionsWorkspaceScreen({
         </section>
       );
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <Link href="/subscriptions" className={subscriptionNavLinkClass}>
           {c.catalog}
         </Link>

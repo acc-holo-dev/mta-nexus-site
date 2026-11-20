@@ -9,7 +9,7 @@ import { resourceActivityService } from "../../../lib/services/resources/resourc
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -79,7 +79,7 @@ export async function PublisherAcquisitionsScreen({
   const result = await resourceActivityService.buyerHistory(actor, page, source).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <header className="space-y-3">
           <Link href="/workspace/library" className={linkAccentSmRounded}>
             {copy.library}
@@ -99,7 +99,7 @@ export async function PublisherAcquisitionsScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header className="space-y-3">
         <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}

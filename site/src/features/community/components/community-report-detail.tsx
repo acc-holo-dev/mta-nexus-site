@@ -14,6 +14,7 @@ import { pageShellStack5 } from "../../shell/page-shell";
 import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
+  typeBreakLgSemiboldPrimary,
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
@@ -218,7 +219,7 @@ export function CommunityReportDetailView({
             {reportHistoryCopy(locale).title}
           </Link>
           <section className={panelMinSpace4P5}>
-            <h2 className="break-words text-lg font-semibold text-primary">
+            <h2 className={typeBreakLgSemiboldPrimary}>
               {copy[report.targetType]} · {copy[report.type]}
             </h2>
             <p className={typeSmSecondary}>

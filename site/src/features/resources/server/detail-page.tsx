@@ -25,7 +25,7 @@ import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/link-shell";
-import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { pageShellStack4, pageShellStack10 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
   typeFlexWrapCenterGap2,
@@ -175,7 +175,7 @@ export async function ProductDetailPage({
     detail = await productService.getProductDetailAccessBySlug(slug, user);
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellStack10}>
         <ErrorState
           title={copy.detailUnavailable}
           description={copy.detailUnavailableDescription}
@@ -299,7 +299,7 @@ export async function ProductDetailPage({
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellStack10}>
       {!isPublic ? (
         <ErrorState
           id="market-private-preview"

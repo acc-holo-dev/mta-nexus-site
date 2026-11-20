@@ -24,6 +24,7 @@ import {
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeMinBreakWords,
+  typeMinFlex1Space1SmSecondary,
   typeMinSpace3,
   typeMlAutoXsMuted,
   typeMt2XsMuted,
@@ -484,7 +485,7 @@ export function ContentDiscussion({
           }}
           className={typeFlexMinWrapEndGap3}
         >
-          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinFlex1Space1SmSecondary}>
             <span>{copy.search}</span>
             <input
               type="search"

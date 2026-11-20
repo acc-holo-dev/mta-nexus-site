@@ -9,11 +9,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
+  typeBreakLgSemiboldPrimary,
   typeFlexWrapBetweenGap3,
   typeMinSpace2,
   typeMinSpace3,
@@ -105,16 +106,14 @@ export async function PublicationHistoryPage({
           : null;
   const retryHref = filters ? returnPath : path;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xlTight}>
       <Link href="/workspace/content" className={linkAccentSm}>
         {labels.back}
       </Link>
       <header className={typeMinSpace2}>
         <h1 className={type2xlExtraboldPrimary}>{copy.history}</h1>
         <p className={typeSmMuted}>{copy.historyDescription}</p>
-        {report && (
-          <h2 className="break-words text-lg font-semibold text-primary">{report.item.title}</h2>
-        )}
+        {report && <h2 className={typeBreakLgSemiboldPrimary}>{report.item.title}</h2>}
       </header>
       {error && (
         <ErrorState

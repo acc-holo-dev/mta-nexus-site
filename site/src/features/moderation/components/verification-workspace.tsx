@@ -13,7 +13,7 @@ import {
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
-import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   typeBreakAllXsMuted,
@@ -54,9 +54,7 @@ import {
 import { verificationApplicationsCopy } from "../verification-applications-copy";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
-
-const filterNavLinkClass = linkFocusRing;
-const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${filterNavLinkClass}`;
+const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${linkFocusRing}`;
 
 export function VerificationWorkspace({
   actorId,
@@ -382,7 +380,7 @@ export function VerificationWorkspace({
   const profile = overview?.profile,
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
-    <div className={pageShellClass} aria-busy={pending}>
+    <div className={pageShellStack6} aria-busy={pending}>
       <div className={typeFlexWrapGap4}>
         <Button
           type="button"
@@ -674,7 +672,7 @@ export function VerificationWorkspace({
         <nav className={typeFlexWrapGap3} aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
-            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${linkFocusRing}`}
           >
             {verificationApplicationsCopy(locale).title}
           </Link>
@@ -683,7 +681,7 @@ export function VerificationWorkspace({
               key={view}
               href={href({ view, page: 1 })}
               aria-current={filters.view === view ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${linkFocusRing}`}
             >
               {copy[view]}
             </Link>

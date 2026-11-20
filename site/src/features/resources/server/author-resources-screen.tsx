@@ -11,7 +11,7 @@ import { resourcePublisherService } from "../../../lib/services/resources/resour
 import { getCommercialCopy } from "../../commerce/commercial-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
@@ -85,7 +85,7 @@ export async function AuthorResourcesScreen({
   const result = await resourcePublisherService.inventory(user, query).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <header className="space-y-2">
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className={typeSmSecondary}>{copy.subtitle}</p>
@@ -107,7 +107,7 @@ export async function AuthorResourcesScreen({
   const emptyTitle = inventoryTotal === 0 ? copy.empty : copy.emptyFilter;
   const emptyDescription = inventoryTotal === 0 ? copy.emptyHint : copy.emptyFilterHint;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>

@@ -12,7 +12,7 @@ import {
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -73,7 +73,7 @@ export async function ManagedServersScreen({
     .catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax6xl}>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={workspace.unavailable}
@@ -97,7 +97,7 @@ export async function ManagedServersScreen({
     filters.query || filters.status || filters.visibility || filters.verification,
   );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <header className={typeFlexWrapStartBetweenGap4}>
         <div className={typeMinSpace2}>
           <Link href="/workspace" className={linkAccentSm}>

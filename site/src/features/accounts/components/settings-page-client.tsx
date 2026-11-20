@@ -15,7 +15,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xlRoomy } from "../../shell/page-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { skelH4W13, skelH20 } from "../../shell/skeleton-shell";
 import { typeDisplayPrimary, typeSmMuted } from "../../shell/type-shell";
@@ -497,7 +497,7 @@ export function SettingsPageClient() {
   if (loading) {
     return (
       <HonestLoadingShell
-        className={pageShellClass}
+        className={pageShellMax3xlRoomy}
         headingId="settings-loading-heading"
         title={copy.title}
         loadingLabel={copy.loading}
@@ -522,7 +522,7 @@ export function SettingsPageClient() {
 
   if (loadError) {
     return (
-      <div className={`${pageShellClass} py-12`}>
+      <div className={`${pageShellMax3xlRoomy} py-12`}>
         <header>
           <h1 className={typeDisplayPrimary}>{copy.unavailable}</h1>
           <p className="mt-1 font-caption text-muted">{copy.description}</p>
@@ -546,7 +546,7 @@ export function SettingsPageClient() {
   }
 
   return (
-    <div className={pageShellClass} aria-busy={pending || undefined}>
+    <div className={pageShellMax3xlRoomy} aria-busy={pending || undefined}>
       <div>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="mt-1 font-caption text-muted">{copy.description}</p>

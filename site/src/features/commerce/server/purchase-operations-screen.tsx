@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../lib/services/commerce/commercial-plan-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
@@ -79,7 +79,7 @@ export async function PurchaseOperationsScreen({
   });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link
           href={`/workspace/purchases/${encodeURIComponent(id)}`}
           className={linkAccentSmRounded}
@@ -112,7 +112,7 @@ export async function PurchaseOperationsScreen({
   const status = (value: string) =>
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
         {copy.back}
       </Link>

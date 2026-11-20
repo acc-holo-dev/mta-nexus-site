@@ -6,7 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { pageShellMax4xlTight, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type2xlExtraboldPrimary,
@@ -68,7 +68,7 @@ export async function PublicContextTrustPage({
     : null;
   const base = `/${kind === "organization" ? "organizations" : "servers"}/${encodeURIComponent(slug)}`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xlTight}>
       <Link href={base} className={linkAccentSm}>
         {copy.back}
       </Link>

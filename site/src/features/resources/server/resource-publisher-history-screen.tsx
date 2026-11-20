@@ -11,7 +11,7 @@ import { resourcePublisherService } from "../../../lib/services/resources/resour
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentRounded, linkMinH } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -85,7 +85,7 @@ export async function ResourcePublisherHistoryScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentRounded}>
           {copy.back}
         </Link>
@@ -104,7 +104,7 @@ export async function ResourcePublisherHistoryScreen({
   const href = (page: number, kind = query.kind) =>
     `?${new URLSearchParams({ kind, page: String(page) })}`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentRounded}>
         {copy.back}
       </Link>

@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
@@ -34,7 +34,7 @@ function ResourceRequirementsLoadError({
   const copy = resourceRequirementsCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax5xl}>
       <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
@@ -132,7 +132,7 @@ export async function ResourceRequirementsScreen({
         ? `/api/products/${encodeURIComponent(productId)}/requirements`
         : `/api/admin/resources/${encodeURIComponent(productId)}/requirements`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={back} className={linkAccent}>
         {copy.back}
       </Link>

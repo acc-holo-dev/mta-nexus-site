@@ -17,7 +17,7 @@ import {
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakXlPrimary,
@@ -70,7 +70,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
   });
   if (!receipt) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax3xl}>
         <Link href="/workspace/library/downloads" className={linkAccentSm}>
           {copy.title}
         </Link>
@@ -90,7 +90,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <Link href="/workspace/library/downloads" className={linkAccentSm}>
         {copy.title}
       </Link>

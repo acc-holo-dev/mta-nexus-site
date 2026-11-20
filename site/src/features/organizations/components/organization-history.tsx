@@ -13,7 +13,7 @@ import {
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
-import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xlCompact } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import {
   typeBreakDisplayPrimary,
@@ -53,7 +53,7 @@ export function OrganizationHistoryView({
     teamCopy = getOrganizationCopy(locale),
     path = `/workspace/organizations/${encodeURIComponent(id)}/activity`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlCompact}>
       <header className="space-y-2">
         <h1 className={typeBreakDisplayPrimary}>
           {copy.history}

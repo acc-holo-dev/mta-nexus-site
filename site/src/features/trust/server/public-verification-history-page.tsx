@@ -7,7 +7,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicVerificationHistoryService } from "../../../lib/services/trust/public-verification-history-service";
 import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
-import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
+import { pageShellMax4xlTight, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P5, panelClipSpace3P6 } from "../../shell/panel-shell";
 import {
   type2xlExtraboldPrimary,
@@ -68,7 +68,7 @@ export async function ApprovalHistoryPage({
       })
     : null;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xlTight}>
       <Link href={`/users/${encodeURIComponent(username)}/trust`} className={linkAccentSm}>
         {copy.back}
       </Link>

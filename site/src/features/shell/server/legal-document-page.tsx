@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { LegalDocument } from "../legal-document";
-import { pageShellClip as pageShellClass } from "../page-shell";
+import { pageShellClip } from "../page-shell";
 
 type LegalKind = "terms" | "privacy" | "copyright" | "communityRules";
 
@@ -31,7 +31,7 @@ async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
           ? legal.copyright
           : legal.communityRules;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <LegalDocument
         badge={legal.openFreeBeta}
         title={document.title}

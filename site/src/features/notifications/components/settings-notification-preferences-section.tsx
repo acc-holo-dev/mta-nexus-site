@@ -6,7 +6,9 @@ import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import {
   typeBlockSmPrimary,
   typeFlexCenterGap2,
+  typeFlexCursorBetweenGap4Py3,
   typeIconAccent,
+  typeMt05BlockXsMuted,
   typeSmSemiboldPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -50,13 +52,10 @@ export function SettingsNotificationPreferencesSection({
       <div className="divide-y divide-base">
         {preferences &&
           preferenceLabels.map(({ key, label, description }) => (
-            <label
-              key={key}
-              className="flex cursor-pointer items-center justify-between gap-4 py-3"
-            >
+            <label key={key} className={typeFlexCursorBetweenGap4Py3}>
               <span>
                 <span className={typeBlockSmPrimary}>{label}</span>
-                <span className="mt-0.5 block text-xs text-muted">{description}</span>
+                <span className={typeMt05BlockXsMuted}>{description}</span>
               </span>
               <input
                 type="checkbox"

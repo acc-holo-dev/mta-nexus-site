@@ -16,11 +16,7 @@ import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-releas
 import { resourceReleaseWatchHistoryQuery } from "../../resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
-import {
-  pageShellMax5xl as pageShellClass,
-  pageShellStack3,
-  pageShellStack4,
-} from "../../shell/page-shell";
+import { pageShellMax5xl, pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -102,7 +98,7 @@ export async function LibraryWatchHistoryScreen({
   const c = resourceReleaseWatchHistoryCopy(typedLocale);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
           {c.back}
         </Link>
@@ -128,7 +124,7 @@ export async function LibraryWatchHistoryScreen({
   const href = (page: number) => `/workspace/library/watches/history?${suffix(page)}`;
   const filtered = result.source !== "all" || Boolean(result.productId) || result.days !== 30;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
         {c.back}
       </Link>

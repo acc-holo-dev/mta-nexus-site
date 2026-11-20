@@ -11,7 +11,7 @@ import { resourceCopyService } from "../../../lib/services/resources/resource-co
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentRounded, linkAccentTightRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceCopyMetadataView } from "../copy-view";
@@ -70,7 +70,7 @@ export async function ResourceCopyReceiptScreen({
     } catch (error) {
       if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax4xl}>
           <Link
             href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
             className={linkAccentRounded}
@@ -91,7 +91,7 @@ export async function ResourceCopyReceiptScreen({
     }
     const { receipt } = detail;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xl}>
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
           className={linkAccentTightRounded}
@@ -137,7 +137,7 @@ export async function ResourceCopyReceiptScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={pageShellClass}>
+        <section className={pageShellMax4xl}>
           <ErrorState
             title={resourceCopyError(locale, error.code)}
             description={c.errorDescription}

@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { PublicationFeed } from "../publication-feed";
@@ -52,7 +52,7 @@ export async function FollowingFeedPage({
     await searchParams,
   );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header>
         <h1 id="following-feed-heading" className={type2xlBoldPrimary}>
           {copy.title}

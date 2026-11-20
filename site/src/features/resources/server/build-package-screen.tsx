@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { buildPackageService } from "../../../lib/services/resources/build-package-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import {
@@ -40,7 +40,7 @@ function BuildPackageLoadError({
   const copy = buildPackageCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax5xl}>
       <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
@@ -129,7 +129,7 @@ export async function BuildPackageScreen({
       ? [detail.baseline, ...detail.candidates]
       : detail.candidates;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href={base} className={linkAccent}>
         {copy.back}
       </Link>

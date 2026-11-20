@@ -6,7 +6,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
+import { pageShellMaxMd } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
@@ -106,7 +106,7 @@ export function ResetPasswordPage() {
       : undefined;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMaxMd}>
       <section aria-labelledby="reset-heading" className={panelClipSpace5P6Shadow}>
         <div className={typeFlexCenterGap3}>
           <ShieldCheck className={typeIcon5Accent} aria-hidden="true" />

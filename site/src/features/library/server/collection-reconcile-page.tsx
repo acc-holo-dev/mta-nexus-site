@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeFlexMinWrapGap4, typeMinBreakWords } from "../../shell/type-shell";
 import { LibraryCollectionImport } from "../collection-import";
@@ -74,7 +74,7 @@ export async function CollectionReconcilePage({
       });
     if (!manifest) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{m.reconcileTitle}</h1>
           <ErrorState
             title={m.reconcileLoadUnavailable}
@@ -90,7 +90,7 @@ export async function CollectionReconcilePage({
     }
     const collection = manifest.collection;
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexMinWrapGap4}>
           <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
             {c.back}
@@ -129,7 +129,7 @@ export async function CollectionReconcilePage({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={m.reconcileLoadUnavailableDescription}

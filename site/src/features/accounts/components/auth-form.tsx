@@ -6,7 +6,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
 import { linkAccentSemibold } from "../../shell/link-shell";
-import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
+import { pageShellMaxMdAuth } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type2xlBoldPrimary,
@@ -114,7 +114,7 @@ export function AuthForm({
   const alternateHref = authEntryHref(registering ? "login" : "register", returnPath);
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMaxMdAuth}>
       <div className="space-y-2">
         <h1 className={type2xlBoldPrimary}>{registering ? copy.registerTitle : copy.loginTitle}</h1>
         <p className={typeSmMuted}>

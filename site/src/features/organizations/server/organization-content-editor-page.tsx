@@ -11,7 +11,7 @@ import { parseEditableContent } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary } from "../../shell/type-shell";
 import { organizationContentId } from "../organization-content-api";
@@ -79,7 +79,7 @@ export async function OrganizationContentEditorPage({
   const initial = result?.content ? parseEditableContent(result.content) : null;
   const path = `/workspace/organizations/${encodeURIComponent(id)}/content`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>

@@ -10,7 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -100,7 +100,7 @@ export async function WorkspaceFinanceScreen({
   ]);
   if (!result || !scopes) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax6xl}>
         <Link href="/workspace/sales" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
@@ -124,7 +124,7 @@ export async function WorkspaceFinanceScreen({
   ) =>
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <Link href="/workspace/sales" className={linkAccentSmRounded}>
         {copy.back}
       </Link>

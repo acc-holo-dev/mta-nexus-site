@@ -24,6 +24,7 @@ import { pageShellStack6 } from "../../shell/page-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
   typeHeadingPrimary,
+  typeMinFlex1Space1SmSecondary,
   typeMlAutoXsMuted,
   typeSmMuted,
   typeXsMuted,
@@ -365,7 +366,7 @@ export function OrganizationWorkspacePanel({
             action={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
             className="flex flex-wrap items-end gap-2"
           >
-            <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+            <label className={typeMinFlex1Space1SmSecondary}>
               <span>{copy.searchTeam}</span>
               <input
                 type="search"

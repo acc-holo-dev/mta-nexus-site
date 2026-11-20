@@ -17,7 +17,7 @@ import {
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -28,6 +28,7 @@ import {
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
+  typeGridGap1Sm,
   typeSmSecondary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -79,7 +80,7 @@ export async function LibraryDownloadsScreen({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className={`${pageShellClass} max-w-xl`}>
+      <section className={`${pageShellMax5xl} max-w-xl`}>
         <ErrorState
           title={copy.invalid}
           description={copy.invalidHint}
@@ -95,7 +96,7 @@ export async function LibraryDownloadsScreen({
   const result = await resourceDeliveriesService.page(user, query).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href="/workspace/library" className={linkAccentSm}>
           {copy.library}
         </Link>
@@ -113,7 +114,7 @@ export async function LibraryDownloadsScreen({
   }
   const href = (page: number) => resourceDeliveriesUrl({ ...query, page });
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>
@@ -125,7 +126,7 @@ export async function LibraryDownloadsScreen({
         {query.resourceId ? (
           <input type="hidden" name="resourceId" value={query.resourceId} />
         ) : null}
-        <label className="grid gap-1 text-sm">
+        <label className={typeGridGap1Sm}>
           {copy.days}
           <select name="days" defaultValue={query.days} className={fieldClass}>
             {["all", "7", "30", "90", "365"].map((days) => (
@@ -135,7 +136,7 @@ export async function LibraryDownloadsScreen({
             ))}
           </select>
         </label>
-        <label className="grid gap-1 text-sm">
+        <label className={typeGridGap1Sm}>
           {copy.title}
           <select name="status" defaultValue={query.status} className={fieldClass}>
             {["all", ...RESOURCE_DELIVERY_STATUSES].map((status) => (

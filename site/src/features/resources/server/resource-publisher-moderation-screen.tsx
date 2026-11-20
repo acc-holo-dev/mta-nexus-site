@@ -16,7 +16,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -83,7 +83,7 @@ export async function ResourcePublisherModerationScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
           {copy.back}
         </Link>
@@ -100,7 +100,7 @@ export async function ResourcePublisherModerationScreen({
     );
   }
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>

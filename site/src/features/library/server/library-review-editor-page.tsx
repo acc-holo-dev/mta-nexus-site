@@ -12,7 +12,7 @@ import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../resources/review-controls";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xlCompact } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeMinBreakDisplay, typeMinBreakWords } from "../../shell/type-shell";
 export async function libraryReviewEditorMetadata(): Promise<Metadata> {
@@ -49,7 +49,7 @@ export async function LibraryReviewEditorPage({ params }: { params: Promise<{ id
   });
   if (!detail) {
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax3xlCompact}>
         <Link href="/workspace/library/reviews" className={linkAccentSmRounded}>
           {copy.back}
         </Link>
@@ -66,7 +66,7 @@ export async function LibraryReviewEditorPage({ params }: { params: Promise<{ id
     );
   }
   return (
-    <section className={pageShellClass}>
+    <section className={pageShellMax3xlCompact}>
       <Link href="/workspace/library/reviews" className={linkAccentSmRounded}>
         {copy.back}
       </Link>

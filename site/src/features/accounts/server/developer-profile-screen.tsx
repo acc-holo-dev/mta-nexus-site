@@ -15,11 +15,12 @@ import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
-import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
+import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
 import {
   typeFlexCenterGap2,
   typeFlexMinCenterGap5Sm6,
+  typeGridMinCols1Gap6Clip,
   typeHeadingPrimary,
   typeIcon5Success,
   typeMaxXlSmLeadingMuted,
@@ -123,7 +124,7 @@ export async function DeveloperProfileScreen({
     .catch(() => new Map());
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellStack10}>
       <section className={panelHeroBetween}>
         <div className={typeFlexMinCenterGap5Sm6}>
           <Avatar
@@ -188,7 +189,7 @@ export async function DeveloperProfileScreen({
           {copy.releasesBy} {user.displayName}
         </h2>
         {authorProducts.length > 0 ? (
-          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
+          <div className={typeGridMinCols1Gap6Clip}>
             {authorProducts.map((product) => (
               <ProductCard
                 key={product.id}

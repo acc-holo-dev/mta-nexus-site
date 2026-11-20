@@ -7,9 +7,6 @@ import { typeFlexWrapGap2, typeFlexWrapGap4, typeMinH11Semibold } from "../../sh
 import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
 import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
-
-const filterNavLinkClass = linkFocusRing;
-
 export function ServerObservationPeriodControls({
   path,
   window,
@@ -50,7 +47,7 @@ export function ServerObservationPeriodControls({
             prefetch={false}
             href={href(period, end)}
             aria-current={window === period ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${filterNavLinkClass} ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${linkFocusRing} ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {label}
           </Link>

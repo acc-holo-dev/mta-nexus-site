@@ -14,7 +14,7 @@ import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { pageShellMax5xlMid, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
@@ -74,7 +74,7 @@ export async function PublicResourceVersionsPage({
     product = await productService.getProductBySlug(slug);
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xlMid}>
         <header className={surfaceSpace3BorderBPb6}>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
@@ -107,7 +107,7 @@ export async function PublicResourceVersionsPage({
 
   if (!history) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xlMid}>
         <header className={surfaceSpace3BorderBPb6}>
           <Link href={back} className={linkAccentSmRounded}>
             {copy.back}
@@ -152,7 +152,7 @@ export async function PublicResourceVersionsPage({
     : false;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlMid}>
       <header className={surfaceSpace3BorderBPb6}>
         <Link href={back} className={linkAccentSmRounded}>
           {copy.back}

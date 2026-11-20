@@ -8,7 +8,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { editableDeveloperSchema } from "../../trust/verification-workspace-contract";
@@ -43,7 +43,7 @@ export async function SettingsDeveloperScreen() {
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/developer" />;
   if (!["developer", "admin"].includes(actor.role))
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax3xl}>
         <EmptyState
           title={copy.roleRequired}
           description={copy.profileDescription}
@@ -60,7 +60,7 @@ export async function SettingsDeveloperScreen() {
     .then((value) => editableDeveloperSchema.parse(value))
     .catch(() => null);
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax3xl}>
       <ProfileChangeHistoryLink locale={locale} />
       <header>
         <h1 className={type2xlBoldPrimary}>{copy.profile}</h1>

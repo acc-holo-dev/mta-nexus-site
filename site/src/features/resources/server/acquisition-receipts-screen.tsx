@@ -10,7 +10,7 @@ import { resourceCartReceiptsService } from "../../../lib/services/commerce/reso
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -77,7 +77,7 @@ export async function AcquisitionReceiptsScreen({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={copy.invalid}
           description={copy.invalidHint}
@@ -94,7 +94,7 @@ export async function AcquisitionReceiptsScreen({
   const result = await resourceCartReceiptsService.page(user, query).catch(() => null);
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <nav className={typeFlexWrapGap4Sm}>
           <Link href="/workspace/cart" className={linkAccentSmRounded}>
             {copy.cart}
@@ -118,7 +118,7 @@ export async function AcquisitionReceiptsScreen({
   const current = { ...query, page: result.page };
   const receiptsFiltered = query.days !== "all" || query.evidence !== "all";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <nav className={typeFlexWrapGap4Sm}>
         <Link href="/workspace/cart" className={linkAccentSmRounded}>
           {copy.cart}

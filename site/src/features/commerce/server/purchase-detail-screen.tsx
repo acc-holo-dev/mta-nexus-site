@@ -11,7 +11,7 @@ import { commerceService } from "../../../lib/services/commerce/commerce-service
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
@@ -87,7 +87,7 @@ export async function PurchaseDetailScreen({
     result = await commerceService.getBuyerOrderDetails(actor, id, page);
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/purchases" className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
@@ -106,7 +106,7 @@ export async function PurchaseDetailScreen({
   if (!result) notFound();
   const { order, items } = result;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <header className="min-w-0 space-y-3 border-b border-base pb-5">
         <Link href="/workspace/purchases" className={linkAccentSmRounded}>
           {copy.backToPurchases}

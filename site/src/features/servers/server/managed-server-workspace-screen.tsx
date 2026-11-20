@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverService } from "../../../lib/services/servers/server-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeLgBoldPrimary,
@@ -61,7 +61,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
   if (!claimStatus) notFound();
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <div className="min-w-0">
         <Link href="/workspace/servers" className={linkAccentSm}>
           ← {serverCopy.title}

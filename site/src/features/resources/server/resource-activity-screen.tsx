@@ -11,7 +11,7 @@ import { resourceActivityService } from "../../../lib/services/resources/resourc
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -78,7 +78,7 @@ export async function ResourceActivityScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccent}>
           {copy.back}
         </Link>
@@ -98,7 +98,7 @@ export async function ResourceActivityScreen({
     `/workspace/resources/${encodeURIComponent(id)}/activity?days=${days}`;
   const cards = ["acquisitions", "retainedGrants", "downloadStarts", "direct", "cart"] as const;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header className="space-y-3">
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccent}>
           {copy.back}

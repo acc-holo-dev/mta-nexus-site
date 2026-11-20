@@ -8,7 +8,9 @@ import {
   typeBlockSmPrimary,
   typeCaptionFaint,
   typeFlexCenterGap2,
+  typeFlexCursorBetweenGap4Py3,
   typeIconAccent,
+  typeMt05BlockXsMuted,
   typeSmSemiboldPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -59,10 +61,10 @@ export function SettingsAdvertisingPreferencesSection({
         </h2>
       </div>
       <p className={typeXsMuted}>{copy.description}</p>
-      <div className="flex cursor-pointer items-center justify-between gap-4 py-3">
+      <div className={typeFlexCursorBetweenGap4Py3}>
         <span>
           <span className={typeBlockSmPrimary}>{toggleLabel}</span>
-          <span className="mt-0.5 block text-xs text-muted">{status}</span>
+          <span className={typeMt05BlockXsMuted}>{status}</span>
         </span>
         <input
           type="checkbox"

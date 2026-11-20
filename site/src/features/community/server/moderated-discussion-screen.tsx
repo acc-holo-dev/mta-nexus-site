@@ -13,10 +13,7 @@ import { communityModerationService } from "../../../lib/services/community/comm
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import {
-  pageShellMax5xlTight as pageShellClass,
-  pageShellMax5xlBare,
-} from "../../shell/page-shell";
+import { pageShellMax5xlBare, pageShellMax5xlTight } from "../../shell/page-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -54,7 +51,7 @@ function ModeratedDiscussionLoadError({
   const copy = moderatedDiscussionCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={`${panelSpace3P5} ${pageShellClass}`}>
+    <section className={`${panelSpace3P5} ${pageShellMax5xlTight}`}>
       <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
@@ -208,7 +205,7 @@ export async function ModeratedDiscussionScreen({
       <span>{copy.unknown}</span>
     );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlTight}>
       <header className="space-y-3">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className={typeSmMuted}>{copy.description}</p>
