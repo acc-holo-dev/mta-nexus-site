@@ -21,12 +21,6 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
   expect(shell).toContain('aria-live="polite"');
   expect(shell).not.toMatch(/^"use client";/m);
 
-  for (const relative of ["site/src/app/workspace/servers/new/loading.tsx"]) {
-    const source = read(relative);
-    expect(source).toContain("features/shell/honest-loading");
-    expect(source).toContain("<HonestLoadingShell");
-  }
-
   for (const relative of [
     "site/src/app/admin/loading.tsx",
     "site/src/app/workspace/content/loading.tsx",
@@ -38,6 +32,7 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/discover/loading.tsx",
     "site/src/app/notifications/loading.tsx",
     "site/src/app/workspace/finance/loading.tsx",
+    "site/src/app/workspace/servers/new/loading.tsx",
   ]) {
     const source = read(relative);
     expect(source).toContain("features/shell/route-honest-loading-server");

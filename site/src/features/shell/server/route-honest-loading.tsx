@@ -11,22 +11,26 @@ const DEFAULT_ROW = "h-20 rounded bg-inset";
 export function RouteHonestLoading({
   headingId,
   title,
+  description,
   loadingLabel,
   className = DEFAULT_CLASS,
   headerClassName,
   titleClassName,
   statusClassName,
+  headingLevel = 1,
   rows = 3,
   rowClassName = DEFAULT_ROW,
   leading,
 }: {
   headingId: string;
   title: ReactNode;
+  description?: ReactNode;
   loadingLabel: ReactNode;
   className?: string;
   headerClassName?: string;
   titleClassName?: string;
   statusClassName?: string;
+  headingLevel?: 1 | 2;
   rows?: number;
   rowClassName?: string;
   leading?: ReactNode;
@@ -37,7 +41,9 @@ export function RouteHonestLoading({
       className={className}
       headingId={headingId}
       title={title}
+      {...(description !== undefined ? { description } : {})}
       loadingLabel={loadingLabel}
+      headingLevel={headingLevel}
       {...(headerClassName ? { headerClassName } : {})}
       {...(titleClassName ? { titleClassName } : {})}
       {...(statusClassName ? { statusClassName } : {})}

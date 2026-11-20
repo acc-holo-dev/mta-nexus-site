@@ -80,7 +80,7 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     "site/src/features/library/server/collection-reconcile-page.tsx",
     "site/src/features/library/server/collection-receipt-page.tsx",
     "site/src/features/library/server/collection-history-page.tsx",
-    "site/src/app/workspace/library/collections/error.tsx",
+    "site/src/features/library/components/library-collections-route-error.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
@@ -90,6 +90,15 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
+  expect(read("site/src/app/workspace/library/collections/error.tsx")).toContain(
+    "features/library/library-collections-route-error",
+  );
+  expect(read("site/src/app/workspace/library/collections/not-found.tsx")).toContain(
+    "features/library/library-collections-not-found-server",
+  );
+  expect(read("site/src/features/library/server/library-collections-not-found.tsx")).toContain(
+    "overflow-x-clip",
+  );
   expect(read("site/src/features/library/server/collection-history-page.tsx")).toContain(
     "EmptyState",
   );
