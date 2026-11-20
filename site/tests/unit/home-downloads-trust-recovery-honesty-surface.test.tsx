@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks Home panel load-unavailable ErrorStates to recovery hints", () => {
-  const home = read("site/src/app/page.tsx");
+  const home = read("site/src/features/shell/server/home-page.tsx");
   expect(home).toContain("dictionary.home.personalErrorHint");
   expect(home).toContain("dictionary.home.directoryPanelUnavailableHint");
   expect(home).toContain("dictionary.market.loadUnavailableHint");

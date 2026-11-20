@@ -350,7 +350,7 @@ function AcquireContent() {
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.version}</dt>
-            <dd className="font-numeric text-primary">v{product.currentVersion}</dd>
+            <dd className="font-numeric text-primary">{`v${product.currentVersion}`}</dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-3 font-bold">
             <dt className="text-primary">{copy.totalDue}</dt>

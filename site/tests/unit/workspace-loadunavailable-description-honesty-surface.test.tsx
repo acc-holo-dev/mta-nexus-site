@@ -10,8 +10,11 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const pages: Array<[string, string]> = [
   ["site/src/features/commerce/server/licenses-history-screen.tsx", "copy.loadUnavailableHint"],
   ["site/src/features/commerce/server/license-detail-page-screen.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/licenses/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/licenses/[id]/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/license-moderation-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/commerce/server/license-moderation-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
   ["site/src/features/library/server/library-download-detail-page.tsx", "copy.loadUnavailableHint"],
   [
     "site/src/features/resources/server/publisher-deliveries-screen.tsx",

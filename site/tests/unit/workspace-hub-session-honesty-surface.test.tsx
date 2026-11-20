@@ -5,13 +5,14 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/workspace/page.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/shell/server/workspace-hub-page.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: workspace hub session probe failure → PlatformSessionError, not guest sign-in. */
 it("locks workspace hub session probe failure to PlatformSessionError without guest-lie", () => {
-  expect(source).toContain(
-    'import { PlatformSessionError } from "../../features/shell/session-error"',
-  );
+  expect(source).toContain('import { PlatformSessionError } from "../session-error"');
   expect(source).toMatch(
     /try \{\s*user = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
   );

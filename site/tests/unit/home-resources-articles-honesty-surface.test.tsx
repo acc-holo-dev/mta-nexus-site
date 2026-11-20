@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/page.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/features/shell/server/home-page.tsx"), "utf8");
 
 /** Home free resources / articles: empty ≠ load failure; silent catch must not look empty. */
 it("locks home free-resource and updates empty vs unavailable surfaces", () => {

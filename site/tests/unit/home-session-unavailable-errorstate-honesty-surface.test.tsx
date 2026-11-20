@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/page.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/features/shell/server/home-page.tsx"), "utf8");
 
 /** Home session probe failure must not hide personal strip as a signed-out guest. */
 it("locks home session probe failure to ErrorState instead of guest null", () => {

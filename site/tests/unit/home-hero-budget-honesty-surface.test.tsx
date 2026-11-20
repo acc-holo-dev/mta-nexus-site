@@ -9,7 +9,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 /** Wave 59: first viewport = brand + one headline + one support + CTA; no eyebrow. */
 it("locks Home hero budget without liveEcosystem eyebrow", () => {
-  const page = read("site/src/app/page.tsx");
+  const page = read("site/src/features/shell/server/home-page.tsx");
   const en = read("site/src/lib/i18n/en/discovery.ts");
   const ru = read("site/src/lib/i18n/ru/discovery.ts");
   expect(page).toContain("nexus-hero-atmosphere");
