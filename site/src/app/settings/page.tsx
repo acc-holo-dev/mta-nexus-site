@@ -1,5 +1,3 @@
-import { SettingsPageClient } from "../../features/accounts/settings";
+"use client";
 
-export default function SettingsPage() {
-  return <SettingsPageClient />;
-}
+export { SettingsPageClient as default } from "../../features/accounts/settings";

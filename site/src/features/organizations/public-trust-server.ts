@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/public-trust";
+export { OrganizationTrustPage, organizationTrustMetadata } from "./server/public-trust";

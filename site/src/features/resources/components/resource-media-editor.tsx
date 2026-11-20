@@ -11,6 +11,7 @@ import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
 import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
 
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ResourceMediaEditor({
   initial,
   locale,
@@ -136,7 +137,7 @@ export function ResourceMediaEditor({
               variant="ghost"
               disabled={busy}
               onClick={() => void execute("GET")}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.reload}
             </Button>

@@ -16,7 +16,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
@@ -217,7 +217,7 @@ export function DiscussionReportBatch({
             <div className="flex flex-wrap gap-3">
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => {
                   resetReview();
                   setSelected(available.map((item) => item.id));
@@ -228,7 +228,7 @@ export function DiscussionReportBatch({
               </Button>
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => {
                   resetReview();
                   setSelected([]);
@@ -303,7 +303,7 @@ export function DiscussionReportBatch({
             blocked && !busy ? (
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => router.refresh()}
                 variant="ghost"
               >
@@ -321,7 +321,7 @@ export function DiscussionReportBatch({
       {blocked && !busy && !error ? (
         <Button
           type="button"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
           variant="ghost"
         >
@@ -390,7 +390,7 @@ export function DiscussionReportBatch({
             <Button
               type="button"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => resetReview()}
               variant="ghost"
             >

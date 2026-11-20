@@ -20,6 +20,7 @@ import {
 } from "../../shell/page-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
+import { linkGhostAccentSm } from "../../shell/link-shell";
 interface ProductInfo {
   id: string;
   slug: string;
@@ -36,8 +37,6 @@ const primaryLinkClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-accent px-5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 const secondaryLinkClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-surface px-5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function AcquireContent() {
   const searchParams = useSearchParams();
@@ -260,12 +259,12 @@ function AcquireContent() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className={ghostActionClass}
+                  className={linkGhostAccentSm}
                   onClick={() => setLoadRevision((value) => value + 1)}
                 >
                   {dictionary.errors.retry}
                 </Button>
-                <Link href="/market" className={ghostActionClass}>
+                <Link href="/market" className={linkGhostAccentSm}>
                   {copy.browse}
                 </Link>
               </div>

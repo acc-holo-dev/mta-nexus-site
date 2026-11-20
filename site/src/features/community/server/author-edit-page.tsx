@@ -16,14 +16,14 @@ import { parseEditableContent } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function editPublicationMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
     robots: { index: false, follow: false },
   };
 }
 
-export default async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
+export async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
   const [locale, { id }] = await Promise.all([getRequestLocale(), params]);
   const returnPath = `/workspace/content/${encodeURIComponent(id)}`;
   const copy = getUserPlatformCopy(locale);

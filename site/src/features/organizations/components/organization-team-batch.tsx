@@ -23,6 +23,7 @@ import { organizationBatchCopy } from "../organization-batch-copy";
 import type { OrganizationTeamPage } from "../organization-team-contract";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationTeamBatch({
   data,
   actorId,
@@ -165,7 +166,7 @@ export function OrganizationTeamBatch({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             onClick={() => setSelected(eligible.map((member) => member.id))}
           >
             {copy.all}
@@ -173,7 +174,7 @@ export function OrganizationTeamBatch({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             onClick={() => setSelected([])}
           >
             {copy.clear}
@@ -307,7 +308,7 @@ export function OrganizationTeamBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               disabled={disabled}
               onClick={() => {
                 setPreview(null);

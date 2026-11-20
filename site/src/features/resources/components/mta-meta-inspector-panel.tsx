@@ -8,6 +8,7 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export type InspectionResponse = {
   inspection?: {
     byteLength: number;
@@ -193,7 +194,7 @@ export function MtaMetaInspectorPanel({
               variant="ghost"
               disabled={!file || loading}
               onClick={() => void inspect()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.inspect}
             </Button>

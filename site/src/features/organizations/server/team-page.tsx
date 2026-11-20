@@ -20,13 +20,13 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../team";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata() {
+export async function teamMetadata() {
   return {
     title: organizationTeamCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function TeamPage({
+export async function TeamPage({
   params,
   searchParams,
 }: {

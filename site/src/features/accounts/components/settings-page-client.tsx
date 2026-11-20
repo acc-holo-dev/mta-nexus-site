@@ -34,7 +34,7 @@ import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-pr
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
 
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 type Notice = {
   text: string;
   error: boolean;
@@ -70,9 +70,6 @@ function parseSessionSnapshot(value: unknown): SessionSnapshot | null {
     return null;
   return { actorId: data.actorId, sessions: data.sessions };
 }
-
-const retryButtonClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function SettingsPageClient() {
   const pathname = usePathname();
@@ -535,7 +532,7 @@ export function SettingsPageClient() {
             <Button
               type="button"
               variant="ghost"
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => setRevision((current) => current + 1)}
             >
               {copy.retry}
@@ -563,7 +560,7 @@ export function SettingsPageClient() {
               type="button"
               variant="ghost"
               disabled={pending}
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => setRevision((current) => current + 1)}
             >
               {copy.retry}

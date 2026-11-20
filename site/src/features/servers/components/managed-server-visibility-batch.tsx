@@ -20,6 +20,7 @@ import {
   type ServerVisibilityPreview,
 } from "../server-workspace-contract";
 import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ManagedServerVisibilityBatch({
   items,
   locale,
@@ -196,7 +197,7 @@ export function ManagedServerVisibilityBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => changeSelection(items.map((item) => item.id))}
             >
               {copy.selectAll}
@@ -204,7 +205,7 @@ export function ManagedServerVisibilityBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => changeSelection([])}
             >
               {copy.clear}
@@ -258,7 +259,7 @@ export function ManagedServerVisibilityBatch({
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
         >
           {copy.reload}
@@ -328,7 +329,7 @@ export function ManagedServerVisibilityBatch({
               type="button"
               variant="ghost"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => {
                 setPreview(null);
                 setCommitAcknowledged(false);

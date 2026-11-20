@@ -32,3 +32,10 @@ export const linkAccentSmPlain = "inline-flex min-h-11 items-center text-sm text
 
 export const linkSecondaryBorder =
   "inline-flex min-h-11 items-center rounded-lg border border-base px-4 text-sm text-secondary";
+
+/** Ghost text-button / underline control used on forms (Button asChild / native). */
+export const linkGhostAccentSm =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkGhostAccentSmRounded =
+  "h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

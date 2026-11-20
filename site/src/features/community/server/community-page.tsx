@@ -11,12 +11,12 @@ import { publicationCopy } from "../publication-feed-copy";
 import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata() {
+export async function communityMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;
   return { title: copy.title, description: copy.description };
 }
 
-export default async function CommunityPage({
+export async function CommunityPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

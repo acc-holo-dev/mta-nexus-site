@@ -8,7 +8,7 @@ import { PlatformRequestError, platformRequest } from "../../community/user-plat
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,
@@ -19,9 +19,6 @@ import {
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../profile-privacy-copy";
-
-const retryButtonClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ProfilePrivacyEditor({
   initial,
@@ -249,7 +246,7 @@ export function ProfilePrivacyEditor({
               type="button"
               variant="ghost"
               disabled={pending}
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => void loadPreferences("replace")}
             >
               {copy.reload}

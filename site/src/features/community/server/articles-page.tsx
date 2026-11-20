@@ -12,12 +12,12 @@ import { ContentCatalogControls, ContentPageNavigation } from "../catalog-contro
 import { contentPageHref, editorialTypes, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata() {
+export async function articlesMetadata() {
   const copy = getDictionary(await getRequestLocale()).articles;
   return { title: copy.title, description: copy.description };
 }
 
-export default async function ArticlesPage({
+export async function ArticlesPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

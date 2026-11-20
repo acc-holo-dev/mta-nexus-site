@@ -14,7 +14,7 @@ import {
 } from "../account-recovery-browser";
 import { authEmailVerificationApiCopy } from "../auth-email-verification-api-copy";
 
-import { linkAccentSmSemibold } from "../../shell/link-shell";
+import { linkAccentSmSemibold, linkGhostAccentSm } from "../../shell/link-shell";
 type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }
@@ -23,9 +23,6 @@ type State =
   | { kind: "submitting"; proof: Proof }
   | { kind: "success"; email: string }
   | { kind: "error"; proof?: Proof; message: string };
-
-const retryButtonClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function VerifyEmailPage() {
   const { dictionary, locale } = useNexusLocale();
@@ -130,7 +127,7 @@ export function VerifyEmailPage() {
                   <Button
                     type="button"
                     variant="ghost"
-                    className={retryButtonClass}
+                    className={linkGhostAccentSm}
                     onClick={() => {
                       if (state.kind === "error" && state.proof) void confirm(state.proof);
                     }}

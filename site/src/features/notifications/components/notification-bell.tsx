@@ -17,6 +17,7 @@ import {
 } from "../notification-inbox-events";
 import { startVisiblePolling } from "../visible-polling";
 
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notificationBell;
@@ -304,7 +305,7 @@ export function NotificationBell() {
                     setError(null);
                     setAttempt((value) => value + 1);
                   }}
-                  className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkGhostAccentSm}
                 >
                   {copy.retry}
                 </Button>

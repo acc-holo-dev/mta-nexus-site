@@ -13,7 +13,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
@@ -170,7 +170,7 @@ export function AuthorPublicationRestore({
           type="button"
           variant="ghost"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
         >
           {copy.reload}
         </Button>

@@ -12,6 +12,7 @@ import {
   verificationApplicationAmendSchema,
 } from "../../trust/verification-applications-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
@@ -153,7 +154,7 @@ export function VerificationApplicationAmend({
         <Button
           type="button"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           variant="ghost"
         >
           {labels.reload}

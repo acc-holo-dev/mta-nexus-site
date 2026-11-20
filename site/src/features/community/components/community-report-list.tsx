@@ -4,7 +4,7 @@ import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { linkMuted } from "../../shell/link-shell";
+import { linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
@@ -156,7 +156,7 @@ export function CommunityReportList({
               variant="ghost"
               disabled={pending}
               onClick={() => void reload()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {pending ? copy.loading : copy.reload}
             </Button>

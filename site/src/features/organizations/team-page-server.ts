@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/team-page";
+export { TeamPage, teamMetadata } from "./server/team-page";

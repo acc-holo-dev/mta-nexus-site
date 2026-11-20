@@ -9,7 +9,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
-import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXs, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import {
   ContentCommentSubmitError,
@@ -38,8 +38,6 @@ import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function readScopedDiscussionDraft(contentId: string, actorId: string | null) {
   const own = readDiscussionComposeDraft(contentId, { actorId });
@@ -501,7 +499,7 @@ export function ContentDiscussion({
               {copy.replying} {reply.name}
             </span>
             <Button
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               variant="ghost"
               type="button"
               disabled={submitting || pendingWrite}
@@ -673,7 +671,7 @@ export function ContentDiscussion({
               />
             ) : null}
             <Button
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               variant="ghost"
               type="button"
               disabled={submitting || !!managingId || pendingWrite}
@@ -761,7 +759,7 @@ export function ContentDiscussion({
               <Button
                 type="button"
                 variant="ghost"
-                className={ghostActionClass}
+                className={linkGhostAccentSm}
                 disabled={loading || submitting || !!managingId}
                 onClick={() => {
                   setSearch("");
@@ -784,7 +782,7 @@ export function ContentDiscussion({
                 <Button
                   type="button"
                   variant="ghost"
-                  className={ghostActionClass}
+                  className={linkGhostAccentSm}
                   disabled={loading || submitting || !!managingId}
                   onClick={returnToDiscussion}
                 >
@@ -794,7 +792,7 @@ export function ContentDiscussion({
               <Button
                 type="button"
                 variant="ghost"
-                className={ghostActionClass}
+                className={linkGhostAccentSm}
                 disabled={loading || submitting || !!managingId}
                 onClick={() => void load(false, activeQuery.current)}
               >
@@ -821,7 +819,7 @@ export function ContentDiscussion({
             type="button"
             variant="ghost"
             disabled={loading || submitting || !!managingId}
-            className={ghostActionClass}
+            className={linkGhostAccentSm}
             onClick={() => void load(false, "")}
           >
             {!page ? copy.retry : copy.latest}

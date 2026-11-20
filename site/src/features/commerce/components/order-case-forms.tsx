@@ -11,7 +11,7 @@ import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { linkAccentRounded } from "../../shell/link-shell";
+import { linkAccentRounded, linkGhostAccentSmRounded } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   clearSupportRetry,
@@ -207,7 +207,7 @@ export function OrderCaseCreateForm({
         variant="ghost"
         disabled={busy}
         onClick={() => router.refresh()}
-        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkGhostAccentSmRounded}
       >
         {copy.reload}
       </Button>
@@ -413,7 +413,7 @@ export function OrderCaseReviewForm({
         variant="ghost"
         disabled={busy}
         onClick={() => router.refresh()}
-        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkGhostAccentSmRounded}
       >
         {copy.reload}
       </Button>

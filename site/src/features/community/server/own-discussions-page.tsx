@@ -14,7 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
 
-export async function generateMetadata() {
+export async function ownDiscussionsMetadata() {
   const copy = ownDiscussionCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -23,7 +23,7 @@ export async function generateMetadata() {
   };
 }
 
-export default async function OwnDiscussionsPage({
+export async function OwnDiscussionsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

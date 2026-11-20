@@ -3,11 +3,11 @@ import { DirectoryFilters, DirectoryResults } from "../../discovery/directory-se
 import { parseDiscoverQuery } from "../../discovery/discover-query";
 import { discoveryCopy } from "../../discovery/discovery-copy";
 import { pageShellStack6 } from "../../shell/page-shell";
-export async function generateMetadata() {
+export async function organizationsMetadata() {
   const copy = discoveryCopy(await getRequestLocale());
   return { title: copy.organizationsTitle, description: copy.organizationsDescription };
 }
-export default async function OrganizationsPage({
+export async function OrganizationsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

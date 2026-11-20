@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/following-feed-page";
+export { FollowingFeedPage, followingFeedMetadata } from "./server/following-feed-page";

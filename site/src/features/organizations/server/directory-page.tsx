@@ -15,13 +15,13 @@ import { parseOrganizationPage } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
-export async function generateMetadata() {
+export async function organizationsMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationsPage({
+export async function OrganizationsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

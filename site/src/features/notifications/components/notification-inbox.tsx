@@ -7,7 +7,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccent, linkAccentSm } from "../../shell/link-shell";
+import { linkAccent, linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
@@ -326,7 +326,7 @@ export function NotificationInbox({
               variant="ghost"
               disabled={busy}
               onClick={() => void refresh()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.retry}
             </Button>
@@ -469,7 +469,7 @@ export function NotificationInbox({
                       variant="ghost"
                       disabled={disabled}
                       onClick={() => void mark(!item.isRead, [item.id])}
-                      className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkGhostAccentSm}
                     >
                       {item.isRead ? copy.markOneUnread : copy.markOneRead}
                     </Button>

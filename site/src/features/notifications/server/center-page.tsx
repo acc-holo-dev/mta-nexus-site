@@ -21,7 +21,7 @@ import {
   parseNotificationInboxQuery,
 } from "../notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
-export async function generateMetadata() {
+export async function notificationCenterMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -29,7 +29,7 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
-export default async function NotificationCenterPage({
+export async function NotificationCenterPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

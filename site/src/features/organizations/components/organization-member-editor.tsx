@@ -9,6 +9,7 @@ import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationMemberEditor({
   member,
   locale,
@@ -106,7 +107,7 @@ export function OrganizationMemberEditor({
           variant="ghost"
           disabled={busy}
           onClick={onSelectOwner}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
         >
           {organizationGovernanceCopy(locale).choose}
         </Button>

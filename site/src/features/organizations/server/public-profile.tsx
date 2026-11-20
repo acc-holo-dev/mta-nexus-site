@@ -32,7 +32,7 @@ import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { linkAccentSm } from "../../shell/link-shell";
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
-export async function generateMetadata({
+export async function organizationProfileMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -54,7 +54,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function OrganizationProfilePage({
+export async function OrganizationProfilePage({
   params,
   searchParams,
 }: {

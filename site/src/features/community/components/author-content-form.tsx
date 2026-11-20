@@ -10,7 +10,11 @@ import {
 } from "../../organizations/organization-content-copy";
 import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
+import {
+  linkAccentRounded,
+  linkAccentSmRounded,
+  linkGhostAccentSmRounded,
+} from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
@@ -319,7 +323,7 @@ export function AuthorContentForm({
               variant="ghost"
               disabled={busy}
               onClick={() => void checkSavedVersion()}
-              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSmRounded}
             >
               {copy.checkLatestContent}
             </Button>
@@ -468,7 +472,7 @@ export function AuthorContentForm({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSmRounded}
               onClick={() =>
                 setPreview(
                   preview === null

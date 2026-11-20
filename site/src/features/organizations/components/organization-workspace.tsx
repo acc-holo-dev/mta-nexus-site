@@ -13,7 +13,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm, linkMuted } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -463,7 +463,7 @@ export function OrganizationWorkspacePanel({
                 type="button"
                 variant="ghost"
                 disabled={busy}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => router.refresh()}
               >
                 {copy.reload}
@@ -494,7 +494,7 @@ export function OrganizationWorkspacePanel({
           type="button"
           variant="ghost"
           disabled={busy}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
         >
           {copy.reload}

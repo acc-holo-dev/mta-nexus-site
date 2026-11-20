@@ -12,7 +12,7 @@ import {
   platformRequest,
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
-import { linkMuted } from "../../shell/link-shell";
+import { linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
@@ -393,7 +393,7 @@ export function VerificationWorkspace({
               type="button"
               variant="ghost"
               disabled={pending}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => void reload()}
             >
               {dictionary.errors.retry}
@@ -638,7 +638,7 @@ export function VerificationWorkspace({
           )}
           <Button
             type="button"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             variant="ghost"
             disabled={pending || Boolean(intent)}
             onClick={() => setTarget(null)}

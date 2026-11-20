@@ -5,6 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { fetchServerStatisticsCsv } from "../server-statistics-download";
 
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ServerStatisticsExportButton({
   url,
   label,
@@ -75,7 +76,7 @@ export function ServerStatisticsExportButton({
               variant="ghost"
               disabled={disabled || busy}
               onClick={() => void download()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.retry}
             </Button>

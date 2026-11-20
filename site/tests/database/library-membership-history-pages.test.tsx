@@ -156,7 +156,7 @@ it.each(["en", "ru"] as const)(
       robots: { index: false, follow: false },
     });
     expect(dynamic).toBe("force-dynamic");
-    expect(Page({ searchParams: Promise.resolve({}) }).type).toBe(LibraryMembershipHistoryScreen);
+    expect(Page).toBe(LibraryMembershipHistoryScreen);
     expect(Detail).toBe(LibraryMembershipHistoryScreen);
   },
 );

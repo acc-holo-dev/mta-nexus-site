@@ -17,6 +17,7 @@ import {
 } from "../organization-governance-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationOwnershipTransfer({
   data,
   target,
@@ -208,7 +209,7 @@ export function OrganizationOwnershipTransfer({
               variant="ghost"
               disabled={busy}
               onClick={onReload}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.reload}
             </Button>

@@ -6,7 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -21,8 +21,6 @@ import {
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
-const retryButtonClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function DeveloperProfileEditor({
   initial,
@@ -207,7 +205,7 @@ export function DeveloperProfileEditor({
               type="button"
               variant="ghost"
               disabled={pending}
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => void reload()}
             >
               {copy.reload}

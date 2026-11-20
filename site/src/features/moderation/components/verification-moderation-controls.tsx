@@ -9,6 +9,7 @@ import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   verificationCopy,
   verificationDecisionError,
@@ -169,7 +170,7 @@ export function VerificationModerationControls({
               <Button
                 type="button"
                 onClick={() => router.refresh()}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 variant="ghost"
               >
                 {verificationCopy(locale).reload}
@@ -181,7 +182,7 @@ export function VerificationModerationControls({
         <Button
           type="button"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           variant="ghost"
         >
           {verificationCopy(locale).reload}

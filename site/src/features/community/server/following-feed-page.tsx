@@ -10,7 +10,7 @@ import { PublicationFeed } from "../publication-feed";
 import { publicationCopy } from "../publication-feed-copy";
 import { publicationFeedView } from "../publication-feed-view";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function followingFeedMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
-export default async function FollowingFeedPage({
+export async function FollowingFeedPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

@@ -5,9 +5,9 @@ import {
   PublicContextTrustPage,
 } from "../../trust/public-context-trust-page";
 
-export const generateMetadata = (props: ContextTrustPageProps) =>
+export const organizationTrustMetadata = (props: ContextTrustPageProps) =>
   contextTrustMetadata("organization", props);
-export default function OrganizationTrustPage(props: ContextTrustPageProps) {
+export function OrganizationTrustPage(props: ContextTrustPageProps) {
   return (
     <div className={pageShellClass}>
       <PublicContextTrustPage {...props} kind="organization" />

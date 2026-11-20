@@ -9,7 +9,7 @@ import {
   moderationDetailHref,
 } from "../../moderation/community-moderation-contract";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 
@@ -197,7 +197,7 @@ export function ContentModerationControls({
               type="button"
               disabled={pending !== null}
               onClick={() => router.refresh()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               variant="ghost"
             >
               {moderationCopy(locale).reload}

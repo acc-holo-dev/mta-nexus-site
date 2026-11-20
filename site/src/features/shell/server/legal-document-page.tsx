@@ -4,9 +4,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { LegalDocument } from "../legal-document";
 import { pageShellClip as pageShellClass } from "../page-shell";
 
-export type LegalKind = "terms" | "privacy" | "copyright" | "communityRules";
+type LegalKind = "terms" | "privacy" | "copyright" | "communityRules";
 
-export async function legalDocumentMetadata(kind: LegalKind): Promise<Metadata> {
+async function legalDocumentMetadata(kind: LegalKind): Promise<Metadata> {
   const legal = getDictionary(await getRequestLocale()).legal;
   const title =
     kind === "terms"
@@ -19,7 +19,7 @@ export async function legalDocumentMetadata(kind: LegalKind): Promise<Metadata> 
   return { title };
 }
 
-export async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
+async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
   const locale = await getRequestLocale();
   const legal = getDictionary(locale).legal;
   const document =
@@ -45,3 +45,15 @@ export async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
     </div>
   );
 }
+
+export const termsMetadata = () => legalDocumentMetadata("terms");
+export const TermsDocumentPage = () => LegalDocumentPage({ kind: "terms" });
+
+export const privacyMetadata = () => legalDocumentMetadata("privacy");
+export const PrivacyDocumentPage = () => LegalDocumentPage({ kind: "privacy" });
+
+export const copyrightMetadata = () => legalDocumentMetadata("copyright");
+export const CopyrightDocumentPage = () => LegalDocumentPage({ kind: "copyright" });
+
+export const communityRulesMetadata = () => legalDocumentMetadata("communityRules");
+export const CommunityRulesDocumentPage = () => LegalDocumentPage({ kind: "communityRules" });

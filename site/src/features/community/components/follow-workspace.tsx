@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXs, linkGhostAccentSm } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
@@ -223,7 +223,7 @@ export function FollowWorkspace({
               type="button"
               variant="ghost"
               disabled={!!pending}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => void load("latest")}
             >
               {copy.retry}

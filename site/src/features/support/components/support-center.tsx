@@ -6,7 +6,7 @@ import { type FormEvent, useCallback, useEffect, useRef, useState } from "react"
 import { platformFieldClass } from "../../community/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccent, linkAccentSm } from "../../shell/link-shell";
+import { linkAccent, linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
@@ -444,7 +444,7 @@ export function SupportCenter({
             <Button
               type="button"
               onClick={() => void loadCases()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -540,7 +540,7 @@ export function SupportCenter({
               <Button
                 type="button"
                 onClick={() => void loadCases()}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 variant="ghost"
               >
                 {workspaceCopy.reload}

@@ -22,7 +22,7 @@ import { ContentReactions } from "../reactions";
 import { CommunityReportForm } from "../report-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata({
+export async function articleDetailMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -52,7 +52,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ArticleDetailPage({
+export async function ArticleDetailPage({
   params,
   searchParams,
 }: {

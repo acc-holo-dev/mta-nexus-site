@@ -5,6 +5,7 @@ import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getLicenseControlCopy } from "../license-control-i18n";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   confirmLicenseRelease,
   type LicenseRuntimeContext,
@@ -157,7 +158,7 @@ export function LicenseRuntimeProbe({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             disabled={busy}
             onClick={() => void check()}
           >

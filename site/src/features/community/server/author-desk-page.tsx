@@ -24,7 +24,7 @@ import { writerTypes } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function authorContentMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function AuthorContentPage({
+export async function AuthorContentPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

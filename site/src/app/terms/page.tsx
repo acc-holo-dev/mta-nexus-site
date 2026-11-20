@@ -1,10 +1,4 @@
-import {
-  LegalDocumentPage,
-  legalDocumentMetadata,
+export {
+  TermsDocumentPage as default,
+  termsMetadata as generateMetadata,
 } from "../../features/shell/legal-document-page-server";
-
-export const generateMetadata = () => legalDocumentMetadata("terms");
-
-export default async function Page() {
-  return LegalDocumentPage({ kind: "terms" });
-}

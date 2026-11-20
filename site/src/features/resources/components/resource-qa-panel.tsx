@@ -20,7 +20,7 @@ import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 type BuildOption = { id: string; version: string };
 
 type PagePayload = {
@@ -36,8 +36,6 @@ type DetailPayload = {
 };
 
 const shellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function readCode(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
@@ -428,7 +426,7 @@ export function ResourceQaPanel({
             <Button
               type="button"
               variant="ghost"
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               disabled={busy || loadingDetail || loadingPage}
               onClick={retryRead}
             >
