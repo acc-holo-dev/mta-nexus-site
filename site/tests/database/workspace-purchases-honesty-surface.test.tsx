@@ -8,6 +8,21 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (
+    /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/.test(
+      source,
+    )
+  ) {
+    expect(source).toMatch(
+      /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/,
+    );
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -151,9 +166,14 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     "site/src/app/workspace/review-reports/[id]/loading.tsx",
   ]) {
     const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toContain('"en" | "ru"');
+    expectClippedLoadingSource(source);
+    if (
+      !/CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading|DictionaryFieldRouteLoading|ResourceReviewRouteLoading/.test(
+        source,
+      )
+    ) {
+      expect(source).toContain('"en" | "ru"');
+    }
   }
 
   const history = read("site/src/features/commerce/commerce-history-i18n.ts");

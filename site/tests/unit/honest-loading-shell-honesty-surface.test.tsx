@@ -35,14 +35,17 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/workspace/servers/new/loading.tsx",
   ]) {
     const source = read(relative);
-    expect(source).toContain("features/shell/route-honest-loading-server");
     expect(source).toMatch(
-      /(?:DictionaryRouteLoading|LocaleCopyRouteLoading)\s*\(|<(?:Dictionary|Route)HonestLoading/,
+      /features\/(?:shell\/route-honest-loading-server|commerce\/(?:commerce-history-route-loading-server|commercial-route-loading-server)|organizations\/organization-workspace-route-loading-server|community\/(?:community-moderation-route-loading-server|author-publication-desk-route-loading-server|community-report-route-loading-server)|library\/resource-release-control-route-loading-server|commerce\/subscriptions-route-loading-server|resources\/(?:author-resources-route-loading-server|resource-review-route-loading-server)|library\/library-collections-route-loading-server)/,
+    );
+    expect(source).toMatch(
+      /(?:DictionaryFieldRouteLoading|DictionaryRouteLoading|LocaleCopyRouteLoading|AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading)\s*\(/,
     );
   }
 
   {
     const port = read("site/src/features/shell/route-honest-loading-server.ts");
+    expect(port).toContain("DictionaryFieldRouteLoading");
     expect(port).toContain("DictionaryRouteLoading");
     expect(port).toContain("LocaleCopyRouteLoading");
     expect(port).not.toContain("RouteHonestLoading");

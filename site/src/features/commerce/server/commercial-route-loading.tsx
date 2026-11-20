@@ -1,0 +1,66 @@
+import type { ReactNode } from "react";
+import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { getCommercialCopy } from "../commercial-i18n";
+
+type CommercialCopy = ReturnType<typeof getCommercialCopy>;
+type CommercialStringKey = {
+  [K in keyof CommercialCopy]-?: CommercialCopy[K] extends string ? K : never;
+}[keyof CommercialCopy];
+
+export function CommercialRouteLoading({
+  headingId,
+  titleKey,
+  loadingKey = "loading",
+  title,
+  loading,
+  className = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+  headerClassName,
+  titleClassName,
+  statusClassName,
+  rows = 4,
+  rowClassName = "h-24 rounded bg-inset",
+  leading,
+}: {
+  headingId: string;
+  titleKey?: CommercialStringKey;
+  loadingKey?: CommercialStringKey;
+  title?: (locale: "en" | "ru") => ReactNode;
+  loading?: (locale: "en" | "ru") => ReactNode;
+  className?: string;
+  headerClassName?: string;
+  titleClassName?: string;
+  statusClassName?: string;
+  rows?: number;
+  rowClassName?: string;
+  /** Pass `null` to omit the default leading pulse block. */
+  leading?: ReactNode | null;
+}) {
+  if (titleKey === undefined && title === undefined) {
+    throw new Error("CommercialRouteLoading requires titleKey or title");
+  }
+  const resolvedLeading =
+    leading === undefined ? <div className="h-10 w-72 rounded bg-inset" /> : (leading ?? undefined);
+  return LocaleCopyRouteLoading({
+    headingId,
+    className,
+    ...(headerClassName !== undefined ? { headerClassName } : {}),
+    ...(titleClassName !== undefined ? { titleClassName } : {}),
+    ...(statusClassName !== undefined ? { statusClassName } : {}),
+    rows,
+    rowClassName,
+    ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+    load: (locale) => {
+      const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+      const copy = getCommercialCopy(typedLocale);
+      const resolvedTitle =
+        title?.(typedLocale) ?? (titleKey !== undefined ? copy[titleKey] : undefined);
+      if (resolvedTitle === undefined) {
+        throw new Error("missing route loading title");
+      }
+      return {
+        title: resolvedTitle,
+        loading: loading ? loading(typedLocale) : copy[loadingKey],
+      };
+    },
+  });
+}

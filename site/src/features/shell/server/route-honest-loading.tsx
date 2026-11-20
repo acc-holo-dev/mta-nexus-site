@@ -58,6 +58,15 @@ function RouteHonestLoading({
   );
 }
 
+function readDictionaryPath(dictionary: Dictionary, path: string): ReactNode {
+  let current: unknown = dictionary;
+  for (const part of path.split(".")) {
+    if (current == null || typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return current as ReactNode;
+}
+
 export async function DictionaryRouteLoading({
   headingId,
   className = DEFAULT_CLASS,
@@ -104,6 +113,45 @@ export async function DictionaryRouteLoading({
       leading={leading}
     />
   );
+}
+
+export async function DictionaryFieldRouteLoading({
+  headingId,
+  titlePath,
+  loadingPath,
+  className = DEFAULT_CLASS,
+  headerClassName,
+  titleClassName,
+  statusClassName,
+  rows = 3,
+  rowClassName = DEFAULT_ROW,
+  leading,
+}: {
+  headingId: string;
+  titlePath: string;
+  loadingPath: string;
+  className?: string;
+  headerClassName?: string;
+  titleClassName?: string;
+  statusClassName?: string;
+  rows?: number;
+  rowClassName?: string;
+  leading?: ReactNode;
+}) {
+  return DictionaryRouteLoading({
+    headingId,
+    className,
+    headerClassName,
+    titleClassName,
+    statusClassName,
+    rows,
+    rowClassName,
+    leading,
+    pick: (dictionary) => ({
+      title: readDictionaryPath(dictionary, titlePath),
+      loading: readDictionaryPath(dictionary, loadingPath),
+    }),
+  });
 }
 
 export async function LocaleCopyRouteLoading({

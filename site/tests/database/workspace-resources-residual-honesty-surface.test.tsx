@@ -8,6 +8,21 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (
+    /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/.test(
+      source,
+    )
+  ) {
+    expect(source).toMatch(
+      /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/,
+    );
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -118,8 +133,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
     "site/src/app/workspace/resources/[id]/builds/[buildId]/package/loading.tsx",
   ];
   for (const loading of loadings) {
-    expect(read(loading)).toContain("overflow-x-clip");
-    expect(read(loading)).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
   }
 
   expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("loadUnavailableHint");

@@ -1,8 +1,10 @@
-import { DictionaryRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
 
 export default async function Loading() {
-  return DictionaryRouteLoading({
+  return DictionaryFieldRouteLoading({
     headingId: "article-loading-heading",
+    titlePath: "articles.title",
+    loadingPath: "articles.loading",
     className: "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip",
     rows: 0,
     leading: (
@@ -12,9 +14,5 @@ export default async function Loading() {
         <div className="h-64 rounded bg-inset" />
       </>
     ),
-    pick: (dictionary) => ({
-      title: dictionary.articles.title,
-      loading: dictionary.articles.loading,
-    }),
   });
 }

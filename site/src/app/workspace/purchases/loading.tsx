@@ -1,19 +1,8 @@
-import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
-import { LocaleCopyRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { CommerceHistoryRouteLoading } from "../../../features/commerce/commerce-history-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return CommerceHistoryRouteLoading({
     headingId: "purchases-loading-heading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
-    rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
-    load: (locale) => {
-      const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
-      const copy = getCommerceHistoryCopy(typedLocale);
-      return {
-        title: copy.purchasesTitle,
-        loading: copy.loading,
-      };
-    },
+    titleKey: "purchasesTitle",
   });
 }

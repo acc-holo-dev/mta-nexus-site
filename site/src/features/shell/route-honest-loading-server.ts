@@ -1,3 +1,7 @@
 import "server-only";
 
-export { DictionaryRouteLoading, LocaleCopyRouteLoading } from "./server/route-honest-loading";
+export {
+  DictionaryFieldRouteLoading,
+  DictionaryRouteLoading,
+  LocaleCopyRouteLoading,
+} from "./server/route-honest-loading";

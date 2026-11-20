@@ -1,9 +1,8 @@
-import { authorPublicationDeskCopy } from "../../../../features/community/author-publication-desk-copy";
+import { AuthorPublicationDeskRouteLoading } from "../../../../features/community/author-publication-desk-route-loading-server";
 import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
-import { LocaleCopyRouteLoading } from "../../../../features/shell/route-honest-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return AuthorPublicationDeskRouteLoading({
     headingId: "edit-publication-loading-heading",
     className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip",
     rowClassName: "h-16 rounded bg-inset",
@@ -13,13 +12,6 @@ export default async function Loading() {
         <div className="h-32 rounded bg-inset" />
       </>
     ),
-    load: (locale) => {
-      const copy = getUserPlatformCopy(locale);
-      const desk = authorPublicationDeskCopy(locale);
-      return {
-        title: copy.edit,
-        loading: desk.loading,
-      };
-    },
+    title: (locale) => getUserPlatformCopy(locale).edit,
   });
 }

@@ -1,8 +1,10 @@
-import { DictionaryRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
 
 export default async function Loading() {
-  return DictionaryRouteLoading({
+  return DictionaryFieldRouteLoading({
     headingId: "auth-verify-email-loading-heading",
+    titlePath: "recovery.verifyTitle",
+    loadingPath: "recovery.checkingVerification",
     className: "mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip py-16",
     headerClassName: "space-y-2 text-center",
     rows: 0,
@@ -12,9 +14,5 @@ export default async function Loading() {
         <div className="h-11 w-40 rounded bg-inset" />
       </>
     ),
-    pick: (dictionary) => ({
-      title: dictionary.recovery.verifyTitle,
-      loading: dictionary.recovery.checkingVerification,
-    }),
   });
 }

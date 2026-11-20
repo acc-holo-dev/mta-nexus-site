@@ -1,17 +1,11 @@
-import { libraryCollectionsCopy } from "../../../../../features/library/library-collections-i18n";
-import { LocaleCopyRouteLoading } from "../../../../../features/shell/route-honest-loading-server";
+import { LibraryCollectionsRouteLoading } from "../../../../../features/library/library-collections-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return LibraryCollectionsRouteLoading({
     headingId: "library-collection-detail-loading-heading",
+    titleKey: "title",
     className: "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip",
+    rows: 3,
     leading: <div className="h-28 rounded bg-inset" />,
-    load: (locale) => {
-      const copy = libraryCollectionsCopy(locale);
-      return {
-        title: copy.title,
-        loading: copy.loading,
-      };
-    },
   });
 }

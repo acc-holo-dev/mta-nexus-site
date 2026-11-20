@@ -1,17 +1,8 @@
-import { moderationCopy } from "../../../features/community/community-moderation-copy";
-import { LocaleCopyRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { CommunityModerationRouteLoading } from "../../../features/community/community-moderation-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return CommunityModerationRouteLoading({
     headingId: "admin-community-loading-heading",
-    className: "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip",
-    leading: <div className="h-24 rounded bg-inset" />,
-    load: (locale) => {
-      const copy = moderationCopy(locale);
-      return {
-        title: copy.title,
-        loading: copy.loading,
-      };
-    },
+    titleKey: "title",
   });
 }

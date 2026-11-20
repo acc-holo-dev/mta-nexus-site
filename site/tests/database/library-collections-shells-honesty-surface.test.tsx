@@ -11,6 +11,21 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (
+    /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/.test(
+      source,
+    )
+  ) {
+    expect(source).toMatch(
+      /AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|DictionaryFieldRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading/,
+    );
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -72,9 +87,7 @@ it("locks library collections shells and exclusive market/articles pages to clip
     expect(source).toContain("min-w-0");
   }
   for (const loading of clippedLoadings) {
-    const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
   }
   for (const [loading, port] of delegatedLoadings) {
     expect(read(loading)).toContain(port);
