@@ -128,11 +128,11 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     "site/src/features/commerce/server/purchase-detail-screen.tsx",
     "site/src/features/commerce/server/purchase-operations-screen.tsx",
     "site/src/features/commerce/server/purchase-terms-screen.tsx",
-    "site/src/app/workspace/purchases/[id]/support/page.tsx",
-    "site/src/app/workspace/order-cases/page.tsx",
-    "site/src/app/workspace/order-cases/[id]/page.tsx",
-    "site/src/app/workspace/review-reports/page.tsx",
-    "site/src/app/workspace/review-reports/[id]/page.tsx",
+    "site/src/features/commerce/server/order-case-page.tsx",
+    "site/src/features/commerce/server/order-case-page.tsx",
+    "site/src/features/commerce/server/order-case-page.tsx",
+    "site/src/features/resources/server/resource-review-report-screen.tsx",
+    "site/src/features/resources/server/resource-review-report-screen.tsx",
   ];
   for (const page of shellPages) {
     const source = read(page);

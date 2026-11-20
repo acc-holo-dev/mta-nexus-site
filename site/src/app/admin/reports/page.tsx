@@ -1,24 +1,14 @@
-import { communityReportCopy } from "../../../features/community/community-report-copy";
-import { CommunityReportScreen } from "../../../features/community/reports-server";
-import { getRequestLocale } from "../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  CommunityReportScreen,
+  communityReportListMetadata,
+} from "../../../features/community/reports-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  return {
-    title: communityReportCopy(await getRequestLocale()).queue,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = communityReportListMetadata;
 export default function ReportsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return (
-    <div className={pageShellClass}>
-      <CommunityReportScreen staff searchParams={searchParams} />
-    </div>
-  );
+  return <CommunityReportScreen staff searchParams={searchParams} />;
 }

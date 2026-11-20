@@ -71,7 +71,7 @@ export async function PublicationReportsPage({
       return `${path}?${params}`;
     };
     return (
-      <div className="mx-auto max-w-5xl space-y-5">
+      <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
         <header className="space-y-2">
           <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
           <p className="break-words text-secondary">{data.publication.title}</p>
@@ -179,7 +179,7 @@ export async function PublicationReportsPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto max-w-5xl space-y-5">
+      <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
         <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
         <ErrorState
           title={communityReportError(

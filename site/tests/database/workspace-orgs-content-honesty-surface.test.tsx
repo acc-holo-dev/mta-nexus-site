@@ -29,7 +29,7 @@ beforeEach(() => {
 
 const clippedOrgPages = [
   "site/src/features/organizations/server/activity-page.tsx",
-  "site/src/app/workspace/organizations/[id]/content/new/page.tsx",
+  "site/src/features/organizations/server/organization-content-editor-page.tsx",
   "site/src/features/organizations/server/organization-content-editor-page.tsx",
   "site/src/features/community/server/context-publication-history-screen.tsx",
 ] as const;

@@ -1,28 +1,15 @@
-import type { Metadata } from "next";
-import { resourceReviewCopy } from "../../../features/resources/resource-review-i18n";
-import { ResourceReviewReportScreen } from "../../../features/resources/review-report-server";
-import { getRequestLocale } from "../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  ResourceReviewReportScreen,
+  resourceReviewReportMetadata,
+} from "../../../features/resources/review-report-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
-  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
-  return {
-    title: `${resourceReviewCopy(typedLocale).reports} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = resourceReviewReportMetadata;
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return (
-    <div className={pageShellClass}>
-      {await ResourceReviewReportScreen({ staff: false, query: await searchParams })}
-    </div>
-  );
+  return await ResourceReviewReportScreen({ staff: false, query: await searchParams });
 }

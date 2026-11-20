@@ -39,17 +39,12 @@ beforeEach(() => {
 });
 
 const clippedDetailPages = [
-  "site/src/app/workspace/library/collections/[id]/page.tsx",
+  "site/src/features/library/server/library-collections-screen.tsx",
   "site/src/features/library/server/library-collections-list-view.tsx",
-  "site/src/app/workspace/library/collections/[id]/copy/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/copy-items/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/move-items/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/history/page.tsx",
   "site/src/features/library/server/collection-releases-screen.tsx",
   "site/src/features/library/server/collection-requirements-screen.tsx",
-  "site/src/app/workspace/library/collections/[id]/versions/page.tsx",
   "site/src/features/library/server/library-selection-batch-screen.tsx",
-  "site/src/app/workspace/library/[id]/requirements/page.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
   "site/src/features/library/server/library-release-comparison-screen.tsx",
 ] as const;
 

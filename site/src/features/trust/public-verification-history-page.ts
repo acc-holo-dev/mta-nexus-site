@@ -1,1 +1,4 @@
-export { ApprovalHistoryPage } from "./server/public-verification-history-page";
+export {
+  ApprovalHistoryPage,
+  approvalHistoryMetadata,
+} from "./server/public-verification-history-page";

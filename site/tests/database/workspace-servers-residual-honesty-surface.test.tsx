@@ -30,13 +30,13 @@ beforeEach(() => {
 
 const clippedPages = [
   "site/src/features/servers/server/server-workspace-history-screen.tsx",
-  "site/src/app/workspace/servers/[id]/statistics/page.tsx",
-  "site/src/app/workspace/servers/[id]/observations/page.tsx",
-  "site/src/app/workspace/servers/[id]/content/new/page.tsx",
+  "site/src/features/servers/server/server-statistics-page.tsx",
+  "site/src/features/servers/server/server-observation-browser-page.tsx",
+  "site/src/features/servers/server/server-content-editor-page.tsx",
   "site/src/features/servers/server/server-content-editor-page.tsx",
   "site/src/features/community/server/context-publication-history-screen.tsx",
-  "site/src/app/servers/[slug]/trust/page.tsx",
-  "site/src/app/workspace/licenses/[id]/history/page.tsx",
+  "site/src/features/trust/server/public-context-trust-page.tsx",
+  "site/src/features/commerce/server/license-history-page.tsx",
 ] as const;
 
 const clippedLoadings = [

@@ -27,6 +27,15 @@ export async function communityReportMetadata(): Promise<Metadata> {
   };
 }
 
+export async function communityReportListMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  return {
+    title: communityReportCopy(typedLocale).title,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CommunityReportScreen({
   staff = false,
   id,

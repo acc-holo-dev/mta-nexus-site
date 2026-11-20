@@ -1,16 +1,12 @@
-import { PublicProfileActivity } from "../../../../features/accounts/public-profile-activity-server";
-import { publicationCopy } from "../../../../features/community/publication-feed-copy";
-import { getRequestLocale } from "../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  PublicProfileActivity,
+  publicProfileActivityMetadata,
+} from "../../../../features/accounts/public-profile-activity-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  return {
-    title: publicationCopy(await getRequestLocale()).activity,
-    robots: { index: false, follow: false },
-  };
-}
+
+export const generateMetadata = publicProfileActivityMetadata;
+
 export default async function UserActivity({
   params,
   searchParams,
@@ -18,15 +14,9 @@ export default async function UserActivity({
   params: Promise<{ username: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return (
-    <div className={pageShellClass}>
-      {
-        await PublicProfileActivity({
-          kind: "user",
-          handle: (await params).username,
-          searchParams,
-        })
-      }
-    </div>
-  );
+  return PublicProfileActivity({
+    kind: "user",
+    handle: (await params).username,
+    searchParams,
+  });
 }

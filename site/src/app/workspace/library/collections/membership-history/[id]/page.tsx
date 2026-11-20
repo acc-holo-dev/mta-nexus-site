@@ -1,10 +1,10 @@
 import {
   LibraryMembershipHistoryScreen,
-  libraryMembershipHistoryMetadata,
+  libraryMembershipHistoryDetailMetadata,
 } from "../../../../../../features/library/membership-history-server";
 
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = libraryMembershipHistoryMetadata;
+export const generateMetadata = libraryMembershipHistoryDetailMetadata;
 
 export default LibraryMembershipHistoryScreen;

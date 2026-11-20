@@ -31,7 +31,7 @@ beforeEach(() => {
 });
 
 const clippedShellPages = [
-  "site/src/app/settings/page.tsx",
+  "site/src/features/accounts/components/settings-page-client.tsx",
   "site/src/features/accounts/server/settings-history-screen.tsx",
   "site/src/features/accounts/server/login-screen.tsx",
   "site/src/features/accounts/server/register-screen.tsx",

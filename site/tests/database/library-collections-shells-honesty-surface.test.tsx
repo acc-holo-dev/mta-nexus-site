@@ -41,8 +41,8 @@ beforeEach(() => {
 });
 
 const clippedPages = [
-  "site/src/app/workspace/library/collections/page.tsx",
-  "site/src/app/workspace/library/collections/membership-history/page.tsx",
+  "site/src/features/library/server/library-collections-list-view.tsx",
+  "site/src/features/library/server/library-membership-history-screen.tsx",
   "site/src/features/library/server/library-membership-history-screen.tsx",
   "site/src/features/resources/server/detail-page.tsx",
   "site/src/features/community/server/articles-page.tsx",

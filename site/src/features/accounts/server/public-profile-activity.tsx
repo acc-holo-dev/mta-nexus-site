@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
@@ -11,6 +12,22 @@ import { publicationFeedView } from "../../community/publication-feed-view";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function publicProfileMetadata(): Promise<Metadata> {
+  const copy = publicationCopy(await getRequestLocale());
+  return {
+    title: copy.serverTitle,
+    description: copy.serverDescription,
+    robots: { index: false, follow: true },
+  };
+}
+
+export async function publicProfileActivityMetadata(): Promise<Metadata> {
+  return {
+    title: publicationCopy(await getRequestLocale()).activity,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function PublicProfileActivity({
   kind,

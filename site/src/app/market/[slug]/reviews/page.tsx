@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
-import { resourceReviewCopy } from "../../../../features/resources/resource-review-i18n";
-import { getRequestLocale } from "../../../../lib/i18n/server";
+import {
+  PublicResourceReviewsPage,
+  publicResourceReviewsMetadata,
+} from "../../../../features/resources/reviews-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
-}
+export const generateMetadata = publicResourceReviewsMetadata;
 
-export { PublicResourceReviewsPage as default } from "../../../../features/resources/reviews-server";
+export default PublicResourceReviewsPage;

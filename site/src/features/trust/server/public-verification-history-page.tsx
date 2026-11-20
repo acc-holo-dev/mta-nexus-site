@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
@@ -11,6 +12,20 @@ import { approvalCopy, approvalError } from "../public-verification-history-copy
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function approvalHistoryMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const copy = approvalCopy(await getRequestLocale()),
+    { username } = await params;
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: { canonical: approvalPageHref(username) },
+  };
+}
 
 export async function ApprovalHistoryPage({
   params,

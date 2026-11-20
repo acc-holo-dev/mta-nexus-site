@@ -30,11 +30,17 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     "site/src/app/workspace/servers/new/loading.tsx",
     "site/src/app/workspace/platform-reports/loading.tsx",
     "site/src/app/workspace/platform-reports/[id]/loading.tsx",
-    "site/src/app/loading.tsx",
   ]) {
     const source = read(relative);
     expect(source).toContain("features/shell/honest-loading");
     expect(source).toContain("<HonestLoadingShell");
+  }
+
+  {
+    const source = read("site/src/features/shell/components/global-loading-page.tsx");
+    expect(source).toContain('from "../honest-loading"');
+    expect(source).toContain("<HonestLoadingShell");
+    expect(read("site/src/app/loading.tsx")).toContain("features/shell/global-loading-page");
   }
 
   for (const relative of [

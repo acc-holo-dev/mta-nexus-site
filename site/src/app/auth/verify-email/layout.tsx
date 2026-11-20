@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import { verifyEmailLayoutMetadata } from "../../../features/accounts/recovery-layout-metadata-server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getDictionary(await getRequestLocale()).recovery.verifyTitle} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = verifyEmailLayoutMetadata;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

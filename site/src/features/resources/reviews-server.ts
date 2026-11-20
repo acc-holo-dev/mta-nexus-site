@@ -1,3 +1,3 @@
 import "server-only";
 
-export { PublicResourceReviewsPage } from "./server/reviews-page";
+export { PublicResourceReviewsPage, publicResourceReviewsMetadata } from "./server/reviews-page";

@@ -1,18 +1,12 @@
-import { PublicProfileActivity } from "../../../../features/accounts/public-profile-activity-server";
-import { publicationCopy } from "../../../../features/community/publication-feed-copy";
-import { getRequestLocale } from "../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  PublicProfileActivity,
+  publicProfileMetadata,
+} from "../../../../features/accounts/public-profile-activity-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  const copy = publicationCopy(await getRequestLocale());
-  return {
-    title: copy.serverTitle,
-    description: copy.serverDescription,
-    robots: { index: false, follow: true },
-  };
-}
+
+export const generateMetadata = publicProfileMetadata;
+
 export default async function ServerUpdates({
   params,
   searchParams,
@@ -20,15 +14,9 @@ export default async function ServerUpdates({
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return (
-    <div className={pageShellClass}>
-      {
-        await PublicProfileActivity({
-          kind: "server",
-          handle: (await params).slug,
-          searchParams,
-        })
-      }
-    </div>
-  );
+  return PublicProfileActivity({
+    kind: "server",
+    handle: (await params).slug,
+    searchParams,
+  });
 }

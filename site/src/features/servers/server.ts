@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ServersPage } from "./server/servers-page";
+export { ServersPage, serversMetadata } from "./server/servers-page";

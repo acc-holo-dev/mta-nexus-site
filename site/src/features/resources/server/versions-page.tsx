@@ -1,6 +1,7 @@
 import { buildRepository } from "@nexus/db";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary, type Locale } from "../../../lib/i18n";
@@ -29,6 +30,13 @@ function formatBuildSize(bytes: number, locale: Locale): string {
   if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+}
+
+export async function publicResourceVersionsMetadata(): Promise<Metadata> {
+  return {
+    title: `${getReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function PublicResourceVersionsPage({

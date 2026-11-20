@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/admin/support/layout.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/support/server/admin-support-layout.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: session probe failure → PlatformSessionError, not guest sign-in. */
 it("locks session probe failure to PlatformSessionError without guest-lie", () => {

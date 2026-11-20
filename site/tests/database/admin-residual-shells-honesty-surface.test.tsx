@@ -28,23 +28,17 @@ beforeEach(() => {
 });
 
 const clippedShellPages = [
-  "site/src/app/admin/licenses/[id]/history/page.tsx",
-  "site/src/app/admin/community/page.tsx",
+  "site/src/features/commerce/server/license-history-page.tsx",
   "site/src/features/community/server/community-moderation-screen.tsx",
-  "site/src/app/admin/community/[id]/reports/page.tsx",
-  "site/src/app/admin/community/[id]/discussion/page.tsx",
   "site/src/features/community/server/moderated-discussion-screen.tsx",
+  "site/src/features/community/server/publication-reports-page.tsx",
   "site/src/features/community/server/discussion-reports-screen.tsx",
-  "site/src/app/admin/support/page.tsx",
-  "site/src/app/admin/support/[id]/page.tsx",
-  "site/src/app/admin/support/[id]/messages/page.tsx",
-  "site/src/app/admin/reports/page.tsx",
+  "site/src/features/support/server/support-page.tsx",
+  "site/src/features/support/server/support-message-page.tsx",
   "site/src/features/community/server/community-report-screen.tsx",
-  "site/src/app/admin/reports/[id]/history/page.tsx",
-  "site/src/app/admin/reports/targets/page.tsx",
-  "site/src/app/admin/commerce/order-cases/page.tsx",
-  "site/src/app/admin/commerce/order-cases/[id]/page.tsx",
-  "site/src/app/admin/commerce/reviews/page.tsx",
+  "site/src/features/community/server/community-report-history-page.tsx",
+  "site/src/features/community/server/community-report-groups-page.tsx",
+  "site/src/features/commerce/server/order-case-page.tsx",
   "site/src/features/resources/server/resource-review-report-screen.tsx",
 ] as const;
 

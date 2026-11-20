@@ -18,8 +18,8 @@ it("locks global-error to Shell bilingual copy port without inline locale dictio
   expect(port).toContain("MTA NEXUS could not start");
   expect(port).toContain("Не удалось запустить MTA NEXUS");
 
-  const page = read("site/src/app/global-error.tsx");
-  expect(page).toContain('from "../features/shell/global-error-copy"');
+  const page = read("site/src/features/shell/components/global-error-page.tsx");
+  expect(page).toContain('from "../global-error-copy"');
   expect(page).toContain("globalErrorCopy");
   expect(page).toContain("detectGlobalErrorLocale");
   expect(page).not.toContain("const copy = {");

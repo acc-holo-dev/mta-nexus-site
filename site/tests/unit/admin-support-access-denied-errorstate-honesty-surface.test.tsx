@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
-const source = read("site/src/app/admin/support/layout.tsx");
+const source = read("site/src/features/support/server/admin-support-layout.tsx");
 
 /** Honesty lock: admin support access-denied muted copy → ErrorState. */
 it("locks admin support access denied to ErrorState with home recovery", () => {

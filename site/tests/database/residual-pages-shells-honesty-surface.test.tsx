@@ -25,8 +25,8 @@ beforeEach(() => {
 });
 
 const clippedShellPages = [
-  "site/src/app/workspace/reports/[id]/page.tsx",
-  "site/src/app/workspace/reports/[id]/history/page.tsx",
+  "site/src/features/community/server/community-report-screen.tsx",
+  "site/src/features/community/server/community-report-history-page.tsx",
   "site/src/features/library/server/library-release-history-screen.tsx",
   "site/src/features/shell/server/development-status-screen.tsx",
 ] as const;
@@ -40,8 +40,10 @@ it("locks residual page shells to clipped min-w-0 frames", () => {
 });
 
 it("keeps residual report and version-history routes as thin clipped shells around honest screens", () => {
-  expect(read("site/src/app/workspace/reports/[id]/page.tsx")).toContain("CommunityReportScreen");
-  expect(read("site/src/app/workspace/reports/[id]/history/page.tsx")).toContain(
+  expect(read("site/src/features/community/server/community-report-screen.tsx")).toContain(
+    "CommunityReportScreen",
+  );
+  expect(read("site/src/features/community/server/community-report-history-page.tsx")).toContain(
     "CommunityReportHistoryPage",
   );
   expect(read("site/src/features/library/server/library-release-history-screen.tsx")).toContain(

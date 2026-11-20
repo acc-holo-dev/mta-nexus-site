@@ -27,15 +27,15 @@ beforeEach(() => {
 });
 
 const clippedPages = [
-  "site/src/app/support/page.tsx",
-  "site/src/app/support/[id]/page.tsx",
-  "site/src/app/support/[id]/messages/page.tsx",
+  "site/src/features/support/server/support-page.tsx",
+  "site/src/features/support/server/support-page.tsx",
+  "site/src/features/support/server/support-message-page.tsx",
   "site/src/features/organizations/server/public-activity.tsx",
   "site/src/features/organizations/server/public-trust.tsx",
-  "site/src/app/users/[username]/activity/page.tsx",
-  "site/src/app/servers/[slug]/updates/page.tsx",
-  "site/src/app/servers/[slug]/statistics/page.tsx",
-  "site/src/app/servers/[slug]/observations/page.tsx",
+  "site/src/features/accounts/server/public-profile-activity.tsx",
+  "site/src/features/accounts/server/public-profile-activity.tsx",
+  "site/src/features/servers/server/server-statistics-page.tsx",
+  "site/src/features/servers/server/server-observation-browser-page.tsx",
 ] as const;
 
 const clippedLoadings = [
@@ -51,7 +51,6 @@ it("locks support and activity page shells to clipped min-w-0 frames", () => {
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
   }
 });
 

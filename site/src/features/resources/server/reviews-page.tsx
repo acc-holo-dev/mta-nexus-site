@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
@@ -17,6 +18,10 @@ import { resourceReviewPageQuery } from "../resource-review-query";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function publicResourceReviewsMetadata(): Promise<Metadata> {
+  return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
+}
 
 export async function PublicResourceReviewsPage({
   params,

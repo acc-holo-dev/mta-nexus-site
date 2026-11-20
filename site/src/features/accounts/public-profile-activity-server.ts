@@ -1,1 +1,5 @@
-export { PublicProfileActivity } from "./server/public-profile-activity";
+export {
+  PublicProfileActivity,
+  publicProfileMetadata,
+  publicProfileActivityMetadata,
+} from "./server/public-profile-activity";

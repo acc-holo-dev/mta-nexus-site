@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import { resetPasswordLayoutMetadata } from "../../../features/accounts/recovery-layout-metadata-server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getDictionary(await getRequestLocale()).recovery.resetTitle} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = resetPasswordLayoutMetadata;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

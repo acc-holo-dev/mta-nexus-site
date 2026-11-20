@@ -26,8 +26,8 @@ describe("localized legal and workspace shell", () => {
   });
 
   it("uses the shared locale provider for route errors and loading", () => {
-    const error = read("site/src/app/error.tsx");
-    const loading = read("site/src/app/loading.tsx");
+    const error = read("site/src/features/shell/components/route-error-page.tsx");
+    const loading = read("site/src/features/shell/components/global-loading-page.tsx");
 
     expect(error).toContain("useNexusLocale");
     expect(error).not.toContain("document.cookie");

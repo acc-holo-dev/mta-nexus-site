@@ -194,7 +194,7 @@ describe("Next.js root runtime shell behavior", () => {
   );
 
   it("locks root error CTAs to size=touch / min-h-11 without size=sm", () => {
-    const source = readSource("site/src/app/error.tsx");
+    const source = readSource("site/src/features/shell/components/route-error-page.tsx");
     expect(source).toContain('size="touch"');
     expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
     expect(source).toContain("min-h-11 items-center");

@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n/server";
+import { settingsLayoutMetadata } from "../../features/accounts/settings-layout-metadata-server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getDictionary(await getRequestLocale()).settings.title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = settingsLayoutMetadata;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

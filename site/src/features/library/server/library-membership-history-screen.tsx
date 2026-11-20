@@ -26,6 +26,13 @@ import {
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 export async function libraryMembershipHistoryMetadata(): Promise<Metadata> {
   return {
+    title: `${libraryMembershipHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function libraryMembershipHistoryDetailMetadata(): Promise<Metadata> {
+  return {
     title: `${libraryMembershipHistoryCopy(await getRequestLocale()).detail} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };

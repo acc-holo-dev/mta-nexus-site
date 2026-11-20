@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n/server";
+import { ServersPage, serversMetadata } from "../../features/servers/server";
 
-export { ServersPage as default } from "../../features/servers/server";
+export const generateMetadata = serversMetadata;
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getDictionary(await getRequestLocale()).servers.title} | MTA NEXUS`,
-  };
-}
+export default ServersPage;

@@ -1,6 +1,7 @@
 import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -23,6 +24,12 @@ const SORTS = [
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function marketMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).product.market} | MTA NEXUS`,
+  };
+}
 
 export async function MarketPage({
   searchParams,

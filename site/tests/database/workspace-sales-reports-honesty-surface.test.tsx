@@ -133,10 +133,9 @@ it("locks additive seller sales honesty copy for report recovery", () => {
 });
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
-  const source = read("site/src/app/workspace/reports/page.tsx");
+  const source = read("site/src/features/community/server/community-report-screen.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
-  expect(source).toContain("pageShellClass");
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("CommunityReportScreen");
 });
