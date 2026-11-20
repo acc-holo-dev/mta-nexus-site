@@ -93,6 +93,12 @@ TEMPLATE_LITERAL = re.compile(r"""template\s*:\s*["']([^"']+)["']""")
 UNKNOWN_MARKER = re.compile(r"""["']—["']""")
 
 ALLOWLIST: tuple[dict[str, str], ...] = (
+    {
+        "id": "shell.meta.title-template",
+        "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+        "kind": "template",
+        "text": "%s | MTA NEXUS",
+    },
 )
 
 

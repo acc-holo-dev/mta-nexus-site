@@ -21,7 +21,7 @@
     {
       "id": "meta.title-template",
       "kind": "template",
-      "path": "site/src/app/layout.tsx",
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
       "text": "%s | MTA NEXUS"
     },
     {
@@ -61,13 +61,6 @@
       "text": "MTA NEXUS"
     },
     {
-      "allowlist_id": "meta.title-template",
-      "kind": "template",
-      "line": 17,
-      "path": "site/src/app/layout.tsx",
-      "text": "%s | MTA NEXUS"
-    },
-    {
       "allowlist_id": "global-error.brand.wordmark",
       "kind": "jsx-text",
       "line": 92,
@@ -82,10 +75,10 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature (excluding server/ and *-server ports), home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "106c9959aa520cc3c9a2bfaaed506eeddee631d4",
+  "source_sha": "02b7bb8dc6227125acae2936f683479f3ec68822",
   "summary": {
-    "allowlisted": 6,
-    "findings": 6,
+    "allowlisted": 5,
+    "findings": 5,
     "locale_copy_ternaries": 0,
     "scanned_files": 66,
     "unallowlisted": 0

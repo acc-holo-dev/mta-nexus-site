@@ -1,6 +1,21 @@
 {
-  "allowlist": [],
-  "findings": [],
+  "allowlist": [
+    {
+      "id": "shell.meta.title-template",
+      "kind": "template",
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+      "text": "%s | MTA NEXUS"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "shell.meta.title-template",
+      "kind": "template",
+      "line": 12,
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+      "text": "%s | MTA NEXUS"
+    }
+  ],
   "scan_roots": [
     "site/src/features/accounts/server",
     "site/src/features/commerce/server",
@@ -45,12 +60,12 @@
     "site/src/features/trust/components/public-user-trust.tsx"
   ],
   "scope": "Git-tracked feature server/ RSC screens plus residual interactive components not covered by shell-home / public-guest / workspace-member inventories — hard-coded member/staff-facing literals + locale copy ternaries.",
-  "source_sha": "106c9959aa520cc3c9a2bfaaed506eeddee631d4",
+  "source_sha": "02b7bb8dc6227125acae2936f683479f3ec68822",
   "summary": {
-    "allowlisted": 0,
-    "findings": 0,
+    "allowlisted": 1,
+    "findings": 1,
     "locale_copy_ternaries": 0,
-    "scanned_files": 213,
+    "scanned_files": 214,
     "unallowlisted": 0
   }
 }
