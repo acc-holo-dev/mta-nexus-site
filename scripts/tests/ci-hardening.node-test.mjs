@@ -127,6 +127,8 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/moderation/report-controls.ts",
     "site/src/features/moderation/reports-server.ts",
     "site/src/features/moderation/admin-home-server.ts",
+    "site/src/features/moderation/staff-storage-server.ts",
+    "site/src/features/moderation/staff-storage-object-server.ts",
     "site/src/features/moderation/verification-history-server.ts",
     "site/src/features/moderation/verification-application-server.ts",
     "site/src/features/moderation/verification-amend.ts",

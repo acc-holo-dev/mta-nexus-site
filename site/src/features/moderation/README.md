@@ -9,6 +9,8 @@
 | `verification-workspace.ts`, `verification-amend.ts`, `verification-controls.ts` | Верификация workspace                                                       |
 | `reports-server.ts`                                                              | Серверные экраны жалоб                                                      |
 | `admin-home-server.ts`                                                           | `AdminHomeScreen`; server-only хаб `/admin`                                 |
+| `staff-storage-server.ts`                                                        | `StaffStorageScreen`; server-only `/admin/storage`                          |
+| `staff-storage-object-server.ts`                                                 | `StaffStorageObjectScreen`; server-only `/admin/storage/objects/[id]`       |
 | `verification-history-server.ts`                                                 | `VerificationHistoryScreen`; server-only `/workspace/verification/history`  |
 | `verification-application-server.ts`                                             | `VerificationApplicationScreen`; server-only `/workspace/verification/[id]` |
 | `admin-home.ts`                                                                  | `Admin*Section` blocks для `/admin` overview                                |
