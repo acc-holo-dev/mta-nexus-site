@@ -13,7 +13,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
@@ -139,7 +139,7 @@ export function AuthorPublicationRestore({
         variant="outline"
         disabled={busy || blocked || saved}
         onClick={() => void restore()}
-        className="min-h-11 font-semibold text-accent"
+        className={linkMinHAccentSemibold}
       >
         {copy.restore}
       </Button>

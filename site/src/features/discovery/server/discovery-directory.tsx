@@ -19,7 +19,13 @@ import { FollowButton } from "../../community/follow";
 import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
-import { linkAccentRounded, linkAccentSm, linkAccentTightRounded } from "../../shell/link-shell";
+import {
+  linkAccentRounded,
+  linkAccentSm,
+  linkAccentTightRounded,
+  linkMinHContentAccentSmPlain,
+  linkMinHContentAccentSmRounded,
+} from "../../shell/link-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
@@ -99,7 +105,7 @@ export function DirectoryFilters({
                   })
                 : discoverHref({ ...state, query: "", page: 1 }, path)
             }
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHContentAccentSmRounded}
           >
             {copy.clearQuery}
           </Link>
@@ -107,7 +113,7 @@ export function DirectoryFilters({
         {hasActiveDiscoverFilters(state) ? (
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHContentAccentSmRounded}
           >
             {copy.reset}
           </Link>
@@ -419,7 +425,7 @@ export async function DirectoryResults({
           >
             {result.page > 1 ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkMinHContentAccentSmPlain}
                 href={discoverHref({ ...state, page: result.page - 1 }, path)}
               >
                 {copy.previous}
@@ -432,7 +438,7 @@ export async function DirectoryResults({
             </span>
             {result.hasMore ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkMinHContentAccentSmPlain}
                 href={discoverHref({ ...state, page: result.page + 1 }, path)}
               >
                 {copy.next}

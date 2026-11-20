@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 import { formatNotification } from "../notification-copy";
@@ -16,8 +17,6 @@ import {
   observeNotificationInboxChange,
 } from "../notification-inbox-events";
 import { startVisiblePolling } from "../visible-polling";
-
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notificationBell;

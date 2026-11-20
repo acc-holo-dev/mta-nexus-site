@@ -8,7 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSm, linkAccentSmPlain } from "../../shell/link-shell";
+import { linkAccentMinHInline, linkAccentSm, linkAccentSmPlain } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { platformReportCopy } from "../platform-report-i18n";
@@ -195,7 +195,7 @@ export async function PlatformReportsScreen({
           {page > 1 ? (
             <Link
               href={`/workspace/platform-reports?page=${page - 1}`}
-              className="min-h-11 inline-flex items-center text-accent underline"
+              className={linkAccentMinHInline}
             >
               {copy.previous}
             </Link>
@@ -206,7 +206,7 @@ export async function PlatformReportsScreen({
           {loaded.hasMore ? (
             <Link
               href={`/workspace/platform-reports?page=${page + 1}`}
-              className="min-h-11 inline-flex items-center text-accent underline"
+              className={linkAccentMinHInline}
             >
               {copy.next}
             </Link>

@@ -7,7 +7,13 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccent, linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  linkAccent,
+  linkAccentSm,
+  linkGhostAccentSm,
+  linkMinHAccent,
+  linkMinHAccentFocus,
+} from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
@@ -340,7 +346,7 @@ export function NotificationInbox({
             variant="outline"
             disabled={disabled}
             onClick={() => void mark(true, [], true)}
-            className="min-h-11 text-accent"
+            className={linkMinHAccent}
           >
             {copy.markAllRead}
           </Button>
@@ -376,7 +382,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length || !selectionAcknowledged}
           onClick={() => void mark(true, selected, false, true)}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {copy.markRead}
         </Button>
@@ -385,7 +391,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length || !selectionAcknowledged}
           onClick={() => void mark(false, selected, false, true)}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {copy.markUnread}
         </Button>

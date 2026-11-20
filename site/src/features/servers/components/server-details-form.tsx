@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import { confirmedUpdatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 
@@ -581,10 +582,7 @@ export function ServerDetailsForm({
         </div>
       )}
       {!foreignActor && identityVerified && newest && (
-        <section
-          aria-label={copy.latestDetails}
-          className="space-y-2 rounded-lg border border-base p-4 text-sm"
-        >
+        <section aria-label={copy.latestDetails} className={surfaceSpace2P4TextSm}>
           <h3 className="font-semibold">{copy.latestDetails}</h3>
           <p>{copy.compareHelp}</p>
           <p>

@@ -4,7 +4,13 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
-import { linkAccentSm, linkAccentTight, linkAccentXs } from "../../shell/link-shell";
+import {
+  linkAccentSm,
+  linkAccentTight,
+  linkAccentXs,
+  linkGhostAccent,
+  linkGhostAccentSmNoH,
+} from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
@@ -334,7 +340,7 @@ export function SupportCaseThread({
             <Button
               type="button"
               onClick={() => void load()}
-              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccent}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -413,7 +419,7 @@ export function SupportCaseThread({
               type="button"
               disabled={sending || updatingStatus}
               onClick={() => void load()}
-              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccent}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -470,7 +476,7 @@ export function SupportCaseThread({
             type="button"
             disabled={messagePage <= 1 || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.max(1, value - 1))}
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSmNoH}
             variant="ghost"
           >
             {dictionary.market.previousPage}
@@ -482,7 +488,7 @@ export function SupportCaseThread({
             type="button"
             disabled={messagePage >= messageTotalPages || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.min(messageTotalPages, value + 1))}
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSmNoH}
             variant="ghost"
           >
             {dictionary.market.nextPage}

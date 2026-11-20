@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
@@ -14,7 +15,6 @@ import {
 } from "../public-context-trust-contract";
 import { contextTrustCopy, contextTrustError } from "../public-context-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
-import { linkAccentSm } from "../../shell/link-shell";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

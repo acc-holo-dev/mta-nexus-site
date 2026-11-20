@@ -20,7 +20,7 @@ import { HomeNetworkServerCard } from "../../servers/client";
 import { HomePersonalChangesPanel } from "../home-personal";
 import { loadPersonalChangesSummary } from "../home-personal-changes-server";
 import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../home-personal-preference";
-import { linkAccentSm } from "../link-shell";
+import { linkAccentSm, linkAccentXsSemiboldHover } from "../link-shell";
 
 function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
   let sum = 0;
@@ -202,10 +202,7 @@ export async function HomePage() {
           description={dictionary.home.networkDescription}
           titleId="home-network-heading"
           action={
-            <Link
-              href="/servers"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/servers" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.openDirectory}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -250,10 +247,7 @@ export async function HomePage() {
           description={dictionary.home.resourcesDescription}
           titleId="home-free-resources-heading"
           action={
-            <Link
-              href="/market?maxPrice=0"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/market?maxPrice=0" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.viewAllResources}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -292,10 +286,7 @@ export async function HomePage() {
           description={dictionary.home.updatesDescription}
           titleId="home-community-updates-heading"
           action={
-            <Link
-              href="/articles"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/articles" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.allUpdates}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>

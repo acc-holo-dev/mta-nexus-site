@@ -21,11 +21,10 @@ import { ownDiscussionCopy } from "../../community/discussion-workspace-copy";
 import { getLibraryCopy } from "../../library/library-view";
 import { ManagedServerCard } from "../../servers/managed-card-server";
 import { getManagedServerCopy } from "../../servers/managed-server-view";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,

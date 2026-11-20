@@ -14,6 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -142,10 +143,7 @@ export async function PurchaseDetailScreen({
       >
         {orderTermsCopy(typedLocale).title}
       </Link>
-      <p
-        role="note"
-        className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
-      >
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
         {copy.receiptNote}
       </p>
       <section className="min-w-0 space-y-4" aria-labelledby="order-items">

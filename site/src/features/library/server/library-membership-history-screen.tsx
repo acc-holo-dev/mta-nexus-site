@@ -13,7 +13,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSm, linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
+import {
+  linkAccentSm,
+  linkAccentSmMedium,
+  linkAccentSmRounded,
+  linkAccentTight,
+} from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
@@ -247,10 +252,7 @@ export async function LibraryMembershipHistoryScreen({
             description={m.note}
             action={
               filtered ? (
-                <Link
-                  href={membershipHistoryHref()}
-                  className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={membershipHistoryHref()} className={linkAccentSmMedium}>
                   {m.clear}
                 </Link>
               ) : undefined

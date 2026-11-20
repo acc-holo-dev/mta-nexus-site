@@ -6,12 +6,12 @@ import { cache } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicUserTrustService } from "../../../lib/services/trust/public-user-trust-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P6 } from "../../shell/panel-shell";
 import { PublicUserTrustPanel } from "../public-user-trust";
 import { trustCopy } from "../public-user-trust-copy";
 
-import { linkAccentSm } from "../../shell/link-shell";
 const load = cache((username: string) =>
   publicUserTrustService.get(username).catch((error: unknown) => {
     if (error instanceof AppError && error.code === "NOT_FOUND") notFound();

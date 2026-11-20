@@ -11,6 +11,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
+import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
@@ -268,10 +269,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         {copy.cart}: {cart.items.length}/{cart.limit}
       </p>
       <p className="text-sm text-secondary">{copy.batchIntent}</p>
-      <p
-        role="note"
-        className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
-      >
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
         {receiptCopy.reviewNote}
       </p>
       {error ? (

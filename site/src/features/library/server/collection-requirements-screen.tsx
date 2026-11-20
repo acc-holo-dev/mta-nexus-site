@@ -12,13 +12,12 @@ import { ResourceRequirementsReportBody } from "../../resources/requirements-vie
 import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../../resources/resource-requirements-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
-
-import { linkAccent } from "../../shell/link-shell";
 export async function collectionRequirementsMetadata(): Promise<Metadata> {
   return {
     title: `${collectionRequirementsCopy(await getRequestLocale()).title} | MTA NEXUS`,

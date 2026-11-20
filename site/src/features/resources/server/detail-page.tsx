@@ -24,7 +24,7 @@ import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -320,7 +320,7 @@ export async function ProductDetailPage({
             <span className="text-muted">{copy.publisher}: </span>
             <Link
               href={`/organizations/${encodeURIComponent(attribution.organization.slug)}`}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightSemiboldHover}
             >
               {attribution.organization.name}
             </Link>
@@ -329,10 +329,7 @@ export async function ProductDetailPage({
         {attribution?.author ? (
           <p className="min-w-0">
             <span className="text-muted">{copy.author}: </span>
-            <Link
-              href={attribution.author.href}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={attribution.author.href} className={linkAccentTightSemiboldHover}>
               {attribution.author.displayName}
             </Link>
           </p>

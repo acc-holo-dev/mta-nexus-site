@@ -3,6 +3,7 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
+import { linkGhostAccentSemibold } from "../../shell/link-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import type { SettingsSession } from "../settings-client-api";
 
@@ -42,7 +43,7 @@ export function SettingsActiveSessions({
           size="touch"
           disabled={pending}
           onClick={onReload}
-          className="h-auto px-0 font-semibold text-accent"
+          className={linkGhostAccentSemibold}
         >
           {copy.reloadSettings}
         </Button>
@@ -110,7 +111,7 @@ export function SettingsActiveSessions({
                 size="touch"
                 disabled={pending}
                 onClick={onReload}
-                className="h-auto px-0 font-semibold text-accent"
+                className={linkGhostAccentSemibold}
               >
                 {copy.reloadSettings}
               </Button>

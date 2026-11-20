@@ -1,7 +1,11 @@
 import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import {
+  linkAccentSmRounded,
+  linkAccentXsRounded,
+  linkMinHAccentSemibold,
+} from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
@@ -143,7 +147,7 @@ export function PublicationFeed({
             defaultValue={filters.tag ?? ""}
           />
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
+        <Button type="submit" variant="outline" className={linkMinHAccentSemibold}>
           {copy.search}
         </Button>
         <Link href={path} className={linkAccentSmRounded}>
@@ -186,7 +190,7 @@ export function PublicationFeed({
               </Link>
               <Link
                 href={publicationHref(path, { ...filters, author: item.author.username })}
-                className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentXsRounded}
                 prefetch={false}
               >
                 {copy.onlyAuthor}
@@ -242,7 +246,7 @@ export function PublicationFeed({
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}#discussion`}
               prefetch={false}
-              className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentXsRounded}
             >
               {copy.comments}: {item.commentCount}
             </Link>

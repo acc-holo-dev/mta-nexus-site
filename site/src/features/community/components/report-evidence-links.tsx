@@ -1,4 +1,5 @@
 import { safeExternalWebUrl } from "@nexus/validation";
+import { linkAccentTightBreakAll } from "../../shell/link-shell";
 
 export function ReportEvidenceLinks({ urls, label }: { urls: string[]; label: string }) {
   const links = [
@@ -20,7 +21,7 @@ export function ReportEvidenceLinks({ urls, label }: { urls: string[]; label: st
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${label} ${index + 1}: ${url}`}
-          className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightBreakAll}
         >
           {index + 1}
         </a>

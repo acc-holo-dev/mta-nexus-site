@@ -11,10 +11,9 @@ import { resourceReviewService } from "../../../lib/services/resources/resource-
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../resources/review-controls";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function libraryReviewEditorMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).write} | MTA NEXUS`,

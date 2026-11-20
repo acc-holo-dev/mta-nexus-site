@@ -9,7 +9,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
-import { linkAccent, linkAccentSm } from "../../shell/link-shell";
+import { linkAccent, linkAccentSm, linkMinHAccentFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
@@ -210,7 +210,7 @@ export function ResourceReleaseWatchControl({
           onClick={save}
           disabled={busy || saved || (!canToggle && !watch.enabled)}
           isLoading={busy}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
         </Button>
@@ -229,7 +229,7 @@ export function ResourceReleaseWatchControl({
               onClick={save}
               disabled={busy}
               isLoading={busy}
-              className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkMinHAccentFocus}
             >
               {busy ? copy.busy : copy.retrySame}
             </Button>
@@ -239,7 +239,7 @@ export function ResourceReleaseWatchControl({
             variant="outline"
             onClick={() => router.refresh()}
             disabled={busy}
-            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHAccentFocus}
           >
             {copy.reloadState}
           </Button>

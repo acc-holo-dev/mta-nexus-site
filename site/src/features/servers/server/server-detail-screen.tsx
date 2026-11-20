@@ -22,6 +22,7 @@ import { serverService } from "../../../lib/services/servers/server-service";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
+import { linkAccentTightHover } from "../../shell/link-shell";
 import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
@@ -308,7 +309,7 @@ export async function ServerDetailScreen({
                   href={websiteUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightHover}
                 >
                   {copy.website} ↗
                 </a>
@@ -318,7 +319,7 @@ export async function ServerDetailScreen({
                   href={discordUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightHover}
                 >
                   {copy.discord} ↗
                 </a>
@@ -328,7 +329,7 @@ export async function ServerDetailScreen({
                   href={rulesUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightHover}
                 >
                   {copy.rules} ↗
                 </a>

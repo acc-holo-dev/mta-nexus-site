@@ -5,8 +5,8 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
-import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,

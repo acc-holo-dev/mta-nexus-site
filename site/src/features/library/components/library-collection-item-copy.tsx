@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { linkAccentTightRounded, linkGhostAccentRounded } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 
-import { linkAccentTightRounded } from "../../shell/link-shell";
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
 export function LibraryCollectionItemCopyForm({
@@ -297,7 +297,7 @@ export function LibraryCollectionItemCopyForm({
             type="button"
             disabled={busy}
             onClick={() => router.refresh()}
-            className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentRounded}
             variant="ghost"
           >
             {c.reload}
@@ -314,7 +314,7 @@ export function LibraryCollectionItemCopyForm({
                 type="button"
                 disabled={busy}
                 onClick={() => router.refresh()}
-                className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentRounded}
                 variant="ghost"
               >
                 {c.reload}

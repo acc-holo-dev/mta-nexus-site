@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import {
   confirmsModeratedDiscussionRemoval,
@@ -103,7 +104,7 @@ export function ModeratedDiscussionRemoval({
     }
   }
   return (
-    <section className="space-y-3 rounded-lg border border-base p-4" aria-busy={pending}>
+    <section className={surfaceSpace3P4} aria-busy={pending}>
       <label className="block space-y-2 text-sm text-primary">
         <span>{copy.reason}</span>
         <textarea

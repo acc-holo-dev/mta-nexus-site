@@ -19,6 +19,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
@@ -158,7 +159,7 @@ export function ResourceModerationControls({
         />
       ) : null}
       {selectedBuild && selectedBuild.status !== "published" ? (
-        <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
+        <div className={surfaceInsetP3TextSmSecondary}>
           <p>
             {copy.buildStatusLine(selectedBuild.version ?? selectedBuild.id, selectedBuild.status)}
           </p>

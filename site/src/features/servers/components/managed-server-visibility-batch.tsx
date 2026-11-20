@@ -11,9 +11,10 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkGhostAccentSm } from "../../shell/link-shell";
+import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
@@ -234,7 +235,7 @@ export function ManagedServerVisibilityBatch({
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 font-semibold text-accent"
+            className={linkMinHAccentSemibold}
             disabled={!selected.length}
             onClick={() => void review()}
           >
@@ -272,7 +273,7 @@ export function ManagedServerVisibilityBatch({
           <p className="text-xs text-muted">{copy.notes}</p>
           <ol className="space-y-3">
             {preview.items.map((item) => (
-              <li key={item.id} className="space-y-2 rounded-lg border border-base p-4">
+              <li key={item.id} className={surfaceSpace2P4}>
                 <Link
                   href={`/workspace/servers/${encodeURIComponent(item.id)}`}
                   className="inline-flex min-h-11 break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -320,7 +321,7 @@ export function ManagedServerVisibilityBatch({
                 !preview.items.some((item) => item.changed) ||
                 !commitAcknowledged
               }
-              className="min-h-11 font-semibold text-accent"
+              className={linkMinHAccentSemibold}
               onClick={() => void commit()}
             >
               {copy.confirm}

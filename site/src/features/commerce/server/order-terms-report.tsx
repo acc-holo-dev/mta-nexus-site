@@ -5,6 +5,7 @@ import Link from "next/link";
 import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
+import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
@@ -53,7 +54,7 @@ export function OrderTermsReportView({
           </time>
         </p>
       </header>
-      <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
+      <p role="note" className={surfaceP4TextSmSecondary}>
         {c.notice}
       </p>
       <section className={panelMinSpace4P5}>

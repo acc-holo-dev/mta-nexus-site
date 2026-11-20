@@ -1,13 +1,13 @@
 import type { LibraryMembershipHistoryItem } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
-import { linkAccentTight } from "../../shell/link-shell";
 export function LibraryMembershipHistoryEntry({
   item,
   locale,

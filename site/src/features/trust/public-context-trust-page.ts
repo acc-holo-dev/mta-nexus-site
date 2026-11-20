@@ -2,6 +2,6 @@ export {
   type ContextTrustPageProps,
   contextTrustMetadata,
   PublicContextTrustPage,
-  serverContextTrustMetadata,
   ServerContextTrustPage,
+  serverContextTrustMetadata,
 } from "./server/public-context-trust-page";

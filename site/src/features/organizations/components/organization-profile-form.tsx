@@ -7,8 +7,9 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTightSmPlain } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
@@ -454,10 +455,7 @@ export function OrganizationProfileForm({
         </Button>
       )}
       {showDraft && identityVerified && newest && (changed || checked) && (
-        <section
-          className="space-y-2 rounded-lg border border-base p-4"
-          aria-label={copy.profileLatest}
-        >
+        <section className={surfaceSpace2P4} aria-label={copy.profileLatest}>
           <p>{copy.profileChanged}</p>
           <p className="text-sm text-muted">{copy.profileDraftHelp}</p>
           <p>
@@ -505,10 +503,7 @@ export function OrganizationProfileForm({
       )}
       {error && <ErrorState title={error} description={formErrorHint} />}
       {saved && (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {copy.saved}
         </p>
       )}

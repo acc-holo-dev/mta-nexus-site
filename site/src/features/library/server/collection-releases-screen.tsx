@@ -12,7 +12,11 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
+import {
+  linkAccentSmMedium,
+  linkAccentSmRounded,
+  linkAccentTightRounded,
+} from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -200,10 +204,7 @@ export async function CollectionReleasesScreen({
           description={c.note}
           action={
             result.filter !== "all" || result.q ? (
-              <Link
-                href={collectionHref(path.id, "releases")}
-                className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={collectionHref(path.id, "releases")} className={linkAccentSmMedium}>
                 {cc.clear}
               </Link>
             ) : undefined

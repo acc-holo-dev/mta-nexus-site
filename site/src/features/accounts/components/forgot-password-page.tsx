@@ -4,13 +4,12 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import { recoveryJsonRequest } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
-
-import { linkAccentSmSemibold } from "../../shell/link-shell";
 export function ForgotPasswordPage() {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.recovery;

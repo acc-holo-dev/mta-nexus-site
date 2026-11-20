@@ -8,3 +8,7 @@ export async function newTopicLayoutMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
+
+export function NewTopicPassthroughLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

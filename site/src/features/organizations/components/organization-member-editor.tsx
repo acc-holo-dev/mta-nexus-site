@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
-import { linkGhostAccentSm } from "../../shell/link-shell";
+import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
@@ -49,7 +49,7 @@ export function OrganizationMemberEditor({
           fallback={member.username}
         />
         <Link
-          className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmMinWBreak}
           href={`/users/${encodeURIComponent(member.username)}`}
         >
           {member.displayName} (@{member.username})

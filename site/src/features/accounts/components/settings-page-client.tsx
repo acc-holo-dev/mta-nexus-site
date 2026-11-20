@@ -13,6 +13,7 @@ import { SettingsNotificationPreferencesSection } from "../../notifications/pref
 import { confirmAction } from "../../shell/confirm-action";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
@@ -34,7 +35,6 @@ import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-pr
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
 
-import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 type Notice = {
   text: string;
   error: boolean;

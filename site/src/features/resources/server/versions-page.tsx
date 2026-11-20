@@ -16,6 +16,7 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
@@ -152,7 +153,7 @@ export async function PublicResourceVersionsPage({
         <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
       </header>
 
-      <p role="note" className="rounded-lg border border-base bg-surface p-4 text-sm text-muted">
+      <p role="note" className={surfaceBgP4TextSmMuted}>
         {copy.warning}
       </p>
 

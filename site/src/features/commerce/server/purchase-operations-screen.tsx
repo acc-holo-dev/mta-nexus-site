@@ -13,6 +13,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -112,10 +113,7 @@ export async function PurchaseOperationsScreen({
       <p className="break-words text-secondary">
         {result.order.orderNumber} · {status(result.order.status)}
       </p>
-      <p
-        role="note"
-        className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
-      >
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
         {copy.operationsNote}
       </p>
       <OrderCancellationForm

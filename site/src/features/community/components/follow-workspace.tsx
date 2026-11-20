@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm, linkAccentXs, linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  linkAccentSm,
+  linkAccentXs,
+  linkGhostAccentSm,
+  linkMinHAccent,
+  linkMinHAccentFocus,
+} from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
@@ -193,11 +199,7 @@ export function FollowWorkspace({
               className="min-h-11 w-full rounded-lg border border-base bg-inset px-3 text-sm text-primary"
             />
           </label>
-          <Button
-            type="submit"
-            variant="outline"
-            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Button type="submit" variant="outline" className={linkMinHAccentFocus}>
             {copy.submit}
           </Button>
           <Link href={href(type, "")} className={linkAccentSm}>
@@ -208,7 +210,7 @@ export function FollowWorkspace({
             variant="outline"
             disabled={!!pending}
             onClick={() => void load("latest")}
-            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHAccentFocus}
           >
             {pending === "latest" ? copy.refreshing : copy.latest}
           </Button>
@@ -359,7 +361,7 @@ export function FollowWorkspace({
               <Button
                 type="button"
                 variant="outline"
-                className="min-h-11 text-accent"
+                className={linkMinHAccent}
                 disabled={!!pending}
                 onClick={() => void remove(item)}
                 aria-label={`${copy.remove}: ${item.title ?? copy.unavailableTarget}`}
@@ -375,7 +377,7 @@ export function FollowWorkspace({
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 text-accent"
+            className={linkMinHAccent}
             disabled={!!pending || !history.length}
             onClick={() => void load("previous")}
           >
@@ -387,7 +389,7 @@ export function FollowWorkspace({
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 text-accent"
+            className={linkMinHAccent}
             disabled={!!pending || !page.hasMore}
             onClick={() => void load("next")}
           >

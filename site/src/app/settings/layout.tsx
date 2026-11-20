@@ -1,7 +1,4 @@
-import { settingsLayoutMetadata } from "../../features/accounts/settings-layout-metadata-server";
-
-export const generateMetadata = settingsLayoutMetadata;
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
-}
+export {
+  SettingsPassthroughLayout as default,
+  settingsLayoutMetadata as generateMetadata,
+} from "../../features/accounts/settings-layout-metadata-server";

@@ -15,6 +15,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceP4 } from "../../shell/surface-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildModerationControls } from "../components/build-moderation-controls";
 import { ResourceBuildControls } from "../components/resource-build-controls";
@@ -246,7 +247,7 @@ export async function ResourceBuildScreen({
         ) : (
           <ol className="space-y-3">
             {history.map((event) => (
-              <li key={event.id} className="rounded-lg border border-base p-4">
+              <li key={event.id} className={surfaceP4}>
                 <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
                 {event.reason && (
                   <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>

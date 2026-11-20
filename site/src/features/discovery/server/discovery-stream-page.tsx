@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import { discoverHref } from "../discover-query";
@@ -14,8 +15,6 @@ import {
   STREAM_TYPES,
 } from "../discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function discoveryStreamMetadata(): Promise<Metadata> {
   const copy = discoveryStreamCopy(await getRequestLocale());
   return {

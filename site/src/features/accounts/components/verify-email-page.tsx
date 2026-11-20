@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { linkAccentSmSemibold, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
@@ -14,7 +15,6 @@ import {
 } from "../account-recovery-browser";
 import { authEmailVerificationApiCopy } from "../auth-email-verification-api-copy";
 
-import { linkAccentSmSemibold, linkGhostAccentSm } from "../../shell/link-shell";
 type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }

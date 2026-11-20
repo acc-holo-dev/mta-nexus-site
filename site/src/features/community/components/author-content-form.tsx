@@ -17,6 +17,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
+import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import {
@@ -285,9 +286,7 @@ export function AuthorContentForm({
           {organizationContentCopy(locale).context}: <strong>{organization.name}</strong>
         </p>
       )}
-      <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
-        {archived ? copy.archivedNote : copy.reviewNote}
-      </p>
+      <p className={surfaceInsetP4TextSmMuted}>{archived ? copy.archivedNote : copy.reviewNote}</p>
       {saved && (
         <div className="flex flex-wrap items-center gap-4 text-sm">
           {!server && !organization && (

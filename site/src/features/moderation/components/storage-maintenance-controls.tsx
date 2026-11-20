@@ -7,6 +7,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { linkGhostAccent } from "../../shell/link-shell";
 import { panelClipSpace4P4 } from "../../shell/panel-shell";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
@@ -158,7 +159,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
               <Button
                 type="button"
                 variant="ghost"
-                className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccent}
                 disabled={pending}
                 onClick={() => {
                   setOwner(owner);

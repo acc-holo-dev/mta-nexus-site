@@ -8,3 +8,7 @@ export async function settingsLayoutMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
+
+export function SettingsPassthroughLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

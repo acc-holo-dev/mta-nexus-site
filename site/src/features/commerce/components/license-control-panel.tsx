@@ -15,7 +15,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
-import { linkMinH } from "../../shell/link-shell";
+import { linkAccentTightSmPlain, linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { confirmedLicenseControl } from "../license-control-confirmation";
@@ -440,10 +440,7 @@ export function LicenseControlPanel({
         />
       ) : null}
       {completedRevision && !error && (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {copy.success}
         </p>
       )}

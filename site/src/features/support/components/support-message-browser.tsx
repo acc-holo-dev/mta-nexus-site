@@ -2,7 +2,7 @@ import type { SupportMessageFilters } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccent, linkAccentTight } from "../../shell/link-shell";
+import { linkAccent, linkAccentTight, linkAccentTightSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
@@ -71,10 +71,7 @@ export function SupportMessageBrowser({
           <Button type="submit" size="touch" variant="primary">
             {copy.apply}
           </Button>
-          <Link
-            href={path}
-            className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={path} className={linkAccentTightSmRounded}>
             {copy.reset}
           </Link>
         </form>

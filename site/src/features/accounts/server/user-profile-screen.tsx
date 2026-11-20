@@ -29,6 +29,7 @@ import { ServerCard } from "../../servers/client";
 import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
+import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -152,7 +153,7 @@ export async function UserProfileScreen({
   return (
     <div className={pageShellStack10}>
       {guestPreview && (
-        <p role="status" className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
+        <p role="status" className={surfaceInsetP4TextSmMuted}>
           {privacyCopy.guestPreviewNote} {privacyCopy.scope}
         </p>
       )}

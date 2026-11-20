@@ -22,3 +22,7 @@ export async function resetPasswordLayoutMetadata(): Promise<Metadata> {
 export async function verifyEmailLayoutMetadata(): Promise<Metadata> {
   return recoveryLayoutMetadata("verifyTitle");
 }
+
+export function RecoveryPassthroughLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

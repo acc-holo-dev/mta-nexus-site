@@ -6,6 +6,8 @@ import { type FormEvent, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkGhostAccentSmBare } from "../../shell/link-shell";
+import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -129,7 +131,7 @@ export function ResourceQaReportForm({
         type="button"
         variant="ghost"
         size="sm"
-        className="min-h-11 px-0 text-sm text-accent underline"
+        className={linkGhostAccentSmBare}
         onClick={() => setOpen(true)}
       >
         {copy.report}
@@ -138,10 +140,7 @@ export function ResourceQaReportForm({
   }
 
   return (
-    <form
-      className="min-w-0 space-y-2 rounded-lg border border-base bg-surface p-3"
-      onSubmit={onSubmit}
-    >
+    <form className={surfaceMinSpace2BgP3} onSubmit={onSubmit}>
       <p className="text-xs text-muted">{copy.reportHelp}</p>
       <label className="block min-w-0 space-y-1 text-xs text-muted">
         <span>{copy.reportType}</span>

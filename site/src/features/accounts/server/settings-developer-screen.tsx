@@ -7,6 +7,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { editableDeveloperSchema } from "../../trust/verification-workspace-contract";
@@ -14,8 +15,6 @@ import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { DeveloperProfileEditor } from "../profile";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function settingsDeveloperMetadata(): Promise<Metadata> {
   return {
     title: verificationCopy(await getRequestLocale()).profile,

@@ -8,7 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
-import { linkAccentSm, linkAccentTightSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTightSm, linkAccentTightSmPlain } from "../../shell/link-shell";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
 import { platformFieldClass } from "../user-platform-client";
@@ -250,10 +250,7 @@ export function CommunityReportForm({
         )
       ) : result ? (
         <div className="space-y-2">
-          <p
-            role="status"
-            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <p role="status" className={linkAccentTightSmPlain}>
             {result.created ? copy.saved : copy.duplicate}
           </p>
           <Link

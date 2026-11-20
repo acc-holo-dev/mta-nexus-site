@@ -10,10 +10,11 @@ import {
 } from "../../community/user-platform-client";
 import type { EditableProfile } from "../../community/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../community/user-platform-copy";
+import { linkAccentTightSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
 
-import { linkAccentTightSm } from "../../shell/link-shell";
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
@@ -244,10 +245,7 @@ export function PublicProfileForm() {
         <p className="text-sm text-muted">{copy.profileRecoveryHelp}</p>
       )}
       {profile && latest && (
-        <section
-          className="space-y-2 rounded-lg border border-base p-4"
-          aria-label={copy.profileLatest}
-        >
+        <section className={surfaceSpace2P4} aria-label={copy.profileLatest}>
           <h3 className="font-semibold">{copy.profileLatest}</h3>
           <p className="text-sm text-muted">{copy.profileCompareHelp}</p>
           <p className="break-words">

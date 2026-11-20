@@ -3,7 +3,7 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
-import { linkAccentTight } from "../../shell/link-shell";
+import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
@@ -136,7 +136,7 @@ export function AdminVerificationQueueSection({
                 {request.serverSlug ? (
                   <Link
                     href={`/servers/${encodeURIComponent(request.serverSlug)}`}
-                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXsBlock}
                   >
                     {copy.verificationOpenServer}
                   </Link>
@@ -144,7 +144,7 @@ export function AdminVerificationQueueSection({
                 {request.targetType === "server" ? (
                   <Link
                     href={`/workspace/servers/${encodeURIComponent(request.targetId)}`}
-                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXsBlock}
                   >
                     {copy.verificationManagedServer}
                   </Link>
@@ -152,7 +152,7 @@ export function AdminVerificationQueueSection({
                 {request.targetUsername && (
                   <Link
                     href={`/users/${encodeURIComponent(request.targetUsername)}`}
-                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXsBlock}
                   >
                     {verificationCopy(locale).publicProfile} · @{request.targetUsername}
                   </Link>
@@ -160,7 +160,7 @@ export function AdminVerificationQueueSection({
                 {request.organizationSlug && (
                   <Link
                     href={`/organizations/${encodeURIComponent(request.organizationSlug)}`}
-                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXsBlock}
                   >
                     {verificationCopy(locale).organization}
                   </Link>
@@ -175,7 +175,7 @@ export function AdminVerificationQueueSection({
                     href={safeExternalWebUrl(request.currentGithubUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXsBlock}
                   >
                     {verificationCopy(locale).github}
                   </a>

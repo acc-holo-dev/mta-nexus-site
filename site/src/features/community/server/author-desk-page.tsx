@@ -8,7 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentXsBreak } from "../../shell/link-shell";
 import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -248,7 +248,7 @@ export async function AuthorContentPage({
                         key={context.href}
                         prefetch={false}
                         href={context.href}
-                        className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={linkAccentXsBreak}
                       >
                         {context.name}
                       </Link>
@@ -259,7 +259,7 @@ export async function AuthorContentPage({
                       key={tag}
                       prefetch={false}
                       href={authorPublicationDeskHref({ ...filters, tag, cursor: undefined })}
-                      className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkAccentXsBreak}
                     >
                       #{tag}
                     </Link>

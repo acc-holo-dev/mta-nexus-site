@@ -7,8 +7,8 @@ import type { Locale } from "../../../lib/i18n";
 import { PlatformRequestError, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
-import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,

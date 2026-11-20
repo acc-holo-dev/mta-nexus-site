@@ -8,6 +8,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -236,7 +237,7 @@ export function ResourceReviewEditor({
         </label>
       )}
       {changed && (
-        <div className="space-y-2 rounded-lg border border-base p-3 text-sm">
+        <div className={surfaceSpace2P3TextSm}>
           <p role="status">{copy.draftChanged}</p>
           <p className="font-semibold">{copy.latestReview}</p>
           {review ? (

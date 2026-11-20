@@ -21,14 +21,17 @@ import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
   linkAccentBorder,
+  linkAccentInlineSm,
   linkAccentSm,
   linkAccentSmRounded,
   linkAccentTight,
   linkAccentTightSm,
+  linkAccentTightSmMedium,
 } from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
@@ -145,10 +148,7 @@ export async function LibraryPageScreen({
             ))}
           </nav>
 
-          <p
-            role="note"
-            className="rounded-lg border border-base bg-surface p-4 text-sm text-muted"
-          >
+          <p role="note" className={surfaceBgP4TextSmMuted}>
             {copy.note}
           </p>
 
@@ -158,17 +158,11 @@ export async function LibraryPageScreen({
               description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilterHint}
               action={
                 result.counts.all === 0 ? (
-                  <Link
-                    href="/market?maxPrice=0"
-                    className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href="/market?maxPrice=0" className={linkAccentTightSmMedium}>
                     {copy.browse}
                   </Link>
                 ) : (
-                  <Link
-                    href={libraryHref("all", 1)}
-                    className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={libraryHref("all", 1)} className={linkAccentTightSmMedium}>
                     {copy.clearFilters}
                   </Link>
                 )
@@ -205,16 +199,10 @@ export async function LibraryPageScreen({
                         intent={item.buildId ? "selected" : "latest"}
                       />
                       <div className="flex flex-wrap gap-4">
-                        <Link
-                          href={`/market/${item.slug}`}
-                          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
+                        <Link href={`/market/${item.slug}`} className={linkAccentInlineSm}>
                           {copy.open}
                         </Link>
-                        <Link
-                          href={releaseHistoryHref(item.slug)}
-                          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
+                        <Link href={releaseHistoryHref(item.slug)} className={linkAccentInlineSm}>
                           {releaseCopy.browse}
                         </Link>
                       </div>

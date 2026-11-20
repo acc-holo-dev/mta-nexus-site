@@ -12,6 +12,7 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
@@ -129,7 +130,7 @@ export function OrganizationTeamDirectory({
     <section className={panelClipSpace5P5} aria-busy={pending}>
       <p className="text-xs text-muted">{copy.private}</p>
       {data.owner && (
-        <div className="space-y-2 rounded-lg border border-base p-4">
+        <div className={surfaceSpace2P4}>
           <p className="text-xs text-muted">{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}

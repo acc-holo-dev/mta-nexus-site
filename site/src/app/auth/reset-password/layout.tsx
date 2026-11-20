@@ -1,7 +1,4 @@
-import { resetPasswordLayoutMetadata } from "../../../features/accounts/recovery-layout-metadata-server";
-
-export const generateMetadata = resetPasswordLayoutMetadata;
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
-}
+export {
+  RecoveryPassthroughLayout as default,
+  resetPasswordLayoutMetadata as generateMetadata,
+} from "../../../features/accounts/recovery-layout-metadata-server";

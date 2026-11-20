@@ -9,8 +9,10 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { linkGhostAccentSmDisabled, linkGhostAccentXsDisabled } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceP4 } from "../../shell/surface-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
@@ -319,7 +321,7 @@ export function ResourceVariantsForm({
         </h2>
         <ol className="space-y-3">
           {selected.map((row, index) => (
-            <li key={row.productId} className="rounded-lg border border-base p-4">
+            <li key={row.productId} className={surfaceP4}>
               <p className="mb-2 break-words text-sm text-primary">{row.title}</p>
               <label
                 htmlFor={`${field}-label-${row.productId}`}
@@ -354,7 +356,7 @@ export function ResourceVariantsForm({
                   disabled={disabled || index === 0}
                   aria-label={`${copy.up}: ${row.title}`}
                   onClick={() => move(index, -1)}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.up}
                 </Button>
@@ -365,7 +367,7 @@ export function ResourceVariantsForm({
                   disabled={disabled || index === selected.length - 1}
                   aria-label={`${copy.down}: ${row.title}`}
                   onClick={() => move(index, 1)}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.down}
                 </Button>
@@ -381,7 +383,7 @@ export function ResourceVariantsForm({
                       rows.filter((value) => value.productId !== row.productId),
                     );
                   }}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.remove}
                 </Button>
@@ -440,7 +442,7 @@ export function ResourceVariantsForm({
                     { productId: row.productId, title: row.title, label: "" },
                   ]);
                 }}
-                className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+                className={linkGhostAccentSmDisabled}
               >
                 {copy.add}
               </Button>
@@ -456,7 +458,7 @@ export function ResourceVariantsForm({
             variant="ghost"
             disabled={disabled || loading || candidates.page <= 1}
             onClick={() => changePage(candidates.page - 1)}
-            className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+            className={linkGhostAccentSmDisabled}
           >
             {copy.previous}
           </Button>
@@ -468,7 +470,7 @@ export function ResourceVariantsForm({
             variant="ghost"
             disabled={disabled || loading || !candidates.hasMore || candidates.page >= 1000}
             onClick={() => changePage(candidates.page + 1)}
-            className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+            className={linkGhostAccentSmDisabled}
           >
             {copy.next}
           </Button>

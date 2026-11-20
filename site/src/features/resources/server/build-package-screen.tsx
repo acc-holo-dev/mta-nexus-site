@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
@@ -197,7 +198,7 @@ export async function BuildPackageScreen({
       </dl>
       <ol className="space-y-3">
         {detail.files.map((file) => (
-          <li key={file.path} className="space-y-2 rounded-lg border border-base p-4 text-sm">
+          <li key={file.path} className={surfaceSpace2P4TextSm}>
             <p className="break-words font-code">{file.path}</p>
             <p className="text-secondary">{labels[file.status]}</p>
             <dl className="grid gap-4 md:grid-cols-2">

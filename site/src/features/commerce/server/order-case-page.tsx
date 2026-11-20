@@ -15,6 +15,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
@@ -462,7 +463,7 @@ export async function OrderCaseDetailPage({
           {formatHistoryAmount(result.case.requestedAmount, result.case.currency, locale)}
         </p>
       )}
-      <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
+      <p role="note" className={surfaceP4TextSmSecondary}>
         {copy.financeNote}
       </p>
       {result.evidenceChanged ? (

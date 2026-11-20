@@ -13,8 +13,15 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { linkAccentSm, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
+import {
+  linkAccentSm,
+  linkAccentSmMinWBreak,
+  linkAccentTightSmPlain,
+  linkGhostAccentSm,
+  linkMuted,
+} from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -290,7 +297,7 @@ export function OrganizationWorkspacePanel({
             />
             <Link
               href={`/users/${encodeURIComponent(data.owner.username)}`}
-              className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmMinWBreak}
             >
               {data.owner.displayName} (@{data.owner.username})
             </Link>
@@ -298,7 +305,7 @@ export function OrganizationWorkspacePanel({
           </div>
         )}
         {manageable && (
-          <form onSubmit={add} className="space-y-3 rounded-lg border border-base p-4">
+          <form onSubmit={add} className={surfaceSpace3P4}>
             <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.username}</span>
@@ -472,10 +479,7 @@ export function OrganizationWorkspacePanel({
           />
         )}
         {message && (
-          <p
-            role="status"
-            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <p role="status" className={linkAccentTightSmPlain}>
             {message}
           </p>
         )}

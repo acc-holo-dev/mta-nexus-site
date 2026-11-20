@@ -12,6 +12,7 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import {
   linkAccentSm,
   linkAccentTight,
+  linkAccentTightSmPlain,
   linkAccentXs,
   linkGhostAccentSm,
 } from "../../shell/link-shell";
@@ -586,21 +587,13 @@ export function ContentDiscussion({
           locale={locale}
         />
         {published && (
-          <p
-            role="status"
-            aria-live="polite"
-            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <p role="status" aria-live="polite" className={linkAccentTightSmPlain}>
             {copy.saved}
           </p>
         )}
       </form>
       {managementSuccess && (
-        <p
-          role="status"
-          aria-live="polite"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" aria-live="polite" className={linkAccentTightSmPlain}>
           {managementSuccess}
         </p>
       )}

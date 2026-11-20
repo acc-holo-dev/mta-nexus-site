@@ -2,7 +2,7 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { linkGhostAccentSm } from "../../shell/link-shell";
+import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { fetchServerStatisticsCsv } from "../server-statistics-download";
 export function ServerStatisticsExportButton({
@@ -60,7 +60,7 @@ export function ServerStatisticsExportButton({
         onClick={download}
         disabled={disabled || busy}
         isLoading={busy}
-        className="min-h-11 font-semibold text-accent"
+        className={linkMinHAccentSemibold}
       >
         {busy ? copy.downloading : label}
       </Button>

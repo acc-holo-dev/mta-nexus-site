@@ -1,7 +1,4 @@
-import { newTopicLayoutMetadata } from "../../../features/community/new-topic-layout-metadata-server";
-
-export const generateMetadata = newTopicLayoutMetadata;
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
-}
+export {
+  NewTopicPassthroughLayout as default,
+  newTopicLayoutMetadata as generateMetadata,
+} from "../../../features/community/new-topic-layout-metadata-server";

@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -19,7 +20,6 @@ import {
   libraryCollectionComparisonSuffix,
 } from "../library-collection-comparison-query";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
-import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   collectionHref,
   collectionPageParams,

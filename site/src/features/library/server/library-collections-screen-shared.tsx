@@ -1,9 +1,8 @@
 import type { User } from "@nexus/domain";
 import Link from "next/link";
+import { linkAccentTight as libraryCollectionsLinkClass } from "../../shell/link-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
-
-import { linkAccentTight as libraryCollectionsLinkClass } from "../../shell/link-shell";
 
 export { libraryCollectionsLinkClass };
 

@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import { AuthorResourceForms, RetireBuildForm } from "../author-controls";
 import { ResourceLifecycleControls } from "../lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../publisher-view";
@@ -123,10 +124,7 @@ export async function ResourceManageScreen({
           <h2 className="text-xl font-semibold text-primary">{commerceCopy.history}</h2>
           <ol className="space-y-3">
             {lifecycleHistory.map((event) => (
-              <li
-                key={event.id}
-                className="rounded-lg border border-base p-4 text-sm text-secondary"
-              >
+              <li key={event.id} className={surfaceP4TextSmSecondary}>
                 <p>
                   {event.action === "product.archive"
                     ? commerceCopy.archive

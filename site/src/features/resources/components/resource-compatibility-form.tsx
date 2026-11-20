@@ -9,6 +9,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
 import { confirmedCompatibility } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
@@ -244,10 +245,7 @@ export function ResourceCompatibilityForm({
             {busy ? copy.working : copy.save}
           </Button>
           {newest && (
-            <section
-              aria-label={copy.compatibilityLatest}
-              className="space-y-2 rounded-lg border border-base p-3 text-sm"
-            >
+            <section aria-label={copy.compatibilityLatest} className={surfaceSpace2P3TextSm}>
               <p>{copy.compatibilityChanged}</p>
               <p>{copy.compatibilityDraftHelp}</p>
               <p>

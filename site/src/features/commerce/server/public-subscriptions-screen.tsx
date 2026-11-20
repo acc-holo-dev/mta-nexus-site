@@ -8,6 +8,7 @@ import { commercialPlanService } from "../../../lib/services/commerce/commercial
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
@@ -79,10 +80,7 @@ export async function PublicSubscriptionsScreen({
           {reviews.history}
         </Link>
       </nav>
-      <p
-        role="note"
-        className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
-      >
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
         {subscriptions.notice}
       </p>
       <nav aria-label={copy.scope} className="flex min-w-0 flex-wrap gap-3">

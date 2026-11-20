@@ -7,6 +7,7 @@ import { ErrorState } from "@nexus/ui";
 import { getDictionary } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { linkAccentTightSm } from "../../shell/link-shell";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 export function BuildPackageSummaryPanel({
@@ -18,10 +19,7 @@ export function BuildPackageSummaryPanel({
 }) {
   const copy = buildPackageCopy(locale);
   return (
-    <section
-      className="space-y-2 rounded-lg border border-base p-4 text-sm"
-      aria-label={copy.title}
-    >
+    <section className={surfaceSpace2P4TextSm} aria-label={copy.title}>
       <h3 className="font-semibold text-primary">{copy.title}</h3>
       {!summary ? (
         <p className="text-muted">{copy.legacy}</p>

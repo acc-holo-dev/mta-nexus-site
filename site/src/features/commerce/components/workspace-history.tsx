@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-import { linkAccentTight } from "../../shell/link-shell";
+import { linkAccentTight, linkAccentTightSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 export type HistoryArea = "purchases" | "licenses" | "sales";
@@ -32,10 +33,7 @@ export function HistoryShell({
   return (
     <div className={pageShellMax5xlMid}>
       <header className="space-y-3 border-b border-base pb-6">
-        <Link
-          href="/workspace"
-          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace" className={linkAccentTightSmRounded}>
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">{titles[area]}</h1>
@@ -53,7 +51,7 @@ export function HistoryShell({
           </Link>
         ))}
       </nav>
-      <p role="note" className="rounded-lg border border-base bg-surface p-4 text-sm text-muted">
+      <p role="note" className={surfaceBgP4TextSmMuted}>
         {copy.betaNotice}
       </p>
       {children}

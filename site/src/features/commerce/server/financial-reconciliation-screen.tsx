@@ -10,7 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTightBreakSemibold, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -123,7 +123,7 @@ export async function FinancialReconciliationScreen({
             <li key={order.id} className={panelMinSpace3P5}>
               <Link
                 href={`/admin/commerce/reconciliation/${encodeURIComponent(order.id)}`}
-                className="break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightBreakSemibold}
               >
                 {order.orderNumber}
               </Link>

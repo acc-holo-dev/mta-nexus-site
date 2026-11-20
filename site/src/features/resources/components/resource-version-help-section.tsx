@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
+import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
@@ -145,16 +146,13 @@ export function ResourceVersionHelpSection({
         <h3 className="text-sm font-semibold text-primary">{copy.sections.support}</h3>
         <p className="text-sm text-secondary">{copy.supportBody}</p>
         <div className="flex flex-wrap gap-3 text-sm">
-          <Link
-            href={`#${qaAnchorId}`}
-            className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`#${qaAnchorId}`} className={linkAccentTightSemiboldHover}>
             {copy.openQa}
           </Link>
           {supportContext ? (
             <ResourceVersionHelpSupportLink
               context={supportContext}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightSemiboldHover}
             >
               {copy.openSupport}
             </ResourceVersionHelpSupportLink>

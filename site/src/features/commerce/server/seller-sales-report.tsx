@@ -3,9 +3,14 @@ import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
+import {
+  linkAccentSmRounded,
+  linkAccentTightRounded,
+  linkAccentTightSmRounded,
+} from "../../shell/link-shell";
 import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
+import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
@@ -43,10 +48,7 @@ export function SellerSalesReportView({
   );
   return (
     <div className={pageShellMax6xl}>
-      <Link
-        href="/workspace/sales"
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/sales" className={linkAccentTightSmRounded}>
         {c.back}
       </Link>
       <header className="space-y-2">
@@ -59,7 +61,7 @@ export function SellerSalesReportView({
           </time>
         </p>
       </header>
-      <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
+      <p role="note" className={surfaceP4TextSmSecondary}>
         {query.attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className="text-sm text-secondary">
@@ -67,7 +69,7 @@ export function SellerSalesReportView({
       </p>
       <Link
         href={`/workspace/finance${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightSmRounded}
       >
         {c.finance}
       </Link>
@@ -163,10 +165,7 @@ export function SellerSalesReportView({
             <Button type="submit" size="touch">
               {c.apply}
             </Button>
-            <Link
-              href={resetHref}
-              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={resetHref} className={linkAccentTightSmRounded}>
               {c.reset}
             </Link>
           </div>
@@ -233,7 +232,7 @@ export function SellerSalesReportView({
               </p>
               <Link
                 href={sellerSaleUrl(sale.id, query.organizationId, query.attribution)}
-                className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightSmRounded}
               >
                 {c.details}
               </Link>

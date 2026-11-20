@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentTightBreakAll, linkGhostAccent } from "../../shell/link-shell";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
@@ -149,10 +150,7 @@ export function LibraryReleaseCommandStatus({
     <>
       {pending && pendingHref ? (
         <div className="space-y-2 text-sm">
-          <Link
-            href={pendingHref}
-            className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={pendingHref} className={linkAccentTightBreakAll}>
             {copy.pendingResource}: {pendingProductId}
           </Link>
           <p>
@@ -246,7 +244,7 @@ export function LibraryReleaseCommandStatus({
           <Button
             type="button"
             onClick={() => router.refresh()}
-            className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccent}
             variant="ghost"
           >
             {copy.reloadState}

@@ -9,7 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/servers/server-workspace-history-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkMinHAccent } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -134,7 +134,7 @@ async function ServerWorkspaceHistoryScreen({
             )}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 text-accent">
+        <Button type="submit" variant="outline" className={linkMinHAccent}>
           {copy.apply}
         </Button>
         <Link href={base} className={linkAccentSmRounded}>

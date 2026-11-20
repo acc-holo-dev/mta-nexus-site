@@ -16,11 +16,10 @@ import {
   resourceDeliveryId,
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { SupportDownloadHelpLink } from "../../support/download-help";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function libraryDownloadDetailMetadata(): Promise<Metadata> {
   return {
     title: `${resourceDeliveriesCopy(await getRequestLocale()).receipt} | MTA NEXUS`,

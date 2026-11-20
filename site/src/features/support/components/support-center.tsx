@@ -10,6 +10,7 @@ import { linkAccent, linkAccentSm, linkGhostAccentSm } from "../../shell/link-sh
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -353,10 +354,7 @@ export function SupportCenter({
           </label>
 
           {objectContext ? (
-            <div
-              role="note"
-              className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
-            >
+            <div role="note" className={surfaceInsetP3TextSmSecondary}>
               <p className="font-label uppercase text-muted">{copy.attachedContext}</p>
               <p className="mt-1 break-all">
                 {copy.contextResource}: {objectContext.productId}

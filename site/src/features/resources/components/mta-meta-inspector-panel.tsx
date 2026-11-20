@@ -6,6 +6,7 @@ import { useState } from "react";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceInsetP3 } from "../../shell/surface-shell";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 export type InspectionResponse = {
@@ -204,7 +205,7 @@ export function MtaMetaInspectorPanel({
       {inspection && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div className="rounded-lg border border-base bg-inset p-3">
+            <div className={surfaceInsetP3}>
               <div className="font-label uppercase text-faint">{copy.scripts}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.scriptCount}
@@ -216,7 +217,7 @@ export function MtaMetaInspectorPanel({
               </div>
             </div>
 
-            <div className="rounded-lg border border-base bg-inset p-3">
+            <div className={surfaceInsetP3}>
               <div className="font-label uppercase text-faint">{copy.files}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.fileCount}
@@ -228,7 +229,7 @@ export function MtaMetaInspectorPanel({
               )}
             </div>
 
-            <div className="rounded-lg border border-base bg-inset p-3">
+            <div className={surfaceInsetP3}>
               <div className="font-label uppercase text-faint">{copy.dependencies}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.dependencyCount}
@@ -240,7 +241,7 @@ export function MtaMetaInspectorPanel({
               )}
             </div>
 
-            <div className="rounded-lg border border-base bg-inset p-3">
+            <div className={surfaceInsetP3}>
               <div className="font-label uppercase text-faint">{copy.exports}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.exportCount}

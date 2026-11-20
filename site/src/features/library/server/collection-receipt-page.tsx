@@ -10,6 +10,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -20,8 +21,6 @@ import {
 } from "../library-collection-receipts-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function collectionReceiptMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionReceiptsCopy(await getRequestLocale()).title} | MTA NEXUS`,

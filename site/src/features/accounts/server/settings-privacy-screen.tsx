@@ -6,14 +6,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { ProfilePrivacyEditor } from "../profile";
 import { editablePrivacySchema } from "../profile-privacy-contract";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function settingsPrivacyMetadata(): Promise<Metadata> {
   return {
     title: profilePrivacyCopy(await getRequestLocale()).title,

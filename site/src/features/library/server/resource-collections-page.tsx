@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -19,8 +20,6 @@ import { collectionHref, collectionPageParams } from "../library-collections-que
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
 import { LibraryMembershipBatchForm } from "../membership-batch";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function resourceCollectionsMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionsCopy(await getRequestLocale()).resourceCollections} | MTA NEXUS`,

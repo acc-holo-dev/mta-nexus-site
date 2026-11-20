@@ -9,7 +9,11 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
+import {
+  linkAccentSmRounded,
+  linkAccentTightRounded,
+  linkAccentTightSmMedium,
+} from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -144,7 +148,7 @@ export async function LibraryReleaseHistoryScreen({
             result.productId ? (
               <Link
                 href={`/workspace/library/version-history?days=${result.days}`}
-                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightSmMedium}
               >
                 {c.clear}
               </Link>

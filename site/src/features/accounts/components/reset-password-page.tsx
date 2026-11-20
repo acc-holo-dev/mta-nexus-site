@@ -4,6 +4,7 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
@@ -14,7 +15,6 @@ import {
 } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
 
-import { linkAccentSmSemibold } from "../../shell/link-shell";
 type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }

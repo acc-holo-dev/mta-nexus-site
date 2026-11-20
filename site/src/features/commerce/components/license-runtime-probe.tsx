@@ -4,7 +4,11 @@ import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import { linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  linkAccentTightSmPlain,
+  linkGhostAccentSm,
+  linkGhostAccentSmNoUnderline,
+} from "../../shell/link-shell";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
@@ -170,7 +174,7 @@ export function LicenseRuntimeProbe({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-auto min-h-11 px-0 text-sm text-accent"
+                className={linkGhostAccentSmNoUnderline}
                 disabled={busy || context.page <= 1}
                 onClick={() => setPage(context.page - 1)}
               >
@@ -183,7 +187,7 @@ export function LicenseRuntimeProbe({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-auto min-h-11 px-0 text-sm text-accent"
+                className={linkGhostAccentSmNoUnderline}
                 disabled={busy || context.page >= context.totalPages}
                 onClick={() => setPage(context.page + 1)}
               >
@@ -207,10 +211,7 @@ export function LicenseRuntimeProbe({
         </label>
       )}
       {confirmed && (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {copy.releaseSaved}{" "}
           <time dateTime={confirmed.leaseExpiresAt}>
             {new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium" }).format(

@@ -9,9 +9,8 @@ import { publicationFeedService } from "../../../lib/services/discovery/publicat
 import { PublicationFeed } from "../../community/publication-feed";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { publicationFeedView } from "../../community/publication-feed-view";
-import { pageShellStack6 } from "../../shell/page-shell";
-
 import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
 export async function publicProfileMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {

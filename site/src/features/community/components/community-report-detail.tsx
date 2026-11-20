@@ -4,9 +4,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccentSmRounded, linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  linkAccentSmRounded,
+  linkAccentTightSmPlain,
+  linkAccentTightSmRounded,
+  linkGhostAccentSm,
+} from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
@@ -194,10 +200,7 @@ export function CommunityReportDetailView({
         />
       ) : null}
       {success ? (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {success}
         </p>
       ) : null}
@@ -291,10 +294,7 @@ export function CommunityReportDetailView({
                 </p>
                 {report.target.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
                 {report.target.href && (
-                  <Link
-                    className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    href={report.target.href}
-                  >
+                  <Link className={linkAccentTightSmRounded} href={report.target.href}>
                     {copy.viewTarget}
                   </Link>
                 )}
@@ -323,10 +323,7 @@ export function CommunityReportDetailView({
                 <span className="block text-xs text-muted">{copy.notesHint}</span>
               </label>
               {confirmation ? (
-                <fieldset
-                  className="space-y-3 rounded-lg border border-base p-4"
-                  aria-label={copy.confirm}
-                >
+                <fieldset className={surfaceSpace3P4} aria-label={copy.confirm}>
                   <p className="text-sm text-secondary">
                     {confirmation.action === "remove_comment"
                       ? copy.confirmRemove

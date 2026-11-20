@@ -1,12 +1,12 @@
 import "server-only";
 
 export {
-  TermsDocumentPage,
-  termsMetadata,
+  CommunityRulesDocumentPage,
+  CopyrightDocumentPage,
+  communityRulesMetadata,
+  copyrightMetadata,
   PrivacyDocumentPage,
   privacyMetadata,
-  CopyrightDocumentPage,
-  copyrightMetadata,
-  CommunityRulesDocumentPage,
-  communityRulesMetadata,
+  TermsDocumentPage,
+  termsMetadata,
 } from "./server/legal-document-page";

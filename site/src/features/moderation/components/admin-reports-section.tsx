@@ -7,7 +7,11 @@ import { communityReportCopy } from "../../community/community-report-copy";
 import { ReportEvidenceLinks } from "../../community/report-evidence-links";
 import { AdminResourceQaReportActions } from "../../resources/qa-report-actions";
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
-import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
+import {
+  linkAccentInlineSmOffset,
+  linkAccentTight,
+  linkAccentTightSm,
+} from "../../shell/link-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -68,22 +72,13 @@ export function AdminReportsSection({
   return (
     <section>
       <SectionHeader title={copy.reports} description={copy.caseHistory} />
-      <Link
-        href="/admin/storage"
-        className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin/storage" className={linkAccentInlineSmOffset}>
         {storageMaintenanceCopy(locale).title}
       </Link>
-      <Link
-        href="/admin/commerce/order-cases"
-        className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin/commerce/order-cases" className={linkAccentInlineSmOffset}>
         {orderCaseCopy(locale).queue}
       </Link>
-      <Link
-        href="/admin/commerce/reviews"
-        className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin/commerce/reviews" className={linkAccentInlineSmOffset}>
         {resourceReviewCopy(locale).queue}
       </Link>
       <Link
