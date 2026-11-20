@@ -9,7 +9,10 @@ const workspace = readFileSync(
   join(root, "site/src/features/moderation/components/verification-workspace.tsx"),
   "utf8",
 );
-const page = readFileSync(join(root, "site/src/app/workspace/verification/page.tsx"), "utf8");
+const page = readFileSync(
+  join(root, "site/src/features/moderation/server/verification-workspace-page.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: verification load/session failures stay ErrorState, not guest sign-in. */
 it("locks verification workspace unavailable notices to ErrorState with stable id", () => {

@@ -95,7 +95,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(manage).not.toContain('role="alert"');
 
   const clippedDelegates = [
-    "site/src/app/workspace/resources/new/page.tsx",
+    "site/src/features/resources/server/resource-create-screen.tsx",
     "site/src/app/workspace/resources/[id]/media/page.tsx",
     "site/src/app/workspace/resources/[id]/requirements/page.tsx",
     "site/src/app/workspace/resources/[id]/builds/[buildId]/page.tsx",

@@ -17,7 +17,7 @@ const pages: Array<[string, string]> = [
     "copy.unavailableHint",
   ],
   ["site/src/features/discovery/server/discovery-directory.tsx", "copy.unavailableHint"],
-  ["site/src/app/workspace/saved/page.tsx", "copy.pageErrorHint"],
+  ["site/src/features/community/server/saved-follows-page.tsx", "copy.pageErrorHint"],
   ["site/src/features/support/components/support-case-thread.tsx", "copy.caseLoadErrorHint"],
   ["site/src/features/support/components/support-center.tsx", "copy.loadErrorHint"],
   ["site/src/features/accounts/components/settings-page-client.tsx", "copy.loadFailedHint"],

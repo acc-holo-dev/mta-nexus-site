@@ -57,6 +57,7 @@ const features = [
       ["admin-home-server", "admin-home-screen.tsx"],
       ["verification-history-server", "verification-history-screen.tsx"],
       ["verification-application-server", "verification-application-screen.tsx"],
+      ["verification-workspace-page-server", "verification-workspace-page.tsx"],
     ],
     safe: "http/private-api-request|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",
   },
@@ -83,6 +84,8 @@ const features = [
     servers: [
       ["user-profile-server", "user-profile-screen.tsx"],
       ["developer-profile-server", "developer-profile-screen.tsx"],
+      ["security-center-server", "security-center-screen.tsx"],
+      ["settings-history-server", "settings-history-screen.tsx"],
     ],
     clientUtilPorts: [
       "profile-pagination",

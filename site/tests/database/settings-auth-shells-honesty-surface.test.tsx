@@ -30,7 +30,7 @@ beforeEach(() => {
 
 const clippedShellPages = [
   "site/src/app/settings/page.tsx",
-  "site/src/app/settings/history/page.tsx",
+  "site/src/features/accounts/server/settings-history-screen.tsx",
   "site/src/app/auth/login/page.tsx",
   "site/src/app/auth/register/page.tsx",
 ] as const;
@@ -94,7 +94,7 @@ it("locks active sessions empty list to EmptyState and revoke/reload ghosts to s
 });
 
 it("wraps settings history guest and authenticated returns in the clipped page shell", () => {
-  const source = read("site/src/app/settings/history/page.tsx");
+  const source = read("site/src/features/accounts/server/settings-history-screen.tsx");
   expect(source).toContain("PlatformSignIn");
   expect(source).toContain("ProfileChangeHistoryView");
   expect(source).toContain("pageShellClass");

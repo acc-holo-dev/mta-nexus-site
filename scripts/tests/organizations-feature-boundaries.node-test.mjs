@@ -35,6 +35,7 @@ const serverPorts = [
   "public-profile",
   "public-activity",
   "public-trust",
+  "organization-create",
 ];
 const safeLib =
   /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:organization-governance-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|http\/private-api-request|content-discussion-contract)\.ts$)/u;
@@ -154,7 +155,7 @@ test("Organizations client graphs exclude server dependencies transitively", () 
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust|organization-create)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -199,6 +200,7 @@ test("Organizations server entries stay server-only and separately composed", ()
     ["public-profile", "public-profile.tsx"],
     ["public-activity", "public-activity.tsx"],
     ["public-trust", "public-trust.tsx"],
+    ["organization-create", "organization-create-screen.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/organizations/${port}-server.ts`;
