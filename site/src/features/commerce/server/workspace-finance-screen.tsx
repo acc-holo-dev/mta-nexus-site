@@ -26,6 +26,7 @@ import {
   typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
   typeSpace2Sm,
+  typeSpace3BorderTPt5,
   typeWFullLeftSm,
   typeXlPrimary,
   typeXsMuted,
@@ -241,7 +242,7 @@ export async function WorkspaceFinanceScreen({
           ) : null}
         </nav>
       ) : null}
-      <section className="space-y-3 border-t border-base pt-5">
+      <section className={typeSpace3BorderTPt5}>
         <h2 className={typeLgSemibold}>{copy.organizations}</h2>
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {copy.personal}

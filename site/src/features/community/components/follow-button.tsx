@@ -10,7 +10,12 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
-import { typeItemsStretchPy4, typeMaxSmXsSuccess, typeSmMuted } from "../../shell/type-shell";
+import {
+  typeItemsStretchPy4,
+  typeMaxSmXsMuted,
+  typeMaxSmXsSuccess,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { FollowTargetType } from "../follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../follow-workspace-copy";
@@ -283,7 +288,7 @@ function FollowControl({
                 : copy.follow}
         </Button>
       )}
-      {showHint && <p className="max-w-sm text-xs text-muted">{copy.hint}</p>}
+      {showHint && <p className={typeMaxSmXsMuted}>{copy.hint}</p>}
       {actorId && (state === "following" || state === "not-following") ? (
         <ObjectMuteControls
           targetType={targetType}

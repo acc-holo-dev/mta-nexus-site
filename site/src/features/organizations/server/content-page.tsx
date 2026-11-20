@@ -19,9 +19,13 @@ import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakHeadingPrimary,
+  typeClamp2SmMuted,
   typeDisplayPrimary,
   typeFlexWrapBetweenGap2,
+  typeFlexWrapGap4XsMuted,
   typeFlexWrapStartBetweenGap4,
+  typeHoverUnderlineAccentFocus,
+  typeInlineMinH11AccentCta,
   typeMt2SmMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
@@ -88,10 +92,7 @@ export async function OrganizationPublications({
           <p className={typeMt2SmMuted}>{team.notice}</p>
         </div>
         {result && (
-          <Link
-            href={`${path}/new`}
-            className="inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
-          >
+          <Link href={`${path}/new`} className={typeInlineMinH11AccentCta}>
             {team.new}
           </Link>
         )}
@@ -123,7 +124,7 @@ export async function OrganizationPublications({
                     <h2 className={typeBreakHeadingPrimary}>
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}
-                        className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={typeHoverUnderlineAccentFocus}
                       >
                         {item.title}
                       </Link>
@@ -132,8 +133,8 @@ export async function OrganizationPublications({
                       {copy[item.status as "draft" | "published" | "archived"]}
                     </span>
                   </div>
-                  <p className="line-clamp-2 text-sm text-muted">{item.excerpt}</p>
-                  <div className="flex flex-wrap gap-4 text-xs text-muted">
+                  <p className={typeClamp2SmMuted}>{item.excerpt}</p>
+                  <div className={typeFlexWrapGap4XsMuted}>
                     <span>
                       {team.author}: {item.authorName ?? item.authorUsername ?? item.authorId}
                     </span>

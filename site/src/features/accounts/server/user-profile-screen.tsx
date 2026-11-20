@@ -37,6 +37,7 @@ import {
   typeGridCols1Gap6Md3,
   typeHeadingPrimary,
   typeIcon5Success,
+  typeIcon35,
   typeMaxXlSmLeadingMuted,
   typeMinSpace15,
   typeTruncate2xlBlackPrimary,
@@ -222,7 +223,7 @@ export async function UserProfileScreen({
               </Link>
             )}
             <div className="flex items-center gap-1.5 pt-1 text-[11px] text-faint">
-              <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+              <Calendar className={typeIcon35} aria-hidden="true" />
               <span>
                 {copy.joined} {formattedDate}
               </span>

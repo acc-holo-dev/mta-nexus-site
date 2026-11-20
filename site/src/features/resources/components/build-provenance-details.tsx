@@ -4,6 +4,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   typeBreakAllSecondary,
   typeFlexCenterGap2,
+  typeIcon35,
   typeMonoSecondary,
   typeTenLeadingFaint,
 } from "../../shell/type-shell";
@@ -79,7 +80,7 @@ export function BuildProvenanceDetails({
         {provenance.scanStatus === "clean" ? (
           <div className={`rounded-md border px-2.5 py-2 ${toneClass.positive}`}>
             <div className="flex items-center gap-1.5 font-semibold">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              <ShieldCheck className={typeIcon35} aria-hidden="true" />
               <span>{scanLabel}</span>
             </div>
             <div className="mt-1 opacity-80">{scanDetail}</div>

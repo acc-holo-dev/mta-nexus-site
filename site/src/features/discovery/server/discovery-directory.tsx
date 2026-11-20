@@ -28,6 +28,7 @@ import {
 } from "../../shell/link-shell";
 import {
   typeFlexWrapEndGap3,
+  typeIcon4ShrinkSuccess,
   typeListDiscInsideSpace1,
   typeMinH11Semibold,
   typeSemiboldPrimary,
@@ -501,7 +502,7 @@ function DirectoryIdentity({
           <span className="truncate">{title}</span>
           {verified && (
             <ShieldCheck
-              className="h-4 w-4 shrink-0 text-success"
+              className={typeIcon4ShrinkSuccess}
               aria-label={getDictionary(locale).discover.verified}
             />
           )}

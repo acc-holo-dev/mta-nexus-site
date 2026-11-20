@@ -24,6 +24,7 @@ import {
   typeDisplayPrimary,
   typeFlexMinCenterGap25Display,
   typeFlexWrapCenterJustifyGap3,
+  typeIcon4Success,
   typeIcon6Accent,
   typeLabelUpperMuted,
   typeMinBreakWords,
@@ -406,7 +407,7 @@ function AcquireContent() {
       </Button>
 
       <div role="note" className="flex items-center justify-center gap-2 text-xs text-muted">
-        <ShieldCheck className="h-4 w-4 text-success" aria-hidden="true" />
+        <ShieldCheck className={typeIcon4Success} aria-hidden="true" />
         <span>{copy.noSimulatedPayments}</span>
       </div>
     </div>

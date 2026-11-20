@@ -14,7 +14,10 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeFlexMinWrapStartBetweenGap3,
+  typeGridMinGap3Sm2,
   typeMinBreakBaseSemiboldPrimary,
+  typeNumericSemiboldPrimary,
+  typeRoundedBorderPx2Py1XsSecondary,
 } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
@@ -112,11 +115,11 @@ export async function PurchasesHistoryScreen({
                   <h2 className={typeMinBreakBaseSemiboldPrimary}>
                     {copy.orderNumber}: {order.orderNumber}
                   </h2>
-                  <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
+                  <span className={typeRoundedBorderPx2Py1XsSecondary}>
                     {orderStatusLabel(order.status, copy.orderStatuses)}
                   </span>
                 </div>
-                <dl className="grid min-w-0 gap-3 text-sm sm:grid-cols-2">
+                <dl className={typeGridMinGap3Sm2}>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.placed}</dt>
                     <dd className="text-primary">
@@ -127,7 +130,7 @@ export async function PurchasesHistoryScreen({
                   </div>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.total}</dt>
-                    <dd className="font-numeric font-semibold text-primary">
+                    <dd className={typeNumericSemiboldPrimary}>
                       {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
                     </dd>
                   </div>

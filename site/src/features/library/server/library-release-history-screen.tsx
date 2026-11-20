@@ -17,7 +17,13 @@ import {
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs, typeBreakSemibold, typeFlexWrapEndGap3 } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeBreakSemibold,
+  typeFlexGap4,
+  typeFlexWrapEndGap3,
+  typeGridGap1,
+} from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
@@ -110,7 +116,7 @@ export async function LibraryReleaseHistoryScreen({
       <h1 className="font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
       <form method="get" className={typeFlexWrapEndGap3}>
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {c.days}
           <select name="days" defaultValue={result.days}>
             {LIBRARY_RELEASE_HISTORY_DAYS.map((days) => (
@@ -120,7 +126,7 @@ export async function LibraryReleaseHistoryScreen({
             ))}
           </select>
         </label>
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {c.productId}
           <input
             name="productId"
@@ -197,7 +203,7 @@ export async function LibraryReleaseHistoryScreen({
           </li>
         ))}
       </ol>
-      <nav aria-label={c.page} className="flex gap-4">
+      <nav aria-label={c.page} className={typeFlexGap4}>
         {result.page > 1 && <Link href={href(result.page - 1)}>{c.previous}</Link>}
         <span>
           {c.page} {result.page} {c.of} {result.totalPages}

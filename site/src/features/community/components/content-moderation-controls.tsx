@@ -15,6 +15,7 @@ import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
   typeBlockSpace1,
   typeFlexWrapGap2,
+  typeIcon35,
   typeLabelUpperMuted,
   typeMinH11SuccessSoftEleven,
   typeSmSuccess,
@@ -163,7 +164,7 @@ export function ContentModerationControls({
           {pending === "publish" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <Send className="h-3.5 w-3.5" aria-hidden="true" />
+            <Send className={typeIcon35} aria-hidden="true" />
           )}
           {copy.publish}
         </Button>
@@ -178,7 +179,7 @@ export function ContentModerationControls({
           {pending === "archive" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <Archive className="h-3.5 w-3.5" aria-hidden="true" />
+            <Archive className={typeIcon35} aria-hidden="true" />
           )}
           {copy.archive}
         </Button>

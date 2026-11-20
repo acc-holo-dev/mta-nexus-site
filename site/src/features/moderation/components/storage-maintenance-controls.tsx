@@ -9,7 +9,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkGhostAccent } from "../../shell/link-shell";
 import { panelClipSpace4P4 } from "../../shell/panel-shell";
-import { typeFlexWrapEndGap3, typeFlexWrapGap3 } from "../../shell/type-shell";
+import { typeFlexWrapEndGap3, typeFlexWrapGap3, typeMinW48Flex1 } from "../../shell/type-shell";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
@@ -181,7 +181,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
           void run("discover");
         }}
       >
-        <div className="min-w-48 flex-1">
+        <div className={typeMinW48Flex1}>
           <Input
             label={copy.owner}
             required

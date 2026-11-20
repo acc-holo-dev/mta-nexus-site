@@ -35,6 +35,7 @@ import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/sur
 import {
   typeDisplayPrimary,
   typeFlexMinWrapGap2,
+  typeFlexWrapCenterGap4,
   typeFlexWrapGap2,
   typeFlexWrapGap4,
   typeGridGap4Md2,
@@ -253,7 +254,7 @@ export async function LibraryPageScreen({
               {copy.showing} {result.items.length} {copy.of} {result.total}
             </p>
             {result.totalPages > 1 && (
-              <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4">
+              <nav aria-label={copy.page} className={typeFlexWrapCenterGap4}>
                 {result.page > 1 ? (
                   <Link href={libraryHref(filter, result.page - 1)} className={linkAccentTight}>
                     {copy.previous}

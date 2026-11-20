@@ -17,7 +17,9 @@ import {
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
+  typeBreakSmBoldPrimary,
   typeFlexStartGap3,
+  typeFlexWrapCenterGap4,
   typeFlexWrapGap4,
   typePrewrapSmSecondary,
   typeSmMuted,
@@ -454,7 +456,7 @@ export function NotificationInbox({
                   />
                 </label>
                 <div className="min-w-0 flex-1 space-y-2">
-                  <h2 className="break-words text-sm font-bold text-primary">{item.title}</h2>
+                  <h2 className={typeBreakSmBoldPrimary}>{item.title}</h2>
                   <p className={typePrewrapSmSecondary}>{item.message}</p>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                     <span>{copy[item.category]}</span>
@@ -468,7 +470,7 @@ export function NotificationInbox({
                     </time>
                   </div>
                   {item.truncated && <p className={typeXsMuted}>{copy.truncated}</p>}
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className={typeFlexWrapCenterGap4}>
                     {item.link && (
                       // Destination navigation alone does not change isRead; use the explicit mark controls.
                       <Link prefetch={false} href={item.link} className={linkAccentSm}>

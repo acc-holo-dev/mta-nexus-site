@@ -13,6 +13,7 @@ import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeBorderT,
+  typeBreakLgPrimary,
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
   typeFlexEndGap4,
@@ -25,6 +26,7 @@ import {
   typeSmSecondary,
   typeSpace1Sm,
   typeSpace2Sm,
+  typeSpace3BorderTPt5,
   typeWFullLeftSm,
   typeXlPrimary,
 } from "../../shell/type-shell";
@@ -189,7 +191,7 @@ export function SellerSalesReportView({
         </form>
       </search>
       {report.product ? (
-        <h2 className="break-words text-lg text-primary">
+        <h2 className={typeBreakLgPrimary}>
           {report.product.title} · {report.product.id}
         </h2>
       ) : null}
@@ -326,7 +328,7 @@ export function SellerSalesReportView({
           </div>
         </section>
       ) : null}
-      <section className="space-y-3 border-t border-base pt-5">
+      <section className={typeSpace3BorderTPt5}>
         <h2 className="text-lg">{c.organizations}</h2>
         <nav aria-label={c.account} className={typeFlexWrapGap4Sm}>
           <Link

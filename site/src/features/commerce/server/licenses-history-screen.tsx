@@ -18,7 +18,9 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakPrimary,
   typeFlexMinWrapStartBetweenGap3,
+  typeGridMinGap3Sm2,
   typeMinBreakBaseSemiboldPrimary,
+  typeRoundedBorderPx2Py1XsSecondary,
   typeSmMuted,
 } from "../../shell/type-shell";
 import {
@@ -152,7 +154,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
               <li key={license.id} className={panelMinSpace3P5}>
                 <div className={typeFlexMinWrapStartBetweenGap3}>
                   <h2 className={typeMinBreakBaseSemiboldPrimary}>{license.productTitle}</h2>
-                  <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
+                  <span className={typeRoundedBorderPx2Py1XsSecondary}>
                     {licenseStatusLabel(
                       license.effectiveStatus ??
                         effectiveLicenseStatus(license.status, license.expiresAt, now),
@@ -160,7 +162,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
                     )}
                   </span>
                 </div>
-                <dl className="grid min-w-0 gap-3 text-sm sm:grid-cols-2">
+                <dl className={typeGridMinGap3Sm2}>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.issued}</dt>
                     <dd className="text-primary">

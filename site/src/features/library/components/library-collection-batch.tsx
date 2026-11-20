@@ -16,7 +16,13 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeBreakSm, typeSmSecondary, typeSpace1Sm } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeBreakSm,
+  typeFlexStartGap2Break,
+  typeSmSecondary,
+  typeSpace1Sm,
+} from "../../shell/type-shell";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -202,7 +208,7 @@ export function LibraryCollectionBatchForm({
         <ul className="space-y-2">
           {shownItems.map((item) => (
             <li key={item.productId}>
-              <label className="flex items-start gap-2 break-words">
+              <label className={typeFlexStartGap2Break}>
                 <input
                   type="checkbox"
                   checked={ids.includes(item.productId)}

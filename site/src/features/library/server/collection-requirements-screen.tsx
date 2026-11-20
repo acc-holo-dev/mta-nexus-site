@@ -16,7 +16,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBorderInsetP2, typeItemsStretchPy4 } from "../../shell/type-shell";
+import { typeBorderInsetP2, typeGridGap1, typeItemsStretchPy4 } from "../../shell/type-shell";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
 export async function collectionRequirementsMetadata(): Promise<Metadata> {
@@ -122,7 +122,7 @@ export async function CollectionRequirementsScreen({
       <p className="text-secondary">{copy.note}</p>
       {result.collection.status === "archived" && <p role="note">{c.archived}</p>}
       <form className={panelFlexWrapEndP4}>
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {copy.target}
           <input
             name="targetMta"

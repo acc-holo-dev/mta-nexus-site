@@ -14,6 +14,7 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBlockBreakAllXsMuted,
   typeBorderT,
   typeBreakSemibold,
   typeFlexMinWrapEndGap3,
@@ -270,7 +271,7 @@ export async function CollectionComparePage({
                     <tr key={item.productId} className={typeBorderT}>
                       <th scope="row" className="break-words p-2 font-normal">
                         {item.available ? (item.title ?? c.unavailable) : c.unavailable}
-                        <code className="block break-all text-xs text-muted">{item.productId}</code>
+                        <code className={typeBlockBreakAllXsMuted}>{item.productId}</code>
                       </th>
                       <td className="p-2 text-sm">
                         {item.inSource ? c.inCollection : c.notInCollection}

@@ -24,6 +24,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeFlexWrapEndGap3,
   typeFlexWrapGap4Sm,
+  typeGridGap1,
   typeSurfaceBorderP2,
 } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
@@ -180,7 +181,7 @@ export async function LibraryMembershipHistoryScreen({
         <h1>{m.title}</h1>
         <p className="text-secondary">{m.note}</p>
         <form method="get" action={membershipHistoryHref()} className={typeFlexWrapEndGap3}>
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {h.days}
             <select name="days" defaultValue={result.days} className={typeSurfaceBorderP2}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
@@ -190,7 +191,7 @@ export async function LibraryMembershipHistoryScreen({
               ))}
             </select>
           </label>
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {h.action}
             <select
               name="operation"
@@ -204,7 +205,7 @@ export async function LibraryMembershipHistoryScreen({
               ))}
             </select>
           </label>
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {h.collectionId}
             <input
               name="collectionId"
@@ -214,7 +215,7 @@ export async function LibraryMembershipHistoryScreen({
               className={typeSurfaceBorderP2}
             />
           </label>
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {h.productId}
             <input
               name="productId"

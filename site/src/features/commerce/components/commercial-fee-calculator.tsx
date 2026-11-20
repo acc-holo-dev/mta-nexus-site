@@ -8,6 +8,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   typeGridGap3Sm2,
+  typeGridGap4Sm3,
   typeNumericPrimary,
   typeSmMuted,
   typeSmSecondary,
@@ -87,7 +88,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
         {copy.calculator}
       </h2>
       <form onSubmit={submit} className="space-y-4">
-        <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-3">
+        <fieldset disabled={busy} className={typeGridGap4Sm3}>
           <label htmlFor={`${field}-amount`} className="space-y-2">
             <span className="text-sm">{copy.gross}</span>
             <input

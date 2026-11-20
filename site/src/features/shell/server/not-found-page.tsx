@@ -2,7 +2,7 @@ import { Compass, Home, SearchX } from "lucide-react";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { typeDisplayPrimary } from "../type-shell";
+import { typeDisplayPrimary, typeIcon35 } from "../type-shell";
 
 export async function NotFoundPage() {
   const locale = await getRequestLocale();
@@ -24,14 +24,14 @@ export async function NotFoundPage() {
           href="/market"
           className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          <Compass className="h-3.5 w-3.5" aria-hidden="true" />
+          <Compass className={typeIcon35} aria-hidden="true" />
           <span>{dictionary.errors.resourceLibrary}</span>
         </Link>
         <Link
           href="/"
           className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          <Home className="h-3.5 w-3.5" aria-hidden="true" />
+          <Home className={typeIcon35} aria-hidden="true" />
           <span>{dictionary.errors.home}</span>
         </Link>
       </div>

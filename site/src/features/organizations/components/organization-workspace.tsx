@@ -25,9 +25,12 @@ import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
   typeBlockSpace1SmSecondary,
   typeBlockXsMuted,
+  typeFlexCenterGap2SmSecondary,
+  typeFlexWrapCenterBetweenGap3Sm,
   typeGridGap3Cols2,
   typeHeadingPrimary,
   typeMinFlex1Space1SmSecondary,
+  typeMinH11DangerUnderline,
   typeMlAutoXsMuted,
   typeSmMuted,
   typeXsMuted,
@@ -344,7 +347,7 @@ export function OrganizationWorkspacePanel({
                     ))}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-sm text-secondary">
+              <label className={typeFlexCenterGap2SmSecondary}>
                 <input
                   type="checkbox"
                   checked={servers}
@@ -445,10 +448,7 @@ export function OrganizationWorkspacePanel({
         ) : (
           <EmptyState title={copy.noMembers} description={copy.noMembersHint} />
         )}
-        <nav
-          className="flex flex-wrap items-center justify-between gap-3 text-sm"
-          aria-label={copy.team}
-        >
+        <nav className={typeFlexWrapCenterBetweenGap3Sm} aria-label={copy.team}>
           {data.page > 1 ? (
             <Link
               className={linkAccentSm}
@@ -498,7 +498,7 @@ export function OrganizationWorkspacePanel({
             type="button"
             variant="ghost"
             disabled={busy}
-            className="h-auto min-h-11 px-0 text-sm text-danger underline"
+            className={typeMinH11DangerUnderline}
             onClick={() => void leave()}
           >
             {copy.leave}

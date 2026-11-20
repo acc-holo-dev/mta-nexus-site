@@ -13,7 +13,7 @@ import {
   requestShellSessionRefresh,
   SHELL_SESSION_REFRESH_EVENT,
 } from "../../shell/session";
-import { typeItemsStretchPy4, typeSelectMinH11 } from "../../shell/type-shell";
+import { typeIcon35, typeItemsStretchPy4, typeSelectMinH11 } from "../../shell/type-shell";
 
 type Account = { id: string; username: string };
 
@@ -158,7 +158,7 @@ export function AccountControls() {
             aria-label={`${copy.workspaceFor} ${account.username}`}
             className={chromeControl}
           >
-            <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+            <UserRound className={typeIcon35} aria-hidden="true" />
             <span className="hidden max-w-24 truncate sm:block">@{account.username}</span>
           </Link>
           <Button
@@ -172,7 +172,7 @@ export function AccountControls() {
             title={signingOut ? copy.signingOut : copy.signOut}
             className={typeSelectMinH11}
           >
-            <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+            <LogOut className={typeIcon35} aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
           </Button>
         </>
@@ -184,13 +184,13 @@ export function AccountControls() {
           onClick={requestShellSessionRefresh}
           className={typeSelectMinH11}
         >
-          <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+          <UserRound className={typeIcon35} aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
           <span className="sr-only sm:hidden">{copy.retry}</span>
         </Button>
       ) : (
         <Link href={loginHref} className={chromeControl}>
-          <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+          <UserRound className={typeIcon35} aria-hidden="true" />
           <span className="hidden sm:block">{copy.signIn}</span>
           <span className="sr-only sm:hidden">{copy.signIn}</span>
         </Link>

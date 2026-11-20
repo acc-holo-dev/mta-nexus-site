@@ -278,3 +278,44 @@ export const typeBlockSm = "block text-sm";
 export const typeBlockSpace1 = "block space-y-1";
 export const typeBreakLgSemibold = "break-words text-lg font-semibold";
 export const typeGridGap3Cols2 = "grid gap-3 sm:grid-cols-2";
+
+export const typeIcon35 = "h-3.5 w-3.5";
+export const typeGridGap1 = "grid gap-1";
+export const typeFlexGap4 = "flex gap-4";
+export const typeMb3FlexGap2 = "mb-3 flex gap-2";
+export const typeCodeCaptionFaint = "font-code font-caption text-faint";
+export const typeMinW48Flex1 = "min-w-48 flex-1";
+export const typeFlexWrapBetweenGap4Sm = "flex flex-wrap justify-between gap-4 text-sm";
+export const typeFlexStartGap2Break = "flex items-start gap-2 break-words";
+export const typeFlexWrapCenterGap4 = "flex flex-wrap items-center gap-4";
+export const typeBlockBreakAllXsMuted = "block break-all text-xs text-muted";
+export const typeTruncateSmBoldPrimary = "truncate text-sm font-bold text-primary";
+export const typeIcon7Accent = "h-7 w-7 text-accent";
+export const typeClamp2SmMuted = "line-clamp-2 text-sm text-muted";
+export const typeFlexWrapGap4XsMuted = "flex flex-wrap gap-4 text-xs text-muted";
+export const typeCoverFull = "h-full w-full object-cover";
+export const typeIcon4Success = "h-4 w-4 text-success";
+export const typeBreakLgPrimary = "break-words text-lg text-primary";
+export const typeMt1SmMuted = "mt-1 text-sm text-muted";
+export const typeBreakSmSemiboldPrimary = "break-words text-sm font-semibold text-primary";
+export const typeIcon4ShrinkSuccess = "h-4 w-4 shrink-0 text-success";
+export const typeBreakSmPrimary = "break-words text-sm text-primary";
+export const typeMaxSmXsMuted = "max-w-sm text-xs text-muted";
+export const typeSpace2BorderBPb6 = "space-y-2 border-b border-base pb-6";
+export const typeMax3xlSmMuted = "max-w-3xl text-sm text-muted";
+export const typePulseSpace3 = "animate-pulse space-y-3";
+export const typeBreakSmBoldPrimary = "break-words text-sm font-bold text-primary";
+export const typeFlexWrapCenterBetweenGap3Sm =
+  "flex flex-wrap items-center justify-between gap-3 text-sm";
+export const typeFlexCenterGap2SmSecondary = "flex items-center gap-2 text-sm text-secondary";
+export const typeGridGap4Sm3 = "grid gap-4 sm:grid-cols-3";
+export const typeSpace3BorderTPt5 = "space-y-3 border-t border-base pt-5";
+export const typeRoundedBorderPx2Py1XsSecondary =
+  "rounded-md border border-base px-2 py-1 text-xs text-secondary";
+export const typeGridMinGap3Sm2 = "grid min-w-0 gap-3 text-sm sm:grid-cols-2";
+export const typeNumericSemiboldPrimary = "font-numeric font-semibold text-primary";
+export const typeHoverUnderlineAccentFocus =
+  "hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export const typeInlineMinH11AccentCta =
+  "inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white";
+export const typeMinH11DangerUnderline = "h-auto min-h-11 px-0 text-sm text-danger underline";

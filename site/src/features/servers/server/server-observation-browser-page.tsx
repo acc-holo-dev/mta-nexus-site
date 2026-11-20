@@ -22,6 +22,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
   typeBorderTSecondary,
+  typeBreakLgPrimary,
   typeFlexWrapGap4,
   typeMinH11Semibold,
   typeSmMuted,
@@ -190,7 +191,7 @@ function ServerObservationBrowserPanel({
           {managed ? stats.management : stats.back}
         </Link>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="break-words text-lg text-primary">{report.server.name}</p>
+        <p className={typeBreakLgPrimary}>{report.server.name}</p>
         <p className={typeSmMuted}>{copy.description}</p>
         {managed && <p className={typeXsMuted}>{stats.private}</p>}
         <Link

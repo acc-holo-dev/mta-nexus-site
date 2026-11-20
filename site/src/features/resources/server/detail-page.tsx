@@ -33,6 +33,7 @@ import {
   typeFlexWrapCenterGap2,
   typeHoverPrimary,
   typeIcon4Warning,
+  typeIcon35,
   typeIconAccent,
   typeMonoSecondary,
   typeMt1XsMuted,
@@ -434,7 +435,7 @@ export async function ProductDetailPage({
                     href="/workspace/library"
                     className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-base bg-surface py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
                   >
-                    <Key className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Key className={typeIcon35} aria-hidden="true" />
                     <span>{copy.openLibrary}</span>
                   </Link>
 

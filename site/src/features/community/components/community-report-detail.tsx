@@ -17,6 +17,7 @@ import {
   typeBlockSpace1SmSecondary,
   typeBlockXsMuted,
   typeBreakLgSemiboldPrimary,
+  typeBreakSmSemiboldPrimary,
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
@@ -285,9 +286,7 @@ export function CommunityReportDetailView({
             )}
             {report.target ? (
               <>
-                <h3 className="break-words text-sm font-semibold text-primary">
-                  {report.target.title}
-                </h3>
+                <h3 className={typeBreakSmSemiboldPrimary}>{report.target.title}</h3>
                 {report.target.author && (
                   <Link
                     className="rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

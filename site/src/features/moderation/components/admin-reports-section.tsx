@@ -15,8 +15,10 @@ import {
 import {
   typeCaptionFaint,
   typeCaptionSecondary,
+  typeCodeCaptionFaint,
   typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
+  typeMb3FlexGap2,
   typeMinBreakSmSemiboldPrimary,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
@@ -97,7 +99,7 @@ export function AdminReportsSection({
       >
         {communityReportCopy(locale).queue}
       </Link>
-      <nav aria-label={copy.reports} className="mb-3 flex gap-2">
+      <nav aria-label={copy.reports} className={typeMb3FlexGap2}>
         <Link
           href={reportHref("pending", 1)}
           aria-current={reportView === "pending" ? "page" : undefined}
@@ -150,7 +152,7 @@ export function AdminReportsSection({
                 </p>
                 <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.reportEvidence} />
                 {report.moderatorNotes && (
-                  <p className="font-code font-caption text-faint">
+                  <p className={typeCodeCaptionFaint}>
                     {copy.notes}: {report.moderatorNotes}
                   </p>
                 )}

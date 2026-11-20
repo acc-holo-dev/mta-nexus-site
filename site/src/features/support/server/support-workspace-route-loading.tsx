@@ -1,3 +1,4 @@
+import { typeSpace2BorderBPb6 } from "../../shell/type-shell";
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax5xlTight, pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
@@ -47,7 +48,7 @@ export function AdminSupportCaseRouteLoading() {
     headingId: "admin-support-case-loading-heading",
     titlePath: "support.staffQueue",
     className: pageShellMax5xlTight,
-    headerClassName: "space-y-2 border-b border-base pb-6",
+    headerClassName: typeSpace2BorderBPb6,
     leading: <div className={skelH10WFullMaxMd} />,
   });
 }
@@ -57,7 +58,7 @@ export function AdminSupportRouteLoading() {
     headingId: "admin-support-loading-heading",
     titlePath: "support.staffQueue",
     className: pageShellMax5xlTight,
-    headerClassName: "space-y-2 border-b border-base pb-6",
+    headerClassName: typeSpace2BorderBPb6,
     leading: <div className={skelH28} />,
   });
 }

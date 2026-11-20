@@ -15,7 +15,7 @@ import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-sh
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllSm, typeBreakAllXsOnly } from "../../shell/type-shell";
+import { typeBreakAllSm, typeBreakAllXsOnly, typeFlexGap4 } from "../../shell/type-shell";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionId, collectionPageParams, collectionsQuery } from "../library-collections-query";
@@ -148,7 +148,7 @@ export async function LibrarySelectionBatchScreen({
               </li>
             ))}
           </ol>
-          <nav aria-label={cc.page} className="flex gap-4">
+          <nav aria-label={cc.page} className={typeFlexGap4}>
             {result.page > 1 && (
               <Link href={`${base}/history?page=${result.page - 1}`}>{cc.previous}</Link>
             )}
@@ -206,7 +206,7 @@ export async function LibrarySelectionBatchScreen({
             }))}
           />
         )}
-        <nav aria-label={cc.page} className="flex gap-4">
+        <nav aria-label={cc.page} className={typeFlexGap4}>
           {result.page > 1 && (
             <Link href={pageHref(result.page - 1)} className={linkAccentTightRounded}>
               {cc.previous}

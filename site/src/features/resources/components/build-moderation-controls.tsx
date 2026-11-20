@@ -12,6 +12,7 @@ import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
   typeBlockSpace1,
   typeFlexWrapGap2,
+  typeIcon35,
   typeLabelUpperMuted,
   typeMinH11SuccessSoftEleven,
   typeTenFaint,
@@ -153,7 +154,7 @@ export function BuildModerationControls({
             href={`/api/admin/builds/${encodeURIComponent(buildId)}/download`}
             className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-base bg-surface px-3 py-2 text-[11px] font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
-            <Download className="h-3.5 w-3.5" aria-hidden="true" />
+            <Download className={typeIcon35} aria-hidden="true" />
             {copy.reviewArtifact}
           </a>
         ) : null}
@@ -168,7 +169,7 @@ export function BuildModerationControls({
           {pending === "approve" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+            <ShieldCheck className={typeIcon35} aria-hidden="true" />
           )}
           {copy.approve}
         </Button>
@@ -183,7 +184,7 @@ export function BuildModerationControls({
           {pending === "reject" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            <XCircle className={typeIcon35} aria-hidden="true" />
           )}
           {copy.reject}
         </Button>

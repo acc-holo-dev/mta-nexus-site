@@ -21,6 +21,7 @@ import { HomePersonalChangesPanel } from "../home-personal";
 import { loadPersonalChangesSummary } from "../home-personal-changes-server";
 import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../home-personal-preference";
 import { linkAccentSm, linkAccentXsSemiboldHover } from "../link-shell";
+import { typeIcon35 } from "../type-shell";
 
 function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
   let sum = 0;
@@ -204,7 +205,7 @@ export async function HomePage() {
           action={
             <Link href="/servers" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.openDirectory}</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className={typeIcon35} />
             </Link>
           }
         />
@@ -249,7 +250,7 @@ export async function HomePage() {
           action={
             <Link href="/market?maxPrice=0" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.viewAllResources}</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className={typeIcon35} />
             </Link>
           }
         />
@@ -288,7 +289,7 @@ export async function HomePage() {
           action={
             <Link href="/articles" className={linkAccentXsSemiboldHover}>
               <span>{dictionary.home.allUpdates}</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className={typeIcon35} />
             </Link>
           }
         />

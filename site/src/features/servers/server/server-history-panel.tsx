@@ -9,6 +9,7 @@ import { pageShellStack3 } from "../../shell/page-shell";
 import {
   typeFlexCenterGap2,
   typeFlexMinWrapGap2,
+  typeIcon35,
   typeIconAccent,
   typeLabelUpperFaint,
   typeMinSpace1,
@@ -183,7 +184,7 @@ export function ServerHistoryPanel({
             })}
           </ol>
           <div className="flex items-center gap-2 text-[11px] text-faint">
-            <Activity className="h-3.5 w-3.5" aria-hidden="true" />
+            <Activity className={typeIcon35} aria-hidden="true" />
             <span>{copy.barsDescription}</span>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import {
   typeBreakSemibold,
   typeDisplayPrimary,
+  typeFlexGap4,
   typeGrid2Gap4,
   typeSmMuted,
   typeSmSecondary,
@@ -93,7 +94,7 @@ export async function LibraryCollectionsListView({
           locale={locale}
         />
       </section>
-      <nav aria-label={c.title} className="flex gap-4">
+      <nav aria-label={c.title} className={typeFlexGap4}>
         {(["active", "archived", "all"] as const).map((status) => (
           <Link
             key={status}

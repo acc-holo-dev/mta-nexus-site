@@ -7,8 +7,10 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell";
 import {
+  typeFlexCenterGap2SmSecondary,
   typeFlexCenterGap3,
   typeFlexWrapEndGap3,
+  typeMinH11DangerUnderline,
   typeMlAutoXsMuted,
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
@@ -86,7 +88,7 @@ export function OrganizationMemberEditor({
                 ))}
             </select>
           </label>
-          <label className="flex items-center gap-2 text-sm text-secondary">
+          <label className={typeFlexCenterGap2SmSecondary}>
             <input
               type="checkbox"
               checked={servers}
@@ -100,7 +102,7 @@ export function OrganizationMemberEditor({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-danger underline"
+            className={typeMinH11DangerUnderline}
             onClick={onRemove}
           >
             {copy.remove}

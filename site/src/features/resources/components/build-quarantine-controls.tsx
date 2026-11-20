@@ -12,6 +12,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
   typeBlockSpace1,
+  typeIcon35,
   typeLabelUpperMuted,
   typeWFullMaxSmSpace2Md80,
 } from "../../shell/type-shell";
@@ -129,9 +130,9 @@ export function BuildQuarantineControls({
         {pending ? (
           <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
         ) : action === "quarantine" ? (
-          <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
+          <ShieldOff className={typeIcon35} aria-hidden="true" />
         ) : (
-          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+          <RotateCcw className={typeIcon35} aria-hidden="true" />
         )}
         {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
       </Button>

@@ -1,3 +1,4 @@
+import { typeSpace2BorderBPb6 } from "../../shell/type-shell";
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
@@ -60,7 +61,7 @@ export function DiscoveryDevelopersRouteLoading() {
   return DevelopersRouteLoading({
     headingId: "developers-loading-heading",
     titlePath: "developers.title",
-    headerClassName: "space-y-2 border-b border-base pb-6",
+    headerClassName: typeSpace2BorderBPb6,
     titleClassName: "text-2xl font-extrabold text-primary",
   });
 }
