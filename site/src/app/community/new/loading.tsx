@@ -1,11 +1,11 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { CommunityCatalogRouteLoading } from "../../../features/community/community-catalog-route-loading-server";
+import { pageShellMax3xl } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return CommunityCatalogRouteLoading({
     headingId: "community-new-loading-heading",
     titlePath: "community.startTitle",
-    loadingPath: "community.loading",
-    className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax3xl,
     rows: 0,
     leading: (
       <>

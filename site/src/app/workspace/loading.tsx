@@ -1,12 +1,5 @@
-import { DictionaryFieldRouteLoading } from "../../features/shell/route-honest-loading-server";
+import { WorkspaceHubRouteLoading } from "../../features/shell/workspace-hub-route-loading-server";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
-    headingId: "workspace-loading-heading",
-    titlePath: "workspace.title",
-    loadingPath: "workspace.loading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
-    headerClassName: "min-w-0 space-y-2",
-    leading: <div className="h-28 rounded bg-inset" />,
-  });
+  return WorkspaceHubRouteLoading();
 }

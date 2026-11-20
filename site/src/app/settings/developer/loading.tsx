@@ -1,11 +1,10 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { SettingsRouteLoading } from "../../../features/accounts/settings-route-loading-server";
+import { pageShellMax3xl } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return SettingsRouteLoading({
     headingId: "developer-settings-loading-heading",
-    titlePath: "settings.title",
-    loadingPath: "settings.loading",
-    className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax3xl,
     rowClassName: "h-24 rounded bg-inset",
     leading: <div className="h-28 rounded bg-inset" />,
   });

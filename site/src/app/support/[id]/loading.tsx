@@ -1,11 +1,10 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { SupportWorkspaceRouteLoading } from "../../../features/support/support-workspace-route-loading-server";
+import { pageShellStack6 } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return SupportWorkspaceRouteLoading({
     headingId: "support-case-loading-heading",
-    titlePath: "support.title",
-    loadingPath: "support.loading",
-    className: "min-w-0 space-y-6 overflow-x-clip",
+    className: pageShellStack6,
     rows: 0,
     leading: (
       <>

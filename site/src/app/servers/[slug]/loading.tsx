@@ -1,11 +1,12 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { ServersDirectoryRouteLoading } from "../../../features/servers/servers-directory-route-loading-server";
+import { pageShellStack6 } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return ServersDirectoryRouteLoading({
     headingId: "server-detail-loading-heading",
     titlePath: "serverDetail.breadcrumb",
     loadingPath: "serverDetail.loading",
-    className: "min-w-0 space-y-6 overflow-x-clip",
+    className: pageShellStack6,
     rows: 0,
     leading: (
       <>

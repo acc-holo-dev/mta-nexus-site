@@ -1,11 +1,9 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { DevelopersRouteLoading } from "../../../features/discovery/developers-route-loading-server";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return DevelopersRouteLoading({
     headingId: "developer-loading-heading",
     titlePath: "developers.creatorProfile",
-    loadingPath: "developers.loading",
-    className: "min-w-0 space-y-6 overflow-x-clip",
     rows: 0,
     leading: (
       <>

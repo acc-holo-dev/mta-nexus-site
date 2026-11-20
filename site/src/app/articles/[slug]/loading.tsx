@@ -1,11 +1,10 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { ArticlesRouteLoading } from "../../../features/community/articles-route-loading-server";
+import { pageShellMax4xlTight } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return ArticlesRouteLoading({
     headingId: "article-loading-heading",
-    titlePath: "articles.title",
-    loadingPath: "articles.loading",
-    className: "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip",
+    className: pageShellMax4xlTight,
     rows: 0,
     leading: (
       <>

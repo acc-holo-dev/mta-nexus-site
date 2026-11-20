@@ -1,11 +1,8 @@
-import { DictionaryFieldRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { MarketRouteLoading } from "../../../features/resources/market-route-loading-server";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return MarketRouteLoading({
     headingId: "market-resource-loading-heading",
-    titlePath: "market.title",
-    loadingPath: "market.loading",
-    className: "min-w-0 space-y-6 overflow-x-clip",
     rows: 0,
     leading: (
       <>

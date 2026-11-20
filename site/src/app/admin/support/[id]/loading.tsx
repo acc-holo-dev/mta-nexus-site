@@ -1,11 +1,11 @@
-import { DictionaryFieldRouteLoading } from "../../../../features/shell/route-honest-loading-server";
+import { SupportWorkspaceRouteLoading } from "../../../../features/support/support-workspace-route-loading-server";
+import { pageShellMax5xlTight } from "../../../../features/shell/page-shell";
 
 export default async function Loading() {
-  return DictionaryFieldRouteLoading({
+  return SupportWorkspaceRouteLoading({
     headingId: "admin-support-case-loading-heading",
     titlePath: "support.staffQueue",
-    loadingPath: "support.loading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip",
+    className: pageShellMax5xlTight,
     headerClassName: "space-y-2 border-b border-base pb-6",
     leading: <div className="h-10 w-full max-w-md rounded bg-inset" />,
   });
