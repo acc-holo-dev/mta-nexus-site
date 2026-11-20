@@ -2,7 +2,7 @@ import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { typeMinSpace4, typeSmMuted } from "../../shell/type-shell";
+import { typeMinSpace1Sm, typeMinSpace4, typeSmMuted } from "../../shell/type-shell";
 import { licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 export function LicenseArchiveFilters({
@@ -23,11 +23,11 @@ export function LicenseArchiveFilters({
           action="/workspace/licenses"
           className="nexus-panel grid min-w-0 gap-4 overflow-x-clip p-4 sm:grid-cols-2"
         >
-          <label className="min-w-0 space-y-1 text-sm">
+          <label className={typeMinSpace1Sm}>
             <span>{copy.search}</span>
             <input name="q" className={fieldClassBlock} maxLength={120} defaultValue={query.q} />
           </label>
-          <label className="min-w-0 space-y-1 text-sm">
+          <label className={typeMinSpace1Sm}>
             <span>{copy.status}</span>
             <select name="status" defaultValue={query.status} className={fieldClassBlock}>
               {(["all", "active", "expiring", "expired", "suspended", "revoked"] as const).map(
@@ -39,7 +39,7 @@ export function LicenseArchiveFilters({
               )}
             </select>
           </label>
-          <label className="min-w-0 space-y-1 text-sm">
+          <label className={typeMinSpace1Sm}>
             <span>{copy.binding}</span>
             <select name="binding" defaultValue={query.binding} className={fieldClassBlock}>
               {(["all", "bound", "unbound"] as const).map((key) => (
@@ -49,7 +49,7 @@ export function LicenseArchiveFilters({
               ))}
             </select>
           </label>
-          <label className="min-w-0 space-y-1 text-sm">
+          <label className={typeMinSpace1Sm}>
             <span>{copy.term}</span>
             <select name="term" defaultValue={query.term} className={fieldClassBlock}>
               {(["all", "finite", "unknown"] as const).map((key) => (
@@ -59,7 +59,7 @@ export function LicenseArchiveFilters({
               ))}
             </select>
           </label>
-          <label className="min-w-0 space-y-1 text-sm">
+          <label className={typeMinSpace1Sm}>
             <span>{copy.sort}</span>
             <select name="sort" defaultValue={query.sort} className={fieldClassBlock}>
               <option value="newest">{copy.newest}</option>

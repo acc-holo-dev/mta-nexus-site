@@ -12,6 +12,7 @@ import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBlockMinH11SurfaceP2,
   typeBorderT,
   typeBreakLgPrimary,
   typeBreakSemiboldPrimary,
@@ -103,7 +104,7 @@ export function SellerSalesReportView({
             <select
               name="attribution"
               defaultValue={query.attribution ?? "portfolio"}
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+              className={typeBlockMinH11SurfaceP2}
             >
               <option value="portfolio">{c.portfolio}</option>
               <option value="recorded">{c.recorded}</option>
@@ -117,7 +118,7 @@ export function SellerSalesReportView({
             <select
               name="days"
               defaultValue={String(query.days)}
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+              className={typeBlockMinH11SurfaceP2}
             >
               <option value="all">{c.allTime}</option>
               {[7, 30, 90, 365].map((days) => (
@@ -129,11 +130,7 @@ export function SellerSalesReportView({
           </label>
           <label className={typeSpace1Sm}>
             <span>{c.status}</span>
-            <select
-              name="status"
-              defaultValue={query.status}
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
-            >
+            <select name="status" defaultValue={query.status} className={typeBlockMinH11SurfaceP2}>
               {(["completed", "refunded", "all"] as const).map((status) => (
                 <option key={status} value={status}>
                   {c.statuses[status]}
@@ -146,7 +143,7 @@ export function SellerSalesReportView({
             <select
               name="evidence"
               defaultValue={query.evidence}
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+              className={typeBlockMinH11SurfaceP2}
             >
               {(["all", ...SELLER_SALES_EVIDENCE] as const).map((value) => (
                 <option key={value} value={value}>
@@ -160,7 +157,7 @@ export function SellerSalesReportView({
             <select
               name="currency"
               defaultValue={query.currency ?? "all"}
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+              className={typeBlockMinH11SurfaceP2}
             >
               <option value="all">{c.all}</option>
               {["USD", "EUR", "RUB"].map((currency) => (
@@ -177,7 +174,7 @@ export function SellerSalesReportView({
               defaultValue={query.productId ?? ""}
               maxLength={128}
               pattern="[A-Za-z0-9_-]+"
-              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+              className={typeBlockMinH11SurfaceP2}
             />
           </label>
           <div className={typeFlexEndGap4}>

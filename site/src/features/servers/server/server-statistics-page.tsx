@@ -17,7 +17,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeXlBoldPrimary } from "../../shell/type-shell";
+import { typeH40RoundedInset, typeXlBoldPrimary } from "../../shell/type-shell";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
@@ -142,7 +142,7 @@ export async function ServerStatisticsLoading() {
     headingId: "server-statistics-loading-heading",
     className: pageShellMax6xlDense,
     rows: 0,
-    leading: <div className="h-40 rounded-lg bg-inset" />,
+    leading: <div className={typeH40RoundedInset} />,
     load: (locale) => {
       const copy = serverStatisticsCopy(locale);
       return {

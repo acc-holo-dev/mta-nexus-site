@@ -9,9 +9,13 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeBorderTSecondary,
   typeBreakLgSemiboldPrimary,
+  typeFlexFullMinEnd,
   typeFlexWrapGap3,
   typeLgBoldPrimary,
+  typeMin24Max60BreakP2,
   typeMinSpace3,
+  typeNowrapP2Normal,
+  typeP2NumericTabular,
   typeSemiboldPrimary,
   typeSmMuted,
   typeSmSecondary,
@@ -141,15 +145,13 @@ export function ServerStatisticsPanel({
                       {time(from)} — {time(to)} UTC
                     </span>
                   </th>
-                  <td className="p-2 font-numeric tabular-nums">{summary.observationCount}</td>
-                  <td className="p-2 font-numeric tabular-nums">
+                  <td className={typeP2NumericTabular}>{summary.observationCount}</td>
+                  <td className={typeP2NumericTabular}>
                     {summary.knownPlayerCount}
                     {summary.knownPlayerPercent == null ? "" : ` (${summary.knownPlayerPercent}%)`}
                   </td>
-                  <td className="p-2 font-numeric tabular-nums">{metric(summary.peakPlayers)}</td>
-                  <td className="p-2 font-numeric tabular-nums">
-                    {metric(summary.averagePlayers)}
-                  </td>
+                  <td className={typeP2NumericTabular}>{metric(summary.peakPlayers)}</td>
+                  <td className={typeP2NumericTabular}>{metric(summary.averagePlayers)}</td>
                 </tr>
               ))}
             </tbody>
@@ -178,7 +180,7 @@ export function ServerStatisticsPanel({
               aria-label={copy.chart}
             >
               {intervals.map((interval) => (
-                <li key={interval.intervalStart} className="flex h-full min-w-0 flex-1 items-end">
+                <li key={interval.intervalStart} className={typeFlexFullMinEnd}>
                   <div
                     aria-hidden="true"
                     className={`min-h-0.5 w-full rounded-t ${interval.peakPlayers == null ? "bg-[var(--nexus-text-faint)]/50" : "bg-[var(--nexus-accent)]/80"}`}
@@ -245,16 +247,13 @@ export function ServerStatisticsPanel({
               <tbody>
                 {report.observations.map((item) => (
                   <tr key={item.id} className={typeBorderTSecondary}>
-                    <th scope="row" className="whitespace-nowrap p-2 font-normal">
+                    <th scope="row" className={typeNowrapP2Normal}>
                       <time dateTime={item.observedAt}>{time(item.observedAt)}</time>
                     </th>
-                    <td className="p-2 font-numeric tabular-nums">{metric(item.currentPlayers)}</td>
-                    <td className="p-2 font-numeric tabular-nums">{metric(item.maxPlayers)}</td>
+                    <td className={typeP2NumericTabular}>{metric(item.currentPlayers)}</td>
+                    <td className={typeP2NumericTabular}>{metric(item.maxPlayers)}</td>
                     {[item.gameMode, item.mapName, item.mtaVersion].map((text, index) => (
-                      <td
-                        key={["mode", "map", "version"][index]}
-                        className="min-w-24 max-w-60 break-words p-2"
-                      >
+                      <td key={["mode", "map", "version"][index]} className={typeMin24Max60BreakP2}>
                         {text ?? copy.unknown}
                       </td>
                     ))}

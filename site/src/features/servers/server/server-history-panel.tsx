@@ -8,6 +8,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
 import {
   typeFlexCenterGap2,
+  typeFlexFullMinEnd,
   typeFlexMinWrapGap2,
   typeIcon35,
   typeIconAccent,
@@ -160,7 +161,7 @@ export function ServerHistoryPanel({
               const percent = serverHistoryBarPercent(point.peakPlayers, peak);
               const label = formatHistoryIntervalUtc(point.bucketAt, locale);
               return (
-                <li key={point.bucketAt} className="flex h-full min-w-0 flex-1 items-end">
+                <li key={point.bucketAt} className={typeFlexFullMinEnd}>
                   <div className="flex h-full w-full items-end">
                     <div
                       className={

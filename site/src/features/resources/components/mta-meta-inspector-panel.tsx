@@ -12,6 +12,7 @@ import {
   typeFileInputInset,
   typeFlexStartGap3,
   typeFlexWrapBaselineBetweenGap2,
+  typeGridGap15Sm2,
   typeItemsStretchPy4,
   typeLabelUpperFaint,
   typeMonoSecondary,
@@ -353,7 +354,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(scripts.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(scripts), (entry) =>
                   JSON.stringify([entry.src, entry.type, entry.cache, entry.validate]),
                 ).map(({ key, item: entry }) => (
@@ -393,7 +394,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(files.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(files), (entry) =>
                   JSON.stringify([entry.src, entry.download]),
                 ).map(({ key, item: entry }) => (
@@ -426,7 +427,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(maps.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(maps), (entry) =>
                   JSON.stringify([entry.src, entry.dimension]),
                 ).map(({ key, item: entry }) => (
@@ -459,7 +460,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(settings.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(settings), (entry) =>
                   JSON.stringify([entry.name, entry.value]),
                 ).map(({ key, item: entry }) => (
@@ -500,7 +501,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(inspection.aclRights.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(inspection.aclRights), (right) =>
                   JSON.stringify([right.name, right.access]),
                 ).map(({ key, item: right }) => (
@@ -541,7 +542,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(inspection.exports.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(inspection.exports), (entry) =>
                   JSON.stringify([entry.function, entry.type, entry.http]),
                 ).map(({ key, item: entry }) => (

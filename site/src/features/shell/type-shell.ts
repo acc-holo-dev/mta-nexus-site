@@ -319,3 +319,13 @@ export const typeHoverUnderlineAccentFocus =
 export const typeInlineMinH11AccentCta =
   "inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white";
 export const typeMinH11DangerUnderline = "h-auto min-h-11 px-0 text-sm text-danger underline";
+
+export const typeGridGap15Sm2 = "grid gap-1.5 sm:grid-cols-2";
+export const typeP2NumericTabular = "p-2 font-numeric tabular-nums";
+export const typeBlockMinH11SurfaceP2 =
+  "block min-h-11 w-full rounded border border-base bg-surface p-2";
+export const typeMinSpace1Sm = "min-w-0 space-y-1 text-sm";
+export const typeNowrapP2Normal = "whitespace-nowrap p-2 font-normal";
+export const typeMin24Max60BreakP2 = "min-w-24 max-w-60 break-words p-2";
+export const typeH40RoundedInset = "h-40 rounded-lg bg-inset";
+export const typeFlexFullMinEnd = "flex h-full min-w-0 flex-1 items-end";
