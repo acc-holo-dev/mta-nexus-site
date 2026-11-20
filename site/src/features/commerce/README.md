@@ -22,7 +22,7 @@ panel and runtime probe live here too. Services, repositories, routes and
 | `plan-reviews.ts`                 | `PlanReviewForm` (client)                                                              |
 | `plan-reviews-workspace.ts`       | `PlanReviewTerms`, `planReviewNavLinkClass` (RSC-safe)                                 |
 | `plan-review-detail.ts`           | `PlanReviewDetailView`; workspace plan review detail                                   |
-| `seller-sales.ts`                 | `SellerSalesReportView`; workspace seller sales report                                 |
+| `seller-sales-report-server.ts`   | `SellerSalesReportScreen`, metadata; workspace seller sales report                     |
 | `license-runtime-response.ts`     | util port `license-runtime-response`                                                   |
 | `order-case-response.ts`          | util port `order-case-response`                                                        |
 | `plan-review-confirmation.ts`     | util port `plan-review-confirmation`                                                   |
