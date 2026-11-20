@@ -25,6 +25,7 @@ import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
   typeBlockSpace1SmSecondary,
   typeBlockXsMuted,
+  typeGridGap3Cols2,
   typeHeadingPrimary,
   typeMinFlex1Space1SmSecondary,
   typeMlAutoXsMuted,
@@ -315,7 +316,7 @@ export function OrganizationWorkspacePanel({
         )}
         {manageable && (
           <form onSubmit={add} className={surfaceSpace3P4}>
-            <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
+            <fieldset disabled={busy} className={typeGridGap3Cols2}>
               <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.username}</span>
                 <input

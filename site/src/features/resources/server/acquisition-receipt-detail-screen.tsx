@@ -14,7 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakLgSemibold, typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceCartReviewEvidence } from "../cart-view";
 import { ResourceDownloadButton } from "../download";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
@@ -107,7 +107,7 @@ export async function AcquisitionReceiptDetailScreen({
         <ol className="space-y-4">
           {receipt.items.map((item) => (
             <li key={item.productId} className={panelSpace4P5}>
-              <h2 className="break-words text-lg font-semibold">{item.title}</h2>
+              <h2 className={typeBreakLgSemibold}>{item.title}</h2>
               <p className={typeSmSecondary}>
                 {item.alreadyClaimed ? copy.alreadyOwned : copy.newlyAdded} ·{" "}
                 {copy[item.accessSource]}

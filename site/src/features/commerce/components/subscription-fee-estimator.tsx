@@ -5,7 +5,12 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeGrid2Gap4, typeSmSecondary, typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
+import {
+  typeBlockSpace2,
+  typeGrid2Gap4,
+  typeSmSecondary,
+  typeWFullSurfaceBorderP2,
+} from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
@@ -115,7 +120,7 @@ export function SubscriptionFeeEstimator({
       </Button>
       {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
       {result && (
-        <output className="block space-y-2">
+        <output className={typeBlockSpace2}>
           <p>
             {c.rate}: {result.commissionBps / 100}%
           </p>

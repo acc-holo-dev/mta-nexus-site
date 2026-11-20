@@ -10,7 +10,11 @@ import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-chec
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
-import { typeLabelUpperMuted, typeWFullMaxSmSpace2Md80 } from "../../shell/type-shell";
+import {
+  typeBlockSpace1,
+  typeLabelUpperMuted,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 export function BuildQuarantineControls({
@@ -85,7 +89,7 @@ export function BuildQuarantineControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>
           {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
         </span>

@@ -29,11 +29,17 @@ import { pageShellStack4, pageShellStack10 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
   type3xlBlackPrimary,
+  typeFlexCenterGap2BaseBoldPrimary,
   typeFlexWrapCenterGap2,
+  typeHoverPrimary,
+  typeIcon4Warning,
   typeIconAccent,
   typeMonoSecondary,
   typeMt1XsMuted,
+  typeMt05Icon4Accent,
   typeNumericElevenFaint,
+  typePrelineSmLeadingSecondary,
+  typeSpace3BorderTPt4,
   typeXsLeadingMuted,
 } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -310,7 +316,7 @@ export async function ProductDetailPage({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-        <Link href="/market" className="transition-colors hover:text-primary">
+        <Link href="/market" className={typeHoverPrimary}>
           {copy.market}
         </Link>
         <span aria-hidden="true">/</span>
@@ -364,7 +370,7 @@ export async function ProductDetailPage({
               </div>
             </div>
 
-            <div className="space-y-3 border-t border-base pt-4">
+            <div className={typeSpace3BorderTPt4}>
               {isPublic ? (
                 <div className="space-y-1">
                   <FollowButton
@@ -532,7 +538,7 @@ export async function ProductDetailPage({
             </div>
 
             <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3 text-xs">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <ShieldCheck className={typeMt05Icon4Accent} aria-hidden="true" />
               <div className="text-[11px] leading-relaxed text-secondary">{copy.security}</div>
             </div>
           </div>
@@ -561,9 +567,7 @@ export async function ProductDetailPage({
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.overview}
             </h2>
-            <div className="whitespace-pre-line text-sm leading-relaxed text-secondary">
-              {product.description}
-            </div>
+            <div className={typePrelineSmLeadingSecondary}>{product.description}</div>
 
             <div className="flex flex-wrap gap-2 border-t border-base pt-4">
               {product.tags.map((tag) => (
@@ -581,7 +585,7 @@ export async function ProductDetailPage({
 
           <section className={panelSpace4P6}>
             <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
-              <h2 className="flex items-center gap-2 text-base font-bold text-primary">
+              <h2 className={typeFlexCenterGap2BaseBoldPrimary}>
                 <Layers className={typeIconAccent} aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
               </h2>
@@ -682,7 +686,7 @@ export async function ProductDetailPage({
 
           <section className={panelSpace4P6}>
             <h2 className="flex items-center gap-2 border-b border-base pb-3 text-base font-bold text-primary">
-              <MessageSquare className="h-4 w-4 text-warning" aria-hidden="true" />
+              <MessageSquare className={typeIcon4Warning} aria-hidden="true" />
               <span>{copy.reviews}</span>
             </h2>
 

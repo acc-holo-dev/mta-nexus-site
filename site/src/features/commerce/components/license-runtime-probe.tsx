@@ -10,10 +10,12 @@ import {
   linkGhostAccentSmNoUnderline,
 } from "../../shell/link-shell";
 import {
+  typeBlockSm,
   typeFlexGap4Sm,
   typeSemiboldPrimary,
   typeSmMuted,
   typeSmSecondary,
+  typeSpace3BorderTPt4,
 } from "../../shell/type-shell";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
@@ -137,7 +139,7 @@ export function LicenseRuntimeProbe({
     }
   }
   return (
-    <section className="space-y-3 border-t border-base pt-4" aria-busy={loading || busy}>
+    <section className={typeSpace3BorderTPt4} aria-busy={loading || busy}>
       <h3 className={typeSemiboldPrimary}>{copy.releaseCheck}</h3>
       <p className={typeSmSecondary}>{copy.releaseNote}</p>
       {loading ? (
@@ -146,7 +148,7 @@ export function LicenseRuntimeProbe({
         </p>
       ) : context?.items.length ? (
         <>
-          <label className="block text-sm">
+          <label className={typeBlockSm}>
             <span>{copy.release}</span>
             <select
               className={`${fieldClassBlock} mt-1`}

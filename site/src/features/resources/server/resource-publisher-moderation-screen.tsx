@@ -24,6 +24,7 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
+  typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -108,7 +109,7 @@ export async function ResourcePublisherModerationScreen({
       <h2 className={typeBreakXlPrimary}>{product.title}</h2>
       <p className="text-secondary">{copy[product.status]}</p>
       {product.status === "suspended" ? (
-        <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">
+        <p role="note" className={typeRoundedBorderP4SmSecondary}>
           {copy.publisherNote}
         </p>
       ) : null}

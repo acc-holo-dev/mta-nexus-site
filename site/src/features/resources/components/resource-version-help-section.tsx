@@ -9,9 +9,11 @@ import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
 import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
+  typeFlexCenterGap2BaseBoldPrimary,
   typeFlexWrapGap3Sm,
   typeIconAccent,
   typeMt1XsMuted,
+  typePrelineSmLeadingSecondary,
   typeSmSecondary,
   typeSmSemiboldPrimary,
   typeSpace2SmSecondary,
@@ -75,10 +77,7 @@ export function ResourceVersionHelpSection({
       data-version={projection.version}
     >
       <div className="border-b border-base pb-3">
-        <h2
-          id="resource-version-help-heading"
-          className="flex items-center gap-2 text-base font-bold text-primary"
-        >
+        <h2 id="resource-version-help-heading" className={typeFlexCenterGap2BaseBoldPrimary}>
           <BookOpen className={typeIconAccent} aria-hidden="true" />
           <span>{copy.title.replace("{version}", projection.version)}</span>
         </h2>
@@ -106,7 +105,7 @@ export function ResourceVersionHelpSection({
 
       <div className="space-y-2">
         <h3 className={typeSmSemiboldPrimary}>{copy.sections.acquire}</h3>
-        <p className="whitespace-pre-line text-sm leading-relaxed text-secondary">
+        <p className={typePrelineSmLeadingSecondary}>
           {copy.acquireBody.replace("{version}", projection.version)}
         </p>
         <p className={typeXsMuted}>{copy.acquireDisclaimer}</p>

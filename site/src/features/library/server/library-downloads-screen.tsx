@@ -29,6 +29,7 @@ import {
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeGridGap1Sm,
+  typeMinH11Sm,
   typeSmSecondary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -146,7 +147,7 @@ export async function LibraryDownloadsScreen({
             ))}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 text-sm">
+        <Button type="submit" variant="outline" className={typeMinH11Sm}>
           {copy.apply}
         </Button>
         {query.resourceId ? (

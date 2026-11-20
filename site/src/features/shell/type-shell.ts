@@ -240,3 +240,41 @@ export const typeFlexWrapBaselineBetweenGap2 =
 export const typeMt1XsSecondary = "mt-1 text-xs text-secondary";
 export const typeLabelUpperSecondary = "font-label uppercase text-secondary";
 export const typeBlockMinSmSecondary = "block min-w-0 text-sm text-secondary";
+
+export const typeBlockSpace2 = "block space-y-2";
+export const typeBlockSpace15 = "block space-y-1.5";
+export const typeP3Numeric = "p-3 font-numeric";
+export const typeMt3Space3 = "mt-3 space-y-3";
+export const typeCursorAccent = "cursor-pointer text-accent";
+export const typeBreakCode = "break-words font-code";
+export const typeBaseBoldPrimary = "text-base font-bold text-primary";
+export const typeMinH11SmCol2 = "min-h-11 sm:col-span-2";
+export const typeFlexCenterGap2BaseBoldPrimary =
+  "flex items-center gap-2 text-base font-bold text-primary";
+export const typePrelineSmLeadingSecondary =
+  "whitespace-pre-line text-sm leading-relaxed text-secondary";
+export const typeFlexWrapGapX4Y2Sm = "flex flex-wrap gap-x-4 gap-y-2 text-sm";
+export const typeXsSemiboldPrimary = "text-xs font-semibold text-primary";
+export const typeBorderInsetP2 = "border border-base bg-inset p-2";
+export const typeRoundedBorderP4SmSecondary =
+  "rounded-md border border-base p-4 text-sm text-secondary";
+export const typeMax3xlSmSecondary = "max-w-3xl text-sm text-secondary";
+export const typeHoverPrimary = "transition-colors hover:text-primary";
+export const typeSpace3BorderTPt4 = "space-y-3 border-t border-base pt-4";
+export const typeMt05Icon4Accent = "mt-0.5 h-4 w-4 shrink-0 text-accent";
+export const typeIcon4Warning = "h-4 w-4 text-warning";
+export const typeListDiscInsideSpace1 = "list-inside list-disc space-y-1";
+export const typeMinH11Sm = "min-h-11 text-sm";
+export const typeBreakP3 = "break-words p-3";
+export const typeMinH11PageInputSmSecondary =
+  "min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary";
+export const typeMinH24PageInputSmSecondary =
+  "min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary";
+export const typeMinH11SuccessSoftEleven =
+  "min-h-11 gap-1.5 bg-success-soft text-success text-[11px]";
+export const typeMinH11DangerSoftXs = "min-h-11 gap-1.5 bg-danger-soft text-danger text-xs";
+
+export const typeBlockSm = "block text-sm";
+export const typeBlockSpace1 = "block space-y-1";
+export const typeBreakLgSemibold = "break-words text-lg font-semibold";
+export const typeGridGap3Cols2 = "grid gap-3 sm:grid-cols-2";

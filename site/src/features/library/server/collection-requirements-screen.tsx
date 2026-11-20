@@ -16,7 +16,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeItemsStretchPy4 } from "../../shell/type-shell";
+import { typeBorderInsetP2, typeItemsStretchPy4 } from "../../shell/type-shell";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
 export async function collectionRequirementsMetadata(): Promise<Metadata> {
@@ -129,7 +129,7 @@ export async function CollectionRequirementsScreen({
             maxLength={64}
             placeholder={copy.targetPlaceholder}
             defaultValue={query.targetMta}
-            className="border border-base bg-inset p-2"
+            className={typeBorderInsetP2}
             required
           />
         </label>

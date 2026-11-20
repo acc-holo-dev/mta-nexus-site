@@ -12,6 +12,7 @@ import { linkGhostUnderlineFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBaseBoldPrimary,
   typeBlockSmSecondary,
   typePrewrapBreak,
   typePrewrapBreakSecondary,
@@ -338,7 +339,7 @@ export function ServerReviewPanel({
   return (
     <section className="space-y-5" aria-labelledby="server-reviews-heading">
       <header className="space-y-2">
-        <h2 id="server-reviews-heading" className="text-base font-bold text-primary">
+        <h2 id="server-reviews-heading" className={typeBaseBoldPrimary}>
           {copy.title}
         </h2>
         <p className={typeXsLeadingMuted}>{copy.description}</p>

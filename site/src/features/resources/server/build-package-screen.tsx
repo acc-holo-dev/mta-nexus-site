@@ -14,6 +14,7 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import {
+  typeBreakCode,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeGridGap4Md2,
@@ -206,7 +207,7 @@ export async function BuildPackageScreen({
       <ol className="space-y-3">
         {detail.files.map((file) => (
           <li key={file.path} className={surfaceSpace2P4TextSm}>
-            <p className="break-words font-code">{file.path}</p>
+            <p className={typeBreakCode}>{file.path}</p>
             <p className="text-secondary">{labels[file.status]}</p>
             <dl className={typeGridGap4Md2}>
               {file.beforeHash && (

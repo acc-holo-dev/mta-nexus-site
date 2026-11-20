@@ -11,7 +11,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSmRounded } from "../../shell/link-shell";
-import { typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
+import { typeBlockSpace1, typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -355,7 +355,7 @@ export function LibraryCollectionCommandForm({
         }
       >
         {(action === "create" || action === "rename" || action === "duplicate") && (
-          <label htmlFor={field} className="block space-y-1">
+          <label htmlFor={field} className={typeBlockSpace1}>
             <span className="text-sm">{c.name}</span>
             <input
               id={field}

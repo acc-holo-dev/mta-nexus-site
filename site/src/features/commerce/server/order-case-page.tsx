@@ -17,6 +17,7 @@ import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-s
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBlockSm,
   typeBreakDisplayPrimary,
   typeDisplayPrimary,
   typeFlexGap4Sm,
@@ -305,7 +306,7 @@ export async function OrderCaseListPage({
       <search aria-label={copy.filters}>
         <form action={base} className={typeFlexWrapEndGap3}>
           <label className="space-y-2">
-            <span className="block text-sm">{copy.status}</span>
+            <span className={typeBlockSm}>{copy.status}</span>
             <select
               name="reviewStatus"
               defaultValue={filters.reviewStatus ?? ""}
@@ -320,7 +321,7 @@ export async function OrderCaseListPage({
             </select>
           </label>
           <label className="space-y-2">
-            <span className="block text-sm">{copy.thread}</span>
+            <span className={typeBlockSm}>{copy.thread}</span>
             <select
               name="threadStatus"
               defaultValue={filters.threadStatus ?? ""}

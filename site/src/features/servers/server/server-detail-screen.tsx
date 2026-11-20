@@ -31,6 +31,7 @@ import {
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
   typeGridCols1Gap6Md3,
+  typeHoverPrimary,
   typeIconAccent,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -172,7 +173,7 @@ export async function ServerDetailScreen({
   return (
     <div className={pageShellStack8}>
       <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
-        <Link href="/servers" className="transition-colors hover:text-primary">
+        <Link href="/servers" className={typeHoverPrimary}>
           {copy.breadcrumb}
         </Link>
         <span aria-hidden="true">/</span>

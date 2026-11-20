@@ -9,7 +9,14 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
-import { typePrewrapBreak, typePrewrapBreakSm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBlockSm,
+  typeCursorAccent,
+  typeMt3Space3,
+  typePrewrapBreak,
+  typePrewrapBreakSm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -167,7 +174,7 @@ export function ResourceReviewEditor({
             void submit("save");
           }}
         >
-          <label className="block text-sm">
+          <label className={typeBlockSm}>
             {copy.rating}
             <select
               value={draftRating}
@@ -190,7 +197,7 @@ export function ResourceReviewEditor({
               ))}
             </select>
           </label>
-          <label className="block text-sm">
+          <label className={typeBlockSm}>
             {copy.text}
             <textarea
               value={draftText}
@@ -308,9 +315,9 @@ export function ResourceReviewReportForm({
     [id, setId] = useState<string | null>(null);
   return (
     <details className="text-sm">
-      <summary className="cursor-pointer text-accent">{copy.report}</summary>
+      <summary className={typeCursorAccent}>{copy.report}</summary>
       <form
-        className="mt-3 space-y-3"
+        className={typeMt3Space3}
         aria-busy={busy || undefined}
         onSubmit={async (event) => {
           event.preventDefault();
@@ -457,7 +464,7 @@ export function ResourceReviewDecisionForm({
         void submitDecision();
       }}
     >
-      <label className="block text-sm">
+      <label className={typeBlockSm}>
         {copy.decide}
         <select
           value={action}
@@ -479,7 +486,7 @@ export function ResourceReviewDecisionForm({
           ))}
         </select>
       </label>
-      <label className="block text-sm">
+      <label className={typeBlockSm}>
         {copy.notes}
         <textarea
           value={notes}

@@ -7,6 +7,7 @@ import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import {
+  typeBlockSpace15,
   typeElevenFaint,
   typeItemsStretchPy4,
   typeMt1XsMuted,
@@ -154,7 +155,7 @@ export function ContextSwitcher() {
       </div>
 
       {contexts.length > 1 && (
-        <label className="block space-y-1.5">
+        <label className={typeBlockSpace15}>
           <span className={typeXsMuted}>{copy.label}</span>
           <select
             value={activeContextId}

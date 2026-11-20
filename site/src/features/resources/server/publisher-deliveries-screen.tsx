@@ -16,11 +16,13 @@ import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBorderT,
+  typeBreakP3,
   typeBreakXlPrimary,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapEndGap3,
   typeGridGap1Sm,
+  typeMinH11Sm,
   typeSmSecondary,
   typeWFullLeftSm,
   typeXsMuted,
@@ -141,7 +143,7 @@ export async function PublisherDeliveriesScreen({
             ))}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 text-sm">
+        <Button type="submit" variant="outline" className={typeMinH11Sm}>
           {copy.apply}
         </Button>
       </form>
@@ -175,7 +177,7 @@ export async function PublisherDeliveriesScreen({
             <tbody>
               {result.items.map((row) => (
                 <tr key={`${row.buildId}:${row.version}`} className={typeBorderT}>
-                  <th scope="row" className="break-words p-3">
+                  <th scope="row" className={typeBreakP3}>
                     {row.version}
                   </th>
                   {RESOURCE_DELIVERY_STATUSES.map((status) => (

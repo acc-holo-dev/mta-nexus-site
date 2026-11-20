@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import {
+  typeBlockSpace15,
   typeFlexWrapCenterGap3,
   typeLabelSecondary,
   typeNumericElevenFaint,
@@ -66,7 +67,7 @@ export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: s
 
   return (
     <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
-      <label className="block space-y-1.5">
+      <label className={typeBlockSpace15}>
         <span className={typeLabelSecondary}>{copy.joinDiscussion}</span>
         <textarea
           value={text}

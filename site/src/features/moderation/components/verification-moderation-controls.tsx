@@ -12,6 +12,7 @@ import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
+  typeBlockSpace1,
   typeFlexWrapGap2,
   typeLabelUpperMuted,
   typeTenFaint,
@@ -121,7 +122,7 @@ export function VerificationModerationControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}

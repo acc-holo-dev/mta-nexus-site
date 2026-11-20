@@ -20,6 +20,7 @@ import {
   typeFlexWrapGap4Sm,
   typeLgSemibold,
   typeNumericPrimary,
+  typeP3Numeric,
   typeSmMuted,
   typeSmSecondary,
   typeSpace1Sm,
@@ -313,7 +314,7 @@ export function SellerSalesReportView({
                     <td className="p-3">{period.period}</td>
                     <td className="p-3">{period.currency}</td>
                     <td className="p-3">{period.lines}</td>
-                    <td className="p-3 font-numeric">
+                    <td className={typeP3Numeric}>
                       {period.gross === null
                         ? c.unknown
                         : formatFinancialMinor(period.gross, period.currency, locale)}

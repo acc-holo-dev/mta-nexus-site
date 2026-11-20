@@ -15,6 +15,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
+  typeBlockSpace15,
   typeDisplayPrimary,
   typeFlexCenterBetweenGap3,
   typeFlexWrapStartBetweenGap3,
@@ -510,7 +511,7 @@ export function SupportCaseThread({
           aria-busy={sending}
           className={panelSpace3P4}
         >
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.reply}</span>
             <textarea
               value={reply}

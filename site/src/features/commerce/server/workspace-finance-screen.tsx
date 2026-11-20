@@ -15,12 +15,15 @@ import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBorderT,
+  typeBreakP3,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeLgSemibold,
   typeNumericPrimary,
+  typeP3Numeric,
+  typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
   typeSpace2Sm,
   typeWFullLeftSm,
@@ -130,7 +133,7 @@ export async function WorkspaceFinanceScreen({
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.title}</h1>
       <h2 className={typeXlPrimary}>{result.scope.name ?? copy.personal}</h2>
-      <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">
+      <p role="note" className={typeRoundedBorderP4SmSecondary}>
         {copy.note}
       </p>
       <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
@@ -206,13 +209,13 @@ export async function WorkspaceFinanceScreen({
                     </time>
                     <p className={typeXsMuted}>{entry.journal ? copy.journal : copy.legacy}</p>
                   </td>
-                  <td className="break-words p-3">
+                  <td className={typeBreakP3}>
                     {financialReferenceLabel(locale, entry.referenceType)} · {entry.referenceId}
                   </td>
-                  <td className="p-3 font-numeric">
+                  <td className={typeP3Numeric}>
                     {formatFinancialMinor(entry.amount, entry.currency, locale)}
                   </td>
-                  <td className="p-3 font-numeric">
+                  <td className={typeP3Numeric}>
                     {formatFinancialMinor(entry.balanceAfter, entry.currency, locale)}
                   </td>
                 </tr>

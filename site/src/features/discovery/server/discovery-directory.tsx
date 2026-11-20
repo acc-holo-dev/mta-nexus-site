@@ -28,6 +28,7 @@ import {
 } from "../../shell/link-shell";
 import {
   typeFlexWrapEndGap3,
+  typeListDiscInsideSpace1,
   typeMinH11Semibold,
   typeSemiboldPrimary,
   typeSmMuted,
@@ -287,7 +288,7 @@ export async function DirectoryResults({
           {hasActiveDiscoverFilters(state) && (
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
               <p className={typeSemiboldPrimary}>{copy.activeFilters}</p>
-              <ul className="list-inside list-disc space-y-1">
+              <ul className={typeListDiscInsideSpace1}>
                 {state.query ? (
                   <li>
                     {copy.query}: {state.query}

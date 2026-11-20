@@ -19,6 +19,7 @@ import {
   typeBreakXl,
   typeDisplayPrimary,
   typeFlexWrapGap3,
+  typeMax3xlSmSecondary,
   typeSmSecondary,
   typeWFullLeftSm,
   typeXsMuted,
@@ -105,7 +106,7 @@ export async function ResourceActivityScreen({
         </Link>
         <h1 className={typeDisplayPrimary}>{copy.analytics}</h1>
         <h2 className={typeBreakXl}>{result.product.title}</h2>
-        <p role="note" className="max-w-3xl text-sm text-secondary">
+        <p role="note" className={typeMax3xlSmSecondary}>
           {copy.analyticsNote}
         </p>
       </header>

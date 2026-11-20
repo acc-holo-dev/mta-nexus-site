@@ -8,8 +8,10 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
 import {
+  typeBlockSpace1,
   typeFlexWrapGap2,
   typeLabelUpperMuted,
+  typeMinH11DangerSoftXs,
   typeTenFaint,
   typeWFullMaxSmSpace2Md80,
 } from "../../shell/type-shell";
@@ -72,7 +74,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
@@ -103,7 +105,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           type="button"
           disabled={!ready || pending !== null}
           onClick={() => void decide("dismiss")}
-          className="min-h-11 gap-1.5 bg-danger-soft text-danger text-xs"
+          className={typeMinH11DangerSoftXs}
           variant="outline"
         >
           {pending === "dismiss" ? (

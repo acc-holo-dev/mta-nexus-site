@@ -14,6 +14,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace5P5, panelP5 } from "../../shell/panel-shell";
 import {
+  typeBlockSpace2,
   typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap3,
   typeGrid2Gap4,
@@ -369,7 +370,7 @@ export function CommercialPlanForm({
           />
         </label>
       </fieldset>
-      <label htmlFor={`${field}-reason`} className="block space-y-2">
+      <label htmlFor={`${field}-reason`} className={typeBlockSpace2}>
         <span className="text-sm">{copy.reason}</span>
         <textarea
           id={`${field}-reason`}

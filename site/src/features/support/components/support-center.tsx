@@ -12,6 +12,7 @@ import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBlockSpace15,
   typeFlexCenterBetweenGap3,
   typeFlexCenterGap2,
   typeFlexMinCenterGap25Display,
@@ -346,7 +347,7 @@ export function SupportCenter({
             <h2 className={typeHeadingPrimary}>{copy.newCase}</h2>
           </div>
 
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.category}</span>
             <select
               value={category}
@@ -409,7 +410,7 @@ export function SupportCenter({
             placeholder={copy.subjectPlaceholder}
           />
 
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.message}</span>
             <textarea
               value={message}
@@ -478,7 +479,7 @@ export function SupportCenter({
                 className={`${platformFieldClass} min-w-0 w-full`}
               />
             </label>
-            <label className="block space-y-1.5">
+            <label className={typeBlockSpace15}>
               <span className={typeLabelSecondary}>{copy.filterStatus}</span>
               <select
                 name="status"
@@ -494,7 +495,7 @@ export function SupportCenter({
                 <option value="closed">{copy.closed}</option>
               </select>
             </label>
-            <label className="block space-y-1.5">
+            <label className={typeBlockSpace15}>
               <span className={typeLabelSecondary}>{copy.category}</span>
               <select
                 name="category"

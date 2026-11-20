@@ -13,7 +13,12 @@ import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4Sm, typeSmSecondary, typeSurfaceBorderP2 } from "../../shell/type-shell";
+import {
+  typeBlockSm,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeSurfaceBorderP2,
+} from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref, planReviewsPageParams, planReviewsQuery } from "../plan-reviews-query";
@@ -81,7 +86,7 @@ export async function SubscriptionReviewsScreen({
         </p>
         <form method="get" className={panelFlexWrapEndGap4P4}>
           <label htmlFor="review-account">
-            <span className="block text-sm">{c.account}</span>
+            <span className={typeBlockSm}>{c.account}</span>
             <select
               id="review-account"
               name="organizationId"
@@ -100,7 +105,7 @@ export async function SubscriptionReviewsScreen({
             </select>
           </label>
           <label htmlFor="review-days">
-            <span className="block text-sm">{c.period}</span>
+            <span className={typeBlockSm}>{c.period}</span>
             <select
               id="review-days"
               name="days"

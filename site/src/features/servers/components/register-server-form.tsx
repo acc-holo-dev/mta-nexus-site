@@ -13,6 +13,7 @@ import {
   typeItemsStretchPy4,
   typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
+  typeMinH11SmCol2,
   typeSmColSpan2,
   typeSpace15SmCol2,
 } from "../../shell/type-shell";
@@ -539,12 +540,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           </select>
         </div>
 
-        <Button
-          type="submit"
-          disabled={!!pending}
-          isLoading={loading}
-          className="min-h-11 sm:col-span-2"
-        >
+        <Button type="submit" disabled={!!pending} isLoading={loading} className={typeMinH11SmCol2}>
           {loading ? copy.creating : copy.create}
         </Button>
       </form>

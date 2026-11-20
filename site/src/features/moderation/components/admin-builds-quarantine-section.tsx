@@ -12,6 +12,7 @@ import {
   typeFlexCenterGap2,
   typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
+  typeIcon4Warning,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
   typeWarningSoftBadge,
@@ -89,7 +90,7 @@ export function AdminBuildsQuarantineSection({
         <SectionHeader
           title={copy.resourceBuildQueue}
           description={`${pendingBuildCount} ${copy.buildsAwaitingReview}`}
-          action={<PackageCheck className="h-4 w-4 text-warning" />}
+          action={<PackageCheck className={typeIcon4Warning} />}
         />
         <div className="space-y-2.5">
           {pendingBuilds.length > 0 ? (

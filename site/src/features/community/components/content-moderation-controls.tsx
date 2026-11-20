@@ -13,8 +13,10 @@ import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
+  typeBlockSpace1,
   typeFlexWrapGap2,
   typeLabelUpperMuted,
+  typeMinH11SuccessSoftEleven,
   typeSmSuccess,
   typeTenFaint,
   typeWFullMaxSmSpace2Md80,
@@ -136,7 +138,7 @@ export function ContentModerationControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null ? true : undefined}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           disabled={pending !== null || blocked}
@@ -155,7 +157,7 @@ export function ContentModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
           onClick={() => void moderate("publish")}
-          className="min-h-11 gap-1.5 bg-success-soft text-success text-[11px]"
+          className={typeMinH11SuccessSoftEleven}
           variant="outline"
         >
           {pending === "publish" ? (
