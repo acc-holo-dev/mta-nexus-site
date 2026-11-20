@@ -30,7 +30,7 @@
     {
       "allowlist_id": "market.reverse-deps.version-prefix",
       "kind": "jsx-text",
-      "line": 40,
+      "line": 41,
       "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
       "text": "v"
     }
@@ -85,7 +85,7 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "c8307d29280f547925056a68542909c5708c6dd0",
+  "source_sha": "13e9322f4927b4a152cc4cbd393ccc96036ceebc",
   "summary": {
     "allowlisted": 2,
     "findings": 2,
