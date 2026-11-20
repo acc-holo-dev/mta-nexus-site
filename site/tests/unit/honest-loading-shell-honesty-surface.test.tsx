@@ -75,7 +75,7 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
   ]) {
     const source = read(relative);
     expect(source).toContain("route-honest-loading-server");
-    expect(source).toContain("<RouteHonestLoading");
+    expect(source).toMatch(/(?:LocaleCopyRouteLoading|RouteHonestLoading)\s*[<(]/);
   }
 
   const shellSource = read("site/src/features/shell/components/honest-loading-shell.tsx");

@@ -113,11 +113,11 @@ it("locks server statistics and observations loading shells to honest busy copy"
   const observations = read("site/src/features/servers/server/server-observation-browser-page.tsx");
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
-  expect(statistics).toContain("RouteHonestLoading");
+  expect(statistics).toMatch(/LocaleCopyRouteLoading|RouteHonestLoading/);
   expect(statistics).toContain("overflow-x-clip");
   expect(observations).toContain("ServerObservationBrowserLoading");
   expect(observations).toContain("copy.loading");
-  expect(observations).toContain("RouteHonestLoading");
+  expect(observations).toMatch(/LocaleCopyRouteLoading|RouteHonestLoading/);
   expect(observations).toContain("overflow-x-clip");
   expect(read("site/src/app/servers/[slug]/statistics/loading.tsx")).toContain(
     "features/servers/statistics-server",

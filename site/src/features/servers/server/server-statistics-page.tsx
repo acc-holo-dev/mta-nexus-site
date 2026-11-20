@@ -13,7 +13,7 @@ import {
   serverStatisticsService,
 } from "../../../lib/services/servers/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { RouteHonestLoading } from "../../shell/route-honest-loading-server";
+import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
@@ -140,15 +140,17 @@ export async function ServerStatisticsPage({
 }
 
 export async function ServerStatisticsLoading() {
-  const copy = serverStatisticsCopy(await getRequestLocale());
-  return (
-    <RouteHonestLoading
-      headingId="server-statistics-loading-heading"
-      title={copy.title}
-      loadingLabel={copy.loading}
-      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
-      rows={0}
-      leading={<div className="h-40 rounded-lg bg-inset" />}
-    />
-  );
+  return LocaleCopyRouteLoading({
+    headingId: "server-statistics-loading-heading",
+    className: "mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8",
+    rows: 0,
+    leading: <div className="h-40 rounded-lg bg-inset" />,
+    load: (locale) => {
+      const copy = serverStatisticsCopy(locale);
+      return {
+        title: copy.title,
+        loading: copy.loading,
+      };
+    },
+  });
 }

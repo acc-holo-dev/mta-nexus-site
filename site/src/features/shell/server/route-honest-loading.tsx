@@ -117,13 +117,18 @@ export async function LocaleCopyRouteLoading({
   rows?: number;
   rowClassName?: string;
   leading?: ReactNode;
-  load: (locale: Locale) => { title: ReactNode; loading: ReactNode };
+  load: (locale: Locale) => {
+    title: ReactNode;
+    loading: ReactNode;
+    description?: ReactNode;
+  };
 }) {
   const copy = load(await getRequestLocale());
   return (
     <RouteHonestLoading
       headingId={headingId}
       title={copy.title}
+      {...(copy.description !== undefined ? { description: copy.description } : {})}
       loadingLabel={copy.loading}
       className={className}
       headerClassName={headerClassName}
