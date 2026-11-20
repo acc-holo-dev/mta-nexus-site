@@ -38,7 +38,7 @@ const pages: Array<[string, string]> = [
   ["site/src/app/auth/reset-password/page.tsx", "copy.invalidResetHint"],
   ["site/src/app/auth/reset-password/page.tsx", "copy.resetErrorHint"],
   ["site/src/features/library/server/library-downloads-screen.tsx", "copy.invalidHint"],
-  ["site/src/app/workspace/resources/[id]/deliveries/page.tsx", "copy.invalidHint"],
+  ["site/src/features/resources/server/publisher-deliveries-screen.tsx", "copy.invalidHint"],
   ["site/src/app/workspace/acquisitions/receipts/page.tsx", "copy.invalidHint"],
   ["site/src/app/workspace/purchases/[id]/terms/page.tsx", "c.invalidHint"],
   ["site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx", "c.invalidHint"],
