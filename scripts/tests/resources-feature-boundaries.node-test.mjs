@@ -240,6 +240,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "staff-resources",
     "staff-resource-detail",
     "resource-manage",
+    "author-resources",
   ]) {
     write(
       `site/src/features/resources/${scenario}-server.ts`,
@@ -401,6 +402,8 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/components/staff-resource-detail-leak.ts", "resources-view-isolation"],
     ["app/resource-manage-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/resource-manage-leak.ts", "resources-view-isolation"],
+    ["app/author-resources-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/author-resources-leak.ts", "resources-view-isolation"],
     ["app/review-report-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/review-report-leak.ts", "resources-view-isolation"],
     ["app/package-deep.ts", "resources-feature-public-api"],
@@ -520,6 +523,7 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/staff-resources.ts",
     "app/staff-resource-detail.ts",
     "app/resource-manage.ts",
+    "app/author-resources.ts",
     "app/review-report.ts",
     "app/package.ts",
     "app/requirements.ts",
@@ -649,7 +653,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery|staff-resources|staff-resource-detail|resource-manage)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery|staff-resources|staff-resource-detail|resource-manage|author-resources)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -894,6 +898,18 @@ test("Resources server entrypoints keep independent composition graphs", () => {
     assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
     const modules = new Set(graph.modules.map((module) => module.source));
     assert(modules.has("site/src/features/resources/server/resource-manage-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // author-resources inventory likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/author-resources-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/author-resources-screen.tsx"));
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
   }
   for (const [entry, ownPage] of entries) {

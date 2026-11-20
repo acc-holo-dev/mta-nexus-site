@@ -9,7 +9,7 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const surfaces = [
   "site/src/features/resources/server/build-screen.tsx",
-  "site/src/app/workspace/resources/page.tsx",
+  "site/src/features/resources/server/author-resources-screen.tsx",
   "site/src/features/resources/server/resource-manage-screen.tsx",
   "site/src/app/workspace/resources/[id]/history/page.tsx",
 ] as const;

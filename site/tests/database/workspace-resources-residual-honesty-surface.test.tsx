@@ -62,7 +62,7 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks residual resources page sources to ErrorState/EmptyState honesty chrome", () => {
-  const inventory = read("site/src/app/workspace/resources/page.tsx");
+  const inventory = read("site/src/features/resources/server/author-resources-screen.tsx");
   expect(inventory).toContain("ErrorState");
   expect(inventory).toContain("EmptyState");
   expect(inventory).toContain("overflow-x-clip");
