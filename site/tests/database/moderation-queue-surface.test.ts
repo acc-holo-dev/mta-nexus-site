@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
@@ -45,28 +47,22 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
-vi.mock("@nexus/db", () => ({
-  buildRepository: {
-    listPendingReviewPage: mocks.listPendingReviewPage,
-    countPendingReview: mocks.countPendingReview,
-    listRiskReviewPage: mocks.listRiskReviewPage,
-    countQuarantined: mocks.countQuarantined,
-  },
-  contentRepository: {
-    listDraftPage: mocks.listDraftPage,
-    countDrafts: mocks.countDrafts,
-  },
-  verificationRepository: {
-    listPage: mocks.listVerificationPage,
-    countPending: mocks.countPendingVerification,
-  },
-}));
-
 vi.mock("../../src/lib/services/moderation/admin-service", () => ({
   adminService: {
     getSystemHealthMetrics: mocks.health,
     listReports: mocks.listReports,
     listAuditLogs: vi.fn(async () => []),
+    listVerificationPage: mocks.listVerificationPage,
+    countPendingVerifications: mocks.countPendingVerification,
+    getVerificationQueueItem: vi.fn(async () => null),
+    listPendingReviewBuilds: mocks.listPendingReviewPage,
+    countPendingReviewBuilds: mocks.countPendingReview,
+    listRiskReviewBuilds: mocks.listRiskReviewPage,
+    countQuarantinedBuilds: mocks.countQuarantined,
+    listDraftContent: mocks.listDraftPage,
+    countDraftContent: mocks.countDrafts,
+    listAdPlacementSummaries: vi.fn(async () => []),
+    getReport: vi.fn(async () => null),
   },
 }));
 
