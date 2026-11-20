@@ -1,25 +1,19 @@
 import { getCommerceHistoryCopy } from "../../../features/commerce/commerce-history-i18n";
-import { HonestLoadingShell } from "../../../features/shell/honest-loading";
+import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
 import { getRequestLocale } from "../../../lib/i18n/server";
 
-// Honest loading shell for /workspace/purchases.
 export default async function Loading() {
   const locale = await getRequestLocale();
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   return (
-    <HonestLoadingShell
-      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
+    <RouteHonestLoading
       headingId="purchases-loading-heading"
       title={copy.purchasesTitle}
       loadingLabel={copy.loading}
-    >
-      <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-10 w-64 rounded bg-inset" />
-        {[1, 2, 3, 4].map((key) => (
-          <div key={key} className="h-20 rounded bg-inset" />
-        ))}
-      </div>
-    </HonestLoadingShell>
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
+      rows={4}
+      leading={<div className="h-10 w-64 rounded bg-inset" />}
+    />
   );
 }

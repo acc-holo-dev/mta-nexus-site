@@ -1,6 +1,6 @@
 import { libraryCollectionHistoryCopy } from "../../../../../features/library/library-collection-history-i18n";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
 import { RouteHonestLoading } from "../../../../../features/shell/route-honest-loading-server";
+import { getRequestLocale } from "../../../../../lib/i18n/server";
 
 export default async function Loading() {
   const copy = libraryCollectionHistoryCopy(await getRequestLocale());

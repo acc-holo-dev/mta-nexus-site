@@ -1,6 +1,6 @@
 import { getResourceCommerceCopy } from "../../../features/resources/resource-commerce-i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
 import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 export default async function Loading() {
   const copy = getResourceCommerceCopy(await getRequestLocale());

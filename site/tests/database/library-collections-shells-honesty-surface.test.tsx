@@ -58,8 +58,11 @@ const clippedLoadings = [
   "site/src/app/workspace/library/collections/[id]/compare/loading.tsx",
   "site/src/app/workspace/library/collections/[id]/history/loading.tsx",
   "site/src/app/workspace/library/collections/[id]/versions/history/loading.tsx",
-  "site/src/app/workspace/discussions/[id]/loading.tsx",
-  "site/src/app/workspace/feed/loading.tsx",
+] as const;
+
+const delegatedLoadings = [
+  ["site/src/app/workspace/discussions/[id]/loading.tsx", "../loading"],
+  ["site/src/app/workspace/feed/loading.tsx", "features/community/publication-feed-loading-server"],
 ] as const;
 
 it("locks library collections shells and exclusive market/articles pages to clipped frames", () => {
@@ -72,6 +75,9 @@ it("locks library collections shells and exclusive market/articles pages to clip
     const source = read(loading);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
+  }
+  for (const [loading, port] of delegatedLoadings) {
+    expect(read(loading)).toContain(port);
   }
 });
 

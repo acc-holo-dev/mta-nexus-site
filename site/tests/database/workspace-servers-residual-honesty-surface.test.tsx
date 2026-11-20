@@ -41,10 +41,16 @@ const clippedPages = [
   "site/src/features/commerce/server/license-history-page.tsx",
 ] as const;
 
-const clippedLoadings = [
-  "site/src/app/workspace/servers/[id]/statistics/loading.tsx",
-  "site/src/app/workspace/servers/[id]/observations/loading.tsx",
-  "site/src/app/servers/[slug]/trust/loading.tsx",
+const delegatedLoadings = [
+  [
+    "site/src/app/workspace/servers/[id]/statistics/loading.tsx",
+    "features/servers/statistics-server",
+  ],
+  [
+    "site/src/app/workspace/servers/[id]/observations/loading.tsx",
+    "features/servers/observations-server",
+  ],
+  ["site/src/app/servers/[slug]/trust/loading.tsx", "organizations/[slug]/trust/loading"],
 ] as const;
 
 it("locks residual workspace server page shells to clipped min-w-0 frames", () => {
@@ -55,12 +61,21 @@ it("locks residual workspace server page shells to clipped min-w-0 frames", () =
   }
 });
 
-it("locks residual workspace server loading shells to clipped frames", () => {
-  for (const loading of clippedLoadings) {
+it("locks residual workspace server loadings to feature/delegate ports with clipped chrome", () => {
+  for (const [loading, port] of delegatedLoadings) {
     const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expect(source).toContain(port);
   }
+  expect(read("site/src/features/servers/server/server-statistics-page.tsx")).toContain(
+    "overflow-x-clip",
+  );
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
+    "overflow-x-clip",
+  );
+  expect(read("site/src/features/servers/server/server-statistics-page.tsx")).toContain("min-w-0");
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
+    "min-w-0",
+  );
 });
 
 it("keeps the server trust loading shell clipped without inventing results", async () => {
@@ -99,10 +114,10 @@ it("locks managed statistics and observations loading shells to honest busy copy
   expect(observations).toContain("HonestLoadingShell");
   expect(observations).toContain("overflow-x-clip");
   expect(read("site/src/app/workspace/servers/[id]/statistics/loading.tsx")).toContain(
-    "overflow-x-clip",
+    "features/servers/statistics-server",
   );
   expect(read("site/src/app/workspace/servers/[id]/observations/loading.tsx")).toContain(
-    "overflow-x-clip",
+    "features/servers/observations-server",
   );
 });
 

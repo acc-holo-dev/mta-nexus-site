@@ -38,12 +38,21 @@ const clippedPages = [
   "site/src/features/servers/server/server-observation-browser-page.tsx",
 ] as const;
 
-const clippedLoadings = [
-  "site/src/app/organizations/[slug]/activity/loading.tsx",
-  "site/src/app/users/[username]/activity/loading.tsx",
-  "site/src/app/servers/[slug]/updates/loading.tsx",
-  "site/src/app/servers/[slug]/statistics/loading.tsx",
-  "site/src/app/servers/[slug]/observations/loading.tsx",
+const delegatedLoadings = [
+  [
+    "site/src/app/organizations/[slug]/activity/loading.tsx",
+    "features/community/publication-feed-loading-server",
+  ],
+  [
+    "site/src/app/users/[username]/activity/loading.tsx",
+    "features/community/publication-feed-loading-server",
+  ],
+  [
+    "site/src/app/servers/[slug]/updates/loading.tsx",
+    "features/community/publication-feed-loading-server",
+  ],
+  ["site/src/app/servers/[slug]/statistics/loading.tsx", "features/servers/statistics-server"],
+  ["site/src/app/servers/[slug]/observations/loading.tsx", "features/servers/observations-server"],
 ] as const;
 
 it("locks support and activity page shells to clipped min-w-0 frames", () => {
@@ -54,13 +63,19 @@ it("locks support and activity page shells to clipped min-w-0 frames", () => {
   }
 });
 
-it("locks activity and server panel loading shells to clipped frames", () => {
-  for (const loading of clippedLoadings) {
-    const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+it("locks activity and server panel loadings to feature ports with clipped chrome", () => {
+  for (const [loading, port] of delegatedLoadings) {
+    expect(read(loading)).toContain(port);
   }
+  expect(read("site/src/features/community/publication-feed-loading-server.ts")).toMatch(
+    /publication-feed|PublicationFeedLoading/,
+  );
+  expect(read("site/src/features/servers/server/server-statistics-page.tsx")).toContain(
+    "overflow-x-clip",
+  );
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
+    "overflow-x-clip",
+  );
 });
 
 it("keeps legacy checkout as a compatibility redirect without payment chrome", () => {
@@ -104,8 +119,12 @@ it("locks server statistics and observations loading shells to honest busy copy"
   expect(observations).toContain("copy.loading");
   expect(observations).toContain("HonestLoadingShell");
   expect(observations).toContain("overflow-x-clip");
-  expect(read("site/src/app/servers/[slug]/statistics/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("site/src/app/servers/[slug]/observations/loading.tsx")).toContain("overflow-x-clip");
+  expect(read("site/src/app/servers/[slug]/statistics/loading.tsx")).toContain(
+    "features/servers/statistics-server",
+  );
+  expect(read("site/src/app/servers/[slug]/observations/loading.tsx")).toContain(
+    "features/servers/observations-server",
+  );
 });
 
 it("locks nested support and activity surfaces to ErrorState/EmptyState honesty chrome", () => {

@@ -1,6 +1,6 @@
 import { getManagedServerCopy } from "../../../features/servers/managed-server-view";
-import { getRequestLocale } from "../../../lib/i18n/server";
 import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
 
 export default async function Loading() {
   const copy = getManagedServerCopy(await getRequestLocale());

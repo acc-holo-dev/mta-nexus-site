@@ -12,6 +12,8 @@ const readSource = (relative: string) => readFileSync(join(root, relative), "utf
 
 const runtime = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("next/script", async () => {
   const ReactModule = await import("react");
   return {

@@ -1,6 +1,6 @@
+import { RouteHonestLoading } from "../../../../features/shell/route-honest-loading-server";
 import { contextTrustCopy } from "../../../../features/trust/public-context-trust-copy";
 import { getRequestLocale } from "../../../../lib/i18n/server";
-import { RouteHonestLoading } from "../../../../features/shell/route-honest-loading-server";
 
 export default async function Loading() {
   const copy = contextTrustCopy(await getRequestLocale());

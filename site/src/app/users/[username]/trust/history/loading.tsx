@@ -1,6 +1,6 @@
+import { RouteHonestLoading } from "../../../../../features/shell/route-honest-loading-server";
 import { approvalCopy } from "../../../../../features/trust/public-verification-history-copy";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
-import { RouteHonestLoading } from "../../../../../features/shell/route-honest-loading-server";
 
 export default async function Loading() {
   const copy = approvalCopy(await getRequestLocale());

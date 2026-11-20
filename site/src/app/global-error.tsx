@@ -1,6 +1,6 @@
 "use client";
 
 export {
-  GlobalErrorPage as default,
   detectGlobalErrorLocale,
+  GlobalErrorPage as default,
 } from "../features/shell/global-error-page";

@@ -1,24 +1,22 @@
 import { getFinancialCopy } from "../../../features/commerce/financial-i18n";
-import { HonestLoadingShell } from "../../../features/shell/honest-loading";
+import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
 import { getRequestLocale } from "../../../lib/i18n/server";
 
-// Honest loading shell for /workspace/finance.
 export default async function Loading() {
   const copy = getFinancialCopy(await getRequestLocale());
   return (
-    <HonestLoadingShell
-      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
+    <RouteHonestLoading
       headingId="finance-loading-heading"
       title={copy.title}
       loadingLabel={copy.loading}
-    >
-      <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-10 w-72 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        {[1, 2, 3, 4].map((key) => (
-          <div key={key} className="h-20 rounded bg-inset" />
-        ))}
-      </div>
-    </HonestLoadingShell>
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
+      rows={4}
+      leading={
+        <>
+          <div className="h-10 w-72 rounded bg-inset" />
+          <div className="h-24 rounded bg-inset" />
+        </>
+      }
+    />
   );
 }
