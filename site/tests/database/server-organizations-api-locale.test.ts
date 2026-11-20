@@ -13,9 +13,9 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  organizationRepository: {
-    listServerManageableByUser: mocks.list,
+vi.mock("../../src/lib/services/servers/server-service", () => ({
+  serverService: {
+    listServerManageableOrganizations: mocks.list,
   },
 }));
 

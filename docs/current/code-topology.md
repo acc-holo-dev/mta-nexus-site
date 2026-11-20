@@ -350,6 +350,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **HTTP_DB burn-down (support cases) done:** `/api/support` + `/api/support/[id]` call `supportCaseService` instead of `supportCaseRepository`; both patterns removed from `HTTP_DB_SERVICE_REQUIRED`.
 
+**HTTP_DB burn-down (notifications list + support activity + server-organizations) done:** `/api/notifications` GET via `notificationInboxService.listByUser`/`countUnread`; `/api/support/[id]/activity` via `supportCaseService.activityHistory`; `/api/workspace/server-organizations` via `serverService.listServerManageableOrganizations`; three patterns removed from `HTTP_DB_ALLOWED_READ_HEALTH`.
+
 **HTTP_DB burn-down (notifications/follow/workspace content) done:** mark-read + preferences via `notificationInboxService`; `/api/follow` via `followWorkspaceService`; workspace content GET via `authorContentService.pageByAuthor`; four more `HTTP_DB_SERVICE_REQUIRED` patterns removed.
 
 **Slice services-domain done:** all 86 `lib/services` root modules grouped into feature-aligned `lib/services/<domain>/` (accounts, commerce, community, discovery, library, moderation, notifications, organizations, resources, servers, support, trust); ARCHITECTURE service layer path unchanged; import/mocks/`package.json` test globs rewritten; `services_root_files` → 0.

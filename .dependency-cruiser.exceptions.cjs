@@ -12,10 +12,7 @@
  */
 const HTTP_DB_ALLOWED_READ_HEALTH = Object.freeze([
   "^(?:apps/web|site)/src/app/api/health/",
-  "^(?:apps/web|site)/src/app/api/notifications/route\\.ts$",
   "^(?:apps/web|site)/src/app/api/finance/",
-  "^(?:apps/web|site)/src/app/api/support/[^/]+/activity/",
-  "^(?:apps/web|site)/src/app/api/workspace/server-organizations/",
   "^(?:apps/web|site)/src/app/api/admin/commerce/reconciliation/",
   "^(?:apps/web|site)/src/app/api/licenses/check/",
   "^(?:apps/web|site)/src/app/api/licenses/check-release/",

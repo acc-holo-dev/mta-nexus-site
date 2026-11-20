@@ -19,10 +19,13 @@ describe("server organizations API copy honesty surface", () => {
       "utf8",
     );
     expect(route).toContain("serverOrganizationsApiCopy");
+    expect(route).toContain("serverService");
+    expect(route).toContain("listServerManageableOrganizations");
     expect(route).toContain("resolveLocale");
     expect(route).toContain("nexus_locale");
     expect(route).toContain("copy.authenticationRequired");
     expect(route).toContain("copy.unavailable");
+    expect(route).not.toContain("@nexus/db");
     expect(route).not.toContain('"Authentication required"');
     expect(route).not.toContain('"Organization options temporarily unavailable"');
   });

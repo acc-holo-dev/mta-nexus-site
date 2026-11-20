@@ -1,4 +1,4 @@
-import { supportCaseRepository } from "@nexus/db";
+import { supportActivityRepository, supportCaseRepository } from "@nexus/db";
 
 /** Named support-case commands for HTTP handlers (OPS-01 / ARC02). */
 export const supportCaseService = {
@@ -10,4 +10,5 @@ export const supportCaseService = {
   createIdempotentCase: supportCaseRepository.createIdempotentCase.bind(supportCaseRepository),
   addIdempotentMessage: supportCaseRepository.addIdempotentMessage.bind(supportCaseRepository),
   updateStatus: supportCaseRepository.updateStatus.bind(supportCaseRepository),
+  activityHistory: supportActivityRepository.history.bind(supportActivityRepository),
 };

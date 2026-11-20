@@ -1,4 +1,3 @@
-import { organizationRepository } from "@nexus/db";
 import type { NextRequest } from "next/server";
 import { serverOrganizationsApiCopy } from "../../../../features/servers/server-organizations-api-copy";
 import { resolveLocale } from "../../../../lib/i18n";
@@ -8,6 +7,7 @@ import {
   logRequestEvent,
 } from "../../../../lib/platform/observability";
 import { authService } from "../../../../lib/services/accounts/auth-service";
+import { serverService } from "../../../../lib/services/servers/server-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const organizations = await organizationRepository.listServerManageableByUser(user.id);
+    const organizations = await serverService.listServerManageableOrganizations(user.id);
     return jsonWithRequestId(context, { organizations }, { headers: privateHeaders });
   } catch (error) {
     logRequestEvent({

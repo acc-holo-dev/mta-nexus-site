@@ -14,8 +14,8 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  notificationRepository: {
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
+  notificationInboxService: {
     listByUser: mocks.listByUser,
     countUnread: mocks.countUnread,
   },

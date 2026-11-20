@@ -7,8 +7,8 @@ const state = vi.hoisted(() => ({
   list: vi.fn(),
 }));
 
-vi.mock("@nexus/db", () => ({
-  organizationRepository: { listServerManageableByUser: state.list },
+vi.mock("../../src/lib/services/servers/server-service", () => ({
+  serverService: { listServerManageableOrganizations: state.list },
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },

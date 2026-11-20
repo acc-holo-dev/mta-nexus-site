@@ -1,4 +1,3 @@
-import { notificationRepository } from "@nexus/db";
 import type { NextRequest } from "next/server";
 import { notificationsApiCopy } from "../../../features/notifications/notifications-api-copy";
 import { resolveLocale } from "../../../lib/i18n";
@@ -9,6 +8,7 @@ import {
   type RequestLogContext,
 } from "../../../lib/platform/observability";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
     const unreadOnly = request.nextUrl.searchParams.get("unreadOnly") === "true";
 
     const [notifications, unreadCount] = await Promise.all([
-      notificationRepository.listByUser(user.id, limit, unreadOnly),
-      notificationRepository.countUnread(user.id),
+      notificationInboxService.listByUser(user.id, limit, unreadOnly),
+      notificationInboxService.countUnread(user.id),
     ]);
 
     return json(context, {

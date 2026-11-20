@@ -94,6 +94,14 @@ class NotificationInboxService {
     return notificationRepository.setInboxReadState(actorId, parsed.data);
   }
 
+  listByUser(userId: string, limit: number, unreadOnly: boolean) {
+    return notificationRepository.listByUser(userId, limit, unreadOnly);
+  }
+
+  countUnread(userId: string) {
+    return notificationRepository.countUnread(userId);
+  }
+
   markAsRead(id: string, recipientId: string) {
     return notificationRepository.markAsRead(id, recipientId);
   }

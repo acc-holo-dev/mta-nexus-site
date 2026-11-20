@@ -7,7 +7,9 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("@nexus/db", () => ({ supportActivityRepository: { history: mocks.history } }));
+vi.mock("../../src/lib/services/support/support-case-service", () => ({
+  supportCaseService: { activityHistory: mocks.history },
+}));
 
 import { GET } from "../../src/app/api/support/[id]/activity/route";
 

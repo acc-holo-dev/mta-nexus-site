@@ -228,6 +228,10 @@ class ServerService {
       throwServerMutationConflict(error);
     }
   }
+
+  listServerManageableOrganizations(userId: string) {
+    return organizationRepository.listServerManageableByUser(userId);
+  }
 }
 
 export const serverService = new ServerService();

@@ -17,9 +17,11 @@ describe("notifications API copy honesty surface", () => {
       "utf8",
     );
     expect(route).toContain("notificationsApiCopy");
+    expect(route).toContain("notificationInboxService");
     expect(route).toContain("resolveLocale");
     expect(route).toContain("nexus_locale");
     expect(route).toContain("copy.fetchFailed");
+    expect(route).not.toContain("@nexus/db");
     expect(route).not.toContain('"Failed to fetch notifications"');
   });
 });
