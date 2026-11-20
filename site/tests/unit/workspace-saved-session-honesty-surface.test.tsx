@@ -12,9 +12,7 @@ const source = readFileSync(
 
 /** Honesty lock: saved/follows session probe failure → PlatformSessionError, not guest sign-in. */
 it("locks saved workspace session probe failure to PlatformSessionError without guest-lie", () => {
-  expect(source).toContain(
-    'import { PlatformSessionError } from "../../shell/session-error"',
-  );
+  expect(source).toContain('import { PlatformSessionError } from "../../shell/session-error"');
   expect(source).toMatch(
     /try \{\s*actor = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
   );

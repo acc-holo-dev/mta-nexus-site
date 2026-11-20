@@ -28,7 +28,7 @@ const clippedShellPages = [
   "site/src/app/workspace/reports/[id]/page.tsx",
   "site/src/app/workspace/reports/[id]/history/page.tsx",
   "site/src/app/workspace/library/version-history/page.tsx",
-  "site/src/app/dev/page.tsx",
+  "site/src/features/shell/server/development-status-screen.tsx",
 ] as const;
 
 it("locks residual page shells to clipped min-w-0 frames", () => {
@@ -102,7 +102,7 @@ it.each([
 );
 
 it("locks /dev diagnostics shell clipped without raw alert failure chrome", () => {
-  const source = read("site/src/app/dev/page.tsx");
+  const source = read("site/src/features/shell/server/development-status-screen.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
   expect(source).toContain("pageShellClass");

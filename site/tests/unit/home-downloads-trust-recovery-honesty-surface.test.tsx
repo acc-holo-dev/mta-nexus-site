@@ -22,7 +22,7 @@ it("locks downloads/trust/verification/author/mta-directory recovery hints", () 
   expect(read("site/src/features/library/server/library-downloads-screen.tsx")).toMatch(
     /title=\{copy\.loadUnavailable\}\s*\n\s*description=\{copy\.loadUnavailableHint\}/u,
   );
-  expect(read("site/src/app/users/[username]/trust/page.tsx")).toMatch(
+  expect(read("site/src/features/trust/server/public-user-trust-page.tsx")).toMatch(
     /title=\{copy\.unavailable\}\s*\n\s*description=\{copy\.unavailableHint\}/u,
   );
   expect(read("site/src/features/community/server/author-edit-page.tsx")).toMatch(

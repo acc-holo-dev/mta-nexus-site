@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const page = readFileSync(join(root, "site/src/app/discover/stream/page.tsx"), "utf8");
+const page = readFileSync(
+  join(root, "site/src/features/discovery/server/discovery-stream-page.tsx"),
+  "utf8",
+);
 const directory = readFileSync(
   join(root, "site/src/features/discovery/server/discovery-directory.tsx"),
   "utf8",

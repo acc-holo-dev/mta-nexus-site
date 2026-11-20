@@ -24,7 +24,7 @@ describe("server ownership hardening surface", () => {
 
   it("uses one server management contract in service and workspace page", () => {
     const service = read("site/src/lib/services/servers/server-service.ts");
-    const page = read("site/src/app/workspace/servers/[id]/page.tsx");
+    const page = read("site/src/features/servers/server/managed-server-workspace-screen.tsx");
 
     expect(service).toContain("async canManageServer(");
     expect(service).toContain("if (!organization) return false");

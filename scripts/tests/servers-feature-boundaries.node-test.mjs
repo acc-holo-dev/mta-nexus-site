@@ -125,6 +125,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "managed-servers",
     "publications",
     "register",
+    "managed-server-workspace",
   ]) {
     write(
       `site/src/features/servers/${port}-server.ts`,
@@ -216,6 +217,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/components/managed-servers-leak.ts", "servers-client-isolation"],
     ["features/servers/components/publications-leak.ts", "servers-client-isolation"],
     ["features/servers/components/register-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/managed-server-workspace-leak.ts", "servers-client-isolation"],
     ["features/servers/components/claim-status-leak.ts", "servers-client-isolation"],
     ["features/servers/components/managed-card-leak.ts", "servers-client-isolation"],
     ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
@@ -241,6 +243,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/managed-servers-server.ts",
     "app/publications-server.ts",
     "app/register-server.ts",
+    "app/managed-server-workspace-server.ts",
     "app/claim-status-server.ts",
     "app/managed-card-server.ts",
     "app/statistics-server.ts",
@@ -347,7 +350,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates|publications|register)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates|publications|register|managed-server-workspace)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -500,5 +503,17 @@ test("Servers register entry stays server-only and avoids routing", () => {
   assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
   const modules = new Set(graph.modules.map((module) => module.source));
   assert(modules.has("site/src/features/servers/server/register-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers managed-server-workspace entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/managed-server-workspace-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/managed-server-workspace-screen.tsx"));
   assert(![...modules].some((name) => name.startsWith("site/src/app/")));
 });

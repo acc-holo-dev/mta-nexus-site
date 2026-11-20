@@ -7,7 +7,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("development diagnostics", () => {
   it("is unavailable in production and reports only sanitized runtime state", () => {
-    const page = read("site/src/app/dev/page.tsx");
+    const page = read("site/src/features/shell/server/development-status-screen.tsx");
 
     expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain("notFound()");

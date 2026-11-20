@@ -21,7 +21,11 @@ const utilPorts = [
   "verification-api-copy",
 ];
 const clientPorts = ["public-user-trust"];
-const serverPorts = ["public-context-trust-page", "public-verification-history-page"];
+const serverPorts = [
+  "public-context-trust-page",
+  "public-verification-history-page",
+  "public-user-trust-page",
+];
 const safeLib =
   /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:public-user-trust-contract|user-platform-copy)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {

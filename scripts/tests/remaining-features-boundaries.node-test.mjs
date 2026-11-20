@@ -86,6 +86,8 @@ const features = [
       ["developer-profile-server", "developer-profile-screen.tsx"],
       ["security-center-server", "security-center-screen.tsx"],
       ["settings-history-server", "settings-history-screen.tsx"],
+      ["settings-developer-server", "settings-developer-screen.tsx"],
+      ["settings-privacy-server", "settings-privacy-screen.tsx"],
     ],
     clientUtilPorts: [
       "profile-pagination",
@@ -156,7 +158,10 @@ const features = [
       "session-policy",
     ],
     privateClients: ["shell-session-unavailable"],
-    servers: [["home-personal-changes-server", "home-personal-changes.ts"]],
+    servers: [
+      ["home-personal-changes-server", "home-personal-changes.ts"],
+      ["development-status-server", "development-status-screen.tsx"],
+    ],
     safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|http/private-api-request|resource-release-watches-i18n",
   },
   {
@@ -341,3 +346,27 @@ for (const { name, clients, privateClients, servers, safe, clientUtilPorts } of 
       }
     });
 }
+
+test("discovery discover-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/discovery/discover-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/discovery/server/discover-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("discovery discovery-stream-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/discovery/discovery-stream-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/discovery/server/discovery-stream-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
