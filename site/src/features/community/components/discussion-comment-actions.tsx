@@ -6,6 +6,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import {
   typeFlexWrapGap3,
+  typeMinH11Xs,
   typeSmSecondary,
   typeXsMuted,
   typeXsSuccess,
@@ -166,7 +167,7 @@ export function DiscussionCommentActions({
           {own && editable && (
             <Button
               type="button"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={disabled || blocked}
               onClick={() => {
                 setText(comment.text);
@@ -182,7 +183,7 @@ export function DiscussionCommentActions({
           )}
           <Button
             type="button"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             disabled={disabled || blocked}
             onClick={() => {
               if (own) {
@@ -241,7 +242,7 @@ export function DiscussionCommentActions({
           <div className={typeFlexWrapGap3}>
             <Button
               type="submit"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || disabled || stale || blocked}
               variant="outline"
             >
@@ -249,7 +250,7 @@ export function DiscussionCommentActions({
             </Button>
             <Button
               type="button"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending}
               onClick={() => setMode(null)}
               variant="outline"
@@ -283,7 +284,7 @@ export function DiscussionCommentActions({
           <p className={typeXsMuted}>{copy.draftKept}</p>
           <Button
             type="button"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             variant="outline"
             onClick={() => void copyDraft()}
           >

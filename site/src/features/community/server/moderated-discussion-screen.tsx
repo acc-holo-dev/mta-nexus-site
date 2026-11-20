@@ -24,6 +24,7 @@ import {
   typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
   typePrewrapBreak,
+  typePrewrapSmPrimary,
   typeSemiboldPrimary,
   typeSmMuted,
   typeSpace1SmPrimary,
@@ -271,9 +272,7 @@ export async function ModeratedDiscussionScreen({
                   <p className={typeSmMuted}>
                     {identity(item.author)} · {date(item.createdAt)}
                   </p>
-                  <p className="whitespace-pre-wrap break-words text-sm text-primary">
-                    {item.text}
-                  </p>
+                  <p className={typePrewrapSmPrimary}>{item.text}</p>
                   <Link
                     href={moderatedDiscussionHref(id, undefined, undefined, item.id)}
                     className={linkAccentSm}

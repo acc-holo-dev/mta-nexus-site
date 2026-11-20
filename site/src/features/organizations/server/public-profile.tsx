@@ -29,10 +29,14 @@ import {
 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
 import {
+  typeFlexMinCenterGap5Sm6,
   typeFlexWrapCenterGap2,
+  typeH35W35Shrink,
   typeHeadingPrimary,
+  typeIcon5Success,
   typeMaxXlSmLeadingMuted,
   typeMinSpace15,
+  typeTruncate2xlBlackPrimary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
@@ -143,7 +147,7 @@ export async function OrganizationProfilePage({
   return (
     <div className={pageShellClass}>
       <section className={panelHeroBetween}>
-        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+        <div className={typeFlexMinCenterGap5Sm6}>
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
             {logoUrl ? (
               <>
@@ -164,10 +168,10 @@ export async function OrganizationProfilePage({
 
           <div className={typeMinSpace15}>
             <div className={typeFlexWrapCenterGap2}>
-              <h1 className="truncate text-2xl font-black text-primary">{organization.name}</h1>
+              <h1 className={typeTruncate2xlBlackPrimary}>{organization.name}</h1>
               {organization.isVerified && (
                 <span title={copy.verified}>
-                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
+                  <ShieldCheck className={typeIcon5Success} aria-hidden="true" />
                 </span>
               )}
               <span className="rounded border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-2 py-0.5 font-label uppercase text-warning">
@@ -198,7 +202,7 @@ export async function OrganizationProfilePage({
                 rel="noreferrer"
                 className="inline-flex min-h-11 max-w-full items-center gap-1.5 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
-                <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <Globe className={typeH35W35Shrink} aria-hidden="true" />
                 <span className="truncate">{websiteUrl}</span>
                 <ExternalLink className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />
               </a>

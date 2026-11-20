@@ -1,5 +1,5 @@
 import type { CommercialPlanTerms } from "@nexus/domain";
-import { typePrewrapSmSecondary } from "../../shell/type-shell";
+import { typeGridGap3Sm3, typePrewrapSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 export function PlanReviewTerms({
@@ -18,7 +18,7 @@ export function PlanReviewTerms({
       <p className={typePrewrapSmSecondary}>
         {locale === "ru" ? terms.descriptionRu : terms.descriptionEn}
       </p>
-      <dl className="grid gap-3 text-sm sm:grid-cols-3">
+      <dl className={typeGridGap3Sm3}>
         <div>
           <dt>{c.price}</dt>
           <dd className="font-numeric">

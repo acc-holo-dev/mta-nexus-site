@@ -19,7 +19,12 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakXlPrimary,
+  typeDisplayPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { SupportDownloadHelpLink } from "../../support/download-help";
 export async function libraryDownloadDetailMetadata(): Promise<Metadata> {
   return {
@@ -90,7 +95,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
         {copy.title}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.receipt}</h1>
-      <h2 className="break-words text-xl text-primary">{receipt.title ?? copy.privateResource}</h2>
+      <h2 className={typeBreakXlPrimary}>{receipt.title ?? copy.privateResource}</h2>
       <p role="note" className={typeSmSecondary}>
         {copy.note}
       </p>

@@ -16,6 +16,7 @@ import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBorderT,
+  typeBreakXlPrimary,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapEndGap3,
@@ -124,7 +125,7 @@ export async function PublisherDeliveriesScreen({
         {copy.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.publisherTitle}</h1>
-      <h2 className="break-words text-xl text-primary">{result.product.title}</h2>
+      <h2 className={typeBreakXlPrimary}>{result.product.title}</h2>
       <p role="note" className={typeSmSecondary}>
         {copy.publisherNote}
       </p>

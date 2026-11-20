@@ -4,7 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Copy } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeElevenFaint } from "../../shell/type-shell";
+import { typeElevenFaint, typeXsSecondaryAnywhere } from "../../shell/type-shell";
 
 /**
  * Honest MTA connect intent: protocol link may open the client, but never proves
@@ -114,7 +114,7 @@ export function ServerConnectControls({
           description={copy.copyUnavailableHint}
         />
       ) : (
-        <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
+        <p role="status" className={typeXsSecondaryAnywhere}>
           {copyMessage}
         </p>
       )}

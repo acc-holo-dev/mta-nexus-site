@@ -8,10 +8,13 @@ import { panelFlexBetweenP4 } from "../../shell/panel-shell";
 import {
   typeCaptionFaint,
   typeCaptionMuted,
+  typeCaptionSecondary,
   typeFlexCenterGap2,
+  typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
+  typeWarningSoftBadge,
 } from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -94,9 +97,7 @@ export function AdminBuildsQuarantineSection({
               <div key={build.id} className={panelFlexBetweenP4}>
                 <div className={typeMinSpace1}>
                   <div className={typeFlexCenterGap2}>
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                      {copy.pendingReview}
-                    </span>
+                    <span className={typeWarningSoftBadge}>{copy.pendingReview}</span>
                     <span className="truncate font-code text-xs font-heading text-primary">
                       {build.fileName} · v{build.version}
                     </span>
@@ -105,7 +106,7 @@ export function AdminBuildsQuarantineSection({
                     {copy.resource} {build.productId} •{" "}
                     {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
                   </p>
-                  <p className="font-caption text-secondary">
+                  <p className={typeCaptionSecondary}>
                     {build.productStatus === "published" ? (
                       <Link
                         className={linkAccent}
@@ -142,7 +143,7 @@ export function AdminBuildsQuarantineSection({
                   )}
                   {build.releaseNotes && <p className={typeCaptionFaint}>{build.releaseNotes}</p>}
                 </div>
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                <div className={typeFlexWFullColStartGap3Md}>
                   <StatusBadge
                     status={adminStatusLabel(locale, build.scanStatus)}
                     tone={adminStatusTone(build.scanStatus)}
@@ -204,7 +205,7 @@ export function AdminBuildsQuarantineSection({
                       {build.fileName} · v{build.version}
                     </span>
                   </div>
-                  <p className="font-caption text-secondary">
+                  <p className={typeCaptionSecondary}>
                     {build.productStatus === "published" ? (
                       <Link
                         className={linkAccent}

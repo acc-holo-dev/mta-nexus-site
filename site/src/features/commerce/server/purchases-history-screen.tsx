@@ -12,6 +12,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeMinBreakBaseSemiboldPrimary } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -105,7 +106,7 @@ export async function PurchasesHistoryScreen({
             {result.orders.map((order) => (
               <li key={order.id} className={panelMinSpace3P5}>
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-                  <h2 className="min-w-0 break-words text-base font-semibold text-primary">
+                  <h2 className={typeMinBreakBaseSemiboldPrimary}>
                     {copy.orderNumber}: {order.orderNumber}
                   </h2>
                   <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">

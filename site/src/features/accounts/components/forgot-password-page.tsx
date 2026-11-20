@@ -8,7 +8,13 @@ import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
-import { typeDisplayPrimary, typeFlexCenterGap3, typeSmLeadingMuted } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexCenterGap3,
+  typeIcon5Accent,
+  typeSmLeadingMuted,
+  typeWFullMinH11,
+} from "../../shell/type-shell";
 import { recoveryJsonRequest } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
 export function ForgotPasswordPage() {
@@ -62,7 +68,7 @@ export function ForgotPasswordPage() {
     <div className={pageShellClass}>
       <section aria-labelledby="forgot-heading" className={panelClipSpace5P6Shadow}>
         <div className={typeFlexCenterGap3}>
-          <KeyRound className="h-5 w-5 text-accent" aria-hidden="true" />
+          <KeyRound className={typeIcon5Accent} aria-hidden="true" />
           <h1 id="forgot-heading" className={typeDisplayPrimary}>
             {copy.forgotTitle}
           </h1>
@@ -86,7 +92,7 @@ export function ForgotPasswordPage() {
             onChange={(event) => setEmail(event.target.value)}
           />
 
-          <Button type="submit" size="lg" isLoading={pending} className="w-full min-h-11">
+          <Button type="submit" size="lg" isLoading={pending} className={typeWFullMinH11}>
             {pending ? copy.submitting : copy.sendReset}
           </Button>
         </form>

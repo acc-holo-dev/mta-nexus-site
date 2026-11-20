@@ -12,7 +12,11 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeSmBoldPrimary } from "../../shell/type-shell";
+import {
+  typeLgBoldPrimary,
+  typeMt1XsLeadingMuted,
+  typeSmBoldPrimary,
+} from "../../shell/type-shell";
 import { ServerClaimStatusPanel } from "../claim-status-server";
 import { ServerDetailsForm } from "../details-controls";
 import { getManagedServerCopy } from "../managed-server-view";
@@ -72,7 +76,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
         <Server className="mt-0.5 h-5 w-5 shrink-0 text-success" aria-hidden="true" />
         <div className="min-w-0">
           <h2 className={typeSmBoldPrimary}>{copy.ownerManaged}</h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.ownerManagedDescription}</p>
+          <p className={typeMt1XsLeadingMuted}>{copy.ownerManagedDescription}</p>
         </div>
       </div>
 
@@ -86,7 +90,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
 
       <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm sm:p-6">
         <div>
-          <h2 className="text-lg font-bold text-primary">{copy.listingDetails}</h2>
+          <h2 className={typeLgBoldPrimary}>{copy.listingDetails}</h2>
           <p className="mt-1 text-sm text-muted">{copy.listingDescription}</p>
         </div>
         <ServerDetailsForm key={`${user.id}:${server.id}`} actorId={user.id} server={server} />

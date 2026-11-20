@@ -13,6 +13,7 @@ import { skelH4W4Spin } from "../../shell/skeleton-shell";
 import {
   typeFlexWrapGap2,
   typeItemsStretchPy4,
+  typeMinH11Xs,
   typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
@@ -377,7 +378,7 @@ function ContentFollowControl({
               key={duration}
               type="button"
               variant="outline"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || !ready}
               onClick={() => void mutateMute(duration)}
             >
@@ -388,7 +389,7 @@ function ContentFollowControl({
             <Button
               type="button"
               variant="outline"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || !ready}
               onClick={() => void mutateMute(null)}
             >

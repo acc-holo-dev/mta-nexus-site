@@ -9,7 +9,11 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentTightSm, linkAccentTightSmPlain } from "../../shell/link-shell";
-import { typeFlexWrapCenterBetweenGap3, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterBetweenGap3,
+  typeFlexWrapCenterGap3,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
 import { platformFieldClass } from "../user-platform-client";
@@ -302,7 +306,7 @@ export function CommunityReportForm({
               onChange={(event) => setEvidence(event.target.value)}
             />
           </label>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className={typeFlexWrapCenterGap3}>
             <Button
               type="submit"
               isLoading={pending}

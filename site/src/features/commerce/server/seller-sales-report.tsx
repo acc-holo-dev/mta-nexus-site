@@ -15,6 +15,7 @@ import {
   typeBorderT,
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
+  typeFlexEndGap4,
   typeFlexGap4Sm,
   typeFlexWrapGap4Sm,
   typeLgSemibold,
@@ -176,7 +177,7 @@ export function SellerSalesReportView({
               className="block min-h-11 w-full rounded border border-base bg-surface p-2"
             />
           </label>
-          <div className="flex items-end gap-4">
+          <div className={typeFlexEndGap4}>
             <Button type="submit" size="touch">
               {c.apply}
             </Button>

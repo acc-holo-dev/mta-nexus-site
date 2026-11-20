@@ -21,6 +21,7 @@ import {
   typeMinFlex1,
   typeSmMuted,
   typeSmSuccess,
+  typeSpace2SmMuted,
   typeXsFaint,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -308,7 +309,7 @@ export function FollowWorkspace({
               </p>
             )}
             {item.discussion && item.href && (
-              <div className="space-y-2 text-sm text-muted">
+              <div className={typeSpace2SmMuted}>
                 <p>
                   {copy.replies}: {item.discussion.replyCount}
                 </p>

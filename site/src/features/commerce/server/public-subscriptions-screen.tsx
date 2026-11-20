@@ -14,6 +14,7 @@ import {
   typeFlexMinWrapGap3,
   typeFlexMinWrapGap4,
   typeFlexMinWrapGap4Sm,
+  typeGridMinGap4ClipSm2,
   typeNumericPrimary,
   typePrewrapSmSecondary,
   typeSmMuted,
@@ -107,7 +108,7 @@ export async function PublicSubscriptionsScreen({
         ))}
       </nav>
       {result.plans.length ? (
-        <ul className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
+        <ul className={typeGridMinGap4ClipSm2}>
           {result.plans.map((plan) => (
             <li key={plan.id} className={panelClipSpace3P5}>
               <h2 className="break-words text-xl font-semibold text-primary">

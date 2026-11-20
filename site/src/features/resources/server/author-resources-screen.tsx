@@ -17,6 +17,7 @@ import {
   typeDisplayPrimary,
   typeFlexWrapCenterGap4Sm,
   typeGrid2Gap4,
+  typeMt2SmSecondary,
   typeMt2XsMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -110,7 +111,7 @@ export async function AuthorResourcesScreen({
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-          <p className="mt-2 text-sm text-secondary">{copy.subtitle}</p>
+          <p className={typeMt2SmSecondary}>{copy.subtitle}</p>
         </div>
         <Link href="/workspace/resources/new" className={primaryCtaClass}>
           {dictionary.workspace.publishResource}
@@ -146,11 +147,11 @@ export async function AuthorResourcesScreen({
               >
                 {product.title}
               </Link>
-              <p className="mt-2 text-sm text-secondary">
+              <p className={typeMt2SmSecondary}>
                 {copy.statusLabels[product.status as Product["status"]]} · {product.currentVersion}
               </p>
               <p className="mt-2 break-words text-sm text-muted">{product.shortDescription}</p>
-              <p className="mt-2 text-sm text-secondary">
+              <p className={typeMt2SmSecondary}>
                 {publisherCopy.readiness[product.readiness]} · {publisherCopy.versions}:{" "}
                 {product.buildCount}
               </p>

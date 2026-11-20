@@ -15,6 +15,7 @@ import {
   typeFlexStartGap3,
   typeFlexWrapGap2,
   typeLabelUpperMuted,
+  typeMt1XsLeadingMuted,
   typeSmBoldPrimary,
   typeTenFaint,
   typeTenLeadingFaint,
@@ -323,7 +324,7 @@ export function ServerClaimControlPanel({
           <h2 id="server-control-proof-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
+          <p className={typeMt1XsLeadingMuted}>{copy.description}</p>
         </div>
       </div>
 

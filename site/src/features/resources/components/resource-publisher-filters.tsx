@@ -3,7 +3,7 @@ import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { linkAccentTightSm, linkFocusRing } from "../../shell/link-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexEndGap4, typeFlexWrapGap2 } from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
@@ -112,7 +112,7 @@ export function ResourcePublisherFilters({
               ))}
             </select>
           </div>
-          <div className="flex items-end gap-4">
+          <div className={typeFlexEndGap4}>
             <Button type="submit" className="min-h-11">
               {copy.apply}
             </Button>

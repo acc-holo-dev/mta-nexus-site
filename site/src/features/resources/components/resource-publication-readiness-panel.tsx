@@ -8,6 +8,7 @@ import {
   typeMinSpace1,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeSpace2SmMuted,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import {
@@ -101,7 +102,7 @@ export function ResourcePublicationReadinessPanel({
           </li>
         ))}
       </ul>
-      <div className="space-y-2 text-sm text-muted">
+      <div className={typeSpace2SmMuted}>
         <p>{copy.checklistNote}</p>
         <p>
           {copy.previewNote}{" "}

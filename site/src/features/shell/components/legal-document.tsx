@@ -1,5 +1,5 @@
 import { panelP5 } from "../panel-shell";
-import { typeCaptionFaint, typeSmBoldPrimary } from "../type-shell";
+import { typeCaptionFaint, typeLgBoldPrimary, typeSmBoldPrimary } from "../type-shell";
 
 type LegalSection = Readonly<{
   title: string;
@@ -41,7 +41,7 @@ export function LegalDocument({
           key={section.title}
           className="space-y-2 border-b border-base pb-6 last:border-b-0"
         >
-          <h2 className="text-lg font-bold text-primary">{section.title}</h2>
+          <h2 className={typeLgBoldPrimary}>{section.title}</h2>
           <p>{section.body}</p>
         </section>
       ))}

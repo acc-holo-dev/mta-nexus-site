@@ -19,12 +19,15 @@ import {
 import { panelClipSpace3P4, panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   typeFlexMinWrapEndGap3,
+  typeFlexWrapCenterGap3,
   typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeMinBreakWords,
   typeMinSpace3,
+  typeMlAutoXsMuted,
   typeMt2XsMuted,
+  typePrewrapSmLeadingSecondary,
   typeSmMuted,
   typeSmSecondary,
   typeXsMuted,
@@ -547,7 +550,7 @@ export function ContentDiscussion({
             }}
           />
         </label>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className={typeFlexWrapCenterGap3}>
           <Button
             type="submit"
             isLoading={submitting}
@@ -620,7 +623,7 @@ export function ContentDiscussion({
             aria-label={comment.id === focusedId ? copy.focused : undefined}
             className={`scroll-mt-20 space-y-3 rounded-lg border bg-inset p-4 ${comment.id === focusedId ? "border-[var(--nexus-accent)]" : "border-base"}`}
           >
-            <header className="flex flex-wrap items-center gap-3">
+            <header className={typeFlexWrapCenterGap3}>
               <Avatar
                 src={comment.author?.avatarUrl ?? undefined}
                 alt={comment.author?.displayName ?? copy.anonymous}
@@ -636,7 +639,7 @@ export function ContentDiscussion({
               ) : (
                 <span className={typeSmMuted}>{copy.anonymous}</span>
               )}
-              <time dateTime={comment.createdAt} className="ml-auto text-xs text-muted">
+              <time dateTime={comment.createdAt} className={typeMlAutoXsMuted}>
                 {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -655,9 +658,7 @@ export function ContentDiscussion({
                 {comment.parent && <p className="mt-1 break-words">{comment.parent.text}</p>}
               </blockquote>
             )}
-            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-              {comment.text}
-            </p>
+            <p className={typePrewrapSmLeadingSecondary}>{comment.text}</p>
             <Link
               className={linkAccentXs}
               href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}

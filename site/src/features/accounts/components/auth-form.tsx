@@ -8,7 +8,13 @@ import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../..
 import { linkAccentSemibold } from "../../shell/link-shell";
 import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { type2xlBoldPrimary, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
+import {
+  type2xlBoldPrimary,
+  typeSmMuted,
+  typeSpace2SmMuted,
+  typeWFullMinH11,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
 
@@ -192,7 +198,7 @@ export function AuthForm({
             </p>
           )}
         </div>
-        <Button type="submit" size="lg" isLoading={loading} className="w-full min-h-11">
+        <Button type="submit" size="lg" isLoading={loading} className={typeWFullMinH11}>
           {loading
             ? registering
               ? copy.creating
@@ -202,7 +208,7 @@ export function AuthForm({
               : copy.signIn}
         </Button>
       </form>
-      <div className="space-y-2 text-sm text-muted">
+      <div className={typeSpace2SmMuted}>
         {!registering && (
           <p>
             <Link href="/auth/forgot-password" className={linkAccentSemibold}>

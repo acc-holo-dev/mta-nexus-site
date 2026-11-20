@@ -14,6 +14,7 @@ import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeFlexCenterBetweenGap3,
   typeFlexCenterGap2,
+  typeFlexMinCenterGap25Display,
   typeFlexWrapStartBetweenGap3,
   typeHeadingPrimary,
   typeIcon6Accent,
@@ -318,7 +319,7 @@ export function SupportCenter({
   return (
     <div className={pageShellMax5xlLooseTight}>
       <header className="space-y-2 border-b border-base pb-6">
-        <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+        <h1 className={typeFlexMinCenterGap25Display}>
           <LifeBuoy className={typeIcon6Accent} aria-hidden="true" />
           <span>{staffMode ? copy.staffQueue : copy.title}</span>
         </h1>

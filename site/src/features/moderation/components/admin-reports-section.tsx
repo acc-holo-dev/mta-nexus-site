@@ -14,9 +14,13 @@ import {
 } from "../../shell/link-shell";
 import {
   typeCaptionFaint,
+  typeCaptionSecondary,
+  typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
+  typeMinBreakSmSemiboldPrimary,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
+  typeWarningSoftBadge,
 } from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
@@ -124,11 +128,9 @@ export function AdminReportsSection({
             >
               <div className={typeMinSpace1}>
                 <div className={typeFlexWrapCenterGap2}>
-                  <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                    {report.type}
-                  </span>
+                  <span className={typeWarningSoftBadge}>{report.type}</span>
                   {report.targetPreview?.title ? (
-                    <span className="min-w-0 break-words text-sm font-semibold text-primary">
+                    <span className={typeMinBreakSmSemiboldPrimary}>
                       {report.targetPreview.title}
                     </span>
                   ) : null}
@@ -141,7 +143,7 @@ export function AdminReportsSection({
                     {report.targetPreview.detail}
                   </p>
                 ) : null}
-                <p className="font-caption text-secondary">{report.reason}</p>
+                <p className={typeCaptionSecondary}>{report.reason}</p>
                 <p className={typeCaptionFaint}>
                   {copy.reporter}: {report.reporterId} · {targetTypeLabel(copy, report.targetType)}{" "}
                   · {new Date(report.createdAt).toLocaleDateString(dateLocale)}
@@ -158,7 +160,7 @@ export function AdminReportsSection({
                   </p>
                 )}
               </div>
-              <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+              <div className={typeFlexWFullColStartGap3Md}>
                 <StatusBadge
                   status={adminStatusLabel(locale, report.status)}
                   tone={adminStatusTone(report.status)}

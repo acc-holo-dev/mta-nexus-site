@@ -5,6 +5,7 @@ import { libraryCollectionsService as service } from "../../../lib/services/libr
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
+  typeBreakAllSm,
   typeBreakAllXsMuted,
   typeDisplayPrimary,
   typeSmMuted,
@@ -74,24 +75,24 @@ export async function LibraryCollectionsHistoryView({
               {item.collection.name} · {c[item.collection.status]}
             </p>
             {item.command.action === "duplicate" && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                 {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
               </p>
             )}
             {(item.command.action === "copy-items" || item.command.action === "move-items") && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                 {item.command.expectedSourceRevision}
               </p>
             )}
             {item.sourceCollection && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.sourceSuccessor}: {item.sourceCollection.id} · {item.sourceCollection.revision}
               </p>
             )}
             {item.command.action === "move-items" && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.destination}: {item.collection.id} · {c.revision} {item.collection.revision}
               </p>
             )}
@@ -120,7 +121,7 @@ export async function LibraryCollectionsHistoryView({
                       </ul>
                     )}
                     {"productId" in item.command && (
-                      <p className="break-all text-sm">{item.command.productId}</p>
+                      <p className={typeBreakAllSm}>{item.command.productId}</p>
                     )}
                   </>
                 );

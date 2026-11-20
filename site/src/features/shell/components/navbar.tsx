@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { AccountControls } from "../../accounts/controls";
 import { NotificationBell } from "../../notifications/bell";
+import { typeH35W35Shrink } from "../type-shell";
 import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -39,7 +40,7 @@ function NavbarSearchTrigger({ placeholder }: { placeholder: string }) {
       className="flex w-full items-center gap-2 rounded-md border border-base bg-inset px-3 py-1.5 text-xs text-muted transition-colors hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       aria-label={placeholder}
     >
-      <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <Search className={typeH35W35Shrink} aria-hidden="true" />
       <span className="truncate">{placeholder}</span>
     </Link>
   );

@@ -15,6 +15,7 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakPrimary,
+  typeBreakXl,
   typeDisplayPrimary,
   typeSmMuted,
   typeSmSecondary,
@@ -122,7 +123,7 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
         {c.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{c.detail}</h1>
-      <h2 className="break-words text-xl">{sale.productTitle}</h2>
+      <h2 className={typeBreakXl}>{sale.productTitle}</h2>
       <p className="text-secondary">{scope.name ?? c.personal}</p>
       <p role="note" className={typeSmSecondary}>
         {attribution === "recorded" ? c.recordedNotice : c.notice}

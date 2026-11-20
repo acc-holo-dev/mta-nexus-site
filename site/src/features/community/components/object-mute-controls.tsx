@@ -5,7 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeXsMuted, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap2,
+  typeMinH11Xs,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import type { FollowTargetType, ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
 
@@ -138,7 +143,7 @@ function ObjectMuteControl({
             key={duration}
             type="button"
             variant="outline"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             disabled={pending || !ready}
             onClick={() => void mutateMute(duration)}
           >
@@ -149,7 +154,7 @@ function ObjectMuteControl({
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             disabled={pending || !ready}
             onClick={() => void mutateMute(null)}
           >

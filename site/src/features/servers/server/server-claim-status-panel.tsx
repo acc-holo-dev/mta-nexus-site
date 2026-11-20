@@ -8,6 +8,7 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeSmBoldPrimary,
   typeSmSemiboldPrimary,
+  typeSmSemiboldSuccess,
   typeXsLeadingMuted,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -37,9 +38,7 @@ export function ServerClaimStatusPanel({
           <h2 id="server-claim-status-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
-          {status.isVerified && (
-            <p className="text-sm font-semibold text-success">{copy.verified}</p>
-          )}
+          {status.isVerified && <p className={typeSmSemiboldSuccess}>{copy.verified}</p>}
           {request && (
             <>
               <p className={typeSmSemiboldPrimary}>{copy[request.status]}</p>

@@ -10,6 +10,7 @@ import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexEndGap4,
   typeFlexWrapGap4,
   typeMinSpace2,
   typeMinSpace3,
@@ -115,7 +116,7 @@ export function CommunityReportGroups({
               ))}
             </select>
           </label>
-          <div className="flex items-end gap-4">
+          <div className={typeFlexEndGap4}>
             <Button type="submit" className="min-h-11" variant="outline">
               {copy.apply}
             </Button>

@@ -4,6 +4,7 @@ import type { licenseControlService } from "../../../lib/services/commerce/licen
 import {
   typeBreakSecondary,
   typeLgSemiboldPrimary,
+  typeMinBreakDisplayPrimary,
   typeMinSpace2,
   typeMinSpace3,
   typeSmSecondary,
@@ -19,7 +20,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
   return (
     <>
       <header className={typeMinSpace2}>
-        <h1 className="min-w-0 break-words font-display text-primary">{license.productTitle}</h1>
+        <h1 className={typeMinBreakDisplayPrimary}>{license.productTitle}</h1>
         <p className="min-w-0 break-words text-sm text-secondary">
           {licenseStatusLabel(license.effectiveStatus, history.licenseStatuses)} · {license.id}
         </p>

@@ -7,9 +7,11 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBreakXl,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typeGridGap3Sm2,
+  typeGridGap3Sm3,
   typeLgSemibold,
   typeMinSpace3,
   typeSmMuted,
@@ -55,7 +57,7 @@ export function OrderTermsReportView({
       </Link>
       <header className={typeMinSpace3}>
         <h1 className={typeDisplayPrimary}>{c.title}</h1>
-        <h2 className="break-words text-xl">{report.order.orderNumber}</h2>
+        <h2 className={typeBreakXl}>{report.order.orderNumber}</h2>
         <p className={typeSmMuted}>
           {c.observed}:{" "}
           <time dateTime={report.observedAt.toISOString()}>
@@ -69,7 +71,7 @@ export function OrderTermsReportView({
       <section className={panelMinSpace4P5}>
         <h2 className={typeLgSemibold}>{c.check}</h2>
         <p className={typeSmSecondary}>{c.consistencyNotice}</p>
-        <dl className="grid gap-3 text-sm sm:grid-cols-3">
+        <dl className={typeGridGap3Sm3}>
           <div>
             <dt>{c.total}</dt>
             <dd className="font-numeric">
@@ -148,7 +150,7 @@ export function OrderTermsReportView({
                     </div>
                   </dl>
                   <h3 className="text-sm font-semibold">{c.baseline}</h3>
-                  <dl className="grid gap-3 text-sm sm:grid-cols-3">
+                  <dl className={typeGridGap3Sm3}>
                     <div>
                       <dt className="text-muted">{c.commission}</dt>
                       <dd>{line.terms.baseline.commissionBps / 100}%</dd>

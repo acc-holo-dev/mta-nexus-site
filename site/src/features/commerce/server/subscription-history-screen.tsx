@@ -13,7 +13,7 @@ import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typeMl3SurfaceP2 } from "../../shell/type-shell";
 import { formatSubscriptionTime } from "../subscription-time";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
 import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
@@ -91,7 +91,7 @@ export async function SubscriptionHistoryScreen({
               id="subscription-days"
               name="days"
               defaultValue={String(query.days)}
-              className="ml-3 rounded border border-base bg-surface p-2"
+              className={typeMl3SurfaceP2}
             >
               <option value="all">{c.all}</option>
               {[7, 30, 90, 365].map((n) => (

@@ -1,7 +1,12 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeFlexCenterGap2, typeMonoSecondary, typeTenLeadingFaint } from "../../shell/type-shell";
+import {
+  typeBreakAllSecondary,
+  typeFlexCenterGap2,
+  typeMonoSecondary,
+  typeTenLeadingFaint,
+} from "../../shell/type-shell";
 import { getBuildProvenance } from "../model/build-provenance";
 
 const toneClass = {
@@ -129,7 +134,7 @@ export function BuildProvenanceDetails({
           <dd className={typeMonoSecondary}>{provenance.scannedAtLabel || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.artifactFile}</dt>
-          <dd className="break-all text-secondary">{build.fileName}</dd>
+          <dd className={typeBreakAllSecondary}>{build.fileName}</dd>
 
           {typeof build.fileSizeBytes === "number" ? (
             <>

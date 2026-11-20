@@ -16,6 +16,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
+  typeFlexMinH11CenterGap3SmPrimary,
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typeSemiboldPrimary,
@@ -244,7 +245,7 @@ export function OrganizationTeamBatch({
           </label>
         )}
         {action === "server_access" && (
-          <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+          <label className={typeFlexMinH11CenterGap3SmPrimary}>
             <input
               type="checkbox"
               className={actionConfirmCheckboxFocusClass}

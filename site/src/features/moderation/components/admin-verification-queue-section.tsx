@@ -7,8 +7,10 @@ import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
 import {
   typeCaptionFaint,
   typeCaptionMuted,
+  typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
   typeIconAccent,
+  typeMinBreakSmSemiboldPrimary,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
   typeXsSecondary,
@@ -108,9 +110,7 @@ export function AdminVerificationQueueSection({
                     {request.targetType}
                   </span>
                   {request.serverName ? (
-                    <span className="min-w-0 break-words text-sm font-semibold text-primary">
-                      {request.serverName}
-                    </span>
+                    <span className={typeMinBreakSmSemiboldPrimary}>{request.serverName}</span>
                   ) : null}
                   <span className="truncate font-code text-xs font-heading text-muted">
                     {request.targetId}
@@ -210,7 +210,7 @@ export function AdminVerificationQueueSection({
                 )}
               </div>
 
-              <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+              <div className={typeFlexWFullColStartGap3Md}>
                 <StatusBadge
                   status={adminStatusLabel(locale, request.status)}
                   tone={adminStatusTone(request.status)}

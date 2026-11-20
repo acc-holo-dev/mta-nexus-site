@@ -11,6 +11,7 @@ import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexCenterGap3,
+  typeIcon5Accent,
   typeSmLeadingMuted,
   typeSmMuted,
   typeSmSuccess,
@@ -87,7 +88,7 @@ export function VerifyEmailPage() {
     <div className={pageShellClass}>
       <section aria-labelledby="verify-email-heading" className={panelClipSpace5P6Shadow}>
         <div className={typeFlexCenterGap3}>
-          <MailCheck className="h-5 w-5 text-accent" aria-hidden="true" />
+          <MailCheck className={typeIcon5Accent} aria-hidden="true" />
           <h1 id="verify-email-heading" className={typeDisplayPrimary}>
             {copy.verifyTitle}
           </h1>

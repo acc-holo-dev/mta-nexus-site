@@ -31,10 +31,13 @@ import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import {
+  typeFlexMinCenterGap5Sm6,
   typeFlexWrapCenterGap2,
   typeHeadingPrimary,
+  typeIcon5Success,
   typeMaxXlSmLeadingMuted,
   typeMinSpace15,
+  typeTruncate2xlBlackPrimary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
@@ -165,7 +168,7 @@ export async function UserProfileScreen({
         </p>
       )}
       <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
-        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+        <div className={typeFlexMinCenterGap5Sm6}>
           <Avatar
             src={user.avatarUrl || undefined}
             alt={user.displayName}
@@ -175,10 +178,10 @@ export async function UserProfileScreen({
           />
           <div className={typeMinSpace15}>
             <div className={typeFlexWrapCenterGap2}>
-              <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
+              <h1 className={typeTruncate2xlBlackPrimary}>{user.displayName}</h1>
               {user.isVerified && (
                 <span title={copy.verifiedMember}>
-                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
+                  <ShieldCheck className={typeIcon5Success} aria-hidden="true" />
                 </span>
               )}
               <span className="rounded border border-base bg-inset px-2 py-0.5 font-numeric text-[10px] font-bold uppercase tracking-wider text-secondary">

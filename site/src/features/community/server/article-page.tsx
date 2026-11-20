@@ -15,7 +15,11 @@ import { contentReactionService } from "../../../lib/services/community/content-
 import { contentService } from "../../../lib/services/community/content-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlLoose } from "../../shell/page-shell";
-import { typeFlexWrapCenterGap2, typeTruncateXsFaint } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeH35W35Shrink,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
@@ -161,7 +165,7 @@ export async function ArticleDetailPage({
         href={isCommunity ? "/community" : "/articles"}
         className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
-        <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        <ArrowLeft className={typeH35W35Shrink} aria-hidden="true" />
         <span>{isCommunity ? getDiscussionCopy(locale).backCommunity : copy.back}</span>
       </Link>
 

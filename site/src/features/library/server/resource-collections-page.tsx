@@ -16,6 +16,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakAllXsMuted,
   typeBreakSemibold,
+  typeBreakXl,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
@@ -123,7 +124,7 @@ export async function ResourceCollectionsPage({
         >
           {libraryCollectionHistoryCopy(locale).title}
         </Link>
-        <h2 className="break-words text-xl">
+        <h2 className={typeBreakXl}>
           {result.resource.available ? (result.resource.title ?? c.unavailable) : c.unavailable}
         </h2>
         <p className={typeBreakAllXsMuted}>{id}</p>

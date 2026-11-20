@@ -16,6 +16,7 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeMinBreakDisplayPrimary,
   typeMinBreakSemiboldPrimary,
   typeMinSpace4,
   typeNumericPrimary,
@@ -110,7 +111,7 @@ export async function PurchaseDetailScreen({
         <Link href="/workspace/purchases" className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
-        <h1 className="min-w-0 break-words font-display text-primary">
+        <h1 className={typeMinBreakDisplayPrimary}>
           {copy.orderNumber}: {order.orderNumber}
         </h1>
         <p className="text-secondary">

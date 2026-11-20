@@ -3,6 +3,11 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import {
+  typeClamp2CaptionMuted,
+  typeCoverHoverScale,
+  typeFlex1ColGap2P35,
+} from "../../shell/type-shell";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
 export function ArticleCard({ article, locale = "en" }: { article: Content; locale?: Locale }) {
@@ -33,7 +38,7 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
             height={360}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={typeCoverHoverScale}
           />
           <div className="absolute left-2 top-2 rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
             {getUserPlatformCopy(locale)[article.type]}
@@ -41,7 +46,7 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
         </div>
       )}
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
+      <div className={typeFlex1ColGap2P35}>
         <div className="flex items-center gap-2 font-caption text-faint">
           <Calendar className="h-3 w-3" aria-hidden="true" />
           <span>{formattedDate}</span>
@@ -55,9 +60,7 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
           {article.title}
         </h3>
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">
-          {article.excerpt || article.body}
-        </p>
+        <p className={typeClamp2CaptionMuted}>{article.excerpt || article.body}</p>
 
         <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption">
           <div className="flex items-center gap-3 text-muted">

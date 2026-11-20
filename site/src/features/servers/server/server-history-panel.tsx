@@ -8,6 +8,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
 import {
   typeFlexCenterGap2,
+  typeFlexMinWrapGap2,
   typeIconAccent,
   typeLabelUpperFaint,
   typeMinSpace1,
@@ -95,7 +96,7 @@ export function ServerHistoryPanel({
         </span>
       </div>
 
-      <nav aria-label={copy.chooseWindow} className="flex min-w-0 flex-wrap gap-2">
+      <nav aria-label={copy.chooseWindow} className={typeFlexMinWrapGap2}>
         {(
           [
             ["24h", copy.period24h],

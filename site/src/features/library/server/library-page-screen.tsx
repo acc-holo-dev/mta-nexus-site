@@ -34,10 +34,12 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
   typeDisplayPrimary,
+  typeFlexMinWrapGap2,
   typeFlexWrapGap2,
   typeFlexWrapGap4,
   typeGridGap4Md2,
   typeMax2xlSmSecondary,
+  typeMinBreakBaseSemiboldPrimary,
   typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
@@ -103,7 +105,7 @@ export async function LibraryPageScreen({
         <p className={typeMax2xlSmSecondary}>{copy.subtitle}</p>
       </header>
 
-      <div className="flex min-w-0 flex-wrap gap-2">
+      <div className={typeFlexMinWrapGap2}>
         <Link href="/workspace/library/collections" className={linkAccentBorder}>
           {libraryCollectionsCopy(locale).title}
         </Link>
@@ -182,7 +184,7 @@ export async function LibraryPageScreen({
               {result.items.map((item) => (
                 <li key={item.resourceId} className={panelFlexColGap3P5}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <h2 className="min-w-0 break-words text-base font-semibold text-primary">
+                    <h2 className={typeMinBreakBaseSemiboldPrimary}>
                       {item.downloadable ? item.title : copy.unavailableResource}
                     </h2>
                     <StatusBadge

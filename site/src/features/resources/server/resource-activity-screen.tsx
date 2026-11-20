@@ -16,6 +16,7 @@ import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBorderT,
+  typeBreakXl,
   typeDisplayPrimary,
   typeFlexWrapGap3,
   typeSmSecondary,
@@ -103,7 +104,7 @@ export async function ResourceActivityScreen({
           {copy.back}
         </Link>
         <h1 className={typeDisplayPrimary}>{copy.analytics}</h1>
-        <h2 className="break-words text-xl">{result.product.title}</h2>
+        <h2 className={typeBreakXl}>{result.product.title}</h2>
         <p role="note" className="max-w-3xl text-sm text-secondary">
           {copy.analyticsNote}
         </p>

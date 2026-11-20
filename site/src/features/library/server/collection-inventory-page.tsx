@@ -25,6 +25,7 @@ import {
   typeFlexWrapEndGap3,
   typeFlexWrapGap4,
   typeSmSecondary,
+  typeSpace2BorderTPt3,
   typeSurfaceBorderP2,
 } from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -266,10 +267,7 @@ export async function CollectionInventoryPage({
                   {item.memberships.length}
                 </p>
                 {release && (
-                  <section
-                    className="space-y-2 border-t border-base pt-3"
-                    aria-label={v.releaseFilter}
-                  >
+                  <section className={typeSpace2BorderTPt3} aria-label={v.releaseFilter}>
                     <p className="font-semibold">{v.releaseStates[release.state]}</p>
                     <p>
                       {v.latestVersion}: <span className="break-all">{release.latest.version}</span>

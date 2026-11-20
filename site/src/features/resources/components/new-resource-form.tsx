@@ -11,6 +11,7 @@ import {
   typeMaxXlSmLeadingMuted,
   typeSmColSpan2,
   typeSmSecondary,
+  typeSpace15SmCol2,
   typeXsMuted,
 } from "../../shell/type-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
@@ -467,7 +468,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className={typeSpace15SmCol2}>
             <label htmlFor="resource-description" className={nativeLabelClass}>
               {copy.description}
             </label>
@@ -548,7 +549,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className={typeSpace15SmCol2}>
             <label htmlFor="resource-build-file" className={nativeLabelClass}>
               {copy.buildArchive}
             </label>
@@ -563,7 +564,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             <span className={typeXsMuted}>{buildFileRequirements}</span>
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className={typeSpace15SmCol2}>
             <label htmlFor="resource-release-notes" className={nativeLabelClass}>
               {copy.releaseNotes}
             </label>

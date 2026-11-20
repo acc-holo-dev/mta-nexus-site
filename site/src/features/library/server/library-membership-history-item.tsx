@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs } from "../../shell/type-shell";
+import { typeBreakAllXs, typeSpace2BorderTPt3 } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -80,7 +80,7 @@ export function LibraryMembershipHistoryEntry({
               const change = receipt.command.changes[index],
                 now = item.collections.find((value) => value.collectionId === child.collection.id);
               return (
-                <li key={child.id} className="space-y-2 border-t border-base pt-3">
+                <li key={child.id} className={typeSpace2BorderTPt3}>
                   <p>{child.command.action === "add" ? c.add : c.remove}</p>
                   <p className="break-words">
                     {h.recorded}: {child.collection.name} · {c[child.collection.status]} ·{" "}

@@ -19,6 +19,7 @@ import {
   typeLgSemibold,
   typeSmSecondary,
   typeSpace2Sm,
+  typeSpace2SmSecondary,
   typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
@@ -128,7 +129,7 @@ export async function FinancialReconciliationDetailScreen({
         {financialOrderLabel(locale, result.order.status)} ·{" "}
         {formatFinancialMinor(result.order.amount, result.order.currency, locale)}
       </p>
-      <ul className="space-y-2 text-sm text-secondary">
+      <ul className={typeSpace2SmSecondary}>
         {financialFlags
           .filter((flag) => result.order[flag])
           .map((flag) => (

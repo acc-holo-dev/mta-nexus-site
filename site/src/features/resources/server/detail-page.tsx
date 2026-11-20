@@ -32,6 +32,7 @@ import {
   typeIconAccent,
   typeMonoSecondary,
   typeMt1XsMuted,
+  typeNumericElevenFaint,
   typeXsLeadingMuted,
 } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -583,7 +584,7 @@ export async function ProductDetailPage({
                 <Layers className={typeIconAccent} aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
               </h2>
-              <span className="font-numeric text-[11px] text-faint">{copy.shaRecorded}</span>
+              <span className={typeNumericElevenFaint}>{copy.shaRecorded}</span>
             </div>
 
             <p className={typeXsLeadingMuted}>{copy.latestBuildNotice}</p>
@@ -620,7 +621,7 @@ export async function ProductDetailPage({
                           {formatBuildStatus(build.status, copy)}
                         </span>
                       </div>
-                      <span className="font-numeric text-[11px] text-faint">
+                      <span className={typeNumericElevenFaint}>
                         {packageCopy.sha256Label}: {build.sha256Hash.slice(0, 16)}…
                       </span>
                     </div>

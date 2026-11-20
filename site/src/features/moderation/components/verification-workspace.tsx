@@ -24,6 +24,7 @@ import {
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeHeadingPrimary,
+  typeMinBreakSmSemiboldPrimary,
   typeMinSpace1,
   typeMinSpace3,
   typeMinSpace4,
@@ -748,9 +749,7 @@ export function VerificationWorkspace({
             className="nexus-panel min-w-0 scroll-mt-20 space-y-3 p-5"
           >
             <div className={typeFlexWrapBetweenGap3}>
-              <h3 className="min-w-0 break-words text-sm font-semibold text-primary">
-                {copy[application.targetType]}
-              </h3>
+              <h3 className={typeMinBreakSmSemiboldPrimary}>{copy[application.targetType]}</h3>
               <span className={typeXsSecondary}>{copy[application.status]}</span>
             </div>
             <p className={typeBreakAllXsMuted}>{application.targetId}</p>

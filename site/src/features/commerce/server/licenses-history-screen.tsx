@@ -15,7 +15,11 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakPrimary, typeSmMuted } from "../../shell/type-shell";
+import {
+  typeBreakPrimary,
+  typeMinBreakBaseSemiboldPrimary,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -146,9 +150,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
             {result.licenses.map((license) => (
               <li key={license.id} className={panelMinSpace3P5}>
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-                  <h2 className="min-w-0 break-words text-base font-semibold text-primary">
-                    {license.productTitle}
-                  </h2>
+                  <h2 className={typeMinBreakBaseSemiboldPrimary}>{license.productTitle}</h2>
                   <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
                     {licenseStatusLabel(
                       license.effectiveStatus ??

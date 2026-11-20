@@ -19,9 +19,12 @@ import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell
 import { panelHeroBetween } from "../../shell/panel-shell";
 import {
   typeFlexCenterGap2,
+  typeFlexMinCenterGap5Sm6,
   typeHeadingPrimary,
+  typeIcon5Success,
   typeMaxXlSmLeadingMuted,
   typeMinSpace15,
+  typeTruncate2xlBlackPrimary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
@@ -122,7 +125,7 @@ export async function DeveloperProfileScreen({
   return (
     <div className={pageShellClass}>
       <section className={panelHeroBetween}>
-        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+        <div className={typeFlexMinCenterGap5Sm6}>
           <Avatar
             src={user.avatarUrl || undefined}
             alt={user.displayName}
@@ -132,10 +135,10 @@ export async function DeveloperProfileScreen({
           />
           <div className={typeMinSpace15}>
             <div className={typeFlexCenterGap2}>
-              <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
+              <h1 className={typeTruncate2xlBlackPrimary}>{user.displayName}</h1>
               {user.isVerified && (
                 <span title={copy.verifiedIdentity}>
-                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
+                  <ShieldCheck className={typeIcon5Success} aria-hidden="true" />
                 </span>
               )}
             </div>

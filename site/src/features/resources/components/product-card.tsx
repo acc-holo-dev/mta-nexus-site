@@ -2,6 +2,7 @@ import type { Product } from "@nexus/domain";
 import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { typeClamp2CaptionMuted, typeFlex1ColGap2P35 } from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import type { PublicResourceAttribution } from "../public-resource-attribution";
 import { ResourcePreview } from "./resource-preview";
@@ -85,7 +86,7 @@ export function ProductCard({
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
+      <div className={typeFlex1ColGap2P35}>
         <div className="flex items-center justify-between font-caption">
           <div className="flex min-w-0 items-center gap-1 font-semibold text-warning">
             {hasReviews ? (
@@ -117,9 +118,7 @@ export function ProductCard({
 
         <AttributionLine attribution={attribution} unavailable={market.publisherUnavailable} />
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">
-          {product.shortDescription || product.description}
-        </p>
+        <p className={typeClamp2CaptionMuted}>{product.shortDescription || product.description}</p>
 
         <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
           <div className="flex min-w-0 items-center gap-1.5">

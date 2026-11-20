@@ -11,9 +11,11 @@ import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexCenterGap3,
+  typeIcon5Accent,
   typeSmLeadingMuted,
   typeSmMuted,
   typeSmSuccess,
+  typeWFullMinH11,
 } from "../../shell/type-shell";
 import {
   type AccountRecoveryProof,
@@ -107,7 +109,7 @@ export function ResetPasswordPage() {
     <div className={pageShellClass}>
       <section aria-labelledby="reset-heading" className={panelClipSpace5P6Shadow}>
         <div className={typeFlexCenterGap3}>
-          <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
+          <ShieldCheck className={typeIcon5Accent} aria-hidden="true" />
           <h1 id="reset-heading" className={typeDisplayPrimary}>
             {copy.resetTitle}
           </h1>
@@ -179,7 +181,7 @@ export function ResetPasswordPage() {
               type="submit"
               size="lg"
               isLoading={state.kind === "submitting"}
-              className="w-full min-h-11"
+              className={typeWFullMinH11}
             >
               {state.kind === "submitting" ? copy.resetting : copy.reset}
             </Button>

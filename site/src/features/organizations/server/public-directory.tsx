@@ -3,6 +3,7 @@ import { DirectoryFilters, DirectoryResults } from "../../discovery/directory-se
 import { parseDiscoverQuery } from "../../discovery/discover-query";
 import { discoveryCopy } from "../../discovery/discovery-copy";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { surfaceBorderBPb6 } from "../../shell/surface-shell";
 import { type2xlExtraboldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 export async function organizationsMetadata() {
   const copy = discoveryCopy(await getRequestLocale());
@@ -19,7 +20,7 @@ export async function OrganizationsPage({
   const results = await DirectoryResults({ state, locale, path: "/organizations" });
   return (
     <div className={pageShellStack6}>
-      <header className="border-b border-base pb-6">
+      <header className={surfaceBorderBPb6}>
         <h1 className={type2xlExtraboldPrimary}>{copy.organizationsTitle}</h1>
         <p className={typeMt2SmMuted}>{copy.organizationsDescription}</p>
       </header>

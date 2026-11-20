@@ -14,7 +14,7 @@ import { linkAccentRounded, linkAccentTightRounded, linkMinH } from "../../shell
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typeMl3SurfaceP2 } from "../../shell/type-shell";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import {
   resourceCopiesPageParams,
@@ -113,7 +113,7 @@ export async function ResourceCopiesScreen({
               id="copy-days"
               name="days"
               defaultValue={String(query.days)}
-              className="ml-3 rounded border border-base bg-surface p-2"
+              className={typeMl3SurfaceP2}
             >
               <option value="all">{c.all}</option>
               {[7, 30, 90, 365].map((n) => (

@@ -8,6 +8,7 @@ import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeFlexWrapGap3,
+  typeLgBoldPrimary,
   typeMinSpace3,
   typeSemiboldPrimary,
   typeSmMuted,
@@ -97,7 +98,7 @@ export function ServerStatisticsPanel({
         <p className={typeXsMuted}>{copy.snapshotScope}</p>
       </header>
       <section className={panelClipSpace3P5}>
-        <h2 id="server-statistics-comparison" className="text-lg font-bold text-primary">
+        <h2 id="server-statistics-comparison" className={typeLgBoldPrimary}>
           {copy.comparison}
         </h2>
         <p className={typeSmMuted}>{copy.scope}</p>
@@ -163,7 +164,7 @@ export function ServerStatisticsPanel({
         </p>
       </section>
       <section className={panelClipSpace3P5} aria-labelledby="server-statistics-chart">
-        <h2 id="server-statistics-chart" className="text-lg font-bold text-primary">
+        <h2 id="server-statistics-chart" className={typeLgBoldPrimary}>
           {copy.chart}
         </h2>
         {report.summary.observationCount === 0 ? (
@@ -199,7 +200,7 @@ export function ServerStatisticsPanel({
         </div>
       </section>
       <section className={panelClipSpace3P5} aria-labelledby="server-statistics-observations">
-        <h2 id="server-statistics-observations" className="text-lg font-bold text-primary">
+        <h2 id="server-statistics-observations" className={typeLgBoldPrimary}>
           {copy.observations}
         </h2>
         <p className={typeSmMuted}>{copy.observationsScope}</p>

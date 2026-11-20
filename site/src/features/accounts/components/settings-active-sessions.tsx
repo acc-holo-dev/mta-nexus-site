@@ -6,6 +6,7 @@ import type { getDictionary } from "../../../lib/i18n";
 import { linkGhostAccentSemibold } from "../../shell/link-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import {
+  typeBreakXsMuted,
   typeFlexCenterGap2,
   typeFlexWrapCenterBetweenGap3,
   typeIconAccent,
@@ -82,7 +83,7 @@ export function SettingsActiveSessions({
               <div className="break-words text-xs text-primary">
                 {session.userAgent || copy.deviceUnavailable}
               </div>
-              <div className="break-words text-xs text-muted">
+              <div className={typeBreakXsMuted}>
                 {session.ipAddress || copy.ipUnavailable} / {copy.started}{" "}
                 {new Date(session.createdAt).toLocaleString(dateLocale)}
               </div>

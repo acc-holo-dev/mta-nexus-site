@@ -13,6 +13,7 @@ import {
   typeMt1XsMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeSpace2SmSecondary,
   typeXsMuted,
 } from "../../shell/type-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
@@ -123,7 +124,7 @@ export function ResourceVersionHelpSection({
 
       <div className="space-y-2">
         <h3 className={typeSmSemiboldPrimary}>{copy.sections.limits}</h3>
-        <dl className="space-y-2 text-sm text-secondary">
+        <dl className={typeSpace2SmSecondary}>
           {projection.limits.map((line) => {
             const label = copy.limits[line.key];
             let value = copy.unknown;

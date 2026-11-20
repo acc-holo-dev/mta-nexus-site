@@ -36,11 +36,13 @@ import {
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBreakXsMuted,
   typeFlexWrapGap4,
   typeHeadingPrimary,
   typeMinSpace2,
   typeMinSpace3,
   typeMinSpace4,
+  typePrewrapSmLeadingSecondary,
   typePrewrapSmSecondary,
   typeSmMuted,
   typeSmPrimary,
@@ -190,15 +192,11 @@ export async function CommunityModerationScreen({
                 </Link>
               ),
           )}
-          {item.tags.length > 0 && (
-            <p className="break-words text-xs text-muted">{item.tags.join(" · ")}</p>
-          )}
+          {item.tags.length > 0 && <p className={typeBreakXsMuted}>{item.tags.join(" · ")}</p>}
         </header>
         <section className={panelMinSpace3P5}>
           <h2 className={typeHeadingPrimary}>{copy.body}</h2>
-          <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-            {item.body}
-          </div>
+          <div className={typePrewrapSmLeadingSecondary}>{item.body}</div>
           {item.truncated ? (
             <p role="note" className={typeSmMuted}>
               {copy.large}

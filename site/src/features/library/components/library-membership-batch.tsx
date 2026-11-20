@@ -15,6 +15,7 @@ import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   typeBreakAllXs,
+  typeBreakSm,
   typeFlexStartGap3,
   typeSmSecondary,
   typeXsMuted,
@@ -255,7 +256,7 @@ export function LibraryMembershipBatchForm({
               (collection) => collection.id === change.collectionId,
             );
             return (
-              <li key={change.collectionId} className="break-words text-sm">
+              <li key={change.collectionId} className={typeBreakSm}>
                 {collection?.name ?? change.collectionId} · {change.inCollection ? c.add : c.remove}{" "}
                 · {c.revision} {change.expectedRevision} → {change.expectedRevision + 1}
               </li>

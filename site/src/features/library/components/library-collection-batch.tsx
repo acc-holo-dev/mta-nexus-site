@@ -16,7 +16,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeSmSecondary, typeSpace1Sm } from "../../shell/type-shell";
+import { typeBreakAllXs, typeBreakSm, typeSmSecondary, typeSpace1Sm } from "../../shell/type-shell";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -182,7 +182,7 @@ export function LibraryCollectionBatchForm({
   return (
     <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{c[shownAction]}</h2>
-      <p className="break-words text-sm">
+      <p className={typeBreakSm}>
         {c.destination}: {shownCollection.name} · {c.revision} {shownCollection.revision}
       </p>
       <p className={typeSmSecondary}>{c.batchLimit}</p>

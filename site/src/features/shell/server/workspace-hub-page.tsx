@@ -27,6 +27,8 @@ import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
 import {
   typeDisplayPrimary,
+  typeFlexMinWrapGap2,
+  typeFlexWrapCenterGap3,
   typeFlexWrapGap2,
   typeMinSpace3,
   typeMinSpace4,
@@ -176,7 +178,7 @@ export async function WorkspaceHubPage() {
         />
       </div>
 
-      <nav aria-label={historyCopy.navigation} className="flex min-w-0 flex-wrap gap-2">
+      <nav aria-label={historyCopy.navigation} className={typeFlexMinWrapGap2}>
         {(["purchases", "licenses", "sales"] as const).map((area) => (
           <Link key={area} href={`/workspace/${area}`} className={historyNavClass}>
             {historyCopy.tabs[area]}
@@ -189,7 +191,7 @@ export async function WorkspaceHubPage() {
           title={dictionary.workspace.libraryTitle}
           description={libraryCopy.subtitle}
           action={
-            <div className="flex flex-wrap items-center gap-3">
+            <div className={typeFlexWrapCenterGap3}>
               <Link href="/workspace/library" className={sectionLinkClass}>
                 {libraryCopy.title}
               </Link>
@@ -261,7 +263,7 @@ export async function WorkspaceHubPage() {
           title={serverCopy.title}
           description={serverCopy.preview}
           action={
-            <div className="flex flex-wrap items-center gap-3">
+            <div className={typeFlexWrapCenterGap3}>
               <Link href="/workspace/servers" className={sectionLinkClass}>
                 {serverCopy.openAll}
               </Link>

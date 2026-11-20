@@ -16,7 +16,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typePrewrapBreakSm } from "../../shell/type-shell";
 import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
@@ -130,7 +130,7 @@ export async function ResourceReviewReportScreen({
         </Link>
         <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
         <p>{resourceReviewState(locale, report.status)}</p>
-        <p className="whitespace-pre-wrap break-words text-sm">{report.reason}</p>
+        <p className={typePrewrapBreakSm}>{report.reason}</p>
         {report.review ? (
           <article className={panelSpace3P5}>
             <p>{report.review.title}</p>
@@ -138,7 +138,7 @@ export async function ResourceReviewReportScreen({
               {resourceReviewState(locale, report.review.status)} · {copy.rating}:{" "}
               {formatUnknown(locale, report.review.rating)}/5
             </p>
-            <p className="whitespace-pre-wrap break-words text-sm">{report.review.text}</p>
+            <p className={typePrewrapBreakSm}>{report.review.text}</p>
           </article>
         ) : (
           <ErrorState

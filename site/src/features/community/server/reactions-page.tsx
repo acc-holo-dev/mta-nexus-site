@@ -18,6 +18,7 @@ import {
   typeMinSpace3,
   typeMinW40Flex1Space1XsMuted,
   typeMt2SmMuted,
+  typeMt2SmSecondary,
   typeSpace1XsMuted,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -170,7 +171,7 @@ export async function ReactionsPageScreen({
                       className="items-start py-4 text-left"
                     />
                   )}
-                  <p className="mt-2 text-sm text-secondary">
+                  <p className={typeMt2SmSecondary}>
                     <span aria-hidden="true">{CONTENT_REACTION_EMOJI[item.reaction]}</span>{" "}
                     {copy[item.reaction]}
                   </p>

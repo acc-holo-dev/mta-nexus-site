@@ -29,6 +29,7 @@ import {
   typeMinBreakDisplay,
   typeMinFlex1,
   typeMinFlex1Space15SmSecondary,
+  typeSpace2BorderTPt3,
 } from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 
@@ -205,7 +206,7 @@ export async function LibraryWatchHistoryScreen({
               {item.changes && (
                 <ul className={pageShellStack3}>
                   {item.changes.map((change) => (
-                    <li key={change.productId} className="space-y-2 border-t border-base pt-3">
+                    <li key={change.productId} className={typeSpace2BorderTPt3}>
                       {change.currentAvailable && change.currentTitle && (
                         <h3 className="break-words">
                           {c.current}: {change.currentTitle}

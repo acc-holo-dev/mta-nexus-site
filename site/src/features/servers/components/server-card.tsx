@@ -8,7 +8,15 @@ import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeMinSpace1 } from "../../shell/type-shell";
+import {
+  typeClamp2CaptionMuted,
+  typeCoverHoverScale,
+  typeFlex1ColGap2P35,
+  typeFlexWrapGap2,
+  typeH35W35Shrink,
+  typeMinSpace1,
+  typeSmSemiboldSuccess,
+} from "../../shell/type-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -148,7 +156,7 @@ export function ServerCard({
               height={224}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className={typeCoverHoverScale}
             />
           </>
         ) : (
@@ -172,7 +180,7 @@ export function ServerCard({
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
+      <div className={typeFlex1ColGap2P35}>
         <h3 className="line-clamp-1 text-xs font-heading text-primary">
           <Link
             href={profileHref}
@@ -183,11 +191,11 @@ export function ServerCard({
         </h3>
 
         <div className="flex items-center gap-2 font-caption text-muted">
-          <Gamepad2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <Gamepad2 className={typeH35W35Shrink} aria-hidden="true" />
           <span className="truncate">{server.gameMode || copy.freeroam}</span>
         </div>
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">{server.description}</p>
+        <p className={typeClamp2CaptionMuted}>{server.description}</p>
 
         <div className="space-y-1.5 border-t border-base pt-2.5">
           <div className="flex items-center justify-between font-caption">
@@ -266,7 +274,7 @@ export function HomeNetworkServerCard({
         </p>
       </div>
 
-      <p className="text-sm font-semibold text-success">
+      <p className={typeSmSemiboldSuccess}>
         {playersLabel}
         {!isStale && observation.players != null ? ` ${home.players}` : null}
       </p>

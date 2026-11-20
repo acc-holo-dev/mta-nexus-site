@@ -22,6 +22,7 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeFlexMinWrapGap4Sm,
+  typeMinBreakDisplayPrimary,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
@@ -126,7 +127,7 @@ export async function LibraryVersionsScreen({
       <Link href="/workspace/library/updates" className={linkAccentSmRounded}>
         {copy.updates}
       </Link>
-      <h1 className="min-w-0 break-words font-display text-primary">{copy.versions}</h1>
+      <h1 className={typeMinBreakDisplayPrimary}>{copy.versions}</h1>
       <h2 className="min-w-0 break-words text-xl text-primary">
         {result.latest ? (result.product.title ?? copy.privateResource) : copy.privateResource}
       </h2>

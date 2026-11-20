@@ -12,7 +12,11 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakPrimary, typeSmMuted } from "../../shell/type-shell";
+import {
+  typeBreakPrimary,
+  typeMinBreakBaseSemiboldPrimary,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -101,9 +105,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
           <ol className="space-y-3">
             {result.sales.map((sale) => (
               <li key={sale.id} className={panelMinSpace3P5}>
-                <h2 className="min-w-0 break-words text-base font-semibold text-primary">
-                  {sale.productTitle}
-                </h2>
+                <h2 className={typeMinBreakBaseSemiboldPrimary}>{sale.productTitle}</h2>
                 <dl className="grid min-w-0 gap-3 text-sm sm:grid-cols-3">
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.orderNumber}</dt>

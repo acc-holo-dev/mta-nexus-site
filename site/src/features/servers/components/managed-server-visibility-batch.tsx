@@ -16,6 +16,7 @@ import { pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
+  typeFlexMinH11CenterGap3SmPrimary,
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typeSemiboldPrimary,
@@ -353,7 +354,7 @@ export function ManagedServerVisibilityBatch({
       <ul className="space-y-4">
         {items.map((item) => (
           <li key={item.id} className="space-y-2">
-            <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+            <label className={typeFlexMinH11CenterGap3SmPrimary}>
               <input
                 type="checkbox"
                 checked={selected.includes(item.id)}

@@ -19,6 +19,7 @@ import { linkAccentTightSmPlain, linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBreakXsMuted,
   typeFlexMinWrapGap4Sm,
   typeLgSemiboldPrimary,
   typeMinSpace2,
@@ -507,7 +508,7 @@ export function LicenseControlPanel({
               {copy.hide}
             </Button>
           </div>
-          <p className="break-words text-xs text-muted">{copy.checkEndpoint}</p>
+          <p className={typeBreakXsMuted}>{copy.checkEndpoint}</p>
           <LicenseRuntimeProbe licenseId={license.id} token={secret.value} locale={locale} />
         </div>
       )}

@@ -19,9 +19,11 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeFlexMinH11CenterGap3SmPrimary,
   typeFlexWrapGap3,
   typeGrid2Gap4,
   typeLgSemiboldPrimary,
+  typePrewrapSmPrimary,
   typeSemiboldPrimary,
   typeSmMuted,
   typeSmPrimary,
@@ -345,7 +347,7 @@ export function DiscussionReportBatch({
           <p className={typeSmSemiboldPrimary}>
             {commentId === null ? copy.publication : copy.comment}
           </p>
-          <p className="whitespace-pre-wrap break-words text-sm text-primary">
+          <p className={typePrewrapSmPrimary}>
             {preview.commentId === null && "text" in preview.publication
               ? preview.publication.text
               : (preview.comment?.text ?? copy.removed)}
@@ -354,7 +356,7 @@ export function DiscussionReportBatch({
             (preview.commentId === null &&
               "truncated" in preview.publication &&
               preview.publication.truncated)) && <p className={typeXsMuted}>{copy.truncated}</p>}
-          <p className="whitespace-pre-wrap break-words text-sm text-primary">
+          <p className={typePrewrapSmPrimary}>
             {copy.notes}: {preview.notes}
           </p>
           <ol className="space-y-3">
@@ -366,9 +368,7 @@ export function DiscussionReportBatch({
                 >
                   {labels[item.type]} · {item.id}
                 </Link>
-                <p className="whitespace-pre-wrap break-words text-sm text-primary">
-                  {item.reason}
-                </p>
+                <p className={typePrewrapSmPrimary}>{item.reason}</p>
                 <p className={typeXsMuted}>
                   {copy.transition}: {labels[item.before]} → {labels[item.after]}
                 </p>
@@ -412,7 +412,7 @@ export function DiscussionReportBatch({
           {items.map((item) => (
             <li key={item.id} className={panelSpace3P5}>
               {allowActions && ["open", "under_review"].includes(item.status) && (
-                <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+                <label className={typeFlexMinH11CenterGap3SmPrimary}>
                   <input
                     type="checkbox"
                     checked={selected.includes(item.id)}
@@ -427,7 +427,7 @@ export function DiscussionReportBatch({
               <p className={typeSmSemiboldPrimary}>
                 {labels[item.type]} · {labels[item.status]}
               </p>
-              <p className="whitespace-pre-wrap break-words text-sm text-primary">{item.reason}</p>
+              <p className={typePrewrapSmPrimary}>{item.reason}</p>
               <time dateTime={item.createdAt} className={typeXsMuted}>
                 {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",

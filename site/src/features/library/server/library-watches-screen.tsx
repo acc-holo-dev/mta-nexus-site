@@ -26,6 +26,8 @@ import {
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap3,
   typeFlexMinWrapGap4Sm,
+  typeGridMinGap4ClipSm2,
+  typeMinBreakDisplayPrimary,
   typeSmSecondary,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -131,7 +133,7 @@ export async function LibraryWatchesScreen({
       <Link href="/workspace/library" className={linkAccentSmRounded}>
         {copy.library}
       </Link>
-      <h1 className="min-w-0 break-words font-display text-primary">{copy.title}</h1>
+      <h1 className={typeMinBreakDisplayPrimary}>{copy.title}</h1>
       <Link href="/workspace/library/watches/history" className={linkAccentSmRounded}>
         {resourceReleaseWatchHistoryCopy(typedLocale).title}
       </Link>
@@ -206,7 +208,7 @@ export async function LibraryWatchesScreen({
         ))}
       </nav>
       {result.items.length ? (
-        <ul className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
+        <ul className={typeGridMinGap4ClipSm2}>
           {result.items.map((watch) => (
             <li key={watch.productId} className={panelClipSpace3P5}>
               <h2 className={typeBreakSemiboldPrimary}>

@@ -1,5 +1,6 @@
 import type { ResourceCartReviewItem } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
+import { typeSpace2SmSecondary } from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 export function ResourceCartReviewEvidence({
   item,
@@ -13,7 +14,7 @@ export function ResourceCartReviewEvidence({
 }) {
   const copy = resourceCartReceiptsCopy(locale);
   return (
-    <dl className="space-y-2 text-sm text-secondary">
+    <dl className={typeSpace2SmSecondary}>
       <div>
         <dt>{copy.version}</dt>
         <dd>{item.version}</dd>

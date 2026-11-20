@@ -11,7 +11,12 @@ import { subscriptionsService } from "../../../lib/services/commerce/subscriptio
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap3, typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeMl3SurfaceP2,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
 import {
   SubscriptionControls,
@@ -101,7 +106,7 @@ export async function SubscriptionsWorkspaceScreen({
               id="subscription-account"
               name="organizationId"
               defaultValue={query.organizationId ?? ""}
-              className="ml-3 rounded border border-base bg-surface p-2"
+              className={typeMl3SurfaceP2}
             >
               <option value="">{c.personal}</option>
               {query.organizationId &&

@@ -19,8 +19,10 @@ import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakAllSm,
   typeBreakAllXs,
   typeBreakAllXsMuted,
+  typeBreakSm,
   typeFlexMinWrapGap4Sm,
   typeMinBreakDisplay,
   typeMinFlex1,
@@ -245,7 +247,7 @@ export async function CollectionHistoryPage({
                       />
                     )}
                     {command && "sourceCollectionId" in command && (
-                      <p className="break-all text-sm">
+                      <p className={typeBreakAllSm}>
                         {c.source}: {command.sourceCollectionId} · {c.revision}{" "}
                         {"expectedSourceRevision" in command
                           ? command.expectedSourceRevision
@@ -253,7 +255,7 @@ export async function CollectionHistoryPage({
                       </p>
                     )}
                     {item.currentSource && (
-                      <p className="break-words text-sm">
+                      <p className={typeBreakSm}>
                         {h.sourceCurrent}:{" "}
                         <Link
                           href={collectionHref(item.currentSource.id)}
@@ -266,7 +268,7 @@ export async function CollectionHistoryPage({
                       </p>
                     )}
                     {receipt.sourceCollection && (
-                      <p className="break-all text-sm">
+                      <p className={typeBreakAllSm}>
                         {c.sourceSuccessor}: {receipt.sourceCollection.id} ·{" "}
                         {receipt.sourceCollection.revision}
                       </p>

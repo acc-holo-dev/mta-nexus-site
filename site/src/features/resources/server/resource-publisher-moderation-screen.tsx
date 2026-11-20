@@ -20,6 +20,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakXlPrimary,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
@@ -104,7 +105,7 @@ export async function ResourcePublisherModerationScreen({
         {copy.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.moderationHistory}</h1>
-      <h2 className="break-words text-xl text-primary">{product.title}</h2>
+      <h2 className={typeBreakXlPrimary}>{product.title}</h2>
       <p className="text-secondary">{copy[product.status]}</p>
       {product.status === "suspended" ? (
         <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">

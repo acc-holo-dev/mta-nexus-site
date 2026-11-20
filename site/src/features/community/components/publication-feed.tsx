@@ -8,7 +8,14 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typeFlexMinWrapGap3, typeMinSpace4, typePrewrapSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapGap2,
+  typeFlexMinWrapGap3,
+  typeMinSpace4,
+  typeMlAutoXsMuted,
+  typePrewrapSmSecondary,
+  typeSpace1XsSecondary,
+} from "../../shell/type-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -100,7 +107,7 @@ export function PublicationFeed({
             placeholder={copy.queryHint}
           />
         </div>
-        <label className="space-y-1 text-xs text-secondary">
+        <label className={typeSpace1XsSecondary}>
           {copy.type}
           <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
             <option value="">{copy.all}</option>
@@ -112,7 +119,7 @@ export function PublicationFeed({
           </select>
         </label>
         {following && !filters.target && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.source}
             <select
               name="source"
@@ -196,7 +203,7 @@ export function PublicationFeed({
               >
                 {copy.onlyAuthor}
               </Link>
-              <time dateTime={item.publishedAt} className="ml-auto text-xs text-muted">
+              <time dateTime={item.publishedAt} className={typeMlAutoXsMuted}>
                 {new Date(item.publishedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -230,7 +237,7 @@ export function PublicationFeed({
             </h2>
             <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
             {item.tags?.length > 0 && (
-              <ul className="flex min-w-0 flex-wrap gap-2" aria-label={copy.tag}>
+              <ul className={typeFlexMinWrapGap2} aria-label={copy.tag}>
                 {Array.from(new Set(item.tags)).map((tag) => (
                   <li key={tag}>
                     <Link

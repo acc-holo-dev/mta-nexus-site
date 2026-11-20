@@ -8,10 +8,12 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3 } from "../../shell/surface-shell";
 import {
+  typeBreakAllSecondary,
   typeFlexStartGap3,
   typeItemsStretchPy4,
   typeLabelUpperFaint,
   typeMonoSecondary,
+  typeMt1XsLeadingMuted,
   typeSmBoldPrimary,
   typeTenFaint,
   typeTenLeadingFaint,
@@ -163,7 +165,7 @@ export function MtaMetaInspectorPanel({
           <h2 id="meta-inspector-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
+          <p className={typeMt1XsLeadingMuted}>{copy.description}</p>
         </div>
       </div>
 
@@ -357,7 +359,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {entry.src || copy.scriptSourceMissing}
                     </code>
                     <span className="text-faint">
@@ -397,7 +399,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {entry.src || copy.fileSourceMissing}
                     </code>
                   </li>
@@ -430,7 +432,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {entry.src || copy.mapSourceMissing}
                     </code>
                   </li>
@@ -463,7 +465,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {entry.name || copy.settingNameMissing}
                     </code>
                     <span className="break-all text-faint">
@@ -504,7 +506,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {right.name || copy.aclRightNameMissing}
                     </code>
                     <span className="shrink-0 text-faint">
@@ -545,7 +547,7 @@ export function MtaMetaInspectorPanel({
                     key={key}
                     className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                   >
-                    <code className="break-all text-secondary">
+                    <code className={typeBreakAllSecondary}>
                       {entry.function || copy.exportFunctionNameMissing}
                     </code>
                     <span className="text-faint">

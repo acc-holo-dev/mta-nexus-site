@@ -15,7 +15,7 @@ import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-sh
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXsOnly } from "../../shell/type-shell";
+import { typeBreakAllSm, typeBreakAllXsOnly } from "../../shell/type-shell";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionId, collectionPageParams, collectionsQuery } from "../library-collections-query";
@@ -130,7 +130,7 @@ export async function LibrarySelectionBatchScreen({
                   <summary>{c.preview}</summary>
                   <ul className="space-y-2 pt-3">
                     {receipt.snapshot.items.map((item) => (
-                      <li key={item.productId} className="break-all text-sm">
+                      <li key={item.productId} className={typeBreakAllSm}>
                         <code>{item.productId}</code>
                         <p>
                           {c.previous}: {c[item.previous.mode]} ·{" "}

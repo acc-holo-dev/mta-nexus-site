@@ -20,6 +20,8 @@ import {
   typeFlexWrapStartBetweenGap3,
   typeLabelSecondary,
   typeLabelUpperMuted,
+  typeNumericElevenFaint,
+  typePrewrapSmLeadingSecondary,
   typeSmSecondary,
   typeSmSuccess,
 } from "../../shell/type-shell";
@@ -458,14 +460,12 @@ export function SupportCaseThread({
               </span>
               <time
                 dateTime={new Date(message.createdAt).toISOString()}
-                className="font-numeric text-[11px] text-faint"
+                className={typeNumericElevenFaint}
               >
                 {new Date(message.createdAt).toLocaleString(dateLocale)}
               </time>
             </div>
-            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-              {message.body}
-            </p>
+            <p className={typePrewrapSmLeadingSecondary}>{message.body}</p>
             <Link
               href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
               className={`mt-2 ${linkAccentXs}`}

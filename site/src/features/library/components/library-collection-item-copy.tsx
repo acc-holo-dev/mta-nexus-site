@@ -9,7 +9,12 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentTightRounded, linkGhostAccentRounded } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeFlexStartGap3, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeBreakSm,
+  typeFlexStartGap3,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -283,7 +288,7 @@ export function LibraryCollectionItemCopyForm({
       )}
       {frozen && !saved && (
         <div className="space-y-2">
-          <p className="break-words text-sm">
+          <p className={typeBreakSm}>
             {c.source}: {pending.current?.source.name} · {c.revision}{" "}
             {pending.current?.source.revision}
           </p>

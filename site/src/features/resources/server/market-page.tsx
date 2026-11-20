@@ -10,6 +10,7 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import {
+  typeFlexMinCenterGap25Display,
   typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap2,
   typeIcon6Accent,
@@ -94,7 +95,7 @@ export async function MarketPage({
     <div className={pageShellStack6}>
       <div className="flex min-w-0 flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
         <div className="min-w-0">
-          <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+          <h1 className={typeFlexMinCenterGap25Display}>
             <ShoppingBag className={typeIcon6Accent} />
             <span className={typeMinBreakWords}>{dictionary.market.title}</span>
           </h1>

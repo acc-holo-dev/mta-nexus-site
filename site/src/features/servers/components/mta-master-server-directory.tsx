@@ -9,9 +9,11 @@ import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeFlexWrapCenterBetweenGap3,
   typeFlexWrapGap2,
+  typeLgBoldPrimary,
   typeMinFlex1,
   typeMinSpace4,
   typeXsSecondary,
+  typeXsSecondaryAnywhere,
 } from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
@@ -73,7 +75,7 @@ function ServerCard({
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h3 className="font-semibold text-primary [overflow-wrap:anywhere]">{name}</h3>
-          <p className="text-xs text-secondary [overflow-wrap:anywhere]">
+          <p className={typeXsSecondaryAnywhere}>
             {[server.gameMode, server.mapName, server.version].filter(Boolean).join(" / ") ||
               copy.noDetails}
           </p>
@@ -142,7 +144,7 @@ function ServerCard({
           description={copy.copyUnavailableHint}
         />
       ) : (
-        <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
+        <p role="status" className={typeXsSecondaryAnywhere}>
           {copyMessage}
         </p>
       )}
@@ -250,7 +252,7 @@ export function MtaMasterServerDirectory({
     <section aria-label={copy.directory} aria-busy={loading} className={typeMinSpace4}>
       <div className={panelSpace3P4}>
         <div>
-          <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
+          <h2 className={typeLgBoldPrimary}>{copy.network}</h2>
           {loading ? (
             <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
               {copy.loading}

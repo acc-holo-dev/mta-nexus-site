@@ -9,6 +9,7 @@ import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell
 import {
   typeFlexCenterGap3,
   typeFlexWrapEndGap3,
+  typeMlAutoXsMuted,
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -59,7 +60,7 @@ export function OrganizationMemberEditor({
         >
           {member.displayName} (@{member.username})
         </Link>
-        <span className="ml-auto text-xs text-muted">
+        <span className={typeMlAutoXsMuted}>
           {member.role === "owner"
             ? organizationTeamCopy(locale).legacyOwner
             : ["admin", "member", "developer"].includes(member.role)

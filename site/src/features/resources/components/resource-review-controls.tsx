@@ -9,7 +9,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
-import { typePrewrapBreak, typeSmSecondary } from "../../shell/type-shell";
+import { typePrewrapBreak, typePrewrapBreakSm, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -221,7 +221,7 @@ export function ResourceReviewEditor({
         </form>
       ) : (
         review && (
-          <p className="whitespace-pre-wrap break-words text-sm" data-review-copyable="true">
+          <p className={typePrewrapBreakSm} data-review-copyable="true">
             {review.text}
           </p>
         )

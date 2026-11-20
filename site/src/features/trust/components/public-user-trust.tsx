@@ -7,6 +7,7 @@ import { panelClipSpace3P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../s
 import {
   type2xlExtraboldPrimary,
   typeGrid2Gap4,
+  typeGridMinGap4ClipSm2,
   typeHeadingPrimary,
   typeSmMuted,
   typeSmSecondary,
@@ -49,7 +50,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <p className={typeSmMuted}>{copy.description}</p>
         <p className={typeXsMuted}>{copy.source}</p>
       </header>
-      <div className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
+      <div className={typeGridMinGap4ClipSm2}>
         {(["identity", "developer"] as const).map((kind) => (
           <section key={kind} className={panelClipSpace3P5}>
             <h2 className={typeHeadingPrimary}>{copy[kind]}</h2>

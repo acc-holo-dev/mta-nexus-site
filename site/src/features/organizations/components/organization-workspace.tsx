@@ -22,7 +22,12 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
-import { typeHeadingPrimary, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeHeadingPrimary,
+  typeMlAutoXsMuted,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -302,7 +307,7 @@ export function OrganizationWorkspacePanel({
             >
               {data.owner.displayName} (@{data.owner.username})
             </Link>
-            <span className="ml-auto text-xs text-muted">{copy.owner}</span>
+            <span className={typeMlAutoXsMuted}>{copy.owner}</span>
           </div>
         )}
         {manageable && (

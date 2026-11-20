@@ -15,6 +15,7 @@ import {
   typeFlexWrapCenterGap2,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeWarningSoftBadge,
   typeXsFaint,
   typeXsMuted,
 } from "../../shell/type-shell";
@@ -99,9 +100,7 @@ export async function PlatformReportsScreen({
               status={copy.statuses[report.status] ?? report.status}
               tone={statusTone(report.status)}
             />
-            <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-              {report.type}
-            </span>
+            <span className={typeWarningSoftBadge}>{report.type}</span>
             <span className={typeXsMuted}>
               {copy.targetTypes[report.targetType] ?? report.targetType}
             </span>

@@ -12,6 +12,7 @@ import {
   typeItemsStretchPy4,
   typeMaxXlSmLeadingMuted,
   typeSmColSpan2,
+  typeSpace15SmCol2,
 } from "../../shell/type-shell";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
@@ -285,7 +286,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         aria-busy={loading}
         className={panelGridClipShadow}
       >
-        <div className="space-y-1.5 sm:col-span-2">
+        <div className={typeSpace15SmCol2}>
           <label htmlFor="server-organization" className={nativeLabelClass}>
             {copy.ownerScope}
           </label>
@@ -354,7 +355,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           readOnly={!!pending}
         />
 
-        <div className="space-y-1.5 sm:col-span-2">
+        <div className={typeSpace15SmCol2}>
           <label htmlFor="server-description" className={nativeLabelClass}>
             {copy.descriptionLabel}
           </label>
@@ -434,7 +435,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           />
         </div>
 
-        <div className="space-y-1.5 sm:col-span-2">
+        <div className={typeSpace15SmCol2}>
           <label htmlFor="server-media-urls" className={nativeLabelClass}>
             {copy.mediaUrls}
           </label>

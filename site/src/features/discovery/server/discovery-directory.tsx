@@ -31,6 +31,7 @@ import {
   typeMinH11Semibold,
   typeSemiboldPrimary,
   typeSmMuted,
+  typeSpace1XsSecondary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
@@ -74,7 +75,7 @@ export function DirectoryFilters({
           />
         </div>
         {names && !stream && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.sort}
             <select name="sort" defaultValue={state.sort} className={field}>
               <option value="newest">{copy.newest}</option>
@@ -83,7 +84,7 @@ export function DirectoryFilters({
           </label>
         )}
         {state.type === "content" && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.contentType}
             <select name="contentType" defaultValue={state.contentType} className={field}>
               <option value="">{copy.any}</option>
@@ -129,7 +130,7 @@ export function DirectoryFilters({
       {state.type === "servers" && (
         <div className="grid gap-3 sm:grid-cols-3">
           {(["language", "region", "gameMode"] as const).map((key) => (
-            <label key={key} className="space-y-1 text-xs text-secondary">
+            <label key={key} className={typeSpace1XsSecondary}>
               {copy[key]}
               <input name={key} defaultValue={state[key]} maxLength={60} className={field} />
             </label>

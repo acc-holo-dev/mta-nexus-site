@@ -22,6 +22,7 @@ import {
 import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
 import {
   typeDisplayPrimary,
+  typeFlexMinCenterGap25Display,
   typeFlexWrapCenterJustifyGap3,
   typeIcon6Accent,
   typeLabelUpperMuted,
@@ -316,7 +317,7 @@ function AcquireContent() {
   return (
     <div className={shellClass}>
       <header className="min-w-0 border-b border-base pb-5">
-        <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+        <h1 className={typeFlexMinCenterGap25Display}>
           <Library className={typeIcon6Accent} aria-hidden="true" />
           <span className={typeMinBreakWords}>{copy.title}</span>
         </h1>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
+import { typeGridGap3Sm3, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -37,7 +37,7 @@ export function PlanReviewDetailView({
       </section>
       <section className={panelSpace4P5}>
         <h2 className="text-xl font-semibold">{c.estimate}</h2>
-        <dl className="grid gap-3 text-sm sm:grid-cols-3">
+        <dl className={typeGridGap3Sm3}>
           {[
             [c.amount, r.estimate.grossAmount],
             [c.fee, r.estimate.platformFee],
