@@ -19,6 +19,7 @@ import { linkAccentTightSmPlain, linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBlockMinSmSecondary,
   typeBreakXsMuted,
   typeFlexMinWrapGap4Sm,
   typeLgSemiboldPrimary,
@@ -309,7 +310,7 @@ export function LicenseControlPanel({
       {actions.length > 0 && (
         <form onSubmit={submit} className={typeMinSpace4}>
           <fieldset disabled={busy || refreshing} className={typeMinSpace4}>
-            <label className="block min-w-0 text-sm text-secondary" htmlFor={`${fieldId}-action`}>
+            <label className={typeBlockMinSmSecondary} htmlFor={`${fieldId}-action`}>
               {copy.action}
               <select
                 id={`${fieldId}-action`}
@@ -329,10 +330,7 @@ export function LicenseControlPanel({
             </label>
             {action === "bind" && (
               <div className={typeMinSpace2}>
-                <label
-                  className="block min-w-0 text-sm text-secondary"
-                  htmlFor={`${fieldId}-server`}
-                >
+                <label className={typeBlockMinSmSecondary} htmlFor={`${fieldId}-server`}>
                   {copy.server}
                   <select
                     id={`${fieldId}-server`}
@@ -400,7 +398,7 @@ export function LicenseControlPanel({
                 {copy.recoveryNote} · {copy.endpointRevision}: {license.currentEndpointRevision}
               </p>
             )}
-            <label htmlFor={`${fieldId}-reason`} className="block min-w-0 text-sm text-secondary">
+            <label htmlFor={`${fieldId}-reason`} className={typeBlockMinSmSecondary}>
               {copy.reason}
               <textarea
                 id={`${fieldId}-reason`}

@@ -12,6 +12,7 @@ import { linkGhostUnderlineFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBlockSmSecondary,
   typePrewrapBreak,
   typePrewrapBreakSecondary,
   typePrewrapSmSecondary,
@@ -431,7 +432,7 @@ export function ServerReviewPanel({
             )}
             {mine?.canReview ? (
               <form className="space-y-4" onSubmit={onSave}>
-                <label className="block text-sm text-secondary">
+                <label className={typeBlockSmSecondary}>
                   {copy.rating}
                   <select
                     value={rating}
@@ -449,7 +450,7 @@ export function ServerReviewPanel({
                     ))}
                   </select>
                 </label>
-                <label className="block text-sm text-secondary">
+                <label className={typeBlockSmSecondary}>
                   {copy.text}
                   <textarea
                     value={text}

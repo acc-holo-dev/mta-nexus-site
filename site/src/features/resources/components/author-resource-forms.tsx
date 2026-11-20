@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {
+  typeBlockXsMuted,
   typeFileInputInset,
   typeLabelBlockUpperSecondary,
   typeSmMuted,
@@ -582,7 +583,7 @@ export function AuthorResourceForms({
               accept=".zip,.rar,.7z,.lua"
               className={typeFileInputInset}
             />
-            <span className="block text-xs text-muted">
+            <span className={typeBlockXsMuted}>
               {publishing.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb)}
             </span>
           </div>

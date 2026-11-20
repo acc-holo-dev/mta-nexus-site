@@ -18,6 +18,7 @@ import {
   typeBreakSemibold,
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap4Sm,
+  typeLabelUpperSecondary,
   typeMinBreakDisplay,
   typeSmMuted,
   typeSmSecondary,
@@ -140,7 +141,7 @@ export async function CollectionComparePage({
             className={typeFlexMinWrapEndGap3}
           >
             <label className="grid min-w-0 max-w-full gap-1.5">
-              <span className="font-label uppercase text-secondary">{h.destination}</span>
+              <span className={typeLabelUpperSecondary}>{h.destination}</span>
               <select
                 name="to"
                 defaultValue={comparison?.destination.id ?? ""}
@@ -158,7 +159,7 @@ export async function CollectionComparePage({
             {comparison && (
               <>
                 <label className="grid min-w-0 max-w-full gap-1.5">
-                  <span className="font-label uppercase text-secondary">{c.all}</span>
+                  <span className={typeLabelUpperSecondary}>{c.all}</span>
                   <select
                     name="filter"
                     defaultValue={comparison.filter}
@@ -172,7 +173,7 @@ export async function CollectionComparePage({
                   </select>
                 </label>
                 <label className="grid min-w-0 max-w-full gap-1.5">
-                  <span className="font-label uppercase text-secondary">{c.search}</span>
+                  <span className={typeLabelUpperSecondary}>{c.search}</span>
                   <input
                     name="q"
                     defaultValue={comparison.q}
@@ -183,7 +184,7 @@ export async function CollectionComparePage({
               </>
             )}
             <label className="grid min-w-0 max-w-full gap-1.5">
-              <span className="font-label uppercase text-secondary">{h.transfer}</span>
+              <span className={typeLabelUpperSecondary}>{h.transfer}</span>
               <select
                 name="transfer"
                 defaultValue={comparison?.transfer ?? query.transfer}

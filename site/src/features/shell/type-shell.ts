@@ -231,3 +231,12 @@ export const typeFileInputInset =
 
 export const typeBlockFileInputInset =
   "block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
+
+export const typeBlockXsMuted = "block text-xs text-muted";
+export const typeBlockSmSecondary = "block text-sm text-secondary";
+export const typeBlockSpace1SmSecondary = "block space-y-1 text-sm text-secondary";
+export const typeFlexWrapBaselineBetweenGap2 =
+  "flex flex-wrap items-baseline justify-between gap-2";
+export const typeMt1XsSecondary = "mt-1 text-xs text-secondary";
+export const typeLabelUpperSecondary = "font-label uppercase text-secondary";
+export const typeBlockMinSmSecondary = "block min-w-0 text-sm text-secondary";

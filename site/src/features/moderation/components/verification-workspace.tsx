@@ -16,6 +16,7 @@ import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-sh
 import { pageShellStack6 } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBlockSpace1SmSecondary,
   typeBreakAllXsMuted,
   typeBreakSmSecondary,
   typeFlexMinWrapEndGap3,
@@ -595,7 +596,7 @@ export function VerificationWorkspace({
           ) : (
             <form className="space-y-3" onSubmit={submit}>
               <p className={typeXsMuted}>{copy.proofPrivacy}</p>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.proof}</span>
                 <input
                   className={`${platformFieldClass} min-h-11`}
@@ -608,7 +609,7 @@ export function VerificationWorkspace({
                   onChange={(event) => setProof(event.target.value)}
                 />
               </label>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.notes}</span>
                 <textarea
                   className={`${platformFieldClass} min-h-11`}

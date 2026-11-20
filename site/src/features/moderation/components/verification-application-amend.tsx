@@ -8,7 +8,12 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSemiboldPrimary, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeBlockSpace1SmSecondary,
+  typeSemiboldPrimary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
@@ -116,7 +121,7 @@ export function VerificationApplicationAmend({
       <h2 className={typeSemiboldPrimary}>{copy.amend}</h2>
       <p className={typeXsMuted}>{labels.proofPrivacy}</p>
       <fieldset disabled={busy || blocked} className="space-y-4">
-        <label className="block space-y-1 text-sm text-secondary">
+        <label className={typeBlockSpace1SmSecondary}>
           {labels.proof}
           <input
             type="url"
@@ -127,7 +132,7 @@ export function VerificationApplicationAmend({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <label className="block space-y-1 text-sm text-secondary">
+        <label className={typeBlockSpace1SmSecondary}>
           {labels.notes}
           <textarea
             rows={5}

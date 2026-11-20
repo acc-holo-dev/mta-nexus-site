@@ -11,6 +11,7 @@ import {
   typeBreakAllSecondary,
   typeFileInputInset,
   typeFlexStartGap3,
+  typeFlexWrapBaselineBetweenGap2,
   typeItemsStretchPy4,
   typeLabelUpperFaint,
   typeMonoSecondary,
@@ -339,7 +340,7 @@ export function MtaMetaInspectorPanel({
 
           {scripts.length > 0 && (
             <section aria-labelledby="meta-inspector-scripts-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-scripts-heading" className={typeLabelUpperFaint}>
                   {copy.scriptsDetails}
                 </h3>
@@ -379,7 +380,7 @@ export function MtaMetaInspectorPanel({
 
           {files.length > 0 && (
             <section aria-labelledby="meta-inspector-files-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-files-heading" className={typeLabelUpperFaint}>
                   {copy.filesDetails}
                 </h3>
@@ -412,7 +413,7 @@ export function MtaMetaInspectorPanel({
 
           {maps.length > 0 && (
             <section aria-labelledby="meta-inspector-maps-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-maps-heading" className={typeLabelUpperFaint}>
                   {copy.mapsDetails}
                 </h3>
@@ -445,7 +446,7 @@ export function MtaMetaInspectorPanel({
 
           {settings.length > 0 && (
             <section aria-labelledby="meta-inspector-settings-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-settings-heading" className={typeLabelUpperFaint}>
                   {copy.settingsDetails}
                 </h3>
@@ -481,7 +482,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.aclRights.length > 0 && (
             <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-acl-heading" className={typeLabelUpperFaint}>
                   {copy.aclRights}
                 </h3>
@@ -522,7 +523,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.exports.length > 0 && (
             <section aria-labelledby="meta-inspector-exports-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-exports-heading" className={typeLabelUpperFaint}>
                   {copy.exportsDetails}
                 </h3>

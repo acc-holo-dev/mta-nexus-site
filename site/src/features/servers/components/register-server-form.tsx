@@ -8,6 +8,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlPadded } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
+  typeBlockXsMuted,
   typeDisplayPrimary,
   typeItemsStretchPy4,
   typeLabelBlockUpperSecondary,
@@ -306,7 +307,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             ))}
           </select>
           {organizationsLoading && (
-            <span className="block text-xs text-muted">{copy.organizationsLoading}</span>
+            <span className={typeBlockXsMuted}>{copy.organizationsLoading}</span>
           )}
           {organizationsFailed ? (
             <ErrorState

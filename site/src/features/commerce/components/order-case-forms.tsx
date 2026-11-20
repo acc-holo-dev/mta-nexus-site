@@ -13,7 +13,12 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { linkAccentRounded, linkGhostAccentSmRounded } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap3, typeLgSemibold, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeBlockSmSecondary,
+  typeFlexWrapGap3,
+  typeLgSemibold,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
@@ -184,7 +189,7 @@ export function OrderCaseCreateForm({
               maxLength={13}
               className={fieldClassBlock}
             />
-            <span className="block text-sm text-secondary">{copy.amountHelp}</span>
+            <span className={typeBlockSmSecondary}>{copy.amountHelp}</span>
           </label>
         )}
         <Button type="submit" variant="outline" isLoading={busy} className="min-h-11">
@@ -372,7 +377,7 @@ export function OrderCaseReviewForm({
           rows={4}
           className={fieldClassBlock}
         />
-        <span className="block text-sm text-secondary">{copy.notesHelp}</span>
+        <span className={typeBlockSmSecondary}>{copy.notesHelp}</span>
       </label>
       <div className={typeFlexWrapGap3}>
         {actions.map((action) => (

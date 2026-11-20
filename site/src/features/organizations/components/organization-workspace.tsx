@@ -23,6 +23,8 @@ import {
 import { pageShellStack6 } from "../../shell/page-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
+  typeBlockSpace1SmSecondary,
+  typeBlockXsMuted,
   typeHeadingPrimary,
   typeMinFlex1Space1SmSecondary,
   typeMlAutoXsMuted,
@@ -314,7 +316,7 @@ export function OrganizationWorkspacePanel({
         {manageable && (
           <form onSubmit={add} className={surfaceSpace3P4}>
             <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.username}</span>
                 <input
                   className={platformFieldClass}
@@ -323,9 +325,9 @@ export function OrganizationWorkspacePanel({
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
-                <span className="block text-xs text-muted">{copy.usernameHelp}</span>
+                <span className={typeBlockXsMuted}>{copy.usernameHelp}</span>
               </label>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.role}</span>
                 <select
                   className={platformFieldClass}

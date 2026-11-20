@@ -5,6 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import {
+  typeBlockXsMuted,
   typeLabelBlockUpperSecondary,
   typeMinFlex1Space15SmSecondary,
   typeXsMuted,
@@ -62,7 +63,7 @@ export function PrivateChangeHistoryFilters<
               defaultValue={filters.query}
               aria-describedby="change-history-search-help"
             />
-            <span id="change-history-search-help" className="block text-xs text-muted">
+            <span id="change-history-search-help" className={typeBlockXsMuted}>
               {copy.searchHelp}
             </span>
           </div>

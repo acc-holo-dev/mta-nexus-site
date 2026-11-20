@@ -8,6 +8,7 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
+  typeBlockSpace1SmSecondary,
   typeFlexWrapGap3,
   typeHeadingPrimary,
   typeSmMuted,
@@ -139,7 +140,7 @@ export function OrganizationOwnershipTransfer({
           <p className="break-words text-sm font-semibold text-primary">
             {copy.selected}: {target.displayName} (@{target.username})
           </p>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.formerRole}</span>
             <select
               className={platformFieldClass}
@@ -151,7 +152,7 @@ export function OrganizationOwnershipTransfer({
               <option value="admin">{teamCopy.admin}</option>
             </select>
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.confirmation}</span>
             <input
               className={platformFieldClass}
