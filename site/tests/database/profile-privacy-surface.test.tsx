@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
+
 import { profilePrivacyCopy } from "../../src/features/accounts/profile-privacy-copy";
 
 const state = vi.hoisted(() => ({

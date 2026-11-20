@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
-import { getDictionary } from "../../src/lib/i18n";
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   ack,
   createDiscussionWatchInteractionHelpers,

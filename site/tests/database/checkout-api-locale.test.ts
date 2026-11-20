@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
+import { POST } from "../../src/app/api/checkout/route";
 import { checkoutApiCopy } from "../../src/features/commerce/checkout-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-
-import { POST } from "../../src/app/api/checkout/route";
 
 function postRequest(locale: "en" | "ru") {
   return new NextRequest("https://nexus.test/api/checkout", {

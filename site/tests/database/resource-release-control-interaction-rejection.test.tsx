@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest";
-import { getDictionary } from "../../src/lib/i18n";
 import type { Locale } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createResourceReleaseControlInteractionHelpers,
   mockReactHooks,

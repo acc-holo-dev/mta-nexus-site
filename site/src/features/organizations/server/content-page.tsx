@@ -16,8 +16,8 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { organizationContentId } from "../organization-content-api";
 import { organizationContentCopy } from "../organization-content-copy";
-import { organizationError } from "../organization-workspace-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
+import { organizationError } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";

@@ -36,8 +36,8 @@ vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (im
   };
 });
 
-import { discoverySearchApiCopy } from "../../src/features/discovery/discovery-search-api-copy";
 import { GET as searchGet } from "../../src/app/api/search/route";
+import { discoverySearchApiCopy } from "../../src/features/discovery/discovery-search-api-copy";
 
 setupDiscoverySearchBehavior();
 

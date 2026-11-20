@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../../../../../../tests/helpers/browser-mutation-headers";
+import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
 
 const state = vi.hoisted(() => ({
   authenticated: true,

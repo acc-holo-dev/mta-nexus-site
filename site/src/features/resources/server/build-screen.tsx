@@ -17,8 +17,8 @@ import { BuildModerationControls } from "../components/build-moderation-controls
 import { ResourceBuildControls } from "../components/resource-build-controls";
 import { BuildPackageEvidencePanel, BuildProvenanceDetails } from "../evidence";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourceManagementCopy } from "../resource-management-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 

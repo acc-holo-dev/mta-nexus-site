@@ -22,8 +22,8 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => "ent_test"),
 }));
 
-import { checkoutApiCopy } from "../../src/features/commerce/checkout-api-copy";
 import { POST as disabledCheckout } from "../../src/app/api/checkout/route";
+import { checkoutApiCopy } from "../../src/features/commerce/checkout-api-copy";
 import { CommerceService } from "../../src/lib/services/commerce/commerce-service";
 
 describe("open free-beta commerce behavior", () => {

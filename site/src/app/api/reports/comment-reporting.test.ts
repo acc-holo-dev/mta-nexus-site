@@ -1,11 +1,11 @@
 import { AppError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../../../../tests/helpers/browser-mutation-headers";
+import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),

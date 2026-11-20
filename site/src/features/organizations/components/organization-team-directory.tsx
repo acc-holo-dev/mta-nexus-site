@@ -8,6 +8,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -17,7 +18,6 @@ import {
   organizationTeamHref,
   organizationTeamPageSchema,
 } from "../organization-team-contract";
-import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";

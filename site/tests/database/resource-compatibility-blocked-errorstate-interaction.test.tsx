@@ -25,10 +25,10 @@ vi.mock("../../src/features/shell/locale", async () => {
   };
 });
 
-import { getDictionary } from "../../src/lib/i18n";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const { render } = createResourceCompatibilityDraftInteractionHelpers(
   harness,

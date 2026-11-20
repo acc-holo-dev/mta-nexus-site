@@ -6,18 +6,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { buildFollowInitialState } from "../../community/follow-initial-state";
-import { ObjectReportForm } from "../../moderation/object-report";
-import { ServerClaimControlPanel } from "../claim-controls";
-import { ServerConnectControls } from "../connect";
-import { ServerFollowButton } from "../follow";
-import { ServerHistoryPanel } from "../history-server";
-import { ServerReviewPanel } from "../review-controls";
-import { parseServerHistoryWindow } from "../server-history-window";
-import { serverStatisticsCopy } from "../server-statistics-copy";
-import { ServerUpdatesPanel } from "../updates-server";
-import { authEntryHref } from "../../shell/auth-return";
-import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
@@ -31,6 +19,18 @@ import {
 import { serverHistoryService } from "../../../lib/services/servers/server-history-service";
 import { serverReviewService } from "../../../lib/services/servers/server-review-service";
 import { serverService } from "../../../lib/services/servers/server-service";
+import { buildFollowInitialState } from "../../community/follow-initial-state";
+import { ObjectReportForm } from "../../moderation/object-report";
+import { authEntryHref } from "../../shell/auth-return";
+import { contextTrustCopy } from "../../trust/public-context-trust-copy";
+import { ServerClaimControlPanel } from "../claim-controls";
+import { ServerConnectControls } from "../connect";
+import { ServerFollowButton } from "../follow";
+import { ServerHistoryPanel } from "../history-server";
+import { ServerReviewPanel } from "../review-controls";
+import { parseServerHistoryWindow } from "../server-history-window";
+import { serverStatisticsCopy } from "../server-statistics-copy";
+import { ServerUpdatesPanel } from "../updates-server";
 
 const getServer = cache((slug: string) => serverService.getServerBySlug(slug));
 
