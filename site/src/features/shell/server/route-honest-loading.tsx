@@ -8,7 +8,7 @@ type Dictionary = ReturnType<typeof getDictionary>;
 const DEFAULT_CLASS = "min-w-0 space-y-6 overflow-x-clip";
 const DEFAULT_ROW = "h-20 rounded bg-inset";
 
-export function RouteHonestLoading({
+function RouteHonestLoading({
   headingId,
   title,
   description,
@@ -77,7 +77,14 @@ export async function DictionaryRouteLoading({
   rows?: number;
   rowClassName?: string;
   leading?: ReactNode;
-  pick: (dictionary: Dictionary, locale: Locale) => { title: ReactNode; loading: ReactNode };
+  pick: (
+    dictionary: Dictionary,
+    locale: Locale,
+  ) => {
+    title: ReactNode;
+    loading: ReactNode;
+    description?: ReactNode;
+  };
 }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -86,6 +93,7 @@ export async function DictionaryRouteLoading({
     <RouteHonestLoading
       headingId={headingId}
       title={copy.title}
+      {...(copy.description !== undefined ? { description: copy.description } : {})}
       loadingLabel={copy.loading}
       className={className}
       headerClassName={headerClassName}

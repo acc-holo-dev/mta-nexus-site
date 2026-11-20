@@ -37,7 +37,7 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     const source = read(relative);
     expect(source).toContain("features/shell/route-honest-loading-server");
     expect(source).toMatch(
-      /(?:DictionaryRouteLoading|LocaleCopyRouteLoading|RouteHonestLoading)\s*[<(]|<(?:Dictionary|Route)HonestLoading/,
+      /(?:DictionaryRouteLoading|LocaleCopyRouteLoading)\s*\(|<(?:Dictionary|Route)HonestLoading/,
     );
   }
 
@@ -45,10 +45,10 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     const port = read("site/src/features/shell/route-honest-loading-server.ts");
     expect(port).toContain("DictionaryRouteLoading");
     expect(port).toContain("LocaleCopyRouteLoading");
-    expect(port).toContain("RouteHonestLoading");
-    expect(read("site/src/features/shell/server/route-honest-loading.tsx")).toContain(
-      "<HonestLoadingShell",
-    );
+    expect(port).not.toContain("RouteHonestLoading");
+    const implementation = read("site/src/features/shell/server/route-honest-loading.tsx");
+    expect(implementation).toContain("function RouteHonestLoading");
+    expect(implementation).toContain("<HonestLoadingShell");
   }
 
   {
@@ -129,4 +129,12 @@ it("supports nested panel headings without promoting them to h1", () => {
   expect(html).toContain("<h2");
   expect(html).not.toContain("<h1");
   expect(html).toContain('aria-busy="true"');
+});
+
+it("locks root layout to the shell RootLayout port", () => {
+  expect(read("site/src/app/layout.tsx")).toContain("features/shell/root-layout-server");
+  expect(read("site/src/app/layout.tsx")).toContain("rootLayoutMetadata");
+  expect(read("site/src/features/shell/root-layout-server.ts")).toContain("export { RootLayout }");
+  expect(read("site/src/features/shell/fonts.ts")).toContain("Unbounded");
+  expect(read("site/src/features/shell/fonts.ts")).toContain("Source_Sans_3");
 });
