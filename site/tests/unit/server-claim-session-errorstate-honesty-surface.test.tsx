@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/servers/[slug]/page.tsx"), "utf8");
+const source = readFileSync(join(root, "site/src/features/servers/server/server-detail-screen.tsx"), "utf8");
 
 /** Honesty lock for server detail claim-session lookup failure. */
 it("locks claim-session lookup failure to ErrorState without soft status", () => {

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -131,14 +133,14 @@ vi.mock("../../../features/servers/follow", async () => {
   };
 });
 
-vi.mock("../../../features/servers/history-server", async () => {
+vi.mock("../../../features/servers/server/server-history-panel", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: () => React.createElement("div", { "data-testid": "server-history" }),
   };
 });
 
-vi.mock("../../../features/servers/updates-server", async () => {
+vi.mock("../../../features/servers/server/server-updates-panel", async () => {
   const React = await import("react");
   return {
     ServerUpdatesPanel: ({ updates }: { updates: unknown }) =>

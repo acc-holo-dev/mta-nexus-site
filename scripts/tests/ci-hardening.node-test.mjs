@@ -208,6 +208,7 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/servers/activity-server.ts",
     "site/src/features/servers/publication-history-server.ts",
     "site/src/features/servers/updates-server.ts",
+    "site/src/features/servers/server-detail-server.ts",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",

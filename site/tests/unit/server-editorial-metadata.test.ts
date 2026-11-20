@@ -36,7 +36,7 @@ describe("editorial server metadata", () => {
   it("allows owner edits and keeps metadata separate from official live state", () => {
     const route = read("site/src/app/api/servers/[id]/route.ts");
     const repository = read("site/packages/db/src/repositories/servers.ts");
-    const detail = read("site/src/app/servers/[slug]/page.tsx");
+    const detail = read("site/src/features/servers/server/server-detail-screen.tsx");
 
     // PATCH delegates field validation to the shared strict schema.
     expect(route).toContain('import { updateServerSchema } from "@nexus/validation"');

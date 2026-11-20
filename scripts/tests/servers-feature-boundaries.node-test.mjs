@@ -121,6 +121,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "activity",
     "publication-history",
     "updates",
+    "server-detail",
   ]) {
     write(
       `site/src/features/servers/${port}-server.ts`,
@@ -208,6 +209,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/components/activity-leak.ts", "servers-client-isolation"],
     ["features/servers/components/publication-history-leak.ts", "servers-client-isolation"],
     ["features/servers/components/updates-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/server-detail-leak.ts", "servers-client-isolation"],
     ["features/servers/components/claim-status-leak.ts", "servers-client-isolation"],
     ["features/servers/components/managed-card-leak.ts", "servers-client-isolation"],
     ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
@@ -229,6 +231,7 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/activity-server.ts",
     "app/publication-history-server.ts",
     "app/updates-server.ts",
+    "app/server-detail-server.ts",
     "app/claim-status-server.ts",
     "app/managed-card-server.ts",
     "app/statistics-server.ts",
@@ -441,4 +444,16 @@ test("Servers server entrypoints keep independent composition graphs", () => {
         assert(!modules.has(`site/src/features/servers/server/${otherPage}`), otherPage);
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
   }
+});
+
+test("Servers server-detail entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/server-detail-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/server-detail-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
 });

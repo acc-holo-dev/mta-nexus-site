@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks server claim session failure to recovery hint", () => {
-  const page = read("site/src/app/servers/[slug]/page.tsx");
+  const page = read("site/src/features/servers/server/server-detail-screen.tsx");
   expect(page).toContain('id="server-claim-session-unavailable"');
   expect(page).toContain("description={copy.claimSessionUnavailableHint}");
   expect(read("site/src/lib/i18n/en/servers.ts")).toContain("claimSessionUnavailableHint:");

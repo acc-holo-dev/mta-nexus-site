@@ -38,7 +38,7 @@ const WAVE57_DASH_REPLACEMENT_CANDIDATES = [
   "site/src/app/workspace/page.tsx",
   "site/src/features/library/server/library-reviews-screen.tsx",
   "site/src/app/admin/storage/objects/[id]/page.tsx",
-  "site/src/app/servers/[slug]/page.tsx",
+  "site/src/features/servers/server/server-detail-screen.tsx",
   "site/src/features/servers/components/server-card.tsx",
   "site/src/features/community/components/content-reactions.tsx",
   "site/src/features/resources/components/resource-qa-panel.tsx",
