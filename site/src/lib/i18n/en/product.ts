@@ -126,7 +126,7 @@ export const product = {
     trustedCleanMet: "Met (clean verdict + scanner id + scan time)",
     trustedCleanMissing: "Not met — public delivery stays fail-closed",
     explanation:
-      "The SHA-256 identifies the stored artifact bytes. A clean malware scan is a separate recorded fact and is not a cryptographic signature. Public delivery requires a published version plus a trusted clean scan (scanner identity and time). Download responses expose the same recorded hash through the X-Content-SHA256 header.",
+      "The SHA-256 identifies the stored artifact bytes. A clean malware scan is a separate recorded fact and is not a cryptographic signature. Public delivery requires a published version plus a trusted clean scan (scanner identity and time). Download responses expose the same recorded hash through the X-Content-SHA256 header and the archived size through X-Resource-Content-Length when platforms strip Content-Length.",
   },
   versionHelpUi: {
     title: "Help and instructions for v{version}",

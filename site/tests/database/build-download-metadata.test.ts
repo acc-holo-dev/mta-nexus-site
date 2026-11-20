@@ -144,6 +144,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     const response = await request();
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Length")).toBe("4");
+    expect(response.headers.get("X-Resource-Content-Length")).toBe("4");
     expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.text()).toBe("data");
     expect(mocks.audit).toHaveBeenCalledOnce();

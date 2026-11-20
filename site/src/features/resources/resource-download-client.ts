@@ -1,5 +1,6 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import { resourceDownloadUrl } from "./build-download-selection";
+import { resolveResourceDownloadContentLength } from "./resource-download-headers";
 import { isValidDownloadSha256Header, matchesDownloadedSha256 } from "./resource-download-sha256";
 
 export type DownloadFailure =
@@ -115,9 +116,13 @@ async function readResourceDownload(
     throw new ResourceDownloadError("failed");
   }
   // Fetch exposes decoded bytes; a proxy may report the compressed wire length.
+  // Next.js 16.4.5+ may strip Content-Length from Route Handlers; fall back to
+  // X-Resource-Content-Length when the wire length is absent.
   const encoding = response.headers.get("Content-Encoding")?.toLowerCase();
   const header =
-    !encoding || encoding === "identity" ? response.headers.get("Content-Length") : null;
+    !encoding || encoding === "identity"
+      ? resolveResourceDownloadContentLength(response.headers)
+      : null;
   if (header !== null && !/^\d+$/.test(header)) {
     void response.body?.cancel().catch(() => undefined);
     throw new ResourceDownloadError("failed");

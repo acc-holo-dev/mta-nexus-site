@@ -185,6 +185,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           selectedBuild.mimeType || stored.meta?.mimeType || "application/octet-stream",
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": String(contentLength),
+        "X-Resource-Content-Length": String(contentLength),
         "X-Content-SHA256": selectedBuild.sha256Hash,
         "X-Resource-Build-Id": selectedBuild.id,
         "X-Resource-Delivery-Id": authorized.receiptId,

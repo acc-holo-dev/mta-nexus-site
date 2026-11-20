@@ -85,7 +85,11 @@ function download({ interrupt = false, slow = false } = {}) {
         const ttfbMs = performance.now() - started;
         try {
           assert.equal(res.statusCode, 200);
-          assert.equal(Number(res.headers["content-length"]), size);
+          // Next.js 16.4.5+ strips Content-Length from Route Handlers; the
+          // application-owned size header remains authoritative for progress.
+          const declared =
+            res.headers["content-length"] ?? res.headers["x-resource-content-length"];
+          assert.equal(Number(declared), size);
           assert.equal(res.headers["x-content-sha256"], expectedHash);
           assert.equal(res.headers["cache-control"], "private, no-store");
         } catch (error) {
