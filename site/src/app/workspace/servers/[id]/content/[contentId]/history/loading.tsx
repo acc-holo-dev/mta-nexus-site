@@ -1,19 +1,12 @@
-import { serverPublicationHistoryCopy } from "../../../../../../../features/servers/server-publication-history-copy";
-import { LocaleCopyRouteLoading } from "../../../../../../../features/shell/route-honest-loading-server";
+import { ServerPublicationHistoryRouteLoading } from "../../../../../../../features/servers/server-publication-history-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return ServerPublicationHistoryRouteLoading({
     headingId: "content-history-loading-heading",
     className: "mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip py-8",
     headerClassName: "",
     titleClassName: "text-xl font-semibold text-primary",
     leading: <div className="h-6 w-2/3 rounded bg-inset" />,
-    load: (locale) => {
-      const copy = serverPublicationHistoryCopy(locale);
-      return {
-        title: copy.title,
-        loading: copy.loading,
-      };
-    },
+    titleKey: "title",
   });
 }

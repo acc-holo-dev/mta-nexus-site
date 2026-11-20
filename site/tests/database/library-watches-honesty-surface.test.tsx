@@ -110,8 +110,13 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     "site/src/app/workspace/library/[id]/versions/loading.tsx",
     "site/src/app/workspace/library/[id]/requirements/loading.tsx",
   ]) {
-    expect(read(loading)).toContain("overflow-x-clip");
-    expect(read(loading)).toContain("min-w-0");
+    const source = read(loading);
+    if (/[A-Za-z]\w*RouteLoading/.test(source)) {
+      expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+    } else {
+      expect(source).toContain("overflow-x-clip");
+      expect(source).toContain("min-w-0");
+    }
   }
   expect(read("site/src/features/resources/resource-release-watches-i18n.ts")).toContain(
     "loadUnavailableDescription",

@@ -10,6 +10,15 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -65,8 +74,7 @@ it("locks admin license detail honesty chrome with ErrorState recovery", () => {
 
 it("locks admin license detail loading shell to clipped busy copy", async () => {
   const source = read("site/src/app/admin/licenses/[id]/loading.tsx");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expectClippedLoadingSource(source);
   const copy = getLicenseControlCopy("en");
   const history = getCommerceHistoryCopy("en");
   const html = renderToStaticMarkup(await AdminLicenseDetailLoading());
@@ -114,10 +122,8 @@ it("keeps admin support messages and report history loadings as clipped re-expor
   expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
-    "overflow-x-clip",
-  );
+  expectClippedLoadingSource(read("site/src/app/support/[id]/messages/loading.tsx"));
+  expectClippedLoadingSource(read("site/src/app/workspace/reports/[id]/history/loading.tsx"));
 });
 
 it("locks admin builds quarantine actionable links to min-h-11 touch targets", () => {

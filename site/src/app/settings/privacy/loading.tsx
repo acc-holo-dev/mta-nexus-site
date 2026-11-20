@@ -1,8 +1,7 @@
-import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
-import { LocaleCopyRouteLoading } from "../../../features/shell/route-honest-loading-server";
+import { ProfilePrivacyRouteLoading } from "../../../features/accounts/profile-privacy-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return ProfilePrivacyRouteLoading({
     headingId: "privacy-loading-heading",
     className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
     rows: 0,
@@ -13,12 +12,6 @@ export default async function Loading() {
         <div className="h-24 rounded bg-inset" />
       </>
     ),
-    load: (locale) => {
-      const copy = profilePrivacyCopy(locale);
-      return {
-        title: copy.title,
-        loading: copy.loading,
-      };
-    },
+    titleKey: "title",
   });
 }

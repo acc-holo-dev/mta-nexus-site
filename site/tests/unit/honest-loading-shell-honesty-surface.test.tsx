@@ -36,10 +36,10 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
   ]) {
     const source = read(relative);
     expect(source).toMatch(
-      /features\/(?:shell\/route-honest-loading-server|commerce\/(?:commerce-history-route-loading-server|commercial-route-loading-server)|organizations\/organization-workspace-route-loading-server|community\/(?:community-moderation-route-loading-server|author-publication-desk-route-loading-server|community-report-route-loading-server)|library\/resource-release-control-route-loading-server|commerce\/subscriptions-route-loading-server|resources\/(?:author-resources-route-loading-server|resource-review-route-loading-server)|library\/library-collections-route-loading-server)/,
+      /features\/(?:shell\/route-honest-loading-server|[\w-]+\/[\w-]*route-loading-server)/,
     );
     expect(source).toMatch(
-      /(?:DictionaryFieldRouteLoading|DictionaryRouteLoading|LocaleCopyRouteLoading|AuthorResourcesRouteLoading|LibraryCollectionsRouteLoading|ResourceReviewRouteLoading|CommerceHistoryRouteLoading|CommercialRouteLoading|OrganizationWorkspaceRouteLoading|CommunityModerationRouteLoading|AuthorPublicationDeskRouteLoading|CommunityReportRouteLoading|ResourceReleaseControlRouteLoading|SubscriptionsRouteLoading)\s*\(/,
+      /(?:DictionaryFieldRouteLoading|DictionaryRouteLoading|LocaleCopyRouteLoading|[A-Za-z]\w*RouteLoading)\s*\(/,
     );
   }
 

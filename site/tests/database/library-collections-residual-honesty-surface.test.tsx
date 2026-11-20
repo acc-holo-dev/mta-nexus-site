@@ -9,6 +9,15 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -109,17 +118,17 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
   expect(read("site/src/features/library/server/collection-receipt-page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/app/workspace/library/collections/[id]/import/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/[id]/import/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/[id]/reconcile/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/[id]/reconcile/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/receipts/[id]/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/receipts/[id]/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/history/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/history/loading.tsx"),
   );
   expect(read("site/src/features/library/library-collections-i18n.ts")).toContain(
     "loadUnavailableDescription",

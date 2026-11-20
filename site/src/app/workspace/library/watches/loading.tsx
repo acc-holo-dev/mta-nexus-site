@@ -1,18 +1,11 @@
-import { resourceReleaseWatchesCopy } from "../../../../features/resources/resource-release-watches-i18n";
-import { LocaleCopyRouteLoading } from "../../../../features/shell/route-honest-loading-server";
+import { ResourceReleaseWatchesRouteLoading } from "../../../../features/resources/resource-release-watches-route-loading-server";
 
 export default async function Loading() {
-  return LocaleCopyRouteLoading({
+  return ResourceReleaseWatchesRouteLoading({
     headingId: "release-watches-loading-heading",
     className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip",
     rowClassName: "h-24 rounded bg-inset",
     leading: <div className="h-28 rounded bg-inset" />,
-    load: (locale) => {
-      const copy = resourceReleaseWatchesCopy(locale);
-      return {
-        title: copy.title,
-        loading: copy.loading,
-      };
-    },
+    titleKey: "title",
   });
 }
