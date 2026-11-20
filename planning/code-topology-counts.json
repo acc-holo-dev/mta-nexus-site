@@ -10,27 +10,27 @@
   },
   "features": {
     "accounts": {
-      "bytes": 199364,
-      "files": 65
+      "bytes": 219233,
+      "files": 75
     },
     "commerce": {
-      "bytes": 518684,
+      "bytes": 525420,
       "files": 129
     },
     "community": {
-      "bytes": 612911,
+      "bytes": 614576,
       "files": 132
     },
     "discovery": {
-      "bytes": 40804,
+      "bytes": 41375,
       "files": 12
     },
     "library": {
-      "bytes": 499576,
+      "bytes": 504564,
       "files": 106
     },
     "moderation": {
-      "bytes": 210939,
+      "bytes": 212981,
       "files": 48
     },
     "notifications": {
@@ -38,15 +38,15 @@
       "files": 25
     },
     "organizations": {
-      "bytes": 191453,
+      "bytes": 192532,
       "files": 51
     },
     "resources": {
-      "bytes": 871063,
+      "bytes": 878721,
       "files": 205
     },
     "servers": {
-      "bytes": 362339,
+      "bytes": 364635,
       "files": 97
     },
     "shell": {
@@ -96,7 +96,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "4fdd59e9f19cb9263ce2ed59d91b124e7c2b2554",
+  "source_sha": "c8adcb12e6648fc7a381f3de95f329fe895032e6",
   "tests": {
     "site_tests_files": 1681
   }
