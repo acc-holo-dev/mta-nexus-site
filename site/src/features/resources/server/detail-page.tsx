@@ -24,6 +24,7 @@ import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -46,7 +47,6 @@ import { safeResourceImageUrl } from "../resource-image-url";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
-import { linkAccentSmRounded } from "../../shell/link-shell";
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;

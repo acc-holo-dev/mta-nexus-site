@@ -6,8 +6,8 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { confirmAction } from "../../shell/confirm-action";
-import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { linkAccentTight } from "../../shell/link-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,

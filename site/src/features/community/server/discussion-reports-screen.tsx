@@ -254,3 +254,14 @@ export async function DiscussionReportsScreen({
     </div>
   );
 }
+
+export async function AdminDiscussionReportsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; commentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, commentId } = await params;
+  return DiscussionReportsScreen({ id, commentId, searchParams });
+}

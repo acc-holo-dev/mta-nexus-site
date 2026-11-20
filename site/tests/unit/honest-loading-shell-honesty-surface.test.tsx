@@ -39,7 +39,7 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
       /features\/(?:shell\/route-honest-loading-server|[\w-]+\/[\w-]*route-loading-server)/,
     );
     expect(source).toMatch(
-      /(?:DictionaryFieldRouteLoading|DictionaryRouteLoading|LocaleCopyRouteLoading|[A-Za-z]\w*RouteLoading)\s*\(/,
+      /(?:DictionaryFieldRouteLoading|DictionaryRouteLoading|LocaleCopyRouteLoading|[A-Za-z]\w*RouteLoading)\s*(?:\(|as default)/,
     );
   }
 

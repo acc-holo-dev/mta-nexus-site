@@ -7,12 +7,11 @@ import { useRef, useState } from "react";
 import { adminActionClientError } from "../../moderation/admin-action-client-error";
 import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { buildModerationUiState } from "../build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
-
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function BuildModerationControls({
   buildId,
   scanStatus,

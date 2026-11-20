@@ -1,5 +1,1 @@
-import { ReviewReportsRouteLoading } from "../../../features/resources/resource-review-route-loading-server";
-
-export default async function Loading() {
-  return ReviewReportsRouteLoading();
-}
+export { ReviewReportsRouteLoading as default } from "../../../features/resources/resource-review-route-loading-server";

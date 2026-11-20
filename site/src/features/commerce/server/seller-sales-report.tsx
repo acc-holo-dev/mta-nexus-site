@@ -3,13 +3,13 @@ import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
 
-import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({
   report,

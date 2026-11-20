@@ -163,3 +163,35 @@ export async function CommunityReportScreen({
     </div>
   );
 }
+
+export function WorkspaceCommunityReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportScreen({ searchParams });
+}
+
+export function StaffCommunityReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportScreen({ staff: true, searchParams });
+}
+
+export async function WorkspaceCommunityReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return CommunityReportScreen({ id: (await params).id });
+}
+
+export async function StaffCommunityReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return CommunityReportScreen({ staff: true, id: (await params).id });
+}

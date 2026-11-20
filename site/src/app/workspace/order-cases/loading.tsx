@@ -1,5 +1,1 @@
-import { OrderCasesRouteLoading } from "../../../features/commerce/order-case-route-loading-server";
-
-export default async function Loading() {
-  return OrderCasesRouteLoading();
-}
+export { OrderCasesRouteLoading as default } from "../../../features/commerce/order-case-route-loading-server";

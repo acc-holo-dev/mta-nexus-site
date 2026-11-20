@@ -1,5 +1,1 @@
-import { ServerStatisticsLoading } from "../../../../features/servers/statistics-server";
-
-export default async function Loading() {
-  return await ServerStatisticsLoading();
-}
+export { ServerStatisticsLoading as default } from "../../../../features/servers/statistics-server";

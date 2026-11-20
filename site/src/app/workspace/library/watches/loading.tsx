@@ -1,5 +1,1 @@
-import { ReleaseWatchesRouteLoading } from "../../../../features/resources/resource-release-watches-route-loading-server";
-
-export default async function Loading() {
-  return ReleaseWatchesRouteLoading();
-}
+export { ReleaseWatchesRouteLoading as default } from "../../../../features/resources/resource-release-watches-route-loading-server";

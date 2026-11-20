@@ -1,5 +1,1 @@
-import { PurchaseOperationsRouteLoading } from "../../../../../features/commerce/commercial-route-loading-server";
-
-export default async function Loading() {
-  return PurchaseOperationsRouteLoading();
-}
+export { PurchaseOperationsRouteLoading as default } from "../../../../../features/commerce/commercial-route-loading-server";

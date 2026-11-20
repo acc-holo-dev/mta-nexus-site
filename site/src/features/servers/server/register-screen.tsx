@@ -5,12 +5,11 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax2xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getManagedServerCopy } from "../managed-server-view";
 import { RegisterServerForm } from "../registration";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function registerServerMetadata(): Promise<Metadata> {
   const copy = getDictionary(await getRequestLocale()).serverRegistration;
   return {

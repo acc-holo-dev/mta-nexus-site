@@ -1,5 +1,1 @@
-import { AcquisitionReceiptDetailRouteLoading } from "../../../../../features/resources/resource-cart-receipts-route-loading-server";
-
-export default async function Loading() {
-  return AcquisitionReceiptDetailRouteLoading();
-}
+export { AcquisitionReceiptDetailRouteLoading as default } from "../../../../../features/resources/resource-cart-receipts-route-loading-server";

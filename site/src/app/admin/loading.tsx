@@ -1,5 +1,1 @@
-import { AdminHomeRouteLoading } from "../../features/moderation/admin-home-route-loading-server";
-
-export default async function Loading() {
-  return AdminHomeRouteLoading();
-}
+export { AdminHomeRouteLoading as default } from "../../features/moderation/admin-home-route-loading-server";

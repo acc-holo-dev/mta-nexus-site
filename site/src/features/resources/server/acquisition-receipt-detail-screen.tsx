@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCartReceiptsService } from "../../../lib/services/commerce/resource-cart-receipts-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -17,8 +18,6 @@ import { ResourceCartReviewEvidence } from "../cart-view";
 import { ResourceDownloadButton } from "../download";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../resource-cart-receipts-query";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function acquisitionReceiptDetailMetadata(): Promise<Metadata> {
   return {
     title: `${resourceCartReceiptsCopy(await getRequestLocale()).receipt} | MTA NEXUS`,

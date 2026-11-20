@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -23,8 +24,6 @@ import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).orderDetailsTitle} | MTA NEXUS`,

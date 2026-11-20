@@ -1,6 +1,6 @@
 import "server-only";
 
 export {
-  DiscussionReportsScreen,
+  AdminDiscussionReportsPage,
   discussionReportsMetadata,
 } from "./server/discussion-reports-screen";

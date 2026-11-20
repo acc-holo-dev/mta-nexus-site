@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -24,8 +25,6 @@ import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export function OrganizationTeamDirectory({
   initial,
   filters,

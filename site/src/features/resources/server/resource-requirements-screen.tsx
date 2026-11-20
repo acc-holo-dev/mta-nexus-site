@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -16,7 +17,6 @@ import { ResourceRequirementsReportBody } from "../components/resource-requireme
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../resource-requirements-query";
 
-import { linkAccent } from "../../shell/link-shell";
 function requirementsAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -176,4 +176,37 @@ export async function ResourceRequirementsScreen({
       />
     </div>
   );
+}
+
+export async function PublisherResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "publisher", raw });
+}
+
+export async function ModeratorResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "moderator", raw });
+}
+
+export async function LibraryResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "library", raw });
 }

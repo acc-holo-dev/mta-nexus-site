@@ -8,14 +8,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCompatibilityForm } from "../compatibility-controls";
 import { ProductDependencyList } from "../detail-view";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function resourceCompatibilityMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceManagementCopy(await getRequestLocale()).compatibility} | MTA NEXUS`,

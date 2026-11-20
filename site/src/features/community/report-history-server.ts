@@ -1,6 +1,7 @@
 import "server-only";
 
 export {
-  CommunityReportHistoryPage,
   reportHistoryMetadata,
+  StaffCommunityReportHistoryPage,
+  WorkspaceCommunityReportHistoryPage,
 } from "./server/community-report-history-page";

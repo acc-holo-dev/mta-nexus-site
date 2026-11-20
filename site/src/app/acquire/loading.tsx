@@ -1,5 +1,1 @@
-import { AcquireRouteLoading } from "../../features/commerce/acquire-route-loading-server";
-
-export default async function Loading() {
-  return AcquireRouteLoading();
-}
+export { AcquireRouteLoading as default } from "../../features/commerce/acquire-route-loading-server";

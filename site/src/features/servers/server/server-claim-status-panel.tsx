@@ -2,12 +2,11 @@ import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
-
-import { linkAccentSmSemibold } from "../../shell/link-shell";
 export function ServerClaimStatusPanel({
   serverId,
   serverName,

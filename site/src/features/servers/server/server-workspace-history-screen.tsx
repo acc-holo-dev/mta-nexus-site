@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverWorkspaceHistoryService } from "../../../lib/services/servers/server-workspace-history-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -20,8 +21,6 @@ import {
   serverWorkspaceHistorySchema,
 } from "../server-workspace-contract";
 import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function serverWorkspaceHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getServerActivityCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -29,7 +28,7 @@ export async function serverWorkspaceHistoryMetadata(): Promise<Metadata> {
   };
 }
 
-export async function ServerWorkspaceHistoryScreen({
+async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,
 }: {
@@ -243,4 +242,14 @@ export async function ServerWorkspaceHistoryScreen({
       )}
     </div>
   );
+}
+
+export async function ManagedServerActivityRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams });
 }

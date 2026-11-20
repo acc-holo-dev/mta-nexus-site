@@ -10,11 +10,11 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCopyService } from "../../../lib/services/resources/resource-copy-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCopyMetadataView } from "../copy-view";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
-import { linkAccentRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,

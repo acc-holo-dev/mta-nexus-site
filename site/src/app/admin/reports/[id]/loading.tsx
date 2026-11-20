@@ -1,5 +1,1 @@
-import { AdminReportDetailRouteLoading } from "../../../../features/community/community-report-route-loading-server";
-
-export default async function Loading() {
-  return AdminReportDetailRouteLoading();
-}
+export { AdminReportDetailRouteLoading as default } from "../../../../features/community/community-report-route-loading-server";

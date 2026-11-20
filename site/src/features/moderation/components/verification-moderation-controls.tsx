@@ -8,8 +8,8 @@ import { z } from "zod";
 import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
-import { useNexusLocale } from "../../shell/locale";
 import { linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
 import {
   verificationCopy,
   verificationDecisionError,

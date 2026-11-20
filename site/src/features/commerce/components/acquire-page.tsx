@@ -11,6 +11,7 @@ import { confirmedResourceClaim } from "../../resources/resource-commerce-confir
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import {
   pageShellMax2xlDensePy12,
@@ -20,7 +21,6 @@ import {
 } from "../../shell/page-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
-import { linkGhostAccentSm } from "../../shell/link-shell";
 interface ProductInfo {
   id: string;
   slug: string;

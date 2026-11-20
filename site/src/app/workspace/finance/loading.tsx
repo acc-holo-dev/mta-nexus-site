@@ -1,5 +1,1 @@
-import { FinanceRouteLoading } from "../../../features/commerce/financial-route-loading-server";
-
-export default async function Loading() {
-  return FinanceRouteLoading();
-}
+export { FinanceRouteLoading as default } from "../../../features/commerce/financial-route-loading-server";

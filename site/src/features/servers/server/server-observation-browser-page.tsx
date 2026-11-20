@@ -14,6 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
 import { panelFlexWrapEndP4, panelSpace3P5 } from "../../shell/panel-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
@@ -31,8 +32,6 @@ import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function serverObservationBrowserMetadata() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return {
@@ -395,5 +394,33 @@ export async function ServerObservationBrowserLoading() {
         loading: copy.loading,
       };
     },
+  });
+}
+
+export async function PublicServerObservationsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerObservationBrowserPage({
+    target: { slug: (await params).slug },
+    managed: false,
+    searchParams: await searchParams,
+  });
+}
+
+export async function ManagedServerObservationsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerObservationBrowserPage({
+    target: { id: (await params).id },
+    managed: true,
+    searchParams: await searchParams,
   });
 }

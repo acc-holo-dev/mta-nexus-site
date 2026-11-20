@@ -7,13 +7,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { FollowWorkspace } from "../follow";
 import { FOLLOW_TYPES, type FollowTargetType } from "../follow-workspace-contract";
 import { followCopy } from "../follow-workspace-copy";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function savedFollowsMetadata(): Promise<Metadata> {
   const copy = followCopy(await getRequestLocale());
   return {

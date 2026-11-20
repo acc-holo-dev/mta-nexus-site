@@ -1,5 +1,1 @@
-import { ResourceMediaRouteLoading } from "../../../../../features/resources/author-resources-route-loading-server";
-
-export default async function Loading() {
-  return ResourceMediaRouteLoading();
-}
+export { ResourceMediaRouteLoading as default } from "../../../../../features/resources/author-resources-route-loading-server";

@@ -10,12 +10,11 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { storageMaintenanceService } from "../../../lib/services/moderation/storage-maintenance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { StorageCleanupControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function staffStorageObjectMetadata(): Promise<Metadata> {
   return {
     title: `${storageMaintenanceCopy(await getRequestLocale()).detail} | MTA NEXUS`,

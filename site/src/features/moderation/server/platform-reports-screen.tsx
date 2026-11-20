@@ -216,3 +216,19 @@ export async function PlatformReportsScreen({
     </div>
   );
 }
+
+export function WorkspacePlatformReportsListPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PlatformReportsScreen({ searchParams });
+}
+
+export async function WorkspacePlatformReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return PlatformReportsScreen({ id: (await params).id });
+}

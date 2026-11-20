@@ -1,6 +1,7 @@
 import "server-only";
 
 export {
-  ServerContentEditorPage,
+  ServerContentEditRoutePage,
+  ServerContentNewRoutePage,
   serverContentEditorMetadata,
 } from "./server/server-content-editor-page";

@@ -8,13 +8,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LicenseControlPanel } from "../components/license-control-panel";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseDetailView } from "./license-detail-view";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function licenseDetailPageMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseControlCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -22,7 +21,7 @@ export async function licenseDetailPageMetadata(): Promise<Metadata> {
   };
 }
 
-export async function LicenseDetailPageScreen({ licenseId }: { licenseId: string }) {
+async function LicenseDetailPageScreen({ licenseId }: { licenseId: string }) {
   const [store, locale] = await Promise.all([cookies(), getRequestLocale()]);
   const copy = getLicenseControlCopy(locale);
   const dictionary = getDictionary(locale);
@@ -105,4 +104,8 @@ export async function LicenseDetailPageScreen({ licenseId }: { licenseId: string
       </Link>
     </div>
   );
+}
+
+export async function WorkspaceLicenseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return LicenseDetailPageScreen({ licenseId: (await params).id });
 }

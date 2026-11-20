@@ -1,14 +1,6 @@
-import {
-  CommunityReportGroupsPage,
-  reportGroupsMetadata,
-} from "../../../../features/community/report-groups-server";
-
 export const dynamic = "force-dynamic";
-export const generateMetadata = reportGroupsMetadata;
-export default function Page({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  return <CommunityReportGroupsPage searchParams={searchParams} />;
-}
+
+export {
+  CommunityReportGroupsPage as default,
+  reportGroupsMetadata as generateMetadata,
+} from "../../../../features/community/report-groups-server";

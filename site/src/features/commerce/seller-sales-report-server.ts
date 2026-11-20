@@ -1,6 +1,6 @@
 import "server-only";
 
 export {
-  SellerSalesReportScreen,
   sellerSalesReportMetadata,
+  WorkspaceSellerSalesReportPage,
 } from "./server/seller-sales-report-screen";

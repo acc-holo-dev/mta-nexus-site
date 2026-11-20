@@ -1,6 +1,6 @@
 import "server-only";
 
 export {
-  LicenseDetailPageScreen,
   licenseDetailPageMetadata,
+  WorkspaceLicenseDetailPage,
 } from "./server/license-detail-page-screen";

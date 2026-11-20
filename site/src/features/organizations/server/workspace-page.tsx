@@ -6,6 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -15,8 +16,6 @@ import {
 import { getOrganizationCopy, organizationError } from "../organization-workspace-copy";
 import { OrganizationWorkspacePanel } from "../workspace";
 import { organizationReturnPath } from "./organization-return-path";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function organizationMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,

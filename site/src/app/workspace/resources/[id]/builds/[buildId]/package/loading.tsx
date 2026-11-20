@@ -1,5 +1,1 @@
-import { ResourceBuildPackageRouteLoading } from "../../../../../../../features/resources/author-resources-route-loading-server";
-
-export default async function Loading() {
-  return ResourceBuildPackageRouteLoading();
-}
+export { ResourceBuildPackageRouteLoading as default } from "../../../../../../../features/resources/author-resources-route-loading-server";

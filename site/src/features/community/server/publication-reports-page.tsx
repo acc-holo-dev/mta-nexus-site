@@ -185,3 +185,13 @@ export async function PublicationReportsPage({
     );
   }
 }
+
+export async function AdminPublicationReportsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PublicationReportsPage({ id: (await params).id, searchParams });
+}

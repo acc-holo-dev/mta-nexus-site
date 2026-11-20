@@ -9,10 +9,9 @@ import { commerceService } from "../../../lib/services/commerce/commerce-service
 import { ResourceCartControls } from "../../resources/cart-controls";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function cartWorkspaceMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceCommerceCopy(await getRequestLocale()).cart} | MTA NEXUS`,

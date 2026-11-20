@@ -1,5 +1,1 @@
-import { DeveloperSettingsRouteLoading } from "../../../features/accounts/settings-route-loading-server";
-
-export default async function Loading() {
-  return DeveloperSettingsRouteLoading();
-}
+export { DeveloperSettingsRouteLoading as default } from "../../../features/accounts/settings-route-loading-server";

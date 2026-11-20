@@ -6,13 +6,13 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
 } from "../../trust/verification-applications-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
-import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,

@@ -1,6 +1,8 @@
 import "server-only";
 
 export {
-  ResourceRequirementsScreen,
+  LibraryResourceRequirementsPage,
+  ModeratorResourceRequirementsPage,
+  PublisherResourceRequirementsPage,
   resourceRequirementsMetadata,
 } from "./server/resource-requirements-screen";

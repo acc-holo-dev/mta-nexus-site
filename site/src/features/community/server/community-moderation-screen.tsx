@@ -20,6 +20,7 @@ import {
   parseModerationQuery,
 } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentTightSm } from "../../shell/link-shell";
 import {
   pageShellMax4xlTight,
   pageShellMaxMdDense,
@@ -38,8 +39,6 @@ import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
-
-import { linkAccentSm, linkAccentTightSm } from "../../shell/link-shell";
 export async function communityModerationMetadata(): Promise<Metadata> {
   return {
     title: moderationCopy(await getRequestLocale()).title,
@@ -391,4 +390,22 @@ export async function CommunityModerationScreen({
       {error ? failure(error, filters ? moderationHref(filters) : "/admin/community") : null}
     </div>
   );
+}
+
+export function AdminCommunityModerationListPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityModerationScreen({ searchParams });
+}
+
+export async function AdminCommunityModerationDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityModerationScreen({ id: (await params).id, searchParams });
 }

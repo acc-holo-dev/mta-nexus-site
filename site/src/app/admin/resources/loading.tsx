@@ -1,5 +1,1 @@
-import { AdminResourcesRouteLoading } from "../../../features/library/resource-release-control-route-loading-server";
-
-export default async function Loading() {
-  return AdminResourcesRouteLoading();
-}
+export { AdminResourcesRouteLoading as default } from "../../../features/library/resource-release-control-route-loading-server";

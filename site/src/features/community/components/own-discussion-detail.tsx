@@ -3,12 +3,11 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P6 } from "../../shell/panel-shell";
 import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export function OwnDiscussionDetail({
   initial,
   locale,

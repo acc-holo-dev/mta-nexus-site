@@ -11,12 +11,11 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
-
-import { linkAccent } from "../../shell/link-shell";
 export async function publicResourceReviewsMetadata(): Promise<Metadata> {
   return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
 }

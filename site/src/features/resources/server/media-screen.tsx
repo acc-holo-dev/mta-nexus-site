@@ -9,13 +9,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceMediaService } from "../../../lib/services/resources/resource-media-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourceMediaEditor } from "../components/resource-media-editor";
 import { resourceMediaCopy } from "../resource-media-i18n";
 
-import { linkAccent } from "../../shell/link-shell";
 function mediaAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -129,4 +129,12 @@ export async function ResourceMediaScreen({
       )}
     </div>
   );
+}
+
+export async function WorkspaceResourceMediaPage({ params }: { params: Promise<{ id: string }> }) {
+  return ResourceMediaScreen({ productId: (await params).id });
+}
+
+export async function StaffResourceMediaPage({ params }: { params: Promise<{ id: string }> }) {
+  return ResourceMediaScreen({ productId: (await params).id, staff: true });
 }

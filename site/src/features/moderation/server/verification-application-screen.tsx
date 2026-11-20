@@ -8,12 +8,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationApplicationAmend } from "../verification-amend";
-import { linkAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,

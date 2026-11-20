@@ -16,6 +16,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -26,8 +27,6 @@ import { AuthorPublicationRestore } from "../author-publication-restore";
 import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";
 import { serverPublicationHistorySchema } from "../server-publication-history-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,

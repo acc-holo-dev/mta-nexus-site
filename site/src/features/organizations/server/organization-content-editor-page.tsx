@@ -10,6 +10,7 @@ import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { organizationContentId } from "../organization-content-api";
@@ -19,8 +20,6 @@ import {
 } from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function organizationContentEditorMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -112,4 +111,20 @@ export async function OrganizationContentEditorPage({
       )}
     </div>
   );
+}
+
+export async function OrganizationContentNewRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return OrganizationContentEditorPage(await params);
+}
+
+export async function OrganizationContentEditRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+}) {
+  return OrganizationContentEditorPage(await params);
 }

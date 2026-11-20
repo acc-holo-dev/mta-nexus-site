@@ -1,5 +1,1 @@
-import { LibraryDownloadRouteLoading } from "../../../../../features/shell/workspace-hub-route-loading-server";
-
-export default async function Loading() {
-  return LibraryDownloadRouteLoading();
-}
+export { LibraryDownloadRouteLoading as default } from "../../../../../features/shell/workspace-hub-route-loading-server";

@@ -1,5 +1,1 @@
-import { CollectionAddRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
-
-export default async function Loading() {
-  return CollectionAddRouteLoading();
-}
+export { CollectionAddRouteLoading as default } from "../../../../../../features/library/library-collections-route-loading-server";

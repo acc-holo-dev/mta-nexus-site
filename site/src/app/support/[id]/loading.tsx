@@ -1,5 +1,1 @@
-import { SupportCaseRouteLoading } from "../../../features/support/support-workspace-route-loading-server";
-
-export default async function Loading() {
-  return SupportCaseRouteLoading();
-}
+export { SupportCaseRouteLoading as default } from "../../../features/support/support-workspace-route-loading-server";

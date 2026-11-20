@@ -1,5 +1,1 @@
-import { PurchaseDetailRouteLoading } from "../../../../features/commerce/commerce-history-route-loading-server";
-
-export default async function Loading() {
-  return PurchaseDetailRouteLoading();
-}
+export { PurchaseDetailRouteLoading as default } from "../../../../features/commerce/commerce-history-route-loading-server";

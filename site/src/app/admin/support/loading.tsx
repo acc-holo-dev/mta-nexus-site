@@ -1,5 +1,1 @@
-import { AdminSupportRouteLoading } from "../../../features/support/support-workspace-route-loading-server";
-
-export default async function Loading() {
-  return AdminSupportRouteLoading();
-}
+export { AdminSupportRouteLoading as default } from "../../../features/support/support-workspace-route-loading-server";

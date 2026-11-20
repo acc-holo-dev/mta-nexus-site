@@ -1,10 +1,9 @@
 import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export function LicenseArchiveFilters({
   query,
   page,

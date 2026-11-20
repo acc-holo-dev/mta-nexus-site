@@ -1,5 +1,1 @@
-import { WorkspaceHubRouteLoading } from "../../features/shell/workspace-hub-route-loading-server";
-
-export default async function Loading() {
-  return WorkspaceHubRouteLoading();
-}
+export { WorkspaceHubRouteLoading as default } from "../../features/shell/workspace-hub-route-loading-server";

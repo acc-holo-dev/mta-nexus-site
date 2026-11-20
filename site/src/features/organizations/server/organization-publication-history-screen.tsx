@@ -25,3 +25,14 @@ export function OrganizationPublicationHistoryScreen(props: {
       organizationContentService.history(props.id, actor, props.contentId, filters),
   });
 }
+
+export async function OrganizationPublicationHistoryRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const scope = await params;
+  return OrganizationPublicationHistoryScreen({ ...scope, searchParams });
+}

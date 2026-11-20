@@ -1,5 +1,1 @@
-import { CollectionReconcileRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
-
-export default async function Loading() {
-  return CollectionReconcileRouteLoading();
-}
+export { CollectionReconcileRouteLoading as default } from "../../../../../../features/library/library-collections-route-loading-server";

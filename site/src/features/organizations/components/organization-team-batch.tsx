@@ -14,6 +14,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
@@ -23,7 +24,6 @@ import { organizationBatchCopy } from "../organization-batch-copy";
 import type { OrganizationTeamPage } from "../organization-team-contract";
 import { organizationRequest } from "../organization-workspace-client";
 import { getOrganizationCopy } from "../organization-workspace-copy";
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationTeamBatch({
   data,
   actorId,

@@ -1,5 +1,1 @@
-import { SubscriptionReviewNewRouteLoading } from "../../../../../features/commerce/plan-reviews-route-loading-server";
-
-export default async function Loading() {
-  return SubscriptionReviewNewRouteLoading();
-}
+export { SubscriptionReviewNewRouteLoading as default } from "../../../../../features/commerce/plan-reviews-route-loading-server";

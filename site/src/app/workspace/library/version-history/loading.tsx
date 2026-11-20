@@ -1,5 +1,1 @@
-import { LibraryVersionHistoryRouteLoading } from "../../../../features/library/library-release-history-route-loading-server";
-
-export default async function Loading() {
-  return LibraryVersionHistoryRouteLoading();
-}
+export { LibraryVersionHistoryRouteLoading as default } from "../../../../features/library/library-release-history-route-loading-server";

@@ -10,13 +10,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { resourceManagementService } from "../../../lib/services/resources/resource-management-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 import { ResourceVariantsForm } from "../variant-controls";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function resourceVariantsMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceManagementCopy(await getRequestLocale()).variants} | MTA NEXUS`,

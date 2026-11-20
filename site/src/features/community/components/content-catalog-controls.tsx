@@ -3,6 +3,7 @@
 import { Button, FilterBar, fieldClass, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   contentPageHref,
   type parseContentPage,
@@ -10,7 +11,6 @@ import {
 } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-import { linkAccentSm } from "../../shell/link-shell";
 type Filters = ReturnType<typeof parseContentPage>;
 
 export function ContentCatalogControls({

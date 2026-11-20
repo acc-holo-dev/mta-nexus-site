@@ -1,5 +1,1 @@
-import { AuthForgotRouteLoading } from "../../../features/accounts/auth-route-loading-server";
-
-export default async function Loading() {
-  return AuthForgotRouteLoading();
-}
+export { AuthForgotRouteLoading as default } from "../../../features/accounts/auth-route-loading-server";

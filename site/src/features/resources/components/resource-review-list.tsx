@@ -3,11 +3,10 @@ import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { unknownMarker } from "../../../lib/i18n/unknown";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
-
-import { linkAccent } from "../../shell/link-shell";
 export function ResourceReviewList({
   reviews,
   productId,

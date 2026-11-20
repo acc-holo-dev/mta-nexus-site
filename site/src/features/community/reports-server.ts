@@ -1,7 +1,10 @@
 import "server-only";
 
 export {
-  CommunityReportScreen,
   communityReportListMetadata,
   communityReportMetadata,
+  StaffCommunityReportDetailPage,
+  StaffCommunityReportsPage,
+  WorkspaceCommunityReportDetailPage,
+  WorkspaceCommunityReportsPage,
 } from "./server/community-report-screen";

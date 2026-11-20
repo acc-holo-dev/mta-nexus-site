@@ -2,10 +2,9 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { fetchServerStatisticsCsv } from "../server-statistics-download";
-
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ServerStatisticsExportButton({
   url,
   label,

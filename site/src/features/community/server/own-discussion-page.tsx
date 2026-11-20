@@ -8,12 +8,11 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function ownCommentMetadata() {
   return {
     title: ownDiscussionCopy(await getRequestLocale()).open,

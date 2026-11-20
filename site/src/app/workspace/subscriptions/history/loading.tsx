@@ -1,5 +1,1 @@
-import { SubscriptionsHistoryRouteLoading } from "../../../../features/commerce/subscriptions-route-loading-server";
-
-export default async function Loading() {
-  return SubscriptionsHistoryRouteLoading();
-}
+export { SubscriptionsHistoryRouteLoading as default } from "../../../../features/commerce/subscriptions-route-loading-server";

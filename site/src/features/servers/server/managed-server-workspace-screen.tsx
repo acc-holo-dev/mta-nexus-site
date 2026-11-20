@@ -9,14 +9,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { serverService } from "../../../lib/services/servers/server-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ServerClaimStatusPanel } from "../claim-status-server";
 import { ServerDetailsForm } from "../details-controls";
 import { getManagedServerCopy } from "../managed-server-view";
 import { serverWorkspaceCopy } from "../server-workspace-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function serverManagementMetadata(): Promise<Metadata> {
   return {
     title: `${serverWorkspaceCopy(await getRequestLocale()).managementDocumentTitle} | MTA NEXUS`,

@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationMemberEditor({
   member,
   locale,

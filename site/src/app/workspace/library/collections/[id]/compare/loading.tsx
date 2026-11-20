@@ -1,5 +1,1 @@
-import { CollectionCompareRouteLoading } from "../../../../../../features/library/library-collection-comparison-route-loading-server";
-
-export default async function Loading() {
-  return CollectionCompareRouteLoading();
-}
+export { CollectionCompareRouteLoading as default } from "../../../../../../features/library/library-collection-comparison-route-loading-server";

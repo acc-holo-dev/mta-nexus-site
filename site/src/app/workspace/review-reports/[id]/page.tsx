@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
 export {
-  WorkspaceResourceReviewReportDetailPage as default,
   resourceReviewReportMetadata as generateMetadata,
+  WorkspaceResourceReviewReportDetailPage as default,
 } from "../../../../features/resources/review-report-server";

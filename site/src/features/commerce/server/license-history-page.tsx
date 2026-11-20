@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4TextSm } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -17,7 +18,6 @@ import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
 
-import { linkAccentSmRounded } from "../../shell/link-shell";
 function licenseHistoryAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -172,4 +172,26 @@ export async function LicenseHistoryPage({
       )}
     </div>
   );
+}
+
+export async function WorkspaceLicenseHistoryRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  return LicenseHistoryPage({ licenseId: id, query });
+}
+
+export async function StaffLicenseHistoryRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  return LicenseHistoryPage({ licenseId: id, query, moderation: true });
 }

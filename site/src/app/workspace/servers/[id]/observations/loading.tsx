@@ -1,5 +1,1 @@
-import { ServerObservationBrowserLoading } from "../../../../../features/servers/observations-server";
-
-export default async function Loading() {
-  return await ServerObservationBrowserLoading();
-}
+export { ServerObservationBrowserLoading as default } from "../../../../../features/servers/observations-server";

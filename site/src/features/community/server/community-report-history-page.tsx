@@ -89,3 +89,23 @@ export async function CommunityReportHistoryPage({
     );
   }
 }
+
+export async function WorkspaceCommunityReportHistoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportHistoryPage({ id: (await params).id, searchParams });
+}
+
+export async function StaffCommunityReportHistoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportHistoryPage({ id: (await params).id, searchParams, staff: true });
+}

@@ -1,5 +1,1 @@
-import { SettingsHistoryRouteLoading } from "../../../features/accounts/private-change-history-route-loading-server";
-
-export default async function Loading() {
-  return SettingsHistoryRouteLoading();
-}
+export { SettingsHistoryRouteLoading as default } from "../../../features/accounts/private-change-history-route-loading-server";

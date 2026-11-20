@@ -9,13 +9,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { sellerSalesCopy } from "../seller-sales-i18n";
 import { sellerSalesPageQuery } from "../seller-sales-query";
 import { SellerSalesReportView } from "./seller-sales-report";
 
-import { linkAccentSmRounded } from "../../shell/link-shell";
 type Query = Record<string, string | string[] | undefined>;
 
 export async function sellerSalesReportMetadata(): Promise<Metadata> {
@@ -25,7 +25,7 @@ export async function sellerSalesReportMetadata(): Promise<Metadata> {
   };
 }
 
-export async function SellerSalesReportScreen({ query }: { query: Query }) {
+async function SellerSalesReportScreen({ query }: { query: Query }) {
   const [store, locale] = await Promise.all([cookies(), getRequestLocale()]),
     c = sellerSalesCopy(locale);
   const dictionary = getDictionary(locale);
@@ -118,4 +118,12 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
       </div>
     );
   }
+}
+
+export async function WorkspaceSellerSalesReportPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SellerSalesReportScreen({ query: await searchParams });
 }

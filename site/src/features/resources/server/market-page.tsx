@@ -7,12 +7,12 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
 
-import { linkAccentSm } from "../../shell/link-shell";
 const CATEGORIES = [
   { id: "all", key: "all" },
   ...PRODUCT_TYPES.map((id) => ({ id, key: PRODUCT_CATEGORY_KEYS[id] })),

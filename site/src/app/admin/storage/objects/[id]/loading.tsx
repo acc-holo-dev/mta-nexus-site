@@ -1,5 +1,1 @@
-import { AdminStorageObjectRouteLoading } from "../../../../../features/moderation/storage-maintenance-route-loading-server";
-
-export default async function Loading() {
-  return AdminStorageObjectRouteLoading();
-}
+export { AdminStorageObjectRouteLoading as default } from "../../../../../features/moderation/storage-maintenance-route-loading-server";

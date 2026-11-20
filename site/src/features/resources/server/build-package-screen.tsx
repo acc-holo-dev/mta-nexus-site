@@ -9,12 +9,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { buildPackageService } from "../../../lib/services/resources/build-package-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
-import { linkAccent } from "../../shell/link-shell";
 function packageAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -275,4 +275,26 @@ export async function BuildPackageScreen({
       )}
     </div>
   );
+}
+
+export async function WorkspaceBuildPackagePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, buildId } = await params;
+  return BuildPackageScreen({ productId: id, buildId, searchParams });
+}
+
+export async function StaffBuildPackagePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, buildId } = await params;
+  return BuildPackageScreen({ productId: id, buildId, searchParams, staff: true });
 }

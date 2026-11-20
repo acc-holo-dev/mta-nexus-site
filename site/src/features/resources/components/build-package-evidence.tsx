@@ -6,10 +6,9 @@ import {
 import { ErrorState } from "@nexus/ui";
 import { getDictionary } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
+import { linkAccentTightSm } from "../../shell/link-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
-
-import { linkAccentTightSm } from "../../shell/link-shell";
 export function BuildPackageSummaryPanel({
   summary,
   locale,

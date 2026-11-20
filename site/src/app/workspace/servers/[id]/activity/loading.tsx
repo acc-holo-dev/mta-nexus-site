@@ -1,5 +1,1 @@
-import { ServersServerActivityRouteLoading } from "../../../../../features/servers/server-activity-route-loading-server";
-
-export default async function Loading() {
-  return ServersServerActivityRouteLoading();
-}
+export { ServersServerActivityRouteLoading as default } from "../../../../../features/servers/server-activity-route-loading-server";

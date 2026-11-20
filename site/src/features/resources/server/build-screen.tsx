@@ -11,6 +11,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceBuildWorkspaceService } from "../../../lib/services/resources/resource-build-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -24,7 +25,6 @@ import { resourceMediaCopy } from "../resource-media-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
-import { linkAccent } from "../../shell/link-shell";
 function buildAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";
@@ -264,4 +264,22 @@ export async function ResourceBuildScreen({
       </section>
     </div>
   );
+}
+
+export async function WorkspaceResourceBuildPage({
+  params,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+}) {
+  const { id, buildId } = await params;
+  return ResourceBuildScreen({ productId: id, buildId });
+}
+
+export async function StaffResourceBuildPage({
+  params,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+}) {
+  const { id, buildId } = await params;
+  return ResourceBuildScreen({ productId: id, buildId, staff: true });
 }

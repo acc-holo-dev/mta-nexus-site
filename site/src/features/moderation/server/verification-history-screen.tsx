@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -18,7 +19,6 @@ import {
 } from "../../trust/verification-applications-contract";
 import { VERIFICATION_TYPES } from "../../trust/verification-workspace-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
-import { linkAccentSm } from "../../shell/link-shell";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,

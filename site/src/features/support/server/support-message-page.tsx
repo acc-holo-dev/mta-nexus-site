@@ -97,3 +97,23 @@ export async function SupportMessagePage({
     );
   }
 }
+
+export async function MemberSupportMessagesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportMessagePage({ id: (await params).id, searchParams });
+}
+
+export async function AdminSupportMessagesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportMessagePage({ id: (await params).id, searchParams, staff: true });
+}

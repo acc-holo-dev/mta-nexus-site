@@ -1,5 +1,1 @@
-import { AuthVerifyRouteLoading } from "../../../features/accounts/auth-route-loading-server";
-
-export default async function Loading() {
-  return AuthVerifyRouteLoading();
-}
+export { AuthVerifyRouteLoading as default } from "../../../features/accounts/auth-route-loading-server";

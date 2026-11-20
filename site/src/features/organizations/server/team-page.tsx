@@ -7,6 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationTeamService } from "../../../lib/services/organizations/organization-team-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -18,8 +19,6 @@ import {
 import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../team";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function teamMetadata() {
   return {
     title: organizationTeamCopy(await getRequestLocale()).title,

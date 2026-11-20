@@ -1,5 +1,1 @@
-import { CommunityCatalogIndexRouteLoading } from "../../features/community/community-catalog-route-loading-server";
-
-export default async function Loading() {
-  return CommunityCatalogIndexRouteLoading();
-}
+export { CommunityCatalogIndexRouteLoading as default } from "../../features/community/community-catalog-route-loading-server";

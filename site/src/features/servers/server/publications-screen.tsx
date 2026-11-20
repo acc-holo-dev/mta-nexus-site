@@ -15,6 +15,7 @@ import {
 } from "../../community/user-platform-contract";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -22,8 +23,6 @@ import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 import { serverWorkspaceError } from "../server-workspace-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function serverPublicationsMetadata(): Promise<Metadata> {
   return {
     title: serverContentCopy(await getRequestLocale()).title,

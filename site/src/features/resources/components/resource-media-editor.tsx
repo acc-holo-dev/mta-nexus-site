@@ -7,11 +7,10 @@ import {
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
 import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
-
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ResourceMediaEditor({
   initial,
   locale,

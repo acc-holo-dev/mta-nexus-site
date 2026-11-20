@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
 import type { ServerStatisticsResult } from "../../../lib/services/servers/server-statistics-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
@@ -13,7 +14,6 @@ import { serverStatisticsIntervals } from "../server-statistics-export";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
 
-import { linkAccentSm } from "../../shell/link-shell";
 function StatisticsScrollArea({
   labelledBy,
   children,

@@ -9,12 +9,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../lib/services/commerce/order-terms-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { orderTermsPageQuery } from "../order-terms-query";
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function financialReconciliationTermsMetadata(): Promise<Metadata> {
   return {
     title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,

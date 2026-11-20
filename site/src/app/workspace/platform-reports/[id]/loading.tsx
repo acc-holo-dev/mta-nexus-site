@@ -1,5 +1,1 @@
-import { PlatformReportDetailRouteLoading } from "../../../../features/moderation/platform-report-route-loading-server";
-
-export default async function Loading() {
-  return PlatformReportDetailRouteLoading();
-}
+export { PlatformReportDetailRouteLoading as default } from "../../../../features/moderation/platform-report-route-loading-server";

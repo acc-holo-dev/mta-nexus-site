@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -19,8 +20,6 @@ import {
 } from "../author-publication-desk-copy";
 import { AuthorPublicationRestore } from "../author-publication-restore";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function publicationHistoryMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {

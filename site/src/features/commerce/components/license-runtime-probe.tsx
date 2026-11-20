@@ -4,8 +4,8 @@ import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
-import { getLicenseControlCopy } from "../license-control-i18n";
 import { linkGhostAccentSm } from "../../shell/link-shell";
+import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
   type LicenseRuntimeContext,

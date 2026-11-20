@@ -21,6 +21,7 @@ import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   pageShellStack10 as pageShellClass,
   pageShellStack4,
@@ -29,7 +30,6 @@ import {
 import { panelHeroBetween } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
-import { linkAccentSm } from "../../shell/link-shell";
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
 export async function organizationProfileMetadata({

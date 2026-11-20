@@ -13,12 +13,12 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
-import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   getReleaseHistoryCopy,
   parseReleaseHistoryPage,

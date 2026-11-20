@@ -1,22 +1,6 @@
-import {
-  ServerStatisticsPage,
-  serverStatisticsMetadata,
-} from "../../../../../features/servers/statistics-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = serverStatisticsMetadata;
-
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  return ServerStatisticsPage({
-    target: { id: (await params).id },
-    managed: true,
-    searchParams: await searchParams,
-  });
-}
+export {
+  ManagedServerStatisticsRoutePage as default,
+  serverStatisticsMetadata as generateMetadata,
+} from "../../../../../features/servers/statistics-server";

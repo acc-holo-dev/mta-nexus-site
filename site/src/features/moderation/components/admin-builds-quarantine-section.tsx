@@ -3,11 +3,11 @@ import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
+import { linkAccent } from "../../shell/link-shell";
 import { panelFlexBetweenP4 } from "../../shell/panel-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
-import { linkAccent } from "../../shell/link-shell";
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type PendingBuild = {

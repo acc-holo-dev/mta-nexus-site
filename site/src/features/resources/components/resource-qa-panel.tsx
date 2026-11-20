@@ -16,11 +16,11 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
-import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 type BuildOption = { id: string; version: string };
 
 type PagePayload = {

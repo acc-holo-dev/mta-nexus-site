@@ -1,5 +1,1 @@
-import { ArticleRouteLoading } from "../../../features/community/articles-route-loading-server";
-
-export default async function Loading() {
-  return ArticleRouteLoading();
-}
+export { ArticleRouteLoading as default } from "../../../features/community/articles-route-loading-server";

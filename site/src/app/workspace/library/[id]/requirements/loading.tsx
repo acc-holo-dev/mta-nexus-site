@@ -1,5 +1,1 @@
-import { LibraryRequirementsRouteLoading } from "../../../../../features/resources/resource-requirements-route-loading-server";
-
-export default async function Loading() {
-  return LibraryRequirementsRouteLoading();
-}
+export { LibraryRequirementsRouteLoading as default } from "../../../../../features/resources/resource-requirements-route-loading-server";

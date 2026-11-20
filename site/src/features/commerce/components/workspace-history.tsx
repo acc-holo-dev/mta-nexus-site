@@ -4,10 +4,9 @@ import type { ReactNode } from "react";
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
+import { linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
-
-import { linkAccentTight } from "../../shell/link-shell";
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
 

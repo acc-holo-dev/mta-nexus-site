@@ -9,13 +9,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseControlPanel } from "../license-controls";
 import { LicenseDetailView } from "../license-detail";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function licenseModerationDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,

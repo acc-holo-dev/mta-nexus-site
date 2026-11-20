@@ -1,5 +1,1 @@
-import { LibraryRouteLoadingPort } from "../../../features/library/library-route-loading-server";
-
-export default async function Loading() {
-  return LibraryRouteLoadingPort();
-}
+export { LibraryRouteLoadingPort as default } from "../../../features/library/library-route-loading-server";

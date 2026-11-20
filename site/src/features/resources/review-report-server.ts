@@ -2,8 +2,8 @@ import "server-only";
 
 export {
   resourceReviewReportMetadata,
-  StaffResourceReviewReportsPage,
-  WorkspaceResourceReviewReportsPage,
   StaffResourceReviewReportDetailPage,
+  StaffResourceReviewReportsPage,
   WorkspaceResourceReviewReportDetailPage,
+  WorkspaceResourceReviewReportsPage,
 } from "./server/resource-review-report-screen";

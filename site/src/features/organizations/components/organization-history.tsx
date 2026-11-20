@@ -12,13 +12,12 @@ import {
 } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
+import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
-
-import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
 export function OrganizationHistoryView({
   data,
   id,

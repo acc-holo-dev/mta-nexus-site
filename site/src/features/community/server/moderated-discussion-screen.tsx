@@ -383,3 +383,24 @@ export async function ModeratedDiscussionScreen({
     </div>
   );
 }
+
+export async function AdminModeratedDiscussionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ModeratedDiscussionScreen({ id: (await params).id, searchParams });
+}
+
+export async function AdminModeratedDiscussionCommentPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; commentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, commentId } = await params;
+  return ModeratedDiscussionScreen({ id, commentId, searchParams });
+}

@@ -11,6 +11,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -26,7 +27,6 @@ import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 import { HistoryShell } from "../workspace-history";
 import { LicenseArchiveFilters } from "./license-archive-filters";
 
-import { linkAccentSmRounded } from "../../shell/link-shell";
 type Query = Record<string, string | string[] | undefined>;
 
 function hasNonDefaultLicenseFilters(filters: ReturnType<typeof licenseArchiveQuery>) {
@@ -228,4 +228,12 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
       </HistoryShell>
     </div>
   );
+}
+
+export async function WorkspaceLicensesHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return LicensesHistoryScreen({ query: await searchParams });
 }

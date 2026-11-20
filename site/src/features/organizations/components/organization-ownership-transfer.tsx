@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
   confirmOwnershipTransfer,
   type ownershipTransferResultSchema,
@@ -17,7 +18,6 @@ import {
 } from "../organization-governance-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function OrganizationOwnershipTransfer({
   data,
   target,

@@ -1,6 +1,7 @@
 import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
@@ -14,8 +15,6 @@ import {
 import { publicationCopy, publicationError } from "../publication-feed-copy";
 import { platformFieldClass } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export function PublicationFeed({
   initial,
   filters,

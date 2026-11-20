@@ -1,5 +1,1 @@
-import { OrgContentRouteLoading } from "../../../../../features/resources/author-resources-route-loading-server";
-
-export default async function Loading() {
-  return OrgContentRouteLoading();
-}
+export { OrgContentRouteLoading as default } from "../../../../../features/resources/author-resources-route-loading-server";

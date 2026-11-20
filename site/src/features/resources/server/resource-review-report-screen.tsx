@@ -12,6 +12,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -20,7 +21,6 @@ import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
 import { ResourceReviewPager } from "../reviews-view";
 
-import { linkAccent } from "../../shell/link-shell";
 function reportAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
   return "failed";

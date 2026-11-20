@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -22,8 +23,6 @@ import {
 import { platformFieldClass } from "../user-platform-client";
 import { writerTypes } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function authorContentMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {

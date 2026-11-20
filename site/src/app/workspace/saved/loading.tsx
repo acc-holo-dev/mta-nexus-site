@@ -1,5 +1,1 @@
-import { SavedFollowsRouteLoading } from "../../../features/community/follow-workspace-route-loading-server";
-
-export default async function Loading() {
-  return SavedFollowsRouteLoading();
-}
+export { SavedFollowsRouteLoading as default } from "../../../features/community/follow-workspace-route-loading-server";

@@ -1,5 +1,1 @@
-import { OrganizationActivityRouteLoading } from "../../../../../features/organizations/organization-governance-route-loading-server";
-
-export default async function Loading() {
-  return OrganizationActivityRouteLoading();
-}
+export { OrganizationActivityRouteLoading as default } from "../../../../../features/organizations/organization-governance-route-loading-server";

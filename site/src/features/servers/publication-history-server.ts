@@ -1,6 +1,6 @@
 import "server-only";
 
 export {
-  ServerPublicationHistoryScreen,
+  ServerPublicationHistoryRoutePage,
   serverPublicationHistoryMetadata,
 } from "./server/server-publication-history-screen";

@@ -5,9 +5,8 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { ArticleCard } from "../../community/article-view";
 import { publicationCopy } from "../../community/publication-feed-copy";
-import { pageShellStack4 } from "../../shell/page-shell";
-
 import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
 export function ServerUpdatesPanel({
   updates,
   locale = "en",

@@ -1,5 +1,1 @@
-import { AccountsPrivacyRouteLoading } from "../../../features/accounts/profile-privacy-route-loading-server";
-
-export default async function Loading() {
-  return AccountsPrivacyRouteLoading();
-}
+export { AccountsPrivacyRouteLoading as default } from "../../../features/accounts/profile-privacy-route-loading-server";

@@ -1,5 +1,1 @@
-import { CommerceSubscriptionsRouteLoading } from "../../../features/commerce/subscriptions-route-loading-server";
-
-export default async function Loading() {
-  return CommerceSubscriptionsRouteLoading();
-}
+export { CommerceSubscriptionsRouteLoading as default } from "../../../features/commerce/subscriptions-route-loading-server";

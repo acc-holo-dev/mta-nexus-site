@@ -1,5 +1,1 @@
-import { CommunityContentHistoryRouteLoading } from "../../../../../../../features/community/author-publication-desk-route-loading-server";
-
-export default async function Loading() {
-  return CommunityContentHistoryRouteLoading();
-}
+export { CommunityContentHistoryRouteLoading as default } from "../../../../../../../features/community/author-publication-desk-route-loading-server";

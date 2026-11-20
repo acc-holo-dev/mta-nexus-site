@@ -1,3 +1,7 @@
 import "server-only";
 
-export { BuildPackageScreen, buildPackageMetadata } from "./server/build-package-screen";
+export {
+  buildPackageMetadata,
+  StaffBuildPackagePage,
+  WorkspaceBuildPackagePage,
+} from "./server/build-package-screen";

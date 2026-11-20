@@ -1,5 +1,1 @@
-import { ServerDetailRouteLoading } from "../../../features/servers/servers-directory-route-loading-server";
-
-export default async function Loading() {
-  return ServerDetailRouteLoading();
-}
+export { ServerDetailRouteLoading as default } from "../../../features/servers/servers-directory-route-loading-server";

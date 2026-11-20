@@ -13,14 +13,13 @@ import {
   serverStatisticsService,
 } from "../../../lib/services/servers/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function serverStatisticsMetadata(): Promise<Metadata> {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return {
@@ -150,5 +149,33 @@ export async function ServerStatisticsLoading() {
         loading: copy.loading,
       };
     },
+  });
+}
+
+export async function PublicServerStatisticsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerStatisticsPage({
+    target: { slug: (await params).slug },
+    managed: false,
+    searchParams: await searchParams,
+  });
+}
+
+export async function ManagedServerStatisticsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerStatisticsPage({
+    target: { id: (await params).id },
+    managed: true,
+    searchParams: await searchParams,
   });
 }

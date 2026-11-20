@@ -9,11 +9,11 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCartReceiptsService } from "../../../lib/services/commerce/resource-cart-receipts-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
-import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   resourceCartReceiptQuery,
   resourceCartReceiptsUrl,

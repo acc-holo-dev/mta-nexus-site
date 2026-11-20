@@ -1,5 +1,1 @@
-import { AdminCommunityRouteLoading } from "../../../features/community/community-moderation-route-loading-server";
-
-export default async function Loading() {
-  return AdminCommunityRouteLoading();
-}
+export { AdminCommunityRouteLoading as default } from "../../../features/community/community-moderation-route-loading-server";

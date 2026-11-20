@@ -11,6 +11,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { getManagedServerCopy } from "../managed-server-copy";
@@ -20,7 +21,6 @@ import {
   type ServerVisibilityPreview,
 } from "../server-workspace-contract";
 import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
-import { linkGhostAccentSm } from "../../shell/link-shell";
 export function ManagedServerVisibilityBatch({
   items,
   locale,

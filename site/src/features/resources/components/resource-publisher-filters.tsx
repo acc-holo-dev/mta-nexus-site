@@ -2,11 +2,11 @@ import { PRODUCT_TYPES, type PublisherResourceQuery, RESOURCE_READINESS } from "
 import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
+import { linkAccentTightSm } from "../../shell/link-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
-import { linkAccentTightSm } from "../../shell/link-shell";
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

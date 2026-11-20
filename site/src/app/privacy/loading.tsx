@@ -1,5 +1,1 @@
-import { PrivacyRouteLoading } from "../../features/shell/legal-document-route-loading-server";
-
-export default async function Loading() {
-  return PrivacyRouteLoading();
-}
+export { PrivacyRouteLoading as default } from "../../features/shell/legal-document-route-loading-server";

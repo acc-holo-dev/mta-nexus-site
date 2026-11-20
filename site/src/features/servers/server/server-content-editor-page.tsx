@@ -12,13 +12,12 @@ import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy, serverContentMutationError } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function serverContentEditorMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -112,4 +111,16 @@ export async function ServerContentEditorPage({
       )}
     </div>
   );
+}
+
+export async function ServerContentNewRoutePage({ params }: { params: Promise<{ id: string }> }) {
+  return ServerContentEditorPage(await params);
+}
+
+export async function ServerContentEditRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+}) {
+  return ServerContentEditorPage(await params);
 }

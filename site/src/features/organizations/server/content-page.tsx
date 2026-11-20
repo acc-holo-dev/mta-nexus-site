@@ -13,6 +13,7 @@ import {
 } from "../../community/user-platform-contract";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -21,8 +22,6 @@ import { organizationContentCopy } from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationError } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function organizationPublicationsMetadata() {
   return {
     title: organizationContentCopy(await getRequestLocale()).title,

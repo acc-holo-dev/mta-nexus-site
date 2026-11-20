@@ -4,12 +4,11 @@ import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationProfileForm } from "../profile";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function organizationCreateMetadata(): Promise<Metadata> {
   return {
     title: getOrganizationCopy(await getRequestLocale()).create,

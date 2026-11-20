@@ -2,6 +2,7 @@ import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   getResourcePublicationReadinessCopy,
@@ -10,7 +11,6 @@ import {
 } from "../resource-publication-readiness-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
-import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 const stateTone: Partial<
   Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>
 > = {

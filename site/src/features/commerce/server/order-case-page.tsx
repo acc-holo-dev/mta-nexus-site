@@ -11,6 +11,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -25,8 +26,6 @@ import {
   orderCaseThreadLabel,
 } from "../order-case-i18n";
 import { orderCasePageQuery } from "../order-case-query";
-
-import { linkAccentSmRounded } from "../../shell/link-shell";
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());
   return {
@@ -562,4 +561,8 @@ export async function StaffOrderCaseDetailPage({
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams]);
   return OrderCaseDetailPage({ staff: true, caseId: id, query });
+}
+
+export async function PurchaseOrderCaseCreatePage({ params }: { params: Promise<{ id: string }> }) {
+  return OrderCaseCreatePage({ orderId: (await params).id });
 }

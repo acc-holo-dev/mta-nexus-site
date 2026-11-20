@@ -10,13 +10,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceActivityService } from "../../../lib/services/resources/resource-activity-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
-
-import { linkAccent } from "../../shell/link-shell";
 export async function resourceActivityMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceActivityCopy(await getRequestLocale()).analytics} | MTA NEXUS`,

@@ -25,3 +25,14 @@ export function ServerPublicationHistoryScreen(props: {
       serverContentService.history(props.id, actor, props.contentId, filters),
   });
 }
+
+export async function ServerPublicationHistoryRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const scope = await params;
+  return ServerPublicationHistoryScreen({ ...scope, searchParams });
+}

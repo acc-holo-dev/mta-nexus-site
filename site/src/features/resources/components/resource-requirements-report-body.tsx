@@ -1,12 +1,11 @@
 import type { ResourceRequirementsReport, ResourceRequirementsScope } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { linkAccentTightRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
-
-import { linkAccentTightRounded } from "../../shell/link-shell";
 export function ResourceRequirementsReportBody({
   report,
   scope,

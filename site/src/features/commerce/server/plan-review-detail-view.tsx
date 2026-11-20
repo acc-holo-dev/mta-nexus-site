@@ -1,11 +1,11 @@
 import type { PlanReviewDetail } from "@nexus/domain";
 import Link from "next/link";
+import { linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
-import { linkAccentTightRounded } from "../../shell/link-shell";
 export function PlanReviewDetailView({
   detail,
   locale,

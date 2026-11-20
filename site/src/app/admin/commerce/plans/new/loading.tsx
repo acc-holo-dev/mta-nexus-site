@@ -1,5 +1,1 @@
-import { AdminPlanNewRouteLoading } from "../../../../../features/commerce/commercial-route-loading-server";
-
-export default async function Loading() {
-  return AdminPlanNewRouteLoading();
-}
+export { AdminPlanNewRouteLoading as default } from "../../../../../features/commerce/commercial-route-loading-server";

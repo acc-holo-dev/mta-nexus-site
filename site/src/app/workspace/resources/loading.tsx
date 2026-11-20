@@ -1,5 +1,1 @@
-import { AuthorResourcesIndexRouteLoading } from "../../../features/resources/author-resources-route-loading-server";
-
-export default async function Loading() {
-  return AuthorResourcesIndexRouteLoading();
-}
+export { AuthorResourcesIndexRouteLoading as default } from "../../../features/resources/author-resources-route-loading-server";

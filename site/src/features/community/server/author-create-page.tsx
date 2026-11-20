@@ -4,12 +4,11 @@ import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { AuthorContentForm } from "../author-content-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
-
-import { linkAccentSm } from "../../shell/link-shell";
 export async function newPublicationMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).create,

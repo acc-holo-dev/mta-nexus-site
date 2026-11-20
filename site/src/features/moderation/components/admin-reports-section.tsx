@@ -7,11 +7,11 @@ import { communityReportCopy } from "../../community/community-report-copy";
 import { ReportEvidenceLinks } from "../../community/report-evidence-links";
 import { AdminResourceQaReportActions } from "../../resources/qa-report-actions";
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
+import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
-import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type AdminReport = {

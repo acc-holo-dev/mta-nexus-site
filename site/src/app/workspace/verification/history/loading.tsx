@@ -1,5 +1,1 @@
-import { VerificationHistoryRouteLoading } from "../../../../features/moderation/verification-applications-route-loading-server";
-
-export default async function Loading() {
-  return VerificationHistoryRouteLoading();
-}
+export { VerificationHistoryRouteLoading as default } from "../../../../features/moderation/verification-applications-route-loading-server";
