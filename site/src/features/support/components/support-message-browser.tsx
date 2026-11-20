@@ -8,8 +8,11 @@ import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapBetweenGap3,
+  typeMt2XsMuted,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
 import { supportMessageCopy } from "../support-message-discovery-copy";
@@ -39,7 +42,7 @@ export function SupportMessageBrowser({
       <header className="space-y-2">
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="text-secondary break-words">{page.supportCase.subject}</p>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
       </header>
       <search aria-label={copy.filters}>
         <form method="get" action={path} className={panelFlexWrapEndP4}>
@@ -95,8 +98,8 @@ export function SupportMessageBrowser({
           {copy.download}
         </a>
       </div>
-      <p className="text-xs text-muted">{copy.exportHelp}</p>
-      <p className="text-xs text-muted">
+      <p className={typeXsMuted}>{copy.exportHelp}</p>
+      <p className={typeXsMuted}>
         {copy.snapshot}: <time dateTime={page.until}>{date(page.until)} UTC</time>
       </p>
       {page.items.length === 0 ? (
@@ -133,7 +136,7 @@ export function SupportMessageBrowser({
                 </p>
               )}
               <p className={typePrewrapSmSecondary}>{message.body}</p>
-              {message.truncated && <p className="mt-2 text-xs text-muted">{copy.truncated}</p>}
+              {message.truncated && <p className={typeMt2XsMuted}>{copy.truncated}</p>}
               <Link
                 href={`${path}?focus=${message.id}#message-${message.id}`}
                 className="mt-2 inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

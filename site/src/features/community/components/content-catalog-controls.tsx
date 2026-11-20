@@ -4,6 +4,7 @@ import { Button, FilterBar, fieldClass, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
+import { typeMinFlex1 } from "../../shell/type-shell";
 import {
   contentPageHref,
   type parseContentPage,
@@ -29,7 +30,7 @@ export function ContentCatalogControls({
   const copy = getUserPlatformCopy(locale);
   return (
     <FilterBar action={path} label={copy.search}>
-      <div className="min-w-0 flex-1">
+      <div className={typeMinFlex1}>
         <SearchField
           label={copy.search}
           name="q"

@@ -9,8 +9,11 @@ import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
   typeFlexMinWrapGap3,
+  typeFlexWrapCenterGap4Sm,
+  typeMinSpace3,
   typeMinW40Flex1Space1SmSecondary,
   typePrewrapSmSecondary,
+  typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import {
@@ -195,7 +198,7 @@ export function CommunityReportList({
           }
         />
       ) : null}
-      <div className="min-w-0 space-y-3">
+      <div className={typeMinSpace3}>
         {!error
           ? page?.items.map((report) => (
               <article key={report.id} className={panelMinSpace2P4}>
@@ -209,7 +212,7 @@ export function CommunityReportList({
                   <span className={typeXsSecondary}>{copy[report.status]}</span>
                 </div>
                 <p className={typePrewrapSmSecondary}>{report.reason}</p>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.created}:{" "}
                   <time dateTime={report.createdAt}>
                     {new Date(report.createdAt).toLocaleString(
@@ -226,7 +229,7 @@ export function CommunityReportList({
           : null}
       </div>
       {!error ? (
-        <nav className="flex flex-wrap items-center gap-4 text-sm" aria-label={copy.page}>
+        <nav className={typeFlexWrapCenterGap4Sm} aria-label={copy.page}>
           {filters.page > 1 && (
             <Link
               className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}

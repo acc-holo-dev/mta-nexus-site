@@ -16,6 +16,7 @@ import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/pag
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexCenterBetweenGap3,
   typeFlexWrapStartBetweenGap3,
   typeLabelSecondary,
   typeLabelUpperMuted,
@@ -476,10 +477,7 @@ export function SupportCaseThread({
       </section>
 
       {messageTotalPages > 1 && (
-        <nav
-          aria-label={dictionary.market.paginationLabel}
-          className="flex items-center justify-between gap-3"
-        >
+        <nav aria-label={dictionary.market.paginationLabel} className={typeFlexCenterBetweenGap3}>
           <Button
             type="button"
             disabled={messagePage <= 1 || loading || sending || updatingStatus}

@@ -24,7 +24,9 @@ import {
   typeBreakSmSecondary,
   typeElevenFaint,
   typeFlexWrapGap2,
+  typeMinSpace2,
   typeXsFaint,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
@@ -423,7 +425,7 @@ export function ResourceQaPanel({
     >
       <div className="min-w-0 space-y-1 border-b border-base pb-3">
         <h2 className="min-w-0 break-words text-base font-bold text-primary">{copy.title}</h2>
-        <p className="text-xs text-muted">{copy.help}</p>
+        <p className={typeXsMuted}>{copy.help}</p>
       </div>
 
       {readError ? (
@@ -592,7 +594,7 @@ export function ResourceQaPanel({
           ) : null}
 
           {canAnswer ? (
-            <form className="min-w-0 space-y-2" onSubmit={onAnswer}>
+            <form className={typeMinSpace2} onSubmit={onAnswer}>
               <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.answer}</span>
                 <textarea
@@ -625,7 +627,7 @@ export function ResourceQaPanel({
             />
           ) : !authenticated ? (
             <div className="space-y-2">
-              <p className="text-xs text-muted">{copy.publicRead}</p>
+              <p className={typeXsMuted}>{copy.publicRead}</p>
               <GuestAuthLinks
                 loginHref={loginHref}
                 registerHref={registerHref}
@@ -640,7 +642,7 @@ export function ResourceQaPanel({
               description={getDictionary(locale).errors.formErrorHint}
             />
           ) : canAsk ? (
-            <form className="min-w-0 space-y-2" onSubmit={onAsk}>
+            <form className={typeMinSpace2} onSubmit={onAsk}>
               <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.ask}</span>
                 <textarea

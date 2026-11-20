@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXlSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   type AuthorDetailsDraft,
   type AuthorResourceDraft,
@@ -417,7 +423,7 @@ export function AuthorResourceForms({
           />
         ) : null}
         {(fileSelected || hasAuthorVersionDraft(versionDraft)) && (
-          <p className="text-sm text-muted">{copy.fileReselect}</p>
+          <p className={typeSmMuted}>{copy.fileReselect}</p>
         )}
       </div>
       <form
@@ -560,7 +566,7 @@ export function AuthorResourceForms({
               rows={4}
               className={textareaClass}
             />
-            <p className="text-xs text-muted">{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
+            <p className={typeXsMuted}>{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
           </div>
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-build-file`} className={nativeLabelClass}>

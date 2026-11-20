@@ -9,7 +9,9 @@ import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeMaxXlSmLeadingMuted,
+  typeSmColSpan2,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
@@ -455,7 +457,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             readOnly={Boolean(createdProduct || intent)}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="resource-short-description"
               name="shortDescription"
@@ -535,7 +537,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             readOnly={Boolean(createdProduct || intent)}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="resource-dependencies"
               name="dependencies"
@@ -558,7 +560,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               required
               className={fileClass}
             />
-            <span className="text-xs text-muted">{buildFileRequirements}</span>
+            <span className={typeXsMuted}>{buildFileRequirements}</span>
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">

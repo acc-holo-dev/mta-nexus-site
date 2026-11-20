@@ -19,6 +19,7 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
@@ -129,7 +130,7 @@ export async function ResourceCollectionsPage({
         <p role="note" className={typeSmSecondary}>
           {c.membershipNote}
         </p>
-        <p className="text-sm text-muted">{c.limit}</p>
+        <p className={typeSmMuted}>{c.limit}</p>
         {!result.resource.available && (
           <ErrorState
             id="library-resource-collections-unavailable"
@@ -189,7 +190,7 @@ export async function ResourceCollectionsPage({
                     returnHref={href}
                   />
                 ) : collection.status === "archived" ? (
-                  <p className="text-sm text-muted">{c.archivedNote}</p>
+                  <p className={typeSmMuted}>{c.archivedNote}</p>
                 ) : !mutable ? (
                   <ErrorState
                     id="library-resource-collection-revision-locked"

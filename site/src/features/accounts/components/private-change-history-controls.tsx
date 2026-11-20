@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
-import { typeMinFlex1Space15SmSecondary } from "../../shell/type-shell";
+import { typeMinFlex1Space15SmSecondary, typeXsMuted } from "../../shell/type-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 const selectClass =
@@ -78,7 +78,7 @@ export function PrivateChangeHistoryFilters<
 export function PrivateChangeHistoryCutoff({ until, locale }: { until: string; locale: Locale }) {
   const copy = privateChangeHistoryCopy(locale);
   return (
-    <p className="text-xs text-muted">
+    <p className={typeXsMuted}>
       {copy.until}:{" "}
       <time dateTime={until}>
         {new Date(until).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" })}{" "}

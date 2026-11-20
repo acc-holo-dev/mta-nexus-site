@@ -9,6 +9,8 @@ import {
   typeCaptionMuted,
   typeFlexWrapCenterGap2,
   typeIconAccent,
+  typeMinSpace1,
+  typeMt3FlexCenterGap3Xs,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
@@ -100,7 +102,7 @@ export function AdminVerificationQueueSection({
                   : ""
               }`}
             >
-              <div className="min-w-0 space-y-1">
+              <div className={typeMinSpace1}>
                 <div className={typeFlexWrapCenterGap2}>
                   <span className="rounded bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
                     {request.targetType}
@@ -236,7 +238,7 @@ export function AdminVerificationQueueSection({
         )}
       </div>
       {(verificationPage > 1 || moreVerifications) && (
-        <nav aria-label={copy.verificationPages} className="mt-3 flex items-center gap-3 text-xs">
+        <nav aria-label={copy.verificationPages} className={typeMt3FlexCenterGap3Xs}>
           {verificationPage > 1 && (
             <Link
               className={linkAccentTight}

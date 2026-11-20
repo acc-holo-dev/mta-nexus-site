@@ -18,6 +18,8 @@ import {
   typeFlexWrapGap4Sm,
   typeLgSemibold,
   typeSmSecondary,
+  typeSpace2Sm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import {
@@ -142,7 +144,7 @@ export async function FinancialReconciliationDetailScreen({
                 {financialPaymentLabel(locale, attempt.status)} ·{" "}
                 {formatFinancialMinor(attempt.amount, attempt.currency, locale)}
               </p>
-              <time dateTime={attempt.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={attempt.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(attempt.createdAt, locale)}
               </time>
             </li>
@@ -169,7 +171,7 @@ export async function FinancialReconciliationDetailScreen({
         </nav>
       ) : null}
       <h2 className={typeLgSemibold}>{copy.ledger}</h2>
-      <ul className="space-y-2 text-sm">
+      <ul className={typeSpace2Sm}>
         {result.ledgerTotals.map((total) => (
           <li key={total.currency}>
             {formatFinancialMinor(total.net, total.currency, locale)} · {total.entries}

@@ -25,8 +25,10 @@ import {
   typeFlexWrapGap4,
   typePrewrapBreak,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSpace1SmPrimary,
   typeXlBoldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -208,7 +210,7 @@ export async function ModeratedDiscussionScreen({
     <div className={pageShellClass}>
       <header className="space-y-3">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         <p className={typeBreakSemiboldPrimary}>
           {publication.title} · {general[publication.status]}
         </p>
@@ -266,7 +268,7 @@ export async function ModeratedDiscussionScreen({
             <ul className="space-y-3">
               {data.items.map((item) => (
                 <li key={item.id} className={panelSpace3P5}>
-                  <p className="text-sm text-muted">
+                  <p className={typeSmMuted}>
                     {identity(item.author)} · {date(item.createdAt)}
                   </p>
                   <p className="whitespace-pre-wrap break-words text-sm text-primary">
@@ -301,7 +303,7 @@ export async function ModeratedDiscussionScreen({
             {data.comment ? (
               <>
                 <h2 className={typeSemiboldPrimary}>{copy.body}</h2>
-                <p className="text-sm text-muted">
+                <p className={typeSmMuted}>
                   {identity(data.comment.author)} · {date(data.comment.createdAt)}
                 </p>
                 {data.comment.parent && (
@@ -312,7 +314,7 @@ export async function ModeratedDiscussionScreen({
                 )}
                 <p className="whitespace-pre-wrap break-words text-primary">{data.comment.text}</p>
                 {data.comment.truncated && (
-                  <p role="status" className="text-sm text-muted">
+                  <p role="status" className={typeSmMuted}>
                     {copy.truncated}
                   </p>
                 )}
@@ -325,14 +327,14 @@ export async function ModeratedDiscussionScreen({
                 />
               </>
             ) : (
-              <p role="status" className="text-sm text-muted">
+              <p role="status" className={typeSmMuted}>
                 {copy.removed}
               </p>
             )}
           </section>
           <section className={panelSpace4P5}>
             <h2 className={typeSemiboldPrimary}>{copy.history}</h2>
-            <p className="text-xs text-muted">{copy.historyHelp}</p>
+            <p className={typeXsMuted}>{copy.historyHelp}</p>
             {data.history.length ? (
               <ul className="space-y-3">
                 {data.history.map((event) => (
@@ -344,7 +346,7 @@ export async function ModeratedDiscussionScreen({
                       {event.action === "content.comment_edited" ? copy.edited : copy.deleted} ·{" "}
                       {event.moderator ? copy.moderator : copy.owner}
                     </p>
-                    <p className="text-xs text-muted">{date(event.createdAt)}</p>
+                    <p className={typeXsMuted}>{date(event.createdAt)}</p>
                     {event.reason && <p className={typePrewrapBreak}>{event.reason}</p>}
                   </li>
                 ))}

@@ -5,7 +5,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
-import { typeXsSuccess } from "../../shell/type-shell";
+import { typeMinSpace2, typeXsSuccess } from "../../shell/type-shell";
 import { confirmedReactionRemoval } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 
@@ -115,7 +115,7 @@ export function ReactionRemoval({
   }
   if (readyScope.current !== scope) return null;
   return (
-    <div className="min-w-0 space-y-2" aria-busy={phase === "saving"}>
+    <div className={typeMinSpace2} aria-busy={phase === "saving"}>
       {phase !== "removed" && (
         <Button
           type="button"

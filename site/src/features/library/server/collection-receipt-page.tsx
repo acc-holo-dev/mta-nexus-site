@@ -14,7 +14,13 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs, typeFlexMinWrapGap4, typeMinBreakWords } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeBreakAllXsOnly,
+  typeFlexMinWrapGap4,
+  typeMinBreakWords,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
   collectionReceiptHref,
@@ -174,7 +180,7 @@ export async function CollectionReceiptPage({
                 <ul>
                   {collectionCommandProductIds(receipt.command).map((productId) => (
                     <li key={productId}>
-                      <code className="break-all text-xs">{productId}</code>
+                      <code className={typeBreakAllXsOnly}>{productId}</code>
                     </li>
                   ))}
                 </ul>
@@ -221,7 +227,7 @@ export async function CollectionReceiptPage({
             locale={typedLocale}
           />
         )}
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           <time dateTime={report.generatedAt}>{report.generatedAt}</time>
         </p>
       </div>

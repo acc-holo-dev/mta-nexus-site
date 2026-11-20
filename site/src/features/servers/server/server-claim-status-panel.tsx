@@ -5,7 +5,12 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typeSmBoldPrimary, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeSmBoldPrimary,
+  typeSmSemiboldPrimary,
+  typeXsLeadingMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
 export function ServerClaimStatusPanel({
@@ -38,17 +43,17 @@ export function ServerClaimStatusPanel({
           {request && (
             <>
               <p className={typeSmSemiboldPrimary}>{copy[request.status]}</p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {request.isRequester ? copy.yourRequest : copy.teamRequest}
               </p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.created}:{" "}
                 <time dateTime={request.createdAt.toISOString()}>
                   {dateLabel(request.createdAt)}
                 </time>
               </p>
               {request.resolvedAt && (
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.resolved}:{" "}
                   <time dateTime={request.resolvedAt.toISOString()}>
                     {dateLabel(request.resolvedAt)}
@@ -59,9 +64,7 @@ export function ServerClaimStatusPanel({
                 <ErrorState title={copy.outdated} description={copy.outdatedHint} />
               ) : null}
               {!status.isVerified && (
-                <p className="text-xs leading-relaxed text-muted">
-                  {waiting ? copy.wait : copy.retry}
-                </p>
+                <p className={typeXsLeadingMuted}>{waiting ? copy.wait : copy.retry}</p>
               )}
             </>
           )}

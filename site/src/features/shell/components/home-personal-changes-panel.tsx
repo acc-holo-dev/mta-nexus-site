@@ -3,7 +3,12 @@ import Link from "next/link";
 import type { PersonalChangesSummary } from "../home-personal-changes-types";
 import type { HomePersonalPreference } from "../home-personal-preference";
 import { pageShellStack3 } from "../page-shell";
-import { typeBreakSemiboldPrimary, typeLabelUpperFaint } from "../type-shell";
+import {
+  typeBreakSemiboldPrimary,
+  typeLabelUpperFaint,
+  typeSmMuted,
+  typeXsMuted,
+} from "../type-shell";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
 
 export type HomePersonalCopy = {
@@ -64,7 +69,7 @@ export function HomePersonalChangesPanel({
           />
         }
       />
-      <p id={HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID} className="text-xs text-muted">
+      <p id={HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID} className={typeXsMuted}>
         {copy.scopeNote}
       </p>
 
@@ -103,9 +108,7 @@ export function HomePersonalChangesPanel({
 
       {summary.status === "partial" || summary.status === "ok" ? (
         <div className={pageShellStack3}>
-          {summary.status === "partial" ? (
-            <p className="text-sm text-muted">{copy.partial}</p>
-          ) : null}
+          {summary.status === "partial" ? <p className={typeSmMuted}>{copy.partial}</p> : null}
           <ul className="min-w-0 divide-y divide-base overflow-x-clip rounded-lg border border-base bg-elevated">
             {summary.items.map((item) => (
               <li key={item.id} className="min-w-0">

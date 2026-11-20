@@ -13,7 +13,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
-import { typeFlexWrapGap4, typeSmSuccess } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typeSmMuted, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
@@ -129,21 +129,21 @@ export function OrganizationTeamDirectory({
   const filtered = !!filters.query || filters.role !== undefined || filters.access !== undefined;
   return (
     <section className={panelClipSpace5P5} aria-busy={pending}>
-      <p className="text-xs text-muted">{copy.private}</p>
+      <p className={typeXsMuted}>{copy.private}</p>
       {data.owner && (
         <div className={surfaceSpace2P4}>
-          <p className="text-xs text-muted">{team.owner}</p>
+          <p className={typeXsMuted}>{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}
             className={`${linkAccentSm} break-words`}
           >
             {data.owner.displayName} (@{data.owner.username})
           </Link>
-          <p className="text-xs text-muted">{copy.ownerNote}</p>
+          <p className={typeXsMuted}>{copy.ownerNote}</p>
         </div>
       )}
-      <p className="text-sm text-muted">{team.roleHelp}</p>
-      <p className="text-xs text-muted">{team.accessHelp}</p>
+      <p className={typeSmMuted}>{team.roleHelp}</p>
+      <p className={typeXsMuted}>{team.accessHelp}</p>
       {canManageOrganization(data.role) ? (
         <Link
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
@@ -224,10 +224,10 @@ export function OrganizationTeamDirectory({
         <ul className="space-y-3">
           {data.members.map((member) => (
             <li key={`${member.id}:${member.role}:${member.managesServers}`} className="space-y-2">
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.access}: {member.effectiveServerAccess ? copy.yes : copy.no}
               </p>
-              <time dateTime={member.joinedAt} className="text-xs text-muted">
+              <time dateTime={member.joinedAt} className={typeXsMuted}>
                 {new Date(member.joinedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",

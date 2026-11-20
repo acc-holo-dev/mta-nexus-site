@@ -5,7 +5,9 @@ import type { Locale } from "../../../lib/i18n";
 import {
   typeFlexWrapCenterGap2,
   typeFlexWrapGap3,
+  typeMinSpace2,
   typeXsFaint,
+  typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
@@ -36,7 +38,7 @@ export function ManagedServerCard({
     "inline-flex min-h-11 items-center text-xs font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
     <article className="nexus-panel flex min-w-0 flex-wrap items-start justify-between gap-4 overflow-x-clip p-4">
-      <div className="min-w-0 space-y-2">
+      <div className={typeMinSpace2}>
         <Link
           href={`/workspace/servers/${encodeURIComponent(server.id)}`}
           className="inline-flex min-h-11 break-words text-sm font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -53,7 +55,7 @@ export function ManagedServerCard({
           </span>
           <span>{server.isVerified ? copy.verified : copy.unverified}</span>
         </p>
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {copy.listingStatus}:{" "}
           {copy[server.status as "active" | "inactive" | "maintenance" | "suspended"] ??
             copy.unknown}
@@ -64,7 +66,7 @@ export function ManagedServerCard({
       </div>
       <div className="flex flex-col items-start gap-2 sm:items-end">
         <div className={typeFlexWrapCenterGap2}>
-          <span className="text-xs text-muted">{copy.live}:</span>
+          <span className={typeXsMuted}>{copy.live}:</span>
           <StatusBadge
             status={copy[live]}
             tone={live === "online" ? "success" : live === "offline" ? "danger" : "neutral"}

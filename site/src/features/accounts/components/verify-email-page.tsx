@@ -12,7 +12,9 @@ import {
   typeDisplayPrimary,
   typeFlexCenterGap3,
   typeSmLeadingMuted,
+  typeSmMuted,
   typeSmSuccess,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   type AccountRecoveryProof,
@@ -92,7 +94,7 @@ export function VerifyEmailPage() {
         </div>
 
         {state.kind === "loading" && (
-          <p role="status" className="text-sm text-muted">
+          <p role="status" className={typeSmMuted}>
             {copy.checkingVerification}
           </p>
         )}
@@ -154,7 +156,7 @@ export function VerifyEmailPage() {
             <p role="status" className={typeSmSuccess}>
               {copy.verifiedPrefix} {state.email}
             </p>
-            <p className="text-xs text-muted">{copy.confirmationConsumed}</p>
+            <p className={typeXsMuted}>{copy.confirmationConsumed}</p>
             <Link href="/settings" className={linkAccentSmSemibold}>
               {copy.backToSettings}
             </Link>

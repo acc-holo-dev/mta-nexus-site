@@ -12,7 +12,14 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeFlexMinWrapGap3, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapGap3,
+  typeMinSpace2,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
@@ -52,14 +59,14 @@ export function AddResourceToCart({
   if (!signedIn)
     return (
       <div className="space-y-2">
-        <p className="text-xs text-muted">{copy.batchIntent}</p>
+        <p className={typeXsMuted}>{copy.batchIntent}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
           signInLabel={copy.signIn}
           createAccountLabel={workspaceCopy.createAccount}
         />
-        <p className="text-xs text-muted">{copy.guestReturnNote}</p>
+        <p className={typeXsMuted}>{copy.guestReturnNote}</p>
       </div>
     );
   async function add() {
@@ -87,7 +94,7 @@ export function AddResourceToCart({
   }
   return (
     <div className="space-y-2" data-acquire-intent="batch">
-      <p className="text-xs text-muted">{copy.batchIntent}</p>
+      <p className={typeXsMuted}>{copy.batchIntent}</p>
       {added ? (
         <Link href="/workspace/cart" className={`${buttonClass} w-full`}>
           {copy.added} · {copy.openCart}
@@ -312,7 +319,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
             return (
               <li key={item.productId} className={panelMinSpace4P5}>
                 <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
-                  <div className="min-w-0 space-y-2">
+                  <div className={typeMinSpace2}>
                     {item.available && item.slug ? (
                       <Link
                         href={`/market/${item.slug}`}
@@ -328,7 +335,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                       />
                     )}
                     {item.available ? (
-                      <p className="text-sm text-muted">
+                      <p className={typeSmMuted}>
                         {copy.free} · {item.version}
                       </p>
                     ) : null}

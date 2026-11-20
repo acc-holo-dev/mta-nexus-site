@@ -11,6 +11,7 @@ import {
   typeItemsStretchPy4,
   typeMt1XsMuted,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 type ContextOption = {
@@ -154,7 +155,7 @@ export function ContextSwitcher() {
 
       {contexts.length > 1 && (
         <label className="block space-y-1.5">
-          <span className="text-xs text-muted">{copy.label}</span>
+          <span className={typeXsMuted}>{copy.label}</span>
           <select
             value={activeContextId}
             onChange={(event) => void switchContext(event.target.value)}

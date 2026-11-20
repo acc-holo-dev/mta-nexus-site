@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { linkAccentTightSm } from "../../shell/link-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexCenterBetweenGap3, typeSmSecondary } from "../../shell/type-shell";
 export function ProfileResourcePagination({
   basePath,
   page,
@@ -43,7 +43,7 @@ export function ProfileResourcePagination({
     return `${basePath}?${query}#${section}`;
   };
   return (
-    <nav aria-label={labels[section]} className="flex items-center justify-between gap-3">
+    <nav aria-label={labels[section]} className={typeFlexCenterBetweenGap3}>
       {page > 1 ? (
         <Link href={href(page - 1)} rel="prev" className={linkAccentTightSm}>
           {copy.previousPage}

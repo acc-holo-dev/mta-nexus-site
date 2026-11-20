@@ -16,10 +16,13 @@ import {
   type2xlBoldPrimary,
   typeBreakAllXsMuted,
   typeFlexWrapBetweenGap3,
+  typeMinBreakSemiboldPrimary,
+  typeMinSpace3,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationApplicationAmend } from "../verification-amend";
@@ -105,17 +108,15 @@ export async function VerificationApplicationScreen({
         <>
           <article className={panelMinSpace4P5}>
             <div className={typeFlexWrapBetweenGap3}>
-              <h2 className="min-w-0 break-words font-semibold text-primary">
-                {labels[application.targetType]}
-              </h2>
+              <h2 className={typeMinBreakSemiboldPrimary}>{labels[application.targetType]}</h2>
               <span className={typeSmSecondary}>{labels[application.status]}</span>
             </div>
             <p className={typeBreakAllXsMuted}>{application.id}</p>
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {labels.submittedAt}: {time(application.createdAt)}
             </p>
             {application.resolvedAt ? (
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {labels.decidedAt}: {time(application.resolvedAt)}
               </p>
             ) : null}
@@ -136,7 +137,7 @@ export async function VerificationApplicationScreen({
                 <p className={typePrewrapSmSecondary}>{application.reviewNotes}</p>
               </section>
             ) : null}
-            {application.truncated ? <p className="text-xs text-muted">{copy.truncated}</p> : null}
+            {application.truncated ? <p className={typeXsMuted}>{copy.truncated}</p> : null}
           </article>
           {application.profileState ? (
             <section className={panelMinSpace2P5}>
@@ -172,17 +173,15 @@ export async function VerificationApplicationScreen({
           )}
           <section className={panelMinSpace4P5}>
             <h2 className={typeSemiboldPrimary}>{copy.events}</h2>
-            {application.hasEarlierEvents ? (
-              <p className="text-xs text-muted">{copy.earlier}</p>
-            ) : null}
+            {application.hasEarlierEvents ? <p className={typeXsMuted}>{copy.earlier}</p> : null}
             {!application.events.length ? (
               <EmptyState title={copy.noEvents} description={copy.noEventsHint} />
             ) : null}
-            <ol className="min-w-0 space-y-3">
+            <ol className={typeMinSpace3}>
               {application.events.map((event) => (
                 <li key={event.id} className="flex flex-wrap justify-between gap-3 text-sm">
                   <span className="text-secondary">{eventLabels[event.action]}</span>
-                  <span className="text-xs text-muted">{time(event.createdAt)}</span>
+                  <span className={typeXsMuted}>{time(event.createdAt)}</span>
                 </li>
               ))}
             </ol>

@@ -12,7 +12,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakPrimary } from "../../shell/type-shell";
+import { typeBreakPrimary, typeSmMuted } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -88,7 +88,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {getFinancialCopy(typedLocale).title}
         </Link>
-        <p role="note" className="text-sm text-muted">
+        <p role="note" className={typeSmMuted}>
           {copy.grossNotice}
         </p>
         {result.sales.length === 0 ? (

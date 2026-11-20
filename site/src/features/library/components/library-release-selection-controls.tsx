@@ -3,7 +3,7 @@ import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap3 } from "../../shell/type-shell";
+import { typeFlexWrapGap3, typeXsMuted } from "../../shell/type-shell";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseSelectionControls({
@@ -27,7 +27,7 @@ export function LibraryReleaseSelectionControls({
   const { pending, busy, saved, send } = state;
   return (
     <section className={panelSpace4P5}>
-      <p className="text-xs text-muted">
+      <p className={typeXsMuted}>
         {copy.revision}: {revision}
       </p>
       <Button

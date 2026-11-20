@@ -25,7 +25,13 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
-import { typeDisplayPrimary, typeFlexWrapGap2, typeXsFaint } from "../type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap2,
+  typeMinSpace3,
+  typeMinSpace4,
+  typeXsFaint,
+} from "../type-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,
@@ -178,7 +184,7 @@ export async function WorkspaceHubPage() {
         ))}
       </nav>
 
-      <section className="min-w-0 space-y-4">
+      <section className={typeMinSpace4}>
         <SectionHeader
           title={dictionary.workspace.libraryTitle}
           description={libraryCopy.subtitle}
@@ -250,7 +256,7 @@ export async function WorkspaceHubPage() {
         )}
       </section>
 
-      <section className="min-w-0 space-y-4">
+      <section className={typeMinSpace4}>
         <SectionHeader
           title={serverCopy.title}
           description={serverCopy.preview}
@@ -277,7 +283,7 @@ export async function WorkspaceHubPage() {
             }
           />
         ) : managedServers.length > 0 ? (
-          <div className="min-w-0 space-y-3">
+          <div className={typeMinSpace3}>
             {managedServers.map((server) => {
               const observation = liveByServerId.get(server.id);
               return (

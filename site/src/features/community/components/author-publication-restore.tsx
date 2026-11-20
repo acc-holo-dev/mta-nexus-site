@@ -15,7 +15,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
-import { typeSmSuccess } from "../../shell/type-shell";
+import { typeSmMuted, typeSmSuccess } from "../../shell/type-shell";
 import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
@@ -134,7 +134,7 @@ export function AuthorPublicationRestore({
   }
   return (
     <div className={panelClipSpace3P4} aria-busy={busy}>
-      <p className="text-sm text-muted">{copy.restoreHelp}</p>
+      <p className={typeSmMuted}>{copy.restoreHelp}</p>
       <Button
         type="button"
         variant="outline"

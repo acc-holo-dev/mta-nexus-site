@@ -13,7 +13,7 @@ const source = readFileSync(
 it("marks the loading line as status inside the live region", () => {
   expect(source).toContain('aria-live="polite"');
   expect(source).toMatch(
-    /<p role="status" className="text-sm text-muted">\s*\{dictionary\.support\.historyLoading\}/u,
+    /<p role="status" className=\{?(?:"text-sm text-muted"|typeSmMuted)\}?>\s*\{dictionary\.support\.historyLoading\}/u,
   );
 });
 

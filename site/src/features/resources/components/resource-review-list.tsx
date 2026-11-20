@@ -5,7 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { linkAccent } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
-import { typePrewrapSmSecondary } from "../../shell/type-shell";
+import { typePrewrapSmSecondary, typeXsMuted } from "../../shell/type-shell";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
 export function ResourceReviewList({
@@ -50,7 +50,7 @@ export function ResourceReviewList({
               </time>
             </div>
             <p className={typePrewrapSmSecondary}>{review.text}</p>
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {review.accessSource === "entitlement"
                 ? copy.entitlement
                 : review.accessSource === "license"

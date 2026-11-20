@@ -14,10 +14,14 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBorderT,
   typeBreakSemibold,
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap4Sm,
+  typeMinBreakDisplay,
+  typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
@@ -118,7 +122,7 @@ export async function CollectionComparePage({
             {c.title}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words font-display">{h.title}</h1>
+        <h1 className={typeMinBreakDisplay}>{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
         <section className={panelClipSpace2P5}>
           <h2 className={typeBreakSemibold}>
@@ -262,7 +266,7 @@ export async function CollectionComparePage({
                 </thead>
                 <tbody>
                   {comparison.items.map((item) => (
-                    <tr key={item.productId} className="border-t border-base">
+                    <tr key={item.productId} className={typeBorderT}>
                       <th scope="row" className="break-words p-2 font-normal">
                         {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                         <code className="block break-all text-xs text-muted">{item.productId}</code>
@@ -278,7 +282,7 @@ export async function CollectionComparePage({
                 </tbody>
               </table>
             </div>
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {h.referenceNote}
             </p>
             {!writableDestination ? (
@@ -336,7 +340,7 @@ export async function CollectionComparePage({
             )}
           </>
         )}
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           <time dateTime={report.generatedAt}>{report.generatedAt}</time>
         </p>
         <a

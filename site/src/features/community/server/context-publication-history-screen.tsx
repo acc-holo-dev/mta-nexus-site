@@ -25,7 +25,9 @@ import {
   typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -108,7 +110,7 @@ export async function ContextPublicationHistoryScreen({
       </Link>
       <header className="space-y-2">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         {data && (
           <p className={typeBreakSemiboldPrimary}>
             {context?.name} · {data.item.title}
@@ -127,7 +129,7 @@ export async function ContextPublicationHistoryScreen({
         />
       ) : (
         <>
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {labels.status}: {labels[data.item.status]}
           </p>
           <Link href={`${base}/${encodeURIComponent(contentId)}`} className={linkAccentSmRounded}>
@@ -144,7 +146,7 @@ export async function ContextPublicationHistoryScreen({
           )}
           {data.item.status === "archived" && !data.item.recoverable && (
             <section className={panelSpace2P4}>
-              <p className="text-sm text-muted">{copy.restoreHelp}</p>
+              <p className={typeSmMuted}>{copy.restoreHelp}</p>
               <Link href={publicationSupportHref(data.item.title)} className={linkAccentSmRounded}>
                 {history.support}
               </Link>
@@ -157,13 +159,13 @@ export async function ContextPublicationHistoryScreen({
               {data.events.map((event) => (
                 <li key={event.id} className={panelClipSpace2P4}>
                   <p className={typeSemiboldPrimary}>{history[event.kind]}</p>
-                  <time dateTime={event.createdAt} className="text-xs text-muted">
+                  <time dateTime={event.createdAt} className={typeXsMuted}>
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
                       timeZoneName: "short",
                     })}
                   </time>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {event.actor === "moderation"
                       ? history.actorModeration
                       : event.actor === "team"

@@ -9,6 +9,8 @@ import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeFlexWrapCenterBetweenGap3,
   typeFlexWrapGap2,
+  typeMinFlex1,
+  typeMinSpace4,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
@@ -245,7 +247,7 @@ export function MtaMasterServerDirectory({
   }
 
   return (
-    <section aria-label={copy.directory} aria-busy={loading} className="min-w-0 space-y-4">
+    <section aria-label={copy.directory} aria-busy={loading} className={typeMinSpace4}>
       <div className={panelSpace3P4}>
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
@@ -279,7 +281,7 @@ export function MtaMasterServerDirectory({
 
         <search aria-label={copy.search}>
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="min-w-0 flex-1">
+            <div className={typeMinFlex1}>
               <SearchField
                 label={copy.search}
                 value={query}

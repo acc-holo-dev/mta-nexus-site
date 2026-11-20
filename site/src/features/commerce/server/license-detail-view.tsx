@@ -1,7 +1,13 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import type { licenseControlService } from "../../../lib/services/commerce/license-control-service";
-import { typeBreakSecondary, typeLgSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSecondary,
+  typeLgSemiboldPrimary,
+  typeMinSpace2,
+  typeMinSpace3,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
@@ -12,7 +18,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
   const history = getCommerceHistoryCopy(locale);
   return (
     <>
-      <header className="min-w-0 space-y-2">
+      <header className={typeMinSpace2}>
         <h1 className="min-w-0 break-words font-display text-primary">{license.productTitle}</h1>
         <p className="min-w-0 break-words text-sm text-secondary">
           {licenseStatusLabel(license.effectiveStatus, history.licenseStatuses)} · {license.id}
@@ -69,7 +75,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
           />
         )
       ) : null}
-      <section className="min-w-0 space-y-3">
+      <section className={typeMinSpace3}>
         <h2 className={typeLgSemiboldPrimary}>{copy.history}</h2>
         {license.history.length === 0 ? (
           <EmptyState

@@ -19,6 +19,7 @@ import {
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typePrewrapBreakSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
@@ -144,11 +145,11 @@ export async function LicenseHistoryPage({
               </p>
               {event.reason && <p className={typePrewrapBreakSecondary}>{event.reason}</p>}
               {event.fromEndpointRevision !== null && event.toEndpointRevision !== null && (
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.endpointRevision}: {event.fromEndpointRevision} → {event.toEndpointRevision}
                 </p>
               )}
-              <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={event.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
             </li>

@@ -10,6 +10,7 @@ import {
   typeFlexCenterGap2,
   typeIconAccent,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 import { adsPreferencesCopy } from "../ads-preferences-i18n";
@@ -57,7 +58,7 @@ export function SettingsAdvertisingPreferencesSection({
           {copy.heading}
         </h2>
       </div>
-      <p className="text-xs text-muted">{copy.description}</p>
+      <p className={typeXsMuted}>{copy.description}</p>
       <div className="flex cursor-pointer items-center justify-between gap-4 py-3">
         <span>
           <span className={typeBlockSmPrimary}>{toggleLabel}</span>

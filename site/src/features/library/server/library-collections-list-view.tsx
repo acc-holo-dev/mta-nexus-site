@@ -9,6 +9,7 @@ import {
   typeBreakSemibold,
   typeDisplayPrimary,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
@@ -81,7 +82,7 @@ export async function LibraryCollectionsListView({
         {libraryCollectionHistoryCopy(locale).title}
       </Link>
       <p className={typeSmSecondary}>{c.subtitle}</p>
-      <p role="note" className="text-sm text-muted">
+      <p role="note" className={typeSmMuted}>
         {c.limit}
       </p>
       <section className={panelSpace3P5}>

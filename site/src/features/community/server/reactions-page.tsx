@@ -15,8 +15,11 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeMinH11Semibold,
+  typeMinSpace3,
+  typeMinW40Flex1Space1XsMuted,
   typeMt2SmMuted,
   typeSpace1XsMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { parseReactionPage, reactionPageHref } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
@@ -85,7 +88,7 @@ export async function ReactionsPageScreen({
       </header>
       <search aria-label={copy.query}>
         <form action="/workspace/reactions" method="get" className={panelFlexMinWrapEndP4}>
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          <label className={typeMinW40Flex1Space1XsMuted}>
             {copy.query}
             <input
               type="search"
@@ -146,7 +149,7 @@ export async function ReactionsPageScreen({
         />
       ) : null}
       {page?.items.length ? (
-        <ul className="min-w-0 space-y-3">
+        <ul className={typeMinSpace3}>
           {page.items.map((item) => (
             <li key={item.contentId} className={panelClipSpace3P5}>
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
@@ -171,7 +174,7 @@ export async function ReactionsPageScreen({
                     <span aria-hidden="true">{CONTENT_REACTION_EMOJI[item.reaction]}</span>{" "}
                     {copy[item.reaction]}
                   </p>
-                  <time className="text-xs text-muted" dateTime={item.reactedAt}>
+                  <time className={typeXsMuted} dateTime={item.reactedAt}>
                     {new Date(item.reactedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
                     })}{" "}

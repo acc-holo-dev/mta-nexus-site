@@ -25,6 +25,7 @@ import {
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
@@ -203,7 +204,7 @@ export async function LibraryVersionsScreen({
       <section className={panelClipSpace3P5}>
         <h2 className={typeSemiboldPrimary}>{watchesCopy.title}</h2>
         <p className={typeSmSecondary}>{watchesCopy.note}</p>
-        <p className="text-xs text-muted">{watchesCopy.pinned}</p>
+        <p className={typeXsMuted}>{watchesCopy.pinned}</p>
         <ResourceReleaseWatchControl
           key={`${id}:${watch.revision}`}
           watch={watch}
@@ -218,7 +219,7 @@ export async function LibraryVersionsScreen({
           {result.versions.map((version) => (
             <li key={version.id} className={panelClipSpace3P5}>
               <h3 className={typeSemiboldPrimary}>{version.version}</h3>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.publication}:{" "}
                 <time dateTime={version.createdAt.toISOString()}>
                   {formatHistoryDate(version.createdAt, typedLocale)}

@@ -5,7 +5,7 @@ import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeIconAccent, typeMt1XsMuted } from "../../shell/type-shell";
+import { typeIconAccent, typeMt1XsMuted, typeXsMuted } from "../../shell/type-shell";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 
 type PushStatus =
@@ -440,7 +440,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
             </Button>
           }
         />
-        <p id={openBetaNoteId} className="text-xs text-muted">
+        <p id={openBetaNoteId} className={typeXsMuted}>
           {openBetaNote}
         </p>
       </section>
@@ -493,7 +493,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
           {copy.webPushEnable}
         </Button>
       ) : shownStatus === "loading" ? (
-        <span aria-hidden="true" className="text-xs text-muted">
+        <span aria-hidden="true" className={typeXsMuted}>
           {copy.webPushLoading}
         </span>
       ) : null}

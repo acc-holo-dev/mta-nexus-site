@@ -24,11 +24,16 @@ import {
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeHeadingPrimary,
+  typeMinSpace1,
+  typeMinSpace3,
+  typeMinSpace4,
   typeMinW40Flex1Space1SmSecondary,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
   typeSmSuccess,
+  typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import {
@@ -434,7 +439,7 @@ export function VerificationWorkspace({
                 ? copy.pending
                 : copy.unverified}
           </p>
-          <p className="text-xs text-muted">{copy.identityHint}</p>
+          <p className={typeXsMuted}>{copy.identityHint}</p>
           <Button
             type="button"
             variant="secondary"
@@ -461,7 +466,7 @@ export function VerificationWorkspace({
                     : copy.unverified}
               </p>
               {!profile.hasSpecialties ? (
-                <p className="text-xs text-muted">{copy.requiresProfile}</p>
+                <p className={typeXsMuted}>{copy.requiresProfile}</p>
               ) : null}
               <Button
                 type="button"
@@ -515,20 +520,20 @@ export function VerificationWorkspace({
             }
           />
         ) : null}
-        <div className="min-w-0 space-y-3">
+        <div className={typeMinSpace3}>
           {teams?.items.map((team) => (
             <div
               key={team.id}
               className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-lg border border-base p-3"
             >
-              <div className="min-w-0 space-y-1">
+              <div className={typeMinSpace1}>
                 <Link
                   className={accentLinkClass}
                   href={`/organizations/${encodeURIComponent(team.slug)}`}
                 >
                   {team.name}
                 </Link>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {team.verified
                     ? copy.alreadyVerified
                     : team.pending
@@ -590,7 +595,7 @@ export function VerificationWorkspace({
             </div>
           ) : (
             <form className="space-y-3" onSubmit={submit}>
-              <p className="text-xs text-muted">{copy.proofPrivacy}</p>
+              <p className={typeXsMuted}>{copy.proofPrivacy}</p>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.proof}</span>
                 <input
@@ -659,12 +664,12 @@ export function VerificationWorkspace({
         </section>
       )}
       <section className={panelMinSpace3P5}>
-        <p className="text-sm text-muted">{copy.serverHint}</p>
+        <p className={typeSmMuted}>{copy.serverHint}</p>
         <Link href="/workspace/servers" className={accentLinkClass}>
           {copy.servers}
         </Link>
       </section>
-      <section className="min-w-0 space-y-4">
+      <section className={typeMinSpace4}>
         <nav className={typeFlexWrapGap3} aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
@@ -773,7 +778,7 @@ export function VerificationWorkspace({
                 <p className={typePrewrapSmSecondary}>{application.reviewNotes}</p>
               </div>
             ) : null}
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.submittedAt}:{" "}
               <time dateTime={application.createdAt}>
                 {new Date(application.createdAt).toLocaleString(
@@ -784,7 +789,7 @@ export function VerificationWorkspace({
               </time>
             </p>
             {application.resolvedAt ? (
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.decidedAt}:{" "}
                 <time dateTime={application.resolvedAt}>
                   {new Date(application.resolvedAt).toLocaleString(

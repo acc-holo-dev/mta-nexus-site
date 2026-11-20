@@ -3,7 +3,12 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
-import { typeBreakSemibold, typeFlexWrapGap4 } from "../../shell/type-shell";
+import {
+  typeBreakAllXsOnly,
+  typeBreakSemibold,
+  typeFlexWrapGap4,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
@@ -51,7 +56,7 @@ export function ResourceRequirementsReportBody({
             }
           />
         ))}
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.snapshot}: {report.generatedAt}
       </p>
       {scope === "library" && (
@@ -89,7 +94,7 @@ export function ResourceRequirementsReportBody({
       {report.order.length > 0 && (
         <section className="space-y-2">
           <h2>{copy.order}</h2>
-          <p className="text-sm text-muted">{copy.orderNote}</p>
+          <p className={typeSmMuted}>{copy.orderNote}</p>
           <ol className="list-inside list-decimal">
             {report.order.map((slug) => (
               <li key={slug} className="break-words">
@@ -118,7 +123,7 @@ export function ResourceRequirementsReportBody({
               </p>
             )}
             {node.build && (
-              <p className="break-all text-xs">
+              <p className={typeBreakAllXsOnly}>
                 {copy.hash}: {node.build.sha256Hash}
               </p>
             )}

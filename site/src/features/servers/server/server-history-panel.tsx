@@ -6,7 +6,14 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
-import { typeFlexCenterGap2, typeIconAccent, typeLabelUpperFaint } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2,
+  typeIconAccent,
+  typeLabelUpperFaint,
+  typeMinSpace1,
+  typeMinSpace3,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
@@ -71,7 +78,7 @@ export function ServerHistoryPanel({
       aria-labelledby="server-history-title"
     >
       <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0 space-y-1">
+        <div className={typeMinSpace1}>
           <div className={typeFlexCenterGap2}>
             <BarChart3 className={typeIconAccent} aria-hidden="true" />
             <h2
@@ -112,7 +119,7 @@ export function ServerHistoryPanel({
           {serverStatisticsCopy(locale).open}
         </Link>
       </nav>
-      <p className="text-xs text-muted">{copy.summaryScope}</p>
+      <p className={typeXsMuted}>{copy.summaryScope}</p>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
@@ -131,7 +138,7 @@ export function ServerHistoryPanel({
       {history.summary.observationCount === 0 || points.length === 0 ? (
         <EmptyState title={copy.empty} description={copy.emptyHint} />
       ) : (
-        <div className="min-w-0 space-y-3">
+        <div className={typeMinSpace3}>
           <div className="flex items-center justify-between text-[11px] text-faint">
             <span>
               {copy.window}:{" "}

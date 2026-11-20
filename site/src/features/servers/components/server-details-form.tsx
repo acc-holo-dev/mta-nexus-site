@@ -8,7 +8,7 @@ import { z } from "zod";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
-import { typePrewrapBreak, typeXsSuccess } from "../../shell/type-shell";
+import { typePrewrapBreak, typeSmColSpan2, typeXsSuccess } from "../../shell/type-shell";
 import { confirmedUpdatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 
@@ -366,7 +366,7 @@ export function ServerDetailsForm({
             id="manage-server-description"
             label={copy.description}
             pending={loading}
-            className="sm:col-span-2"
+            className={typeSmColSpan2}
           >
             {(control) => (
               <textarea
@@ -435,7 +435,7 @@ export function ServerDetailsForm({
             pending={loading}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="manage-server-gameplay-tags"
               name="gameplayTags"
@@ -452,7 +452,7 @@ export function ServerDetailsForm({
             id="manage-server-media-urls"
             label={copy.mediaUrls}
             pending={loading}
-            className="sm:col-span-2"
+            className={typeSmColSpan2}
           >
             {(control) => (
               <textarea
@@ -553,7 +553,11 @@ export function ServerDetailsForm({
             )}
           </div>
           {notice?.error ? (
-            <ErrorState title={notice.text} description={formErrorHint} className="sm:col-span-2" />
+            <ErrorState
+              title={notice.text}
+              description={formErrorHint}
+              className={typeSmColSpan2}
+            />
           ) : null}
         </form>
       )}

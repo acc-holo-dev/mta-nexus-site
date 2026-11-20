@@ -7,7 +7,7 @@ import { linkGhostAccent } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
-import { typeFlexMinWrapGap4 } from "../../shell/type-shell";
+import { typeFlexMinWrapGap4, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
 import { supportActivitySchema } from "../support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 
@@ -91,7 +91,7 @@ export function SupportStatusHistory({
               }
             />
           ) : !data ? (
-            <p role="status" className="text-sm text-muted">
+            <p role="status" className={typeSmMuted}>
               {dictionary.support.historyLoading}
             </p>
           ) : data.items.length === 0 ? (
@@ -113,7 +113,7 @@ export function SupportStatusHistory({
                   <span className="text-muted">
                     {item.by === "staff" ? dictionary.support.staff : dictionary.support.requester}
                   </span>
-                  <time dateTime={item.createdAt} className="text-xs text-muted">
+                  <time dateTime={item.createdAt} className={typeXsMuted}>
                     {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
                   </time>
                 </li>

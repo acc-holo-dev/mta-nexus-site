@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeXsSecondary } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeXsMuted, typeXsSecondary } from "../../shell/type-shell";
 import type { FollowTargetType, ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
 
@@ -125,7 +125,7 @@ function ObjectMuteControl({
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-muted">{copy.muteHelp}</p>
+      <p className={typeXsMuted}>{copy.muteHelp}</p>
       {muted && mutedUntil ? (
         <p role="status" className={typeXsSecondary}>
           {copy.mutedUntil}:{" "}

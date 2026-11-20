@@ -22,6 +22,7 @@ import {
   type2xlBoldPrimary,
   typeBreakPrimary,
   typeFlexWrapGap4,
+  typeSmMuted,
   typeSpace1SmPrimary,
   typeXlBoldPrimary,
 } from "../../shell/type-shell";
@@ -162,7 +163,7 @@ export async function DiscussionReportsScreen({
     <div className={pageShellClass}>
       <header className="space-y-3">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         <p className={typeBreakPrimary}>
           {data.publication.title} · {general[data.publication.status]}
         </p>

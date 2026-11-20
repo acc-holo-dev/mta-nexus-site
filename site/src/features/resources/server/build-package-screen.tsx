@@ -13,7 +13,13 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
-import { typeDisplayPrimary, typeFlexGap4Sm } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexGap4Sm,
+  typeGridGap4Md2,
+  typeSmMuted,
+  typeSpace1Sm,
+} from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
@@ -133,7 +139,7 @@ export async function BuildPackageScreen({
           {detail.product.title} · {detail.build.version}
         </p>
       </header>
-      <p className="text-sm text-muted">{copy.comparisonNote}</p>
+      <p className={typeSmMuted}>{copy.comparisonNote}</p>
       {!detail.build.hasInventory ? (
         <ErrorState title={copy.legacy} description={copy.legacyHint} />
       ) : null}
@@ -145,7 +151,7 @@ export async function BuildPackageScreen({
         action={pageBase}
         className="flex flex-wrap items-end gap-4 rounded-lg border border-base p-4"
       >
-        <label className="space-y-1 text-sm">
+        <label className={typeSpace1Sm}>
           <span className="block">{copy.baseline}</span>
           <select
             name="baseline"
@@ -162,7 +168,7 @@ export async function BuildPackageScreen({
             ))}
           </select>
         </label>
-        <label className="space-y-1 text-sm">
+        <label className={typeSpace1Sm}>
           <span className="block">{copy.filter}</span>
           <select
             name="filter"
@@ -202,7 +208,7 @@ export async function BuildPackageScreen({
           <li key={file.path} className={surfaceSpace2P4TextSm}>
             <p className="break-words font-code">{file.path}</p>
             <p className="text-secondary">{labels[file.status]}</p>
-            <dl className="grid gap-4 md:grid-cols-2">
+            <dl className={typeGridGap4Md2}>
               {file.beforeHash && (
                 <div>
                   <dt>{copy.before}</dt>

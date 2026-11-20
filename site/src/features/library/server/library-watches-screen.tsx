@@ -27,6 +27,7 @@ import {
   typeFlexMinWrapGap3,
   typeFlexMinWrapGap4Sm,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 const filterNavClass =
@@ -215,7 +216,7 @@ export async function LibraryWatchesScreen({
                 {watch.enabled ? copy.enabled : copy.disabled}
                 {watch.available ? "" : ` · ${copy.unavailable}`}
               </p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.updated}:{" "}
                 <time dateTime={watch.updatedAt.toISOString()}>
                   {formatHistoryDate(watch.updatedAt, typedLocale)}

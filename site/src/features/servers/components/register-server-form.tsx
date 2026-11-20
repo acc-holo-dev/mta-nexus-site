@@ -11,6 +11,7 @@ import {
   typeDisplayPrimary,
   typeItemsStretchPy4,
   typeMaxXlSmLeadingMuted,
+  typeSmColSpan2,
 } from "../../shell/type-shell";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
@@ -421,7 +422,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           readOnly={!!pending}
         />
 
-        <div className="sm:col-span-2">
+        <div className={typeSmColSpan2}>
           <Input
             id="server-gameplay-tags"
             name="gameplayTags"

@@ -9,6 +9,7 @@ import {
   typeFlexCenterGap2,
   typeFlexWrapCenterBetweenGap3,
   typeIconAccent,
+  typeSmMuted,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
 import type { SettingsSession } from "../settings-client-api";
@@ -55,7 +56,7 @@ export function SettingsActiveSessions({
         </Button>
       </div>
 
-      <p className="text-sm text-muted">{copy.sessionsDescription}</p>
+      <p className={typeSmMuted}>{copy.sessionsDescription}</p>
 
       {sessions && sessions.length > 1 && (
         <Button

@@ -10,7 +10,12 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
-import { typeFlexWrapGap2, typeItemsStretchPy4, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap2,
+  typeItemsStretchPy4,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
@@ -359,7 +364,7 @@ function ContentFollowControl({
         {notifyComments ? copy.watchingHint : following ? copy.quietSaveHint : copy.discussionHelp}
       </p>
       <div className="space-y-2">
-        <p className="text-xs text-muted">{copy.muteHelp}</p>
+        <p className={typeXsMuted}>{copy.muteHelp}</p>
         {muted && mutedUntil && (
           <p role="status" className={typeXsSecondary}>
             {copy.mutedUntil}:{" "}

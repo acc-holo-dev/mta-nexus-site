@@ -24,6 +24,8 @@ import {
   typeLgSemibold,
   typePrewrapSmSecondary,
   typeSmSecondary,
+  typeSpace2Sm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
@@ -100,14 +102,14 @@ function Evidence({
         {data.recordedCaptureCount} · {copy.refunded}: {data.refundedRecordCount} · {copy.disputed}:{" "}
         {data.disputedRecordCount}
       </p>
-      <p className="text-xs text-muted">
+      <p className={typeXsMuted}>
         {copy.captured}:{" "}
         <time dateTime={data.capturedAt}>
           {formatHistoryDate(new Date(data.capturedAt), locale)}
         </time>
       </p>
       {data.payments.length ? (
-        <ul className="space-y-2 text-sm">
+        <ul className={typeSpace2Sm}>
           {data.payments.map((payment) => (
             <li key={payment.recordKey}>
               {financialPaymentLabel(locale, payment.status)} ·{" "}
@@ -122,7 +124,7 @@ function Evidence({
         <EmptyState title={copy.noPayments} description={copy.noPaymentsHint} />
       )}
       {data.paymentCount > data.payments.length && (
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {data.payments.length} / {data.paymentCount}
         </p>
       )}
@@ -363,7 +365,7 @@ export async function OrderCaseListPage({
                   {formatHistoryAmount(item.requestedAmount, item.currency, locale)}
                 </p>
               )}
-              <time dateTime={item.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(item.createdAt, locale)}
               </time>
             </li>
@@ -518,7 +520,7 @@ export async function OrderCaseDetailPage({
             <li key={event.id} className={panelSpace2P4}>
               <p className="text-sm">{orderCaseStatusLabel(locale, event.reviewStatus)}</p>
               {event.notes && <p className={typePrewrapSmSecondary}>{event.notes}</p>}
-              <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={event.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
             </li>

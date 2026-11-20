@@ -19,6 +19,7 @@ import {
   typePrewrapSmSecondary,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   type CommunityReportDetail,
@@ -268,7 +269,7 @@ export function CommunityReportDetailView({
           </section>
           <section className={panelSpace3P5}>
             <h2 className={typeLgSemiboldPrimary}>{copy.currentTarget}</h2>
-            <p className="text-xs text-muted">{copy.currentHint}</p>
+            <p className={typeXsMuted}>{copy.currentHint}</p>
             {staff && report.moderationHref && (
               <Link href={report.moderationHref} className={linkAccentSmRounded}>
                 {discussionReportsCopy(locale).link}
@@ -293,7 +294,7 @@ export function CommunityReportDetailView({
                   </Link>
                 )}
                 <p className={typePrewrapSmSecondary}>{report.target.text}</p>
-                {report.target.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+                {report.target.truncated && <p className={typeXsMuted}>{copy.truncated}</p>}
                 {report.target.href && (
                   <Link className={linkAccentTightSmRounded} href={report.target.href}>
                     {copy.viewTarget}

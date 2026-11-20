@@ -36,7 +36,9 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap2,
   typeFlexWrapGap4,
+  typeGridGap4Md2,
   typeMax2xlSmSecondary,
+  typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -176,7 +178,7 @@ export async function LibraryPageScreen({
               }
             />
           ) : (
-            <ol className="grid gap-4 md:grid-cols-2">
+            <ol className={typeGridGap4Md2}>
               {result.items.map((item) => (
                 <li key={item.resourceId} className={panelFlexColGap3P5}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
@@ -189,7 +191,7 @@ export async function LibraryPageScreen({
                     />
                   </div>
 
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {copy.added}{" "}
                     <time dateTime={new Date(item.addedAt).toISOString()}>
                       {formatHistoryDate(new Date(item.addedAt), locale)}

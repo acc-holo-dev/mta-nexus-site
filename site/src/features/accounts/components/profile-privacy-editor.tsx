@@ -12,9 +12,11 @@ import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   typeFlexWrapGap3,
   typeFlexWrapGap4,
+  typeSmMuted,
   typeSmSemiboldPrimary,
   typeSmSuccess,
   typeSpace1SmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   confirmedPrivacyUpdate,
@@ -201,7 +203,7 @@ export function ProfilePrivacyEditor({
             </span>
           </label>
         </fieldset>
-        <p className="text-sm text-muted">{copy.scope}</p>
+        <p className={typeSmMuted}>{copy.scope}</p>
         <div className={typeFlexWrapGap3}>
           <Button
             type="submit"
@@ -232,15 +234,15 @@ export function ProfilePrivacyEditor({
             {copy.reload}
           </Button>
         </div>
-        <p id="privacy-refresh-description" className="text-xs text-muted">
+        <p id="privacy-refresh-description" className={typeXsMuted}>
           {copy.refreshVersionHint}
         </p>
-        <p id="privacy-reload-description" className="text-xs text-muted">
+        <p id="privacy-reload-description" className={typeXsMuted}>
           {copy.reloadHint}
         </p>
       </form>
       {pending && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" className={typeSmMuted}>
           {copy.loading}
         </p>
       )}
@@ -271,7 +273,7 @@ export function ProfilePrivacyEditor({
           aria-label={copy.guestPreview}
         >
           <h2 className={typeSmSemiboldPrimary}>{copy.guestPreview}</h2>
-          <p className="text-sm text-muted">{copy.guestPreviewNote}</p>
+          <p className={typeSmMuted}>{copy.guestPreviewNote}</p>
           <ul className={typeSpace1SmSecondary}>
             <li>{activity ? copy.guestPreviewActivityOn : copy.guestPreviewActivityOff}</li>
             <li>{contacts ? copy.guestPreviewContactsOn : copy.guestPreviewContactsOff}</li>

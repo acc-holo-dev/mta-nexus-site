@@ -9,7 +9,12 @@ import {
   linkGhostAccentSm,
   linkGhostAccentSmNoUnderline,
 } from "../../shell/link-shell";
-import { typeFlexGap4Sm, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexGap4Sm,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
@@ -136,7 +141,7 @@ export function LicenseRuntimeProbe({
       <h3 className={typeSemiboldPrimary}>{copy.releaseCheck}</h3>
       <p className={typeSmSecondary}>{copy.releaseNote}</p>
       {loading ? (
-        <p role="status" aria-live="polite" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className={typeSmMuted}>
           {copy.releaseLoading}
         </p>
       ) : context?.items.length ? (

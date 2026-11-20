@@ -14,7 +14,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeMinBreakWords } from "../../shell/type-shell";
+import { typeMinBreakDisplay, typeMinBreakWords } from "../../shell/type-shell";
 export async function libraryReviewEditorMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).write} | MTA NEXUS`,
@@ -70,7 +70,7 @@ export async function LibraryReviewEditorPage({ params }: { params: Promise<{ id
       <Link href="/workspace/library/reviews" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
-      <h1 className="min-w-0 break-words font-display">{copy.write}</h1>
+      <h1 className={typeMinBreakDisplay}>{copy.write}</h1>
       <p className={typeMinBreakWords}>{detail.product.title ?? copy.unavailable}</p>
       <ResourceReviewEditor
         key={`${actor.id}:${target.id}`}

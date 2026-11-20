@@ -13,8 +13,10 @@ import {
   typeDisplayPrimary,
   typeFlexWrapBetweenGap3,
   typeFlexWrapGap4Sm,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
@@ -47,9 +49,9 @@ export function ProfileChangeHistoryView({
     <div className={pageShellClass}>
       <header className="space-y-2">
         <h1 className={typeDisplayPrimary}>{copy.profileTitle}</h1>
-        <p className="text-sm text-muted">{copy.profileDescription}</p>
-        <p className="text-xs text-muted">{copy.privacy}</p>
-        <p className="text-xs text-muted">{copy.recorded}</p>
+        <p className={typeSmMuted}>{copy.profileDescription}</p>
+        <p className={typeXsMuted}>{copy.privacy}</p>
+        <p className={typeXsMuted}>{copy.recorded}</p>
       </header>
       <Link href="/settings" className={linkAccentSmRounded}>
         {copy.back}
@@ -85,7 +87,7 @@ export function ProfileChangeHistoryView({
             >
               {copy.export}
             </a>
-            <p className="text-xs text-muted">{copy.exportHelp}</p>
+            <p className={typeXsMuted}>{copy.exportHelp}</p>
           </div>
           {!data.items.length && (
             <EmptyState
@@ -104,7 +106,7 @@ export function ProfileChangeHistoryView({
             <article key={item.id} className={panelClipSpace3P5}>
               <div className={typeFlexWrapBetweenGap3}>
                 <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
-                <time dateTime={item.createdAt} className="text-xs text-muted">
+                <time dateTime={item.createdAt} className={typeXsMuted}>
                   {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",
                   })}{" "}
@@ -113,12 +115,12 @@ export function ProfileChangeHistoryView({
               </div>
               <p className={typeSmSecondary}>{item.actor === "you" ? copy.you : copy.system}</p>
               {!!item.fields.length && (
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.fields}: {item.fields.map((field) => copy.fieldNames[field]).join(", ")}
                 </p>
               )}
               {item.experienceVerificationInvalidated && (
-                <p className="text-sm text-muted">
+                <p className={typeSmMuted}>
                   {copy.invalidated}{" "}
                   <Link href="/workspace/verification" className={linkAccentTight}>
                     {copy.verification}

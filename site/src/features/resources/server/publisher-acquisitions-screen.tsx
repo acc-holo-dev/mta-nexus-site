@@ -17,7 +17,9 @@ import {
   typeFlexMinWrapGap3,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import {
@@ -142,7 +144,7 @@ export async function PublisherAcquisitionsScreen({
                 {item.downloadable ? item.title : copy.hidden}
               </h2>
               <p className={typeSmSecondary}>{copy[item.source]}</p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.acquiredAt}{" "}
                 <time dateTime={item.acquiredAt.toISOString()}>
                   {formatHistoryDate(item.acquiredAt, locale)}
@@ -164,7 +166,7 @@ export async function PublisherAcquisitionsScreen({
           ))}
         </ol>
       )}
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.showing} {result.items.length} {copy.of} {result.total}
       </p>
       {result.totalPages > 1 ? (

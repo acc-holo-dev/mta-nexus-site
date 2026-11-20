@@ -11,6 +11,7 @@ import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import {
   typeGrid2Gap4,
   typeGridGap3Sm2,
+  typeSmMuted,
   typeSmSecondary,
   typeWFullSurfaceBorderP2,
 } from "../../shell/type-shell";
@@ -302,7 +303,7 @@ export function PlanReviewForm({
             </div>
           </dl>
         ) : null}
-        <p className="text-sm text-muted">{c.baseline}</p>
+        <p className={typeSmMuted}>{c.baseline}</p>
         {frozen ? (
           <ErrorState id="plan-review-form-frozen" title={c.frozen} description={c.retry} />
         ) : null}

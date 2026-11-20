@@ -13,8 +13,11 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakSecondary,
   typeDisplayPrimary,
+  typeFlexWrapCenterGap4Sm,
   typeFlexWrapEndGap3,
   typeFlexWrapGap4,
+  typeMt2XsMuted,
+  typeSmMuted,
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
 import { reportRateLimit } from "../community-report-api";
@@ -85,7 +88,7 @@ export async function PublicationReportsPage({
         <header className="space-y-2">
           <h1 className={typeDisplayPrimary}>{copy.publicationTitle}</h1>
           <p className={typeBreakSecondary}>{data.publication.title}</p>
-          <p className="text-sm text-muted">{copy.publicationDescription}</p>
+          <p className={typeSmMuted}>{copy.publicationDescription}</p>
         </header>
         <div className={typeFlexWrapGap4}>
           <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
@@ -99,13 +102,11 @@ export async function PublicationReportsPage({
           <summary className="cursor-pointer text-sm font-semibold text-primary">
             {copy.publicationBody}
           </summary>
-          <p className="mt-2 text-xs text-muted">{copy.publicationCurrent}</p>
+          <p className={typeMt2XsMuted}>{copy.publicationCurrent}</p>
           <p className="mt-2 whitespace-pre-wrap break-words text-sm text-secondary">
             {data.publication.text}
           </p>
-          {data.publication.truncated && (
-            <p className="mt-2 text-xs text-muted">{labels.truncated}</p>
-          )}
+          {data.publication.truncated && <p className={typeMt2XsMuted}>{labels.truncated}</p>}
         </details>
         <search aria-label={copy.search}>
           <form method="get" action={path} className="nexus-panel grid gap-3 p-4 sm:grid-cols-2">
@@ -155,7 +156,7 @@ export async function PublicationReportsPage({
           locale={locale}
           allowActions={filters.view === "pending"}
         />
-        <nav aria-label={labels.page} className="flex flex-wrap items-center gap-4 text-sm">
+        <nav aria-label={labels.page} className={typeFlexWrapCenterGap4Sm}>
           {filters.page > 1 && (
             <Link href={href(filters.page - 1)} className={linkAccent}>
               {labels.previous}

@@ -18,7 +18,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { skelH4W13, skelH20 } from "../../shell/skeleton-shell";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeSmMuted } from "../../shell/type-shell";
 import { authPasswordApiCopy } from "../auth-password-api-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
@@ -581,7 +581,7 @@ export function SettingsPageClient() {
       ) : null}
 
       {pending && (
-        <p role="status" aria-live="polite" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className={typeSmMuted}>
           {copy.saving}
         </p>
       )}

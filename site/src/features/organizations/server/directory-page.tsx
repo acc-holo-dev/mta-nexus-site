@@ -14,8 +14,10 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexWrapEndGap3,
+  typeFlexWrapStartBetweenGap4,
   typeGrid2Gap4,
   typeMt2SmMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { parseOrganizationPage } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -62,7 +64,7 @@ export async function OrganizationsPage({
   };
   return (
     <div className={pageShellClass}>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className={typeMt2SmMuted}>{copy.description}</p>
@@ -108,7 +110,7 @@ export async function OrganizationsPage({
               {result.items.map((item) => (
                 <article className={panelSpace3P5} key={item.id}>
                   <h2 className="break-words font-heading text-primary">{item.name}</h2>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     @{item.slug} ·{" "}
                     {item.role in copy
                       ? copy[item.role as "owner" | "admin" | "member" | "developer"]

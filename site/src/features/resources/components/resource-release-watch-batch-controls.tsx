@@ -12,7 +12,12 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSecondary, typeSmSuccess, typeSpace1SmSecondary } from "../../shell/type-shell";
+import {
+  typeSmSecondary,
+  typeSmSuccess,
+  typeSpace1SmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { confirmedResourceReleaseWatchBatch } from "../resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 export function ResourceReleaseWatchBatchControls({
@@ -190,7 +195,7 @@ export function ResourceReleaseWatchBatchControls({
     <section className={panelSpace4P5}>
       <h2>{title}</h2>
       <p className={typeSmSecondary}>{note}</p>
-      <p className="text-xs text-muted">{copy.batchLimit}</p>
+      <p className={typeXsMuted}>{copy.batchLimit}</p>
       {enabling && capacity === 0 ? (
         <ErrorState
           id="resource-release-watch-batch-maximum"

@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
-import { typeFlexWrapGap2, typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import type { SupportCaseData, SupportCaseStatus } from "../support-response";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
 export function SupportCaseActions({
@@ -56,7 +56,7 @@ export function SupportCaseActions({
   }
   return (
     <div className="space-y-2">
-      {!staff && <p className="text-sm text-muted">{workspace.ownHelp}</p>}
+      {!staff && <p className={typeSmMuted}>{workspace.ownHelp}</p>}
       {supportCase.status === "resolved" && !staff ? (
         <p className={typeSmSecondary}>{workspace.resolvedReplyReopens}</p>
       ) : null}

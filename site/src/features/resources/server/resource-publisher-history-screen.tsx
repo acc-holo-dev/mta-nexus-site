@@ -19,6 +19,7 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
@@ -109,7 +110,7 @@ export async function ResourcePublisherHistoryScreen({
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.history}</h1>
       <p className={typeBreakSecondary}>{result.product.title}</p>
-      <p className="text-sm text-muted">{copy.historyNote}</p>
+      <p className={typeSmMuted}>{copy.historyNote}</p>
       <nav className="flex flex-wrap gap-4 text-accent" aria-label={copy.history}>
         {(["all", "changes", "publication"] as const).map((kind) => (
           <Link
@@ -142,7 +143,7 @@ export async function ResourcePublisherHistoryScreen({
                 />
               ) : null}
               {event.reason && <p className={typePrewrapSmSecondary}>{event.reason}</p>}
-              <time className="text-sm text-muted" dateTime={event.createdAt.toISOString()}>
+              <time className={typeSmMuted} dateTime={event.createdAt.toISOString()}>
                 {formatHistoryDate(event.createdAt, locale)} UTC
               </time>
             </li>

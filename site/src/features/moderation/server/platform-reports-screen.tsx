@@ -16,6 +16,7 @@ import {
   typeSmSecondary,
   typeSmSemiboldPrimary,
   typeXsFaint,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { platformReportCopy } from "../platform-report-i18n";
 
@@ -101,7 +102,7 @@ export async function PlatformReportsScreen({
             <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
               {report.type}
             </span>
-            <span className="text-xs text-muted">
+            <span className={typeXsMuted}>
               {copy.targetTypes[report.targetType] ?? report.targetType}
             </span>
           </div>
@@ -121,7 +122,7 @@ export async function PlatformReportsScreen({
             </p>
           ) : null}
           {report.moderatorNotes ? (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.notes}: {report.moderatorNotes}
             </p>
           ) : null}
@@ -184,7 +185,7 @@ export async function PlatformReportsScreen({
                 <span className={typeSmSemiboldPrimary}>
                   {report.targetPreview?.title ?? report.targetId}
                 </span>
-                <span className="text-xs text-muted">
+                <span className={typeXsMuted}>
                   {copy.targetTypes[report.targetType] ?? report.targetType}
                 </span>
               </div>

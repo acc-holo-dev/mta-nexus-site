@@ -19,10 +19,15 @@ import {
 import { panelClipSpace3P4, panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   typeFlexMinWrapEndGap3,
+  typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeMinBreakWords,
+  typeMinSpace3,
+  typeMt2XsMuted,
+  typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   ContentCommentSubmitError,
@@ -496,11 +501,9 @@ export function ContentDiscussion({
             {copy.applySearch}
           </Button>
         </form>
-        {text.trim().length > 0 && (
-          <p className="mt-2 text-xs text-muted">{copy.searchKeepsDraft}</p>
-        )}
+        {text.trim().length > 0 && <p className={typeMt2XsMuted}>{copy.searchKeepsDraft}</p>}
       </search>
-      <form onSubmit={submit} className="min-w-0 space-y-3" aria-busy={submitting}>
+      <form onSubmit={submit} className={typeMinSpace3} aria-busy={submitting}>
         {draftRestoreNotice ? (
           <p role="status" aria-live="polite" className={typeSmSecondary}>
             {workspaceCopy.draftRestored}
@@ -559,7 +562,7 @@ export function ContentDiscussion({
                 ? copy.publishRestoredDraft
                 : copy.publish}
           </Button>
-          <span className="text-xs text-muted">{text.length}/5000</span>
+          <span className={typeXsMuted}>{text.length}/5000</span>
           {identityUnavailable ? (
             <ErrorState
               id="discussion-identity-unavailable"
@@ -606,7 +609,7 @@ export function ContentDiscussion({
       )}
       <div className="space-y-3">
         {loading ? (
-          <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
+          <p role="status" aria-live="polite" aria-busy="true" className={typeSmMuted}>
             {copy.loading}
           </p>
         ) : null}
@@ -631,7 +634,7 @@ export function ContentDiscussion({
                   {comment.author.displayName} (@{comment.author.username})
                 </Link>
               ) : (
-                <span className="text-sm text-muted">{copy.anonymous}</span>
+                <span className={typeSmMuted}>{copy.anonymous}</span>
               )}
               <time dateTime={comment.createdAt} className="ml-auto text-xs text-muted">
                 {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -782,7 +785,7 @@ export function ContentDiscussion({
           title={readError}
           description={readError === copy.unavailable ? copy.unavailableDescription : undefined}
           action={
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className={typeFlexWrapCenterJustifyGap3}>
               {(readError === copy.focusMissing || focusedId) && (
                 <Button
                   type="button"

@@ -28,7 +28,13 @@ import { linkAccentSmRounded, linkAccentTight, linkAccentXs } from "../../shell/
 import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeCaptionMuted, typeFlexCenterGap2, typeSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeCaptionMuted,
+  typeFlexCenterGap2,
+  typeMinSpace1,
+  typeMt3FlexCenterGap3Xs,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   AdminAdPlacementSection,
   AdminBuildsQuarantineSection,
@@ -303,7 +309,7 @@ export async function AdminHomeScreen({
           {pendingContent.length > 0 ? (
             pendingContent.map((item) => (
               <div key={item.id} className={panelFlexBetweenP4}>
-                <div className="min-w-0 space-y-1">
+                <div className={typeMinSpace1}>
                   <div className={typeFlexCenterGap2}>
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                       {item.type}
@@ -340,7 +346,7 @@ export async function AdminHomeScreen({
           )}
         </div>
         {(contentPage > 1 || moreContent) && (
-          <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
+          <nav aria-label={copy.contentPages} className={typeMt3FlexCenterGap3Xs}>
             {contentPage > 1 && (
               <Link className={linkAccentTight} href={adminHref({ contentPage: contentPage - 1 })}>
                 {copy.previous}

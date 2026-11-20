@@ -8,6 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSmPlain } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeSmMuted, typeXsMuted } from "../../shell/type-shell";
 import {
   type CommunityTopicIntent,
   clearCommunityTopicIntent,
@@ -288,7 +289,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
       )}
       {(!actorId || !identityVerified || foreignActor) && (
         <div className="space-y-1">
-          {!actorId && <p className="text-sm text-muted">{copy.topicGuestDraft}</p>}
+          {!actorId && <p className={typeSmMuted}>{copy.topicGuestDraft}</p>}
           <Link href={authEntryHref("login", "/community/new")} className={linkAccentSmPlain}>
             {copy.topicSignIn}
           </Link>
@@ -308,7 +309,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
         className="nexus-panel grid min-w-0 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:p-6"
       >
         {busy && (
-          <p role="status" className="text-xs text-muted">
+          <p role="status" className={typeXsMuted}>
             {copy.publishing}
           </p>
         )}

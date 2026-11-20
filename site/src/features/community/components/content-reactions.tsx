@@ -11,7 +11,12 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap2, typeSmSecondary, typeXsSuccess } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap2,
+  typeSmSecondary,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
 import {
   confirmedReactionMutation,
   type ReactionState,
@@ -230,7 +235,7 @@ export function ContentReactions({
           {message}
         </p>
       ) : null}
-      <p className="text-xs text-muted">{copy.scope}</p>
+      <p className={typeXsMuted}>{copy.scope}</p>
     </section>
   );
 }

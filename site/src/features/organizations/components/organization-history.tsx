@@ -19,8 +19,10 @@ import {
   typeBreakDisplayPrimary,
   typeFlexWrapBetweenGap3,
   typeFlexWrapGap4Sm,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -57,8 +59,8 @@ export function OrganizationHistoryView({
           {copy.history}
           {data ? ` · ${data.organization.name}` : ""}
         </h1>
-        <p className="text-sm text-muted">{copy.historyDescription}</p>
-        <p className="text-xs text-muted">{copy.privacy}</p>
+        <p className={typeSmMuted}>{copy.historyDescription}</p>
+        <p className={typeXsMuted}>{copy.privacy}</p>
       </header>
       <Link className={linkAccentSm} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
         {copy.back}
@@ -83,7 +85,7 @@ export function OrganizationHistoryView({
           >
             {journal.export}
           </a>
-          <p className="text-xs text-muted">{journal.exportHelp}</p>
+          <p className={typeXsMuted}>{journal.exportHelp}</p>
         </div>
       )}
       {!data && (
@@ -114,7 +116,7 @@ export function OrganizationHistoryView({
         <article className={panelSpace3P5} key={item.id}>
           <div className={typeFlexWrapBetweenGap3}>
             <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
-            <time className="text-xs text-muted" dateTime={item.createdAt}>
+            <time className={typeXsMuted} dateTime={item.createdAt}>
               {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                 timeZone: "UTC",
               })}{" "}
@@ -146,7 +148,7 @@ export function OrganizationHistoryView({
             </p>
           )}
           {(item.fromRole || item.toRole) && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.role}:{" "}
               {[
                 item.fromRole ? teamCopy[item.fromRole] : null,
@@ -157,12 +159,12 @@ export function OrganizationHistoryView({
             </p>
           )}
           {item.managesServers !== null && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.serverAccess}: {item.managesServers ? copy.enabled : copy.disabled}
             </p>
           )}
           {item.fields.length > 0 && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.fields}:{" "}
               {[...new Set(item.fields)].map((field) => copy.fieldNames[field]).join(", ")}
             </p>

@@ -9,7 +9,10 @@ import {
   typeBlockSmPrimary,
   typeFlexCenterGap2,
   typeIconAccent,
+  typeMinSpace1,
+  typeSmMuted,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
@@ -43,7 +46,7 @@ export function SettingsPasswordForm({
         </h2>
       </div>
 
-      <p id="password-policy" className="text-sm text-muted">
+      <p id="password-policy" className={typeSmMuted}>
         {copy.passwordDescription}
       </p>
 
@@ -53,7 +56,7 @@ export function SettingsPasswordForm({
         aria-describedby="password-policy"
         className="grid gap-3 sm:grid-cols-2"
       >
-        <div className="min-w-0 space-y-1">
+        <div className={typeMinSpace1}>
           <label htmlFor="current-password" className={typeBlockSmPrimary}>
             {copy.currentPassword}
           </label>
@@ -80,7 +83,7 @@ export function SettingsPasswordForm({
           />
         </div>
 
-        <div className="min-w-0 space-y-1">
+        <div className={typeMinSpace1}>
           <label htmlFor="new-password" className={typeBlockSmPrimary}>
             {copy.newPassword}
           </label>
@@ -106,7 +109,7 @@ export function SettingsPasswordForm({
               className: "min-h-11",
             })}
           />
-          <p id="password-length" className="text-xs text-muted">
+          <p id="password-length" className={typeXsMuted}>
             {copy.passwordHint}
           </p>
         </div>

@@ -22,7 +22,10 @@ import {
   typeBreakAllXs,
   typeBreakAllXsMuted,
   typeFlexMinWrapGap4Sm,
+  typeMinBreakDisplay,
+  typeMinFlex1,
   typeMinFlex1Space15SmSecondary,
+  typeSmMuted,
 } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -123,7 +126,7 @@ export async function CollectionHistoryPage({
             {c.library}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words font-display">{h.title}</h1>
+        <h1 className={typeMinBreakDisplay}>{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
         <form
           method="get"
@@ -150,7 +153,7 @@ export async function CollectionHistoryPage({
               ))}
             </select>
           </label>
-          <div className="min-w-0 flex-1">
+          <div className={typeMinFlex1}>
             <Input
               name="collectionId"
               defaultValue={result.collectionId ?? ""}
@@ -159,7 +162,7 @@ export async function CollectionHistoryPage({
               label={h.collectionId}
             />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className={typeMinFlex1}>
             <Input
               name="productId"
               defaultValue={result.productId ?? ""}
@@ -175,7 +178,7 @@ export async function CollectionHistoryPage({
             {h.clear}
           </Link>
         </form>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {c.items}: {result.total} ·{" "}
           <time dateTime={result.generatedAt}>{result.generatedAt}</time>
         </p>
@@ -284,7 +287,7 @@ export async function CollectionHistoryPage({
                         <p>
                           {c.items}: {command.expectedItemCount}
                         </p>
-                        <p className="text-sm text-muted">{h.fullCopy}</p>
+                        <p className={typeSmMuted}>{h.fullCopy}</p>
                       </>
                     )}
                   </>

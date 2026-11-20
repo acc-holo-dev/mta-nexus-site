@@ -13,7 +13,12 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlBare, pageShellStack4, pageShellStack6 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary, typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  type2xlBoldPrimary,
+  typeDisplayPrimary,
+  typeMinSpace2,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import {
   communityReportDetailSchema,
   communityReportPageQuery,
@@ -99,9 +104,9 @@ export async function CommunityReportScreen({
     );
   }
   const header = (
-    <header className="min-w-0 space-y-2">
+    <header className={typeMinSpace2}>
       <h1 className={type2xlBoldPrimary}>{title}</h1>
-      <p className="text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
+      <p className={typeSmMuted}>{staff ? copy.queueDescription : copy.description}</p>
       {staff && !id && (
         <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
           {reportGroupsCopy(locale).open}

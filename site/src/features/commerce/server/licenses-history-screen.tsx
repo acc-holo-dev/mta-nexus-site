@@ -15,7 +15,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakPrimary } from "../../shell/type-shell";
+import { typeBreakPrimary, typeSmMuted } from "../../shell/type-shell";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -120,7 +120,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
     <div className={pageShellClass}>
       <HistoryShell copy={copy} area="licenses">
         <LicenseArchiveFilters query={filters} page={result.page} locale={locale} />
-        <p role="note" className="text-sm text-muted">
+        <p role="note" className={typeSmMuted}>
           {copy.licenseNotice}
         </p>
         {can(user, "admin.moderation") && (

@@ -19,7 +19,9 @@ import {
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   confirmsOrganizationBatchCommand,
@@ -163,7 +165,7 @@ export function OrganizationTeamBatch({
   return (
     <section className="space-y-4 rounded-lg border border-base p-4" aria-busy={stage !== "idle"}>
       <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
-      <p className="text-sm text-muted">{copy.help}</p>
+      <p className={typeSmMuted}>{copy.help}</p>
       <fieldset disabled={disabled || preview !== null} className="space-y-3">
         <legend className={typeSmPrimary}>
           {copy.selected}: {selected.length} / 20
@@ -253,7 +255,7 @@ export function OrganizationTeamBatch({
           </label>
         )}
       </fieldset>
-      <p className="text-xs text-muted">{copy.warning}</p>
+      <p className={typeXsMuted}>{copy.warning}</p>
       {!preview ? (
         <Button
           type="button"
@@ -288,7 +290,7 @@ export function OrganizationTeamBatch({
             ))}
           </ul>
           {!preview.changedCount && (
-            <p role="status" className="text-sm text-muted">
+            <p role="status" className={typeSmMuted}>
               {copy.noChanges}
             </p>
           )}

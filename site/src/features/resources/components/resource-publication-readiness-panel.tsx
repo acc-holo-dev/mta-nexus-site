@@ -5,6 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeMinSpace1,
   typeSemiboldPrimary,
   typeSmSecondary,
   typeXlSemiboldPrimary,
@@ -56,7 +57,7 @@ export function ResourcePublicationReadinessPanel({
             key={item.id}
             className="flex flex-col gap-2 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-start sm:justify-between"
           >
-            <div className="min-w-0 space-y-1">
+            <div className={typeMinSpace1}>
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <span className={typeSemiboldPrimary}>{copy.items[item.id]}</span>
                 <span className="font-label uppercase text-[10px] text-muted">

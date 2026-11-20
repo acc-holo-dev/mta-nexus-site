@@ -17,7 +17,10 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
+  typeSpace2Sm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import {
@@ -136,7 +139,7 @@ export async function AcquisitionReceiptsScreen({
         action="/workspace/acquisitions/receipts"
         className="flex flex-wrap items-end gap-4"
       >
-        <label className="space-y-2 text-sm">
+        <label className={typeSpace2Sm}>
           <span className="block">{copy.days}</span>
           <select
             name="days"
@@ -150,7 +153,7 @@ export async function AcquisitionReceiptsScreen({
             ))}
           </select>
         </label>
-        <label className="space-y-2 text-sm">
+        <label className={typeSpace2Sm}>
           <span className="block">{copy.evidence}</span>
           <select
             name="evidence"
@@ -200,14 +203,14 @@ export async function AcquisitionReceiptsScreen({
               <p className="text-sm">
                 {copy.items}: {item.itemCount}
               </p>
-              <time dateTime={item.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(item.createdAt, locale)}
               </time>
             </li>
           ))}
         </ol>
       )}
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.receipts}: {result.total}
       </p>
       <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>

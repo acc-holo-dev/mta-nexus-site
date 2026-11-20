@@ -8,7 +8,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typeFlexMinWrapGap3, typePrewrapSmSecondary } from "../../shell/type-shell";
+import { typeFlexMinWrapGap3, typeMinSpace4, typePrewrapSmSecondary } from "../../shell/type-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -173,7 +173,7 @@ export function PublicationFeed({
           }
         />
       )}
-      <div className="min-w-0 space-y-4">
+      <div className={typeMinSpace4}>
         {page?.items.map((item) => (
           <article key={item.id} className={panelClipSpace3P5}>
             <header className="flex min-w-0 flex-wrap items-center gap-3">

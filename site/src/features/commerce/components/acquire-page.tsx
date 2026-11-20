@@ -22,6 +22,7 @@ import {
 import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
 import {
   typeDisplayPrimary,
+  typeFlexWrapCenterJustifyGap3,
   typeIcon6Accent,
   typeLabelUpperMuted,
   typeMinBreakWords,
@@ -266,7 +267,7 @@ function AcquireContent() {
             title={productError}
             description={dictionary.errors.message}
             action={
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className={typeFlexWrapCenterJustifyGap3}>
                 <Button
                   type="button"
                   variant="ghost"

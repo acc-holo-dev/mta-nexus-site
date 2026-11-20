@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P6 } from "../../shell/panel-shell";
-import { typeSmSuccess } from "../../shell/type-shell";
+import { typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
@@ -51,7 +51,7 @@ export function OwnDiscussionDetail({
           description={copy.readOnlyHint}
         />
       )}
-      <time dateTime={comment.createdAt} className="text-xs text-muted">
+      <time dateTime={comment.createdAt} className={typeXsMuted}>
         {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
           timeZone: "UTC",
           timeZoneName: "short",
@@ -105,7 +105,7 @@ export function OwnDiscussionDetail({
           {copy.edited}
         </p>
       )}
-      <p className="text-xs text-muted">{copy.privacy}</p>
+      <p className={typeXsMuted}>{copy.privacy}</p>
     </article>
   );
 }

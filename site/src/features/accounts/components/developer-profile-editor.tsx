@@ -7,7 +7,7 @@ import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
-import { typeFlexWrapGap3, typeSmSuccess } from "../../shell/type-shell";
+import { typeFlexWrapGap3, typeSmMuted, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -140,8 +140,8 @@ export function DeveloperProfileEditor({
   }
   return (
     <div className={panelClipSpace5P5Sm} aria-busy={pending}>
-      <p className="text-sm text-muted">{copy.invalidation}</p>
-      <p className="text-xs text-muted">{copy.pendingChange}</p>
+      <p className={typeSmMuted}>{copy.invalidation}</p>
+      <p className={typeXsMuted}>{copy.pendingChange}</p>
       {profile?.verifiedDeveloper && (
         <p className="text-sm font-semibold text-success">{copy.experience}</p>
       )}

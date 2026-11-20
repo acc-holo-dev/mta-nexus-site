@@ -16,7 +16,9 @@ import {
   typeFlexMinWrapGap4Sm,
   typeNumericPrimary,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
@@ -121,7 +123,7 @@ export async function PublicSubscriptionsScreen({
               <p className={typeSmSecondary}>
                 {copy.commission}: {(plan.commissionBps / 100).toLocaleString(locale)}%
               </p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.revision} {plan.revision} · {plan.slug}
               </p>
               {plan.price === 0 ? (
@@ -137,7 +139,7 @@ export async function PublicSubscriptionsScreen({
                   variant="outline"
                   size="touch"
                   disabled
-                  className="text-sm text-muted"
+                  className={typeSmMuted}
                 >
                   {copy.unavailable}
                 </Button>

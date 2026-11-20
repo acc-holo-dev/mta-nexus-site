@@ -17,8 +17,10 @@ import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
   typeFlexCenterGap3,
   typePrewrapBreak,
+  typeSmMuted,
   typeSmSemiboldPrimary,
   typeSmSuccess,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 const textareaClass =
@@ -166,9 +168,9 @@ export function PublicProfileForm() {
       <h2 id="public-profile-heading" className={typeSmSemiboldPrimary}>
         {copy.profile}
       </h2>
-      <p className="text-xs text-muted">{copy.profileDescription}</p>
+      <p className={typeXsMuted}>{copy.profileDescription}</p>
       {loading && (
-        <p role="status" aria-live="polite" aria-busy={true} className="text-sm text-muted">
+        <p role="status" aria-live="polite" aria-busy={true} className={typeSmMuted}>
           {copy.loading}
         </p>
       )}
@@ -247,13 +249,11 @@ export function PublicProfileForm() {
           </fieldset>
         </form>
       )}
-      {profile && recoveryRequired && (
-        <p className="text-sm text-muted">{copy.profileRecoveryHelp}</p>
-      )}
+      {profile && recoveryRequired && <p className={typeSmMuted}>{copy.profileRecoveryHelp}</p>}
       {profile && latest && (
         <section className={surfaceSpace2P4} aria-label={copy.profileLatest}>
           <h3 className="font-semibold">{copy.profileLatest}</h3>
-          <p className="text-sm text-muted">{copy.profileCompareHelp}</p>
+          <p className={typeSmMuted}>{copy.profileCompareHelp}</p>
           <p className="break-words">
             {copy.displayName}: {latest.displayName}
           </p>

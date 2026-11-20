@@ -10,10 +10,12 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import {
+  typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap2,
   typeIcon6Accent,
   typeMinBreakWords,
   typeSemiboldPrimary,
+  typeSmMuted,
 } from "../../shell/type-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
@@ -230,7 +232,7 @@ export async function MarketPage({
                   </ul>
                 </div>
               ) : null}
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className={typeFlexWrapCenterJustifyGap3}>
                 {page > 1 ? (
                   <Link
                     href={buildHref(type, sort, query)}
@@ -274,7 +276,7 @@ export async function MarketPage({
           ) : (
             <span />
           )}
-          <span className="text-sm text-muted">
+          <span className={typeSmMuted}>
             {dictionary.market.pageLabel} {page}
           </span>
           {catalog.hasMore && page < MAX_MARKET_PAGE ? (

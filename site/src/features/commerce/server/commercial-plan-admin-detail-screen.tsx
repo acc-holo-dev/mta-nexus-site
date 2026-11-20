@@ -16,8 +16,10 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeMinSpace4,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -129,7 +131,7 @@ export async function CommercialPlanAdminDetailScreen({
         actorId={user.id}
         plan={editor}
       />
-      <section aria-labelledby="plan-history" className="min-w-0 space-y-4">
+      <section aria-labelledby="plan-history" className={typeMinSpace4}>
         <h2 id="plan-history" className={typeXlSemiboldPrimary}>
           {copy.history} ({result.total})
         </h2>
@@ -139,7 +141,7 @@ export async function CommercialPlanAdminDetailScreen({
               <h3 className={typeSemiboldPrimary}>
                 {copy.revision} {version.revision} · {copy[version.status]}
               </h3>
-              <time dateTime={version.createdAt.toISOString()} className="text-sm text-muted">
+              <time dateTime={version.createdAt.toISOString()} className={typeSmMuted}>
                 {formatHistoryDate(version.createdAt, locale)}
               </time>
               <p className="break-words text-sm text-primary">

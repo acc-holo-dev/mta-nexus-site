@@ -8,6 +8,7 @@ import {
   typeFlexCenterGap2,
   typeIconAccent,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import type { NotificationPreferences } from "../notification-preferences-confirmation";
 import { type PushIdentity, WebPushSettings } from "./web-push-settings";
@@ -45,7 +46,7 @@ export function SettingsNotificationPreferencesSection({
           {copy.notificationPreferences}
         </h2>
       </div>
-      <p className="text-xs text-muted">{copy.notificationDescription}</p>
+      <p className={typeXsMuted}>{copy.notificationDescription}</p>
       <div className="divide-y divide-base">
         {preferences &&
           preferenceLabels.map(({ key, label, description }) => (

@@ -18,6 +18,7 @@ import {
   typeSemiboldPrimary,
   typeSmSecondary,
   typeSmSuccess,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
@@ -486,7 +487,7 @@ export function ResourceVariantsForm({
         <form onSubmit={(event) => submit(event, "remove")} className={panelSpace3P5}>
           <h2 className={typeSemiboldPrimary}>{copy.dissolve}</h2>
           <p className={typeSmSecondary}>{copy.dissolveNote}</p>
-          <p className="text-xs text-muted">{copy.reason}</p>
+          <p className={typeXsMuted}>{copy.reason}</p>
           <label htmlFor={`${field}-remove-reason`} className="block text-sm text-secondary">
             {copy.reason}
           </label>

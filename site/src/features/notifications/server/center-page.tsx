@@ -16,7 +16,9 @@ import { surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
   type2xlExtraboldPrimary,
   typeMinH11Semibold,
+  typeSmMuted,
   typeSpace1XsMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
@@ -92,8 +94,8 @@ export async function NotificationCenterPage({
           {copy.workspace}
         </Link>
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">{copy.openBetaNote}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{copy.openBetaNote}</p>
         <Link href="/settings#notification-heading" className={linkAccentSm}>
           {copy.settings}
         </Link>

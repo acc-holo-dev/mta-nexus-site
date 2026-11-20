@@ -12,7 +12,12 @@ import {
   linkAccentTight,
   linkAccentTightSm,
 } from "../../shell/link-shell";
-import { typeCaptionFaint, typeFlexWrapCenterGap2 } from "../../shell/type-shell";
+import {
+  typeCaptionFaint,
+  typeFlexWrapCenterGap2,
+  typeMinSpace1,
+  typeMt3FlexCenterGap3Xs,
+} from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -117,7 +122,7 @@ export function AdminReportsSection({
                   : ""
               }`}
             >
-              <div className="min-w-0 space-y-1">
+              <div className={typeMinSpace1}>
                 <div className={typeFlexWrapCenterGap2}>
                   <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                     {report.type}
@@ -204,7 +209,7 @@ export function AdminReportsSection({
         )}
       </div>
       {(reportPage > 1 || moreReports) && (
-        <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
+        <nav aria-label={copy.reportPages} className={typeMt3FlexCenterGap3Xs}>
           {reportPage > 1 && (
             <Link className={linkAccentTight} href={reportHref(reportView, reportPage - 1)}>
               {copy.previous}

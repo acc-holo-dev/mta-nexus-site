@@ -9,7 +9,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
 import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
 export function ResourceMediaEditor({
@@ -174,7 +174,7 @@ export function ResourceMediaEditor({
                 fallback={copy.previewUnavailable}
               />
             </div>
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {item.width} × {item.height}
               {index === 0 ? ` · ${copy.currentCover}` : ""}
             </p>
@@ -236,7 +236,7 @@ export function ResourceMediaEditor({
       {!readonly && (
         <>
           {dirty && (
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {copy.dirty}
             </p>
           )}

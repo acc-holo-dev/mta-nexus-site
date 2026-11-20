@@ -16,7 +16,7 @@ it("locks library membership revisionLocked to ErrorState", () => {
   expect(source).toContain('id="library-membership-revision-locked"');
   expect(source).toContain("title={c.revisionLocked}");
   expect(source).toContain("{c.archivedNote}");
-  expect(source).toContain('<p role="note" className="text-xs text-muted">');
+  expect(source).toMatch(/<p role="note" className=\{?(?:"text-xs text-muted"|typeXsMuted)\}?>/);
   expect(source).not.toContain(
     '{collection.status === "archived" ? c.archivedNote : c.revisionLocked}',
   );

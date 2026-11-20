@@ -14,10 +14,15 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import {
+  typeFlexCenterBetweenGap3,
   typeFlexWrapCenterBetweenGap3,
   typeFlexWrapEndGap3,
+  typeGridGap4Md2,
+  typeMinFlex1,
+  typeSmMuted,
   typeSmSuccess,
   typeXsFaint,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
@@ -261,7 +266,7 @@ export function FollowWorkspace({
           }
         />
       )}
-      <div aria-busy={!!pending} className="grid gap-4 md:grid-cols-2">
+      <div aria-busy={!!pending} className={typeGridGap4Md2}>
         {page?.items.map((item) => (
           <article key={item.id} className="nexus-panel flex flex-col gap-3 p-4">
             <div className="flex min-w-0 items-start gap-3">
@@ -271,8 +276,8 @@ export function FollowWorkspace({
                 fallback={item.title ?? "?"}
                 size="md"
               />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted">{copy[item.targetType]}</p>
+              <div className={typeMinFlex1}>
+                <p className={typeXsMuted}>{copy[item.targetType]}</p>
                 <h2 className="flex gap-2 text-sm font-bold text-primary">
                   {item.href ? (
                     <Link
@@ -298,7 +303,7 @@ export function FollowWorkspace({
               </div>
             </div>
             {item.targetType === "content" && (
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {item.notifyComments ? copy.watchingDiscussion : copy.quietSaveHint}
               </p>
             )}
@@ -379,7 +384,7 @@ export function FollowWorkspace({
         ))}
       </div>
       {page && (
-        <nav aria-label={copy.page} className="flex items-center justify-between gap-3">
+        <nav aria-label={copy.page} className={typeFlexCenterBetweenGap3}>
           <Button
             type="button"
             variant="outline"
@@ -389,7 +394,7 @@ export function FollowWorkspace({
           >
             {copy.previous}
           </Button>
-          <span className="text-sm text-muted">
+          <span className={typeSmMuted}>
             {copy.page} {history.length + 1}
           </span>
           <Button

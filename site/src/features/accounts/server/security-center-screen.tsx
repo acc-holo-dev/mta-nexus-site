@@ -16,6 +16,7 @@ import {
   typeIconAccent,
   typeMt1XsMuted,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { securityActivityLabelKey } from "../security-activity";
 
@@ -113,7 +114,7 @@ export async function SecurityCenterScreen() {
             {copy.sessions}
           </h2>
         </div>
-        <p className="text-xs text-muted">{copy.sessionsDescription}</p>
+        <p className={typeXsMuted}>{copy.sessionsDescription}</p>
         <div className="min-w-0 space-y-2 overflow-x-clip">
           {sessions.map((session) => (
             <div
@@ -150,7 +151,7 @@ export async function SecurityCenterScreen() {
             {copy.activity}
           </h2>
         </div>
-        <p className="text-xs text-muted">{copy.activityDescription}</p>
+        <p className={typeXsMuted}>{copy.activityDescription}</p>
 
         {activity.length > 0 ? (
           <ol className="min-w-0 divide-y divide-base overflow-x-clip">

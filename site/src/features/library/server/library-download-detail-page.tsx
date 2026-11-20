@@ -19,7 +19,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { SupportDownloadHelpLink } from "../../support/download-help";
 export async function libraryDownloadDetailMetadata(): Promise<Metadata> {
   return {
@@ -96,7 +96,7 @@ export async function LibraryDownloadDetailPage({ params }: { params: Promise<{ 
       </p>
       <p>{copy[receipt.status]}</p>
       <ResourceDeliveryEvidence receipt={receipt} locale={locale} />
-      <p className="text-sm text-muted">{receipt.pinned ? copy.fixed : copy.latest}</p>
+      <p className={typeSmMuted}>{receipt.pinned ? copy.fixed : copy.latest}</p>
       {receipt.downloadable ? (
         <div className="space-y-2">
           <p>{copy.retry}</p>

@@ -30,6 +30,7 @@ import {
   typeFlexWrapEndGap3,
   typeMinH11Semibold,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
@@ -258,7 +259,7 @@ export async function DirectoryResults({
   return (
     <div className="space-y-5">
       {state.type === "servers" && (
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {copy.serversHint}{" "}
           <Link href="/servers" className={linkAccentTightRounded}>
             {copy.master}
@@ -439,7 +440,7 @@ export async function DirectoryResults({
             ) : (
               <span />
             )}
-            <span className="text-sm text-muted">
+            <span className={typeSmMuted}>
               {copy.page} {result.page}
             </span>
             {result.hasMore ? (

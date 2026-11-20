@@ -23,10 +23,12 @@ import {
   typeGrid2Gap4,
   typeLgSemiboldPrimary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmPrimary,
   typeSmSemiboldPrimary,
   typeSmSuccess,
   typeSpace1SmPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
@@ -214,10 +216,8 @@ export function DiscussionReportBatch({
       {allowActions && available.length > 0 && (
         <div className={panelSpace4P5}>
           <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
-          <p className="text-sm text-muted">
-            {commentId === null ? copy.publicationHelp : copy.help}
-          </p>
-          <p className="text-xs text-muted">
+          <p className={typeSmMuted}>{commentId === null ? copy.publicationHelp : copy.help}</p>
+          <p className={typeXsMuted}>
             {commentId === null ? copy.publicationActionHint : copy.noRemoval}
           </p>
           <fieldset disabled={busy || !!preview || blocked} className="space-y-4">
@@ -301,7 +301,7 @@ export function DiscussionReportBatch({
         </div>
       )}
       {busy && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" className={typeSmMuted}>
           {copy.busy}
         </p>
       )}
@@ -353,9 +353,7 @@ export function DiscussionReportBatch({
           {(preview.comment?.truncated ||
             (preview.commentId === null &&
               "truncated" in preview.publication &&
-              preview.publication.truncated)) && (
-            <p className="text-xs text-muted">{copy.truncated}</p>
-          )}
+              preview.publication.truncated)) && <p className={typeXsMuted}>{copy.truncated}</p>}
           <p className="whitespace-pre-wrap break-words text-sm text-primary">
             {copy.notes}: {preview.notes}
           </p>
@@ -371,7 +369,7 @@ export function DiscussionReportBatch({
                 <p className="whitespace-pre-wrap break-words text-sm text-primary">
                   {item.reason}
                 </p>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.transition}: {labels[item.before]} → {labels[item.after]}
                 </p>
               </li>
@@ -430,7 +428,7 @@ export function DiscussionReportBatch({
                 {labels[item.type]} · {labels[item.status]}
               </p>
               <p className="whitespace-pre-wrap break-words text-sm text-primary">{item.reason}</p>
-              <time dateTime={item.createdAt} className="text-xs text-muted">
+              <time dateTime={item.createdAt} className={typeXsMuted}>
                 {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",

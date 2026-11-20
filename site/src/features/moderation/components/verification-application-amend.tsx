@@ -8,7 +8,7 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSemiboldPrimary, typeSmSuccess } from "../../shell/type-shell";
+import { typeSemiboldPrimary, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
@@ -114,7 +114,7 @@ export function VerificationApplicationAmend({
   return (
     <form onSubmit={(event) => void amend(event)} aria-busy={busy} className={panelClipSpace4P5}>
       <h2 className={typeSemiboldPrimary}>{copy.amend}</h2>
-      <p className="text-xs text-muted">{labels.proofPrivacy}</p>
+      <p className={typeXsMuted}>{labels.proofPrivacy}</p>
       <fieldset disabled={busy || blocked} className="space-y-4">
         <label className="block space-y-1 text-sm text-secondary">
           {labels.proof}

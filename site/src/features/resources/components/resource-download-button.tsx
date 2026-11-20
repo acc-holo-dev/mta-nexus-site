@@ -10,7 +10,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeSmSecondary, typeXsMuted } from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
   type DownloadFailure,
@@ -131,7 +131,7 @@ export function ResourceDownloadButton({
     return (
       <div className="space-y-2">
         <ErrorState title={unavailableReason} description={copy.downloadFixedUnavailable} />
-        <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
+        <p className={typeXsMuted}>{copy.downloadNotInstalled}</p>
       </div>
     );
   }
@@ -150,7 +150,7 @@ export function ResourceDownloadButton({
         <Download className="h-4 w-4" aria-hidden="true" />
         {busy ? copy.downloadPreparing : label}
       </Button>
-      <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
+      <p className={typeXsMuted}>{copy.downloadNotInstalled}</p>
       {busy && (
         <div className="space-y-2">
           <progress

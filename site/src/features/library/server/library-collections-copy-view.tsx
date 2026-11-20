@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax2xlStandard } from "../../shell/page-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -37,7 +37,7 @@ export async function LibraryCollectionsCopyView({
       <p role="note" className={typeSmSecondary}>
         {c.copyNote}
       </p>
-      <p className="text-sm text-muted">{c.limit}</p>
+      <p className={typeSmMuted}>{c.limit}</p>
       <LibraryCollectionCommandForm
         key={`copy:${actor.id}:${id}:${preview.source.revision}:${preview.sourceDigest}`}
         actorId={actor.id}

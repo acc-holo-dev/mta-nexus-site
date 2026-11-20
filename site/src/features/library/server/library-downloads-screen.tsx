@@ -29,6 +29,7 @@ import {
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 const filterNavClass =
@@ -188,7 +189,7 @@ export async function LibraryDownloadsScreen({
                 <span className={typeSmSecondary}>{copy[receipt.status]}</span>
               </div>
               <ResourceDeliveryEvidence receipt={receipt} locale={locale} />
-              <p className="text-xs text-muted">{receipt.pinned ? copy.fixed : copy.latest}</p>
+              <p className={typeXsMuted}>{receipt.pinned ? copy.fixed : copy.latest}</p>
               <div className={typeFlexWrapGap4}>
                 <Link
                   href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}

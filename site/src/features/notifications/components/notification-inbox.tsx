@@ -20,6 +20,8 @@ import {
   typeFlexStartGap3,
   typeFlexWrapGap4,
   typePrewrapSmSecondary,
+  typeSmMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   confirmedNotificationInboxCommand,
@@ -282,12 +284,12 @@ export function NotificationInbox({
     }).format(new Date(value));
   return (
     <section className="space-y-4" aria-label={copy.title}>
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.totalUnread}: <strong className="text-primary">{page.unreadCount}</strong>
       </p>
-      <p className="text-xs text-muted">{copy.live}</p>
+      <p className={typeXsMuted}>{copy.live}</p>
       {page.window && (
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {copy.window}: <time dateTime={page.window.from}>{displayDate(page.window.from)}</time>
           {" — "}
           <time dateTime={page.window.until}>{displayDate(page.window.until)}</time>
@@ -295,7 +297,7 @@ export function NotificationInbox({
       )}
       <div className={panelSpace2P4}>
         {busy || blocked ? (
-          <span aria-disabled="true" className="text-sm text-muted">
+          <span aria-disabled="true" className={typeSmMuted}>
             {copy.export}
           </span>
         ) : (
@@ -315,10 +317,10 @@ export function NotificationInbox({
             {copy.export}
           </a>
         )}
-        <p className="text-xs text-muted">{copy.exportHelp}</p>
+        <p className={typeXsMuted}>{copy.exportHelp}</p>
       </div>
       {busy && (
-        <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
+        <p role="status" aria-live="polite" aria-busy="true" className={typeSmMuted}>
           {exporting ? copy.exportLoading : copy.loading}
         </p>
       )}
@@ -369,7 +371,7 @@ export function NotificationInbox({
           />
           {copy.selectPage}
         </label>
-        <span className="text-xs text-muted">
+        <span className={typeXsMuted}>
           {copy.selected}: {selected.length}
         </span>
         <ActionConfirmCheckbox
@@ -465,7 +467,7 @@ export function NotificationInbox({
                       UTC
                     </time>
                   </div>
-                  {item.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+                  {item.truncated && <p className={typeXsMuted}>{copy.truncated}</p>}
                   <div className="flex flex-wrap items-center gap-4">
                     {item.link && (
                       // Destination navigation alone does not change isRead; use the explicit mark controls.

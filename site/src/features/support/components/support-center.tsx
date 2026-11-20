@@ -12,6 +12,7 @@ import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeFlexCenterBetweenGap3,
   typeFlexCenterGap2,
   typeFlexWrapStartBetweenGap3,
   typeHeadingPrimary,
@@ -20,6 +21,7 @@ import {
   typeLabelSecondary,
   typeLabelUpperMuted,
   typeMt1XsMuted,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import {
@@ -529,7 +531,7 @@ export function SupportCenter({
 
         {loading ? (
           <div role="status" aria-live="polite" className="space-y-3">
-            <p className="text-sm text-muted">{copy.loading}</p>
+            <p className={typeSmMuted}>{copy.loading}</p>
             <div className="animate-pulse space-y-3" aria-hidden="true">
               {[1, 2, 3].map((key) => (
                 <div key={key} className="nexus-panel h-24 p-4">
@@ -601,10 +603,7 @@ export function SupportCenter({
       </section>
 
       {totalPages > 1 && (
-        <nav
-          aria-label={dictionary.market.paginationLabel}
-          className="flex items-center justify-between gap-3"
-        >
+        <nav aria-label={dictionary.market.paginationLabel} className={typeFlexCenterBetweenGap3}>
           {page > 1 ? (
             <Link href={supportHref(basePath, initialFilters, page - 1)} className={linkAccentSm}>
               {dictionary.market.previousPage}

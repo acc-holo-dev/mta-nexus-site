@@ -24,6 +24,7 @@ import {
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 export async function resourcePublisherModerationMetadata(): Promise<Metadata> {
@@ -117,7 +118,7 @@ export async function ResourcePublisherModerationScreen({
               <h3 className={typeSemiboldPrimary}>
                 {resourceModerationLabel(locale, event.action)}
               </h3>
-              <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={event.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
               {event.reason ? <p className={typePrewrapSmSecondary}>{event.reason}</p> : null}

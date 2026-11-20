@@ -16,6 +16,7 @@ import {
   typeHeadingPrimary,
   typeMinH11Semibold,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeSpace1XsMuted,
 } from "../../shell/type-shell";
@@ -78,7 +79,7 @@ export async function ApprovalHistoryPage({
             {page.subject.name} (@{page.subject.username})
           </p>
         )}
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         <p className={typeSmSecondary}>{copy.scope}</p>
       </header>
       {page && (
@@ -86,7 +87,7 @@ export async function ApprovalHistoryPage({
           <h2 className={typeHeadingPrimary}>{copy.current}</h2>
           <dl className={typeGrid2Gap4}>
             <div>
-              <dt className="text-sm text-muted">{copy.user}</dt>
+              <dt className={typeSmMuted}>{copy.user}</dt>
               <dd
                 className={`text-sm font-semibold ${page.subject.identityVerified ? "text-success" : "text-muted"}`}
               >
@@ -94,7 +95,7 @@ export async function ApprovalHistoryPage({
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted">{copy.developer}</dt>
+              <dt className={typeSmMuted}>{copy.developer}</dt>
               <dd
                 className={`text-sm font-semibold ${page.subject.developerVerified ? "text-success" : "text-muted"}`}
               >
@@ -161,7 +162,7 @@ export async function ApprovalHistoryPage({
             <li key={record.key} className={panelClipSpace2P5}>
               <h2 className={typeSemiboldPrimary}>{copy[record.type]}</h2>
               <p className={typeSmSecondary}>{copy.approved}</p>
-              <time dateTime={record.approvedAt} className="text-sm text-muted">
+              <time dateTime={record.approvedAt} className={typeSmMuted}>
                 {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",

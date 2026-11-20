@@ -10,6 +10,8 @@ import {
   typeCaptionMuted,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
+  typeMinSpace1,
+  typeMt3FlexCenterGap3Xs,
 } from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -90,7 +92,7 @@ export function AdminBuildsQuarantineSection({
           {pendingBuilds.length > 0 ? (
             pendingBuilds.map((build) => (
               <div key={build.id} className={panelFlexBetweenP4}>
-                <div className="min-w-0 space-y-1">
+                <div className={typeMinSpace1}>
                   <div className={typeFlexCenterGap2}>
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                       {copy.pendingReview}
@@ -163,7 +165,7 @@ export function AdminBuildsQuarantineSection({
           )}
         </div>
         {(buildPage > 1 || moreBuilds) && (
-          <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
+          <nav aria-label={copy.buildPages} className={typeMt3FlexCenterGap3Xs}>
             {buildPage > 1 && (
               <Link className={linkAccent} href={adminHref({ buildPage: buildPage - 1 })}>
                 {copy.previous}
@@ -192,7 +194,7 @@ export function AdminBuildsQuarantineSection({
           {riskBuilds.length > 0 ? (
             riskBuilds.map((build) => (
               <div key={build.id} className={panelFlexBetweenP4}>
-                <div className="min-w-0 space-y-1">
+                <div className={typeMinSpace1}>
                   <div className={typeFlexWrapCenterGap2}>
                     <StatusBadge
                       status={adminStatusLabel(locale, build.status)}
@@ -270,7 +272,7 @@ export function AdminBuildsQuarantineSection({
           )}
         </div>
         {(riskBuildPage > 1 || moreRiskBuilds) && (
-          <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
+          <nav aria-label={copy.quarantinePages} className={typeMt3FlexCenterGap3Xs}>
             {riskBuildPage > 1 && (
               <Link className={linkAccent} href={adminHref({ riskBuildPage: riskBuildPage - 1 })}>
                 {copy.previous}

@@ -15,6 +15,9 @@ import {
   typePrewrapBreakSecondary,
   typePrewrapSmSecondary,
   typeSmSemiboldPrimary,
+  typeSpace2Sm,
+  typeXsLeadingMuted,
+  typeXsMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { confirmedServerReview } from "../server-review-confirmation";
@@ -339,7 +342,7 @@ export function ServerReviewPanel({
         <h2 id="server-reviews-heading" className="text-base font-bold text-primary">
           {copy.title}
         </h2>
-        <p className="text-xs leading-relaxed text-muted">{copy.description}</p>
+        <p className={typeXsLeadingMuted}>{copy.description}</p>
       </header>
 
       {unavailable || !page ? (
@@ -400,7 +403,7 @@ export function ServerReviewPanel({
           <>
             <p className={typeXsSecondary}>{copy.access}</p>
             {mine?.review && (
-              <p className="text-xs text-muted">{serverReviewState(locale, mine.review.status)}</p>
+              <p className={typeXsMuted}>{serverReviewState(locale, mine.review.status)}</p>
             )}
             {mine?.review?.moderationReason && (
               <p className={typeXsSecondary}>
@@ -517,7 +520,7 @@ export function ServerReviewPanel({
           </p>
         ) : null}
         {conflict && (
-          <div className="space-y-2 text-sm">
+          <div className={typeSpace2Sm}>
             <Button
               type="button"
               variant="outline"

@@ -14,7 +14,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap3, typeFlexWrapGap4Sm } from "../../shell/type-shell";
+import { typeFlexWrapGap3, typeFlexWrapGap4Sm, typeSmMuted } from "../../shell/type-shell";
 import { StorageDiscoveryControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { storageQuery } from "../storage-maintenance-query";
@@ -137,7 +137,7 @@ export async function StaffStorageScreen({
                 {copy.states[item.state]} · {copy.size}: {item.identity.sizeBytes} ·{" "}
                 {copy.referenced}: {item.referenced ? copy.yes : copy.no}
               </p>
-              <p className="text-sm text-muted">
+              <p className={typeSmMuted}>
                 {copy.modified}: {item.modifiedAt.toISOString()}
               </p>
             </li>

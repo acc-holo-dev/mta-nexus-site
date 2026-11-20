@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useNexusLocale } from "../locale";
 import { readSafePublicErrorReference } from "../safe-public-error-reference";
-import { typeCaptionMuted, typeDisplayPrimary } from "../type-shell";
+import { typeCaptionMuted, typeDisplayPrimary, typeFlexWrapCenterJustifyGap3 } from "../type-shell";
 
 export function RouteErrorPage({
   error,
@@ -74,7 +74,7 @@ export function RouteErrorPage({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-center gap-3">
+      <div className={typeFlexWrapCenterJustifyGap3}>
         <Button
           type="button"
           size="touch"

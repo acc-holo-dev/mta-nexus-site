@@ -15,7 +15,14 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeNumericPrimary, typeSmSecondary, typeXlSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeMinBreakSemiboldPrimary,
+  typeMinSpace4,
+  typeNumericPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -147,7 +154,7 @@ export async function PurchaseDetailScreen({
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {copy.receiptNote}
       </p>
-      <section className="min-w-0 space-y-4" aria-labelledby="order-items">
+      <section className={typeMinSpace4} aria-labelledby="order-items">
         <h2 id="order-items" className={typeXlSemiboldPrimary}>
           {copy.lineItems} ({result.total})
         </h2>
@@ -161,14 +168,14 @@ export async function PurchaseDetailScreen({
           <ol className="space-y-3">
             {items.map((item) => (
               <li key={item.id} className={panelMinSpace3P5}>
-                <h3 className="min-w-0 break-words font-semibold text-primary">
+                <h3 className={typeMinBreakSemiboldPrimary}>
                   {item.productTitle ?? copy.unavailableResource}
                 </h3>
                 <p className={typeSmSecondary}>
                   {copy.linePrice}:{" "}
                   {formatHistoryAmount(item.unitPrice, item.currency, typedLocale)}
                 </p>
-                <p className="text-sm text-muted">
+                <p className={typeSmMuted}>
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>
                 {item.hasCurrentAccess && (

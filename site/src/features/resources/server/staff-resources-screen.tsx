@@ -31,6 +31,7 @@ import {
   typeFlexWrapGap4Sm,
   typeSmSecondary,
   typeSpace1SmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
@@ -171,7 +172,7 @@ export async function StaffResourcesScreen({
               <p className={typeSmSecondary}>
                 {resourceStatusLabel(locale, product.status)} · {product.currentVersion}
               </p>
-              <time dateTime={product.updatedAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={product.updatedAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(product.updatedAt, locale)}
               </time>
             </li>

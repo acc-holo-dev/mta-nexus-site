@@ -21,6 +21,8 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   typeFlexMinWrapGap4Sm,
   typeLgSemiboldPrimary,
+  typeMinSpace2,
+  typeMinSpace4,
   typeSmPrimary,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -304,8 +306,8 @@ export function LicenseControlPanel({
         </>
       )}
       {actions.length > 0 && (
-        <form onSubmit={submit} className="min-w-0 space-y-4">
-          <fieldset disabled={busy || refreshing} className="min-w-0 space-y-4">
+        <form onSubmit={submit} className={typeMinSpace4}>
+          <fieldset disabled={busy || refreshing} className={typeMinSpace4}>
             <label className="block min-w-0 text-sm text-secondary" htmlFor={`${fieldId}-action`}>
               {copy.action}
               <select
@@ -325,7 +327,7 @@ export function LicenseControlPanel({
               </select>
             </label>
             {action === "bind" && (
-              <div className="min-w-0 space-y-2">
+              <div className={typeMinSpace2}>
                 <label
                   className="block min-w-0 text-sm text-secondary"
                   htmlFor={`${fieldId}-server`}

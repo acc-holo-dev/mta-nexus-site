@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { privateRequest } from "../private-request";
 import {
   getResourceBuildWorkspaceCopy,
@@ -126,7 +126,7 @@ export function ResourceBuildControls({
   return (
     <section className="space-y-4" aria-busy={pending}>
       <p className={typeSmSecondary}>{copy.immutable}</p>
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.revision}: {current.revision} · {copy.statuses[current.status]}
       </p>
       {withdrawn ? (

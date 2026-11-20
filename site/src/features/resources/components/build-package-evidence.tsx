@@ -8,7 +8,12 @@ import { getDictionary } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { linkAccentTightSm } from "../../shell/link-shell";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
-import { typeBreakAllXs, typeSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 export function BuildPackageSummaryPanel({
@@ -79,7 +84,7 @@ export function BuildPackageSummaryPanel({
           ) : null}
         </>
       )}
-      <p className="text-xs text-muted">{copy.publicNote}</p>
+      <p className={typeXsMuted}>{copy.publicNote}</p>
     </section>
   );
 }
@@ -107,7 +112,7 @@ export function BuildPackageEvidencePanel({
       <BuildPackageSummaryPanel summary={buildPackageSummary(evidence)} locale={locale} />
       {evidence && (
         <>
-          <p className="text-xs text-muted">
+          <p className={typeXsMuted}>
             {copy.inspected}:{" "}
             <time dateTime={evidence.inspectedAt}>
               {new Date(evidence.inspectedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
@@ -116,7 +121,7 @@ export function BuildPackageEvidencePanel({
           <a href={reportHref} className={linkAccentTightSm}>
             {copy.export}
           </a>
-          <p className="text-sm text-muted">{copy.note}</p>
+          <p className={typeSmMuted}>{copy.note}</p>
           {manifest && (
             <section className="space-y-4 rounded-lg border border-base p-4 text-sm">
               <p className="break-words font-code">{manifest.path}</p>

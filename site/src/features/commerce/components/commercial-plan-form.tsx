@@ -14,8 +14,10 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace5P5, panelP5 } from "../../shell/panel-shell";
 import {
+  typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap3,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSuccess,
 } from "../../shell/type-shell";
@@ -382,7 +384,7 @@ export function CommercialPlanForm({
         />
       </label>
       {plan && dirty ? (
-        <p role="note" className="text-sm text-muted">
+        <p role="note" className={typeSmMuted}>
           {copy.dirtyNote}
         </p>
       ) : null}
@@ -392,7 +394,7 @@ export function CommercialPlanForm({
           title={copy.previousResultUnknown}
           description={marker.slug}
           action={
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className={typeFlexWrapCenterJustifyGap3}>
               <a href="/admin/commerce/plans" className="underline">
                 {copy.back}
               </a>

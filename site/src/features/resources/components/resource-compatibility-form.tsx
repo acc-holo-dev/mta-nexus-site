@@ -10,7 +10,12 @@ import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
-import { typePrewrapBreak, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typePrewrapBreak,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { confirmedCompatibility } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
@@ -233,7 +238,7 @@ export function ResourceCompatibilityForm({
               className={textareaClass}
             />
           </div>
-          <p id={`${field}-hint`} className="text-xs text-muted">
+          <p id={`${field}-hint`} className={typeXsMuted}>
             {copy.dependencyHint}
           </p>
           {product.suspended ? (

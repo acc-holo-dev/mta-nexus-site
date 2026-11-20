@@ -12,6 +12,7 @@ import {
   typeDisplayPrimary,
   typeFlexCenterGap3,
   typeSmLeadingMuted,
+  typeSmMuted,
   typeSmSuccess,
 } from "../../shell/type-shell";
 import {
@@ -113,7 +114,7 @@ export function ResetPasswordPage() {
         </div>
 
         {state.kind === "loading" && (
-          <p role="status" className="text-sm text-muted">
+          <p role="status" className={typeSmMuted}>
             {copy.checkingReset}
           </p>
         )}

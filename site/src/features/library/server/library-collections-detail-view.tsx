@@ -10,6 +10,8 @@ import {
   typeBreakSemibold,
   typeFlexWrapEndGap3,
   typeFlexWrapGap4Sm,
+  typeGridGap4Md2,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
@@ -88,7 +90,7 @@ export async function LibraryCollectionsDetailView({
       )}
       {!adding && (
         <>
-          <p role="note" className="text-sm text-muted">
+          <p role="note" className={typeSmMuted}>
             {c.watchesIndependentNote}
           </p>
           <Link
@@ -237,7 +239,7 @@ export async function LibraryCollectionsDetailView({
           items={result.items.filter((item) => !adding || !item.inCollection)}
         />
       )}
-      <ol className="grid gap-4 md:grid-cols-2">
+      <ol className={typeGridGap4Md2}>
         {result.items.map((item) => (
           <li key={item.productId} className={panelSpace3P5}>
             <h2 className={typeBreakSemibold}>{item.title ?? c.unavailable}</h2>
@@ -280,7 +282,7 @@ export async function LibraryCollectionsDetailView({
             </div>
             {collection.status === "active" &&
               (adding && item.inCollection ? (
-                <p role="status" className="text-sm text-muted">
+                <p role="status" className={typeSmMuted}>
                   {c.inCollection}
                 </p>
               ) : (

@@ -32,6 +32,7 @@ import {
   typeFlexWrapCenterGap2,
   typeHeadingPrimary,
   typeMaxXlSmLeadingMuted,
+  typeMinSpace15,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
@@ -161,7 +162,7 @@ export async function OrganizationProfilePage({
             )}
           </div>
 
-          <div className="min-w-0 space-y-1.5">
+          <div className={typeMinSpace15}>
             <div className={typeFlexWrapCenterGap2}>
               <h1 className="truncate text-2xl font-black text-primary">{organization.name}</h1>
               {organization.isVerified && (

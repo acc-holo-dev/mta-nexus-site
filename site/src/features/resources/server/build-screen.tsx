@@ -21,6 +21,7 @@ import {
   typeDisplayPrimary,
   typePrewrapBreakSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeXlPrimary,
   typeXlSemiboldPrimary,
@@ -160,7 +161,7 @@ export async function ResourceBuildScreen({
       )}
       {staff && (
         <section className={panelSpace3P5} aria-label={publisherCopy.description}>
-          <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
+          <p className={typeSmMuted}>{publisherCopy.reviewNote}</p>
           <h2 className={typeXlSemiboldPrimary}>{publisherCopy.description}</h2>
           {product.shortDescription && (
             <p className={typePrewrapBreakSecondary}>{product.shortDescription}</p>
@@ -257,10 +258,7 @@ export async function ResourceBuildScreen({
               <li key={event.id} className={surfaceP4}>
                 <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
                 {event.reason && <p className={typePrewrapBreakSecondary}>{event.reason}</p>}
-                <time
-                  dateTime={new Date(event.createdAt).toISOString()}
-                  className="text-sm text-muted"
-                >
+                <time dateTime={new Date(event.createdAt).toISOString()} className={typeSmMuted}>
                   {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
                 </time>
               </li>

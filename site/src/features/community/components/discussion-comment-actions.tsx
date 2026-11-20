@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap3, typeSmSecondary, typeXsSuccess } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3,
+  typeSmSecondary,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
 import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
@@ -275,7 +280,7 @@ export function DiscussionCommentActions({
       ) : null}
       {(stale || blocked) && mode === "edit" && (
         <div className="space-y-2">
-          <p className="text-xs text-muted">{copy.draftKept}</p>
+          <p className={typeXsMuted}>{copy.draftKept}</p>
           <Button
             type="button"
             className="min-h-11 text-xs"

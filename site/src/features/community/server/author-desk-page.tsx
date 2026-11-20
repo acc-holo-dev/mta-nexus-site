@@ -16,10 +16,15 @@ import {
   type2xlExtraboldPrimary,
   typeFlexWrapGap4,
   typeFlexWrapStartBetweenGap3,
+  typeFlexWrapStartBetweenGap4,
+  typeMinBreakSemiboldPrimary,
   typeMinH11Semibold,
+  typeMinSpace3,
+  typeMinW40Flex1Space1XsMuted,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   authorPublicationDeskHref,
@@ -95,7 +100,7 @@ export async function AuthorContentPage({
   const retryHref = filters ? returnPath : "/workspace/content";
   return (
     <div className={pageShellClass}>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div className="min-w-0">
           <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
           <p className={typeMt2SmMuted}>{copy.description}</p>
@@ -109,7 +114,7 @@ export async function AuthorContentPage({
       </header>
       <search aria-label={copy.filters}>
         <form action="/workspace/content" method="get" className={panelFlexMinWrapEndP4}>
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          <label className={typeMinW40Flex1Space1XsMuted}>
             {copy.query}
             <input
               type="search"
@@ -179,7 +184,7 @@ export async function AuthorContentPage({
           </Link>
         </form>
       </search>
-      <p className="text-xs text-muted">{copy.live}</p>
+      <p className={typeXsMuted}>{copy.live}</p>
       <Link
         prefetch={false}
         href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
@@ -218,13 +223,13 @@ export async function AuthorContentPage({
           }
         />
       )}
-      <ul className="min-w-0 space-y-3">
+      <ul className={typeMinSpace3}>
         {filters &&
           report?.items.map((item) => (
             <li key={item.id}>
               <article className={panelMinSpace3P5}>
                 <div className={typeFlexWrapStartBetweenGap3}>
-                  <h2 className="min-w-0 break-words font-semibold text-primary">
+                  <h2 className={typeMinBreakSemiboldPrimary}>
                     <Link
                       prefetch={false}
                       href={`/workspace/content/${encodeURIComponent(item.id)}`}
@@ -232,7 +237,7 @@ export async function AuthorContentPage({
                       {item.title}
                     </Link>
                   </h2>
-                  <span className="text-xs text-muted">{labels[item.status]}</span>
+                  <span className={typeXsMuted}>{labels[item.status]}</span>
                 </div>
                 <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">

@@ -8,9 +8,12 @@ import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeFlexWrapGap3,
+  typeMinSpace3,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeWFullLeftSm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
@@ -67,7 +70,7 @@ export function ServerStatisticsPanel({
   const exportPath = `${managed ? "/api/workspace" : "/api"}/servers/${encodeURIComponent(report.server.id)}/statistics/export`;
   return (
     <div className={pageShellStack6}>
-      <header className="min-w-0 space-y-3">
+      <header className={typeMinSpace3}>
         <Link
           href={
             managed
@@ -80,27 +83,25 @@ export function ServerStatisticsPanel({
         </Link>
         <h1 className="break-words text-2xl font-black text-primary">{copy.title}</h1>
         <p className="break-words text-lg font-semibold text-primary">{report.server.name}</p>
-        <p className="text-sm text-muted">{copy.description}</p>
-        {managed && <p className="text-xs text-muted">{copy.private}</p>}
+        <p className={typeSmMuted}>{copy.description}</p>
+        {managed && <p className={typeXsMuted}>{copy.private}</p>}
         <ServerObservationPeriodControls
           path={path}
           window={report.window}
           end={report.windowEnd}
           locale={locale}
         />
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {copy.snapshot}: <time dateTime={report.windowEnd}>{time(report.windowEnd)} UTC</time>
         </p>
-        <p className="text-xs text-muted">{copy.snapshotScope}</p>
+        <p className={typeXsMuted}>{copy.snapshotScope}</p>
       </header>
       <section className={panelClipSpace3P5}>
         <h2 id="server-statistics-comparison" className="text-lg font-bold text-primary">
           {copy.comparison}
         </h2>
-        <p className="text-sm text-muted">{copy.scope}</p>
-        {report.server.endpointRevision > 0 && (
-          <p className="text-sm text-muted">{copy.lifetime}</p>
-        )}
+        <p className={typeSmMuted}>{copy.scope}</p>
+        {report.server.endpointRevision > 0 && <p className={typeSmMuted}>{copy.lifetime}</p>}
         {!report.collectionEligible ? (
           <ErrorState
             id="server-statistics-collection-paused"
@@ -189,7 +190,7 @@ export function ServerStatisticsPanel({
                 </li>
               ))}
             </ol>
-            <p className="text-xs text-muted">{copy.chartScope}</p>
+            <p className={typeXsMuted}>{copy.chartScope}</p>
           </>
         )}
         <div className="flex flex-wrap justify-between gap-2 text-xs text-muted">
@@ -201,7 +202,7 @@ export function ServerStatisticsPanel({
         <h2 id="server-statistics-observations" className="text-lg font-bold text-primary">
           {copy.observations}
         </h2>
-        <p className="text-sm text-muted">{copy.observationsScope}</p>
+        <p className={typeSmMuted}>{copy.observationsScope}</p>
         <Link
           className={linkAccentSm}
           href={serverStatisticsHref(
@@ -295,7 +296,7 @@ export function ServerStatisticsPanel({
             disabled={report.observations.length === 0}
           />
         </div>
-        <p className="text-sm text-muted">{copy.exportScope}</p>
+        <p className={typeSmMuted}>{copy.exportScope}</p>
       </section>
     </div>
   );

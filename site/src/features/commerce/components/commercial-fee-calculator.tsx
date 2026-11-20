@@ -9,6 +9,7 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   typeGridGap3Sm2,
   typeNumericPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -154,7 +155,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
         </div>
       ) : null}
       <p className={typeSmSecondary}>{copy.hold}</p>
-      <p role="note" className="text-sm text-muted">
+      <p role="note" className={typeSmMuted}>
         {copy.estimateNote}
       </p>
     </section>

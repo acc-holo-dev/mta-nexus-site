@@ -23,7 +23,13 @@ import {
 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexMinWrapGap4Sm, typeMinFlex1Space15SmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakAllXsOnly,
+  typeFlexMinWrapGap4Sm,
+  typeMinBreakDisplay,
+  typeMinFlex1,
+  typeMinFlex1Space15SmSecondary,
+} from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 
 const selectClass =
@@ -125,7 +131,7 @@ export async function LibraryWatchHistoryScreen({
       <Link href="/workspace/library/watches" className={linkAccentSmRounded}>
         {c.back}
       </Link>
-      <h1 className="min-w-0 break-words font-display">{c.title}</h1>
+      <h1 className={typeMinBreakDisplay}>{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
       <form method="get" className={panelFlexClipWrapEndGap4}>
         <label className={typeMinFlex1Space15SmSecondary}>
@@ -148,7 +154,7 @@ export async function LibraryWatchHistoryScreen({
             ))}
           </select>
         </label>
-        <div className="min-w-0 flex-1">
+        <div className={typeMinFlex1}>
           <Input
             name="productId"
             defaultValue={result.productId ?? ""}
@@ -205,7 +211,7 @@ export async function LibraryWatchHistoryScreen({
                           {c.current}: {change.currentTitle}
                         </h3>
                       )}
-                      <code className="break-all text-xs">{change.productId}</code>
+                      <code className={typeBreakAllXsOnly}>{change.productId}</code>
                       <p>
                         {change.enabled ? c.enabled : c.disabled} · {c.revision}: {change.revision}
                       </p>

@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentTightBreakAll, linkGhostAccent } from "../../shell/link-shell";
-import { typeSmSuccess } from "../../shell/type-shell";
+import { typeSmSuccess, typeSpace2Sm } from "../../shell/type-shell";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
@@ -150,7 +150,7 @@ export function LibraryReleaseCommandStatus({
   return (
     <>
       {pending && pendingHref ? (
-        <div className="space-y-2 text-sm">
+        <div className={typeSpace2Sm}>
           <Link href={pendingHref} className={linkAccentTightBreakAll}>
             {copy.pendingResource}: {pendingProductId}
           </Link>

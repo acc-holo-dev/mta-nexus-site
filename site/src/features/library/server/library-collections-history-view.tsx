@@ -4,7 +4,12 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
-import { typeBreakAllXsMuted, typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  typeBreakAllXsMuted,
+  typeDisplayPrimary,
+  typeSmMuted,
+  typeSpace1Sm,
+} from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
@@ -52,7 +57,7 @@ export async function LibraryCollectionsHistoryView({
         {libraryCollectionHistoryCopy(locale).title}
       </Link>
       {!result.items.length && (
-        <p className="text-sm text-muted" role="status" aria-live="polite">
+        <p className={typeSmMuted} role="status" aria-live="polite">
           {c.emptyHistory}
         </p>
       )}
@@ -106,7 +111,7 @@ export async function LibraryCollectionsHistoryView({
                 return (
                   <>
                     {"productIds" in item.command && (
-                      <ul className="space-y-1 text-sm">
+                      <ul className={typeSpace1Sm}>
                         {item.command.productIds.map((productId) => (
                           <li key={productId} className="break-all">
                             {productId}
@@ -127,7 +132,7 @@ export async function LibraryCollectionsHistoryView({
                 moved: c["move-items"],
               } as const;
               return (
-                <ul className="space-y-1 text-sm">
+                <ul className={typeSpace1Sm}>
                   {results.map((entry) => (
                     <li key={`${entry.outcome}:${entry.productId}`} className="break-all">
                       {outcomeLabel[entry.outcome]}: {entry.productId} · {c.batchApplied}

@@ -18,7 +18,9 @@ import {
   typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
   typeSmBoldPrimary,
+  typeSmMuted,
   typeSmPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
@@ -107,8 +109,8 @@ async function ServerWorkspaceHistoryScreen({
         </Link>
         <h1 className={type2xlBoldPrimary}>{history.title}</h1>
         {data && <p className={typeBreakSemiboldPrimary}>{data.server.name}</p>}
-        <p className="text-sm text-muted">{history.description}</p>
-        <p className="text-xs text-muted">{history.private}</p>
+        <p className={typeSmMuted}>{history.description}</p>
+        <p className={typeXsMuted}>{history.private}</p>
       </header>
       <form action={base} method="get" className="nexus-panel flex flex-wrap items-end gap-4 p-5">
         <label className="flex flex-col gap-2 text-sm text-primary">
@@ -164,7 +166,7 @@ async function ServerWorkspaceHistoryScreen({
             <a href={exportPath} className={linkAccentSmRounded}>
               {copy.export}
             </a>
-            <p className="text-xs text-muted">{copy.exportHelp}</p>
+            <p className={typeXsMuted}>{copy.exportHelp}</p>
           </div>
           {!data.events.length ? (
             <EmptyState
@@ -183,13 +185,13 @@ async function ServerWorkspaceHistoryScreen({
               {data.events.map((event) => (
                 <li key={event.id} className={panelClipSpace2P5}>
                   <h2 className={typeSmBoldPrimary}>{history.actions[event.action]}</h2>
-                  <time dateTime={event.createdAt} className="text-xs text-muted">
+                  <time dateTime={event.createdAt} className={typeXsMuted}>
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB", {
                       timeZone: "UTC",
                       timeZoneName: "short",
                     })}
                   </time>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {history.actor}:{" "}
                     {event.actor === "you"
                       ? history.you
@@ -210,7 +212,7 @@ async function ServerWorkspaceHistoryScreen({
                     </Link>
                   )}
                   {event.fields.length > 0 && (
-                    <p className="text-sm text-muted">
+                    <p className={typeSmMuted}>
                       {history.fields}:{" "}
                       {event.fields.map((field) => history.fieldNames[field]).join(", ")}
                     </p>

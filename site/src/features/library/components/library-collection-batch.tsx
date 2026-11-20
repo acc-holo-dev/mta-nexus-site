@@ -16,7 +16,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakAllXs, typeSmSecondary, typeSpace1Sm } from "../../shell/type-shell";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -307,7 +307,7 @@ export function LibraryCollectionBatchForm({
           <p role="status" aria-live="polite">
             {c.saved}
           </p>
-          <ul className="space-y-1 text-sm">
+          <ul className={typeSpace1Sm}>
             {collectionCommandItemResults(pending.current.command).map((entry) => {
               const item = shownItems.find((value) => value.productId === entry.productId);
               return (

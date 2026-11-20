@@ -15,11 +15,13 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBorderT,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapEndGap3,
   typeSmSecondary,
   typeWFullLeftSm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import { deliverySearchParams, publisherDeliveriesQuery } from "../resource-deliveries-query";
@@ -144,7 +146,7 @@ export async function PublisherDeliveriesScreen({
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {(["all", ...RESOURCE_DELIVERY_STATUSES] as const).map((status) => (
           <div key={status} className={panelP4}>
-            <dt className="text-xs text-muted">{status === "all" ? copy.total : copy[status]}</dt>
+            <dt className={typeXsMuted}>{status === "all" ? copy.total : copy[status]}</dt>
             <dd className="text-2xl text-primary">{result.counts[status]}</dd>
           </div>
         ))}
@@ -170,7 +172,7 @@ export async function PublisherDeliveriesScreen({
             </thead>
             <tbody>
               {result.items.map((row) => (
-                <tr key={`${row.buildId}:${row.version}`} className="border-t border-base">
+                <tr key={`${row.buildId}:${row.version}`} className={typeBorderT}>
                   <th scope="row" className="break-words p-3">
                     {row.version}
                   </th>

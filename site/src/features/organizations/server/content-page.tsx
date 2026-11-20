@@ -20,6 +20,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexWrapBetweenGap2,
+  typeFlexWrapStartBetweenGap4,
   typeMt2SmMuted,
   typeXsSecondary,
 } from "../../shell/type-shell";
@@ -76,7 +77,7 @@ export async function OrganizationPublications({
       <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {team.back}
       </Link>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div>
           <h1 className={typeDisplayPrimary}>
             {team.title}

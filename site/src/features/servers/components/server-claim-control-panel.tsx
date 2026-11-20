@@ -18,6 +18,7 @@ import {
   typeSmBoldPrimary,
   typeTenFaint,
   typeTenLeadingFaint,
+  typeXsLeadingMuted,
 } from "../../shell/type-shell";
 import {
   confirmsServerClaimVerification,
@@ -308,7 +309,7 @@ export function ServerClaimControlPanel({
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           <h2 className="text-sm font-bold">{copy.verifiedTitle}</h2>
         </div>
-        <p className="text-xs leading-relaxed text-muted">{copy.verifiedDescription}</p>
+        <p className={typeXsLeadingMuted}>{copy.verifiedDescription}</p>
         <p className={typeTenFaint}>{copy.moderationSeparate}</p>
       </section>
     );

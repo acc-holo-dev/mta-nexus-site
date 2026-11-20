@@ -6,7 +6,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeMinSpace15 } from "../../shell/type-shell";
 import { CommunityTopicForm } from "../topic-form";
 
 export async function NewCommunityTopicPage() {
@@ -28,7 +28,7 @@ export async function NewCommunityTopicPage() {
 
   return (
     <div className={pageShellMax3xl}>
-      <div className="min-w-0 space-y-1.5">
+      <div className={typeMinSpace15}>
         <Link href="/community" className={linkAccentSm}>
           {copy.backToCommunity}
         </Link>

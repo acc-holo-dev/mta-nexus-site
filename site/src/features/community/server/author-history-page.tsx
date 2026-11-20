@@ -15,8 +15,12 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeFlexWrapBetweenGap3,
+  typeMinSpace2,
+  typeMinSpace3,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -105,9 +109,9 @@ export async function PublicationHistoryPage({
       <Link href="/workspace/content" className={linkAccentSm}>
         {labels.back}
       </Link>
-      <header className="min-w-0 space-y-2">
+      <header className={typeMinSpace2}>
         <h1 className={type2xlExtraboldPrimary}>{copy.history}</h1>
-        <p className="text-sm text-muted">{copy.historyDescription}</p>
+        <p className={typeSmMuted}>{copy.historyDescription}</p>
         {report && (
           <h2 className="break-words text-lg font-semibold text-primary">{report.item.title}</h2>
         )}
@@ -125,7 +129,7 @@ export async function PublicationHistoryPage({
       )}
       {report && (
         <>
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {labels.status}: {state(report.item.status)}
           </p>
           <Link
@@ -145,7 +149,7 @@ export async function PublicationHistoryPage({
           )}
           {report.item.status === "archived" && !report.item.recoverable && (
             <div className={panelMinSpace2P4}>
-              <p className="text-sm text-muted">{copy.restoreHelp}</p>
+              <p className={typeSmMuted}>{copy.restoreHelp}</p>
               <Link href={publicationSupportHref(report.item.title)} className={linkAccentSm}>
                 {copy.support}
               </Link>
@@ -157,19 +161,19 @@ export async function PublicationHistoryPage({
           {!report.events.length && (
             <EmptyState title={copy.historyEmpty} description={copy.historyEmptyHint} />
           )}
-          <ol className="min-w-0 space-y-3">
+          <ol className={typeMinSpace3}>
             {report.events.map((event) => (
               <li key={event.id} className={panelMinSpace2P4}>
                 <div className={typeFlexWrapBetweenGap3}>
                   <span className={typeSmSemiboldPrimary}>{action(event.kind)}</span>
-                  <time dateTime={event.createdAt} className="text-xs text-muted">
+                  <time dateTime={event.createdAt} className={typeXsMuted}>
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
                     })}{" "}
                     UTC
                   </time>
                 </div>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {event.actor === "moderation"
                     ? copy.actorModeration
                     : event.actor === "team"

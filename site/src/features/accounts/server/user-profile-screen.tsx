@@ -34,6 +34,7 @@ import {
   typeFlexWrapCenterGap2,
   typeHeadingPrimary,
   typeMaxXlSmLeadingMuted,
+  typeMinSpace15,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
@@ -172,7 +173,7 @@ export async function UserProfileScreen({
             size="lg"
             className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
           />
-          <div className="min-w-0 space-y-1.5">
+          <div className={typeMinSpace15}>
             <div className={typeFlexWrapCenterGap2}>
               <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
               {user.isVerified && (

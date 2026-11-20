@@ -15,10 +15,12 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBorderT,
   typeDisplayPrimary,
   typeFlexWrapGap3,
   typeSmSecondary,
   typeWFullLeftSm,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
@@ -118,7 +120,7 @@ export async function ResourceActivityScreen({
           </Link>
         ))}
       </nav>
-      <p className="text-xs text-muted">
+      <p className={typeXsMuted}>
         <time dateTime={result.from.toISOString()}>{formatHistoryDate(result.from, locale)}</time> —{" "}
         <time dateTime={result.through.toISOString()}>
           {formatHistoryDate(result.through, locale)}
@@ -153,7 +155,7 @@ export async function ResourceActivityScreen({
           </thead>
           <tbody>
             {result.timeline.map((day) => (
-              <tr key={day.day} className="border-t border-base">
+              <tr key={day.day} className={typeBorderT}>
                 <th scope="row" className="px-4 py-3 font-normal">
                   <time dateTime={day.day}>{day.day}</time>
                 </th>
@@ -171,7 +173,7 @@ export async function ResourceActivityScreen({
         >
           {copy.export}
         </a>
-        <p className="text-xs text-muted">{copy.exportNote}</p>
+        <p className={typeXsMuted}>{copy.exportNote}</p>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkAccentSm, linkMinHAccentFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import { typeSmSecondary, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
 export function ResourceReleaseWatchControl({
@@ -175,7 +175,7 @@ export function ResourceReleaseWatchControl({
     return (
       <div className="space-y-2">
         <p className={typeSmSecondary}>{copy.signInRequired}</p>
-        <p className="text-xs text-muted">{copy.note}</p>
+        <p className={typeXsMuted}>{copy.note}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -191,8 +191,8 @@ export function ResourceReleaseWatchControl({
       {surface === "detail" ? (
         <>
           <p className={typeSmSecondary}>{copy.note}</p>
-          <p className="text-xs text-muted">{copy.pinned}</p>
-          <p className="text-xs text-muted">{copy.limit}</p>
+          <p className={typeXsMuted}>{copy.pinned}</p>
+          <p className={typeXsMuted}>{copy.limit}</p>
         </>
       ) : null}
       {!commerceEnabled ? (

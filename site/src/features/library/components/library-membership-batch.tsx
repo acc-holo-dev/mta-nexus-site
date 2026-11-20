@@ -13,7 +13,12 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeFlexStartGap3, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeFlexStartGap3,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
@@ -172,7 +177,7 @@ export function LibraryMembershipBatchForm({
     <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{h.title}</h2>
       <p className={typeSmSecondary}>{h.note}</p>
-      <p className="text-xs text-muted">{h.quota}</p>
+      <p className={typeXsMuted}>{h.quota}</p>
       <code className={typeBreakAllXs}>
         {pending.current?.productId ?? report.resource.productId}
       </code>
@@ -215,7 +220,7 @@ export function LibraryMembershipBatchForm({
                       <span className="block text-xs text-muted">{h.desired}</span>
                     </span>
                   </label>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {c[collection.status]} · {c.revision} {collection.revision} · {c.items}:{" "}
                     {collection.itemCount}/{report.itemLimit} · {h.current}:{" "}
                     {collection.inCollection ? c.inCollection : c.notInCollection}
@@ -229,7 +234,7 @@ export function LibraryMembershipBatchForm({
                   ) : null}
                   {readOnly &&
                     (collection.status === "archived" ? (
-                      <p role="note" className="text-xs text-muted">
+                      <p role="note" className={typeXsMuted}>
                         {c.archivedNote}
                       </p>
                     ) : (

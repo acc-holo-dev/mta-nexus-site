@@ -3,7 +3,7 @@ import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -49,12 +49,12 @@ export function PlanReviewDetailView({
             </div>
           ))}
         </dl>
-        <p className="text-sm text-muted">{c.baseline}</p>
+        <p className={typeSmMuted}>{c.baseline}</p>
       </section>
       <section className={panelSpace4P5}>
         <h2 className="text-xl font-semibold">{c.latest}</h2>
         <p role="status">{c[detail.state]}</p>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {c.observed}:{" "}
           <time dateTime={detail.observedAt.toISOString()}>
             {formatHistoryDate(detail.observedAt, locale)}

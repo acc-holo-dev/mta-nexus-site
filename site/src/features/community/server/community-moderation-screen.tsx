@@ -38,10 +38,15 @@ import {
   type2xlBoldPrimary,
   typeFlexWrapGap4,
   typeHeadingPrimary,
+  typeMinSpace2,
+  typeMinSpace3,
+  typeMinSpace4,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSmPrimary,
   typeSpace1XsMuted,
   typeXlBoldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
@@ -156,7 +161,7 @@ export async function CommunityModerationScreen({
         </Link>
         <header className={panelMinSpace3P5}>
           <h1 className="break-words text-2xl font-bold text-primary">{item.title}</h1>
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {types[item.type]} · {copy[item.status]}
           </p>
           <Link
@@ -165,7 +170,7 @@ export async function CommunityModerationScreen({
           >
             {item.author.name} (@{item.author.username})
           </Link>
-          <p className="text-xs text-muted">
+          <p className={typeXsMuted}>
             {copy.updated}: {date(item.updatedAt)}
           </p>
           {item.status === "published" && (
@@ -195,13 +200,13 @@ export async function CommunityModerationScreen({
             {item.body}
           </div>
           {item.truncated ? (
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {copy.large}
             </p>
           ) : null}
         </section>
         <section className={panelMinSpace4P5}>
-          <p className="text-sm text-muted">{copy.description}</p>
+          <p className={typeSmMuted}>{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
             className={linkAccentSm}
@@ -217,9 +222,9 @@ export async function CommunityModerationScreen({
             workspace
           />
         </section>
-        <section className="min-w-0 space-y-4">
+        <section className={typeMinSpace4}>
           <h2 className={typeHeadingPrimary}>{copy.history}</h2>
-          <p className="text-sm text-muted">{copy.historyScope}</p>
+          <p className={typeSmMuted}>{copy.historyScope}</p>
           <a className={linkAccentSm} href={moderationDetailHref(id)}>
             {copy.latest}
           </a>
@@ -230,14 +235,14 @@ export async function CommunityModerationScreen({
               icon={<FileText className="h-6 w-6" aria-hidden="true" />}
             />
           ) : null}
-          <ol className="min-w-0 space-y-3">
+          <ol className={typeMinSpace3}>
             {history.map((event) => (
               <li key={event.id} className={panelMinSpace2P5}>
                 <p className={typeSmPrimary}>
                   {event.action === "content.published" ? copy.publish : copy.archive} ·{" "}
                   {date(event.createdAt)}
                 </p>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {event.from ? copy[event.from] : copy.unknown} →{" "}
                   {event.to ? copy[event.to] : copy.unknown}
                 </p>
@@ -281,9 +286,9 @@ export async function CommunityModerationScreen({
   );
   return (
     <div className={pageShellStack6}>
-      <header className="min-w-0 space-y-2">
+      <header className={typeMinSpace2}>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         <Link className={linkAccentSm} href="/admin/reports">
           {copy.reports}
         </Link>
@@ -362,7 +367,7 @@ export async function CommunityModerationScreen({
               }
             />
           ) : (
-            <ul className="min-w-0 space-y-3">
+            <ul className={typeMinSpace3}>
               {parsed.data.items.map((item) => (
                 <li key={item.id} className={panelMinSpace2P5}>
                   <Link
@@ -371,7 +376,7 @@ export async function CommunityModerationScreen({
                   >
                     {item.title}
                   </Link>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {types[item.type]} · {copy[item.status]} · @{item.author.username} ·{" "}
                     {date(item.updatedAt)}
                   </p>

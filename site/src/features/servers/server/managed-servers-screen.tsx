@@ -15,7 +15,14 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeMinH11Semibold, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapCenterGap4Sm,
+  typeFlexWrapStartBetweenGap4,
+  typeMinH11Semibold,
+  typeMinSpace2,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { ManagedServerCard } from "../managed-card-server";
 import {
   getManagedServerCopy,
@@ -91,8 +98,8 @@ export async function ManagedServersScreen({
   );
   return (
     <div className={pageShellClass}>
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 space-y-2">
+      <header className={typeFlexWrapStartBetweenGap4}>
+        <div className={typeMinSpace2}>
           <Link href="/workspace" className={linkAccentSm}>
             ← {copy.back}
           </Link>
@@ -217,7 +224,7 @@ export async function ManagedServersScreen({
         />
       )}
       {result.totalPages > 1 && (
-        <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapCenterGap4Sm}>
           {result.page > 1 && (
             <Link href={managedServerHref(filters, result.page - 1)} className={linkAccentSm}>
               {copy.previous}

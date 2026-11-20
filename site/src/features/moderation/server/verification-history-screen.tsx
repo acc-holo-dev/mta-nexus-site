@@ -17,9 +17,13 @@ import {
   type2xlBoldPrimary,
   typeBreakAllXsMuted,
   typeFlexWrapStartBetweenGap3,
+  typeMinBreakSemiboldPrimary,
+  typeMinSpace3,
+  typeMinW40Flex1Space1XsMuted,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   parseVerificationApplicationsQuery,
@@ -107,7 +111,7 @@ export async function VerificationHistoryScreen({
           action="/workspace/verification/history"
           className={panelFlexMinWrapEndP4}
         >
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          <label className={typeMinW40Flex1Space1XsMuted}>
             {copy.query}
             <input
               type="search"
@@ -156,7 +160,7 @@ export async function VerificationHistoryScreen({
           ) : null}
         </form>
       </search>
-      <p className="text-xs text-muted">{copy.live}</p>
+      <p className={typeXsMuted}>{copy.live}</p>
       <Link
         prefetch={false}
         href={filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"}
@@ -196,12 +200,12 @@ export async function VerificationHistoryScreen({
           }
         />
       ) : null}
-      <ul className="min-w-0 space-y-3">
+      <ul className={typeMinSpace3}>
         {report?.items.map((item) => (
           <li key={item.id}>
             <article className={panelMinSpace3P5}>
               <div className={typeFlexWrapStartBetweenGap3}>
-                <h2 className="min-w-0 break-words font-semibold text-primary">
+                <h2 className={typeMinBreakSemiboldPrimary}>
                   <Link
                     prefetch={false}
                     href={`/workspace/verification/${encodeURIComponent(item.id)}`}
@@ -209,11 +213,11 @@ export async function VerificationHistoryScreen({
                     {labels[item.targetType]}
                   </Link>
                 </h2>
-                <span className="text-xs text-muted">{labels[item.status]}</span>
+                <span className={typeXsMuted}>{labels[item.status]}</span>
               </div>
               <p className={typePrewrapSmSecondary}>{item.notes}</p>
               <p className={typeBreakAllXsMuted}>{item.id}</p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {labels.submittedAt}:{" "}
                 <time dateTime={item.createdAt}>
                   {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

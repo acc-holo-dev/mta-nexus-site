@@ -12,13 +12,17 @@ import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBorderT,
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapGap4Sm,
   typeLgSemibold,
   typeNumericPrimary,
+  typeSmMuted,
   typeSmSecondary,
+  typeSpace1Sm,
+  typeSpace2Sm,
   typeWFullLeftSm,
   typeXlPrimary,
 } from "../../shell/type-shell";
@@ -65,7 +69,7 @@ export function SellerSalesReportView({
       <header className="space-y-2">
         <h1 className={typeDisplayPrimary}>{c.title}</h1>
         <h2 className={typeXlPrimary}>{report.scope.name ?? c.personal}</h2>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {c.observed}:{" "}
           <time dateTime={report.observedAt.toISOString()}>
             {sellerSalesTime(report.observedAt, locale)} UTC
@@ -90,7 +94,7 @@ export function SellerSalesReportView({
           method="get"
           className="nexus-panel grid gap-4 p-5 sm:grid-cols-3"
         >
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.attribution}</span>
             <select
               name="attribution"
@@ -104,7 +108,7 @@ export function SellerSalesReportView({
           {query.organizationId ? (
             <input type="hidden" name="organizationId" value={query.organizationId} />
           ) : null}
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.days}</span>
             <select
               name="days"
@@ -119,7 +123,7 @@ export function SellerSalesReportView({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.status}</span>
             <select
               name="status"
@@ -133,7 +137,7 @@ export function SellerSalesReportView({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.evidenceTitle}</span>
             <select
               name="evidence"
@@ -147,7 +151,7 @@ export function SellerSalesReportView({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.currency}</span>
             <select
               name="currency"
@@ -162,7 +166,7 @@ export function SellerSalesReportView({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-sm">
+          <label className={typeSpace1Sm}>
             <span>{c.product}</span>
             <input
               name="productId"
@@ -192,7 +196,7 @@ export function SellerSalesReportView({
           {report.totals.map((total) => (
             <li key={total.currency} className={panelSpace3P4}>
               <h2 className={typeLgSemibold}>{total.currency}</h2>
-              <dl className="space-y-2 text-sm">
+              <dl className={typeSpace2Sm}>
                 <div>
                   <dt>{c.gross}</dt>
                   <dd className={typeNumericPrimary}>
@@ -304,7 +308,7 @@ export function SellerSalesReportView({
               </thead>
               <tbody>
                 {report.periods.map((period) => (
-                  <tr key={`${period.period}:${period.currency}`} className="border-t border-base">
+                  <tr key={`${period.period}:${period.currency}`} className={typeBorderT}>
                     <td className="p-3">{period.period}</td>
                     <td className="p-3">{period.currency}</td>
                     <td className="p-3">{period.lines}</td>

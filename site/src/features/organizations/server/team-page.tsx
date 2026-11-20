@@ -15,6 +15,8 @@ import {
   type2xlExtraboldPrimary,
   typeBreakSemiboldPrimary,
   typeMinH11Semibold,
+  typeMinW40Flex1Space1XsMuted,
+  typeSmMuted,
   typeSpace1XsMuted,
 } from "../../shell/type-shell";
 import {
@@ -90,7 +92,7 @@ export async function TeamPage({
         {parsed.success && (
           <p className={typeBreakSemiboldPrimary}>{parsed.data.organization.name}</p>
         )}
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
       </header>
       {parsed.success && filters && (
         <>
@@ -100,7 +102,7 @@ export async function TeamPage({
               method="get"
               className={panelFlexWrapEndP4}
             >
-              <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+              <label className={typeMinW40Flex1Space1XsMuted}>
                 {copy.search}
                 <input
                   type="search"

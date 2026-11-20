@@ -7,7 +7,13 @@ import { platformFieldClass, platformRequest } from "../../community/user-platfo
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap3, typeHeadingPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3,
+  typeHeadingPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   confirmOwnershipTransfer,
   type ownershipTransferResultSchema,
@@ -124,7 +130,7 @@ export function OrganizationOwnershipTransfer({
       aria-busy={busy}
     >
       <h2 className={typeHeadingPrimary}>{copy.transfer}</h2>
-      <p className="text-sm text-muted">{copy.description}</p>
+      <p className={typeSmMuted}>{copy.description}</p>
       <p className={typeSmSecondary}>{copy.consequence}</p>
       {!target ? (
         <EmptyState title={copy.noSelection} description={copy.noSelectionHint} />
@@ -174,7 +180,7 @@ export function OrganizationOwnershipTransfer({
               onChange={(event) => setCurrentPassword(event.target.value)}
               aria-describedby="organization-ownership-password-hint"
             />
-            <p id="organization-ownership-password-hint" className="text-xs text-muted">
+            <p id="organization-ownership-password-hint" className={typeXsMuted}>
               {copy.currentPasswordHelp}
             </p>
           </div>

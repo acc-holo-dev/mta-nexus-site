@@ -22,8 +22,10 @@ import {
   typeDisplayPrimary,
   typeFlexWrapStartBetweenGap3,
   typeMax2xlSmSecondary,
+  typeMinSpace1,
   typePrewrapSmSecondary,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
@@ -172,11 +174,11 @@ export async function PublicResourceVersionsPage({
           {history.releases.map((release) => (
             <li key={release.id} className={panelClipSpace4P5}>
               <header className={typeFlexWrapStartBetweenGap3}>
-                <div className="min-w-0 space-y-1">
+                <div className={typeMinSpace1}>
                   <h2 className="text-base font-semibold text-primary">
                     {copy.version} {release.version}
                   </h2>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {copy.released}{" "}
                     <time dateTime={release.createdAt.toISOString()}>
                       {formatHistoryDate(release.createdAt, locale)}
@@ -217,14 +219,12 @@ export async function PublicResourceVersionsPage({
                 </div>
               </dl>
 
-              <div className="min-w-0 space-y-1">
-                <p className="text-xs text-muted">{copy.checksum}</p>
+              <div className={typeMinSpace1}>
+                <p className={typeXsMuted}>{copy.checksum}</p>
                 <code className="block select-all break-all rounded-md border border-base bg-inset px-3 py-2 text-xs text-secondary">
                   {release.sha256Hash}
                 </code>
-                <p className="text-xs text-muted">
-                  {release.isSigned ? copy.signed : copy.unsigned}
-                </p>
+                <p className={typeXsMuted}>{release.isSigned ? copy.signed : copy.unsigned}</p>
               </div>
 
               <div className="space-y-2">

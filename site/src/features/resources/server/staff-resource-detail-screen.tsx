@@ -25,9 +25,11 @@ import {
   typeFlexMinWrapGap4,
   typeFlexWrapGap4Sm,
   typeLgSemiboldPrimary,
+  typeMinSpace3,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
@@ -136,13 +138,13 @@ export async function StaffResourceDetailScreen({
       />
       <h2 className={typeLgSemiboldPrimary}>{copy.history}</h2>
       {result.events.length ? (
-        <ol className="min-w-0 space-y-3">
+        <ol className={typeMinSpace3}>
           {result.events.map((event) => (
             <li key={event.id} className={panelMinSpace3P5}>
               <h3 className={typeSemiboldPrimary}>
                 {resourceModerationLabel(locale, event.action)}
               </h3>
-              <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
+              <time dateTime={event.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
               {event.reason ? <p className={typePrewrapSmSecondary}>{event.reason}</p> : null}

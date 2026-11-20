@@ -8,7 +8,7 @@ import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../..
 import { linkAccentSemibold } from "../../shell/link-shell";
 import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { type2xlBoldPrimary } from "../../shell/type-shell";
+import { type2xlBoldPrimary, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
 
@@ -111,7 +111,7 @@ export function AuthForm({
     <div className={pageShellClass}>
       <div className="space-y-2">
         <h1 className={type2xlBoldPrimary}>{registering ? copy.registerTitle : copy.loginTitle}</h1>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {registering ? copy.registerDescription : copy.loginDescription}
         </p>
       </div>
@@ -152,7 +152,7 @@ export function AuthForm({
                 aria-describedby="username-hint"
                 disabled={loading}
               />
-              <p id="username-hint" className="text-xs text-muted">
+              <p id="username-hint" className={typeXsMuted}>
                 {copy.usernameHint}
               </p>
             </div>
@@ -167,7 +167,7 @@ export function AuthForm({
                 aria-describedby="display-name-hint"
                 disabled={loading}
               />
-              <p id="display-name-hint" className="text-xs text-muted">
+              <p id="display-name-hint" className={typeXsMuted}>
                 {copy.displayNameHint}
               </p>
             </div>
@@ -187,7 +187,7 @@ export function AuthForm({
             disabled={loading}
           />
           {registering && (
-            <p id="password-hint" className="text-xs text-muted">
+            <p id="password-hint" className={typeXsMuted}>
               {copy.passwordHint}
             </p>
           )}

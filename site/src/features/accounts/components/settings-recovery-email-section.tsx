@@ -9,7 +9,9 @@ import {
   typeBlockSmPrimary,
   typeFlexCenterGap2,
   typeIconAccent,
+  typeSmMuted,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import type { SettingsRecoveryEmail } from "../settings-client-api";
 
@@ -48,7 +50,7 @@ export function SettingsRecoveryEmailSection({
           <div className="rounded-md border border-base bg-inset px-3 py-3 space-y-2">
             <div className="break-all text-sm text-primary">{recoveryEmail.email}</div>
             {recoveryEmail.verified ? (
-              <div className="text-xs text-muted">
+              <div className={typeXsMuted}>
                 {`${copy.verifiedForRecovery}${
                   recoveryEmail.verifiedAt
                     ? ` ${copy.verifiedOn} ${new Date(recoveryEmail.verifiedAt).toLocaleString(
@@ -74,7 +76,7 @@ export function SettingsRecoveryEmailSection({
 
           {!recoveryEmail.verified && recoveryEmail.eligible && (
             <form onSubmit={onSubmit} aria-label={copy.verifyRecoveryEmail} className="space-y-3">
-              <p id="recovery-email-policy" className="text-sm text-muted">
+              <p id="recovery-email-policy" className={typeSmMuted}>
                 {copy.recoveryPolicy}
               </p>
 

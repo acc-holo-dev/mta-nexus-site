@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeMinSpace1 } from "../../shell/type-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -259,7 +259,7 @@ export function HomeNetworkServerCard({
 
   return (
     <article aria-label={name} className={panelFlexColGap3P5}>
-      <div className="min-w-0 space-y-1">
+      <div className={typeMinSpace1}>
         <h3 className="truncate text-sm font-bold text-primary">{name}</h3>
         <p className="truncate text-xs text-muted">
           {[observation.gameMode, observation.mapName].filter(Boolean).join(" · ") || address}

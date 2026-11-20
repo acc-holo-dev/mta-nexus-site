@@ -32,6 +32,7 @@ import {
   typeIconAccent,
   typeMonoSecondary,
   typeMt1XsMuted,
+  typeXsLeadingMuted,
 } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
@@ -585,7 +586,7 @@ export async function ProductDetailPage({
               <span className="font-numeric text-[11px] text-faint">{copy.shaRecorded}</span>
             </div>
 
-            <p className="text-xs leading-relaxed text-muted">{copy.latestBuildNotice}</p>
+            <p className={typeXsLeadingMuted}>{copy.latestBuildNotice}</p>
             {isPublic && (
               <Link
                 href={releaseHistoryHref(product.slug)}

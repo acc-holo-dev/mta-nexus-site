@@ -8,7 +8,12 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
-import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2, typeXsSuccess } from "../../shell/type-shell";
+import {
+  typeBlockMinSpace1XsMuted,
+  typeFlexWrapGap2,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -126,7 +131,7 @@ export function ObjectReportForm({
   if (!authenticated) {
     return (
       <div className="space-y-1">
-        <p className="text-xs text-muted">{copy.reportSignIn}</p>
+        <p className={typeXsMuted}>{copy.reportSignIn}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -167,7 +172,7 @@ export function ObjectReportForm({
 
   return (
     <form className={surfaceMinSpace2BgP3} onSubmit={onSubmit}>
-      <p className="text-xs text-muted">{copy.reportHelp}</p>
+      <p className={typeXsMuted}>{copy.reportHelp}</p>
       <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportType}</span>
         <select

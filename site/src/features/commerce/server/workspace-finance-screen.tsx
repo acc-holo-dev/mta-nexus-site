@@ -14,6 +14,7 @@ import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBorderT,
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeFlexWrapGap4,
@@ -21,8 +22,10 @@ import {
   typeLgSemibold,
   typeNumericPrimary,
   typeSemiboldPrimary,
+  typeSpace2Sm,
   typeWFullLeftSm,
   typeXlPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
@@ -150,7 +153,7 @@ export async function WorkspaceFinanceScreen({
           {result.totals.map((total) => (
             <li key={total.currency} className={panelSpace3P5}>
               <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
-              <dl className="space-y-2 text-sm">
+              <dl className={typeSpace2Sm}>
                 {[
                   [copy.balance, total.balance],
                   [copy.credits, total.credits],
@@ -172,7 +175,7 @@ export async function WorkspaceFinanceScreen({
                   <dd>{copy.unknown}</dd>
                 </div>
               </dl>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.legacy}: {total.legacyEntries}
               </p>
             </li>
@@ -196,14 +199,12 @@ export async function WorkspaceFinanceScreen({
             </thead>
             <tbody>
               {result.entries.map((entry) => (
-                <tr key={entry.id} className="border-t border-base">
+                <tr key={entry.id} className={typeBorderT}>
                   <td className="p-3">
                     <time dateTime={entry.createdAt.toISOString()}>
                       {formatHistoryDate(entry.createdAt, locale)}
                     </time>
-                    <p className="text-xs text-muted">
-                      {entry.journal ? copy.journal : copy.legacy}
-                    </p>
+                    <p className={typeXsMuted}>{entry.journal ? copy.journal : copy.legacy}</p>
                   </td>
                   <td className="break-words p-3">
                     {financialReferenceLabel(locale, entry.referenceType)} · {entry.referenceId}

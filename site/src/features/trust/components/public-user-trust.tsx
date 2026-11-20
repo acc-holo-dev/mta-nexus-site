@@ -8,7 +8,9 @@ import {
   type2xlExtraboldPrimary,
   typeGrid2Gap4,
   typeHeadingPrimary,
+  typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
@@ -44,8 +46,8 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
           </div>
         </div>
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">{copy.source}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{copy.source}</p>
       </header>
       <div className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
         {(["identity", "developer"] as const).map((kind) => (
@@ -62,7 +64,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
               {copy[kind === "identity" ? "identityScope" : "developerScope"]}
             </p>
             {data[kind].verified && (
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {data[kind].latestRecordedApprovalAt ? (
                   <>
                     {copy.approval}:{" "}
@@ -83,7 +85,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <time className={typeSmSecondary} dateTime={data.user.joinedAt}>
           {date(data.user.joinedAt)}
         </time>
-        <p className="text-xs text-muted">{copy.joinedScope}</p>
+        <p className={typeXsMuted}>{copy.joinedScope}</p>
       </section>
       <section className={panelClipSpace4P5}>
         <div className={typeGrid2Gap4}>
@@ -93,13 +95,13 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
               <p className="mt-2 font-numeric text-2xl font-bold text-primary">
                 {data[kind].total}
               </p>
-              <p className="text-sm text-muted">
+              <p className={typeSmMuted}>
                 {copy.verifiedSubset}: {data[kind].verified}
               </p>
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted">{copy.ownershipScope}</p>
+        <p className={typeXsMuted}>{copy.ownershipScope}</p>
       </section>
       <section className={panelClipSpace3P5}>
         <h2 className={typeHeadingPrimary}>{copy.publications}</h2>
@@ -117,7 +119,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
             </Link>
           </>
         )}
-        <p className="text-xs text-muted">{copy.publicationScope}</p>
+        <p className={typeXsMuted}>{copy.publicationScope}</p>
       </section>
       <section className={panelClipSpace3P5}>
         <h2 className={typeHeadingPrimary}>{copy.limits}</h2>

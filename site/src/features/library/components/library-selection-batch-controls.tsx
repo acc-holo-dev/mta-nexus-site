@@ -10,6 +10,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
+import { typeBreakAllXsOnly } from "../../shell/type-shell";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
@@ -196,7 +197,7 @@ export function LibrarySelectionBatchControls({
                   {c.next}: {c[item.next.mode]} · {c.selectionRevision}: {item.next.revision}
                 </p>
                 {item.previous.revision === item.next.revision && <p>{c.unchanged}</p>}
-                <code className="break-all text-xs">{item.targetBuildId}</code>
+                <code className={typeBreakAllXsOnly}>{item.targetBuildId}</code>
               </li>
             ))}
           </ol>

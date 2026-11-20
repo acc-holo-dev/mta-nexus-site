@@ -17,6 +17,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeSmMuted,
   typeSmSecondary,
   typeXlPrimary,
 } from "../../shell/type-shell";
@@ -113,12 +114,12 @@ export async function LicenseMaintenanceScreen({
           [copy.unknownTerms, result.unknownTerms],
         ].map(([label, total]) => (
           <div className={panelP4} key={label}>
-            <dt className="text-sm text-muted">{label}</dt>
+            <dt className={typeSmMuted}>{label}</dt>
             <dd className={typeXlPrimary}>{total}</dd>
           </div>
         ))}
       </dl>
-      <p className="text-sm text-muted">{copy.worker}</p>
+      <p className={typeSmMuted}>{copy.worker}</p>
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((license) => (
@@ -134,7 +135,7 @@ export async function LicenseMaintenanceScreen({
                 {license.event === "expired" ? copy.expiredTitle : copy.expiringTitle}
               </p>
               {license.expiresAt && (
-                <time className="text-sm text-muted" dateTime={license.expiresAt.toISOString()}>
+                <time className={typeSmMuted} dateTime={license.expiresAt.toISOString()}>
                   {formatHistoryDate(license.expiresAt, locale)} UTC
                 </time>
               )}

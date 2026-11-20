@@ -13,7 +13,13 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapCenterGap4Sm,
+  typeGrid2Gap4,
+  typeMt2XsMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { ResourcePublisherFilters } from "../publisher-view";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import {
@@ -148,7 +154,7 @@ export async function AuthorResourcesScreen({
                 {publisherCopy.readiness[product.readiness]} · {publisherCopy.versions}:{" "}
                 {product.buildCount}
               </p>
-              <p className="mt-2 text-xs text-muted">
+              <p className={typeMt2XsMuted}>
                 {product.scope === "personal" ? publisherCopy.personal : publisherCopy.organization}
               </p>
               {product.metadataReviewRequired ? (
@@ -164,7 +170,7 @@ export async function AuthorResourcesScreen({
         </ul>
       )}
       {result.totalPages > 1 && (
-        <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapCenterGap4Sm}>
           {result.page > 1 && (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

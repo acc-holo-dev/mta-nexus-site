@@ -9,7 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary } from "../../shell/type-shell";
+import { type2xlBoldPrimary, typeSmMuted } from "../../shell/type-shell";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { ProfilePrivacyEditor } from "../profile";
 import { editablePrivacySchema } from "../profile-privacy-contract";
@@ -51,7 +51,7 @@ export async function SettingsPrivacyScreen() {
           {copy.back}
         </Link>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
       </header>
       <ProfilePrivacyEditor key={actor.id} initial={initial} locale={locale} />
       {["developer", "admin"].includes(actor.role) && (

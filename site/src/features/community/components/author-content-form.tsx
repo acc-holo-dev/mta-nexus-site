@@ -19,9 +19,11 @@ import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import {
+  typeFlexWrapCenterGap4Sm,
   typeFlexWrapGap3,
   typeGrid2Gap4,
   typePrewrapBreak,
+  typeSmMuted,
   typeSmSecondary,
   typeSmSuccess,
 } from "../../shell/type-shell";
@@ -295,7 +297,7 @@ export function AuthorContentForm({
       )}
       <p className={surfaceInsetP4TextSmMuted}>{archived ? copy.archivedNote : copy.reviewNote}</p>
       {saved && (
-        <div className="flex flex-wrap items-center gap-4 text-sm">
+        <div className={typeFlexWrapCenterGap4Sm}>
           {!server && !organization && (
             <Link
               prefetch={false}
@@ -349,7 +351,7 @@ export function AuthorContentForm({
       {latest && (
         <section className={panelMinSpace3P5} aria-label={copy.latestContent}>
           <h2 className="font-semibold">{copy.latestContent}</h2>
-          <p className="text-sm text-muted">{copy.latestContentHelp}</p>
+          <p className={typeSmMuted}>{copy.latestContentHelp}</p>
           <p>
             {copy.status}: {copy[latest.status]}
           </p>

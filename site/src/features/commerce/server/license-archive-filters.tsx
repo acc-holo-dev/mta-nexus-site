@@ -2,6 +2,7 @@ import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentSmRounded } from "../../shell/link-shell";
+import { typeMinSpace4, typeSmMuted } from "../../shell/type-shell";
 import { licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 export function LicenseArchiveFilters({
@@ -15,7 +16,7 @@ export function LicenseArchiveFilters({
 }) {
   const copy = getLicenseMaintenanceCopy(locale);
   return (
-    <section className="min-w-0 space-y-4">
+    <section className={typeMinSpace4}>
       <search aria-label={copy.filters}>
         <form
           method="get"
@@ -75,7 +76,7 @@ export function LicenseArchiveFilters({
           </div>
         </form>
       </search>
-      <p className="text-sm text-muted">{copy.archiveNote}</p>
+      <p className={typeSmMuted}>{copy.archiveNote}</p>
       <a
         href={licenseArchiveUrl({ ...query, page }, "/api/licenses/export")}
         className={linkAccentSmRounded}

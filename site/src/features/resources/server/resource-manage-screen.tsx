@@ -20,6 +20,7 @@ import {
   typePrewrapBreak,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSmSecondary,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -176,10 +177,7 @@ export async function ResourceManageScreen({
               <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
                 <div className={typeFlexWrapBetweenGap2}>
                   <h3 className={typeSemiboldPrimary}>{build.version}</h3>
-                  <time
-                    dateTime={new Date(build.createdAt).toISOString()}
-                    className="text-sm text-muted"
-                  >
+                  <time dateTime={new Date(build.createdAt).toISOString()} className={typeSmMuted}>
                     {new Date(build.createdAt).toLocaleDateString(
                       locale === "ru" ? "ru-RU" : "en-GB",
                     )}

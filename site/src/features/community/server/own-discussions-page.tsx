@@ -14,9 +14,14 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeFlexMinWrapGap3,
+  typeMinBreakSemiboldPrimary,
   typeMinH11Semibold,
+  typeMinSpace3,
+  typeMinW40Flex1Space1XsMuted,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSpace1XsMuted,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
@@ -84,12 +89,12 @@ export async function OwnDiscussionsPage({
       </Link>
       <header className="min-w-0 space-y-2 border-b border-base pb-6">
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">{copy.privacy}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{copy.privacy}</p>
       </header>
       <search aria-label={copy.filters}>
         <form action="/workspace/discussions" method="get" className={panelFlexMinWrapEndP4}>
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          <label className={typeMinW40Flex1Space1XsMuted}>
             {copy.query}
             <input
               type="search"
@@ -147,14 +152,12 @@ export async function OwnDiscussionsPage({
         />
       ) : null}
       {page?.items.length ? (
-        <ul className="min-w-0 space-y-3">
+        <ul className={typeMinSpace3}>
           {page.items.map((item) => (
             <li key={item.id} className={panelClipSpace3P5}>
-              <h2 className="min-w-0 break-words font-semibold text-primary">
-                {item.title ?? copy.hidden}
-              </h2>
+              <h2 className={typeMinBreakSemiboldPrimary}>{item.title ?? copy.hidden}</h2>
               <p className={typePrewrapSmSecondary}>{item.text}</p>
-              <time className="text-xs text-muted" dateTime={item.createdAt}>
+              <time className={typeXsMuted} dateTime={item.createdAt}>
                 {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",

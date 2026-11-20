@@ -11,6 +11,8 @@ import {
   typeFlexWrapGap4Sm,
   typeGridGap3Sm2,
   typeLgSemibold,
+  typeMinSpace3,
+  typeSmMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
@@ -51,10 +53,10 @@ export function OrderTermsReportView({
       <Link href={base} className={linkAccentSmRounded}>
         {c.back}
       </Link>
-      <header className="min-w-0 space-y-3">
+      <header className={typeMinSpace3}>
         <h1 className={typeDisplayPrimary}>{c.title}</h1>
         <h2 className="break-words text-xl">{report.order.orderNumber}</h2>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {c.observed}:{" "}
           <time dateTime={report.observedAt.toISOString()}>
             {sellerSalesTime(report.observedAt, locale)}
@@ -98,7 +100,7 @@ export function OrderTermsReportView({
           <p className={typeSmSecondary}>{c.clear}</p>
         )}
         {report.summary.legacyLines > 0 ? (
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {c.legacy}: {report.summary.legacyLines}
           </p>
         ) : null}

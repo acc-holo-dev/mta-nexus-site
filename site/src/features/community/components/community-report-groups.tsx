@@ -11,9 +11,13 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap4,
+  typeMinSpace2,
+  typeMinSpace3,
   typeNumericPrimary,
   typePrewrapSmSecondary,
+  typeSmMuted,
   typeSpace1SmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
@@ -50,10 +54,10 @@ export function CommunityReportGroups({
       <Link href="/admin/reports" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <header className="min-w-0 space-y-2">
+      <header className={typeMinSpace2}>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">{copy.order}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{copy.order}</p>
       </header>
       <search aria-label={copy.search}>
         <form
@@ -136,7 +140,7 @@ export function CommunityReportGroups({
           }
         />
       ) : (
-        <ol className="min-w-0 space-y-3">
+        <ol className={typeMinSpace3}>
           {page.items.map((item) => (
             <li key={`${item.targetType}:${item.targetId}`} className={panelMinSpace3P5}>
               <h2 className="break-words text-base font-semibold text-primary">
@@ -162,7 +166,7 @@ export function CommunityReportGroups({
                   </div>
                 ))}
               </dl>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.first}: <time dateTime={item.firstAt}>{date(item.firstAt)} UTC</time> ·{" "}
                 {copy.last}: <time dateTime={item.lastAt}>{date(item.lastAt)} UTC</time>
               </p>

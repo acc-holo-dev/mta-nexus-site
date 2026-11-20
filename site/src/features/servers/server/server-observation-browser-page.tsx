@@ -23,9 +23,11 @@ import {
   type2xlBoldPrimary,
   typeFlexWrapGap4,
   typeMinH11Semibold,
+  typeSmMuted,
   typeSpace1XsMuted,
   typeWFullLeftSm,
   typeXlBoldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   parseServerObservationBrowserQuery,
@@ -188,8 +190,8 @@ function ServerObservationBrowserPanel({
         </Link>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="break-words text-lg text-primary">{report.server.name}</p>
-        <p className="text-sm text-muted">{copy.description}</p>
-        {managed && <p className="text-xs text-muted">{stats.private}</p>}
+        <p className={typeSmMuted}>{copy.description}</p>
+        {managed && <p className={typeXsMuted}>{stats.private}</p>}
         <Link
           href={serverStatisticsHref(`${base}/statistics`, {
             window: report.window,
@@ -199,11 +201,11 @@ function ServerObservationBrowserPanel({
         >
           {copy.statistics}
         </Link>
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           <time dateTime={report.windowStart}>{time(report.windowStart)}</time> —{" "}
           <time dateTime={report.windowEnd}>{time(report.windowEnd)}</time> UTC
         </p>
-        <p className="text-xs text-muted">{stats.snapshotScope}</p>
+        <p className={typeXsMuted}>{stats.snapshotScope}</p>
       </header>
       <ServerObservationPeriodControls
         path={path}
@@ -212,7 +214,7 @@ function ServerObservationBrowserPanel({
         locale={locale}
         filters={filters}
       />
-      {report.server.endpointRevision > 0 && <p className="text-sm text-muted">{stats.lifetime}</p>}
+      {report.server.endpointRevision > 0 && <p className={typeSmMuted}>{stats.lifetime}</p>}
       {!report.collectionEligible ? (
         <ErrorState
           id="server-observation-collection-paused"
@@ -275,7 +277,7 @@ function ServerObservationBrowserPanel({
           ) : null}
         </form>
       </search>
-      <p className="text-sm text-muted">{copy.scope}</p>
+      <p className={typeSmMuted}>{copy.scope}</p>
       {report.observations.length === 0 ? (
         <EmptyState
           title={observationFiltersActive ? copy.emptyFiltered : copy.emptyNever}
@@ -384,7 +386,7 @@ function ServerObservationBrowserPanel({
           locale={locale}
           disabled={report.observations.length === 0}
         />
-        <p className="text-sm text-muted">{copy.exportScope}</p>
+        <p className={typeSmMuted}>{copy.exportScope}</p>
       </section>
     </div>
   );

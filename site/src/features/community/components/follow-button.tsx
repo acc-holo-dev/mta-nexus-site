@@ -10,7 +10,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
-import { typeItemsStretchPy4 } from "../../shell/type-shell";
+import { typeItemsStretchPy4, typeSmMuted } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { FollowTargetType } from "../follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../follow-workspace-copy";
@@ -237,7 +237,7 @@ function FollowControl({
           createAccountLabel={workspace.createAccount}
         />
       ) : state === "self" ? (
-        <p className="text-sm text-muted">{copy.self}</p>
+        <p className={typeSmMuted}>{copy.self}</p>
       ) : state === "error" ? (
         <ErrorState
           title={message || shared.error}

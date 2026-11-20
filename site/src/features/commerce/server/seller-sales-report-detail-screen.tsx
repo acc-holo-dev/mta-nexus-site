@@ -13,7 +13,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakPrimary, typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakPrimary,
+  typeDisplayPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
@@ -136,7 +141,7 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
           [c.observed, `${sellerSalesTime(result.observedAt, locale)} UTC`],
         ].map(([label, value]) => (
           <div key={label}>
-            <dt className="text-sm text-muted">{label}</dt>
+            <dt className={typeSmMuted}>{label}</dt>
             <dd className={typeBreakPrimary}>{value}</dd>
           </div>
         ))}

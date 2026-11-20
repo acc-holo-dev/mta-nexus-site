@@ -17,6 +17,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeSmMuted,
   typeSmSecondary,
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
@@ -145,7 +146,7 @@ export async function FinancialReconciliationScreen({
                   ))}
               </ul>
               {financialFlags.some((flag) => order[flag]) ? null : (
-                <p className="text-sm text-muted">{copy.clear}</p>
+                <p className={typeSmMuted}>{copy.clear}</p>
               )}
             </li>
           ))}

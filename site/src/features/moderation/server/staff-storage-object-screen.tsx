@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmMuted } from "../../shell/type-shell";
 import { StorageCleanupControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 export async function staffStorageObjectMetadata(): Promise<Metadata> {
@@ -101,7 +102,7 @@ export async function StaffStorageObjectScreen({ params }: { params: Promise<{ i
           [copy.lease, formatUnknown(locale, item.leaseExpiresAt?.toISOString())],
         ].map(([label, value]) => (
           <div key={label}>
-            <dt className="text-sm text-muted">{label}</dt>
+            <dt className={typeSmMuted}>{label}</dt>
             <dd className="break-all">{value}</dd>
           </div>
         ))}

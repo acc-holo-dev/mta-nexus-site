@@ -13,6 +13,7 @@ import {
   typeMt1XsMuted,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
@@ -106,7 +107,7 @@ export function ResourceVersionHelpSection({
         <p className="whitespace-pre-line text-sm leading-relaxed text-secondary">
           {copy.acquireBody.replace("{version}", projection.version)}
         </p>
-        <p className="text-xs text-muted">{copy.acquireDisclaimer}</p>
+        <p className={typeXsMuted}>{copy.acquireDisclaimer}</p>
       </div>
 
       {projection.setup ? (
@@ -145,7 +146,7 @@ export function ResourceVersionHelpSection({
             );
           })}
         </dl>
-        <p className="text-xs text-muted">{copy.limitsNotice}</p>
+        <p className={typeXsMuted}>{copy.limitsNotice}</p>
       </div>
 
       <div className="space-y-2 border-t border-base pt-4">

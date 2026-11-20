@@ -13,8 +13,10 @@ import {
   typeBreakSemiboldPrimary,
   typeGrid2Gap4,
   typeHeadingPrimary,
+  typeSmMuted,
   typeSmPrimary,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import {
   type ContextKind,
@@ -73,7 +75,7 @@ export async function PublicContextTrustPage({
       <header className={panelClipSpace3P6}>
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {page && <p className={typeBreakSemiboldPrimary}>{page.subject.name}</p>}
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
         <p className={typeSmSecondary}>
           {kind === "organization" ? copy.organizationScope : copy.serverScope}
         </p>
@@ -88,7 +90,7 @@ export async function PublicContextTrustPage({
           </p>
           <dl className={typeGrid2Gap4}>
             <div>
-              <dt className="text-xs text-muted">{copy.created}</dt>
+              <dt className={typeXsMuted}>{copy.created}</dt>
               <dd className={typeSmPrimary}>
                 <time dateTime={page.subject.createdAt}>
                   {new Date(page.subject.createdAt).toLocaleDateString(
@@ -99,30 +101,30 @@ export async function PublicContextTrustPage({
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-muted">{copy.publications}</dt>
+              <dt className={typeXsMuted}>{copy.publications}</dt>
               <dd className={typeSmPrimary}>{page.subject.publications}</dd>
             </div>
             {page.subject.servers && (
               <>
                 <div>
-                  <dt className="text-xs text-muted">{copy.servers}</dt>
+                  <dt className={typeXsMuted}>{copy.servers}</dt>
                   <dd className={typeSmPrimary}>{page.subject.servers.total}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-muted">{copy.verifiedServers}</dt>
+                  <dt className={typeXsMuted}>{copy.verifiedServers}</dt>
                   <dd className={typeSmPrimary}>{page.subject.servers.verified}</dd>
                 </div>
               </>
             )}
             {page.subject.ownershipKind && (
               <div>
-                <dt className="text-xs text-muted">{copy.ownership}</dt>
+                <dt className={typeXsMuted}>{copy.ownership}</dt>
                 <dd className={typeSmPrimary}>{copy[page.subject.ownershipKind]}</dd>
               </div>
             )}
             {page.subject.organization && (
               <div>
-                <dt className="text-xs text-muted">{copy.affiliation}</dt>
+                <dt className={typeXsMuted}>{copy.affiliation}</dt>
                 <dd>
                   <Link
                     href={contextTrustHref("organization", page.subject.organization.slug)}
@@ -130,7 +132,7 @@ export async function PublicContextTrustPage({
                   >
                     {page.subject.organization.name}
                   </Link>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {page.subject.organization.verified ? copy.verified : copy.unverified}
                   </p>
                 </dd>
@@ -147,7 +149,7 @@ export async function PublicContextTrustPage({
       )}
       <section className={pageShellStack4}>
         <h2 className={typeHeadingPrimary}>{copy.history}</h2>
-        <p className="text-sm text-muted">{approvals.scope}</p>
+        <p className={typeSmMuted}>{approvals.scope}</p>
         <a href={latest} className={linkAccentSm}>
           {copy.latest}
         </a>
@@ -170,7 +172,7 @@ export async function PublicContextTrustPage({
             {page.items.map((record) => (
               <li key={record.key} className={panelClipSpace2P5}>
                 <p className={typeSmSecondary}>{copy.approved}</p>
-                <time dateTime={record.approvedAt} className="text-sm text-muted">
+                <time dateTime={record.approvedAt} className={typeSmMuted}>
                   {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",
                     timeZoneName: "short",
