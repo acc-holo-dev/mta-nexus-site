@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
+
 import { browserMutationHeaders } from "../helpers/browser-mutation-headers";
 
 vi.mock("next/server", async () => {

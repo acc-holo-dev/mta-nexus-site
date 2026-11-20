@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));

@@ -97,3 +97,41 @@ export async function DictionaryRouteLoading({
     />
   );
 }
+
+export async function LocaleCopyRouteLoading({
+  headingId,
+  className = DEFAULT_CLASS,
+  headerClassName,
+  titleClassName,
+  statusClassName,
+  rows = 3,
+  rowClassName = DEFAULT_ROW,
+  leading,
+  load,
+}: {
+  headingId: string;
+  className?: string;
+  headerClassName?: string;
+  titleClassName?: string;
+  statusClassName?: string;
+  rows?: number;
+  rowClassName?: string;
+  leading?: ReactNode;
+  load: (locale: Locale) => { title: ReactNode; loading: ReactNode };
+}) {
+  const copy = load(await getRequestLocale());
+  return (
+    <RouteHonestLoading
+      headingId={headingId}
+      title={copy.title}
+      loadingLabel={copy.loading}
+      className={className}
+      headerClassName={headerClassName}
+      titleClassName={titleClassName}
+      statusClassName={statusClassName}
+      rows={rows}
+      rowClassName={rowClassName}
+      leading={leading}
+    />
+  );
+}

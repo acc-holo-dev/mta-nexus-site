@@ -3,35 +3,11 @@ import "./globals.css";
 import { PwaServiceWorker } from "../features/shell/pwa-service-worker";
 import { rootLayoutMetadata } from "../features/shell/root-layout-metadata-server";
 import { NexusShell } from "../features/shell/shell";
+import { themeInitScript } from "../features/shell/theme-init-script";
 import { getRequestLocale } from "../lib/i18n/server";
 import { bodyFont, displayFont } from "./fonts";
 
 export const generateMetadata = rootLayoutMetadata;
-
-const themeInitScript = `
-(function() {
-  var preference = 'system';
-
-  try {
-    var stored = localStorage.getItem('nexus-theme');
-    if (stored === 'light' || stored === 'dark' || stored === 'system') {
-      preference = stored;
-    }
-  } catch (e) {
-    // Storage can be unavailable in hardened browser modes. System theme remains safe.
-  }
-
-  var prefersDark =
-    typeof window.matchMedia === 'function'
-      ? window.matchMedia('(prefers-color-scheme: dark)').matches
-      : true;
-  var useDark =
-    preference === 'dark' || (preference === 'system' && prefersDark);
-
-  document.documentElement.classList.toggle('dark', useDark);
-  document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
-})();
-`;
 
 export default async function RootLayout({
   children,

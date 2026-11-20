@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { observationBrowserFixture } from "../helpers/server-observation-browser-fixture";
 
 const state = vi.hoisted(() => ({ locale: "ru" as "ru" | "en", session: vi.fn(), read: vi.fn() }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...props}>

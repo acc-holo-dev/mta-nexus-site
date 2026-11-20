@@ -5,6 +5,7 @@ import { getDictionary } from "../../lib/i18n";
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
+vi.mock("server-only", () => ({}));
 
 vi.mock("../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,

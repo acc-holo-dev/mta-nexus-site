@@ -162,7 +162,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/shell/)" },
       to: {
-        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|development-status-server|home-page-server|workspace-hub-server|legal-document-page-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|offline-document-copy|honest-loading|not-found-page-server|global-loading-page|global-error-page|route-error-page|route-honest-loading-server|root-layout-metadata-server)\\.ts$)",
+        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|development-status-server|home-page-server|workspace-hub-server|legal-document-page-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|offline-document-copy|honest-loading|not-found-page-server|global-loading-page|global-error-page|route-error-page|route-honest-loading-server|root-layout-metadata-server|theme-init-script)\\.ts$)",
       },
     },
     {

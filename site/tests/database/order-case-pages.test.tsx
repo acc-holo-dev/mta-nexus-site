@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   orderDetail: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/order-cases",

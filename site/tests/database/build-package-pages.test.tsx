@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   page: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/resources/prd_a/builds/bld_a/package",

@@ -1,22 +1,20 @@
 import { DictionaryRouteLoading } from "../../features/shell/route-honest-loading-server";
 
-export default function Loading() {
-  return (
-    <DictionaryRouteLoading
-      headingId="market-loading-heading"
-      className="min-w-0 space-y-6 overflow-x-clip"
-      rows={6}
-      rowClassName="h-40 rounded bg-inset"
-      leading={
-        <>
-          <div className="h-11 rounded bg-inset" />
-          <div className="h-10 w-80 max-w-full rounded bg-inset" />
-        </>
-      }
-      pick={(dictionary) => ({
-        title: dictionary.market.title,
-        loading: dictionary.market.loading,
-      })}
-    />
-  );
+export default async function Loading() {
+  return DictionaryRouteLoading({
+    headingId: "market-loading-heading",
+    className: "min-w-0 space-y-6 overflow-x-clip",
+    rows: 6,
+    rowClassName: "h-40 rounded bg-inset",
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-10 w-80 max-w-full rounded bg-inset" />
+      </>
+    ),
+    pick: (dictionary) => ({
+      title: dictionary.market.title,
+      loading: dictionary.market.loading,
+    }),
+  });
 }

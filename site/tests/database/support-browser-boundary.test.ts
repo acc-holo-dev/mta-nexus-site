@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
@@ -20,6 +21,9 @@ vi.mock("@nexus/db", () => ({
     addIdempotentMessage: vi.fn(),
     findMutationReplay: vi.fn(),
     updateStatus: vi.fn(),
+  },
+  supportActivityRepository: {
+    history: vi.fn(),
   },
   userRepository: { listModeratorIds: vi.fn() },
 }));

@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   locale: "en",
   report: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/prd_a/requirements",

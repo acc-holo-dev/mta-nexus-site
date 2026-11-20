@@ -8,6 +8,7 @@ const state = vi.hoisted(() => ({
   discussion: vi.fn(),
   discussionDetail: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/admin/community/post/discussion",

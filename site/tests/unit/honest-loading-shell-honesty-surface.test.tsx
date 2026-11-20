@@ -37,13 +37,14 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     const source = read(relative);
     expect(source).toContain("features/shell/route-honest-loading-server");
     expect(source).toMatch(
-      /<(Dictionary|Route)HonestLoading|DictionaryRouteLoading|RouteHonestLoading/,
+      /(?:DictionaryRouteLoading|LocaleCopyRouteLoading|RouteHonestLoading)\s*[<(]|<(?:Dictionary|Route)HonestLoading/,
     );
   }
 
   {
     const port = read("site/src/features/shell/route-honest-loading-server.ts");
     expect(port).toContain("DictionaryRouteLoading");
+    expect(port).toContain("LocaleCopyRouteLoading");
     expect(port).toContain("RouteHonestLoading");
     expect(read("site/src/features/shell/server/route-honest-loading.tsx")).toContain(
       "<HonestLoadingShell",
