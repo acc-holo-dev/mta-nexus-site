@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   formatHistoryAmount,
@@ -129,7 +130,7 @@ export async function CommercialPlanAdminDetailScreen({
         </h2>
         <ol className="space-y-3">
           {result.history.map((version) => (
-            <li key={version.revision} className="nexus-panel min-w-0 space-y-3 p-5">
+            <li key={version.revision} className={panelMinSpace3P5}>
               <h3 className="font-semibold text-primary">
                 {copy.revision} {version.revision} · {copy[version.status]}
               </h3>

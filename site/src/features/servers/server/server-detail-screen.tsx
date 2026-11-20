@@ -23,6 +23,7 @@ import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
 import { pageShellStack8 } from "../../shell/page-shell";
+import { panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { ServerClaimControlPanel } from "../claim-controls";
 import { ServerConnectControls } from "../connect";
@@ -278,7 +279,7 @@ export async function ServerDetailScreen({
         rulesUrl ||
         server.gameplayTags?.length ||
         mediaUrls?.length) && (
-        <section className="nexus-panel space-y-4 p-5">
+        <section className={panelSpace4P5}>
           <div className="flex flex-wrap items-center gap-2 text-xs text-secondary">
             {server.language && (
               <span className="rounded border border-base bg-inset px-2 py-1">
@@ -368,7 +369,7 @@ export async function ServerDetailScreen({
       ) : null}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="nexus-panel space-y-4 p-6">
+        <div className={panelSpace4P6}>
           <div className="flex items-center justify-between text-xs text-muted">
             <span className="font-semibold uppercase tracking-wider">{copy.livePlayerLoad}</span>
             <Users className="h-4 w-4 text-success" aria-hidden="true" />

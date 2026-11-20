@@ -13,6 +13,7 @@ import { resourceRequirementsCopy } from "../../resources/resource-requirements-
 import { resourceRequirementsQuery } from "../../resources/resource-requirements-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
@@ -122,7 +123,7 @@ export async function CollectionRequirementsScreen({
       <p className="text-secondary">{c.note}</p>
       <p className="text-secondary">{copy.note}</p>
       {result.collection.status === "archived" && <p role="note">{c.archived}</p>}
-      <form className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form className={panelFlexWrapEndP4}>
         <label className="grid gap-1">
           {copy.target}
           <input

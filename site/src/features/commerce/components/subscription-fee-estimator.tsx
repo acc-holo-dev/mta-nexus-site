@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
@@ -72,7 +73,7 @@ export function SubscriptionFeeEstimator({
     return c.estimateFailed;
   }
   return (
-    <form className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" onSubmit={submit}>
+    <form className={panelClipSpace4P5} onSubmit={submit}>
       <p className="text-sm text-secondary" role="note">
         {c.feeNote}
       </p>

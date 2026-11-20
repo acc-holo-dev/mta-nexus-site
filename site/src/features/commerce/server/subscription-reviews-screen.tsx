@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -137,7 +138,7 @@ export async function SubscriptionReviewsScreen({
         {result.reviews.length ? (
           <ol className="space-y-4">
             {result.reviews.map((r) => (
-              <li key={r.id} className="nexus-panel space-y-3 p-5">
+              <li key={r.id} className={panelSpace3P5}>
                 <Link
                   href={planReviewHref(r.id, query.organizationId)}
                   className={`${planReviewNavLinkClass} break-words text-lg`}

@@ -2,6 +2,7 @@ import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5, panelClipSpace4P5 } from "../../shell/panel-shell";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
@@ -44,7 +45,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       </header>
       <div className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
         {(["identity", "developer"] as const).map((kind) => (
-          <section key={kind} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <section key={kind} className={panelClipSpace3P5}>
             <h2 className="font-heading text-primary">{copy[kind]}</h2>
             <p
               className={
@@ -73,14 +74,14 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
           </section>
         ))}
       </div>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+      <section className={panelClipSpace3P5}>
         <h2 className="font-heading text-primary">{copy.joined}</h2>
         <time className="text-sm text-secondary" dateTime={data.user.joinedAt}>
           {date(data.user.joinedAt)}
         </time>
         <p className="text-xs text-muted">{copy.joinedScope}</p>
       </section>
-      <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+      <section className={panelClipSpace4P5}>
         <div className="grid gap-4 sm:grid-cols-2">
           {(["servers", "organizations"] as const).map((kind) => (
             <div key={kind} className="min-w-0">
@@ -96,7 +97,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         </div>
         <p className="text-xs text-muted">{copy.ownershipScope}</p>
       </section>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+      <section className={panelClipSpace3P5}>
         <h2 className="font-heading text-primary">{copy.publications}</h2>
         {data.publications === null ? (
           <ErrorState
@@ -114,7 +115,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         )}
         <p className="text-xs text-muted">{copy.publicationScope}</p>
       </section>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+      <section className={panelClipSpace3P5}>
         <h2 className="font-heading text-primary">{copy.limits}</h2>
         <p className="text-sm text-secondary">{copy.limitsDescription}</p>
         <Link href="/workspace/verification" className={actionLinkClass}>

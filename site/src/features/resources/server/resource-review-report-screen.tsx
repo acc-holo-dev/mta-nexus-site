@@ -13,6 +13,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
@@ -132,7 +133,7 @@ export async function ResourceReviewReportScreen({
         <p>{resourceReviewState(locale, report.status)}</p>
         <p className="whitespace-pre-wrap break-words text-sm">{report.reason}</p>
         {report.review ? (
-          <article className="nexus-panel space-y-3 p-5">
+          <article className={panelSpace3P5}>
             <p>{report.review.title}</p>
             <p>
               {resourceReviewState(locale, report.review.status)} · {copy.rating}:{" "}
@@ -203,7 +204,7 @@ export async function ResourceReviewReportScreen({
       </nav>
       {result.items.length ? (
         result.items.map((report) => (
-          <article key={report.id} className="nexus-panel min-w-0 space-y-2 p-4">
+          <article key={report.id} className={panelMinSpace2P4}>
             <Link href={`${base}/${encodeURIComponent(report.id)}`} className={navLinkClass}>
               {copy.detail} · {resourceReviewState(locale, report.status)}
             </Link>

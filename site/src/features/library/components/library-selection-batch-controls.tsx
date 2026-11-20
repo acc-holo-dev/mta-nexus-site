@@ -8,6 +8,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
@@ -106,7 +107,7 @@ export function LibrarySelectionBatchControls({
   return (
     <section className="space-y-5">
       <p className="text-secondary">{c.note}</p>
-      <fieldset disabled={busy || frozen || saved} className="nexus-panel space-y-3 p-4">
+      <fieldset disabled={busy || frozen || saved} className={panelSpace3P4}>
         <legend className="font-semibold">{c.choose}</legend>
         <label className="flex gap-2">
           <input

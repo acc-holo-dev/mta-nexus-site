@@ -15,6 +15,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -197,7 +198,7 @@ export default async function Page({
             const receipt = item.receipt,
               command = receipt?.command;
             return (
-              <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+              <li key={item.id} className={panelClipSpace3P5}>
                 <Link href={collectionReceiptHref(item.id)} className={navLinkClass}>
                   {libraryCollectionReceiptsCopy(typedLocale).open}
                 </Link>

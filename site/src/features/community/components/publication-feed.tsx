@@ -2,6 +2,7 @@ import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellStack5 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -172,7 +173,7 @@ export function PublicationFeed({
       )}
       <div className="min-w-0 space-y-4">
         {page?.items.map((item) => (
-          <article key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <article key={item.id} className={panelClipSpace3P5}>
             <header className="flex min-w-0 flex-wrap items-center gap-3">
               <Avatar
                 src={item.author.avatar ?? undefined}

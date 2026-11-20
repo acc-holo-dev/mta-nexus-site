@@ -4,7 +4,7 @@ import { publicationCopy } from "../publication-feed-copy";
 
 type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
 
-export async function PublicationFeedLoading({
+async function PublicationFeedLoading({
   heading = "title",
 }: {
   heading?: PublicationFeedLoadingHeading;
@@ -23,4 +23,16 @@ export async function PublicationFeedLoading({
       };
     },
   });
+}
+
+export async function PublicationFeedTitleLoading() {
+  return PublicationFeedLoading({ heading: "title" });
+}
+
+export async function PublicationFeedActivityLoading() {
+  return PublicationFeedLoading({ heading: "activity" });
+}
+
+export async function PublicationFeedServerTitleLoading() {
+  return PublicationFeedLoading({ heading: "serverTitle" });
 }

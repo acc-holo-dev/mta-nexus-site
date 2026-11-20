@@ -16,6 +16,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
@@ -158,7 +159,7 @@ export async function StaffResourcesScreen({
       {result.resources.length ? (
         <ul className="space-y-3">
           {result.resources.map((product) => (
-            <li key={product.id} className="nexus-panel min-w-0 space-y-2 p-5">
+            <li key={product.id} className={panelMinSpace2P5}>
               <Link
                 href={`/admin/resources/${encodeURIComponent(product.id)}`}
                 className="break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

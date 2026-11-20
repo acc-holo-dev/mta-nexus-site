@@ -1,6 +1,7 @@
 import type { ResourceRequirementsReport, ResourceRequirementsScope } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
@@ -64,7 +65,7 @@ export function ResourceRequirementsReportBody({
         {copy.export}
       </a>
       {(report.issues.length > 0 || !suppressEmptyIssues) && (
-        <section className="nexus-panel space-y-3 p-4">
+        <section className={panelSpace3P4}>
           <h2>{copy.issues}</h2>
           {report.issues.length ? (
             <ul className="space-y-2">
@@ -102,7 +103,7 @@ export function ResourceRequirementsReportBody({
       )}
       <ul className="space-y-4">
         {report.nodes.map((node) => (
-          <li key={node.id} className="nexus-panel space-y-3 p-4">
+          <li key={node.id} className={panelSpace3P4}>
             <h3 className="break-words font-semibold">{node.title}</h3>
             <code>{node.slug}</code>
             <p>

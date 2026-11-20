@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
@@ -56,7 +57,7 @@ export async function LibraryCollectionsHistoryView({
       )}
       <ol className="space-y-4">
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-2 p-4">
+          <li key={item.id} className={panelSpace2P4}>
             <Link href={collectionReceiptHref(item.id)} className={libraryCollectionsLinkClass}>
               {libraryCollectionReceiptsCopy(locale).open}
             </Link>

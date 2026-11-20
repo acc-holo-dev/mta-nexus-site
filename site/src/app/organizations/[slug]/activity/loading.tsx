@@ -1,5 +1,5 @@
-import { PublicationFeedLoading } from "../../../../features/community/publication-feed-loading-server";
+import { PublicationFeedActivityLoading } from "../../../../features/community/publication-feed-loading-server";
 
 export default async function Loading() {
-  return await PublicationFeedLoading({ heading: "activity" });
+  return PublicationFeedActivityLoading();
 }

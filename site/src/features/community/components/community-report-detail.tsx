@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellStack5 } from "../../shell/page-shell";
+import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
@@ -207,7 +208,7 @@ export function CommunityReportDetailView({
           >
             {reportHistoryCopy(locale).title}
           </Link>
-          <section className="nexus-panel min-w-0 space-y-4 p-5">
+          <section className={panelMinSpace4P5}>
             <h2 className="break-words text-lg font-semibold text-primary">
               {copy[report.targetType]} · {copy[report.type]}
             </h2>
@@ -261,7 +262,7 @@ export function CommunityReportDetailView({
               </div>
             )}
           </section>
-          <section className="nexus-panel space-y-3 p-5">
+          <section className={panelSpace3P5}>
             <h2 className="text-lg font-semibold text-primary">{copy.currentTarget}</h2>
             <p className="text-xs text-muted">{copy.currentHint}</p>
             {staff && report.moderationHref && (
@@ -315,7 +316,7 @@ export function CommunityReportDetailView({
             )}
           </section>
           {staff && (report.status === "open" || report.status === "under_review") && (
-            <section className="nexus-panel space-y-4 p-5">
+            <section className={panelSpace4P5}>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.notes}</span>
                 <textarea

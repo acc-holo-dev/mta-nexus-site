@@ -11,6 +11,7 @@ import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
@@ -124,11 +125,7 @@ export function OrderCaseCreateForm({
     }
   }
   return (
-    <form
-      onSubmit={submit}
-      aria-busy={busy}
-      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
-    >
+    <form onSubmit={submit} aria-busy={busy} className={panelClipSpace4P5}>
       <fieldset disabled={busy || savedId !== null} className="space-y-4">
         <label className="block space-y-2">
           <span>{copy.kind}</span>
@@ -360,7 +357,7 @@ export function OrderCaseReviewForm({
   }
   if (ready.current !== identity) return null;
   return (
-    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" aria-busy={busy}>
+    <section className={panelClipSpace4P5} aria-busy={busy}>
       <h2 className="text-lg font-semibold">{copy.review}</h2>
       <label className="block space-y-2">
         <span>{copy.notes}</span>

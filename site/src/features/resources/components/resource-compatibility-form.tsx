@@ -8,6 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedCompatibility } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
@@ -183,7 +184,7 @@ export function ResourceCompatibilityForm({
     }
   }
   return (
-    <form onSubmit={submit} aria-busy={busy} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} aria-busy={busy} className={panelSpace4P5}>
       <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
       {product.suspended ? (
         <ErrorState

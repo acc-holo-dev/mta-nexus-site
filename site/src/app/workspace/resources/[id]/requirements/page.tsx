@@ -2,7 +2,6 @@ import {
   ResourceRequirementsScreen,
   resourceRequirementsMetadata,
 } from "../../../../../features/resources/requirements-server";
-import { pageShellClip } from "../../../../../features/shell/page-shell";
 export const dynamic = "force-dynamic";
 export const generateMetadata = resourceRequirementsMetadata;
 export default async function Page({
@@ -13,9 +12,5 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ id }, raw] = await Promise.all([params, searchParams]);
-  return (
-    <div className={pageShellClip}>
-      {await ResourceRequirementsScreen({ productId: id, scope: "publisher", raw })}
-    </div>
-  );
+  return ResourceRequirementsScreen({ productId: id, scope: "publisher", raw });
 }

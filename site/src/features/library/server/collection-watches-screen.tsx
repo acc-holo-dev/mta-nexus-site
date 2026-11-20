@@ -15,6 +15,7 @@ import { resourceReleaseWatchesCopy } from "../../resources/resource-release-wat
 import { resourceReleaseWatchesQuery } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
@@ -194,7 +195,7 @@ export async function CollectionWatchesScreen({
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (
-            <li key={item.productId} className="nexus-panel space-y-3 p-5">
+            <li key={item.productId} className={panelSpace3P5}>
               <h3>
                 {item.available ? (item.title ?? copy.privateResource) : copy.privateResource}
               </h3>

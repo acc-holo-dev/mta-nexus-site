@@ -7,6 +7,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";
@@ -92,7 +93,7 @@ export function ProfileChangeHistoryView({
             />
           )}
           {data.items.map((item) => (
-            <article key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <article key={item.id} className={panelClipSpace3P5}>
               <div className="flex flex-wrap justify-between gap-3">
                 <h2 className="text-sm font-semibold text-primary">{copy.actions[item.action]}</h2>
                 <time dateTime={item.createdAt} className="text-xs text-muted">

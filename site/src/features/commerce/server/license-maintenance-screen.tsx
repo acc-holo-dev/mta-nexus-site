@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
@@ -123,7 +124,7 @@ export async function LicenseMaintenanceScreen({
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((license) => (
-            <li key={license.id} className="nexus-panel min-w-0 space-y-2 p-4">
+            <li key={license.id} className={panelMinSpace2P4}>
               <Link
                 href={`/admin/licenses/${encodeURIComponent(license.id)}`}
                 className="inline-flex min-h-11 items-center break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

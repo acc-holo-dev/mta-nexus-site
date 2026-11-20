@@ -14,6 +14,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -177,7 +178,7 @@ export function LibraryCollectionBatchForm({
       )
     : items;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{c[shownAction]}</h2>
       <p className="break-words text-sm">
         {c.destination}: {shownCollection.name} · {c.revision} {shownCollection.revision}

@@ -18,6 +18,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { stashSupportObjectContext } from "../../support/center";
 import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 
@@ -153,7 +154,7 @@ export function ResourceLifecycleControls({
   return (
     <section
       id="author-resource-lifecycle"
-      className="nexus-panel space-y-4 p-5"
+      className={panelSpace4P5}
       aria-labelledby={`${fieldId}-heading`}
     >
       <h2 id={`${fieldId}-heading`} className="text-xl font-semibold text-primary">

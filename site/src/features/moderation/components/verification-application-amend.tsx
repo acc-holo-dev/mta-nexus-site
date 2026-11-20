@@ -6,6 +6,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
@@ -109,11 +110,7 @@ export function VerificationApplicationAmend({
     }
   }
   return (
-    <form
-      onSubmit={(event) => void amend(event)}
-      aria-busy={busy}
-      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
-    >
+    <form onSubmit={(event) => void amend(event)} aria-busy={busy} className={panelClipSpace4P5}>
       <h2 className="font-semibold text-primary">{copy.amend}</h2>
       <p className="text-xs text-muted">{labels.proofPrivacy}</p>
       <fieldset disabled={busy || blocked} className="space-y-4">

@@ -4,6 +4,7 @@ import { libraryCollectionsService as service } from "../../../lib/services/libr
 import { ResourceDownloadButton } from "../../resources/download";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
@@ -231,7 +232,7 @@ export async function LibraryCollectionsDetailView({
       )}
       <ol className="grid gap-4 md:grid-cols-2">
         {result.items.map((item) => (
-          <li key={item.productId} className="nexus-panel space-y-3 p-5">
+          <li key={item.productId} className={panelSpace3P5}>
             <h2 className="break-words font-semibold">{item.title ?? c.unavailable}</h2>
             {item.downloadable && item.version ? (
               <ResourceDownloadButton

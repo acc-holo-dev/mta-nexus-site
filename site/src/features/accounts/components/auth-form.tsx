@@ -6,6 +6,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
 import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
 
@@ -121,7 +122,7 @@ export function AuthForm({
         onSubmit={submit}
         aria-busy={loading}
         aria-describedby={error ? "auth-error" : undefined}
-        className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
+        className={panelClipSpace4P5}
       >
         {error ? (
           <ErrorState id="auth-error" title={error} description={copy.formErrorHint} />

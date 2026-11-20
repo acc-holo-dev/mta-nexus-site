@@ -16,6 +16,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { confirmedLicenseControl } from "../license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../license-control-i18n";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
@@ -286,7 +287,7 @@ export function LicenseControlPanel({
 
   if (readyScope.current !== scope) return null;
   return (
-    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+    <section className={panelClipSpace4P5}>
       <h2 className="text-lg font-semibold text-primary">
         {moderation ? copy.moderation : copy.title}
       </h2>

@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
@@ -115,7 +116,7 @@ export default async function Page({
         </nav>
         <h1 className="min-w-0 break-words font-display">{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
-        <section className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
+        <section className={panelClipSpace2P5}>
           <h2 className="break-words font-semibold">
             {c.source}: {report.source.name}
           </h2>
@@ -202,7 +203,7 @@ export default async function Page({
           />
         ) : (
           <>
-            <section className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
+            <section className={panelClipSpace2P5}>
               <h2 className="break-words font-semibold">
                 {c.destination}:{" "}
                 <Link href={collectionHref(comparison.destination.id)} className={navLinkClass}>

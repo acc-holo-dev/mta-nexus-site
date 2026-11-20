@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { collectionPageParams } from "../library-collections-query";
@@ -158,7 +159,7 @@ export async function LibraryReleaseComparisonScreen({
       </section>
       <div className="grid gap-5 md:grid-cols-2">
         {([result.from, result.to] as const).map((release, index) => (
-          <section key={release.id} className="nexus-panel space-y-3 p-5">
+          <section key={release.id} className={panelSpace3P5}>
             <h2>
               {index === 0 ? c.from : c.to}: {release.version}
             </h2>

@@ -2,6 +2,7 @@
 
 import { Bell } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import type { NotificationPreferences } from "../notification-preferences-confirmation";
 import { type PushIdentity, WebPushSettings } from "./web-push-settings";
 
@@ -31,10 +32,7 @@ export function SettingsNotificationPreferencesSection({
   onPreferenceChange,
 }: Props) {
   return (
-    <section
-      aria-labelledby="notification-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
+    <section aria-labelledby="notification-heading" className={panelSpace4P5Shadow}>
       <div className="flex items-center gap-2">
         <Bell className="h-4 w-4 text-accent" aria-hidden="true" />
         <h2 id="notification-heading" className="text-sm font-semibold text-primary">

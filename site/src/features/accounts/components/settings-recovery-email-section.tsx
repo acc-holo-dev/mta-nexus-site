@@ -4,6 +4,7 @@ import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../../../lib/i18n";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import type { SettingsRecoveryEmail } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
@@ -28,10 +29,7 @@ export function SettingsRecoveryEmailSection({
   onSubmit,
 }: Props) {
   return (
-    <section
-      aria-labelledby="recovery-email-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
+    <section aria-labelledby="recovery-email-heading" className={panelSpace4P5Shadow}>
       <div className="flex items-center gap-2">
         <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
         <h2 id="recovery-email-heading" className="text-sm font-semibold text-primary">

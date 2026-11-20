@@ -8,6 +8,7 @@ import { organizationWorkspaceService } from "../../../lib/services/organization
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseOrganizationPage } from "../organization-workspace-contract";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -100,7 +101,7 @@ export default async function OrganizationsPage({
           {result.items.length ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {result.items.map((item) => (
-                <article className="nexus-panel space-y-3 p-5" key={item.id}>
+                <article className={panelSpace3P5} key={item.id}>
                   <h2 className="break-words font-heading text-primary">{item.name}</h2>
                   <p className="text-xs text-muted">
                     @{item.slug} ·{" "}

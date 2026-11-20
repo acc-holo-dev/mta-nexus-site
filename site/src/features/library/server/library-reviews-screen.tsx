@@ -12,6 +12,7 @@ import { resourceReviewPageQuery } from "../../resources/resource-review-query";
 import { ResourceReviewPager } from "../../resources/reviews-view";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const navLinkClass =
@@ -95,7 +96,7 @@ export async function LibraryReviewsScreen({
       </Link>
       {result.items.length ? (
         result.items.map((review) => (
-          <article key={review.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <article key={review.id} className={panelClipSpace3P5}>
             <h2 className="min-w-0 break-words">{review.title ?? copy.unavailable}</h2>
             <p>
               {resourceReviewState(typedLocale, review.status)} · {copy.rating}:{" "}

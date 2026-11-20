@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax3xl } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
@@ -131,7 +132,7 @@ export async function SellerSalesReportDetailScreen({
       <p role="note" className="text-sm text-secondary">
         {c.paymentNotice}
       </p>
-      <dl className="nexus-panel space-y-4 p-5">
+      <dl className={panelSpace4P5}>
         {[
           [c.order, sale.orderNumber],
           [c.product, sale.productId],

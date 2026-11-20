@@ -26,6 +26,12 @@ import {
   pageShellStack5,
   pageShellStack6,
 } from "../../shell/page-shell";
+import {
+  panelFlexMinWrapEndP4,
+  panelMinSpace2P5,
+  panelMinSpace3P5,
+  panelMinSpace4P5,
+} from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
@@ -142,7 +148,7 @@ export async function CommunityModerationScreen({
         <Link className={focusLink} href="/admin/community">
           {copy.back}
         </Link>
-        <header className="nexus-panel min-w-0 space-y-3 p-5">
+        <header className={panelMinSpace3P5}>
           <h1 className="break-words text-2xl font-bold text-primary">{item.title}</h1>
           <p className="text-sm text-muted">
             {types[item.type]} · {copy[item.status]}
@@ -177,7 +183,7 @@ export async function CommunityModerationScreen({
             <p className="break-words text-xs text-muted">{item.tags.join(" · ")}</p>
           )}
         </header>
-        <section className="nexus-panel min-w-0 space-y-3 p-5">
+        <section className={panelMinSpace3P5}>
           <h2 className="font-heading text-primary">{copy.body}</h2>
           <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
             {item.body}
@@ -188,7 +194,7 @@ export async function CommunityModerationScreen({
             </p>
           ) : null}
         </section>
-        <section className="nexus-panel min-w-0 space-y-4 p-5">
+        <section className={panelMinSpace4P5}>
           <p className="text-sm text-muted">{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
@@ -220,7 +226,7 @@ export async function CommunityModerationScreen({
           ) : null}
           <ol className="min-w-0 space-y-3">
             {history.map((event) => (
-              <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-5">
+              <li key={event.id} className={panelMinSpace2P5}>
                 <p className="text-sm text-primary">
                   {event.action === "content.published" ? copy.publish : copy.archive} ·{" "}
                   {date(event.createdAt)}
@@ -279,11 +285,7 @@ export async function CommunityModerationScreen({
       {parsed.success && filters ? (
         <>
           <search aria-label={copy.search}>
-            <form
-              method="get"
-              action="/admin/community"
-              className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-            >
+            <form method="get" action="/admin/community" className={panelFlexMinWrapEndP4}>
               <label className="min-w-44 flex-1 space-y-1 text-xs text-muted">
                 {copy.search}
                 <input
@@ -356,7 +358,7 @@ export async function CommunityModerationScreen({
           ) : (
             <ul className="min-w-0 space-y-3">
               {parsed.data.items.map((item) => (
-                <li key={item.id} className="nexus-panel min-w-0 space-y-2 p-5">
+                <li key={item.id} className={panelMinSpace2P5}>
                   <Link
                     className="block break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     href={moderationDetailHref(item.id)}

@@ -4,6 +4,7 @@ import { Button, ErrorState, withOccurrenceKeys } from "@nexus/ui";
 import { FileSearch } from "lucide-react";
 import { useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 
@@ -144,7 +145,7 @@ export function MtaMetaInspectorPanel({
   const versionSuggestion = getMtaVersionTargetSuggestion(inspection?.minMtaVersion ?? null);
 
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-labelledby="meta-inspector-heading">
+    <section className={panelSpace4P5} aria-labelledby="meta-inspector-heading">
       <div className="flex items-start gap-3">
         <FileSearch className="mt-0.5 h-5 w-5 text-accent" aria-hidden="true" />
         <div>

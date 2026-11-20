@@ -18,6 +18,7 @@ import {
 } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const navLinkClass =
@@ -200,7 +201,7 @@ export async function LibraryWatchesScreen({
       {result.items.length ? (
         <ul className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
           {result.items.map((watch) => (
-            <li key={watch.productId} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <li key={watch.productId} className={panelClipSpace3P5}>
               <h2 className="break-words font-semibold text-primary">
                 {watch.available ? (watch.title ?? copy.privateResource) : copy.privateResource}
               </h2>

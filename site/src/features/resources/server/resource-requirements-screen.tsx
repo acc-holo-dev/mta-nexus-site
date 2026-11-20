@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
@@ -146,7 +147,7 @@ export async function ResourceRequirementsScreen({
           {copy.libraryPreview}
         </p>
       )}
-      <form className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form className={panelFlexWrapEndP4}>
         <label className="grid gap-1">
           {copy.target}
           <input

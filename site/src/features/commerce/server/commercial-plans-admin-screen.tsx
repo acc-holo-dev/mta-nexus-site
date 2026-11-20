@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
@@ -135,7 +136,7 @@ export async function CommercialPlansAdminScreen({
       {result.plans.length ? (
         <ul className="space-y-3">
           {result.plans.map((plan) => (
-            <li key={plan.id} className="nexus-panel min-w-0 space-y-2 p-5">
+            <li key={plan.id} className={panelMinSpace2P5}>
               <Link
                 href={`/admin/commerce/plans/${encodeURIComponent(plan.id)}`}
                 className={`break-words font-semibold ${linkClass}`}

@@ -25,6 +25,7 @@ import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
 import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { panelSpace4P6 } from "../../shell/panel-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ProductDependencyList } from "../components/product-dependency-list";
@@ -552,7 +553,7 @@ export async function ProductDetailPage({
 
           <ResourceGallery items={gallery} title={product.title} locale={locale} />
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.overview}
             </h2>
@@ -574,7 +575,7 @@ export async function ProductDetailPage({
 
           <ResourceVersionHelpSection projection={versionHelp} locale={locale} />
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
               <h2 className="flex items-center gap-2 text-base font-bold text-primary">
                 <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
@@ -668,14 +669,14 @@ export async function ProductDetailPage({
             )}
           </section>
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
             <ReverseDependencyList summary={reverseDependencySummary} locale={locale} />
           </section>
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="flex items-center gap-2 border-b border-base pb-3 text-base font-bold text-primary">
               <MessageSquare className="h-4 w-4 text-warning" aria-hidden="true" />
               <span>{copy.reviews}</span>

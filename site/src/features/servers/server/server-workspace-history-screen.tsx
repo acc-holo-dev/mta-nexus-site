@@ -10,6 +10,7 @@ import { serverWorkspaceHistoryService } from "../../../lib/services/servers/ser
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
@@ -176,7 +177,7 @@ export async function ServerWorkspaceHistoryScreen({
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
+                <li key={event.id} className={panelClipSpace2P5}>
                   <h2 className="text-sm font-bold text-primary">
                     {history.actions[event.action]}
                   </h2>

@@ -10,6 +10,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
@@ -295,7 +296,7 @@ export function ResourceVariantsForm({
   }
   return (
     <section className="space-y-6">
-      <form onSubmit={(event) => submit(event, "save")} className="nexus-panel space-y-4 p-5">
+      <form onSubmit={(event) => submit(event, "save")} className={panelSpace4P5}>
         <p className="text-sm text-secondary">{copy.variantNote}</p>
         <label htmlFor={`${field}-title`} className="block text-sm text-secondary">
           {copy.title}
@@ -409,7 +410,7 @@ export function ResourceVariantsForm({
           {busy ? copy.working : copy.save}
         </Button>
       </form>
-      <section className="nexus-panel space-y-3 p-5" aria-labelledby={`${field}-candidates`}>
+      <section className={panelSpace3P5} aria-labelledby={`${field}-candidates`}>
         <h2 id={`${field}-candidates`} className="font-semibold text-primary">
           {copy.candidates}
         </h2>
@@ -474,7 +475,7 @@ export function ResourceVariantsForm({
         </nav>
       </section>
       {base.group && (
-        <form onSubmit={(event) => submit(event, "remove")} className="nexus-panel space-y-3 p-5">
+        <form onSubmit={(event) => submit(event, "remove")} className={panelSpace3P5}>
           <h2 className="font-semibold text-primary">{copy.dissolve}</h2>
           <p className="text-sm text-secondary">{copy.dissolveNote}</p>
           <p className="text-xs text-muted">{copy.reason}</p>

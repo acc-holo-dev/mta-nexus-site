@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
@@ -240,7 +241,7 @@ export function MtaMasterServerDirectory({
 
   return (
     <section aria-label={copy.directory} aria-busy={loading} className="min-w-0 space-y-4">
-      <div className="nexus-panel space-y-3 p-4">
+      <div className={panelSpace3P4}>
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
           {loading ? (

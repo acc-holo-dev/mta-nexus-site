@@ -3,6 +3,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
@@ -56,7 +57,7 @@ export function OrderTermsReportView({
       <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
         {c.notice}
       </p>
-      <section className="nexus-panel min-w-0 space-y-4 p-5">
+      <section className={panelMinSpace4P5}>
         <h2 className="text-lg font-semibold">{c.check}</h2>
         <p className="text-sm text-secondary">{c.consistencyNotice}</p>
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
@@ -108,7 +109,7 @@ export function OrderTermsReportView({
       {report.lines.length ? (
         <ol className="space-y-4">
           {report.lines.map((line) => (
-            <li key={line.id} className="nexus-panel min-w-0 space-y-4 p-5">
+            <li key={line.id} className={panelMinSpace4P5}>
               <h2 className="break-words text-lg font-semibold">
                 {line.terms?.product.title ?? line.productId}
               </h2>

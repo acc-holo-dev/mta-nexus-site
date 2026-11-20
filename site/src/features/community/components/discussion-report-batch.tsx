@@ -16,6 +16,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../discussion-reports-contract";
@@ -200,7 +201,7 @@ export function DiscussionReportBatch({
   return (
     <section className="space-y-4" aria-busy={busy}>
       {allowActions && available.length > 0 && (
-        <div className="nexus-panel space-y-4 p-5">
+        <div className={panelSpace4P5}>
           <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
           <p className="text-sm text-muted">
             {commentId === null ? copy.publicationHelp : copy.help}
@@ -327,7 +328,7 @@ export function DiscussionReportBatch({
         </Button>
       ) : null}
       {preview && (
-        <div className="nexus-panel space-y-4 p-5">
+        <div className={panelSpace4P5}>
           <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
           <p className="break-words text-sm text-primary">{preview.publication.title}</p>
           <p className="text-sm font-semibold text-primary">
@@ -400,7 +401,7 @@ export function DiscussionReportBatch({
       {items.length ? (
         <ul className="space-y-3">
           {items.map((item) => (
-            <li key={item.id} className="nexus-panel space-y-3 p-5">
+            <li key={item.id} className={panelSpace3P5}>
               {allowActions && ["open", "under_review"].includes(item.status) && (
                 <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
                   <input
@@ -434,7 +435,7 @@ export function DiscussionReportBatch({
           ))}
         </ul>
       ) : (
-        <div className="nexus-panel space-y-3 p-5">
+        <div className={panelSpace3P5}>
           <p className="text-muted">
             {commentId === null
               ? reportGroupsCopy(locale).publicationEmpty

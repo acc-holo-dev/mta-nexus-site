@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
@@ -348,7 +349,7 @@ export function OrganizationProfileForm({
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5" aria-busy={busy}>
+    <form onSubmit={submit} className={panelSpace4P5} aria-busy={busy}>
       <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
       {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (

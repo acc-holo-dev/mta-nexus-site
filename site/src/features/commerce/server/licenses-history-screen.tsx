@@ -12,6 +12,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   effectiveLicenseStatus,
@@ -144,7 +145,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
         ) : (
           <ol className="space-y-3">
             {result.licenses.map((license) => (
-              <li key={license.id} className="nexus-panel min-w-0 space-y-3 p-5">
+              <li key={license.id} className={panelMinSpace3P5}>
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                   <h2 className="min-w-0 break-words text-base font-semibold text-primary">
                     {license.productTitle}

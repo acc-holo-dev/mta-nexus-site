@@ -2,6 +2,7 @@ import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
@@ -32,7 +33,7 @@ export function ResourcePublicationReadinessPanel({
   return (
     <section
       id="publication-readiness"
-      className="nexus-panel space-y-4 p-5"
+      className={panelSpace4P5}
       aria-labelledby="publication-readiness-heading"
     >
       <div className="space-y-1">

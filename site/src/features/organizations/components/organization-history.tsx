@@ -13,6 +13,7 @@ import {
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -105,7 +106,7 @@ export function OrganizationHistoryView({
         />
       )}
       {data?.items.map((item) => (
-        <article className="nexus-panel space-y-3 p-5" key={item.id}>
+        <article className={panelSpace3P5} key={item.id}>
           <div className="flex flex-wrap justify-between gap-3">
             <h2 className="text-sm font-semibold text-primary">{copy.actions[item.action]}</h2>
             <time className="text-xs text-muted" dateTime={item.createdAt}>

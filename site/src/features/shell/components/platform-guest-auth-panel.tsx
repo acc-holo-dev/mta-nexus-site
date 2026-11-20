@@ -1,4 +1,5 @@
 import type { Locale } from "../../../lib/i18n";
+import { panelSpace3P5 } from "../panel-shell";
 import {
   PlatformWorkspaceGuestAuthLinks,
   PlatformWorkspaceSignInCopy,
@@ -14,7 +15,7 @@ export function PlatformGuestAuthPanel({
   linkClassName?: string;
 }) {
   return (
-    <div className="nexus-panel space-y-3 p-5">
+    <div className={panelSpace3P5}>
       <PlatformWorkspaceSignInCopy locale={locale} variant="panel" />
       <PlatformWorkspaceGuestAuthLinks
         locale={locale}

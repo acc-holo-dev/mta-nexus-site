@@ -16,6 +16,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
@@ -259,7 +260,7 @@ export default async function Page({
               resourceHref = `/workspace/library/${encodeURIComponent(item.productId)}`,
               release = item.available ? item.release : null;
             return (
-              <li key={item.productId} className="nexus-panel space-y-3 p-5">
+              <li key={item.productId} className={panelSpace3P5}>
                 <h2 className="break-words font-semibold">
                   {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                 </h2>

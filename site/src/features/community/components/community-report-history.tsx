@@ -12,6 +12,7 @@ import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import { communityReportCopy } from "../community-report-copy";
 import type { ReportHistoryPage } from "../community-report-history-contract";
 import { reportHistoryCopy } from "../community-report-history-copy";
@@ -54,11 +55,7 @@ export function CommunityReportHistory({
           {page.audience === "staff" ? copy.staffHint : copy.ownHint}
         </p>
       </header>
-      <form
-        method="get"
-        action={path}
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
+      <form method="get" action={path} className={panelFlexMinWrapEndP4}>
         <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
           <span>{copy.period}</span>
           <select name="period" defaultValue={filters.period} className={platformFieldClass}>
@@ -124,7 +121,7 @@ export function CommunityReportHistory({
       ) : (
         <ol className="min-w-0 space-y-3" aria-label={copy.title}>
           {page.items.map((event) => (
-            <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-4">
+            <li key={event.id} className={panelMinSpace2P4}>
               <div className="flex flex-wrap justify-between gap-2">
                 <h2 className="text-sm font-semibold text-primary">{copy.actions[event.action]}</h2>
                 <time dateTime={event.createdAt} className="text-xs text-muted">

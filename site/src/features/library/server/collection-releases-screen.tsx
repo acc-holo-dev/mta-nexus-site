@@ -13,6 +13,7 @@ import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
@@ -227,7 +228,7 @@ export async function CollectionReleasesScreen({
           const downloadable =
             item.hasAccess && ["latest", "pinned", "update_available"].includes(item.state);
           return (
-            <li key={item.productId} className="nexus-panel space-y-3 p-5">
+            <li key={item.productId} className={panelSpace3P5}>
               <h3 className="break-words font-semibold">{item.title ?? cc.unavailable}</h3>
               <p>{copy[item.state]}</p>
               {item.latestVersion && (

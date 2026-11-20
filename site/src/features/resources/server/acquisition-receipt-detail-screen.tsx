@@ -11,6 +11,7 @@ import { resourceCartReceiptsService } from "../../../lib/services/commerce/reso
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCartReviewEvidence } from "../cart-view";
 import { ResourceDownloadButton } from "../download";
@@ -98,7 +99,7 @@ export async function AcquisitionReceiptDetailScreen({
         </time>
       </p>
       {!receipt.reviewed ? (
-        <div className="nexus-panel space-y-3 p-5">
+        <div className={panelSpace3P5}>
           <p>{copy.legacyNote}</p>
           <p>
             {copy.items}: {receipt.legacyProductCount}
@@ -107,7 +108,7 @@ export async function AcquisitionReceiptDetailScreen({
       ) : (
         <ol className="space-y-4">
           {receipt.items.map((item) => (
-            <li key={item.productId} className="nexus-panel space-y-4 p-5">
+            <li key={item.productId} className={panelSpace4P5}>
               <h2 className="break-words text-lg font-semibold">{item.title}</h2>
               <p className="text-sm text-secondary">
                 {item.alreadyClaimed ? copy.alreadyOwned : copy.newlyAdded} ·{" "}

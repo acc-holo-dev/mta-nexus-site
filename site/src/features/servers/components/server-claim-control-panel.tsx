@@ -10,6 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
@@ -306,7 +307,7 @@ export function ServerClaimControlPanel({
   }
 
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-labelledby="server-control-proof-heading">
+    <section className={panelSpace4P5} aria-labelledby="server-control-proof-heading">
       <div className="flex items-start gap-3">
         <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>

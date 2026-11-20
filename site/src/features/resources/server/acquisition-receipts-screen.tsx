@@ -10,6 +10,7 @@ import { resourceCartReceiptsService } from "../../../lib/services/commerce/reso
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import {
@@ -181,7 +182,7 @@ export async function AcquisitionReceiptsScreen({
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (
-            <li key={item.requestId} className="nexus-panel space-y-3 p-5">
+            <li key={item.requestId} className={panelSpace3P5}>
               <h2 className="font-semibold">
                 <Link
                   href={resourceCartReceiptUrl(item.requestId)}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellStack5 } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
@@ -94,11 +95,7 @@ export function CommunityReportList({
         ))}
       </nav>
       <search aria-label={copy.textSearch}>
-        <form
-          method="GET"
-          action={path}
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
+        <form method="GET" action={path} className={panelFlexMinWrapEndP4}>
           <input type="hidden" name="view" value={filters.view} />
           <label className="min-w-0 basis-full space-y-1 text-sm text-secondary">
             <span>{copy.textSearch}</span>
@@ -195,7 +192,7 @@ export function CommunityReportList({
       <div className="min-w-0 space-y-3">
         {!error
           ? page?.items.map((report) => (
-              <article key={report.id} className="nexus-panel min-w-0 space-y-2 p-4">
+              <article key={report.id} className={panelMinSpace2P4}>
                 <div className="flex min-w-0 flex-wrap justify-between gap-2">
                   <Link
                     className={`break-words text-sm font-semibold text-accent underline ${filterNavLinkClass}`}

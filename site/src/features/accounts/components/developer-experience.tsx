@@ -1,6 +1,7 @@
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ShieldCheck } from "lucide-react";
 import type { Locale } from "../../../lib/i18n";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 export function DeveloperExperience({
   profile,
@@ -18,7 +19,7 @@ export function DeveloperExperience({
   const copy = verificationCopy(locale);
   const githubUrl = safeExternalWebUrl(profile.githubUrl);
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-label={copy.profile}>
+    <section className={panelSpace4P5} aria-label={copy.profile}>
       <h2 className="font-heading text-primary">{copy.profile}</h2>
       {profile.verifiedDeveloper && (
         <p className="flex items-center gap-2 text-sm font-semibold text-success">

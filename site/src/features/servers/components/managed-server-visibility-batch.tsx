@@ -12,6 +12,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { pageShellStack4 } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
@@ -184,7 +185,7 @@ export function ManagedServerVisibilityBatch({
   }
   return (
     <section className={pageShellStack4} aria-busy={busy}>
-      <div className="nexus-panel space-y-4 p-5">
+      <div className={panelSpace4P5}>
         <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
         <p className="text-sm text-muted">{copy.batchHelp}</p>
         <fieldset disabled={busy || blocked || !!preview} className="space-y-4">
@@ -264,7 +265,7 @@ export function ManagedServerVisibilityBatch({
         </Button>
       )}
       {preview && (
-        <div className="nexus-panel space-y-4 p-5">
+        <div className={panelSpace4P5}>
           <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
           <p className="text-sm text-muted">{copy[`${preview.visibility}Help`]}</p>
           <p className="text-xs text-muted">{copy.notes}</p>

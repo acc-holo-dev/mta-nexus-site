@@ -17,6 +17,7 @@ import {
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const navLinkClass =
@@ -174,7 +175,7 @@ export async function LibraryDownloadsScreen({
       {result.items.length ? (
         <ol className="space-y-4">
           {result.items.map((receipt) => (
-            <li key={receipt.id} className="nexus-panel space-y-4 p-5">
+            <li key={receipt.id} className={panelSpace4P5}>
               <div className="flex flex-wrap justify-between gap-2">
                 <h2 className="break-words font-semibold text-primary">
                   {receipt.title ?? copy.privateResource}

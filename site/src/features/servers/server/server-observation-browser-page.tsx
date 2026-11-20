@@ -15,6 +15,7 @@ import {
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
+import { panelFlexWrapEndP4, panelSpace3P5 } from "../../shell/panel-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -214,7 +215,7 @@ function ServerObservationBrowserPanel({
         />
       ) : null}
       <search aria-label={copy.search}>
-        <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+        <form action={path} method="get" className={panelFlexWrapEndP4}>
           <input type="hidden" name="window" value={report.window} />
           <input type="hidden" name="end" value={report.windowEnd} />
           <label className="min-w-48 flex-1 space-y-1 text-xs text-muted">
@@ -366,7 +367,7 @@ function ServerObservationBrowserPanel({
           </Link>
         )}
       </nav>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className={panelSpace3P5}>
         <ServerStatisticsExportButton
           url={serverObservationBrowserHref(
             `${managed ? "/api/workspace" : "/api"}/servers/${encodeURIComponent(report.server.id)}/observations/export`,

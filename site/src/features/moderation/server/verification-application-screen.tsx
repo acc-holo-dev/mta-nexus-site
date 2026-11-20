@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationApplicationAmend } from "../verification-amend";
@@ -95,7 +96,7 @@ export async function VerificationApplicationScreen({
       ) : null}
       {application ? (
         <>
-          <article className="nexus-panel min-w-0 space-y-4 p-5">
+          <article className={panelMinSpace4P5}>
             <div className="flex flex-wrap justify-between gap-3">
               <h2 className="min-w-0 break-words font-semibold text-primary">
                 {labels[application.targetType]}
@@ -135,7 +136,7 @@ export async function VerificationApplicationScreen({
             {application.truncated ? <p className="text-xs text-muted">{copy.truncated}</p> : null}
           </article>
           {application.profileState ? (
-            <section className="nexus-panel min-w-0 space-y-2 p-5">
+            <section className={panelMinSpace2P5}>
               <p className="text-sm text-secondary">
                 {
                   copy[
@@ -166,7 +167,7 @@ export async function VerificationApplicationScreen({
               description={copy.readOnlyHint}
             />
           )}
-          <section className="nexus-panel min-w-0 space-y-4 p-5">
+          <section className={panelMinSpace4P5}>
             <h2 className="font-semibold text-primary">{copy.events}</h2>
             {application.hasEarlierEvents ? (
               <p className="text-xs text-muted">{copy.earlier}</p>

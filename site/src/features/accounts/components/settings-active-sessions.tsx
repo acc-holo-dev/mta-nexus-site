@@ -3,6 +3,7 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import type { SettingsSession } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
@@ -27,10 +28,7 @@ export function SettingsActiveSessions({
   onRevokeSession,
 }: Props) {
   return (
-    <section
-      aria-labelledby="sessions-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
+    <section aria-labelledby="sessions-heading" className={panelSpace4P5Shadow}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />

@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
@@ -161,7 +162,7 @@ export async function LibraryReleaseHistoryScreen({
       )}
       <ol className="space-y-4">
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-3 p-5">
+          <li key={item.id} className={panelSpace3P5}>
             {item.currentTitle && (
               <h2 className="break-words font-semibold">
                 {c.current}: {item.currentTitle}

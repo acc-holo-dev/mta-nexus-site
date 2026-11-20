@@ -12,6 +12,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
@@ -110,7 +111,7 @@ export async function LibraryUpdatesScreen({
               Boolean(item.latestBuildId) &&
               item.selectedBuildId !== item.latestBuildId;
             return (
-              <li key={item.productId} className="nexus-panel space-y-3 p-5">
+              <li key={item.productId} className={panelSpace3P5}>
                 <h2 className="break-words font-semibold text-primary">
                   {item.state === "unavailable"
                     ? copy.privateResource

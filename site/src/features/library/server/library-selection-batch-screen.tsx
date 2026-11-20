@@ -12,6 +12,7 @@ import { libraryCollectionsService } from "../../../lib/services/library/library
 import { librarySelectionBatchesService } from "../../../lib/services/library/library-selection-batches-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
@@ -112,7 +113,7 @@ export async function LibrarySelectionBatchScreen({
           {!result.items.length && <EmptyState title={c.empty} description={c.privacy} />}
           <ol className="space-y-4">
             {result.items.map((receipt) => (
-              <li key={receipt.id} className="nexus-panel space-y-3 p-4">
+              <li key={receipt.id} className={panelSpace3P4}>
                 <h2>
                   {c[receipt.snapshot.mode]} · {c.changed}:{" "}
                   {

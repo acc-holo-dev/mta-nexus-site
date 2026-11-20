@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { confirmedOrderCancellation } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -182,7 +183,7 @@ export function OrderCancellationForm({
     return error ? <ErrorState title={error} description={copy.formErrorHint} /> : null;
   if (ready === scope && !canCancel && !pending.current && !saved) return null;
   return (
-    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+    <form onSubmit={submit} className={panelClipSpace4P5}>
       <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
       {ready === scope && retry ? (
         <ErrorState

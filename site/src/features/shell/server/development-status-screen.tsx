@@ -9,6 +9,7 @@ import packageMetadata from "../../../../../package.json";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { pageShellMax5xlLoose as pageShellClass } from "../page-shell";
+import { panelClipSpace2P5 } from "../panel-shell";
 
 export async function DevelopmentStatusScreen() {
   if (process.env.NODE_ENV === "production") {
@@ -95,10 +96,7 @@ export async function DevelopmentStatusScreen() {
         </div>
       </section>
 
-      <section
-        aria-labelledby="dev-app-url-heading"
-        className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5"
-      >
+      <section aria-labelledby="dev-app-url-heading" className={panelClipSpace2P5}>
         <h2
           id="dev-app-url-heading"
           className="flex items-center gap-2 text-sm font-semibold text-primary"

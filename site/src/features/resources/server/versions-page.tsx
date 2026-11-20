@@ -14,6 +14,7 @@ import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
@@ -162,7 +163,7 @@ export async function PublicResourceVersionsPage({
       ) : (
         <ol className={pageShellStack4}>
           {history.releases.map((release) => (
-            <li key={release.id} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+            <li key={release.id} className={panelClipSpace4P5}>
               <header className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">
                   <h2 className="text-base font-semibold text-primary">

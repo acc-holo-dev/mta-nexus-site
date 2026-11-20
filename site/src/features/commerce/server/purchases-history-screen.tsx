@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   formatHistoryAmount,
@@ -105,7 +106,7 @@ export async function PurchasesHistoryScreen({
         ) : (
           <ol className="space-y-3">
             {result.orders.map((order) => (
-              <li key={order.id} className="nexus-panel min-w-0 space-y-3 p-5">
+              <li key={order.id} className={panelMinSpace3P5}>
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                   <h2 className="min-w-0 break-words text-base font-semibold text-primary">
                     {copy.orderNumber}: {order.orderNumber}

@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
@@ -51,7 +52,7 @@ export function LibraryReleaseComparisonSelection({
     });
   }
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-label={copy.chooseCompared}>
+    <section className={panelSpace4P5} aria-label={copy.chooseCompared}>
       <h2>
         {copy.chooseCompared}: {target.version}
       </h2>

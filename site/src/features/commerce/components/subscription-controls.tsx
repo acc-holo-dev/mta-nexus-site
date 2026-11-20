@@ -11,6 +11,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { commercialTerms } from "../commercial-confirmation";
 import {
   confirmedSubscriptionReceipt,
@@ -257,7 +258,7 @@ export function SubscriptionControls(props: Props) {
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+    <form onSubmit={submit} className={panelClipSpace4P5}>
       <p role="note" className="text-sm text-secondary">
         {props.action === "activate" ? c.notice : c.cancelNote}
       </p>

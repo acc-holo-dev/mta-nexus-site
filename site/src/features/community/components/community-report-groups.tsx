@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
 import { type ReportGroupsPage, reportGroupsHref } from "../community-report-groups-contract";
@@ -138,10 +139,7 @@ export function CommunityReportGroups({
       ) : (
         <ol className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li
-              key={`${item.targetType}:${item.targetId}`}
-              className="nexus-panel min-w-0 space-y-3 p-5"
-            >
+            <li key={`${item.targetType}:${item.targetId}`} className={panelMinSpace3P5}>
               <h2 className="break-words text-base font-semibold text-primary">
                 {labels[item.targetType]} · {item.target?.title ?? item.targetId}
               </h2>

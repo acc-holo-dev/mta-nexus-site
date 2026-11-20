@@ -13,6 +13,7 @@ import {
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -407,7 +408,7 @@ export function VerificationWorkspace({
         />
       ) : null}
       {profile && (
-        <section className="nexus-panel space-y-3 p-5">
+        <section className={panelSpace3P5}>
           <h2 className="font-heading text-primary">{copy.current}</h2>
           <p className="text-sm text-secondary">
             {copy.user}:{" "}
@@ -466,7 +467,7 @@ export function VerificationWorkspace({
           ) : null}
         </section>
       )}
-      <section className="nexus-panel space-y-4 p-5">
+      <section className={panelSpace4P5}>
         <h2 className="font-heading text-primary">{copy.manage}</h2>
         <form
           method="GET"
@@ -558,7 +559,7 @@ export function VerificationWorkspace({
         </nav>
       </section>
       {target && (
-        <section className="nexus-panel space-y-4 p-5">
+        <section className={panelSpace4P5}>
           <h2 className="font-heading text-primary">{copy.apply}</h2>
           <p className="break-words text-sm text-secondary">
             {copy[target.type]} · {target.name}
@@ -645,7 +646,7 @@ export function VerificationWorkspace({
           </Button>
         </section>
       )}
-      <section className="nexus-panel min-w-0 space-y-3 p-5">
+      <section className={panelMinSpace3P5}>
         <p className="text-sm text-muted">{copy.serverHint}</p>
         <Link href="/workspace/servers" className={accentLinkClass}>
           {copy.servers}

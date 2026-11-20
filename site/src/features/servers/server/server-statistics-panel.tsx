@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
 import type { ServerStatisticsResult } from "../../../lib/services/servers/server-statistics-service";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";
@@ -88,7 +89,7 @@ export function ServerStatisticsPanel({
         </p>
         <p className="text-xs text-muted">{copy.snapshotScope}</p>
       </header>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+      <section className={panelClipSpace3P5}>
         <h2 id="server-statistics-comparison" className="text-lg font-bold text-primary">
           {copy.comparison}
         </h2>
@@ -156,10 +157,7 @@ export function ServerStatisticsPanel({
             : ` (${report.averagePlayerPercentChange > 0 ? "+" : ""}${report.averagePlayerPercentChange}%)`}
         </p>
       </section>
-      <section
-        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
-        aria-labelledby="server-statistics-chart"
-      >
+      <section className={panelClipSpace3P5} aria-labelledby="server-statistics-chart">
         <h2 id="server-statistics-chart" className="text-lg font-bold text-primary">
           {copy.chart}
         </h2>
@@ -195,10 +193,7 @@ export function ServerStatisticsPanel({
           <time dateTime={report.windowEnd}>{time(report.windowEnd)} UTC</time>
         </div>
       </section>
-      <section
-        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
-        aria-labelledby="server-statistics-observations"
-      >
+      <section className={panelClipSpace3P5} aria-labelledby="server-statistics-observations">
         <h2 id="server-statistics-observations" className="text-lg font-bold text-primary">
           {copy.observations}
         </h2>
@@ -282,7 +277,7 @@ export function ServerStatisticsPanel({
           )}
         </nav>
       </section>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+      <section className={panelClipSpace3P5}>
         <div className="flex flex-wrap gap-3">
           <ServerStatisticsExportButton
             url={serverStatisticsHref(exportPath, { ...state, format: "buckets" })}

@@ -2,6 +2,7 @@
 import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseSelectionControls({
@@ -24,7 +25,7 @@ export function LibraryReleaseSelectionControls({
   const state = useLibraryReleaseCommand(productId, actorId, locale);
   const { pending, busy, saved, send } = state;
   return (
-    <section className="nexus-panel space-y-4 p-5">
+    <section className={panelSpace4P5}>
       <p className="text-xs text-muted">
         {copy.revision}: {revision}
       </p>

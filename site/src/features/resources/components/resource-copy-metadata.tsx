@@ -1,5 +1,6 @@
 import type { ResourceCopyMetadata } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { resourceCopyCopy } from "../resource-copy-i18n";
 export function ResourceCopyMetadataView({
   metadata,
@@ -18,7 +19,7 @@ export function ResourceCopyMetadataView({
     [c.dependencies, metadata.compatibility.dependencies.join(", ") || c.none],
   ];
   return (
-    <dl className="nexus-panel space-y-4 p-5">
+    <dl className={panelSpace4P5}>
       {rows.map(([label, value]) => (
         <div key={label}>
           <dt className="text-sm text-secondary">{label}</dt>

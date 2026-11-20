@@ -3,6 +3,7 @@ import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 
@@ -37,7 +38,7 @@ export function SupportMessageBrowser({
         <p className="text-sm text-muted">{copy.description}</p>
       </header>
       <search aria-label={copy.filters}>
-        <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+        <form method="get" action={path} className={panelFlexWrapEndP4}>
           <label
             className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-secondary"
             htmlFor="support-message-query"

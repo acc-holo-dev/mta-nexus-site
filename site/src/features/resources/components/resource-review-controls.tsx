@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { confirmAction } from "../../shell/confirm-action";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -139,7 +140,7 @@ export function ResourceReviewEditor({
     void submit("withdraw");
   }
   return (
-    <section className="nexus-panel space-y-4 p-5">
+    <section className={panelSpace4P5}>
       <p className="text-sm text-secondary">{copy.access}</p>
       {eligibilityNote ? (
         <ErrorState
@@ -449,7 +450,7 @@ export function ResourceReviewDecisionForm({
   if (status !== "open" && status !== "under_review") return null;
   return (
     <form
-      className="nexus-panel space-y-3 p-5"
+      className={panelSpace3P5}
       aria-busy={busy || undefined}
       onSubmit={(event) => {
         event.preventDefault();

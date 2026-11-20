@@ -20,6 +20,7 @@ import {
   pageShellStack3,
   pageShellStack4,
 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 
@@ -188,7 +189,7 @@ export async function LibraryWatchHistoryScreen({
       {result.items.length ? (
         <ol className={pageShellStack4}>
           {result.items.map((item) => (
-            <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <li key={item.id} className={panelClipSpace3P5}>
               <h2>{c[item.source]}</h2>
               <p>
                 {c.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>

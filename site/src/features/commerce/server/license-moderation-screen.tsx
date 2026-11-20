@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   effectiveLicenseStatus,
@@ -170,7 +171,7 @@ export async function LicenseModerationScreen({
       {result.licenses.length ? (
         <ol className="space-y-3">
           {result.licenses.map((license) => (
-            <li key={license.id} className="nexus-panel min-w-0 space-y-2 p-5">
+            <li key={license.id} className={panelMinSpace2P5}>
               <h2 className="font-semibold text-primary">{license.productTitle}</h2>
               <p className="text-sm text-secondary">
                 {licenseStatusLabel(

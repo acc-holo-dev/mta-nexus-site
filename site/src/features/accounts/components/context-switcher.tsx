@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 
 type ContextOption = {
   id: string;
@@ -123,7 +124,7 @@ export function ContextSwitcher() {
   if (loading) {
     return (
       <HonestLoadingShell
-        className="nexus-panel space-y-3 p-5"
+        className={panelSpace3P5}
         headingId="workspace-context-loading-heading"
         headingLevel={2}
         title={copy.title}
@@ -139,7 +140,7 @@ export function ContextSwitcher() {
   if (contexts.length <= 1 && !error) return null;
 
   return (
-    <section aria-busy={saving ? true : undefined} className="nexus-panel space-y-3 p-5">
+    <section aria-busy={saving ? true : undefined} className={panelSpace3P5}>
       <div>
         <h2 className="text-sm font-semibold text-primary">{copy.title}</h2>
         <p className="mt-1 text-xs text-muted">{copy.description}</p>

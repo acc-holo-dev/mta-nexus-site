@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
+import { panelSpace4P6 } from "../../shell/panel-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
 function renderSectionBody({
@@ -58,7 +59,7 @@ export function ResourceVersionHelpSection({
 
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className={panelSpace4P6}
       aria-labelledby="resource-version-help-heading"
       data-testid="resource-version-help"
       data-version={projection.version}

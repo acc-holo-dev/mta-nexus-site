@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
 import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   authorPublicationDeskHref,
@@ -101,11 +102,7 @@ export default async function AuthorContentPage({
         </Link>
       </header>
       <search aria-label={copy.filters}>
-        <form
-          action="/workspace/content"
-          method="get"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
+        <form action="/workspace/content" method="get" className={panelFlexMinWrapEndP4}>
           <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
             {copy.query}
             <input
@@ -219,7 +216,7 @@ export default async function AuthorContentPage({
         {filters &&
           report?.items.map((item) => (
             <li key={item.id}>
-              <article className="nexus-panel min-w-0 space-y-3 p-5">
+              <article className={panelMinSpace3P5}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h2 className="min-w-0 break-words font-semibold text-primary">
                     <Link

@@ -13,6 +13,7 @@ import {
 } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -146,7 +147,7 @@ export function LibraryCollectionImport({
   return (
     <div className="space-y-6">
       <p>{mode ? m.reconcileNote : m.note}</p>
-      <form onSubmit={inspect} className="nexus-panel space-y-4 p-5">
+      <form onSubmit={inspect} className={panelSpace4P5}>
         <fieldset disabled={frozen} className="space-y-3">
           <label className="grid gap-1">
             {m.choose}

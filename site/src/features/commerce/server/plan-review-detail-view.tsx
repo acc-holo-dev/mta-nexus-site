@@ -1,6 +1,7 @@
 import type { PlanReviewDetail } from "@nexus/domain";
 import Link from "next/link";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -28,14 +29,14 @@ export function PlanReviewDetailView({
       <p role="note" className="text-sm text-secondary">
         {c.notice}
       </p>
-      <section className="nexus-panel space-y-4 p-5">
+      <section className={panelSpace4P5}>
         <p>
           {c.revision} {r.planRevision} ·{" "}
           <time dateTime={r.createdAt.toISOString()}>{formatHistoryDate(r.createdAt, locale)}</time>
         </p>
         <PlanReviewTerms terms={r.terms} locale={locale} />
       </section>
-      <section className="nexus-panel space-y-4 p-5">
+      <section className={panelSpace4P5}>
         <h2 className="text-xl font-semibold">{c.estimate}</h2>
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
           {[
@@ -51,7 +52,7 @@ export function PlanReviewDetailView({
         </dl>
         <p className="text-sm text-muted">{c.baseline}</p>
       </section>
-      <section className="nexus-panel space-y-4 p-5">
+      <section className={panelSpace4P5}>
         <h2 className="text-xl font-semibold">{c.latest}</h2>
         <p role="status">{c[detail.state]}</p>
         <p className="text-sm text-muted">

@@ -17,6 +17,7 @@ import {
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -138,7 +139,7 @@ export async function ContextPublicationHistoryScreen({
             />
           )}
           {data.item.status === "archived" && !data.item.recoverable && (
-            <section className="nexus-panel space-y-2 p-4">
+            <section className={panelSpace2P4}>
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
               <Link href={publicationSupportHref(data.item.title)} className={navLinkClass}>
                 {history.support}

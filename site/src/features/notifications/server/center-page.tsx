@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
@@ -108,11 +109,7 @@ export default async function NotificationCenterPage({
         }}
       >
         <search aria-label={copy.filters}>
-          <form
-            action="/notifications"
-            method="get"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-          >
+          <form action="/notifications" method="get" className={panelFlexWrapEndP4}>
             <label className="min-w-0 flex-1 space-y-1 text-xs text-muted sm:min-w-40">
               {copy.query}
               <input

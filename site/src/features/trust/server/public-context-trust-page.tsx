@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace2P5, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type ContextKind,
   contextTrustHref,
@@ -71,7 +72,7 @@ export async function PublicContextTrustPage({
         </p>
       </header>
       {page && (
-        <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
+        <section className={panelClipSpace4P5}>
           <h2 className="font-heading text-primary">{copy.current}</h2>
           <p
             className={`text-sm font-semibold ${page.subject.verified ? "text-success" : "text-muted"}`}
@@ -160,7 +161,7 @@ export async function PublicContextTrustPage({
         {page && (
           <ol className="space-y-3">
             {page.items.map((record) => (
-              <li key={record.key} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
+              <li key={record.key} className={panelClipSpace2P5}>
                 <p className="text-sm text-secondary">{copy.approved}</p>
                 <time dateTime={record.approvedAt} className="text-sm text-muted">
                   {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

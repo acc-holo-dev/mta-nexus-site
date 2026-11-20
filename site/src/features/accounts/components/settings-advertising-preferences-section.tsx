@@ -3,6 +3,7 @@
 import { BellOff } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 import { adsPreferencesCopy } from "../ads-preferences-i18n";
 
@@ -42,10 +43,7 @@ export function SettingsAdvertisingPreferencesSection({
   const offLine = rendererEnabled ? copy.rendererOn : copy.rendererOff;
 
   return (
-    <section
-      aria-labelledby="advertising-preferences-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
+    <section aria-labelledby="advertising-preferences-heading" className={panelSpace4P5Shadow}>
       <div className="flex items-center gap-2">
         <BellOff className="h-4 w-4 text-accent" aria-hidden="true" />
         <h2 id="advertising-preferences-heading" className="text-sm font-semibold text-primary">

@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
@@ -100,7 +101,7 @@ export async function PublicSubscriptionsScreen({
       {result.plans.length ? (
         <ul className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
           {result.plans.map((plan) => (
-            <li key={plan.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <li key={plan.id} className={panelClipSpace3P5}>
               <h2 className="break-words text-xl font-semibold text-primary">
                 {locale === "ru" ? plan.titleRu : plan.titleEn}
               </h2>

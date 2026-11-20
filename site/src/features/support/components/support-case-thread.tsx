@@ -7,6 +7,7 @@ import { type FormEvent, useCallback, useEffect, useRef, useState } from "react"
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
@@ -497,7 +498,7 @@ export function SupportCaseThread({
         <form
           onSubmit={(event) => void sendReply(event)}
           aria-busy={sending}
-          className="nexus-panel space-y-3 p-4"
+          className={panelSpace3P4}
         >
           <label className="block space-y-1.5">
             <span className="font-label text-secondary">{copy.reply}</span>

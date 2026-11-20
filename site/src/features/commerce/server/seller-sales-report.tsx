@@ -4,6 +4,7 @@ import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellMax6xl } from "../../shell/page-shell";
+import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
@@ -180,7 +181,7 @@ export function SellerSalesReportView({
       {report.totals.length ? (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {report.totals.map((total) => (
-            <li key={total.currency} className="nexus-panel space-y-3 p-4">
+            <li key={total.currency} className={panelSpace3P4}>
               <h2 className="text-lg font-semibold">{total.currency}</h2>
               <dl className="space-y-2 text-sm">
                 <div>
@@ -217,7 +218,7 @@ export function SellerSalesReportView({
       {report.sales.length ? (
         <ol className="space-y-3">
           {report.sales.map((sale) => (
-            <li key={sale.id} className="nexus-panel space-y-3 p-5">
+            <li key={sale.id} className={panelSpace3P5}>
               <h2 className="break-words font-semibold text-primary">{sale.productTitle}</h2>
               <p className="text-sm text-secondary">
                 {sale.orderNumber} ·{" "}

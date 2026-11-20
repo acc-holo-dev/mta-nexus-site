@@ -9,6 +9,7 @@ import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -323,7 +324,7 @@ export function SupportCenter({
         <form
           onSubmit={(event) => void createCase(event)}
           aria-busy={creating}
-          className="nexus-panel space-y-4 p-5"
+          className={panelSpace4P5}
         >
           <div className="flex items-center gap-2">
             <Plus className="h-4 w-4 text-accent" aria-hidden="true" />

@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { storageMaintenanceService } from "../../../lib/services/moderation/storage-maintenance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { StorageDiscoveryControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -126,7 +127,7 @@ export async function StaffStorageScreen({
       {result.items.length ? (
         <ul className="space-y-3">
           {result.items.map((item) => (
-            <li key={item.id} className="nexus-panel min-w-0 space-y-2 p-4">
+            <li key={item.id} className={panelMinSpace2P4}>
               <Link href={`/admin/storage/objects/${item.id}`} className={`break-all ${linkClass}`}>
                 {item.storageKey}
               </Link>

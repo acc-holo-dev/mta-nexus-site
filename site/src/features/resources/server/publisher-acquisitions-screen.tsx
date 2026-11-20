@@ -9,6 +9,7 @@ import { resourceActivityService } from "../../../lib/services/resources/resourc
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import {
@@ -130,7 +131,7 @@ export async function PublisherAcquisitionsScreen({
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (
-            <li key={item.id} className="nexus-panel min-w-0 space-y-3 p-5">
+            <li key={item.id} className={panelMinSpace3P5}>
               <h2 className="min-w-0 break-words text-base font-semibold">
                 {item.downloadable ? item.title : copy.hidden}
               </h2>

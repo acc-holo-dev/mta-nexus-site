@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
@@ -74,10 +75,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
     }
   }
   return (
-    <section
-      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
-      aria-labelledby={`${field}-heading`}
-    >
+    <section className={panelClipSpace4P5} aria-labelledby={`${field}-heading`}>
       <h2 id={`${field}-heading`} className="text-xl font-semibold text-primary">
         {copy.calculator}
       </h2>

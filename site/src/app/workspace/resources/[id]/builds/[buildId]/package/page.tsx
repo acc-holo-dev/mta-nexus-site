@@ -2,7 +2,6 @@ import {
   BuildPackageScreen,
   buildPackageMetadata,
 } from "../../../../../../../features/resources/package-server";
-import { pageShellClip } from "../../../../../../../features/shell/page-shell";
 export const dynamic = "force-dynamic";
 export const generateMetadata = buildPackageMetadata;
 export default async function Page({
@@ -13,9 +12,5 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id, buildId } = await params;
-  return (
-    <div className={pageShellClip}>
-      <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} />
-    </div>
-  );
+  return <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} />;
 }

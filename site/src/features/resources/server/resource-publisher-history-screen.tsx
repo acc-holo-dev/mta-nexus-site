@@ -11,6 +11,7 @@ import { resourcePublisherService } from "../../../lib/services/resources/resour
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { publisherSearchParams, resourcePublisherHistoryQuery } from "../resource-publisher-query";
@@ -119,7 +120,7 @@ export async function ResourcePublisherHistoryScreen({
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((event) => (
-            <li key={event.id} className="nexus-panel space-y-2 p-4">
+            <li key={event.id} className={panelSpace2P4}>
               <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
               {event.status && (
                 <p className="text-sm text-secondary">

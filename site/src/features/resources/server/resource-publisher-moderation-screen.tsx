@@ -16,6 +16,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const navLinkClass =
@@ -108,7 +109,7 @@ export async function ResourcePublisherModerationScreen({
       {result.events.length ? (
         <ol className="space-y-3">
           {result.events.map((event) => (
-            <li key={event.id} className="nexus-panel space-y-3 p-5">
+            <li key={event.id} className={panelSpace3P5}>
               <h3 className="font-semibold text-primary">
                 {resourceModerationLabel(locale, event.action)}
               </h3>

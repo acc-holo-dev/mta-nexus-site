@@ -10,6 +10,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
@@ -310,7 +311,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           {cart.items.map((item) => {
             const evidence = review?.items.find((row) => row.productId === item.productId);
             return (
-              <li key={item.productId} className="nexus-panel min-w-0 space-y-4 p-5">
+              <li key={item.productId} className={panelMinSpace4P5}>
                 <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
                   <div className="min-w-0 space-y-2">
                     {item.available && item.slug ? (

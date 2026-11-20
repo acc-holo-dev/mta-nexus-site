@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -79,7 +80,7 @@ export async function LibraryCollectionsListView({
       <p role="note" className="text-sm text-muted">
         {c.limit}
       </p>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className={panelSpace3P5}>
         <h2 className="font-semibold">{c.create}</h2>
         <LibraryCollectionCommandForm
           key={`create:${actor.id}`}

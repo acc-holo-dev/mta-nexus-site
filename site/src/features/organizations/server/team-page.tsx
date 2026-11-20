@@ -8,6 +8,7 @@ import { organizationTeamService } from "../../../lib/services/organizations/org
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   organizationTeamHref,
@@ -93,7 +94,7 @@ export default async function TeamPage({
             <form
               action={organizationTeamHref(id, { query: "" })}
               method="get"
-              className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+              className={panelFlexWrapEndP4}
             >
               <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
                 {copy.search}

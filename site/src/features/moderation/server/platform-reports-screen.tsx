@@ -9,8 +9,8 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
 import { platformReportCopy } from "../platform-report-i18n";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
@@ -89,7 +89,7 @@ export async function PlatformReportsScreen({
     return (
       <div className="space-y-4">
         <SectionHeader as="h1" title={copy.detail} description={copy.help} />
-        <div className="nexus-panel space-y-3 p-4">
+        <div className={panelSpace3P4}>
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge
               status={copy.statuses[report.status] ?? report.status}

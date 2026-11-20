@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -187,7 +188,7 @@ export function LibraryCollectionItemCopyForm({
     : items;
   const shownDestinations = pending.current ? [pending.current.destination] : destinations;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <p role="note" className="text-sm text-secondary">
         {shownMove ? c.moveItemsNote : c.copyItemsNote}
       </p>

@@ -17,6 +17,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
@@ -135,7 +136,7 @@ export async function StaffResourceDetailScreen({
       {result.events.length ? (
         <ol className="min-w-0 space-y-3">
           {result.events.map((event) => (
-            <li key={event.id} className="nexus-panel min-w-0 space-y-3 p-5">
+            <li key={event.id} className={panelMinSpace3P5}>
               <h3 className="font-semibold text-primary">
                 {resourceModerationLabel(locale, event.action)}
               </h3>

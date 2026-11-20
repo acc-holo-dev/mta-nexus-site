@@ -8,6 +8,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
@@ -82,11 +83,7 @@ export default async function OwnDiscussionsPage({
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
       <search aria-label={copy.filters}>
-        <form
-          action="/workspace/discussions"
-          method="get"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
+        <form action="/workspace/discussions" method="get" className={panelFlexMinWrapEndP4}>
           <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
             {copy.query}
             <input
@@ -147,7 +144,7 @@ export default async function OwnDiscussionsPage({
       {page?.items.length ? (
         <ul className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <li key={item.id} className={panelClipSpace3P5}>
               <h2 className="min-w-0 break-words font-semibold text-primary">
                 {item.title ?? copy.hidden}
               </h2>

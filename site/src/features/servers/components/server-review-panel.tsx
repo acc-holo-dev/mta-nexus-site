@@ -9,6 +9,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedServerReview } from "../server-review-confirmation";
 import {
   serverReviewCopy,
@@ -379,7 +380,7 @@ export function ServerReviewPanel({
         </div>
       )}
 
-      <div className="nexus-panel space-y-4 p-5">
+      <div className={panelSpace4P5}>
         <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
         {!signedIn ? (
           <GuestAuthLinks

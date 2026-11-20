@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatSubscriptionTime } from "../subscription-time";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
@@ -108,7 +109,7 @@ export async function SubscriptionHistoryScreen({
         {result.receipts.length ? (
           <ul className="space-y-4">
             {result.receipts.map((r) => (
-              <li key={r.id} className="nexus-panel space-y-2 p-4">
+              <li key={r.id} className={panelSpace2P4}>
                 <Link
                   href={subscriptionReceiptHref(r.id, query.organizationId)}
                   className={subscriptionNavLinkClass}

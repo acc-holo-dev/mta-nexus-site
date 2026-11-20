@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../lib/services/commerce/commercial-plan-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   formatHistoryAmount,
@@ -138,7 +139,7 @@ export async function PurchaseOperationsScreen({
         {result.attempts.length ? (
           <ol className="space-y-3">
             {result.attempts.map((attempt) => (
-              <li key={attempt.id} className="nexus-panel space-y-3 p-5">
+              <li key={attempt.id} className={panelSpace3P5}>
                 <p className="text-primary">
                   {copy.status}: {status(attempt.status)}
                 </p>

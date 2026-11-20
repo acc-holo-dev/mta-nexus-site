@@ -16,6 +16,7 @@ import {
   pageShellMax5xlTight as pageShellClass,
   pageShellMax5xlBare,
 } from "../../shell/page-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -269,7 +270,7 @@ export async function ModeratedDiscussionScreen({
           {data.items.length ? (
             <ul className="space-y-3">
               {data.items.map((item) => (
-                <li key={item.id} className="nexus-panel space-y-3 p-5">
+                <li key={item.id} className={panelSpace3P5}>
                   <p className="text-sm text-muted">
                     {identity(item.author)} · {date(item.createdAt)}
                   </p>
@@ -301,7 +302,7 @@ export async function ModeratedDiscussionScreen({
         </>
       ) : (
         <>
-          <section className="nexus-panel space-y-4 p-5">
+          <section className={panelSpace4P5}>
             {data.comment ? (
               <>
                 <h2 className="font-semibold text-primary">{copy.body}</h2>
@@ -334,7 +335,7 @@ export async function ModeratedDiscussionScreen({
               </p>
             )}
           </section>
-          <section className="nexus-panel space-y-4 p-5">
+          <section className={panelSpace4P5}>
             <h2 className="font-semibold text-primary">{copy.history}</h2>
             <p className="text-xs text-muted">{copy.historyHelp}</p>
             {data.history.length ? (

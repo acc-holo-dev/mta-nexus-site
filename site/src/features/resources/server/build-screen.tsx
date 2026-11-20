@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceBuildWorkspaceService } from "../../../lib/services/resources/resource-build-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildModerationControls } from "../components/build-moderation-controls";
@@ -150,7 +151,7 @@ export async function ResourceBuildScreen({
         </Link>
       )}
       {staff && (
-        <section className="nexus-panel space-y-3 p-5" aria-label={publisherCopy.description}>
+        <section className={panelSpace3P5} aria-label={publisherCopy.description}>
           <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
           <h2 className="text-xl font-semibold text-primary">{publisherCopy.description}</h2>
           {product.shortDescription && (

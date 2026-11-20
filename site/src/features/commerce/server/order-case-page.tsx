@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
@@ -80,7 +81,7 @@ function Evidence({
 }) {
   const copy = orderCaseCopy(locale);
   return (
-    <section className="nexus-panel space-y-3 p-5">
+    <section className={panelSpace3P5}>
       <h2 className="text-lg font-semibold">{title}</h2>
       <p>
         {financialOrderLabel(locale, data.orderStatus)} ·{" "}
@@ -506,7 +507,7 @@ export async function OrderCaseDetailPage({
         <h2 className="text-lg font-semibold">{copy.history}</h2>
         <ol className="space-y-3">
           {result.history.map((event) => (
-            <li key={event.id} className="nexus-panel space-y-2 p-4">
+            <li key={event.id} className={panelSpace2P4}>
               <p className="text-sm">{orderCaseStatusLabel(locale, event.reviewStatus)}</p>
               {event.notes && (
                 <p className="whitespace-pre-wrap break-words text-sm text-secondary">

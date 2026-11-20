@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
@@ -166,7 +167,7 @@ export function LibraryMembershipBatchForm({
       inCollection: desired[collection.id] ?? collection.inCollection,
     }));
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{h.title}</h2>
       <p className="text-sm text-secondary">{h.note}</p>
       <p className="text-xs text-muted">{h.quota}</p>

@@ -1,6 +1,7 @@
 import type { LibraryMembershipHistoryItem } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -19,7 +20,7 @@ export function LibraryMembershipHistoryEntry({
   const receipt = item.receipt,
     resource = item.resource;
   return (
-    <article className="nexus-panel space-y-4 p-5">
+    <article className={panelSpace4P5}>
       <h2>
         <Link
           href={membershipHistoryHref(item.id)}

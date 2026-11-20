@@ -11,6 +11,7 @@ import { commerceService } from "../../../lib/services/commerce/commerce-service
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   formatHistoryAmount,
@@ -160,7 +161,7 @@ export async function PurchaseDetailScreen({
         ) : (
           <ol className="space-y-3">
             {items.map((item) => (
-              <li key={item.id} className="nexus-panel min-w-0 space-y-3 p-5">
+              <li key={item.id} className={panelMinSpace3P5}>
                 <h3 className="min-w-0 break-words font-semibold text-primary">
                   {item.productTitle ?? copy.unavailableResource}
                 </h3>

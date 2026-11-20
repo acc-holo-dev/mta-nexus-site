@@ -18,6 +18,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
@@ -122,7 +123,7 @@ export function ResourceModerationControls({
 
   if (allowed.length === 0) {
     return (
-      <div className="nexus-panel space-y-3 p-5">
+      <div className={panelSpace3P5}>
         <p role="note" className="text-sm text-secondary">
           {copy.moderationNote}
         </p>
@@ -135,7 +136,7 @@ export function ResourceModerationControls({
   }
 
   return (
-    <form onSubmit={send} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={send} className={panelSpace4P5}>
       <p role="note" className="text-sm text-secondary">
         {copy.moderationNote}
       </p>

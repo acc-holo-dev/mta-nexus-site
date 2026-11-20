@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
@@ -112,7 +113,7 @@ export default async function Page({
         {!receipt ? (
           <EmptyState title={r.unknown} description={r.unknownHint} />
         ) : (
-          <article className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <article className={panelClipSpace3P5}>
             <h2>{c[receipt.command.action]}</h2>
             <code className="block break-all text-xs">
               {c.request}: {receipt.requestId}

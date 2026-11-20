@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import {
@@ -131,7 +132,7 @@ export async function FinancialReconciliationDetailScreen({
       {result.attempts.length ? (
         <ol className="space-y-3">
           {result.attempts.map((attempt) => (
-            <li key={attempt.id} className="nexus-panel min-w-0 space-y-2 p-5">
+            <li key={attempt.id} className={panelMinSpace2P5}>
               <p className="text-sm">
                 {financialPaymentLabel(locale, attempt.status)} ·{" "}
                 {formatFinancialMinor(attempt.amount, attempt.currency, locale)}

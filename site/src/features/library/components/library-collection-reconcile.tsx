@@ -9,6 +9,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import {
   collectionReceiptHref,
@@ -158,7 +159,7 @@ export function LibraryCollectionReconcileForm({
   }
   const shownIds = pending.current ? [...adds, ...removes] : selected;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2>{c["reconcile-items"]}</h2>
       <p>
         {c.destination}: {shown.collection.name} · {c.revision} {shown.collection.revision}

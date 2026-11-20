@@ -7,6 +7,7 @@ import {
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
+import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
 import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
 
@@ -164,7 +165,7 @@ export function ResourceMediaEditor({
       {!items.length ? <EmptyState title={copy.empty} description={copy.emptyDescription} /> : null}
       <ol className="grid gap-5 sm:grid-cols-2">
         {items.map((item, index) => (
-          <li key={item.id} className="nexus-panel space-y-3 p-4">
+          <li key={item.id} className={panelSpace3P4}>
             <div className="aspect-video overflow-hidden rounded-lg bg-inset">
               <ResourcePreview
                 src={item.url}
@@ -255,7 +256,7 @@ export function ResourceMediaEditor({
           >
             {copy.save}
           </Button>
-          <form onSubmit={upload} className="nexus-panel space-y-4 p-5">
+          <form onSubmit={upload} className={panelSpace4P5}>
             <div className="space-y-1.5">
               <label
                 htmlFor="media-upload-file"

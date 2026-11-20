@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseReactionPage, reactionPageHref } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
@@ -79,11 +80,7 @@ export async function ReactionsPageScreen({
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
       <search aria-label={copy.query}>
-        <form
-          action="/workspace/reactions"
-          method="get"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
+        <form action="/workspace/reactions" method="get" className={panelFlexMinWrapEndP4}>
           <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
             {copy.query}
             <input
@@ -147,7 +144,7 @@ export async function ReactionsPageScreen({
       {page?.items.length ? (
         <ul className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li key={item.contentId} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <li key={item.contentId} className={panelClipSpace3P5}>
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 overflow-x-clip">
                   {item.slug && item.title ? (

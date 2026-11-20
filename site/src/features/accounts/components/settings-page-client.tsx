@@ -15,6 +15,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { authPasswordApiCopy } from "../auth-password-api-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
@@ -507,7 +508,7 @@ export function SettingsPageClient() {
       >
         <div className="animate-pulse space-y-8" aria-hidden="true">
           {[1, 2, 3, 4].map((key) => (
-            <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
+            <div key={key} className={panelSpace4P5Shadow}>
               <div className="h-4 w-1/3 rounded bg-inset" />
               <div className="h-20 rounded bg-inset" />
             </div>

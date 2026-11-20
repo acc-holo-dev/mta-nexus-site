@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
@@ -139,7 +140,7 @@ export async function WorkspaceFinanceScreen({
       {result.totals.length ? (
         <ul className="grid gap-4 md:grid-cols-3">
           {result.totals.map((total) => (
-            <li key={total.currency} className="nexus-panel space-y-3 p-5">
+            <li key={total.currency} className={panelSpace3P5}>
               <h3 className="font-semibold text-primary">{total.currency}</h3>
               <dl className="space-y-2 text-sm">
                 {[

@@ -11,6 +11,7 @@ import { resourceCopyService } from "../../../lib/services/resources/resource-co
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import {
@@ -146,7 +147,7 @@ export async function ResourceCopiesScreen({
         ) : (
           <ul className="space-y-4">
             {result.copies.map((row) => (
-              <li key={row.id} className="nexus-panel space-y-2 p-4">
+              <li key={row.id} className={panelSpace2P4}>
                 <Link
                   href={`${base}/${encodeURIComponent(row.id)}`}
                   className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

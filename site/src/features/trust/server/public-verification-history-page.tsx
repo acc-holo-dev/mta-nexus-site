@@ -7,6 +7,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicVerificationHistoryService } from "../../../lib/services/trust/public-verification-history-service";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
+import { panelClipSpace2P5, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { approvalPageHref, parseApprovalQuery } from "../public-verification-history-contract";
 import { approvalCopy, approvalError } from "../public-verification-history-copy";
 
@@ -73,7 +74,7 @@ export async function ApprovalHistoryPage({
         <p className="text-sm text-secondary">{copy.scope}</p>
       </header>
       {page && (
-        <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+        <section className={panelClipSpace3P5}>
           <h2 className="font-heading text-primary">{copy.current}</h2>
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -149,7 +150,7 @@ export async function ApprovalHistoryPage({
       {page && (
         <ol className={pageShellStack3}>
           {page.items.map((record) => (
-            <li key={record.key} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
+            <li key={record.key} className={panelClipSpace2P5}>
               <h2 className="font-semibold text-primary">{copy[record.type]}</h2>
               <p className="text-sm text-secondary">{copy.approved}</p>
               <time dateTime={record.approvedAt} className="text-sm text-muted">

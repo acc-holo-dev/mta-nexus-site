@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
@@ -159,7 +160,7 @@ export default async function ResourceCollectionsPage({
               (collection.inCollection ||
                 (result.resource.canAdd && collection.itemCount < result.itemLimit));
             return (
-              <li key={collection.id} className="nexus-panel space-y-3 p-5">
+              <li key={collection.id} className={panelSpace3P5}>
                 <h3 className="break-words font-semibold">
                   <Link href={collectionHref(collection.id)} className={navLinkClass}>
                     {collection.name}

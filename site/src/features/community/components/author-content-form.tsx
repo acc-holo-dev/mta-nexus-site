@@ -11,6 +11,7 @@ import {
 import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { pageShellStack4 } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import {
@@ -344,7 +345,7 @@ export function AuthorContentForm({
         </p>
       ) : null}
       {latest && (
-        <section className="nexus-panel min-w-0 space-y-3 p-5" aria-label={copy.latestContent}>
+        <section className={panelMinSpace3P5} aria-label={copy.latestContent}>
           <h2 className="font-semibold">{copy.latestContent}</h2>
           <p className="text-sm text-muted">{copy.latestContentHelp}</p>
           <p>

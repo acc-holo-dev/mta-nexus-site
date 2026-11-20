@@ -8,6 +8,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
   confirmedNotificationInboxCommand,
   NOTIFICATION_INBOX_SELECTION_LIMIT,
@@ -280,7 +281,7 @@ export function NotificationInbox({
           <time dateTime={page.window.until}>{displayDate(page.window.until)}</time>
         </p>
       )}
-      <div className="nexus-panel space-y-2 p-4">
+      <div className={panelSpace2P4}>
         {busy || blocked ? (
           <span aria-disabled="true" className="text-sm text-muted">
             {copy.export}

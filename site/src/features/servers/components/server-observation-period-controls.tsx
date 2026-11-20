@@ -1,6 +1,7 @@
 import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
 import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
@@ -60,7 +61,7 @@ export function ServerObservationPeriodControls({
           {copy.refresh}
         </a>
       </nav>
-      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form method="get" action={path} className={panelFlexWrapEndP4}>
         <input type="hidden" name="window" value={window} />
         {Object.entries(filters)
           .filter(([, value]) => value)
