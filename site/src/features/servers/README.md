@@ -14,6 +14,7 @@ repositories и collectors остаются в прежних модулях и 
 | `statistics-export.ts`                   | `ServerStatisticsExportButton`; client экспорт                                                    |
 | `statistics-view.ts`                     | `ServerObservationPeriodControls`; RSC-compatible выбор периода                                   |
 | `server-detail-server.ts`                | `ServerDetailScreen`, metadata; server-only публичная карточка `/servers/[slug]`                  |
+| `managed-servers-server.ts`              | `ManagedServersScreen`; server-only workspace `/workspace/servers`                                |
 | `statistics-server.ts`                   | Statistics page, metadata и loading; server-only                                                  |
 | `observations-server.ts`                 | Observation browser, metadata и loading; server-only                                              |
 | `history-server.ts`                      | `ServerHistoryPanel`; server-only                                                                 |

@@ -8,7 +8,7 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 it("locks managed-servers load-unavailable ErrorState to recovery hint", () => {
-  const page = read("site/src/app/workspace/servers/page.tsx");
+  const page = read("site/src/features/servers/server/managed-servers-screen.tsx");
   expect(page).toContain("workspace.unavailable");
   expect(page).toContain("workspace.unavailableHint");
   expect(page).toMatch(
