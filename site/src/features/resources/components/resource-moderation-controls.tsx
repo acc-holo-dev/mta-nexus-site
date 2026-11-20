@@ -20,7 +20,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
-import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import { typeLabelUpperMuted, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
@@ -144,11 +144,11 @@ export function ResourceModerationControls({
       </p>
       <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
         <div>
-          <dt className="font-label uppercase text-muted">{copy.resourceStatus}</dt>
+          <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">{copy.allowedAction}</dt>
+          <dt className={typeLabelUpperMuted}>{copy.allowedAction}</dt>
           <dd className="text-primary">{release ? copy.release : copy.suspend}</dd>
         </div>
       </dl>

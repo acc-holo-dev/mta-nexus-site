@@ -15,6 +15,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSecondary,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
@@ -107,7 +108,7 @@ export async function ResourcePublisherHistoryScreen({
         {copy.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.history}</h1>
-      <p className="break-words text-secondary">{result.product.title}</p>
+      <p className={typeBreakSecondary}>{result.product.title}</p>
       <p className="text-sm text-muted">{copy.historyNote}</p>
       <nav className="flex flex-wrap gap-4 text-accent" aria-label={copy.history}>
         {(["all", "changes", "publication"] as const).map((kind) => (

@@ -14,10 +14,12 @@ import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakDisplayPrimary,
   typeFlexWrapGap4Sm,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
@@ -118,9 +120,7 @@ export async function CommercialPlanAdminDetailScreen({
       <Link href="/admin/commerce/plans" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="break-words font-display text-primary">
-        {locale === "ru" ? plan.titleRu : plan.titleEn}
-      </h1>
+      <h1 className={typeBreakDisplayPrimary}>{locale === "ru" ? plan.titleRu : plan.titleEn}</h1>
       <p className={typeSmSecondary}>
         {copy[plan.status]} · {copy.revision} {plan.revision} · {plan.slug} · {copy[plan.scope]}
       </p>
@@ -130,7 +130,7 @@ export async function CommercialPlanAdminDetailScreen({
         plan={editor}
       />
       <section aria-labelledby="plan-history" className="min-w-0 space-y-4">
-        <h2 id="plan-history" className="text-xl font-semibold text-primary">
+        <h2 id="plan-history" className={typeXlSemiboldPrimary}>
           {copy.history} ({result.total})
         </h2>
         <ol className="space-y-3">

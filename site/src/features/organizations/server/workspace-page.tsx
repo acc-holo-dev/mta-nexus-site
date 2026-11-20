@@ -9,7 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeBreakDisplayPrimary, typeDisplayPrimary } from "../../shell/type-shell";
 import {
   organizationWorkspaceSchema,
   parseOrganizationPage,
@@ -67,7 +67,7 @@ export async function OrganizationPage({
       </Link>
       {parsed.success ? (
         <>
-          <h1 className="break-words font-display text-primary">{parsed.data.organization.name}</h1>
+          <h1 className={typeBreakDisplayPrimary}>{parsed.data.organization.name}</h1>
           <OrganizationWorkspacePanel
             initial={parsed.data}
             actorId={actor.id}

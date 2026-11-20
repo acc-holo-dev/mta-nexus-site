@@ -1,7 +1,7 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import type { licenseControlService } from "../../../lib/services/commerce/license-control-service";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakSecondary, typeLgSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
@@ -70,7 +70,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
         )
       ) : null}
       <section className="min-w-0 space-y-3">
-        <h2 className="text-lg font-semibold text-primary">{copy.history}</h2>
+        <h2 className={typeLgSemiboldPrimary}>{copy.history}</h2>
         {license.history.length === 0 ? (
           <EmptyState
             title={copy.noHistory}
@@ -90,7 +90,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
                     {formatHistoryDate(event.createdAt, locale)}
                   </time>
                 </p>
-                {event.reason && <p className="break-words text-secondary">{event.reason}</p>}
+                {event.reason && <p className={typeBreakSecondary}>{event.reason}</p>}
               </li>
             ))}
           </ol>

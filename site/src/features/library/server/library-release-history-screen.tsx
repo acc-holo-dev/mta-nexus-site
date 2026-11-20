@@ -17,7 +17,7 @@ import {
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs, typeFlexWrapEndGap3 } from "../../shell/type-shell";
+import { typeBreakAllXs, typeBreakSemibold, typeFlexWrapEndGap3 } from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
@@ -161,7 +161,7 @@ export async function LibraryReleaseHistoryScreen({
         {result.items.map((item) => (
           <li key={item.id} className={panelSpace3P5}>
             {item.currentTitle && (
-              <h2 className="break-words font-semibold">
+              <h2 className={typeBreakSemibold}>
                 {c.current}: {item.currentTitle}
               </h2>
             )}

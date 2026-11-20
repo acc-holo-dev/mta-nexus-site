@@ -14,7 +14,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 import { ResourceVariantsForm } from "../variant-controls";
 export async function resourceVariantsMetadata(): Promise<Metadata> {
@@ -78,7 +78,7 @@ export async function ResourceVariantsScreen({ params }: { params: Promise<{ id:
       </Link>
       <header>
         <h1 className={typeDisplayPrimary}>{copy.variants}</h1>
-        <p className="break-words text-secondary">{product.title}</p>
+        <p className={typeBreakSecondary}>{product.title}</p>
       </header>
       {candidates ? (
         <ResourceVariantsForm

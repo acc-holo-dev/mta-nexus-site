@@ -11,7 +11,11 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlExtraboldPrimary, typeSpace1XsMuted } from "../../shell/type-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeBreakSemiboldPrimary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
@@ -83,7 +87,7 @@ export async function TeamPage({
       <header className="space-y-2">
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {parsed.success && (
-          <p className="break-words font-semibold text-primary">{parsed.data.organization.name}</p>
+          <p className={typeBreakSemiboldPrimary}>{parsed.data.organization.name}</p>
         )}
         <p className="text-sm text-muted">{copy.description}</p>
       </header>

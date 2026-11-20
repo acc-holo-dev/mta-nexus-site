@@ -6,7 +6,7 @@ import { useState } from "react";
 import { communityReportCopy } from "../../community/community-report-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
 import { adminActionClientError } from "../admin-action-client-error";
 import { confirmsAdminAction } from "../admin-action-confirmation";
 
@@ -67,7 +67,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
   return (
     <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}

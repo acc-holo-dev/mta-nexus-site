@@ -14,10 +14,12 @@ import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBreakDisplayPrimary,
   typePrewrapBreak,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import { AuthorResourceForms, RetireBuildForm } from "../author-controls";
 import { ResourceLifecycleControls } from "../lifecycle-controls";
@@ -97,7 +99,7 @@ export async function ResourceManageScreen({
         {copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="break-words font-display text-primary">{product.title}</h1>
+        <h1 className={typeBreakDisplayPrimary}>{product.title}</h1>
         <p className="text-secondary">
           {copy.statusLabels[product.status]} · {product.currentVersion}
         </p>
@@ -127,7 +129,7 @@ export async function ResourceManageScreen({
       />
       {lifecycleHistory.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-primary">{commerceCopy.history}</h2>
+          <h2 className={typeXlSemiboldPrimary}>{commerceCopy.history}</h2>
           <ol className="space-y-3">
             {lifecycleHistory.map((event) => (
               <li key={event.id} className={surfaceP4TextSmSecondary}>
@@ -163,7 +165,7 @@ export async function ResourceManageScreen({
         }}
       />
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-primary">{copy.history}</h2>
+        <h2 className={typeXlSemiboldPrimary}>{copy.history}</h2>
         {history.builds.length === 0 ? (
           <EmptyState title={copy.noBuilds} description={publisherCopy.readiness.no_build} />
         ) : (

@@ -2,7 +2,7 @@ import type { ManagedServerItem } from "@nexus/db";
 import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { typeFlexWrapGap3, typeXsSecondary } from "../../shell/type-shell";
+import { typeFlexWrapCenterGap2, typeFlexWrapGap3, typeXsSecondary } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { type MtaMasterServer, mtaLiveStatus } from "../model";
 import { getServerActivityCopy } from "../server-activity-view";
@@ -58,7 +58,7 @@ export function ManagedServerCard({
         </p>
       </div>
       <div className="flex flex-col items-start gap-2 sm:items-end">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={typeFlexWrapCenterGap2}>
           <span className="text-xs text-muted">{copy.live}:</span>
           <StatusBadge
             status={copy[live]}

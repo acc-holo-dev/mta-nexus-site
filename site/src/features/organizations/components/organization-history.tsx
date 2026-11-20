@@ -15,7 +15,12 @@ import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap4Sm, typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -47,7 +52,7 @@ export function OrganizationHistoryView({
   return (
     <div className={pageShellClass}>
       <header className="space-y-2">
-        <h1 className="break-words font-display text-primary">
+        <h1 className={typeBreakDisplayPrimary}>
           {copy.history}
           {data ? ` · ${data.organization.name}` : ""}
         </h1>

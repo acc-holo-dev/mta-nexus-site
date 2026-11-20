@@ -14,6 +14,7 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
+  typeFlexMinWrapGap3,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
   typeSmSecondary,
@@ -109,7 +110,7 @@ export async function PublisherAcquisitionsScreen({
           {copy.historyNote}
         </p>
       </header>
-      <nav aria-label={copy.source} className="flex min-w-0 flex-wrap gap-3">
+      <nav aria-label={copy.source} className={typeFlexMinWrapGap3}>
         {(["all", "direct", "cart"] as const).map((filter) => (
           <Link
             key={filter}

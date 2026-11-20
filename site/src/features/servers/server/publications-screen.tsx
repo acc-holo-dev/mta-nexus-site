@@ -19,7 +19,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
+import { typeBreakDisplayPrimary, typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
@@ -74,7 +74,7 @@ export async function ServerPublicationsScreen({
       </Link>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="break-words font-display text-primary">
+          <h1 className={typeBreakDisplayPrimary}>
             {team.title}
             {result ? `: ${result.server.name}` : ""}
           </h1>

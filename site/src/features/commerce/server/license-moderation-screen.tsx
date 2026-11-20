@@ -15,7 +15,12 @@ import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../s
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexMinWrapEndGap3,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -123,7 +128,7 @@ export async function LicenseModerationScreen({
         </Link>
       )}
       <search aria-label={copy.search}>
-        <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
+        <form className={typeFlexMinWrapEndGap3} method="get">
           <input
             name="q"
             defaultValue={text}

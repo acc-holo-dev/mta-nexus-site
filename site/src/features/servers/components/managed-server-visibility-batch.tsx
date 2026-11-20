@@ -17,6 +17,7 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
   typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
   typeSemiboldPrimary,
   typeSmPrimary,
   typeSmSuccess,
@@ -194,7 +195,7 @@ export function ManagedServerVisibilityBatch({
   return (
     <section className={pageShellStack4} aria-busy={busy}>
       <div className={panelSpace4P5}>
-        <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
+        <h2 className={typeLgSemiboldPrimary}>{copy.batchTitle}</h2>
         <p className="text-sm text-muted">{copy.batchHelp}</p>
         <fieldset disabled={busy || blocked || !!preview} className="space-y-4">
           <legend className={typeSmPrimary}>

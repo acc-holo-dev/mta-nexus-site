@@ -21,7 +21,11 @@ import {
 } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapEndGap3, typeFlexWrapGap4Sm } from "../../shell/type-shell";
+import {
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4Sm,
+  typeSurfaceBorderP2,
+} from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
@@ -178,11 +182,7 @@ export async function LibraryMembershipHistoryScreen({
         <form method="get" action={membershipHistoryHref()} className={typeFlexWrapEndGap3}>
           <label className="grid gap-1">
             {h.days}
-            <select
-              name="days"
-              defaultValue={result.days}
-              className="rounded border border-base bg-surface p-2"
-            >
+            <select name="days" defaultValue={result.days} className={typeSurfaceBorderP2}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
                 <option key={days} value={days}>
                   {days}
@@ -195,7 +195,7 @@ export async function LibraryMembershipHistoryScreen({
             <select
               name="operation"
               defaultValue={result.operation}
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             >
               {LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS.map((op) => (
                 <option key={op} value={op}>
@@ -211,7 +211,7 @@ export async function LibraryMembershipHistoryScreen({
               defaultValue={result.collectionId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             />
           </label>
           <label className="grid gap-1">
@@ -221,7 +221,7 @@ export async function LibraryMembershipHistoryScreen({
               defaultValue={result.productId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             />
           </label>
           <Button type="submit" variant="outline">

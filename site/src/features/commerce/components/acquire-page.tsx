@@ -20,7 +20,12 @@ import {
   pageShellMaxXlPy12,
 } from "../../shell/page-shell";
 import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
-import { typeDisplayPrimary, typeMt2SmMuted } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeLabelUpperMuted,
+  typeMt2SmMuted,
+  typeNumericPrimary,
+} from "../../shell/type-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
 interface ProductInfo {
@@ -335,7 +340,7 @@ function AcquireContent() {
         aria-labelledby={summaryHeadingId}
         className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6 shadow-nexus-sm"
       >
-        <h2 id={summaryHeadingId} className="font-label uppercase text-muted">
+        <h2 id={summaryHeadingId} className={typeLabelUpperMuted}>
           {copy.orderSummary}
         </h2>
         <dl className="divide-y divide-[color:var(--nexus-border)] text-sm">
@@ -357,7 +362,7 @@ function AcquireContent() {
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.version}</dt>
-            <dd className="font-numeric text-primary">{`v${product.currentVersion}`}</dd>
+            <dd className={typeNumericPrimary}>{`v${product.currentVersion}`}</dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-3 font-bold">
             <dt className="text-primary">{copy.totalDue}</dt>

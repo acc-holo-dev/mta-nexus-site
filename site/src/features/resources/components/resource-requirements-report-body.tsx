@@ -3,7 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
-import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeBreakSemibold, typeFlexWrapGap4 } from "../../shell/type-shell";
 import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
@@ -102,7 +102,7 @@ export function ResourceRequirementsReportBody({
       <ul className="space-y-4">
         {report.nodes.map((node) => (
           <li key={node.id} className={panelSpace3P4}>
-            <h3 className="break-words font-semibold">{node.title}</h3>
+            <h3 className={typeBreakSemibold}>{node.title}</h3>
             <code>{node.slug}</code>
             <p>
               {copy.selection}: {copy.modes[node.selection]} · {copy.version}:{" "}

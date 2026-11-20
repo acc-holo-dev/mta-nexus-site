@@ -19,9 +19,7 @@ it("routes unconfirmed verification submit intent through ErrorState and keeps s
   expect(source).toMatch(
     /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{copy\.submissionUnconfirmed\}\s+description=\{dictionary\.errors\.formErrorHint\}\s*\/>/u,
   );
-  expect(source).toMatch(
-    /role="status" className=\{?(?:"text-sm text-success"|typeSmSuccess)\}?/,
-  );
+  expect(source).toMatch(/role="status" className=\{?(?:"text-sm text-success"|typeSmSuccess)\}?/);
   expect(source).toContain("{copy.submitted}");
   expect(source).not.toContain('<p role="status">');
   expect(source).not.toContain('role="alert"');

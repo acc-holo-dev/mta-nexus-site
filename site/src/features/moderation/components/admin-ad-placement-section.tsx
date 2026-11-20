@@ -1,7 +1,7 @@
 import type { AdSlotPlan } from "@nexus/domain";
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { Locale } from "../../../lib/i18n";
-import { typeCaptionFaint } from "../../shell/type-shell";
+import { typeBreakSemiboldPrimary, typeCaptionFaint } from "../../shell/type-shell";
 import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
 
 /**
@@ -47,7 +47,7 @@ export function AdminAdPlacementSection({
               className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-base p-3"
             >
               <div className="min-w-0">
-                <p className="break-words font-semibold text-primary">{slotLabel(slot)}</p>
+                <p className={typeBreakSemiboldPrimary}>{slotLabel(slot)}</p>
                 <p className="font-caption text-muted">
                   {copy.positionCapacity(slot.positionKey, slot.capacity)}
                 </p>

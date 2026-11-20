@@ -18,6 +18,7 @@ import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../she
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
 import {
+  typeBreakSecondary,
   typeDisplayPrimary,
   typePrewrapSmSecondary,
   typeSmSecondary,
@@ -198,7 +199,7 @@ export async function PublicResourceVersionsPage({
                 </div>
                 <div>
                   <dt className="text-muted">{copy.scanner}</dt>
-                  <dd className="break-words text-secondary">{release.scanner}</dd>
+                  <dd className={typeBreakSecondary}>{release.scanner}</dd>
                 </div>
                 <div>
                   <dt className="text-muted">{copy.released}</dt>

@@ -11,7 +11,13 @@ import {
 import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSemiboldPrimary,
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeNumericPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
@@ -185,7 +191,7 @@ export function SellerSalesReportView({
               <dl className="space-y-2 text-sm">
                 <div>
                   <dt>{c.gross}</dt>
-                  <dd className="font-numeric text-primary">
+                  <dd className={typeNumericPrimary}>
                     {total.gross === null
                       ? c.unknown
                       : formatFinancialMinor(total.gross, total.currency, locale)}
@@ -218,14 +224,14 @@ export function SellerSalesReportView({
         <ol className="space-y-3">
           {report.sales.map((sale) => (
             <li key={sale.id} className={panelSpace3P5}>
-              <h2 className="break-words font-semibold text-primary">{sale.productTitle}</h2>
+              <h2 className={typeBreakSemiboldPrimary}>{sale.productTitle}</h2>
               <p className={typeSmSecondary}>
                 {sale.orderNumber} ·{" "}
                 <time dateTime={sale.createdAt.toISOString()}>
                   {sellerSalesTime(sale.createdAt, locale)}
                 </time>
               </p>
-              <p className="font-numeric text-primary">
+              <p className={typeNumericPrimary}>
                 {formatFinancialMinor(sale.unitPrice, sale.currency, locale)}
               </p>
               <p className={typeSmSecondary}>

@@ -27,6 +27,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
+import { typeFlexWrapCenterGap2 } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ProductDependencyList } from "../components/product-dependency-list";
@@ -597,7 +598,7 @@ export async function ProductDetailPage({
                     className="min-w-0 space-y-3 overflow-x-clip rounded-lg border border-base bg-inset p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className={typeFlexWrapCenterGap2}>
                         <span className="font-mono font-bold text-primary">
                           {copy.version} {build.version}
                         </span>

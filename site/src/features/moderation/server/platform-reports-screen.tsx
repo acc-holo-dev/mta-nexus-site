@@ -11,7 +11,11 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentMinHInline, linkAccentSm, linkAccentSmPlain } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { platformReportCopy } from "../platform-report-i18n";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
@@ -88,7 +92,7 @@ export async function PlatformReportsScreen({
       <div className="space-y-4">
         <SectionHeader as="h1" title={copy.detail} description={copy.help} />
         <div className={panelSpace3P4}>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className={typeFlexWrapCenterGap2}>
             <StatusBadge
               status={copy.statuses[report.status] ?? report.status}
               tone={statusTone(report.status)}
@@ -171,7 +175,7 @@ export async function PlatformReportsScreen({
               href={`/workspace/platform-reports/${encodeURIComponent(report.id)}`}
               className="nexus-panel block space-y-1 p-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              <div className="flex flex-wrap items-center gap-2">
+              <div className={typeFlexWrapCenterGap2}>
                 <StatusBadge
                   status={copy.statuses[report.status] ?? report.status}
                   tone={statusTone(report.status)}

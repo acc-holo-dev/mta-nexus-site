@@ -5,7 +5,12 @@ import { libraryCollectionsService as service } from "../../../lib/services/libr
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
-import { typeDisplayPrimary, typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSemibold,
+  typeDisplayPrimary,
+  typeGrid2Gap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -125,7 +130,7 @@ export async function LibraryCollectionsListView({
       <ol className={typeGrid2Gap4}>
         {result.items.map((item) => (
           <li key={item.id} className={panelSpace2P5}>
-            <h2 className="break-words font-semibold">
+            <h2 className={typeBreakSemibold}>
               <Link href={collectionHref(item.id)} className={libraryCollectionsLinkClass}>
                 {item.name}
               </Link>

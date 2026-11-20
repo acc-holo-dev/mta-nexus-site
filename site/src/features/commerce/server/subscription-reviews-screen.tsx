@@ -13,7 +13,7 @@ import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexWrapGap4Sm, typeSmSecondary, typeSurfaceBorderP2 } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref, planReviewsPageParams, planReviewsQuery } from "../plan-reviews-query";
@@ -86,7 +86,7 @@ export async function SubscriptionReviewsScreen({
               id="review-account"
               name="organizationId"
               defaultValue={query.organizationId ?? ""}
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             >
               <option value="">{c.personal}</option>
               {query.organizationId && !scopes.scopes.some((o) => o.id === query.organizationId) ? (
@@ -105,7 +105,7 @@ export async function SubscriptionReviewsScreen({
               id="review-days"
               name="days"
               defaultValue={String(query.days)}
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             >
               <option value="all">{c.all}</option>
               {[7, 30, 90, 365].map((v) => (

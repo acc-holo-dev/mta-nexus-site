@@ -16,6 +16,7 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSemiboldPrimary,
   typeDisplayPrimary,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
@@ -118,7 +119,7 @@ export async function LibraryUpdatesScreen({
               item.selectedBuildId !== item.latestBuildId;
             return (
               <li key={item.productId} className={panelSpace3P5}>
-                <h2 className="break-words font-semibold text-primary">
+                <h2 className={typeBreakSemiboldPrimary}>
                   {item.state === "unavailable"
                     ? copy.privateResource
                     : (item.title ?? copy.privateResource)}

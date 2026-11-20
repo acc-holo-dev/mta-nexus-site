@@ -11,7 +11,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
@@ -350,7 +350,7 @@ export function ServerClaimControlPanel({
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3">
-            <div className="font-label uppercase text-muted">{copy.tokenLabel}</div>
+            <div className={typeLabelUpperMuted}>{copy.tokenLabel}</div>
             <code className="mt-2 block select-all break-all font-mono text-sm font-bold text-accent">
               {challenge.token}
             </code>

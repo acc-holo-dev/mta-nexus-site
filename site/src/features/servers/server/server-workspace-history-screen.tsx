@@ -13,7 +13,12 @@ import { linkAccentSmRounded, linkMinHAccent } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary, typeFlexWrapGap4, typeSmPrimary } from "../../shell/type-shell";
+import {
+  type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
+  typeFlexWrapGap4,
+  typeSmPrimary,
+} from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
 import {
@@ -100,7 +105,7 @@ async function ServerWorkspaceHistoryScreen({
           {history.back}
         </Link>
         <h1 className={type2xlBoldPrimary}>{history.title}</h1>
-        {data && <p className="break-words font-semibold text-primary">{data.server.name}</p>}
+        {data && <p className={typeBreakSemiboldPrimary}>{data.server.name}</p>}
         <p className="text-sm text-muted">{history.description}</p>
         <p className="text-xs text-muted">{history.private}</p>
       </header>

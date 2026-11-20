@@ -18,7 +18,12 @@ import {
 import { linkAccentTightSmPlain, linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSmPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapGap4Sm,
+  typeLgSemiboldPrimary,
+  typeSmPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { confirmedLicenseControl } from "../license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../license-control-i18n";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
@@ -290,9 +295,7 @@ export function LicenseControlPanel({
   if (readyScope.current !== scope) return null;
   return (
     <section className={panelClipSpace4P5}>
-      <h2 className="text-lg font-semibold text-primary">
-        {moderation ? copy.moderation : copy.title}
-      </h2>
+      <h2 className={typeLgSemiboldPrimary}>{moderation ? copy.moderation : copy.title}</h2>
       <p className={typeSmSecondary}>{copy.policy}</p>
       {!moderation && (
         <>
@@ -351,7 +354,7 @@ export function LicenseControlPanel({
                     icon={<Server className="h-6 w-6" aria-hidden="true" />}
                   />
                 ) : null}
-                <div className="flex min-w-0 flex-wrap gap-4 text-sm">
+                <div className={typeFlexMinWrapGap4Sm}>
                   <Button
                     type="button"
                     variant="ghost"
@@ -477,7 +480,7 @@ export function LicenseControlPanel({
               )}
             </time>
           </p>
-          <div className="flex min-w-0 flex-wrap gap-4 text-sm">
+          <div className={typeFlexMinWrapGap4Sm}>
             <Button
               type="button"
               variant="ghost"

@@ -18,7 +18,7 @@ import {
 } from "../../shell/page-shell";
 import { panelGrid2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary, typeFlexWrapGap4 } from "../../shell/type-shell";
+import { type2xlBoldPrimary, typeFlexWrapGap4, typeSpace1SmPrimary } from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
@@ -174,7 +174,7 @@ export async function DiscussionReportsScreen({
       )}
       <search aria-label={copy.search}>
         <form action={path} className={panelGrid2P5}>
-          <label className="space-y-1 text-sm text-primary">
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.search}</span>
             <input
               className={platformFieldClass}
@@ -184,14 +184,14 @@ export async function DiscussionReportsScreen({
               defaultValue={filters?.query}
             />
           </label>
-          <label className="space-y-1 text-sm text-primary">
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.view}</span>
             <select className={platformFieldClass} name="view" defaultValue={filters?.view}>
               <option value="pending">{copy.pending}</option>
               <option value="history">{copy.history}</option>
             </select>
           </label>
-          <label className="space-y-1 text-sm text-primary">
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.type}</span>
             <select className={platformFieldClass} name="type" defaultValue={filters?.type ?? ""}>
               <option value="">{copy.all}</option>

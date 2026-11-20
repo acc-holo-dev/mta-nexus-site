@@ -19,7 +19,11 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P6 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import {
+  typeBlockMinSpace1XsMuted,
+  typeBreakSmSecondary,
+  typeFlexWrapGap2,
+} from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
@@ -469,7 +473,7 @@ export function ResourceQaPanel({
                 </span>
               ) : null}
             </div>
-            <p className="break-words text-sm text-secondary">{detail.thread.body}</p>
+            <p className={typeBreakSmSecondary}>{detail.thread.body}</p>
             <p className="text-xs text-faint">
               {formatUnknown(
                 locale,
@@ -540,7 +544,7 @@ export function ResourceQaPanel({
                       : "border-base bg-surface"
                   }`}
                 >
-                  <p className="break-words text-sm text-secondary">{item.body}</p>
+                  <p className={typeBreakSmSecondary}>{item.body}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-faint">
                     <span>
                       {formatUnknown(locale, item.author?.displayName ?? item.author?.username)}
@@ -587,7 +591,7 @@ export function ResourceQaPanel({
 
           {canAnswer ? (
             <form className="min-w-0 space-y-2" onSubmit={onAnswer}>
-              <label className="block min-w-0 space-y-1 text-xs text-muted">
+              <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.answer}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -635,7 +639,7 @@ export function ResourceQaPanel({
             />
           ) : canAsk ? (
             <form className="min-w-0 space-y-2" onSubmit={onAsk}>
-              <label className="block min-w-0 space-y-1 text-xs text-muted">
+              <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.ask}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -647,7 +651,7 @@ export function ResourceQaPanel({
                 />
               </label>
               {builds.length > 0 ? (
-                <label className="block min-w-0 space-y-1 text-xs text-muted">
+                <label className={typeBlockMinSpace1XsMuted}>
                   <span>{copy.optionalBuild}</span>
                   <select
                     className="min-h-11 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -711,7 +715,7 @@ export function ResourceQaPanel({
                       </span>
                     ) : null}
                   </div>
-                  <p className="break-words text-sm text-secondary">{thread.body}</p>
+                  <p className={typeBreakSmSecondary}>{thread.body}</p>
                   <button
                     type="button"
                     className={`mt-2 ${linkAccentSm}`}

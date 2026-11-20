@@ -5,7 +5,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
+import { typeGrid2Gap4, typeSmSecondary, typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
@@ -90,7 +90,7 @@ export function SubscriptionFeeEstimator({
               setAmount(e.target.value);
               setResult(null);
             }}
-            className="w-full rounded border border-base bg-surface p-2"
+            className={typeWFullSurfaceBorderP2}
           />
         </label>
         <label htmlFor={`${field}-currency`}>
@@ -102,7 +102,7 @@ export function SubscriptionFeeEstimator({
               setCurrency(e.target.value as typeof currency);
               setResult(null);
             }}
-            className="w-full rounded border border-base bg-surface p-2"
+            className={typeWFullSurfaceBorderP2}
           >
             {["USD", "EUR", "RUB"].map((v) => (
               <option key={v}>{v}</option>

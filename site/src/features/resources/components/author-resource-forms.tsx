@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import { typeSmSecondary, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import {
   type AuthorDetailsDraft,
   type AuthorResourceDraft,
@@ -426,7 +426,7 @@ export function AuthorResourceForms({
         aria-label={copy.edit}
         className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
-        <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
+        <h2 className={typeXlSemiboldPrimary}>{copy.edit}</h2>
         {uploadBlocked ? (
           <ErrorState
             id="author-resource-details-readonly"
@@ -504,7 +504,7 @@ export function AuthorResourceForms({
         aria-label={copy.newVersion}
         className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
-        <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
+        <h2 className={typeXlSemiboldPrimary}>{copy.newVersion}</h2>
         {uploadBlocked ? (
           <ErrorState
             id="author-resource-upload-blocked"

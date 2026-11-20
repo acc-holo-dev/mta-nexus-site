@@ -20,7 +20,12 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeLabelUpperMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 
@@ -159,16 +164,16 @@ export function ResourceLifecycleControls({
       className={panelSpace4P5}
       aria-labelledby={`${fieldId}-heading`}
     >
-      <h2 id={`${fieldId}-heading`} className="text-xl font-semibold text-primary">
+      <h2 id={`${fieldId}-heading`} className={typeXlSemiboldPrimary}>
         {copy.lifecycle}
       </h2>
       <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
         <div>
-          <dt className="font-label uppercase text-muted">{copy.resourceStatus}</dt>
+          <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">{copy.selectedBuild}</dt>
+          <dt className={typeLabelUpperMuted}>{copy.selectedBuild}</dt>
           <dd className="text-primary">
             {selectedBuild
               ? `${selectedBuild.version ?? selectedBuild.id} · ${selectedBuild.status}`

@@ -8,7 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSuccess } from "../../shell/type-shell";
+import { typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import { confirmedOrderCancellation } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -185,7 +185,7 @@ export function OrderCancellationForm({
   if (ready === scope && !canCancel && !pending.current && !saved) return null;
   return (
     <form onSubmit={submit} className={panelClipSpace4P5}>
-      <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
+      <h2 className={typeXlSemiboldPrimary}>{copy.cancel}</h2>
       {ready === scope && retry ? (
         <ErrorState
           id="order-cancellation-unconfirmed"

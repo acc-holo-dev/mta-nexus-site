@@ -5,7 +5,13 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
-import { typeFlexWrapEndGap3, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeBreakSemibold,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
@@ -65,7 +71,7 @@ export async function LibraryCollectionsDetailView({
       >
         {adding ? c.back : c.title}
       </Link>
-      <h1 className="break-words font-display text-primary">
+      <h1 className={typeBreakDisplayPrimary}>
         {collection.name}
         {adding ? ` · ${c.candidates}` : ""}
       </h1>
@@ -234,7 +240,7 @@ export async function LibraryCollectionsDetailView({
       <ol className="grid gap-4 md:grid-cols-2">
         {result.items.map((item) => (
           <li key={item.productId} className={panelSpace3P5}>
-            <h2 className="break-words font-semibold">{item.title ?? c.unavailable}</h2>
+            <h2 className={typeBreakSemibold}>{item.title ?? c.unavailable}</h2>
             {item.downloadable && item.version ? (
               <ResourceDownloadButton
                 productId={item.productId}

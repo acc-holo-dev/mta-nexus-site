@@ -8,7 +8,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typePrewrapSmSecondary } from "../../shell/type-shell";
+import { typeFlexMinWrapGap3, typePrewrapSmSecondary } from "../../shell/type-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -308,7 +308,7 @@ export function PublicationFeed({
           />
         )}
       </div>
-      <nav aria-label={copy.activity} className="flex min-w-0 flex-wrap gap-3">
+      <nav aria-label={copy.activity} className={typeFlexMinWrapGap3}>
         {page?.previousCursor && (
           <Link
             href={publicationHref(path, filters, page.previousCursor)}

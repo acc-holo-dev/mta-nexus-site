@@ -10,6 +10,7 @@ import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../s
 import { panelClipSpace2P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type2xlExtraboldPrimary,
+  typeBreakSemiboldPrimary,
   typeGrid2Gap4,
   typeHeadingPrimary,
   typeSmPrimary,
@@ -71,7 +72,7 @@ export async function PublicContextTrustPage({
       </Link>
       <header className={panelClipSpace3P6}>
         <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
-        {page && <p className="break-words font-semibold text-primary">{page.subject.name}</p>}
+        {page && <p className={typeBreakSemiboldPrimary}>{page.subject.name}</p>}
         <p className="text-sm text-muted">{copy.description}</p>
         <p className={typeSmSecondary}>
           {kind === "organization" ? copy.organizationScope : copy.serverScope}

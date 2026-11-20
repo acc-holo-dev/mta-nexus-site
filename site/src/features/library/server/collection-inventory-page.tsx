@@ -21,9 +21,11 @@ import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakAllXs,
+  typeBreakSemibold,
   typeFlexWrapEndGap3,
   typeFlexWrapGap4,
   typeSmSecondary,
+  typeSurfaceBorderP2,
 } from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
@@ -143,11 +145,7 @@ export async function CollectionInventoryPage({
             </label>
             <label className="grid gap-1">
               {v.status}
-              <select
-                name="status"
-                defaultValue={report.status}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="status" defaultValue={report.status} className={typeSurfaceBorderP2}>
                 {(["all", "active", "archived"] as const).map((status) => (
                   <option key={status} value={status}>
                     {c[status]}
@@ -160,7 +158,7 @@ export async function CollectionInventoryPage({
               <select
                 name="collectionId"
                 defaultValue={report.collectionId ?? ""}
-                className="rounded border border-base bg-surface p-2"
+                className={typeSurfaceBorderP2}
               >
                 <option value="">{c.all}</option>
                 {report.collections.map((collection) => (
@@ -172,11 +170,7 @@ export async function CollectionInventoryPage({
             </label>
             <label className="grid gap-1">
               {v.filter}
-              <select
-                name="filter"
-                defaultValue={report.filter}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="filter" defaultValue={report.filter} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_FILTERS.map((filter) => (
                   <option key={filter} value={filter}>
                     {v[filter]}
@@ -186,11 +180,7 @@ export async function CollectionInventoryPage({
             </label>
             <label className="grid gap-1">
               {v.releaseFilter}
-              <select
-                name="release"
-                defaultValue={report.release}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="release" defaultValue={report.release} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (
                   <option key={release} value={release}>
                     {v.releaseFilters[release]}
@@ -267,7 +257,7 @@ export async function CollectionInventoryPage({
               release = item.available ? item.release : null;
             return (
               <li key={item.productId} className={panelSpace3P5}>
-                <h2 className="break-words font-semibold">
+                <h2 className={typeBreakSemibold}>
                   {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                 </h2>
                 <code className={typeBreakAllXs}>{item.productId}</code>

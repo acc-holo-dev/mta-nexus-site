@@ -9,6 +9,7 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { typeLabelUpperMuted } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 export function BuildQuarantineControls({
@@ -84,7 +85,7 @@ export function BuildQuarantineControls({
   return (
     <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">
+        <span className={typeLabelUpperMuted}>
           {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
         </span>
         <textarea

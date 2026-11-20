@@ -17,6 +17,7 @@ import {
   typeDisplayPrimary,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
+  typeNumericPrimary,
   typeSemiboldPrimary,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
@@ -153,7 +154,7 @@ export async function WorkspaceFinanceScreen({
                 ].map(([label, amount]) => (
                   <div key={label}>
                     <dt className="text-muted">{label}</dt>
-                    <dd className="font-numeric text-primary">
+                    <dd className={typeNumericPrimary}>
                       {formatFinancialMinor(amount, total.currency, locale)}
                     </dd>
                   </div>

@@ -23,6 +23,7 @@ import {
 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexMinWrapGap4Sm } from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 
 const selectClass =
@@ -233,7 +234,7 @@ export async function LibraryWatchHistoryScreen({
         </ol>
       ) : null}
       {result.totalPages > 1 && (
-        <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+        <nav aria-label={c.page} className={typeFlexMinWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {c.previous}

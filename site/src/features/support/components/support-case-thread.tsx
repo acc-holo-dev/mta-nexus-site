@@ -14,7 +14,12 @@ import {
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
-import { typeDisplayPrimary, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeLabelUpperMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
@@ -370,7 +375,7 @@ export function SupportCaseThread({
       <header className="space-y-2 border-b border-base pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-label uppercase text-muted">
+            <p className={typeLabelUpperMuted}>
               {categories[supportCase.category] ?? supportCase.category}
             </p>
             <h1 className="mt-1 font-display text-primary">{supportCase.subject}</h1>

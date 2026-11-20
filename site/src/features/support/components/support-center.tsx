@@ -11,7 +11,12 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
-import { typeFlexCenterGap2, typeHeadingPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2,
+  typeHeadingPrimary,
+  typeLabelUpperMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -356,7 +361,7 @@ export function SupportCenter({
 
           {objectContext ? (
             <div role="note" className={surfaceInsetP3TextSmSecondary}>
-              <p className="font-label uppercase text-muted">{copy.attachedContext}</p>
+              <p className={typeLabelUpperMuted}>{copy.attachedContext}</p>
               <p className="mt-1 break-all">
                 {copy.contextResource}: {objectContext.productId}
               </p>

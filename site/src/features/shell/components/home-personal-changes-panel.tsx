@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { PersonalChangesSummary } from "../home-personal-changes-types";
 import type { HomePersonalPreference } from "../home-personal-preference";
 import { pageShellStack3 } from "../page-shell";
-import { typeLabelUpperFaint } from "../type-shell";
+import { typeBreakSemiboldPrimary, typeLabelUpperFaint } from "../type-shell";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
 
 export type HomePersonalCopy = {
@@ -114,7 +114,7 @@ export function HomePersonalChangesPanel({
                   className="flex min-h-11 min-w-0 flex-col justify-center gap-1 overflow-x-clip px-4 py-3 text-sm transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)]"
                 >
                   <span className={typeLabelUpperFaint}>{copy[reasonKey[item.reason]]}</span>
-                  <span className="break-words font-semibold text-primary">{item.title}</span>
+                  <span className={typeBreakSemiboldPrimary}>{item.title}</span>
                 </Link>
               </li>
             ))}

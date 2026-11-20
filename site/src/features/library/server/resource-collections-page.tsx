@@ -14,6 +14,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSemibold,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
@@ -164,7 +165,7 @@ export async function ResourceCollectionsPage({
                 (result.resource.canAdd && collection.itemCount < result.itemLimit));
             return (
               <li key={collection.id} className={panelSpace3P5}>
-                <h3 className="break-words font-semibold">
+                <h3 className={typeBreakSemibold}>
                   <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
                     {collection.name}
                   </Link>

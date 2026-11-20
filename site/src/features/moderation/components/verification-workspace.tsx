@@ -16,6 +16,8 @@ import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-sh
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBreakSmSecondary,
+  typeFlexMinWrapEndGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
@@ -480,11 +482,7 @@ export function VerificationWorkspace({
       )}
       <section className={panelSpace4P5}>
         <h2 className={typeHeadingPrimary}>{copy.manage}</h2>
-        <form
-          method="GET"
-          action="/workspace/verification"
-          className="flex min-w-0 flex-wrap items-end gap-3"
-        >
+        <form method="GET" action="/workspace/verification" className={typeFlexMinWrapEndGap3}>
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="page" value={filters.page} />
           {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
@@ -572,7 +570,7 @@ export function VerificationWorkspace({
       {target && (
         <section className={panelSpace4P5}>
           <h2 className={typeHeadingPrimary}>{copy.apply}</h2>
-          <p className="break-words text-sm text-secondary">
+          <p className={typeBreakSmSecondary}>
             {copy[target.type]} · {target.name}
           </p>
           {savedId ? (
@@ -682,11 +680,7 @@ export function VerificationWorkspace({
             </Link>
           ))}
         </nav>
-        <form
-          method="GET"
-          action="/workspace/verification"
-          className="flex min-w-0 flex-wrap items-end gap-3"
-        >
+        <form method="GET" action="/workspace/verification" className={typeFlexMinWrapEndGap3}>
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="teamsQ" value={teamFilters.query} />
           <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">

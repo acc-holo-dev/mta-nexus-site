@@ -15,6 +15,7 @@ import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/pane
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
   typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
   typeSmSecondary,
   typeSmSemiboldPrimary,
@@ -266,7 +267,7 @@ export function CommunityReportDetailView({
             )}
           </section>
           <section className={panelSpace3P5}>
-            <h2 className="text-lg font-semibold text-primary">{copy.currentTarget}</h2>
+            <h2 className={typeLgSemiboldPrimary}>{copy.currentTarget}</h2>
             <p className="text-xs text-muted">{copy.currentHint}</p>
             {staff && report.moderationHref && (
               <Link href={report.moderationHref} className={linkAccentSmRounded}>

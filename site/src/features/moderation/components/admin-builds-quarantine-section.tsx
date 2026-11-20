@@ -5,7 +5,11 @@ import type { getDictionary, Locale } from "../../../lib/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
 import { linkAccent } from "../../shell/link-shell";
 import { panelFlexBetweenP4 } from "../../shell/panel-shell";
-import { typeCaptionFaint, typeFlexCenterGap2 } from "../../shell/type-shell";
+import {
+  typeCaptionFaint,
+  typeFlexCenterGap2,
+  typeFlexWrapCenterGap2,
+} from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
@@ -188,7 +192,7 @@ export function AdminBuildsQuarantineSection({
             riskBuilds.map((build) => (
               <div key={build.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className={typeFlexWrapCenterGap2}>
                     <StatusBadge
                       status={adminStatusLabel(locale, build.status)}
                       tone={adminStatusTone(build.status)}

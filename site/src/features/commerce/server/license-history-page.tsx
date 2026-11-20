@@ -14,7 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4TextSm } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
 import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
@@ -124,7 +124,7 @@ export async function LicenseHistoryPage({
         {copy.manage}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.fullHistory}</h1>
-      <p className="break-words text-secondary">{result.license.productTitle}</p>
+      <p className={typeBreakSecondary}>{result.license.productTitle}</p>
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((event) => (

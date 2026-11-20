@@ -21,6 +21,7 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSemibold,
   typeFlexWrapEndGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
@@ -225,7 +226,7 @@ export async function CollectionReleasesScreen({
             item.hasAccess && ["latest", "pinned", "update_available"].includes(item.state);
           return (
             <li key={item.productId} className={panelSpace3P5}>
-              <h3 className="break-words font-semibold">{item.title ?? cc.unavailable}</h3>
+              <h3 className={typeBreakSemibold}>{item.title ?? cc.unavailable}</h3>
               <p>{copy[item.state]}</p>
               {item.latestVersion && (
                 <p>

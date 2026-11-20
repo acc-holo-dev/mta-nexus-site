@@ -21,6 +21,7 @@ import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeFlexMinWrapGap4Sm,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
@@ -258,7 +259,7 @@ export async function LibraryVersionsScreen({
         <EmptyState title={copy.noVersions} description={copy.noVersionsHint} />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexMinWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}

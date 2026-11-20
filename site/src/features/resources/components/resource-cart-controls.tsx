@@ -12,7 +12,7 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import { typeFlexMinWrapGap3, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
@@ -365,7 +365,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           description={copy.unavailableNoteHint}
         />
       ) : null}
-      <div className="flex min-w-0 flex-wrap gap-3">
+      <div className={typeFlexMinWrapGap3}>
         {uncertain ? (
           <Button
             type="button"

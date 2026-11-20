@@ -8,7 +8,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2 } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -143,7 +143,7 @@ export function ResourceQaReportForm({
   return (
     <form className={surfaceMinSpace2BgP3} onSubmit={onSubmit}>
       <p className="text-xs text-muted">{copy.reportHelp}</p>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportType}</span>
         <select
           className="min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
@@ -158,7 +158,7 @@ export function ResourceQaReportForm({
           ))}
         </select>
       </label>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportReason}</span>
         <textarea
           className="min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"

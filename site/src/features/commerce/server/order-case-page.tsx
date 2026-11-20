@@ -17,6 +17,7 @@ import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-s
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBreakDisplayPrimary,
   typeDisplayPrimary,
   typeFlexWrapEndGap3,
   typePrewrapSmSecondary,
@@ -455,7 +456,7 @@ export async function OrderCaseDetailPage({
       <Link href={listBase} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
-      <h1 className="break-words font-display text-primary">{result.case.subject}</h1>
+      <h1 className={typeBreakDisplayPrimary}>{result.case.subject}</h1>
       <p>
         {copy.order}: {result.order.orderNumber} · {orderCaseKindLabel(locale, result.case.kind)}
       </p>

@@ -8,7 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
-import { typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
+import { typeGrid2Gap4, typeSmSecondary, typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confirmation";
@@ -237,7 +237,7 @@ export function PlanReviewForm({
                 required
                 value={organizationId}
                 onChange={(e) => setOrganization(e.target.value)}
-                className="w-full rounded border border-base bg-surface p-2"
+                className={typeWFullSurfaceBorderP2}
               >
                 <option value="">{unknownMarker(locale)}</option>
                 {frozen &&
@@ -266,7 +266,7 @@ export function PlanReviewForm({
               onChange={(e) => setAmount(e.target.value)}
               inputMode="decimal"
               maxLength={14}
-              className="w-full rounded border border-base bg-surface p-2"
+              className={typeWFullSurfaceBorderP2}
             />
           </label>
           <label htmlFor={`${field}-currency`} className="space-y-2">
@@ -275,7 +275,7 @@ export function PlanReviewForm({
               id={`${field}-currency`}
               value={currency}
               onChange={(e) => setCurrency(e.target.value as typeof currency)}
-              className="w-full rounded border border-base bg-surface p-2"
+              className={typeWFullSurfaceBorderP2}
             >
               {["USD", "EUR", "RUB"].map((v) => (
                 <option key={v} value={v}>

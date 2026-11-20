@@ -17,7 +17,12 @@ import {
   linkGhostAccentSm,
 } from "../../shell/link-shell";
 import { panelClipSpace3P4, panelClipSpace5P5Sm } from "../../shell/panel-shell";
-import { typeFlexWrapGap3, typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapEndGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import {
   ContentCommentSubmitError,
   createCommentIntentKey,
@@ -468,7 +473,7 @@ export function ContentDiscussion({
             // Search refreshes the list only; the compose draft stays in React state.
             void load(false, search.trim());
           }}
-          className="flex min-w-0 flex-wrap items-end gap-3"
+          className={typeFlexMinWrapEndGap3}
         >
           <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
             <span>{copy.search}</span>

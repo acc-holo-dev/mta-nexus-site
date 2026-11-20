@@ -21,9 +21,11 @@ import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
   typePrewrapBreak,
   typeSemiboldPrimary,
+  typeSpace1SmPrimary,
 } from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -206,7 +208,7 @@ export async function ModeratedDiscussionScreen({
       <header className="space-y-3">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <p className="break-words font-semibold text-primary">
+        <p className={typeBreakSemiboldPrimary}>
           {publication.title} · {general[publication.status]}
         </p>
         <nav className={typeFlexWrapGap4}>
@@ -232,7 +234,7 @@ export async function ModeratedDiscussionScreen({
               action={moderatedDiscussionHref(id)}
               className="nexus-panel grid gap-3 p-5 sm:grid-cols-2"
             >
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{general.search}</span>
                 <input
                   className={platformFieldClass}
@@ -242,7 +244,7 @@ export async function ModeratedDiscussionScreen({
                   defaultValue={params.get("q") ?? ""}
                 />
               </label>
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{general.author}</span>
                 <input
                   className={platformFieldClass}

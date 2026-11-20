@@ -3,7 +3,7 @@
 import type { ResourceMediaItem } from "@nexus/domain";
 import { useState } from "react";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeGrid2Gap4 } from "../../shell/type-shell";
+import { typeBreakSmSecondary, typeGrid2Gap4, typeLgSemiboldPrimary } from "../../shell/type-shell";
 import { shouldOpenGalleryLightbox } from "../model/resource-gallery-interaction";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { ResourceGalleryLightbox } from "./resource-gallery-lightbox";
@@ -23,7 +23,7 @@ export function ResourceGallery({
   if (!items.length) return null;
   return (
     <section className={panelSpace4P5} aria-label={copy.title}>
-      <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
+      <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
       <ul className={typeGrid2Gap4}>
         {items.map((item, index) => (
           <li key={item.id}>
@@ -48,9 +48,7 @@ export function ResourceGallery({
                 />
               </a>
               {item.caption && (
-                <figcaption className="break-words text-sm text-secondary">
-                  {item.caption}
-                </figcaption>
+                <figcaption className={typeBreakSmSecondary}>{item.caption}</figcaption>
               )}
             </figure>
           </li>

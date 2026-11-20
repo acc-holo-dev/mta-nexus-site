@@ -11,7 +11,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
 import { ResourceCompatibilityForm } from "../compatibility-controls";
 import { ProductDependencyList } from "../detail-view";
 import { getResourceManagementCopy } from "../resource-management-i18n";
@@ -70,7 +70,7 @@ export async function ResourceCompatibilityScreen({ params }: { params: Promise<
       </Link>
       <header>
         <h1 className={typeDisplayPrimary}>{copy.compatibility}</h1>
-        <p className="break-words text-secondary">{product.title}</p>
+        <p className={typeBreakSecondary}>{product.title}</p>
       </header>
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}

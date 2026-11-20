@@ -18,7 +18,7 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs } from "../../shell/type-shell";
+import { typeBreakAllXs, typeFlexMinWrapGap4Sm } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionHistoryQuery,
@@ -107,7 +107,7 @@ export async function CollectionHistoryPage({
       result.days !== 30;
     return (
       <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
+        <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
           <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
             {libraryMembershipHistoryCopy(typedLocale).history}
           </Link>
@@ -311,7 +311,7 @@ export async function CollectionHistoryPage({
           })}
         </ol>
         {result.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className={typeFlexMinWrapGap4Sm}>
             {result.page > 1 && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page - 1)}`}

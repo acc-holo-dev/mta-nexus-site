@@ -11,6 +11,9 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeDisplayPrimary,
+  typeFlexMinWrapGap3,
+  typeFlexMinWrapGap4Sm,
+  typeNumericPrimary,
   typePrewrapSmSecondary,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -88,7 +91,7 @@ export async function PublicSubscriptionsScreen({
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {subscriptions.notice}
       </p>
-      <nav aria-label={copy.scope} className="flex min-w-0 flex-wrap gap-3">
+      <nav aria-label={copy.scope} className={typeFlexMinWrapGap3}>
         {(["user", "organization"] as const).map((value) => (
           <Link
             key={value}
@@ -110,7 +113,7 @@ export async function PublicSubscriptionsScreen({
               <p className={typePrewrapSmSecondary}>
                 {locale === "ru" ? plan.descriptionRu : plan.descriptionEn}
               </p>
-              <p className="font-numeric text-primary">
+              <p className={typeNumericPrimary}>
                 {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
                 {copy.days}
               </p>
@@ -162,7 +165,7 @@ export async function PublicSubscriptionsScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexMinWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

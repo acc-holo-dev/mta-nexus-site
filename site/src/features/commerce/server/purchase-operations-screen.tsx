@@ -14,7 +14,11 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  typeBreakSecondary,
+  typeDisplayPrimary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -111,7 +115,7 @@ export async function PurchaseOperationsScreen({
         {copy.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.paymentOperations}</h1>
-      <p className="break-words text-secondary">
+      <p className={typeBreakSecondary}>
         {result.order.orderNumber} · {status(result.order.status)}
       </p>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
@@ -132,7 +136,7 @@ export async function PurchaseOperationsScreen({
         />
       ) : null}
       <section aria-labelledby="payment-attempts" className="space-y-4">
-        <h2 id="payment-attempts" className="text-xl font-semibold text-primary">
+        <h2 id="payment-attempts" className={typeXlSemiboldPrimary}>
           {copy.attempts} ({result.total})
         </h2>
         {result.attempts.length ? (

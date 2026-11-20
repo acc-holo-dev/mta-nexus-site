@@ -13,7 +13,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSemibold,
+  typeFlexMinWrapEndGap3,
+  typeFlexMinWrapGap4Sm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
 import {
@@ -105,7 +110,7 @@ export async function CollectionComparePage({
       comparison?.destination.status === "active" && comparison.destination.revision < 2147483647;
     return (
       <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
+        <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
           <Link href={collectionHref(id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
@@ -116,7 +121,7 @@ export async function CollectionComparePage({
         <h1 className="min-w-0 break-words font-display">{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
         <section className={panelClipSpace2P5}>
-          <h2 className="break-words font-semibold">
+          <h2 className={typeBreakSemibold}>
             {c.source}: {report.source.name}
           </h2>
           <p>
@@ -128,7 +133,7 @@ export async function CollectionComparePage({
           <form
             method="get"
             action={collectionHref(id, "compare")}
-            className="flex min-w-0 flex-wrap items-end gap-3"
+            className={typeFlexMinWrapEndGap3}
           >
             <label className="grid min-w-0 max-w-full gap-1.5">
               <span className="font-label uppercase text-secondary">{h.destination}</span>
@@ -203,7 +208,7 @@ export async function CollectionComparePage({
         ) : (
           <>
             <section className={panelClipSpace2P5}>
-              <h2 className="break-words font-semibold">
+              <h2 className={typeBreakSemibold}>
                 {c.destination}:{" "}
                 <Link
                   href={collectionHref(comparison.destination.id)}
@@ -310,7 +315,7 @@ export async function CollectionComparePage({
               />
             )}
             {comparison.totalPages > 1 && (
-              <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+              <nav aria-label={c.page} className={typeFlexMinWrapGap4Sm}>
                 {comparison.page > 1 && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page - 1)}`}

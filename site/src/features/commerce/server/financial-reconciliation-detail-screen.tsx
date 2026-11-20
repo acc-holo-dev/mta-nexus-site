@@ -13,7 +13,11 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import {
   financialFlags,
@@ -107,7 +111,7 @@ export async function FinancialReconciliationDetailScreen({
       <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="break-words font-display text-primary">{result.order.orderNumber}</h1>
+      <h1 className={typeBreakDisplayPrimary}>{result.order.orderNumber}</h1>
       <Link
         href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
         className={linkAccentSm}

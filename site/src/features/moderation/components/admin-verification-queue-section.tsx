@@ -4,7 +4,7 @@ import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
-import { typeCaptionFaint, typeXsSecondary } from "../../shell/type-shell";
+import { typeCaptionFaint, typeFlexWrapCenterGap2, typeXsSecondary } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
@@ -95,7 +95,7 @@ export function AdminVerificationQueueSection({
               }`}
             >
               <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
+                <div className={typeFlexWrapCenterGap2}>
                   <span className="rounded bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
                     {request.targetType}
                   </span>

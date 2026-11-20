@@ -13,6 +13,7 @@ import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shel
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
+  typeFlexMinWrapGap3,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
 } from "../../shell/type-shell";
@@ -158,7 +159,7 @@ export async function OwnDiscussionsPage({
                   timeZoneName: "short",
                 })}
               </time>
-              <div className="flex min-w-0 flex-wrap gap-3">
+              <div className={typeFlexMinWrapGap3}>
                 <Link
                   prefetch={false}
                   href={`/workspace/discussions/${encodeURIComponent(item.id)}`}

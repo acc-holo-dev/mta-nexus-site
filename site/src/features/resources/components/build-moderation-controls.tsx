@@ -8,7 +8,7 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { buildModerationUiState } from "../build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
@@ -119,7 +119,7 @@ export function BuildModerationControls({
   return (
     <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}

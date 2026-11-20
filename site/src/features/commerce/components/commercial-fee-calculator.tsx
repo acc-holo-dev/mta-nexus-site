@@ -6,7 +6,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeNumericPrimary, typeSmSecondary, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
@@ -77,7 +77,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
   }
   return (
     <section className={panelClipSpace4P5} aria-labelledby={`${field}-heading`}>
-      <h2 id={`${field}-heading`} className="text-xl font-semibold text-primary">
+      <h2 id={`${field}-heading`} className={typeXlSemiboldPrimary}>
         {copy.calculator}
       </h2>
       <form onSubmit={submit} className="space-y-4">
@@ -135,13 +135,13 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted">{copy.fee}</dt>
-              <dd className="font-numeric text-primary">
+              <dd className={typeNumericPrimary}>
                 {formatHistoryAmount(result.platformFee, result.currency, locale)}
               </dd>
             </div>
             <div>
               <dt className="text-muted">{copy.proceeds}</dt>
-              <dd className="font-numeric text-primary">
+              <dd className={typeNumericPrimary}>
                 {formatHistoryAmount(result.sellerProceeds, result.currency, locale)}
               </dd>
             </div>

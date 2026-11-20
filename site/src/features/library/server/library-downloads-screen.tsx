@@ -21,6 +21,7 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSemiboldPrimary,
   typeDisplayPrimary,
   typeFlexWrapEndGap3,
   typeFlexWrapGap3,
@@ -180,7 +181,7 @@ export async function LibraryDownloadsScreen({
           {result.items.map((receipt) => (
             <li key={receipt.id} className={panelSpace4P5}>
               <div className="flex flex-wrap justify-between gap-2">
-                <h2 className="break-words font-semibold text-primary">
+                <h2 className={typeBreakSemiboldPrimary}>
                   {receipt.title ?? copy.privateResource}
                 </h2>
                 <span className={typeSmSecondary}>{copy[receipt.status]}</span>

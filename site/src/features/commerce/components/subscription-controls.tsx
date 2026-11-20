@@ -12,7 +12,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeSmSecondary, typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
 import { commercialTerms } from "../commercial-confirmation";
 import {
   confirmedSubscriptionReceipt,
@@ -272,7 +272,7 @@ export function SubscriptionControls(props: Props) {
               id={`${field}-org`}
               value={organizationId}
               onChange={(e) => setOrganization(e.target.value)}
-              className="w-full rounded border border-base bg-surface p-2"
+              className={typeWFullSurfaceBorderP2}
             >
               <option value="">{c.organization}</option>
               {props.scopes.map((scope) => (

@@ -4,7 +4,11 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
@@ -39,7 +43,7 @@ export function ResourcePublicationReadinessPanel({
       aria-labelledby="publication-readiness-heading"
     >
       <div className="space-y-1">
-        <h2 id="publication-readiness-heading" className="text-xl font-semibold text-primary">
+        <h2 id="publication-readiness-heading" className={typeXlSemiboldPrimary}>
           {copy.title}
         </h2>
         <p className={typeSmSecondary}>

@@ -11,6 +11,7 @@ import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { panelP5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakSecondary,
   typeDisplayPrimary,
   typeFlexWrapEndGap3,
   typeFlexWrapGap4,
@@ -83,7 +84,7 @@ export async function PublicationReportsPage({
       <div className={pageShellMax5xlCompactTight}>
         <header className="space-y-2">
           <h1 className={typeDisplayPrimary}>{copy.publicationTitle}</h1>
-          <p className="break-words text-secondary">{data.publication.title}</p>
+          <p className={typeBreakSecondary}>{data.publication.title}</p>
           <p className="text-sm text-muted">{copy.publicationDescription}</p>
         </header>
         <div className={typeFlexWrapGap4}>

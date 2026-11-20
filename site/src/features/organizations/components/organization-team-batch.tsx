@@ -15,7 +15,12 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap3, typeSemiboldPrimary, typeSmPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
+  typeSemiboldPrimary,
+  typeSmPrimary,
+} from "../../shell/type-shell";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
@@ -157,7 +162,7 @@ export function OrganizationTeamBatch({
   );
   return (
     <section className="space-y-4 rounded-lg border border-base p-4" aria-busy={stage !== "idle"}>
-      <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
+      <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
       <p className="text-sm text-muted">{copy.help}</p>
       <fieldset disabled={disabled || preview !== null} className="space-y-3">
         <legend className={typeSmPrimary}>

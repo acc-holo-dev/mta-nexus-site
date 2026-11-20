@@ -16,7 +16,13 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4 } from "../../shell/surface-shell";
-import { typeDisplayPrimary, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSmSecondary,
+  typeDisplayPrimary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildModerationControls } from "../components/build-moderation-controls";
 import { ResourceBuildControls } from "../components/resource-build-controls";
@@ -153,14 +159,14 @@ export async function ResourceBuildScreen({
       {staff && (
         <section className={panelSpace3P5} aria-label={publisherCopy.description}>
           <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
-          <h2 className="text-xl font-semibold text-primary">{publisherCopy.description}</h2>
+          <h2 className={typeXlSemiboldPrimary}>{publisherCopy.description}</h2>
           {product.shortDescription && (
             <p className="whitespace-pre-wrap break-words text-secondary">
               {product.shortDescription}
             </p>
           )}
           <p className="whitespace-pre-wrap break-words text-secondary">{product.description}</p>
-          <p className="break-words text-sm text-secondary">
+          <p className={typeBreakSmSecondary}>
             {publisherCopy.tags}: {formatUnknown(locale, (product.tags ?? []).join(", "))}
           </p>
           <h3 className={typeSemiboldPrimary}>{publisherCopy.requirements}</h3>

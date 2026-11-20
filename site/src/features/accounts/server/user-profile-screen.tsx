@@ -30,7 +30,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
-import { typeHeadingPrimary } from "../../shell/type-shell";
+import { typeFlexWrapCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -168,7 +168,7 @@ export async function UserProfileScreen({
             className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
           />
           <div className="min-w-0 space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className={typeFlexWrapCenterGap2}>
               <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
               {user.isVerified && (
                 <span title={copy.verifiedMember}>

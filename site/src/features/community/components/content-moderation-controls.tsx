@@ -11,7 +11,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeSmSuccess } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeLabelUpperMuted, typeSmSuccess } from "../../shell/type-shell";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 
 export function ContentModerationControls({
@@ -133,7 +133,7 @@ export function ContentModerationControls({
       aria-busy={pending !== null ? true : undefined}
     >
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           disabled={pending !== null || blocked}
           value={notes}

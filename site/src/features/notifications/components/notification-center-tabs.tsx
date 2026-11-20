@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { linkFocusRing } from "../../shell/link-shell";
+import { typeFlexWrapCenterGap2 } from "../../shell/type-shell";
 import { type NotificationInboxQuery, notificationInboxHref } from "../notification-inbox-contract";
 
 const STATES = ["all", "unread", "read"] as const;
@@ -33,7 +34,7 @@ export function NotificationCenterTabs({
 
   return (
     <div className="space-y-4">
-      <nav aria-label={readingNavLabel} className="flex flex-wrap items-center gap-2">
+      <nav aria-label={readingNavLabel} className={typeFlexWrapCenterGap2}>
         {STATES.map((item) => {
           const active = state === item;
           const href = notificationInboxHref("/notifications", { ...base, state: item });

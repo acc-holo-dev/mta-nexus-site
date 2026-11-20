@@ -28,7 +28,7 @@ import {
   pageShellStack6,
 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
-import { typeHeadingPrimary } from "../../shell/type-shell";
+import { typeFlexWrapCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
@@ -157,7 +157,7 @@ export async function OrganizationProfilePage({
           </div>
 
           <div className="min-w-0 space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className={typeFlexWrapCenterGap2}>
               <h1 className="truncate text-2xl font-black text-primary">{organization.name}</h1>
               {organization.isVerified && (
                 <span title={copy.verified}>

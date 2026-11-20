@@ -21,7 +21,13 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeBreakSemiboldPrimary,
+  typeFlexMinWrapEndGap3,
+  typeFlexMinWrapGap3,
+  typeFlexMinWrapGap4Sm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -137,7 +143,7 @@ export async function LibraryWatchesScreen({
       <Link href="/settings" className={linkAccentSmRounded}>
         {copy.settings}
       </Link>
-      <form className="flex min-w-0 flex-wrap items-end gap-3">
+      <form className={typeFlexMinWrapEndGap3}>
         <input type="hidden" name="filter" value={query.filter} />
         <label className="grid gap-1">
           {copy.search}
@@ -186,7 +192,7 @@ export async function LibraryWatchesScreen({
           title: available ? title : null,
         }))}
       />
-      <nav aria-label={copy.title} className="flex min-w-0 flex-wrap gap-3">
+      <nav aria-label={copy.title} className={typeFlexMinWrapGap3}>
         {(["all", "enabled", "disabled", "unavailable"] as const).map((filter) => (
           <Link
             key={filter}
@@ -202,7 +208,7 @@ export async function LibraryWatchesScreen({
         <ul className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
           {result.items.map((watch) => (
             <li key={watch.productId} className={panelClipSpace3P5}>
-              <h2 className="break-words font-semibold text-primary">
+              <h2 className={typeBreakSemiboldPrimary}>
                 {watch.available ? (watch.title ?? copy.privateResource) : copy.privateResource}
               </h2>
               <p className={typeSmSecondary}>
@@ -254,7 +260,7 @@ export async function LibraryWatchesScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexMinWrapGap4Sm}>
           {result.page > 1 ? (
             <Link
               href={resourceReleaseWatchesUrl(query.filter, result.page - 1, query.query)}

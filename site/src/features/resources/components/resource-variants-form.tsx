@@ -13,7 +13,12 @@ import { linkGhostAccentSmDisabled, linkGhostAccentXsDisabled } from "../../shel
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4 } from "../../shell/surface-shell";
-import { typeSemiboldPrimary, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeBreakSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
@@ -423,7 +428,7 @@ export function ResourceVariantsForm({
               key={row.productId}
               className="flex items-center justify-between gap-4 rounded border border-base p-3"
             >
-              <span className="break-words text-sm text-secondary">
+              <span className={typeBreakSmSecondary}>
                 {row.title}
                 <span className="block text-xs text-muted">{row.slug}</span>
               </span>

@@ -25,7 +25,11 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentTightHover } from "../../shell/link-shell";
 import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
-import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2,
+  typeFlexWrapCenterGap2,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { ServerClaimControlPanel } from "../claim-controls";
 import { ServerConnectControls } from "../connect";
@@ -192,7 +196,7 @@ export async function ServerDetailScreen({
 
         <div className="relative -mt-20 flex flex-col justify-between gap-6 p-6 md:flex-row md:items-end md:p-8">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className={typeFlexWrapCenterGap2}>
               <span
                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-numeric text-xs font-bold ${statusClass}`}
               >

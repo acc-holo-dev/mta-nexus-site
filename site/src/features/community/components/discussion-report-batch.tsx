@@ -21,10 +21,12 @@ import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   typeFlexWrapGap3,
   typeGrid2Gap4,
+  typeLgSemiboldPrimary,
   typeSemiboldPrimary,
   typeSmPrimary,
   typeSmSemiboldPrimary,
   typeSmSuccess,
+  typeSpace1SmPrimary,
 } from "../../shell/type-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
@@ -211,7 +213,7 @@ export function DiscussionReportBatch({
     <section className="space-y-4" aria-busy={busy}>
       {allowActions && available.length > 0 && (
         <div className={panelSpace4P5}>
-          <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
+          <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
           <p className="text-sm text-muted">
             {commentId === null ? copy.publicationHelp : copy.help}
           </p>
@@ -247,7 +249,7 @@ export function DiscussionReportBatch({
               </Button>
             </div>
             <div className={typeGrid2Gap4}>
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{copy.action}</span>
                 <select
                   className={platformFieldClass}
@@ -271,7 +273,7 @@ export function DiscussionReportBatch({
                   ))}
                 </select>
               </label>
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{copy.notes}</span>
                 <textarea
                   className={platformFieldClass}

@@ -7,7 +7,11 @@ import type { Locale } from "../../../lib/i18n";
 import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
-import { typePrewrapSmSecondary, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexMinWrapGap3,
+  typePrewrapSmSecondary,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
@@ -83,7 +87,7 @@ export function CommunityReportList({
   }
   return (
     <div className={pageShellStack5} aria-busy={pending}>
-      <nav className="flex min-w-0 flex-wrap gap-3" aria-label={copy.status}>
+      <nav className={typeFlexMinWrapGap3} aria-label={copy.status}>
         {(["pending", "history"] as const).map((view) => (
           <Link
             key={view}

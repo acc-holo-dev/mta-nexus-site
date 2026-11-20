@@ -2,7 +2,7 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import { ShieldCheck } from "lucide-react";
 import type { Locale } from "../../../lib/i18n";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeHeadingPrimary } from "../../shell/type-shell";
+import { typeBreakSmSecondary, typeFlexWrapGap2, typeHeadingPrimary } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 export function DeveloperExperience({
   profile,
@@ -49,7 +49,7 @@ export function DeveloperExperience({
         </a>
       )}
       {profile.discordTag && (
-        <p className="break-words text-sm text-secondary">
+        <p className={typeBreakSmSecondary}>
           {copy.discord}: {profile.discordTag}
         </p>
       )}

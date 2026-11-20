@@ -11,6 +11,7 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap4,
+  typeNumericPrimary,
   typePrewrapSmSecondary,
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
@@ -155,7 +156,7 @@ export function CommunityReportGroups({
                     <dt className="text-muted">
                       {labels[key === "review" ? "under_review" : key]}
                     </dt>
-                    <dd className="font-numeric text-primary">
+                    <dd className={typeNumericPrimary}>
                       {item[key].toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
                     </dd>
                   </div>

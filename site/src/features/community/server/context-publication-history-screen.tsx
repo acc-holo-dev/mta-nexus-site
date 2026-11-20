@@ -22,6 +22,7 @@ import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
   typeSemiboldPrimary,
   typeSmPrimary,
@@ -109,7 +110,7 @@ export async function ContextPublicationHistoryScreen({
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         {data && (
-          <p className="break-words font-semibold text-primary">
+          <p className={typeBreakSemiboldPrimary}>
             {context?.name} · {data.item.title}
           </p>
         )}

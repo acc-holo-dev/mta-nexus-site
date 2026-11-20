@@ -21,7 +21,9 @@ import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
@@ -109,7 +111,7 @@ export async function StaffResourceDetailScreen({
       <Link href="/admin/resources" className={linkAccentSm}>
         {copy.moderation}
       </Link>
-      <h1 className="break-words font-display text-primary">{product.title}</h1>
+      <h1 className={typeBreakDisplayPrimary}>{product.title}</h1>
       <p className="text-secondary">
         {resourceStatusLabel(locale, product.status)} · {product.currentVersion}
       </p>
@@ -131,7 +133,7 @@ export async function StaffResourceDetailScreen({
         key={`${id}:${product.updatedAt.toISOString()}`}
         product={{ id, status: product.status, updatedAt: product.updatedAt.toISOString() }}
       />
-      <h2 className="text-lg font-semibold text-primary">{copy.history}</h2>
+      <h2 className={typeLgSemiboldPrimary}>{copy.history}</h2>
       {result.events.length ? (
         <ol className="min-w-0 space-y-3">
           {result.events.map((event) => (

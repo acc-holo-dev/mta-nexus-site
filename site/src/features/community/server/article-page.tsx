@@ -15,6 +15,7 @@ import { contentReactionService } from "../../../lib/services/community/content-
 import { contentService } from "../../../lib/services/community/content-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlLoose } from "../../shell/page-shell";
+import { typeFlexWrapCenterGap2 } from "../../shell/type-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
@@ -165,7 +166,7 @@ export async function ArticleDetailPage({
       </Link>
 
       <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={typeFlexWrapCenterGap2}>
           <span className="rounded bg-warning-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-warning">
             {getUserPlatformCopy(locale)[article.type]}
           </span>
@@ -234,7 +235,7 @@ export async function ArticleDetailPage({
       ) : null}
 
       <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={typeFlexWrapCenterGap2}>
           {article.tags.map((tag) => (
             <span
               key={tag}

@@ -15,7 +15,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeNumericPrimary, typeSmSecondary, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -120,7 +120,7 @@ export async function PurchaseDetailScreen({
           </div>
           <div className="min-w-0">
             <dt className="text-muted">{copy.total}</dt>
-            <dd className="font-numeric text-primary">
+            <dd className={typeNumericPrimary}>
               {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
             </dd>
           </div>
@@ -148,7 +148,7 @@ export async function PurchaseDetailScreen({
         {copy.receiptNote}
       </p>
       <section className="min-w-0 space-y-4" aria-labelledby="order-items">
-        <h2 id="order-items" className="text-xl font-semibold text-primary">
+        <h2 id="order-items" className={typeXlSemiboldPrimary}>
           {copy.lineItems} ({result.total})
         </h2>
         {items.length === 0 ? (

@@ -27,6 +27,7 @@ import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
+  typeFlexMinWrapEndGap3,
   typeFlexWrapGap4Sm,
   typeSmSecondary,
   typeSpace1SmSecondary,
@@ -123,7 +124,7 @@ export async function StaffResourcesScreen({
       <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
-      <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
+      <form className={typeFlexMinWrapEndGap3} method="get">
         <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary sm:min-w-40">
           {copy.search}
           <input
