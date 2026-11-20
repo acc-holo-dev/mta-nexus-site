@@ -11,6 +11,7 @@ import { reportId, reportRateLimit } from "../community-report-api";
 import { parseReportHistoryQuery } from "../community-report-history-contract";
 import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
 import { CommunityReportHistory } from "../components/community-report-history";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,
@@ -69,7 +70,7 @@ export async function CommunityReportHistoryPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax4xlDenseTight}>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <ErrorState
           title={reportHistoryError(

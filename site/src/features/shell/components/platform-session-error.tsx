@@ -1,6 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { pageShellMax5xlDenseTight } from "../page-shell";
 
 export function PlatformSessionError({
   locale,
@@ -14,7 +15,7 @@ export function PlatformSessionError({
   retryHref: string;
 }) {
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+    <div className={pageShellMax5xlDenseTight}>
       <h1 className="font-display text-primary">{title}</h1>
       <ErrorState
         title={message}

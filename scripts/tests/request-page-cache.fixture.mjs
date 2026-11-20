@@ -37,6 +37,7 @@ const sourceFiles = new Set([
   resolve(sourceRoot, "features/accounts/server/user-profile-screen.tsx"),
   resolve(sourceRoot, "features/accounts/developer-profile-server.ts"),
   resolve(sourceRoot, "features/accounts/server/developer-profile-screen.tsx"),
+  resolve(sourceRoot, "features/shell/page-shell.ts"),
   resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
   resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
   resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
@@ -171,14 +172,16 @@ function mockModule(specifier, names) {
   const key = mocks[specifier] ? specifier : mocks[id] ? id : null;
   const url = `nexus-rsc-fixture:${encodeURIComponent(specifier + JSON.stringify(names))}`;
   if (!virtualSources.has(url)) {
+    // Emit the remote export name (not the local alias). ESM
+    // `import { remote as local }` resolves against `export const remote`.
     const exports = names
-      .map(([local, exported]) => {
+      .map(([, exported]) => {
         const value = key
           ? `globalThis.__nexusRscMocks[${JSON.stringify(key)}][${JSON.stringify(exported)}]`
           : "() => null";
         return exported === "default"
           ? `export default ${value};`
-          : `export const ${local} = ${value};`;
+          : `export const ${exported} = ${value};`;
       })
       .join("\n");
     virtualSources.set(url, exports);

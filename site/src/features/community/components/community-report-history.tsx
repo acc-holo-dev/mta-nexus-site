@@ -15,6 +15,7 @@ import { communityReportCopy } from "../community-report-copy";
 import type { ReportHistoryPage } from "../community-report-history-contract";
 import { reportHistoryCopy } from "../community-report-history-copy";
 import { platformFieldClass } from "../user-platform-client";
+import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 export function CommunityReportHistory({
   page,
   filters,
@@ -35,7 +36,7 @@ export function CommunityReportHistory({
       !!filters.cursor ||
       !!filters.until;
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip">
+    <div className={pageShellMax4xlCompactTight}>
       <Link
         href={base}
         className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

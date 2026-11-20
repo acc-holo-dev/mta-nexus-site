@@ -19,6 +19,7 @@ import { ContentDiscussion } from "../discussion";
 import { ContentReactions } from "../reactions";
 import { CommunityReportForm } from "../report-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
+import { pageShellMax4xlLoose } from "../../shell/page-shell";
 
 export async function generateMetadata({
   params,
@@ -153,7 +154,7 @@ export default async function ArticleDetailPage({
   });
 
   return (
-    <article className="mx-auto min-w-0 max-w-4xl space-y-8 overflow-x-clip">
+    <article className={pageShellMax4xlLoose}>
       <Link
         href={isCommunity ? "/community" : "/articles"}
         className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

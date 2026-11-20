@@ -32,7 +32,7 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
-import { pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
+import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 
 export async function adminHomeMetadata(): Promise<Metadata> {
   return {
@@ -117,7 +117,7 @@ export async function AdminHomeScreen({
   }
   if (!can(currentUser, "admin.access")) {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-20">
+      <div className={pageShellMaxMdGuest}>
         <ErrorState
           title={copy.accessDenied}
           description={copy.accessDeniedDescription}

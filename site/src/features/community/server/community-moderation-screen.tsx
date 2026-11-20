@@ -26,7 +26,7 @@ import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
-import { pageShellMax4xlTight, pageShellStack6 } from "../../shell/page-shell";
+import { pageShellMax4xlTight, pageShellMaxMdDense, pageShellStack6 } from "../../shell/page-shell";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -67,7 +67,7 @@ export async function CommunityModerationScreen({
   }
   if (!can(actor, "admin.moderation")) {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
+      <div className={pageShellMaxMdDense}>
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <ErrorState
           title={copy.denied}

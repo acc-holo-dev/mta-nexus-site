@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
 import { supportMessageCopy } from "../support-message-discovery-copy";
+import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 
 export function SupportMessageBrowser({
   page,
@@ -23,7 +24,7 @@ export function SupportMessageBrowser({
   const date = (value: string) =>
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip">
+    <div className={pageShellMax4xlCompactTight}>
       <Link
         href={base}
         className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

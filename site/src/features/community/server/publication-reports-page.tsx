@@ -17,6 +17,7 @@ import {
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import { platformFieldClass } from "../user-platform-client";
+import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,
@@ -71,7 +72,7 @@ export async function PublicationReportsPage({
       return `${path}?${params}`;
     };
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
+      <div className={pageShellMax5xlCompactTight}>
         <header className="space-y-2">
           <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
           <p className="break-words text-secondary">{data.publication.title}</p>
@@ -179,7 +180,7 @@ export async function PublicationReportsPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
+      <div className={pageShellMax5xlCompactTight}>
         <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
         <ErrorState
           title={communityReportError(

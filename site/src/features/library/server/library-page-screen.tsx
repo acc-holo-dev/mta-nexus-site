@@ -25,6 +25,7 @@ import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { getLibraryCopy, libraryHref, parseLibraryFilter, parseLibraryPage } from "../library-view";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+import { pageShellMax5xlMid } from "../../shell/page-shell";
 
 export async function libraryPageMetadata(): Promise<Metadata> {
   return {
@@ -70,7 +71,7 @@ export async function LibraryPageScreen({
   const filters: readonly UserLibraryFilter[] = ["all", "ready", "unavailable"];
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-7 overflow-x-clip py-8">
+    <div className={pageShellMax5xlMid}>
       <header className="space-y-3 border-b border-base pb-6">
         <Link
           href="/workspace"

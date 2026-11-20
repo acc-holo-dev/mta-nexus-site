@@ -53,3 +53,23 @@ export const pageShellMax4xlDense = "mx-auto min-w-0 max-w-4xl space-y-4 overflo
 export const pageShellMax5xlDense = "mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip py-8";
 
 export const pageShellMax6xlDense = "mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8";
+
+export const pageShellMax5xlBare = "mx-auto min-w-0 max-w-5xl overflow-x-clip";
+
+export const pageShellMax5xlCompactTight = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip";
+
+export const pageShellMax4xlCompactTight = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip";
+
+export const pageShellMax5xlDenseTight = "mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip";
+
+export const pageShellMax4xlDenseTight = "mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip";
+
+export const pageShellMaxXl = "mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16";
+
+export const pageShellMaxMdDense = "mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8";
+
+export const pageShellMaxMdGuest = "mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-20";
+
+export const pageShellMax5xlLooseTight = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip";
+
+export const pageShellMax4xlLoose = "mx-auto min-w-0 max-w-4xl space-y-8 overflow-x-clip";

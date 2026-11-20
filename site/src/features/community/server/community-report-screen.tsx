@@ -20,7 +20,7 @@ import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
-import { pageShellStack6 } from "../../shell/page-shell";
+import { pageShellMax5xlBare, pageShellStack6 } from "../../shell/page-shell";
 export async function communityReportMetadata(): Promise<Metadata> {
   return {
     title: communityReportCopy(await getRequestLocale()).detail,
@@ -82,7 +82,7 @@ export async function CommunityReportScreen({
   }
   if (staff && !can(actor, "admin.moderation")) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <h1 className="font-display text-primary">{title}</h1>
         <ErrorState
           title={copy.forbidden}

@@ -25,6 +25,7 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../support-workspace-copy";
+import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 
@@ -300,7 +301,7 @@ export function SupportCenter({
   );
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
+    <div className={pageShellMax5xlLooseTight}>
       <header className="space-y-2 border-b border-base pb-6">
         <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
           <LifeBuoy className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />

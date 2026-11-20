@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { pageShellMaxXl } from "../../shell/page-shell";
 
 export async function LibraryCollectionsNotFound() {
   const c = libraryCollectionsCopy(await getRequestLocale());
   return (
-    <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
+    <section className={pageShellMaxXl}>
       <h1 className="font-display text-primary">{c.notFound}</h1>
       <Link
         href="/workspace/library/collections"

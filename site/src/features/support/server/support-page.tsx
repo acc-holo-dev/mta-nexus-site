@@ -11,6 +11,11 @@ import { SupportCenter } from "../center";
 import { supportQuery } from "../support-workspace-contract";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
 import { SupportCaseThread } from "../thread";
+import {
+  pageShellMax5xlBare,
+  pageShellMax5xlDenseTight,
+  pageShellMax5xlLooseTight,
+} from "../../shell/page-shell";
 
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;
@@ -56,7 +61,7 @@ export async function SupportPageSurface({
     // Case detail uses the shared gate; the list keeps the Support H1 shell a11y asserts.
     if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={casePath} />;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
+      <div className={pageShellMax5xlLooseTight}>
         <header className="space-y-2 border-b border-base pb-6">
           <h1 className="font-display text-primary">{support.title}</h1>
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
@@ -72,7 +77,7 @@ export async function SupportPageSurface({
   }
   if (staff && !can(actor, "admin.moderation"))
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <h1 className="font-display text-primary">{support.staffQueue}</h1>
         <ErrorState
           title={copy.forbidden}
@@ -97,7 +102,7 @@ export async function SupportPageSurface({
         actorId={actor.id}
       />
     ) : (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax5xlDenseTight}>
         <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.notFound}
@@ -116,7 +121,7 @@ export async function SupportPageSurface({
   const filters = supportQuery(params);
   if (!filters)
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax5xlDenseTight}>
         <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.queryInvalid}

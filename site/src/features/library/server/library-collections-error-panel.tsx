@@ -3,6 +3,7 @@ import Link from "next/link";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { libraryCollectionsLinkClass } from "./library-collections-screen-shared";
+import { pageShellMaxXl } from "../../shell/page-shell";
 
 const recoveryLinkClass = `${libraryCollectionsLinkClass} inline-flex min-h-11 items-center`;
 
@@ -17,7 +18,7 @@ export function LibraryCollectionsErrorPanel({
 }) {
   const c = libraryCollectionsCopy(locale);
   return (
-    <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
+    <section className={pageShellMaxXl}>
       <ErrorState
         title={libraryCollectionError(locale, code)}
         description={

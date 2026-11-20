@@ -9,6 +9,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { pageShellMaxMdGuest } from "../../shell/page-shell";
 
 export async function AdminSupportLayout({ children }: { children: ReactNode }) {
   const locale = await getRequestLocale();
@@ -33,7 +34,7 @@ export async function AdminSupportLayout({ children }: { children: ReactNode }) 
   }
   if (!can(currentUser, "admin.moderation")) {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-20">
+      <div className={pageShellMaxMdGuest}>
         <ErrorState
           id="admin-support-access-denied"
           title={dictionary.admin.accessDenied}

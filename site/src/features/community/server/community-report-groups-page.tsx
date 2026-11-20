@@ -11,6 +11,7 @@ import { reportRateLimit } from "../community-report-api";
 import { parseReportGroupsQuery } from "../community-report-groups-contract";
 import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
 import { CommunityReportGroups } from "../components/community-report-groups";
+import { pageShellMax5xlDenseTight } from "../../shell/page-shell";
 export async function reportGroupsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).title,
@@ -58,7 +59,7 @@ export async function CommunityReportGroupsPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax5xlDenseTight}>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <ErrorState
           title={reportGroupsError(

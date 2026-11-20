@@ -27,7 +27,7 @@ import {
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
-import { pageShellMax4xlTight } from "../../shell/page-shell";
+import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 
 export function SupportCaseThread({
   caseId,
@@ -318,7 +318,7 @@ export function SupportCaseThread({
 
   if (!supportCase) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax4xlDenseTight}>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <Link
           href={backHref}

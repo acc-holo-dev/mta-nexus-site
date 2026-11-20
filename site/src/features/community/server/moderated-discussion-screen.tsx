@@ -12,7 +12,10 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
+import {
+  pageShellMax5xlBare,
+  pageShellMax5xlTight as pageShellClass,
+} from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -99,7 +102,7 @@ export async function ModeratedDiscussionScreen({
   if (!can(actor, "admin.moderation")) {
     const dictionary = getDictionary(locale);
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={general.denied}
           description={general.deniedHint}
@@ -147,7 +150,7 @@ export async function ModeratedDiscussionScreen({
       return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
     }
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={failure || general.unavailable}
           description={copy.loadUnavailableHint}

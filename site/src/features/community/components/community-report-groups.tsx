@@ -10,6 +10,7 @@ import { communityReportCopy } from "../community-report-copy";
 import { type ReportGroupsPage, reportGroupsHref } from "../community-report-groups-contract";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { platformFieldClass } from "../user-platform-client";
+import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 export function CommunityReportGroups({
   page,
   filters,
@@ -36,7 +37,7 @@ export function CommunityReportGroups({
   if (filters.type) contextQuery.set("type", filters.type);
   if (filters.query) contextQuery.set("q", filters.query);
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
+    <div className={pageShellMax5xlCompactTight}>
       <Link
         href="/admin/reports"
         className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

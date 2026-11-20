@@ -12,6 +12,7 @@ import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 
 export async function supportMessageMetadata() {
   return {
@@ -78,7 +79,7 @@ export async function SupportMessagePage({
       error instanceof AppError ? error.code : "INTERNAL_ERROR",
     );
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
+      <div className={pageShellMax4xlDenseTight}>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <ErrorState
           title={title}

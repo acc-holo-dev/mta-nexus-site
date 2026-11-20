@@ -3,13 +3,14 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useNexusLocale } from "../../shell/locale";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { pageShellMaxXl } from "../../shell/page-shell";
 
 export function LibraryCollectionsRouteError({ reset }: { reset: () => void }) {
   const { locale } = useNexusLocale();
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const c = libraryCollectionsCopy(typedLocale);
   return (
-    <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
+    <section className={pageShellMaxXl}>
       <ErrorState
         title={c.retry}
         description={c.loadUnavailableDescription}
