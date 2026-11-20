@@ -1,29 +1,12 @@
-import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { PwaServiceWorker } from "../features/shell/pwa-service-worker";
+import { rootLayoutMetadata } from "../features/shell/root-layout-metadata-server";
 import { NexusShell } from "../features/shell/shell";
-import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n/server";
 import { bodyFont, displayFont } from "./fonts";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
-  const dictionary = getDictionary(locale);
-
-  return {
-    title: {
-      default: dictionary.meta.title,
-      template: "%s | MTA NEXUS",
-    },
-    description: dictionary.meta.description,
-    openGraph: {
-      title: dictionary.meta.title,
-      description: dictionary.meta.description,
-      type: "website",
-    },
-  };
-}
+export const generateMetadata = rootLayoutMetadata;
 
 const themeInitScript = `
 (function() {

@@ -1,15 +1,9 @@
-import { RouteHonestLoading } from "../../features/shell/route-honest-loading-server";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n/server";
+import { DictionaryRouteLoading } from "../../features/shell/route-honest-loading-server";
 
-export default async function SettingsLoading() {
-  const locale = await getRequestLocale();
-  const copy = getDictionary(locale).settings;
+export default function SettingsLoading() {
   return (
-    <RouteHonestLoading
+    <DictionaryRouteLoading
       headingId="settings-loading-heading"
-      title={copy.title}
-      loadingLabel={copy.loading}
       className="mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip"
       headerClassName=""
       statusClassName="mt-1 font-caption text-muted"
@@ -20,6 +14,10 @@ export default async function SettingsLoading() {
           <div className="h-20 rounded bg-inset" />
         </>
       }
+      pick={(dictionary) => ({
+        title: dictionary.settings.title,
+        loading: dictionary.settings.loading,
+      })}
     />
   );
 }

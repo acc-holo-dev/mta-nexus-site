@@ -107,11 +107,11 @@ it("locks managed statistics and observations loading shells to honest busy copy
   const observations = read("site/src/features/servers/server/server-observation-browser-page.tsx");
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
-  expect(statistics).toContain("HonestLoadingShell");
+  expect(statistics).toContain("RouteHonestLoading");
   expect(statistics).toContain("overflow-x-clip");
   expect(observations).toContain("ServerObservationBrowserLoading");
   expect(observations).toContain("copy.loading");
-  expect(observations).toContain("HonestLoadingShell");
+  expect(observations).toContain("RouteHonestLoading");
   expect(observations).toContain("overflow-x-clip");
   expect(read("site/src/app/workspace/servers/[id]/statistics/loading.tsx")).toContain(
     "features/servers/statistics-server",

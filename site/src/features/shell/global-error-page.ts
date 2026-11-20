@@ -1,1 +1,1 @@
-export { GlobalErrorPage, detectGlobalErrorLocale } from "./components/global-error-page";
+export { detectGlobalErrorLocale, GlobalErrorPage } from "./components/global-error-page";

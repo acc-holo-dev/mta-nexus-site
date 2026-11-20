@@ -13,7 +13,7 @@ import {
   serverStatisticsService,
 } from "../../../lib/services/servers/server-statistics-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { HonestLoadingShell } from "../../shell/honest-loading";
+import { RouteHonestLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
@@ -142,13 +142,13 @@ export async function ServerStatisticsPage({
 export async function ServerStatisticsLoading() {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return (
-    <HonestLoadingShell
-      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
+    <RouteHonestLoading
       headingId="server-statistics-loading-heading"
       title={copy.title}
       loadingLabel={copy.loading}
-    >
-      <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
-    </HonestLoadingShell>
+      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
+      rows={0}
+      leading={<div className="h-40 rounded-lg bg-inset" />}
+    />
   );
 }

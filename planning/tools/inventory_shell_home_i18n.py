@@ -79,7 +79,7 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
     },
     {
         "id": "meta.title-template",
-        "path": "site/src/app/layout.tsx",
+        "path": "site/src/features/shell/server/root-layout-metadata.tsx",
         "kind": "template",
         "text": "%s | MTA NEXUS",
     },

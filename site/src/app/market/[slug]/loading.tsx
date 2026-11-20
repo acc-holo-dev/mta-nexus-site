@@ -1,14 +1,9 @@
-import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import { DictionaryRouteLoading } from "../../../features/shell/route-honest-loading-server";
 
-export default async function Loading() {
-  const dictionary = getDictionary(await getRequestLocale());
+export default function Loading() {
   return (
-    <RouteHonestLoading
+    <DictionaryRouteLoading
       headingId="market-resource-loading-heading"
-      title={dictionary.market.title}
-      loadingLabel={dictionary.market.loading}
       className="min-w-0 space-y-6 overflow-x-clip"
       rows={0}
       leading={
@@ -19,6 +14,10 @@ export default async function Loading() {
           <div className="h-32 rounded bg-inset" />
         </>
       }
+      pick={(dictionary) => ({
+        title: dictionary.market.title,
+        loading: dictionary.market.loading,
+      })}
     />
   );
 }

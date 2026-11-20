@@ -14,7 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { HonestLoadingShell } from "../../shell/honest-loading";
+import { RouteHonestLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   parseServerObservationBrowserQuery,
@@ -385,13 +385,13 @@ function ServerObservationBrowserPanel({
 export async function ServerObservationBrowserLoading() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return (
-    <HonestLoadingShell
-      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
+    <RouteHonestLoading
       headingId="server-observations-loading-heading"
       title={copy.title}
       loadingLabel={copy.loading}
-    >
-      <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
-    </HonestLoadingShell>
+      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
+      rows={0}
+      leading={<div className="h-40 rounded-lg bg-inset" />}
+    />
   );
 }

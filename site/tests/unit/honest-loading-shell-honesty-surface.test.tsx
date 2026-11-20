@@ -58,8 +58,6 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
   }
 
   for (const relative of [
-    "site/src/features/servers/server/server-statistics-page.tsx",
-    "site/src/features/servers/server/server-observation-browser-page.tsx",
     "site/src/features/accounts/components/settings-page-client.tsx",
     "site/src/features/support/components/support-case-thread.tsx",
     "site/src/features/commerce/components/acquire-page.tsx",
@@ -67,6 +65,16 @@ it("locks Shell honest-loading port export and migrated route consumers", () => 
     const source = read(relative);
     expect(source).toContain('from "../../shell/honest-loading"');
     expect(source).toContain("<HonestLoadingShell");
+  }
+
+  for (const relative of [
+    "site/src/features/servers/server/server-statistics-page.tsx",
+    "site/src/features/servers/server/server-observation-browser-page.tsx",
+    "site/src/features/community/server/publication-feed-loading.tsx",
+  ]) {
+    const source = read(relative);
+    expect(source).toContain("route-honest-loading-server");
+    expect(source).toContain("<RouteHonestLoading");
   }
 
   const shellSource = read("site/src/features/shell/components/honest-loading-shell.tsx");

@@ -1,14 +1,9 @@
-import { RouteHonestLoading } from "../../../features/shell/route-honest-loading-server";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import { DictionaryRouteLoading } from "../../../features/shell/route-honest-loading-server";
 
-export default async function Loading() {
-  const dictionary = getDictionary(await getRequestLocale());
+export default function Loading() {
   return (
-    <RouteHonestLoading
+    <DictionaryRouteLoading
       headingId="auth-login-loading-heading"
-      title={dictionary.auth.loginTitle}
-      loadingLabel={dictionary.errors.loading}
       className="mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip py-16"
       headerClassName="space-y-2 text-center"
       rows={0}
@@ -19,6 +14,10 @@ export default async function Loading() {
           <div className="h-11 rounded bg-inset" />
         </>
       }
+      pick={(dictionary) => ({
+        title: dictionary.auth.loginTitle,
+        loading: dictionary.errors.loading,
+      })}
     />
   );
 }
