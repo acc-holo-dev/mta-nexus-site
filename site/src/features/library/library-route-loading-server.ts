@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryRouteLoading } from "./server/library-route-loading";
+export { LibraryRouteLoadingPort } from "./server/library-route-loading";

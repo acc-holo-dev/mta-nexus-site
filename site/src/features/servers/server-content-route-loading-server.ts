@@ -1,3 +1,7 @@
 import "server-only";
 
-export { ServerContentRouteLoading } from "./server/server-content-route-loading";
+export {
+  ServerContentDetailRouteLoading,
+  ServerContentNewRouteLoading,
+  ServersServerContentRouteLoading,
+} from "./server/server-content-route-loading";

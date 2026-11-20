@@ -1,3 +1,9 @@
 import "server-only";
 
-export { AuthorPublicationDeskRouteLoading } from "./server/author-publication-desk-route-loading";
+export {
+  CommunityContentHistoryRouteLoading,
+  ContentHistoryRouteLoading,
+  ContentNewRouteLoading,
+  EditPublicationRouteLoading,
+  PublicationDeskRouteLoading,
+} from "./server/author-publication-desk-route-loading";

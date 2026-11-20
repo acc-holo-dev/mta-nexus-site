@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function LibraryReleaseHistoryRouteLoading({
+function LibraryReleaseHistoryRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,15 @@ export function LibraryReleaseHistoryRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function LibraryVersionHistoryRouteLoading() {
+  return LibraryReleaseHistoryRouteLoading({
+    headingId: "library-version-history-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

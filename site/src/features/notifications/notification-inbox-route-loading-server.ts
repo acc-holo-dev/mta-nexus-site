@@ -1,3 +1,3 @@
 import "server-only";
 
-export { NotificationInboxRouteLoading } from "./server/notification-inbox-route-loading";
+export { NotificationsNotificationInboxRouteLoading } from "./server/notification-inbox-route-loading";

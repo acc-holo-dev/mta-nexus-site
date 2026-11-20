@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function VerificationWorkspaceRouteLoading({
+function VerificationWorkspaceRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,15 @@ export function VerificationWorkspaceRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function VerificationRouteLoading() {
+  return VerificationWorkspaceRouteLoading({
+    headingId: "verification-loading-heading",
+    className: pageShellMax5xl,
+    titleClassName: "text-xl font-semibold text-primary",
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

@@ -1,3 +1,7 @@
 import "server-only";
 
-export { AdminResourceRouteLoading } from "./server/admin-resource-route-loading";
+export {
+  AdminResourceBuildPackageRouteLoading,
+  AdminResourceBuildRouteLoading,
+  AdminResourceMediaRouteLoading,
+} from "./server/admin-resource-route-loading";

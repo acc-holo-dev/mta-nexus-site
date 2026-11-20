@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryReleaseHistoryRouteLoading } from "./server/library-release-history-route-loading";
+export { LibraryVersionHistoryRouteLoading } from "./server/library-release-history-route-loading";

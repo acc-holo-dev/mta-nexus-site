@@ -1,3 +1,3 @@
 import "server-only";
 
-export { PublicVerificationHistoryRouteLoading } from "./server/public-verification-history-route-loading";
+export { UserTrustHistoryRouteLoading } from "./server/public-verification-history-route-loading";

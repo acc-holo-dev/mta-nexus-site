@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function SupportMessageDiscoveryRouteLoading({
+function SupportMessageDiscoveryRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -66,5 +66,16 @@ export function SupportMessageDiscoveryRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SupportMessagesRouteLoading() {
+  return SupportMessageDiscoveryRouteLoading({
+    headingId: "support-messages-loading-heading",
+    className: pageShellMax4xlTight,
+    headerClassName: "space-y-3 border-b border-base pb-6",
+    titleClassName: "text-2xl font-extrabold text-primary",
+    leading: <div className="h-10 w-full max-w-md rounded bg-inset" />,
+    titleKey: "title",
   });
 }

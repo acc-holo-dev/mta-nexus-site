@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import { pageShellMax3xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { serverContentCopy } from "../server-content-copy";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ServerContentRouteLoading({
+function ServerContentRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,35 @@ export function ServerContentRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ServerContentDetailRouteLoading() {
+  return ServerContentRouteLoading({
+    headingId: "server-content-detail-loading-heading",
+    className: pageShellMax3xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function ServersServerContentRouteLoading() {
+  return ServerContentRouteLoading({
+    headingId: "server-content-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function ServerContentNewRouteLoading() {
+  return ServerContentRouteLoading({
+    headingId: "server-content-new-loading-heading",
+    className: pageShellMax3xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "new",
   });
 }

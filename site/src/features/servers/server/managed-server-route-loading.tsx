@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { pageShellMax6xl } from "../../shell/page-shell";
+import { getDictionary } from "../../../lib/i18n";
+import { pageShellMax4xl, pageShellMax6xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getManagedServerCopy } from "../managed-server-view";
 
@@ -8,7 +9,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ManagedServerRouteLoading({
+function ManagedServerRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +63,27 @@ export function ManagedServerRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ServerManagementRouteLoading() {
+  return ManagedServerRouteLoading({
+    headingId: "server-management-loading-heading",
+    className: pageShellMax4xl,
+    titleClassName: "text-2xl font-black text-primary",
+    rows: 3,
+    rowClassName: "h-32 rounded bg-inset",
+    leading: <div className="h-24 rounded bg-inset" />,
+    title: (locale) => getDictionary(locale).serverManagement.listingDetails,
+    loading: (locale) => getDictionary(locale).serverDetail.loading,
+  });
+}
+
+export function ManagedServersRouteLoading() {
+  return ManagedServerRouteLoading({
+    headingId: "managed-servers-loading-heading",
+    className: pageShellMax6xl,
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

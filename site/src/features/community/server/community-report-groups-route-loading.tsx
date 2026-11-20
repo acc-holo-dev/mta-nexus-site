@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xlTight } from "../../shell/page-shell";
+import { pageShellMax4xlTight, pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function CommunityReportGroupsRouteLoading({
+function CommunityReportGroupsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,25 @@ export function CommunityReportGroupsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminPublicationReportsRouteLoading() {
+  return CommunityReportGroupsRouteLoading({
+    headingId: "admin-publication-reports-loading-heading",
+    className: pageShellMax4xlTight,
+    titleClassName: "text-2xl font-extrabold text-primary",
+    leading: <div className="h-24 rounded bg-inset" />,
+    titleKey: "publicationTitle",
+    loadingKey: "publicationLoading",
+  });
+}
+
+export function ReportGroupsRouteLoading() {
+  return CommunityReportGroupsRouteLoading({
+    headingId: "report-groups-loading-heading",
+    className: pageShellMax5xlTight,
+    leading: <div className="h-32 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

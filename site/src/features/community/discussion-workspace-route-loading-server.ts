@@ -1,3 +1,3 @@
 import "server-only";
 
-export { DiscussionWorkspaceRouteLoading } from "./server/discussion-workspace-route-loading";
+export { DiscussionsRouteLoading } from "./server/discussion-workspace-route-loading";

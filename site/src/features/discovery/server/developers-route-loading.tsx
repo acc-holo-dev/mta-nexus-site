@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
-export function DevelopersRouteLoading({
+function DevelopersRouteLoading({
   headingId,
   titlePath,
   loadingPath = "developers.loading",
@@ -42,5 +42,28 @@ export function DevelopersRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function DeveloperRouteLoading() {
+  return DevelopersRouteLoading({
+    headingId: "developer-loading-heading",
+    titlePath: "developers.creatorProfile",
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-28 max-w-full rounded bg-inset" />
+        <div className="h-40 max-w-full rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function DiscoveryDevelopersRouteLoading() {
+  return DevelopersRouteLoading({
+    headingId: "developers-loading-heading",
+    titlePath: "developers.title",
+    headerClassName: "space-y-2 border-b border-base pb-6",
+    titleClassName: "text-2xl font-extrabold text-primary",
   });
 }

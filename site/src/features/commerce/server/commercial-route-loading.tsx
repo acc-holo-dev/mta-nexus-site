@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getCommercialCopy } from "../commercial-i18n";
+import { subscriptionsCopy } from "../subscriptions-i18n";
 
 type CommercialCopy = ReturnType<typeof getCommercialCopy>;
 type CommercialStringKey = {
   [K in keyof CommercialCopy]-?: CommercialCopy[K] extends string ? K : never;
 }[keyof CommercialCopy];
 
-export function CommercialRouteLoading({
+function CommercialRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +64,44 @@ export function CommercialRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminPlanDetailRouteLoading() {
+  return CommercialRouteLoading({
+    headingId: "admin-plan-detail-loading-heading",
+    className: pageShellMax4xl,
+    titleKey: "admin",
+  });
+}
+
+export function AdminPlansRouteLoading() {
+  return CommercialRouteLoading({
+    headingId: "admin-plans-loading-heading",
+    titleKey: "admin",
+  });
+}
+
+export function AdminPlanNewRouteLoading() {
+  return CommercialRouteLoading({
+    headingId: "admin-plan-new-loading-heading",
+    className: pageShellMax4xl,
+    titleKey: "newPlan",
+  });
+}
+
+export function PurchaseOperationsRouteLoading() {
+  return CommercialRouteLoading({
+    headingId: "purchase-operations-loading-heading",
+    titleKey: "paymentOperations",
+  });
+}
+
+export function SubscriptionsCatalogRouteLoading() {
+  return CommercialRouteLoading({
+    headingId: "subscriptions-catalog-loading-heading",
+    rowClassName: "h-28 rounded bg-inset",
+    titleKey: "catalog",
+    loading: (locale) => subscriptionsCopy(locale).loading,
   });
 }

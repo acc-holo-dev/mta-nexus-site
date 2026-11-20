@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { pageShellMaxMdAuthTall } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
-export function AuthRouteLoading({
+function AuthRouteLoading({
   headingId,
   titlePath,
   loadingPath = "errors.loading",
@@ -36,5 +36,90 @@ export function AuthRouteLoading({
     rows,
     rowClassName,
     ...(leading !== undefined ? { leading } : {}),
+  });
+}
+
+export function AuthForgotRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-forgot-loading-heading",
+    titlePath: "recovery.forgotTitle",
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function AuthLoginRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-login-loading-heading",
+    titlePath: "auth.loginTitle",
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function AuthRegisterRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-register-loading-heading",
+    titlePath: "auth.registerTitle",
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function AuthResetRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-reset-loading-heading",
+    titlePath: "recovery.resetTitle",
+    loadingPath: "recovery.checkingReset",
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-11 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function AuthVerifyEmailRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-verify-email-loading-heading",
+    titlePath: "recovery.verifyTitle",
+    loadingPath: "recovery.checkingVerification",
+    leading: (
+      <>
+        <div className="h-28 rounded bg-inset" />
+        <div className="h-11 w-40 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function AuthVerifyRouteLoading() {
+  return AuthRouteLoading({
+    headingId: "auth-verify-loading-heading",
+    titlePath: "recovery.verifyTitle",
+    loadingPath: "recovery.checkingVerification",
+    leading: (
+      <>
+        <div className="h-28 rounded bg-inset" />
+        <div className="h-11 w-40 rounded bg-inset" />
+      </>
+    ),
   });
 }

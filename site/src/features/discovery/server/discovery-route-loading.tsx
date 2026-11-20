@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function DiscoveryRouteLoading({
+function DiscoveryRouteLoading({
   headingId,
   titleKey,
   loadingKey = "organizationsLoading",
@@ -66,5 +66,17 @@ export function DiscoveryRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function DiscoveryOrganizationsRouteLoading() {
+  return DiscoveryRouteLoading({
+    headingId: "organizations-loading-heading",
+    className: pageShellStack6,
+    rowClassName: "h-24 max-w-full rounded bg-inset",
+    rows: 4,
+    leading: <div className="h-11 max-w-full rounded bg-inset" />,
+    titleKey: "organizationsTitle",
+    loadingKey: "organizationsLoading",
   });
 }

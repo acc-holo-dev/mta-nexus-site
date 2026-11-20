@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PublicVerificationHistoryRouteLoading({
+function PublicVerificationHistoryRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,13 @@ export function PublicVerificationHistoryRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function UserTrustHistoryRouteLoading() {
+  return PublicVerificationHistoryRouteLoading({
+    headingId: "user-trust-history-loading-heading",
+    className: pageShellMax4xlTight,
+    titleKey: "title",
   });
 }

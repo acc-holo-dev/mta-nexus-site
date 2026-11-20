@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ResourceRequirementsRouteLoading({
+function ResourceRequirementsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,25 @@ export function ResourceRequirementsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminResourceRequirementsRouteLoading() {
+  return ResourceRequirementsRouteLoading({
+    headingId: "admin-resource-requirements-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function LibraryRequirementsRouteLoading() {
+  return ResourceRequirementsRouteLoading({
+    headingId: "library-requirements-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

@@ -1,3 +1,6 @@
 import "server-only";
 
-export { DevelopersRouteLoading } from "./server/developers-route-loading";
+export {
+  DeveloperRouteLoading,
+  DiscoveryDevelopersRouteLoading,
+} from "./server/developers-route-loading";

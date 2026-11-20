@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function SellerSalesRouteLoading({
+function SellerSalesRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,31 @@ export function SellerSalesRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SalesReportDetailRouteLoading() {
+  return SellerSalesRouteLoading({
+    headingId: "sales-report-detail-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "detail",
+    loadingKey: "detailLoading",
+  });
+}
+
+export function SalesReportRouteLoading() {
+  return SellerSalesRouteLoading({
+    headingId: "sales-report-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: (
+      <>
+        <div className="h-10 w-72 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
   });
 }

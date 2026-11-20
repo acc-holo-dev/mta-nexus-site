@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PlatformReportRouteLoading({
+function PlatformReportRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,29 @@ export function PlatformReportRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function PlatformReportDetailRouteLoading() {
+  return PlatformReportRouteLoading({
+    headingId: "platform-report-detail-loading-heading",
+    className: pageShellMax5xl,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-28 rounded bg-inset" />
+        <div className="h-40 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "detail",
+  });
+}
+
+export function PlatformReportsRouteLoading() {
+  return PlatformReportRouteLoading({
+    headingId: "platform-reports-loading-heading",
+    className: pageShellMax5xl,
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

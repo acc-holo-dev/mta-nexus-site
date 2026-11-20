@@ -1,3 +1,3 @@
 import "server-only";
 
-export { SupportMessageDiscoveryRouteLoading } from "./server/support-message-discovery-route-loading";
+export { SupportMessagesRouteLoading } from "./server/support-message-discovery-route-loading";

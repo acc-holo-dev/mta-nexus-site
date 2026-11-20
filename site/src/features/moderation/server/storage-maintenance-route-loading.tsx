@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function StorageMaintenanceRouteLoading({
+function StorageMaintenanceRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,24 @@ export function StorageMaintenanceRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminStorageRouteLoading() {
+  return StorageMaintenanceRouteLoading({
+    headingId: "admin-storage-loading-heading",
+    className: pageShellMax5xl,
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function AdminStorageObjectRouteLoading() {
+  return StorageMaintenanceRouteLoading({
+    headingId: "admin-storage-object-loading-heading",
+    className: pageShellMax4xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "detail",
   });
 }

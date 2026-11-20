@@ -4,6 +4,7 @@ import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -381,7 +382,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
+    <div className={pageShellMax2xlStandard}>
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.resourceTitle}</h1>
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>

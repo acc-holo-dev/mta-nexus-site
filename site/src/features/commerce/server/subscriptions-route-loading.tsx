@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function SubscriptionsRouteLoading({
+function SubscriptionsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,47 @@ export function SubscriptionsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SubscriptionsActivateRouteLoading() {
+  return SubscriptionsRouteLoading({
+    headingId: "subscriptions-activate-loading-heading",
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-10 w-64 rounded bg-inset" />
+        <div className="h-28 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "activate",
+  });
+}
+
+export function SubscriptionsHistoryRouteLoading() {
+  return SubscriptionsRouteLoading({
+    headingId: "subscriptions-history-loading-heading",
+    rows: 4,
+    titleKey: "history",
+  });
+}
+
+export function CommerceSubscriptionsRouteLoading() {
+  return SubscriptionsRouteLoading({
+    headingId: "subscriptions-loading-heading",
+    leading: (
+      <>
+        <div className="h-10 w-64 rounded bg-inset" />
+        <div className="h-28 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
+  });
+}
+
+export function SubscriptionReceiptRouteLoading() {
+  return SubscriptionsRouteLoading({
+    headingId: "subscription-receipt-loading-heading",
+    titleKey: "recorded",
   });
 }

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryMembershipHistoryRouteLoading } from "./server/library-membership-history-route-loading";
+export { MembershipHistoryRouteLoading } from "./server/library-membership-history-route-loading";

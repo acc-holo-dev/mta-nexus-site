@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function OrderTermsRouteLoading({
+function OrderTermsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "termsLoading",
@@ -63,5 +63,27 @@ export function OrderTermsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminReconciliationTermsRouteLoading() {
+  return OrderTermsRouteLoading({
+    headingId: "admin-reconciliation-terms-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 max-w-full rounded bg-inset" />,
+    titleKey: "title",
+    loadingKey: "termsLoading",
+  });
+}
+
+export function PurchaseTermsRouteLoading() {
+  return OrderTermsRouteLoading({
+    headingId: "purchase-terms-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
+    loadingKey: "termsLoading",
   });
 }

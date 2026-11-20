@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { pageShellMax3xlRoomy } from "../../shell/page-shell";
+import { pageShellMax3xl, pageShellMax3xlRoomy } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
-export function SettingsRouteLoading({
+function SettingsRouteLoading({
   headingId = "settings-loading-heading",
   titlePath = "settings.title",
   loadingPath = "settings.loading",
@@ -45,5 +45,21 @@ export function SettingsRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function DeveloperSettingsRouteLoading() {
+  return SettingsRouteLoading({
+    headingId: "developer-settings-loading-heading",
+    className: pageShellMax3xl,
+    rowClassName: "h-24 rounded bg-inset",
+    leading: <div className="h-28 rounded bg-inset" />,
+  });
+}
+
+export function SettingsIndexRouteLoading() {
+  return SettingsRouteLoading({
+    headerClassName: "",
+    statusClassName: "mt-1 font-caption text-muted",
   });
 }

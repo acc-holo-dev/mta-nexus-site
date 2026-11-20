@@ -1,3 +1,3 @@
 import "server-only";
 
-export { CommunityReportHistoryRouteLoading } from "./server/community-report-history-route-loading";
+export { ReportHistoryRouteLoading } from "./server/community-report-history-route-loading";

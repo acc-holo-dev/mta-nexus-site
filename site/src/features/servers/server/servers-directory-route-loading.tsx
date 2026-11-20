@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellStack8 } from "../../shell/page-shell";
+import { pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
 export function ServersDirectoryRouteLoading({
@@ -38,5 +38,22 @@ export function ServersDirectoryRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function ServerDetailRouteLoading() {
+  return ServersDirectoryRouteLoading({
+    headingId: "server-detail-loading-heading",
+    titlePath: "serverDetail.breadcrumb",
+    loadingPath: "serverDetail.loading",
+    className: pageShellStack6,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-32 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+        <div className="h-40 rounded bg-inset" />
+      </>
+    ),
   });
 }

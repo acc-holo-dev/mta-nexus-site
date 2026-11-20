@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ContentReactionRouteLoading({
+function ContentReactionRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,14 @@ export function ContentReactionRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ReactionsRouteLoading() {
+  return ContentReactionRouteLoading({
+    headingId: "reactions-loading-heading",
+    className: pageShellMax4xl,
+    leading: <div className="h-24 rounded bg-inset" />,
+    titleKey: "my",
   });
 }

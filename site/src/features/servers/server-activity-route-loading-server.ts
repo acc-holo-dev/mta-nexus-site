@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ServerActivityRouteLoading } from "./server/server-activity-route-loading";
+export { ServersServerActivityRouteLoading } from "./server/server-activity-route-loading";

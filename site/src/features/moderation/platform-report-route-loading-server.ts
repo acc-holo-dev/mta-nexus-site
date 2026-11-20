@@ -1,3 +1,6 @@
 import "server-only";
 
-export { PlatformReportRouteLoading } from "./server/platform-report-route-loading";
+export {
+  PlatformReportDetailRouteLoading,
+  PlatformReportsRouteLoading,
+} from "./server/platform-report-route-loading";

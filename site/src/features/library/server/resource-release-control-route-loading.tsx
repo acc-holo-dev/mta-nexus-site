@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ResourceReleaseControlRouteLoading({
+function ResourceReleaseControlRouteLoading({
   headingId,
   titleKey,
   loadingKey = "moderationLoading",
@@ -63,5 +63,42 @@ export function ResourceReleaseControlRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminResourceDetailRouteLoading() {
+  return ResourceReleaseControlRouteLoading({
+    headingId: "admin-resource-detail-loading-heading",
+    rowClassName: "h-16 rounded bg-inset",
+    leading: <div className="h-32 rounded bg-inset" />,
+    titleKey: "moderation",
+    loadingKey: "moderationLoading",
+  });
+}
+
+export function AdminResourcesRouteLoading() {
+  return ResourceReleaseControlRouteLoading({
+    headingId: "admin-resources-loading-heading",
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "moderation",
+    loadingKey: "moderationLoading",
+  });
+}
+
+export function LibraryVersionsRouteLoading() {
+  return ResourceReleaseControlRouteLoading({
+    headingId: "library-versions-loading-heading",
+    titleKey: "versions",
+    loadingKey: "updatesLoading",
+  });
+}
+
+export function LibraryUpdatesRouteLoading() {
+  return ResourceReleaseControlRouteLoading({
+    headingId: "library-updates-loading-heading",
+    rowClassName: "h-32 rounded bg-inset",
+    leading: <div className="h-12 rounded bg-inset" />,
+    titleKey: "updates",
+    loadingKey: "updatesLoading",
   });
 }

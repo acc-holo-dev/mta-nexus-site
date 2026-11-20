@@ -1,3 +1,9 @@
 import "server-only";
 
-export { CommercialRouteLoading } from "./server/commercial-route-loading";
+export {
+  AdminPlanDetailRouteLoading,
+  AdminPlanNewRouteLoading,
+  AdminPlansRouteLoading,
+  PurchaseOperationsRouteLoading,
+  SubscriptionsCatalogRouteLoading,
+} from "./server/commercial-route-loading";

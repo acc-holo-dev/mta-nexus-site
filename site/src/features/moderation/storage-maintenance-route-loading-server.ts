@@ -1,3 +1,6 @@
 import "server-only";
 
-export { StorageMaintenanceRouteLoading } from "./server/storage-maintenance-route-loading";
+export {
+  AdminStorageObjectRouteLoading,
+  AdminStorageRouteLoading,
+} from "./server/storage-maintenance-route-loading";

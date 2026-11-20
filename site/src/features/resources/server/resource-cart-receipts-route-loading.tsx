@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ResourceCartReceiptsRouteLoading({
+function ResourceCartReceiptsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,24 @@ export function ResourceCartReceiptsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AcquisitionReceiptDetailRouteLoading() {
+  return ResourceCartReceiptsRouteLoading({
+    headingId: "acquisition-receipt-detail-loading-heading",
+    className: pageShellMax5xl,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function AcquisitionReceiptsRouteLoading() {
+  return ResourceCartReceiptsRouteLoading({
+    headingId: "acquisition-receipts-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

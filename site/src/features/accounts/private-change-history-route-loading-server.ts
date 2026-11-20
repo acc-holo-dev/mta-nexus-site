@@ -1,3 +1,3 @@
 import "server-only";
 
-export { PrivateChangeHistoryRouteLoading } from "./server/private-change-history-route-loading";
+export { SettingsHistoryRouteLoading } from "./server/private-change-history-route-loading";

@@ -1,8 +1,5 @@
-import { LibraryCollectionsRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
+import { CollectionVersionsRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
 
 export default async function Loading() {
-  return LibraryCollectionsRouteLoading({
-    headingId: "collection-versions-loading-heading",
-    titleKey: "versions",
-  });
+  return CollectionVersionsRouteLoading();
 }

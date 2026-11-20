@@ -1,5 +1,6 @@
 import type { PlanReviewDetail } from "@nexus/domain";
 import Link from "next/link";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -16,7 +17,7 @@ export function PlanReviewDetailView({
     r = detail.review,
     context = organizationId ? `?${new URLSearchParams({ organizationId })}` : "";
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href={`/workspace/subscriptions/reviews${context}`}
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

@@ -1,3 +1,6 @@
 import "server-only";
 
-export { CommunityReportGroupsRouteLoading } from "./server/community-report-groups-route-loading";
+export {
+  AdminPublicationReportsRouteLoading,
+  ReportGroupsRouteLoading,
+} from "./server/community-report-groups-route-loading";

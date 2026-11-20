@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function OrderCaseRouteLoading({
+function OrderCaseRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,35 @@ export function OrderCaseRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function OrderCaseDetailRouteLoading() {
+  return OrderCaseRouteLoading({
+    headingId: "order-case-detail-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function OrderCasesRouteLoading() {
+  return OrderCaseRouteLoading({
+    headingId: "order-cases-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "buyerCases",
+  });
+}
+
+export function PurchaseSupportRouteLoading() {
+  return OrderCaseRouteLoading({
+    headingId: "purchase-support-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "create",
   });
 }

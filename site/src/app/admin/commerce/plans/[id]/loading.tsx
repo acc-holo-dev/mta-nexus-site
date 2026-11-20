@@ -1,10 +1,5 @@
-import { CommercialRouteLoading } from "../../../../../features/commerce/commercial-route-loading-server";
-import { pageShellMax4xl } from "../../../../../features/shell/page-shell";
+import { AdminPlanDetailRouteLoading } from "../../../../../features/commerce/commercial-route-loading-server";
 
 export default async function Loading() {
-  return CommercialRouteLoading({
-    headingId: "admin-plan-detail-loading-heading",
-    className: pageShellMax4xl,
-    titleKey: "admin",
-  });
+  return AdminPlanDetailRouteLoading();
 }

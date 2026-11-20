@@ -1,14 +1,20 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xlTight } from "../../shell/page-shell";
+import {
+  pageShellMax3xlTight,
+  pageShellMax4xlDense,
+  pageShellMax5xl,
+  pageShellMax5xlTight,
+} from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Copy = ReturnType<typeof authorPublicationDeskCopy>;
 type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function AuthorPublicationDeskRouteLoading({
+function AuthorPublicationDeskRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +69,63 @@ export function AuthorPublicationDeskRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ContentHistoryRouteLoading() {
+  return AuthorPublicationDeskRouteLoading({
+    headingId: "content-history-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    titleKey: "history",
+  });
+}
+
+export function PublicationDeskRouteLoading() {
+  return AuthorPublicationDeskRouteLoading({
+    headingId: "publication-desk-loading-heading",
+    leading: <div className="h-32 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function ContentNewRouteLoading() {
+  return AuthorPublicationDeskRouteLoading({
+    headingId: "content-new-loading-heading",
+    className: pageShellMax3xlTight,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-64 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
+  });
+}
+
+export function CommunityContentHistoryRouteLoading() {
+  return AuthorPublicationDeskRouteLoading({
+    headingId: "content-history-loading-heading",
+    className: pageShellMax4xlDense,
+    headerClassName: "",
+    titleClassName: "text-xl font-semibold text-primary",
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function EditPublicationRouteLoading() {
+  return AuthorPublicationDeskRouteLoading({
+    headingId: "edit-publication-loading-heading",
+    className: pageShellMax3xlTight,
+    rowClassName: "h-16 rounded bg-inset",
+    leading: (
+      <>
+        <div className="h-10 w-40 rounded bg-inset" />
+        <div className="h-32 rounded bg-inset" />
+      </>
+    ),
+    title: (locale) => getUserPlatformCopy(locale).edit,
   });
 }

@@ -1,8 +1,5 @@
-import { CommerceHistoryRouteLoading } from "../../../features/commerce/commerce-history-route-loading-server";
+import { LicensesRouteLoading } from "../../../features/commerce/commerce-history-route-loading-server";
 
 export default async function Loading() {
-  return CommerceHistoryRouteLoading({
-    headingId: "licenses-loading-heading",
-    titleKey: "licensesTitle",
-  });
+  return LicensesRouteLoading();
 }

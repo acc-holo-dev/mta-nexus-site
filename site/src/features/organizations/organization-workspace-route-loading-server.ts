@@ -1,3 +1,7 @@
 import "server-only";
 
-export { OrganizationWorkspaceRouteLoading } from "./server/organization-workspace-route-loading";
+export {
+  OrganizationRouteLoading,
+  OrganizationsRouteLoading,
+  OrgNewRouteLoading,
+} from "./server/organization-workspace-route-loading";

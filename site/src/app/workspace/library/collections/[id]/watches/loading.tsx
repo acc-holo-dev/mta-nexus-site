@@ -1,12 +1,5 @@
-import { ResourceReleaseWatchesRouteLoading } from "../../../../../../features/resources/resource-release-watches-route-loading-server";
-import { pageShellMax5xl } from "../../../../../../features/shell/page-shell";
+import { CollectionWatchesRouteLoading } from "../../../../../../features/resources/resource-release-watches-route-loading-server";
 
 export default async function Loading() {
-  return ResourceReleaseWatchesRouteLoading({
-    headingId: "collection-watches-loading-heading",
-    className: pageShellMax5xl,
-    rows: 4,
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
-    titleKey: "title",
-  });
+  return CollectionWatchesRouteLoading();
 }

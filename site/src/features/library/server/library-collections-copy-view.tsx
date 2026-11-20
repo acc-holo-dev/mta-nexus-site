@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -20,7 +21,7 @@ export async function LibraryCollectionsCopyView({
   const c = libraryCollectionsCopy(locale);
   const preview = await service.copyPreview(actor, id);
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
+    <div className={pageShellMax2xlStandard}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>

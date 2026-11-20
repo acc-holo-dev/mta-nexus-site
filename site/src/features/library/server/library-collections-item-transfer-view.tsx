@@ -1,6 +1,7 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
@@ -34,7 +35,7 @@ export async function LibraryCollectionsItemTransferView({
   const query = collectionsQuery(collectionPageParams(queryValues), "detail");
   const result = await service.copyItemsPage(actor, id, query);
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className={pageShellMax4xl}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>

@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function DiscoveryStreamRouteLoading({
+function DiscoveryStreamRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,14 @@ export function DiscoveryStreamRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function DiscoverStreamRouteLoading() {
+  return DiscoveryStreamRouteLoading({
+    headingId: "discover-stream-loading-heading",
+    className: pageShellMax4xlTight,
+    leading: <div className="h-24 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

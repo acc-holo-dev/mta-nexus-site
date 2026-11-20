@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ResourceActivityRouteLoading({
+function ResourceActivityRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,15 @@ export function ResourceActivityRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AcquisitionsRouteLoading() {
+  return ResourceActivityRouteLoading({
+    headingId: "acquisitions-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "history",
   });
 }

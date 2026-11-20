@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { pageShellStack6 } from "../../shell/page-shell";
+import { pageShellMax3xl, pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
-export function CommunityCatalogRouteLoading({
+function CommunityCatalogRouteLoading({
   headingId = "community-loading-heading",
   titlePath = "community.title",
   loadingPath = "community.loading",
@@ -38,5 +38,27 @@ export function CommunityCatalogRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function CommunityNewRouteLoading() {
+  return CommunityCatalogRouteLoading({
+    headingId: "community-new-loading-heading",
+    titlePath: "community.startTitle",
+    className: pageShellMax3xl,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-11 rounded bg-inset" />
+        <div className="h-40 rounded bg-inset" />
+        <div className="h-28 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function CommunityCatalogIndexRouteLoading() {
+  return CommunityCatalogRouteLoading({
+    headerClassName: "space-y-2 border-b border-base pb-5",
   });
 }

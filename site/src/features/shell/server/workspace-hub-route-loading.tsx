@@ -40,3 +40,21 @@ export function WorkspaceHubRouteLoading({
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
   });
 }
+
+export function LibraryVersionsCompareRouteLoading() {
+  return WorkspaceHubRouteLoading({
+    headingId: "library-versions-compare-loading-heading",
+    titlePath: "workspace.libraryTitle",
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+  });
+}
+
+export function LibraryDownloadRouteLoading() {
+  return WorkspaceHubRouteLoading({
+    headingId: "library-download-loading-heading",
+    titlePath: "workspace.libraryTitle",
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+  });
+}

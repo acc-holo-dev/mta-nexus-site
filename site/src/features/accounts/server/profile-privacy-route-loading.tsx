@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ProfilePrivacyRouteLoading({
+function ProfilePrivacyRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,21 @@ export function ProfilePrivacyRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AccountsPrivacyRouteLoading() {
+  return ProfilePrivacyRouteLoading({
+    headingId: "privacy-loading-heading",
+    className: pageShellMax3xl,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-28 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
   });
 }

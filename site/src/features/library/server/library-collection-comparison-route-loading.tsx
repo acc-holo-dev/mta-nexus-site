@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function LibraryCollectionComparisonRouteLoading({
+function LibraryCollectionComparisonRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,19 @@ export function LibraryCollectionComparisonRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function CollectionCompareRouteLoading() {
+  return LibraryCollectionComparisonRouteLoading({
+    headingId: "collection-compare-loading-heading",
+    className: pageShellMax5xl,
+    leading: (
+      <>
+        <div className="h-10 w-72 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
   });
 }

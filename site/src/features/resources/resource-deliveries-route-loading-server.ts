@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceDeliveriesRouteLoading } from "./server/resource-deliveries-route-loading";
+export { LibraryDownloadsRouteLoading } from "./server/resource-deliveries-route-loading";

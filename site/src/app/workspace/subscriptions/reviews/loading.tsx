@@ -1,12 +1,5 @@
-import { PlanReviewsRouteLoading } from "../../../../features/commerce/plan-reviews-route-loading-server";
-import { pageShellMax5xl } from "../../../../features/shell/page-shell";
+import { SubscriptionReviewsRouteLoading } from "../../../../features/commerce/plan-reviews-route-loading-server";
 
 export default async function Loading() {
-  return PlanReviewsRouteLoading({
-    headingId: "subscription-reviews-loading-heading",
-    className: pageShellMax5xl,
-    rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
-    titleKey: "title",
-  });
+  return SubscriptionReviewsRouteLoading();
 }

@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function DiscussionWorkspaceRouteLoading({
+function DiscussionWorkspaceRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,15 @@ export function DiscussionWorkspaceRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function DiscussionsRouteLoading() {
+  return DiscussionWorkspaceRouteLoading({
+    headingId: "discussions-loading-heading",
+    className: pageShellMax4xl,
+    rowClassName: "h-24 rounded bg-inset",
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

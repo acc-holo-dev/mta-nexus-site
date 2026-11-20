@@ -2,6 +2,7 @@ import {
   ResourceBuildScreen,
   resourceBuildMetadata,
 } from "../../../../../../features/resources/build-server";
+import { pageShellClip } from "../../../../../../features/shell/page-shell";
 export const dynamic = "force-dynamic";
 export const generateMetadata = resourceBuildMetadata;
 export default async function Page({
@@ -11,7 +12,7 @@ export default async function Page({
 }) {
   const { id, buildId } = await params;
   return (
-    <div className="min-w-0 overflow-x-clip">
+    <div className={pageShellClip}>
       <ResourceBuildScreen productId={id} buildId={buildId} />
     </div>
   );

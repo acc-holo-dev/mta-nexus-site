@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import {
+  pageShellMax3xlCompact,
+  pageShellMax5xl,
+  pageShellMax5xlCompact,
+} from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 
@@ -8,7 +12,7 @@ type OrgStringKey = {
   [K in keyof OrgCopy]-?: OrgCopy[K] extends string ? K : never;
 }[keyof OrgCopy];
 
-export function OrganizationWorkspaceRouteLoading({
+function OrganizationWorkspaceRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -54,5 +58,31 @@ export function OrganizationWorkspaceRouteLoading({
         loading: copy[loadingKey],
       };
     },
+  });
+}
+
+export function OrganizationRouteLoading() {
+  return OrganizationWorkspaceRouteLoading({
+    headingId: "organization-loading-heading",
+    className: pageShellMax5xlCompact,
+    rowClassName: "h-28 rounded bg-inset",
+    titleKey: "profile",
+  });
+}
+
+export function OrganizationsRouteLoading() {
+  return OrganizationWorkspaceRouteLoading({
+    headingId: "organizations-loading-heading",
+    titleKey: "title",
+    loadingKey: "listLoading",
+    leading: <div className="h-28 rounded bg-inset" />,
+  });
+}
+
+export function OrgNewRouteLoading() {
+  return OrganizationWorkspaceRouteLoading({
+    headingId: "org-new-loading-heading",
+    className: pageShellMax3xlCompact,
+    titleKey: "create",
   });
 }

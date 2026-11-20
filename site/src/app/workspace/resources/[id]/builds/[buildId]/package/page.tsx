@@ -2,6 +2,7 @@ import {
   BuildPackageScreen,
   buildPackageMetadata,
 } from "../../../../../../../features/resources/package-server";
+import { pageShellClip } from "../../../../../../../features/shell/page-shell";
 export const dynamic = "force-dynamic";
 export const generateMetadata = buildPackageMetadata;
 export default async function Page({
@@ -13,7 +14,7 @@ export default async function Page({
 }) {
   const { id, buildId } = await params;
   return (
-    <div className="min-w-0 overflow-x-clip">
+    <div className={pageShellClip}>
       <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} />
     </div>
   );

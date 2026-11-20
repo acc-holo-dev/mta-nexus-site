@@ -1,3 +1,3 @@
 import "server-only";
 
-export { OrganizationTeamRouteLoading } from "./server/organization-team-route-loading";
+export { OrganizationsOrganizationTeamRouteLoading } from "./server/organization-team-route-loading";

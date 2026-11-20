@@ -1,3 +1,6 @@
 import "server-only";
 
-export { OrderTermsRouteLoading } from "./server/order-terms-route-loading";
+export {
+  AdminReconciliationTermsRouteLoading,
+  PurchaseTermsRouteLoading,
+} from "./server/order-terms-route-loading";

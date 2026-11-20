@@ -2,8 +2,11 @@ import type { ReactNode } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { buildPackageCopy } from "../build-package-i18n";
+import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
 
-export function AdminResourceRouteLoading({
+function AdminResourceRouteLoading({
   headingId,
   title,
   className = pageShellMax5xl,
@@ -42,5 +45,26 @@ export function AdminResourceRouteLoading({
         loading: getDictionary(typedLocale).admin.loading,
       };
     },
+  });
+}
+
+export function AdminResourceBuildRouteLoading() {
+  return AdminResourceRouteLoading({
+    headingId: "admin-resource-build-loading-heading",
+    title: (locale) => getResourceBuildWorkspaceCopy(locale).title,
+  });
+}
+
+export function AdminResourceBuildPackageRouteLoading() {
+  return AdminResourceRouteLoading({
+    headingId: "admin-resource-build-package-loading-heading",
+    title: (locale) => buildPackageCopy(locale).inventory,
+  });
+}
+
+export function AdminResourceMediaRouteLoading() {
+  return AdminResourceRouteLoading({
+    headingId: "admin-resource-media-loading-heading",
+    title: (locale) => resourceMediaCopy(locale).title,
   });
 }

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { FollowWorkspaceRouteLoading } from "./server/follow-workspace-route-loading";
+export { SavedFollowsRouteLoading } from "./server/follow-workspace-route-loading";

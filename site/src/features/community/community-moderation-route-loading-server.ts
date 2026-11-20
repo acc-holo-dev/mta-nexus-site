@@ -1,3 +1,9 @@
 import "server-only";
 
-export { CommunityModerationRouteLoading } from "./server/community-moderation-route-loading";
+export {
+  AdminCommunityItemRouteLoading,
+  AdminCommunityRouteLoading,
+  AdminDiscussionCommentRouteLoading,
+  AdminDiscussionReportsRouteLoading,
+  AdminDiscussionRouteLoading,
+} from "./server/community-moderation-route-loading";

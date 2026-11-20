@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PublicContextTrustRouteLoading({
+function PublicContextTrustRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,14 @@ export function PublicContextTrustRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ContextTrustRouteLoading() {
+  return PublicContextTrustRouteLoading({
+    headingId: "context-trust-loading-heading",
+    className: pageShellMax4xlTight,
+    rowClassName: "h-24 max-w-full rounded bg-inset",
+    titleKey: "title",
   });
 }

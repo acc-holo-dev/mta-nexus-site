@@ -1,3 +1,3 @@
 import "server-only";
 
-export { DiscoveryRouteLoading } from "./server/discovery-route-loading";
+export { DiscoveryOrganizationsRouteLoading } from "./server/discovery-route-loading";

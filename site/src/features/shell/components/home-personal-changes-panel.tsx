@@ -1,8 +1,8 @@
 import { EmptyState, ErrorState, SectionHeader } from "@nexus/ui";
 import Link from "next/link";
-import { pageShellStack3 } from "../../shell/page-shell";
 import type { PersonalChangesSummary } from "../home-personal-changes-types";
 import type { HomePersonalPreference } from "../home-personal-preference";
+import { pageShellStack3 } from "../page-shell";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
 
 export type HomePersonalCopy = {

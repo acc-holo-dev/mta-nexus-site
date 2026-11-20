@@ -1,3 +1,8 @@
 import "server-only";
 
-export { LegalDocumentRouteLoading } from "./server/legal-document-route-loading";
+export {
+  CommunityRulesRouteLoading,
+  CopyrightRouteLoading,
+  PrivacyRouteLoading,
+  TermsRouteLoading,
+} from "./server/legal-document-route-loading";

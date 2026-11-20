@@ -1,3 +1,8 @@
 import "server-only";
 
-export { ResourceReleaseControlRouteLoading } from "./server/resource-release-control-route-loading";
+export {
+  AdminResourceDetailRouteLoading,
+  AdminResourcesRouteLoading,
+  LibraryUpdatesRouteLoading,
+  LibraryVersionsRouteLoading,
+} from "./server/resource-release-control-route-loading";

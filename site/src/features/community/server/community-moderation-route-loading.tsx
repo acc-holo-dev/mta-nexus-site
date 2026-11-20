@@ -2,13 +2,15 @@ import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { moderationCopy } from "../community-moderation-copy";
+import { discussionReportsCopy } from "../discussion-reports-copy";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 
 type Copy = ReturnType<typeof moderationCopy>;
 type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function CommunityModerationRouteLoading({
+function CommunityModerationRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +65,43 @@ export function CommunityModerationRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminCommunityItemRouteLoading() {
+  return CommunityModerationRouteLoading({
+    headingId: "admin-community-item-loading-heading",
+    titleKey: "title",
+  });
+}
+
+export function AdminCommunityRouteLoading() {
+  return CommunityModerationRouteLoading({
+    headingId: "admin-community-loading-heading",
+    titleKey: "title",
+  });
+}
+
+export function AdminDiscussionCommentRouteLoading() {
+  return CommunityModerationRouteLoading({
+    headingId: "admin-discussion-comment-loading-heading",
+    titleClassName: "text-2xl font-extrabold text-primary",
+    title: (locale) => moderatedDiscussionCopy(locale).title,
+  });
+}
+
+export function AdminDiscussionReportsRouteLoading() {
+  return CommunityModerationRouteLoading({
+    headingId: "admin-discussion-reports-loading-heading",
+    titleClassName: "text-2xl font-extrabold text-primary",
+    title: (locale) => discussionReportsCopy(locale).title,
+  });
+}
+
+export function AdminDiscussionRouteLoading() {
+  return CommunityModerationRouteLoading({
+    headingId: "admin-discussion-loading-heading",
+    titleClassName: "text-2xl font-extrabold text-primary",
+    title: (locale) => moderatedDiscussionCopy(locale).title,
   });
 }

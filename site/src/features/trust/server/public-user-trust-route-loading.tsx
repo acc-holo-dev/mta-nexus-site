@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PublicUserTrustRouteLoading({
+function PublicUserTrustRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,16 @@ export function PublicUserTrustRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function UserTrustRouteLoading() {
+  return PublicUserTrustRouteLoading({
+    headingId: "user-trust-loading-heading",
+    className: pageShellMax4xlTight,
+    headerClassName: "nexus-panel min-w-0 space-y-3 overflow-x-clip p-6",
+    titleClassName: "text-xl font-bold text-primary",
+    rowClassName: "h-24 rounded bg-inset",
+    titleKey: "title",
   });
 }

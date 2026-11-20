@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PrivateChangeHistoryRouteLoading({
+function PrivateChangeHistoryRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,14 @@ export function PrivateChangeHistoryRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SettingsHistoryRouteLoading() {
+  return PrivateChangeHistoryRouteLoading({
+    headingId: "settings-history-loading-heading",
+    className: pageShellMax5xlDense,
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "profileTitle",
   });
 }

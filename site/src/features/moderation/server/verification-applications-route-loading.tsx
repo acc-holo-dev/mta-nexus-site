@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import { pageShellMax3xl, pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function VerificationApplicationsRouteLoading({
+function VerificationApplicationsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,25 @@ export function VerificationApplicationsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function VerificationDetailRouteLoading() {
+  return VerificationApplicationsRouteLoading({
+    headingId: "verification-detail-loading-heading",
+    className: pageShellMax3xl,
+    titleClassName: "text-xl font-semibold text-primary",
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "detail",
+  });
+}
+
+export function VerificationHistoryRouteLoading() {
+  return VerificationApplicationsRouteLoading({
+    headingId: "verification-history-loading-heading",
+    className: pageShellMax4xl,
+    titleClassName: "text-xl font-semibold text-primary",
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xl } from "../../shell/page-shell";
+import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getFinancialCopy } from "../financial-i18n";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function FinancialRouteLoading({
+function FinancialRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,42 @@ export function FinancialRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminReconciliationDetailRouteLoading() {
+  return FinancialRouteLoading({
+    headingId: "admin-reconciliation-detail-loading-heading",
+    className: pageShellMax4xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 max-w-full rounded bg-inset" />,
+    titleKey: "review",
+    loadingKey: "reviewLoading",
+  });
+}
+
+export function AdminReconciliationRouteLoading() {
+  return FinancialRouteLoading({
+    headingId: "admin-reconciliation-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 max-w-full rounded bg-inset" />,
+    titleKey: "review",
+    loadingKey: "reviewLoading",
+  });
+}
+
+export function FinanceRouteLoading() {
+  return FinancialRouteLoading({
+    headingId: "finance-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: (
+      <>
+        <div className="h-10 w-72 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
   });
 }

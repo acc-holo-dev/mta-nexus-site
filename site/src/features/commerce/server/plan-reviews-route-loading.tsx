@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function PlanReviewsRouteLoading({
+function PlanReviewsRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,39 @@ export function PlanReviewsRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SubscriptionReviewDetailRouteLoading() {
+  return PlanReviewsRouteLoading({
+    headingId: "subscription-review-detail-loading-heading",
+    className: pageShellMax5xl,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "saved",
+  });
+}
+
+export function SubscriptionReviewsRouteLoading() {
+  return PlanReviewsRouteLoading({
+    headingId: "subscription-reviews-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function SubscriptionReviewNewRouteLoading() {
+  return PlanReviewsRouteLoading({
+    headingId: "subscription-review-new-loading-heading",
+    className: pageShellMax5xl,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-10 w-64 rounded bg-inset" />
+        <div className="h-28 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "newReview",
   });
 }

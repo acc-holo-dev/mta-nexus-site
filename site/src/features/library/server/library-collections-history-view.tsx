@@ -2,6 +2,7 @@ import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
@@ -35,7 +36,7 @@ export async function LibraryCollectionsHistoryView({
   const query = collectionsQuery(collectionPageParams(queryValues), "history");
   const result = await service.history(actor, id, query.page);
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className={pageShellMax4xl}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>

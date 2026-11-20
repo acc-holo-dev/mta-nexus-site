@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ResourceReleaseWatchesRouteLoading } from "./server/resource-release-watches-route-loading";
+export {
+  CollectionWatchesRouteLoading,
+  ReleaseWatchesRouteLoading,
+} from "./server/resource-release-watches-route-loading";

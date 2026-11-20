@@ -3,6 +3,7 @@ import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { ResourceDownloadButton } from "../../resources/download";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
@@ -55,7 +56,7 @@ export async function LibraryCollectionsDetailView({
       ...(result.q ? { q: result.q } : {}),
     });
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href={adding ? collectionHref(id) : collectionHref()}
         className={libraryCollectionsLinkClass}

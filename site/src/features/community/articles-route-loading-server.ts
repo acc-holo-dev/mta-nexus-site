@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ArticlesRouteLoading } from "./server/articles-route-loading";
+export {
+  ArticleRouteLoading,
+  ArticlesIndexRouteLoading,
+} from "./server/articles-route-loading";

@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function CommunityReportRouteLoading({
+function CommunityReportRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,33 @@ export function CommunityReportRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function AdminReportDetailRouteLoading() {
+  return CommunityReportRouteLoading({
+    headingId: "admin-report-detail-loading-heading",
+    titleKey: "detail",
+  });
+}
+
+export function AdminReportsRouteLoading() {
+  return CommunityReportRouteLoading({
+    headingId: "admin-reports-loading-heading",
+    titleKey: "queue",
+  });
+}
+
+export function WorkspaceReportDetailRouteLoading() {
+  return CommunityReportRouteLoading({
+    headingId: "workspace-report-detail-loading-heading",
+    titleKey: "detail",
+  });
+}
+
+export function WorkspaceReportsRouteLoading() {
+  return CommunityReportRouteLoading({
+    headingId: "workspace-reports-loading-heading",
+    titleKey: "title",
   });
 }

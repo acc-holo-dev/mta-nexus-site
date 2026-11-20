@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
+import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 
 export type HistoryArea = "purchases" | "licenses" | "sales";
@@ -29,7 +30,7 @@ export function HistoryShell({
     sales: copy.salesDescription,
   };
   return (
-    <div className="mx-auto max-w-5xl space-y-7 py-8">
+    <div className={pageShellMax5xlMid}>
       <header className="space-y-3 border-b border-base pb-6">
         <Link
           href="/workspace"

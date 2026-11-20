@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { pageShellStack8 } from "../../shell/page-shell";
+import { pageShellMax4xlTight, pageShellStack8 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 
-export function ArticlesRouteLoading({
+function ArticlesRouteLoading({
   headingId = "articles-loading-heading",
   titlePath = "articles.title",
   loadingPath = "articles.loading",
@@ -38,5 +38,27 @@ export function ArticlesRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function ArticleRouteLoading() {
+  return ArticlesRouteLoading({
+    headingId: "article-loading-heading",
+    className: pageShellMax4xlTight,
+    rows: 0,
+    leading: (
+      <>
+        <div className="h-10 w-72 max-w-full rounded bg-inset" />
+        <div className="h-40 rounded bg-inset" />
+        <div className="h-64 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function ArticlesIndexRouteLoading() {
+  return ArticlesRouteLoading({
+    headerClassName: "space-y-2 border-b border-base pb-6",
+    titleClassName: "text-2xl font-extrabold text-primary sm:text-3xl",
   });
 }

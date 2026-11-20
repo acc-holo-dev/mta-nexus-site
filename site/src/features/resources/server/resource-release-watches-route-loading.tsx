@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { pageShellMax5xlTight } from "../../shell/page-shell";
+import { pageShellMax5xl, pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ResourceReleaseWatchesRouteLoading({
+function ResourceReleaseWatchesRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -63,5 +63,25 @@ export function ResourceReleaseWatchesRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function CollectionWatchesRouteLoading() {
+  return ResourceReleaseWatchesRouteLoading({
+    headingId: "collection-watches-loading-heading",
+    className: pageShellMax5xl,
+    rows: 4,
+    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    titleKey: "title",
+  });
+}
+
+export function ReleaseWatchesRouteLoading() {
+  return ResourceReleaseWatchesRouteLoading({
+    headingId: "release-watches-loading-heading",
+    className: pageShellMax5xlTight,
+    rowClassName: "h-24 rounded bg-inset",
+    leading: <div className="h-28 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

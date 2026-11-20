@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function NotificationInboxRouteLoading({
+function NotificationInboxRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,21 @@ export function NotificationInboxRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function NotificationsNotificationInboxRouteLoading() {
+  return NotificationInboxRouteLoading({
+    headingId: "notification-inbox-loading-heading",
+    className: pageShellMax4xlTight,
+    headerClassName: "space-y-3 border-b border-base pb-6",
+    titleClassName: "text-2xl font-extrabold text-primary",
+    leading: (
+      <>
+        <div className="h-10 w-full max-w-md rounded bg-inset" />
+        <div className="h-28 rounded bg-inset" />
+      </>
+    ),
+    titleKey: "title",
   });
 }

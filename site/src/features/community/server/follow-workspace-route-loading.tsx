@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function FollowWorkspaceRouteLoading({
+function FollowWorkspaceRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,16 @@ export function FollowWorkspaceRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function SavedFollowsRouteLoading() {
+  return FollowWorkspaceRouteLoading({
+    headingId: "saved-follows-loading-heading",
+    className: pageShellMax5xl,
+    rowClassName: "h-24 rounded bg-inset",
+    rows: 4,
+    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

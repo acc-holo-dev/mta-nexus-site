@@ -1,3 +1,6 @@
 import "server-only";
 
-export { MarketRouteLoading } from "./server/market-route-loading";
+export {
+  MarketResourceRouteLoading,
+  ResourcesMarketRouteLoading,
+} from "./server/market-route-loading";

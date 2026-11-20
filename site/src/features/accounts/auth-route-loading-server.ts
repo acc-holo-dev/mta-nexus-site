@@ -1,3 +1,10 @@
 import "server-only";
 
-export { AuthRouteLoading } from "./server/auth-route-loading";
+export {
+  AuthForgotRouteLoading,
+  AuthLoginRouteLoading,
+  AuthRegisterRouteLoading,
+  AuthResetRouteLoading,
+  AuthVerifyEmailRouteLoading,
+  AuthVerifyRouteLoading,
+} from "./server/auth-route-loading";

@@ -1,8 +1,5 @@
-import { LibraryCollectionsRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
+import { CollectionCopyItemsRouteLoading } from "../../../../../../features/library/library-collections-route-loading-server";
 
 export default async function Loading() {
-  return LibraryCollectionsRouteLoading({
-    headingId: "collection-copy-items-loading-heading",
-    titleKey: "copy-items",
-  });
+  return CollectionCopyItemsRouteLoading();
 }

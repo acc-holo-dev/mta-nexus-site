@@ -8,7 +8,7 @@ type StringKey = {
   [K in keyof Copy]-?: Copy[K] extends string ? K : never;
 }[keyof Copy];
 
-export function ServerActivityRouteLoading({
+function ServerActivityRouteLoading({
   headingId,
   titleKey,
   loadingKey = "loading",
@@ -62,5 +62,15 @@ export function ServerActivityRouteLoading({
         loading: loading ? loading(typedLocale) : copy[loadingKey],
       };
     },
+  });
+}
+
+export function ServersServerActivityRouteLoading() {
+  return ServerActivityRouteLoading({
+    headingId: "server-activity-loading-heading",
+    className: pageShellMax4xlDense,
+    titleClassName: "text-xl font-semibold text-primary",
+    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    titleKey: "title",
   });
 }

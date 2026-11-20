@@ -1,8 +1,5 @@
-import { AuthorResourcesRouteLoading } from "../../../../../../features/resources/author-resources-route-loading-server";
+import { ResourceCopyReceiptRouteLoading } from "../../../../../../features/resources/author-resources-route-loading-server";
 
 export default async function Loading() {
-  return AuthorResourcesRouteLoading({
-    headingId: "resource-copy-receipt-loading-heading",
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
-  });
+  return ResourceCopyReceiptRouteLoading();
 }

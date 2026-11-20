@@ -1,16 +1,5 @@
-import { LibraryCollectionComparisonRouteLoading } from "../../../../../../features/library/library-collection-comparison-route-loading-server";
-import { pageShellMax5xl } from "../../../../../../features/shell/page-shell";
+import { CollectionCompareRouteLoading } from "../../../../../../features/library/library-collection-comparison-route-loading-server";
 
 export default async function Loading() {
-  return LibraryCollectionComparisonRouteLoading({
-    headingId: "collection-compare-loading-heading",
-    className: pageShellMax5xl,
-    leading: (
-      <>
-        <div className="h-10 w-72 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-      </>
-    ),
-    titleKey: "title",
-  });
+  return CollectionCompareRouteLoading();
 }

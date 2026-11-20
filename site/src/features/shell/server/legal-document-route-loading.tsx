@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { pageShellMax3xl } from "../page-shell";
 import { DictionaryFieldRouteLoading } from "../route-honest-loading-server";
 
-export function LegalDocumentRouteLoading({
+function LegalDocumentRouteLoading({
   headingId,
   titlePath,
   loadingPath = "errors.loading",
@@ -47,5 +47,40 @@ export function LegalDocumentRouteLoading({
     rows,
     rowClassName,
     ...(resolvedLeading !== undefined ? { leading: resolvedLeading } : {}),
+  });
+}
+
+export function CommunityRulesRouteLoading() {
+  return LegalDocumentRouteLoading({
+    headingId: "community-rules-loading-heading",
+    titlePath: "legal.communityRules.title",
+  });
+}
+
+export function CopyrightRouteLoading() {
+  return LegalDocumentRouteLoading({
+    headingId: "copyright-loading-heading",
+    titlePath: "legal.copyright.title",
+    leading: (
+      <>
+        <div className="h-4 w-40 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+      </>
+    ),
+  });
+}
+
+export function PrivacyRouteLoading() {
+  return LegalDocumentRouteLoading({
+    headingId: "privacy-loading-heading",
+    titlePath: "legal.privacy.title",
+  });
+}
+
+export function TermsRouteLoading() {
+  return LegalDocumentRouteLoading({
+    headingId: "terms-loading-heading",
+    titlePath: "legal.terms.title",
   });
 }
