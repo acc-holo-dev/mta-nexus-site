@@ -1,5 +1,18 @@
+import type { Metadata } from "next";
+import { getRequestLocale } from "../../../lib/i18n/server";
 import { serverContentService } from "../../../lib/services/servers/server-content-service";
 import { ContextPublicationHistoryScreen } from "../../community/context-history-server";
+import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
+
+export async function serverPublicationHistoryMetadata(): Promise<Metadata> {
+  const copy = serverPublicationHistoryCopy(await getRequestLocale());
+  return {
+    title: copy.title,
+    description: copy.description,
+    robots: { index: false, follow: false },
+  };
+}
+
 export function ServerPublicationHistoryScreen(props: {
   id: string;
   contentId: string;

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +17,13 @@ import { storageQuery } from "../storage-maintenance-query";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function staffStorageMetadata(): Promise<Metadata> {
+  return {
+    title: `${storageMaintenanceCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function StaffStorageScreen({
   searchParams,

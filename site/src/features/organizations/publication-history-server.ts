@@ -1,3 +1,6 @@
 import "server-only";
 
-export { OrganizationPublicationHistoryScreen } from "./server/organization-publication-history-screen";
+export {
+  OrganizationPublicationHistoryScreen,
+  organizationPublicationHistoryMetadata,
+} from "./server/organization-publication-history-screen";

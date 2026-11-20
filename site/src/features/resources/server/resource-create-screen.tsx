@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -6,6 +7,13 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { NewResourceForm } from "../create-controls";
+
+export async function resourceCreateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).publishing.resourceTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function ResourceCreateScreen() {
   const locale = await getRequestLocale();

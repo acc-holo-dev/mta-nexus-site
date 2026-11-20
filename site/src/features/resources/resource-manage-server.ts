@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceManageScreen } from "./server/resource-manage-screen";
+export { ResourceManageScreen, resourceManageMetadata } from "./server/resource-manage-screen";

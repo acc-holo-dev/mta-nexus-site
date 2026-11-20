@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -56,6 +57,13 @@ function ResourceMediaLoadError({
       />
     </section>
   );
+}
+
+export async function resourceMediaMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceMediaCopy(await getRequestLocale()).reviewDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ResourceMediaScreen({

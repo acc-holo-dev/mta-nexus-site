@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ServerContentEditorPage } from "./server/server-content-editor-page";
+export {
+  ServerContentEditorPage,
+  serverContentEditorMetadata,
+} from "./server/server-content-editor-page";

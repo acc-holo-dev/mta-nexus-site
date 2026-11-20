@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceBuildScreen } from "./server/build-screen";
+export { ResourceBuildScreen, resourceBuildMetadata } from "./server/build-screen";

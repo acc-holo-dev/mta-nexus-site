@@ -1,5 +1,6 @@
 import { AppError, LIBRARY_RELEASE_HISTORY_DAYS } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,6 +13,13 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
+export async function libraryReleaseHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {

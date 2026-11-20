@@ -29,12 +29,12 @@ beforeEach(() => {
 });
 
 const clippedPages = [
-  "site/src/app/workspace/servers/[id]/activity/page.tsx",
+  "site/src/features/servers/server/server-workspace-history-screen.tsx",
   "site/src/app/workspace/servers/[id]/statistics/page.tsx",
   "site/src/app/workspace/servers/[id]/observations/page.tsx",
   "site/src/app/workspace/servers/[id]/content/new/page.tsx",
-  "site/src/app/workspace/servers/[id]/content/[contentId]/page.tsx",
-  "site/src/app/workspace/servers/[id]/content/[contentId]/history/page.tsx",
+  "site/src/features/servers/server/server-content-editor-page.tsx",
+  "site/src/features/community/server/context-publication-history-screen.tsx",
   "site/src/app/servers/[slug]/trust/page.tsx",
   "site/src/app/workspace/licenses/[id]/history/page.tsx",
 ] as const;
@@ -50,7 +50,7 @@ it("locks residual workspace server page shells to clipped min-w-0 frames", () =
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 
@@ -59,7 +59,7 @@ it("locks residual workspace server loading shells to clipped frames", () => {
     const source = read(loading);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 

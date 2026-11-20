@@ -97,7 +97,7 @@ it.each(["en", "ru"] as const)(
     expect(
       links.find((url) => url.searchParams.get("cursor") === cursor)?.searchParams.get("status"),
     ).toBe("pending");
-    expect((await historyMetadata()).robots.index).toBe(false);
+    expect((await historyMetadata()).robots).toEqual({ index: false, follow: false });
     expect(renderToStaticMarkup(await Loading())).toContain(
       verificationApplicationsCopy(locale).loading,
     );
@@ -119,7 +119,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("&lt;img");
     expect(html).not.toContain("<img");
     expect(html).toContain('rel="noopener noreferrer"');
-    expect((await detailMetadata()).robots.index).toBe(false);
+    expect((await detailMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it.each(["approved", "rejected", "server"])(

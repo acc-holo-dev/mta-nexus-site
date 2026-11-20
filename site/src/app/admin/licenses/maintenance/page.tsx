@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
-import { getLicenseMaintenanceCopy } from "../../../../features/commerce/license-maintenance-i18n";
-import { LicenseMaintenanceScreen } from "../../../../features/commerce/license-maintenance-server";
-import { getRequestLocale } from "../../../../lib/i18n/server";
+import {
+  LicenseMaintenanceScreen,
+  licenseMaintenanceMetadata,
+} from "../../../../features/commerce/license-maintenance-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getLicenseMaintenanceCopy(await getRequestLocale()).maintenance} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = licenseMaintenanceMetadata;
 
 export default async function Page({
   searchParams,

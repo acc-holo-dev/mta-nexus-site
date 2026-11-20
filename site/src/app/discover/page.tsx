@@ -1,13 +1,8 @@
-import { DiscoverPage } from "../../features/discovery/discover-page-server";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n/server";
+import { DiscoverPage, discoverMetadata } from "../../features/discovery/discover-page-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
-  const copy = getDictionary(await getRequestLocale()).discover;
-  return { title: copy.title, description: copy.description };
-}
+export const generateMetadata = discoverMetadata;
 
 export default async function Page(props: {
   searchParams: Promise<{

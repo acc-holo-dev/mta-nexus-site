@@ -1,3 +1,6 @@
 import "server-only";
 
-export { OrganizationCreateScreen } from "./server/organization-create-screen";
+export {
+  OrganizationCreateScreen,
+  organizationCreateMetadata,
+} from "./server/organization-create-screen";

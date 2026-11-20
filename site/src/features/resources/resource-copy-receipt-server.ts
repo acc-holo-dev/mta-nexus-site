@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ResourceCopyReceiptScreen } from "./server/resource-copy-receipt-screen";
+export {
+  ResourceCopyReceiptScreen,
+  resourceCopyReceiptMetadata,
+} from "./server/resource-copy-receipt-screen";

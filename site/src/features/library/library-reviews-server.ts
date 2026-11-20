@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryReviewsScreen } from "./server/library-reviews-screen";
+export { LibraryReviewsScreen, libraryReviewsMetadata } from "./server/library-reviews-screen";

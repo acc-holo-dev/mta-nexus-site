@@ -1,3 +1,6 @@
 import "server-only";
 
-export { CommercialPlanAdminDetailScreen } from "./server/commercial-plan-admin-detail-screen";
+export {
+  CommercialPlanAdminDetailScreen,
+  commercialPlanAdminDetailMetadata,
+} from "./server/commercial-plan-admin-detail-screen";

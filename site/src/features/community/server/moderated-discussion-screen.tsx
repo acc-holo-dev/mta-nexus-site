@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -52,6 +53,13 @@ function ModeratedDiscussionLoadError({
       />
     </section>
   );
+}
+
+export async function moderatedDiscussionMetadata(): Promise<Metadata> {
+  return {
+    title: moderatedDiscussionCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ModeratedDiscussionScreen({

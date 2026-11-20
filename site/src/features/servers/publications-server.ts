@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ServerPublicationsScreen } from "./server/publications-screen";
+export { ServerPublicationsScreen, serverPublicationsMetadata } from "./server/publications-screen";

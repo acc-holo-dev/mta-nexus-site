@@ -1,3 +1,6 @@
 import "server-only";
 
-export { FinancialReconciliationScreen } from "./server/financial-reconciliation-screen";
+export {
+  FinancialReconciliationScreen,
+  financialReconciliationMetadata,
+} from "./server/financial-reconciliation-screen";

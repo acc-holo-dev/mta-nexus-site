@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionsWorkspaceScreen } from "./server/subscriptions-workspace-screen";
+export {
+  SubscriptionsWorkspaceScreen,
+  subscriptionsWorkspaceMetadata,
+} from "./server/subscriptions-workspace-screen";

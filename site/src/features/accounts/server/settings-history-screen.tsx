@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -15,6 +16,13 @@ import { ProfileChangeHistoryView } from "../profile-change-history";
 import { parseProfileChangeHistoryQuery } from "../profile-change-history-contract";
 
 const pageShellClass = "min-w-0 overflow-x-clip";
+
+export async function settingsHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: privateChangeHistoryCopy(await getRequestLocale()).profileTitle,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function SettingsHistoryScreen({
   searchParams,

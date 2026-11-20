@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +9,13 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
+export async function commercialPlanCreateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).createDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CommercialPlanCreateScreen() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getCommercialCopy(locale);

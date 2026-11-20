@@ -1,18 +1,12 @@
-import { ServerPublicationHistoryScreen } from "../../../../../../../features/servers/publication-history-server";
-import { serverPublicationHistoryCopy } from "../../../../../../../features/servers/server-publication-history-copy";
-import { getRequestLocale } from "../../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  ServerPublicationHistoryScreen,
+  serverPublicationHistoryMetadata,
+} from "../../../../../../../features/servers/publication-history-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  const copy = serverPublicationHistoryCopy(await getRequestLocale());
-  return {
-    title: copy.title,
-    description: copy.description,
-    robots: { index: false, follow: false },
-  };
-}
+
+export const generateMetadata = serverPublicationHistoryMetadata;
+
 export default async function Page({
   params,
   searchParams,
@@ -21,9 +15,5 @@ export default async function Page({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const scope = await params;
-  return (
-    <div className={pageShellClass}>
-      {await ServerPublicationHistoryScreen({ ...scope, searchParams })}
-    </div>
-  );
+  return ServerPublicationHistoryScreen({ ...scope, searchParams });
 }

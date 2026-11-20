@@ -1,3 +1,3 @@
 import "server-only";
 
-export { DiscoverPage } from "./server/discover-page";
+export { DiscoverPage, discoverMetadata } from "./server/discover-page";

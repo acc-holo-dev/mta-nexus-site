@@ -65,6 +65,9 @@ const features = [
     name: "accounts",
     clients: [
       "auth",
+      "forgot-password-page",
+      "reset-password-page",
+      "verify-email-page",
       "controls",
       "settings",
       "context",
@@ -88,6 +91,8 @@ const features = [
       ["settings-history-server", "settings-history-screen.tsx"],
       ["settings-developer-server", "settings-developer-screen.tsx"],
       ["settings-privacy-server", "settings-privacy-screen.tsx"],
+      ["login-page-server", "login-screen.tsx"],
+      ["register-page-server", "register-screen.tsx"],
     ],
     clientUtilPorts: [
       "profile-pagination",

@@ -1,20 +1,16 @@
-import { getUserPlatformCopy } from "../../../../../../features/community/user-platform-copy";
-import { ServerContentEditorPage } from "../../../../../../features/servers/content-editor-server";
-import { getRequestLocale } from "../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  ServerContentEditorPage,
+  serverContentEditorMetadata,
+} from "../../../../../../features/servers/content-editor-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  return {
-    title: getUserPlatformCopy(await getRequestLocale()).edit,
-    robots: { index: false, follow: false },
-  };
-}
+
+export const generateMetadata = serverContentEditorMetadata;
+
 export default async function Page({
   params,
 }: {
   params: Promise<{ id: string; contentId: string }>;
 }) {
-  return <div className={pageShellClass}>{await ServerContentEditorPage(await params)}</div>;
+  return ServerContentEditorPage(await params);
 }

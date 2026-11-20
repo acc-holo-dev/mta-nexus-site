@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionReviewsScreen } from "./server/subscription-reviews-screen";
+export {
+  SubscriptionReviewsScreen,
+  subscriptionReviewsMetadata,
+} from "./server/subscription-reviews-screen";

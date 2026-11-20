@@ -1,18 +1,13 @@
-import type { Metadata } from "next";
-import { AuthorResourcesScreen } from "../../../features/resources/author-resources-server";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import {
+  AuthorResourcesScreen,
+  authorResourcesMetadata,
+} from "../../../features/resources/author-resources-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getDictionary(await getRequestLocale()).authorResources.title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = authorResourcesMetadata;
 
-export default async function AuthorResourcesPage(props: {
+export default async function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return AuthorResourcesScreen(props);

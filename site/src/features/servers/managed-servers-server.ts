@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ManagedServersScreen } from "./server/managed-servers-screen";
+export { ManagedServersScreen, managedServersMetadata } from "./server/managed-servers-screen";

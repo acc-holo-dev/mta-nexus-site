@@ -1,3 +1,6 @@
 import "server-only";
 
-export { WorkspaceFinanceScreen } from "./server/workspace-finance-screen";
+export {
+  WorkspaceFinanceScreen,
+  workspaceFinanceMetadata,
+} from "./server/workspace-finance-screen";

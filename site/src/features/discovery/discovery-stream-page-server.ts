@@ -1,3 +1,3 @@
 import "server-only";
 
-export { DiscoveryStreamPage } from "./server/discovery-stream-page";
+export { DiscoveryStreamPage, discoveryStreamMetadata } from "./server/discovery-stream-page";

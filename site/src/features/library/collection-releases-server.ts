@@ -1,3 +1,6 @@
 import "server-only";
 
-export { CollectionReleasesScreen } from "./server/collection-releases-screen";
+export {
+  CollectionReleasesScreen,
+  collectionReleasesMetadata,
+} from "./server/collection-releases-screen";

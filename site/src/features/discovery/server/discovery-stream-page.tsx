@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -16,6 +17,15 @@ import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-c
 const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function discoveryStreamMetadata(): Promise<Metadata> {
+  const copy = discoveryStreamCopy(await getRequestLocale());
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: { canonical: "/discover/stream" },
+  };
+}
 
 export async function DiscoveryStreamPage({
   searchParams,

@@ -1,4 +1,5 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -21,6 +22,13 @@ const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const filterLinkClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-4 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white";
+
+export async function publisherAcquisitionsMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceActivityCopy(await getRequestLocale()).history} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function PublisherAcquisitionsScreen({
   searchParams,

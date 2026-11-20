@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LibraryDownloadsScreen } from "./server/library-downloads-screen";
+export {
+  LibraryDownloadsScreen,
+  libraryDownloadsMetadata,
+} from "./server/library-downloads-screen";

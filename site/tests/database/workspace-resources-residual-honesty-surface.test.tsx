@@ -96,10 +96,10 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
 
   const clippedDelegates = [
     "site/src/features/resources/server/resource-create-screen.tsx",
-    "site/src/app/workspace/resources/[id]/media/page.tsx",
-    "site/src/app/workspace/resources/[id]/requirements/page.tsx",
-    "site/src/app/workspace/resources/[id]/builds/[buildId]/page.tsx",
-    "site/src/app/workspace/resources/[id]/builds/[buildId]/package/page.tsx",
+    "site/src/features/resources/server/media-screen.tsx",
+    "site/src/features/resources/server/resource-requirements-screen.tsx",
+    "site/src/features/resources/server/build-screen.tsx",
+    "site/src/features/resources/server/build-package-screen.tsx",
   ];
   for (const page of clippedDelegates) {
     const source = read(page);

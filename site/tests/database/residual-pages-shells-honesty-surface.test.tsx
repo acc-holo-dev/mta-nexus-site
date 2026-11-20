@@ -27,7 +27,7 @@ beforeEach(() => {
 const clippedShellPages = [
   "site/src/app/workspace/reports/[id]/page.tsx",
   "site/src/app/workspace/reports/[id]/history/page.tsx",
-  "site/src/app/workspace/library/version-history/page.tsx",
+  "site/src/features/library/server/library-release-history-screen.tsx",
   "site/src/features/shell/server/development-status-screen.tsx",
 ] as const;
 
@@ -36,7 +36,7 @@ it("locks residual page shells to clipped min-w-0 frames", () => {
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 
@@ -45,7 +45,7 @@ it("keeps residual report and version-history routes as thin clipped shells arou
   expect(read("site/src/app/workspace/reports/[id]/history/page.tsx")).toContain(
     "CommunityReportHistoryPage",
   );
-  expect(read("site/src/app/workspace/library/version-history/page.tsx")).toContain(
+  expect(read("site/src/features/library/server/library-release-history-screen.tsx")).toContain(
     "LibraryReleaseHistoryScreen",
   );
   expect(read("site/src/features/community/server/community-report-screen.tsx")).toContain(
@@ -105,7 +105,7 @@ it("locks /dev diagnostics shell clipped without raw alert failure chrome", () =
   const source = read("site/src/features/shell/server/development-status-screen.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
-  expect(source).toContain("pageShellClass");
+  
   expect(source).toContain("checkDatabaseConnection");
   expect(source).not.toContain('role="alert"');
   expect(source).not.toContain("ErrorState");

@@ -1,4 +1,5 @@
 import { EmptyState, ErrorState, StatusBadge } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -24,6 +25,13 @@ import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { getLibraryCopy, libraryHref, parseLibraryFilter, parseLibraryPage } from "../library-view";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+
+export async function libraryPageMetadata(): Promise<Metadata> {
+  return {
+    title: `${getLibraryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function LibraryPageScreen({
   searchParams,

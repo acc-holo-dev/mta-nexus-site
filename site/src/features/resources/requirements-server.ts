@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ResourceRequirementsScreen } from "./server/resource-requirements-screen";
+export {
+  ResourceRequirementsScreen,
+  resourceRequirementsMetadata,
+} from "./server/resource-requirements-screen";

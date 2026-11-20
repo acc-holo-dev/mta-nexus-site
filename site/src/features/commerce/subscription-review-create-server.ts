@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionReviewCreateScreen } from "./server/subscription-review-create-screen";
+export {
+  SubscriptionReviewCreateScreen,
+  subscriptionReviewCreateMetadata,
+} from "./server/subscription-review-create-screen";

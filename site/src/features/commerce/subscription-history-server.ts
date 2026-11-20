@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionHistoryScreen } from "./server/subscription-history-screen";
+export {
+  SubscriptionHistoryScreen,
+  subscriptionHistoryMetadata,
+} from "./server/subscription-history-screen";

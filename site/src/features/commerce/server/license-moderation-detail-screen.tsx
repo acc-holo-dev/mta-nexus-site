@@ -1,5 +1,6 @@
 import { can } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +17,13 @@ import { LicenseDetailView } from "../license-detail";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function licenseModerationDetailMetadata(): Promise<Metadata> {
+  return {
+    title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function LicenseModerationDetailScreen({
   params,

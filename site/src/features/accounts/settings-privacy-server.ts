@@ -1,3 +1,3 @@
 import "server-only";
 
-export { SettingsPrivacyScreen } from "./server/settings-privacy-screen";
+export { SettingsPrivacyScreen, settingsPrivacyMetadata } from "./server/settings-privacy-screen";

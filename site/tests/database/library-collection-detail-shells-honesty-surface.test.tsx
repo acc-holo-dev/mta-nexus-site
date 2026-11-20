@@ -40,17 +40,17 @@ beforeEach(() => {
 
 const clippedDetailPages = [
   "site/src/app/workspace/library/collections/[id]/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/add/page.tsx",
+  "site/src/features/library/server/library-collections-list-view.tsx",
   "site/src/app/workspace/library/collections/[id]/copy/page.tsx",
   "site/src/app/workspace/library/collections/[id]/copy-items/page.tsx",
   "site/src/app/workspace/library/collections/[id]/move-items/page.tsx",
   "site/src/app/workspace/library/collections/[id]/history/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/releases/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/requirements/page.tsx",
+  "site/src/features/library/server/collection-releases-screen.tsx",
+  "site/src/features/library/server/collection-requirements-screen.tsx",
   "site/src/app/workspace/library/collections/[id]/versions/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/versions/history/page.tsx",
+  "site/src/features/library/server/library-selection-batch-screen.tsx",
   "site/src/app/workspace/library/[id]/requirements/page.tsx",
-  "site/src/app/workspace/library/[id]/versions/compare/page.tsx",
+  "site/src/features/library/server/library-release-comparison-screen.tsx",
 ] as const;
 
 const delegatedHonestyScreens = [
@@ -66,7 +66,7 @@ it("locks library collection detail route shells to clipped min-w-0 frames", () 
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 

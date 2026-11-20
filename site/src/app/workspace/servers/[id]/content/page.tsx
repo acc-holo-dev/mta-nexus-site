@@ -1,15 +1,11 @@
-import { ServerPublicationsScreen } from "../../../../../features/servers/publications-server";
-import { serverContentCopy } from "../../../../../features/servers/server-content-copy";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
+import {
+  ServerPublicationsScreen,
+  serverPublicationsMetadata,
+} from "../../../../../features/servers/publications-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
-  return {
-    title: serverContentCopy(await getRequestLocale()).title,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = serverPublicationsMetadata;
 
 export default async function Page(props: {
   params: Promise<{ id: string }>;

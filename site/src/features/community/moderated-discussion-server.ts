@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ModeratedDiscussionScreen } from "./server/moderated-discussion-screen";
+export {
+  ModeratedDiscussionScreen,
+  moderatedDiscussionMetadata,
+} from "./server/moderated-discussion-screen";

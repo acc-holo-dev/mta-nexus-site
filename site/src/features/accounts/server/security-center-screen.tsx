@@ -1,5 +1,6 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -15,6 +16,13 @@ const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus
 const panelShellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";
 const settingsActionClass =
   "inline-flex min-h-11 items-center gap-2 self-start rounded-lg border border-base px-3 text-xs font-semibold text-secondary hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-accent";
+
+export async function securityCenterMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).securityCenter.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function SecurityCenterScreen() {
   const locale = await getRequestLocale();

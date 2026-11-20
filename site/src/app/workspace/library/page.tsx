@@ -1,17 +1,13 @@
-import type { Metadata } from "next";
-import { LibraryPageScreen } from "../../../features/library/library-page-server";
-import { getLibraryCopy } from "../../../features/library/library-view";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import {
+  LibraryPageScreen,
+  libraryPageMetadata,
+} from "../../../features/library/library-page-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getLibraryCopy(await getRequestLocale()).title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
 
-export default async function ResourceLibraryPage(props: {
+export const generateMetadata = libraryPageMetadata;
+
+export default async function Page(props: {
   searchParams: Promise<{
     filter?: string | string[];
     page?: string | string[];

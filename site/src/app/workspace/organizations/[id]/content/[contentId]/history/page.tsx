@@ -1,19 +1,12 @@
-import { organizationPublicationHistoryCopy } from "../../../../../../../features/organizations/organization-publication-history-copy";
-import { OrganizationPublicationHistoryScreen } from "../../../../../../../features/organizations/publication-history-server";
-import { getRequestLocale } from "../../../../../../../lib/i18n/server";
+import {
+  OrganizationPublicationHistoryScreen,
+  organizationPublicationHistoryMetadata,
+} from "../../../../../../../features/organizations/publication-history-server";
 
 export const dynamic = "force-dynamic";
 
-const pageShellClass = "min-w-0 overflow-x-clip";
+export const generateMetadata = organizationPublicationHistoryMetadata;
 
-export async function generateMetadata() {
-  const copy = organizationPublicationHistoryCopy(await getRequestLocale());
-  return {
-    title: copy.title,
-    description: copy.description,
-    robots: { index: false, follow: false },
-  };
-}
 export default async function Page({
   params,
   searchParams,
@@ -22,9 +15,5 @@ export default async function Page({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const scope = await params;
-  return (
-    <div className={pageShellClass}>
-      {await OrganizationPublicationHistoryScreen({ ...scope, searchParams })}
-    </div>
-  );
+  return OrganizationPublicationHistoryScreen({ ...scope, searchParams });
 }

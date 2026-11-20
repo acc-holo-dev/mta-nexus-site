@@ -1,3 +1,3 @@
 import "server-only";
 
-export { CartWorkspaceScreen } from "./server/cart-workspace-screen";
+export { CartWorkspaceScreen, cartWorkspaceMetadata } from "./server/cart-workspace-screen";

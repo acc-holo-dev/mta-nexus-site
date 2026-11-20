@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -45,6 +46,13 @@ function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; ret
       />
     </section>
   );
+}
+
+export async function discussionReportsMetadata(): Promise<Metadata> {
+  return {
+    title: discussionReportsCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function DiscussionReportsScreen({

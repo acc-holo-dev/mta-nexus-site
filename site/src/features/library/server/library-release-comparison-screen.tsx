@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,6 +14,13 @@ import { LibraryReleaseComparisonSelection } from "../components/library-release
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
+export async function libraryReleaseComparisonMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryReleaseComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,

@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LibraryReleaseComparisonScreen } from "./server/library-release-comparison-screen";
+export {
+  LibraryReleaseComparisonScreen,
+  libraryReleaseComparisonMetadata,
+} from "./server/library-release-comparison-screen";

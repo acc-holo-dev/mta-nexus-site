@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionReceiptScreen } from "./server/subscription-receipt-screen";
+export {
+  SubscriptionReceiptScreen,
+  subscriptionReceiptMetadata,
+} from "./server/subscription-receipt-screen";

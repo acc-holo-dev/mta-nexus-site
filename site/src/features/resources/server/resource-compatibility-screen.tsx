@@ -1,4 +1,5 @@
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +17,13 @@ import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export async function resourceCompatibilityMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceManagementCopy(await getRequestLocale()).compatibility} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function ResourceCompatibilityScreen({ params }: { params: Promise<{ id: string }> }) {
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
   const copy = getResourceManagementCopy(locale);

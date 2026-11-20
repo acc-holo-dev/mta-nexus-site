@@ -159,10 +159,7 @@ it.each(["en", "ru"] as const)(
     expect(Page({ searchParams: Promise.resolve({}) }).props.children.type).toBe(
       LibraryMembershipHistoryScreen,
     );
-    expect(
-      Detail({ searchParams: Promise.resolve({}), params: Promise.resolve({ id: "lmb_a" }) }).props
-        .children.type,
-    ).toBe(LibraryMembershipHistoryScreen);
+    expect(Detail).toBe(LibraryMembershipHistoryScreen);
   },
 );
 it("does not reuse an invalid membership receipt identifier during session failure", async () => {

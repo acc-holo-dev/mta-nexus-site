@@ -1,18 +1,13 @@
-import type { Metadata } from "next";
-import { PublisherDeliveriesScreen } from "../../../../../features/resources/publisher-deliveries-server";
-import { resourceDeliveriesCopy } from "../../../../../features/resources/resource-deliveries-i18n";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
+import {
+  PublisherDeliveriesScreen,
+  publisherDeliveriesMetadata,
+} from "../../../../../features/resources/publisher-deliveries-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${resourceDeliveriesCopy(await getRequestLocale()).publisherTitle} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = publisherDeliveriesMetadata;
 
-export default async function PublisherDeliveriesPage(props: {
+export default async function Page(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {

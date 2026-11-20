@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,6 +15,13 @@ import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-forma
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
+export async function licenseMaintenanceMetadata(): Promise<Metadata> {
+  return {
+    title: `${getLicenseMaintenanceCopy(await getRequestLocale()).maintenance} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LicenseMaintenanceScreen({
   searchParams,
 }: {

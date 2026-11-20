@@ -1,24 +1,10 @@
-import type { Metadata } from "next";
-import { libraryMembershipHistoryCopy } from "../../../../../../features/library/library-membership-history-i18n";
-import { LibraryMembershipHistoryScreen } from "../../../../../../features/library/membership-history-server";
-import { getRequestLocale } from "../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  LibraryMembershipHistoryScreen,
+  libraryMembershipHistoryMetadata,
+} from "../../../../../../features/library/membership-history-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${libraryMembershipHistoryCopy(await getRequestLocale()).detail} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
-export default function Page(props: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  return (
-    <div className={pageShellClass}>
-      <LibraryMembershipHistoryScreen {...props} />
-    </div>
-  );
-}
+
+export const generateMetadata = libraryMembershipHistoryMetadata;
+
+export default LibraryMembershipHistoryScreen;

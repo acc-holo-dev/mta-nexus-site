@@ -1,3 +1,6 @@
 import "server-only";
 
-export { StaffStorageObjectScreen } from "./server/staff-storage-object-screen";
+export {
+  StaffStorageObjectScreen,
+  staffStorageObjectMetadata,
+} from "./server/staff-storage-object-screen";

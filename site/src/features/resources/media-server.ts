@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceMediaScreen } from "./server/media-screen";
+export { ResourceMediaScreen, resourceMediaMetadata } from "./server/media-screen";

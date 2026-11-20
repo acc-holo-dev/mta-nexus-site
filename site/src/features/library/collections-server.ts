@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LibraryCollectionsScreen } from "./server/library-collections-screen";
+export {
+  LibraryCollectionsScreen,
+  libraryCollectionsMetadata,
+} from "./server/library-collections-screen";

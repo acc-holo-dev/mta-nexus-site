@@ -1,16 +1,10 @@
-import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
-import { SettingsPrivacyScreen } from "../../../features/accounts/settings-privacy-server";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import {
+  SettingsPrivacyScreen,
+  settingsPrivacyMetadata,
+} from "../../../features/accounts/settings-privacy-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
-  return {
-    title: profilePrivacyCopy(await getRequestLocale()).title,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = settingsPrivacyMetadata;
 
-export default async function Page() {
-  return SettingsPrivacyScreen();
-}
+export default SettingsPrivacyScreen;

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryVersionsScreen } from "./server/library-versions-screen";
+export { LibraryVersionsScreen, libraryVersionsMetadata } from "./server/library-versions-screen";

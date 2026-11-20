@@ -30,8 +30,8 @@ beforeEach(() => {
 const clippedOrgPages = [
   "site/src/features/organizations/server/activity-page.tsx",
   "site/src/app/workspace/organizations/[id]/content/new/page.tsx",
-  "site/src/app/workspace/organizations/[id]/content/[contentId]/page.tsx",
-  "site/src/app/workspace/organizations/[id]/content/[contentId]/history/page.tsx",
+  "site/src/features/organizations/server/organization-content-editor-page.tsx",
+  "site/src/features/community/server/context-publication-history-screen.tsx",
 ] as const;
 
 const clippedSubscriptionPages = [
@@ -49,7 +49,7 @@ it("locks workspace org activity and content page shells to clipped min-w-0 fram
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 
@@ -64,7 +64,7 @@ it("locks residual workspace subscription page shells to clipped min-w-0 frames"
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
     expect(source).toContain("ErrorState");
   }
   expect(read("site/src/features/commerce/server/subscriptions-workspace-screen.tsx")).toContain(

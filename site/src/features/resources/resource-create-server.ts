@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceCreateScreen } from "./server/resource-create-screen";
+export { ResourceCreateScreen, resourceCreateMetadata } from "./server/resource-create-screen";

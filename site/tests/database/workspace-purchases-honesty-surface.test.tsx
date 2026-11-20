@@ -124,10 +124,10 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(terms).not.toContain('<p role="alert"');
 
   const shellPages = [
-    "site/src/app/workspace/purchases/page.tsx",
-    "site/src/app/workspace/purchases/[id]/page.tsx",
-    "site/src/app/workspace/purchases/[id]/operations/page.tsx",
-    "site/src/app/workspace/purchases/[id]/terms/page.tsx",
+    "site/src/features/commerce/server/purchases-history-screen.tsx",
+    "site/src/features/commerce/server/purchase-detail-screen.tsx",
+    "site/src/features/commerce/server/purchase-operations-screen.tsx",
+    "site/src/features/commerce/server/purchase-terms-screen.tsx",
     "site/src/app/workspace/purchases/[id]/support/page.tsx",
     "site/src/app/workspace/order-cases/page.tsx",
     "site/src/app/workspace/order-cases/[id]/page.tsx",

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ResourceCopiesScreen } from "./server/resource-copies-screen";
+export { ResourceCopiesScreen, resourceCopiesMetadata } from "./server/resource-copies-screen";

@@ -1,5 +1,6 @@
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,6 +22,13 @@ import { collectionHref, collectionId, collectionPageParams } from "../library-c
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+export async function collectionReleasesMetadata(): Promise<Metadata> {
+  return {
+    title: `${collectionReleasesCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CollectionReleasesScreen({
   params,
   searchParams,

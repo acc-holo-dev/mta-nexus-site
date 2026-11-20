@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,6 +13,13 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { orderTermsPageQuery } from "../order-terms-query";
+export async function financialReconciliationTermsMetadata(): Promise<Metadata> {
+  return {
+    title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function FinancialReconciliationTermsScreen({
   params,
   searchParams,

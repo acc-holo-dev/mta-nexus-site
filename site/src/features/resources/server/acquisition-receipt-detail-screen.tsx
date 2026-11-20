@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,6 +18,13 @@ import { resourceCartReceiptId } from "../resource-cart-receipts-query";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function acquisitionReceiptDetailMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceCartReceiptsCopy(await getRequestLocale()).receipt} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function AcquisitionReceiptDetailScreen({
   params,

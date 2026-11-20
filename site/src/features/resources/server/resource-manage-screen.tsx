@@ -1,4 +1,5 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,13 @@ import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function resourceManageMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).authorResources.manageDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function ResourceManageScreen({
   params,

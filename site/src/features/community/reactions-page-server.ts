@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ReactionsPageScreen } from "./server/reactions-page";
+export { ReactionsPageScreen, reactionsPageMetadata } from "./server/reactions-page";

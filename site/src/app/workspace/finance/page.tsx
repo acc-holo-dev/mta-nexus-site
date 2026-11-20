@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
-import { getFinancialCopy } from "../../../features/commerce/financial-i18n";
-import { WorkspaceFinanceScreen } from "../../../features/commerce/workspace-finance-server";
-import { getRequestLocale } from "../../../lib/i18n/server";
+import {
+  WorkspaceFinanceScreen,
+  workspaceFinanceMetadata,
+} from "../../../features/commerce/workspace-finance-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getFinancialCopy(await getRequestLocale()).title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = workspaceFinanceMetadata;
 
 export default async function Page({
   searchParams,

@@ -1,19 +1,13 @@
-import { verificationApplicationsCopy } from "../../../../features/moderation/verification-applications-copy";
-import { VerificationHistoryScreen } from "../../../../features/moderation/verification-history-server";
-import { getRequestLocale } from "../../../../lib/i18n/server";
+import {
+  VerificationHistoryScreen,
+  verificationHistoryMetadata,
+} from "../../../../features/moderation/verification-history-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
-  const copy = verificationApplicationsCopy(await getRequestLocale());
-  return {
-    title: copy.title,
-    description: copy.description,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = verificationHistoryMetadata;
 
-export default async function VerificationHistoryPage(props: {
+export default async function Page(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return VerificationHistoryScreen(props);

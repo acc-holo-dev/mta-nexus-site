@@ -1,16 +1,12 @@
-import { discussionReportsCopy } from "../../../../../../../features/community/discussion-reports-copy";
-import { DiscussionReportsScreen } from "../../../../../../../features/community/discussion-reports-server";
-import { getRequestLocale } from "../../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  DiscussionReportsScreen,
+  discussionReportsMetadata,
+} from "../../../../../../../features/community/discussion-reports-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  return {
-    title: discussionReportsCopy(await getRequestLocale()).title,
-    robots: { index: false, follow: false },
-  };
-}
+
+export const generateMetadata = discussionReportsMetadata;
+
 export default async function Page({
   params,
   searchParams,
@@ -20,12 +16,10 @@ export default async function Page({
 }) {
   const scope = await params;
   return (
-    <div className={pageShellClass}>
-      <DiscussionReportsScreen
-        id={scope.id}
-        commentId={scope.commentId}
-        searchParams={searchParams}
-      />
-    </div>
+    <DiscussionReportsScreen
+      id={scope.id}
+      commentId={scope.commentId}
+      searchParams={searchParams}
+    />
   );
 }

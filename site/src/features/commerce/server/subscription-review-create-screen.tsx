@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,6 +16,13 @@ import { planReviewNewQuery, planReviewsPageParams } from "../plan-reviews-query
 import { planReviewNavLinkClass } from "../plan-reviews-workspace";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+export async function subscriptionReviewCreateMetadata(): Promise<Metadata> {
+  return {
+    title: `${planReviewsCopy(await getRequestLocale()).newReview} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function SubscriptionReviewCreateScreen({
   searchParams,
 }: {

@@ -10,16 +10,11 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("localized legal and workspace shell", () => {
   it("serves legal pages from one RU/EN document system", () => {
-    for (const [path, key] of [
-      ["site/src/app/terms/page.tsx", "terms"],
-      ["site/src/app/privacy/page.tsx", "privacy"],
-      ["site/src/app/copyright/page.tsx", "copyright"],
-      ["site/src/app/community-rules/page.tsx", "communityRules"],
-    ] as const) {
-      const page = read(path);
-      expect(page).toContain("getRequestLocale");
-      expect(page).toContain(`.legal.${key}`);
-      expect(page).toContain("<LegalDocument");
+    const page = read("site/src/features/shell/server/legal-document-page.tsx");
+    expect(page).toContain("getRequestLocale");
+    expect(page).toContain("<LegalDocument");
+    for (const key of ["terms", "privacy", "copyright", "communityRules"] as const) {
+      expect(page).toContain(`legal.${key}`);
     }
 
     const en = getDictionary("en").legal;

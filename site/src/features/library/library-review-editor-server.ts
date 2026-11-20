@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LibraryReviewEditorPage } from "./server/library-review-editor-page";
+export {
+  LibraryReviewEditorPage,
+  libraryReviewEditorMetadata,
+} from "./server/library-review-editor-page";

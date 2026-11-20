@@ -1,5 +1,6 @@
 import { AppError, RESOURCE_RELEASE_WATCH_LIMIT } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,6 +22,13 @@ import { getResourceReleaseControlCopy } from "../resource-release-control-i18n"
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function collectionWatchesMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceReleaseWatchesCopy(await getRequestLocale()).collectionTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function CollectionWatchesScreen({
   params,

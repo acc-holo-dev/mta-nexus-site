@@ -1,3 +1,3 @@
 import "server-only";
 
-export { ProductDetailPage } from "./server/detail-page";
+export { ProductDetailPage, productDetailMetadata } from "./server/detail-page";

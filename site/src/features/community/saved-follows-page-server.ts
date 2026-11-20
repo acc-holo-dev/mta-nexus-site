@@ -1,3 +1,3 @@
 import "server-only";
 
-export { SavedFollowsScreen } from "./server/saved-follows-page";
+export { SavedFollowsScreen, savedFollowsMetadata } from "./server/saved-follows-page";

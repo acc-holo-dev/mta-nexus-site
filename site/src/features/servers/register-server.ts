@@ -1,3 +1,3 @@
 import "server-only";
 
-export { RegisterServerScreen } from "./server/register-screen";
+export { RegisterServerScreen, registerServerMetadata } from "./server/register-screen";

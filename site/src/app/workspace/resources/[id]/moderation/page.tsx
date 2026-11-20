@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
-import { getResourceReleaseControlCopy } from "../../../../../features/library/resource-release-control-i18n";
-import { ResourcePublisherModerationScreen } from "../../../../../features/resources/resource-publisher-moderation-server";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
+import {
+  ResourcePublisherModerationScreen,
+  resourcePublisherModerationMetadata,
+} from "../../../../../features/resources/resource-publisher-moderation-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getResourceReleaseControlCopy(await getRequestLocale()).moderationHistory} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = resourcePublisherModerationMetadata;
 
 export default async function Page(props: {
   params: Promise<{ id: string }>;

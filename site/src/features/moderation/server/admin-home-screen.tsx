@@ -10,6 +10,7 @@ import {
   SectionHeader,
 } from "@nexus/ui";
 import { FileText, ShieldAlert } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -31,6 +32,13 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
+
+export async function adminHomeMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).admin.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function AdminHomeScreen({
   searchParams,

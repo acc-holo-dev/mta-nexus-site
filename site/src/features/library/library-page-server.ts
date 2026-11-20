@@ -1,3 +1,3 @@
 import "server-only";
 
-export { LibraryPageScreen } from "./server/library-page-screen";
+export { LibraryPageScreen, libraryPageMetadata } from "./server/library-page-screen";

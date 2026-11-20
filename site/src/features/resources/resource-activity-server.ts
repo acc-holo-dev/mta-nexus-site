@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ResourceActivityScreen } from "./server/resource-activity-screen";
+export {
+  ResourceActivityScreen,
+  resourceActivityMetadata,
+} from "./server/resource-activity-screen";

@@ -1,3 +1,6 @@
 import "server-only";
 
-export { CollectionWatchesScreen } from "./server/collection-watches-screen";
+export {
+  CollectionWatchesScreen,
+  collectionWatchesMetadata,
+} from "./server/collection-watches-screen";

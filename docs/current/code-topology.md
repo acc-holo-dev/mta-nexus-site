@@ -342,6 +342,8 @@ Scope: all `features/*/server` RSC screens + residual interactive components out
 
 **Waves 287–290 done (local tip):** additive `{error}` on license bearer runtime checks (`valid`+`code` preserved); `LICENSE_CHECK_*` dictionary keys; honesty lock.
 
+**Auth + metadata absorb done:** recovery clients (`forgot`/`reset`/`verify-email`) + login/register server screens → `features/accounts`; market detail metadata → `detail-server`; ~90 App Router pages fold static `generateMetadata` into existing `*-server` screens; honesty locks retargeted to screens.
+
 **Domains cutover done:** `RESOURCES` / `COMMUNITY` / `SERVERS-ORGS` / `TRUST-STAFF` → `docs/current/domains/*` with root redirect stubs; mainline policy expects the four domain files.
 
 **Library residual pages absorb done:** thick `workspace/library` pages (index, updates, downloads, watches, watch history, reviews, versions, collection watches, download receipt, review editor) → `features/library` server screens + `*-server` ports; `userLibraryService` wraps `userLibraryRepository` (workspace dashboard uses the same service).
@@ -555,6 +557,7 @@ Live tracker на момент измерения: 19 карточек, почт
 | A   | Waves 269–281 — additive `{error}` on code-only product/commerce API envelopes                                    | API envelope RU/EN               | **done** |
 | A   | Waves 282–286 — media upload/image + commercial public additive `{error}` helpers                                 | API envelope RU/EN               | **done** |
 | A   | Waves 287–290 — license bearer check/check-release additive `{error}`                                             | API envelope RU/EN               | **done** |
+| T   | Auth recovery/login/register absorb + market metadata + bulk generateMetadata → `*-server`                        | thin App Router + Accounts       | **done** |
 
 Дальше: F/ops external. API envelope RU/EN (code-only + AppError message + license bearer) exhausted. Новые TOPO ID не заводить.
 

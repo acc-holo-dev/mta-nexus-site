@@ -1,3 +1,3 @@
 import "server-only";
 
-export { AuthorResourcesScreen } from "./server/author-resources-screen";
+export { AuthorResourcesScreen, authorResourcesMetadata } from "./server/author-resources-screen";

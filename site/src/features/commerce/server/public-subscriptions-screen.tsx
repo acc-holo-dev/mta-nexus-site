@@ -1,5 +1,6 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CreditCard } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -15,6 +16,12 @@ const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const scopeLinkClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function publicSubscriptionsMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).catalog} | MTA NEXUS`,
+  };
+}
 
 export async function PublicSubscriptionsScreen({
   searchParams,

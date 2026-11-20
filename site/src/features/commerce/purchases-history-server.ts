@@ -1,3 +1,6 @@
 import "server-only";
 
-export { PurchasesHistoryScreen } from "./server/purchases-history-screen";
+export {
+  PurchasesHistoryScreen,
+  purchasesHistoryMetadata,
+} from "./server/purchases-history-screen";

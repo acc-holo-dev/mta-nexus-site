@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SettingsDeveloperScreen } from "./server/settings-developer-screen";
+export {
+  SettingsDeveloperScreen,
+  settingsDeveloperMetadata,
+} from "./server/settings-developer-screen";

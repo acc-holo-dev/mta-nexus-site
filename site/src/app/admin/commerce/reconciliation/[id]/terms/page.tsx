@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
-import { FinancialReconciliationTermsScreen } from "../../../../../../features/commerce/financial-reconciliation-terms-server";
-import { orderTermsCopy } from "../../../../../../features/commerce/order-terms-i18n";
-import { getRequestLocale } from "../../../../../../lib/i18n/server";
+import {
+  FinancialReconciliationTermsScreen,
+  financialReconciliationTermsMetadata,
+} from "../../../../../../features/commerce/financial-reconciliation-terms-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = financialReconciliationTermsMetadata;
 
 export default async function Page({
   params,

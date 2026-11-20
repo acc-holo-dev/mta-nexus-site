@@ -1,24 +1,10 @@
-import type { Metadata } from "next";
-import { LibraryCollectionsScreen } from "../../../../../../features/library/collections-server";
-import { libraryCollectionsCopy } from "../../../../../../features/library/library-collections-i18n";
-import { getRequestLocale } from "../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  LibraryCollectionsScreen,
+  libraryCollectionsMetadata,
+} from "../../../../../../features/library/collections-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${libraryCollectionsCopy(await getRequestLocale()).candidates} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
-export default function Page(props: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-  params: Promise<{ id: string }>;
-}) {
-  return (
-    <div className={pageShellClass}>
-      <LibraryCollectionsScreen {...props} view="add" />
-    </div>
-  );
-}
+
+export const generateMetadata = libraryCollectionsMetadata;
+
+export default LibraryCollectionsScreen;

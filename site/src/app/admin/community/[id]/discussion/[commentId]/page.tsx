@@ -1,16 +1,12 @@
-import { moderatedDiscussionCopy } from "../../../../../../features/community/moderated-discussion-copy";
-import { ModeratedDiscussionScreen } from "../../../../../../features/community/moderated-discussion-server";
-import { getRequestLocale } from "../../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  ModeratedDiscussionScreen,
+  moderatedDiscussionMetadata,
+} from "../../../../../../features/community/moderated-discussion-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
-  return {
-    title: moderatedDiscussionCopy(await getRequestLocale()).title,
-    robots: { index: false, follow: false },
-  };
-}
+
+export const generateMetadata = moderatedDiscussionMetadata;
+
 export default async function Page({
   params,
   searchParams,
@@ -20,12 +16,10 @@ export default async function Page({
 }) {
   const scope = await params;
   return (
-    <div className={pageShellClass}>
-      <ModeratedDiscussionScreen
-        id={scope.id}
-        commentId={scope.commentId}
-        searchParams={searchParams}
-      />
-    </div>
+    <ModeratedDiscussionScreen
+      id={scope.id}
+      commentId={scope.commentId}
+      searchParams={searchParams}
+    />
   );
 }

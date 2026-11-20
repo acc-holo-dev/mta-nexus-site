@@ -1,5 +1,6 @@
 import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { Flag } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -17,6 +18,14 @@ function statusTone(status: string): "warning" | "success" | "danger" | "neutral
   if (status === "dismissed") return "danger";
   if (status === "under_review") return "warning";
   return "neutral";
+}
+
+export async function platformReportsMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return {
+    title: platformReportCopy(locale === "ru" ? "ru" : "en").detail,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function PlatformReportsScreen({

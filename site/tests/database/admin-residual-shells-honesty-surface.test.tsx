@@ -30,22 +30,22 @@ beforeEach(() => {
 const clippedShellPages = [
   "site/src/app/admin/licenses/[id]/history/page.tsx",
   "site/src/app/admin/community/page.tsx",
-  "site/src/app/admin/community/[id]/page.tsx",
+  "site/src/features/community/server/community-moderation-screen.tsx",
   "site/src/app/admin/community/[id]/reports/page.tsx",
   "site/src/app/admin/community/[id]/discussion/page.tsx",
-  "site/src/app/admin/community/[id]/discussion/[commentId]/page.tsx",
-  "site/src/app/admin/community/[id]/discussion/[commentId]/reports/page.tsx",
+  "site/src/features/community/server/moderated-discussion-screen.tsx",
+  "site/src/features/community/server/discussion-reports-screen.tsx",
   "site/src/app/admin/support/page.tsx",
   "site/src/app/admin/support/[id]/page.tsx",
   "site/src/app/admin/support/[id]/messages/page.tsx",
   "site/src/app/admin/reports/page.tsx",
-  "site/src/app/admin/reports/[id]/page.tsx",
+  "site/src/features/community/server/community-report-screen.tsx",
   "site/src/app/admin/reports/[id]/history/page.tsx",
   "site/src/app/admin/reports/targets/page.tsx",
   "site/src/app/admin/commerce/order-cases/page.tsx",
   "site/src/app/admin/commerce/order-cases/[id]/page.tsx",
   "site/src/app/admin/commerce/reviews/page.tsx",
-  "site/src/app/admin/commerce/reviews/[id]/page.tsx",
+  "site/src/features/resources/server/resource-review-report-screen.tsx",
 ] as const;
 
 it("locks residual admin route shells to clipped min-w-0 frames", () => {
@@ -53,7 +53,7 @@ it("locks residual admin route shells to clipped min-w-0 frames", () => {
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { History } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -60,6 +61,13 @@ function ResourceBuildLoadError({
       />
     </section>
   );
+}
+
+export async function resourceBuildMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceBuildWorkspaceCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ResourceBuildScreen({

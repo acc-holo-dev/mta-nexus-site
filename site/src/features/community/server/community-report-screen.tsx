@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,13 @@ import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
+export async function communityReportMetadata(): Promise<Metadata> {
+  return {
+    title: communityReportCopy(await getRequestLocale()).detail,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CommunityReportScreen({
   staff = false,
   id,

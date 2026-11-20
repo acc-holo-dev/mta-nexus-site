@@ -4,6 +4,7 @@ import {
   LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS,
 } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,6 +24,13 @@ import {
   membershipHistoryHref,
 } from "../library-membership-history-query";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
+export async function libraryMembershipHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryMembershipHistoryCopy(await getRequestLocale()).detail} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,

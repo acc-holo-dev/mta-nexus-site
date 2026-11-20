@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,6 +16,13 @@ import { LibrarySelectionBatchControls } from "../components/library-selection-b
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionId, collectionPageParams, collectionsQuery } from "../library-collections-query";
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
+export async function librarySelectionBatchMetadata(): Promise<Metadata> {
+  return {
+    title: `${librarySelectionBatchesCopy(await getRequestLocale()).history} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,

@@ -96,8 +96,8 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
 
   it("uses shared @nexus/ui Input/Button/ErrorState on auth and recovery screens", () => {
     const auth = read("site/src/features/accounts/components/auth-form.tsx");
-    const forgot = read("site/src/app/auth/forgot-password/page.tsx");
-    const reset = read("site/src/app/auth/reset-password/page.tsx");
+    const forgot = read("site/src/features/accounts/components/forgot-password-page.tsx");
+    const reset = read("site/src/features/accounts/components/reset-password-page.tsx");
 
     for (const source of [auth, forgot, reset]) {
       expect(source).toContain('from "@nexus/ui"');

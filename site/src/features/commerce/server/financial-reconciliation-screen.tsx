@@ -2,6 +2,7 @@ import { financialReviewRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Receipt } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,6 +18,14 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
+
+export async function financialReconciliationMetadata(): Promise<Metadata> {
+  return {
+    title: `${getFinancialCopy(await getRequestLocale()).review} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function FinancialReconciliationScreen({
   searchParams,
 }: {

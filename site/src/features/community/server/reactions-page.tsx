@@ -1,5 +1,6 @@
 import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -15,6 +16,11 @@ import { ReactionRemoval } from "../reaction-removal";
 const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function reactionsPageMetadata(): Promise<Metadata> {
+  const copy = reactionCopy(await getRequestLocale());
+  return { title: copy.my, description: copy.description, robots: { index: false, follow: false } };
+}
 
 export async function ReactionsPageScreen({
   searchParams,

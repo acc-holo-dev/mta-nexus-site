@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ResourceVariantsScreen } from "./server/resource-variants-screen";
+export {
+  ResourceVariantsScreen,
+  resourceVariantsMetadata,
+} from "./server/resource-variants-screen";

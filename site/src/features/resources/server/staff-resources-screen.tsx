@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,6 +18,14 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
+
+export async function staffResourcesMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function StaffResourcesScreen({
   searchParams,
 }: {

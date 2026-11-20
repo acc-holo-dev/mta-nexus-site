@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LicenseModerationScreen } from "./server/license-moderation-screen";
+export {
+  LicenseModerationScreen,
+  licenseModerationMetadata,
+} from "./server/license-moderation-screen";

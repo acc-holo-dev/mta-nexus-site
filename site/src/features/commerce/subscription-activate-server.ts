@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionActivateScreen } from "./server/subscription-activate-screen";
+export {
+  SubscriptionActivateScreen,
+  subscriptionActivateMetadata,
+} from "./server/subscription-activate-screen";

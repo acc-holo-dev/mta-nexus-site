@@ -1,3 +1,6 @@
 import "server-only";
 
-export { SubscriptionReviewDetailScreen } from "./server/subscription-review-detail-screen";
+export {
+  SubscriptionReviewDetailScreen,
+  subscriptionReviewDetailMetadata,
+} from "./server/subscription-review-detail-screen";

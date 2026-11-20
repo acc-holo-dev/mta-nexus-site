@@ -1,3 +1,6 @@
 import "server-only";
 
-export { PublisherDeliveriesScreen } from "./server/publisher-deliveries-screen";
+export {
+  PublisherDeliveriesScreen,
+  publisherDeliveriesMetadata,
+} from "./server/publisher-deliveries-screen";

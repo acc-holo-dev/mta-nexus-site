@@ -1,5 +1,6 @@
 import { AppError, type Product } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,6 +25,13 @@ const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const primaryCtaClass =
   "inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function authorResourcesMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).authorResources.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function AuthorResourcesScreen({
   searchParams,

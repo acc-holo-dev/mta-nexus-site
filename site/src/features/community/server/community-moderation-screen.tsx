@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { FileText, ShieldAlert } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,6 +29,13 @@ import { platformFieldClass } from "../user-platform-client";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function communityModerationMetadata(): Promise<Metadata> {
+  return {
+    title: moderationCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function CommunityModerationScreen({
   id,

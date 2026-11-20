@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,6 +21,13 @@ import {
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
+
+export async function licenseModerationMetadata(): Promise<Metadata> {
+  return {
+    title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function LicenseModerationScreen({
   searchParams,

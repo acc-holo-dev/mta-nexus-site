@@ -1,3 +1,6 @@
 import "server-only";
 
-export { LibraryWatchHistoryScreen } from "./server/library-watch-history-screen";
+export {
+  LibraryWatchHistoryScreen,
+  libraryWatchHistoryMetadata,
+} from "./server/library-watch-history-screen";

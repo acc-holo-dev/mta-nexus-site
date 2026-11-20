@@ -1,27 +1,18 @@
-import type { Metadata } from "next";
-import { ServerWorkspaceHistoryScreen } from "../../../../../features/servers/activity-server";
-import { getServerActivityCopy } from "../../../../../features/servers/server-activity-view";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import {
+  ServerWorkspaceHistoryScreen,
+  serverWorkspaceHistoryMetadata,
+} from "../../../../../features/servers/activity-server";
 
 export const dynamic = "force-dynamic";
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${getServerActivityCopy(await getRequestLocale()).title} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
-export default async function ServerActivityPage({
+
+export const generateMetadata = serverWorkspaceHistoryMetadata;
+
+export default async function Page({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return (
-    <div className={pageShellClass}>
-      {await ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams })}
-    </div>
-  );
+  return ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams });
 }

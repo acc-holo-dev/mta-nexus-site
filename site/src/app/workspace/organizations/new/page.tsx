@@ -1,16 +1,10 @@
-import { OrganizationCreateScreen } from "../../../../features/organizations/organization-create-server";
-import { getOrganizationCopy } from "../../../../features/organizations/organization-workspace-copy";
-import { getRequestLocale } from "../../../../lib/i18n/server";
+import {
+  OrganizationCreateScreen,
+  organizationCreateMetadata,
+} from "../../../../features/organizations/organization-create-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
-  return {
-    title: getOrganizationCopy(await getRequestLocale()).create,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = organizationCreateMetadata;
 
-export default async function Page() {
-  return OrganizationCreateScreen();
-}
+export default OrganizationCreateScreen;

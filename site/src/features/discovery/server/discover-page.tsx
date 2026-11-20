@@ -7,6 +7,7 @@ import {
   Server as ServerIcon,
   ShoppingBag,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -27,6 +28,11 @@ const ICONS = {
   organizations: Building2,
   content: FileText,
 } satisfies Record<DiscoverType, typeof ServerIcon>;
+
+export async function discoverMetadata(): Promise<Metadata> {
+  const copy = getDictionary(await getRequestLocale()).discover;
+  return { title: copy.title, description: copy.description };
+}
 
 export async function DiscoverPage({
   searchParams,

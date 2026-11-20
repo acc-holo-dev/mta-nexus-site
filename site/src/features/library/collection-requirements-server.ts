@@ -1,3 +1,6 @@
 import "server-only";
 
-export { CollectionRequirementsScreen } from "./server/collection-requirements-screen";
+export {
+  CollectionRequirementsScreen,
+  collectionRequirementsMetadata,
+} from "./server/collection-requirements-screen";

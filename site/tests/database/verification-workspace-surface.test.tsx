@@ -278,5 +278,5 @@ it("binds SSR history/managed organization filters to the session and marks priv
     { id: "actor", role: "developer" },
     expect.objectContaining({ page: 3, query: "Team" }),
   );
-  expect((await generateMetadata()).robots.index).toBe(false);
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });

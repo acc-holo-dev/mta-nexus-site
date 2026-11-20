@@ -1,3 +1,3 @@
 import "server-only";
 
-export { AdminHomeScreen } from "./server/admin-home-screen";
+export { AdminHomeScreen, adminHomeMetadata } from "./server/admin-home-screen";

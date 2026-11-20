@@ -1,3 +1,4 @@
+import { config } from "@nexus/config";
 import {
   followWorkspaceRepository,
   notificationRepository,
@@ -6,6 +7,7 @@ import {
 import { buildResourceVersionHelp } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -38,6 +40,7 @@ import { ReverseDependencyList } from "../components/reverse-dependency-list";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../public-release-history";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
+import { safeResourceImageUrl } from "../resource-image-url";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
@@ -93,6 +96,41 @@ function readQaThreadId(value: string | string[] | undefined): string | null {
   if (!raw || typeof raw !== "string") return null;
   const id = raw.trim();
   return /^[A-Za-z0-9_-]{8,128}$/.test(id) ? id : null;
+}
+
+export async function productDetailMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [locale, product] = await Promise.all([
+    getRequestLocale(),
+    productService.getProductBySlug(slug),
+  ]);
+  const dictionary = getDictionary(locale);
+
+  if (!product) {
+    return { title: dictionary.product.notFound, robots: { index: false, follow: false } };
+  }
+
+  const description = product.shortDescription || product.description.slice(0, 155);
+  const previewUrl = safeResourceImageUrl(product.thumbnailUrl);
+  const thumbnailUrl = previewUrl?.startsWith("/")
+    ? new URL(previewUrl, config.NEXT_PUBLIC_APP_URL).href
+    : previewUrl;
+
+  return {
+    title: product.title,
+    description,
+    alternates: { canonical: `/market/${product.slug}` },
+    openGraph: {
+      title: product.title,
+      description,
+      type: "website",
+      images: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined,
+    },
+  };
 }
 
 export async function ProductDetailPage({

@@ -1,3 +1,6 @@
 import "server-only";
 
-export { AcquisitionReceiptsScreen } from "./server/acquisition-receipts-screen";
+export {
+  AcquisitionReceiptsScreen,
+  acquisitionReceiptsMetadata,
+} from "./server/acquisition-receipts-screen";

@@ -1,4 +1,5 @@
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -14,6 +15,15 @@ import { followCopy } from "../follow-workspace-copy";
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const retryLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function savedFollowsMetadata(): Promise<Metadata> {
+  const copy = followCopy(await getRequestLocale());
+  return {
+    title: copy.title,
+    description: copy.description,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function SavedFollowsScreen({
   searchParams,

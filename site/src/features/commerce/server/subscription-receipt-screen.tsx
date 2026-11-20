@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,6 +22,13 @@ import {
 } from "../subscriptions-query";
 
 const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+export async function subscriptionReceiptMetadata(): Promise<Metadata> {
+  return {
+    title: `${subscriptionsCopy(await getRequestLocale()).recorded} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function SubscriptionReceiptScreen({
   params,
   searchParams,

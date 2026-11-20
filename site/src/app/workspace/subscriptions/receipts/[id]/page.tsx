@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
-import { SubscriptionReceiptScreen } from "../../../../../features/commerce/subscription-receipt-server";
-import { subscriptionsCopy } from "../../../../../features/commerce/subscriptions-i18n";
-import { getRequestLocale } from "../../../../../lib/i18n/server";
+import {
+  SubscriptionReceiptScreen,
+  subscriptionReceiptMetadata,
+} from "../../../../../features/commerce/subscription-receipt-server";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `${subscriptionsCopy(await getRequestLocale()).recorded} | MTA NEXUS`,
-    robots: { index: false, follow: false },
-  };
-}
+export const generateMetadata = subscriptionReceiptMetadata;
 
 export default async function Page(props: {
   params: Promise<{ id: string }>;

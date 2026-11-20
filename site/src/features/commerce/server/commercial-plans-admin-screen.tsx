@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { CreditCard } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,6 +16,13 @@ import { getCommercialCopy } from "../commercial-i18n";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export async function commercialPlansAdminMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).admin} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CommercialPlansAdminScreen({
   searchParams,
 }: {

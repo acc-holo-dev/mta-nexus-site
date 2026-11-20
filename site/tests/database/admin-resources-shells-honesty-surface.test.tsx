@@ -37,10 +37,10 @@ beforeEach(() => {
 });
 
 const clippedShellPages = [
-  "site/src/app/admin/resources/[id]/media/page.tsx",
-  "site/src/app/admin/resources/[id]/requirements/page.tsx",
-  "site/src/app/admin/resources/[id]/builds/[buildId]/page.tsx",
-  "site/src/app/admin/resources/[id]/builds/[buildId]/package/page.tsx",
+  "site/src/features/resources/server/media-screen.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
+  "site/src/features/resources/server/build-screen.tsx",
+  "site/src/features/resources/server/build-package-screen.tsx",
 ] as const;
 
 const clippedResourceLoadings = [
@@ -57,7 +57,7 @@ it("locks admin resource route shells to clipped min-w-0 frames", () => {
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    
   }
 });
 

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { PurchaseTermsScreen } from "./server/purchase-terms-screen";
+export { PurchaseTermsScreen, purchaseTermsMetadata } from "./server/purchase-terms-screen";

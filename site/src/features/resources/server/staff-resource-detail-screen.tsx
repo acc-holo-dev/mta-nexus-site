@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,13 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
+
+export async function staffResourceDetailMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).decisionDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function StaffResourceDetailScreen({
   params,

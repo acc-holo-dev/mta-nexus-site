@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -19,6 +20,13 @@ import {
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
+
+export async function libraryCollectionsMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryCollectionsCopy(await getRequestLocale()).candidates} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function LibraryCollectionsScreen({
   view = "list",

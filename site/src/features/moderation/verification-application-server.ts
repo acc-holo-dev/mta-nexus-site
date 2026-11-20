@@ -1,3 +1,6 @@
 import "server-only";
 
-export { VerificationApplicationScreen } from "./server/verification-application-screen";
+export {
+  VerificationApplicationScreen,
+  verificationApplicationMetadata,
+} from "./server/verification-application-screen";

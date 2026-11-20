@@ -1,3 +1,6 @@
 import "server-only";
 
-export { VerificationHistoryScreen } from "./server/verification-history-screen";
+export {
+  VerificationHistoryScreen,
+  verificationHistoryMetadata,
+} from "./server/verification-history-screen";

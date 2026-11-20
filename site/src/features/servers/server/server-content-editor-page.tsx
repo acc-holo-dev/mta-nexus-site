@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
@@ -20,6 +21,13 @@ import { serverPublicationHistoryCopy } from "../server-publication-history-copy
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function serverContentEditorMetadata(): Promise<Metadata> {
+  return {
+    title: getUserPlatformCopy(await getRequestLocale()).edit,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function ServerContentEditorPage({
   id,
