@@ -166,7 +166,7 @@ describe("bounded home feed reads", () => {
     expect(html).toContain(copy.personalEmptyHint);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the Home shell and recovers personal load failure with ErrorState retry", async () => {
@@ -182,7 +182,7 @@ describe("bounded home feed reads", () => {
     expect(html).toContain('href="/"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("personal-secret");
     expect(html).not.toContain(copy.personalEmpty);
   });

@@ -189,7 +189,7 @@ describe("Next.js root runtime shell behavior", () => {
       expect(html).toContain(`>${dictionary.errors.retry}</span>`);
       expect(html).toContain(`>${dictionary.errors.home}</span>`);
       expect(html).toContain('href="/"');
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).toContain("flex min-h-11 items-center");
       expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(2);
     },

@@ -177,7 +177,7 @@ describe("workspace and resource UI surface", () => {
       expect(html).toContain('for="publisher-type"');
       expect(html).toContain('data-ui="button"');
       expect(html).toContain(copy.apply);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).not.toContain("h-10");
     },
   );

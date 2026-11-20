@@ -8,6 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
 import { platformFieldClass } from "../user-platform-client";
@@ -312,10 +313,7 @@ export function CommunityReportForm({
             >
               {pending ? copy.submitting : intent ? copy.retryOriginal : copy.submit}
             </Button>
-            <Link
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href="/workspace/reports"
-            >
+            <Link className={linkAccentSm} href="/workspace/reports">
               {copy.myReports}
             </Link>
           </div>

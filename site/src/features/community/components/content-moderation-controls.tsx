@@ -1,6 +1,5 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +9,7 @@ import {
   moderationDetailHref,
 } from "../../moderation/community-moderation-contract";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 
@@ -184,10 +184,7 @@ export function ContentModerationControls({
         </p>
       )}
       {saved && (
-        <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={workspace ? moderationDetailHref(contentId) : "/admin"}
-        >
+        <a className={linkAccentSm} href={workspace ? moderationDetailHref(contentId) : "/admin"}>
           {moderationCopy(locale).reload}
         </a>
       )}

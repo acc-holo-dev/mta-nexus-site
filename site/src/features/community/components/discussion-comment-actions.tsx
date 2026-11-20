@@ -3,6 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
@@ -263,7 +264,7 @@ export function DiscussionCommentActions({
                   recoveryHref ??
                   `/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`
                 }
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
               >
                 {copy.reloadSaved}
               </a>

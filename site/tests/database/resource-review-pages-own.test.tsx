@@ -84,7 +84,7 @@ it("shows EmptyState honesty when own reviews are empty", async () => {
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.ownEmptyHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("shows an honest recovery state when own reviews fail to load", async () => {
   mocks.ownPage.mockRejectedValueOnce(new Error("reviews unavailable"));

@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confirmation";
@@ -217,7 +218,7 @@ export function PlanReviewForm({
         onSubmit={submit}
         hidden={readyScope !== renderScope}
         style={readyScope !== renderScope ? { display: "none" } : undefined}
-        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5"
+        className={panelClipSpace5P5}
       >
         <PlanReviewTerms terms={shownPlan} locale={locale} />
         <p className="text-sm">

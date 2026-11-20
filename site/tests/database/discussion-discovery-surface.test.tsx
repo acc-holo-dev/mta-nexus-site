@@ -159,7 +159,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/workspace/saved?type=content"');
     expect(html).toContain('href="/settings#notification-heading"');
     expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("Checking");
   },

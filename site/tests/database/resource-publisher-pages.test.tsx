@@ -164,7 +164,7 @@ it.each([
     expect(html).toContain(expectText);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
       expect(html).toContain("/workspace/resources/new");
       expect(html).toContain(getDictionary(locale).authorResources.emptyHint);

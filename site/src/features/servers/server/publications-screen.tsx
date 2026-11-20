@@ -16,6 +16,7 @@ import {
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
@@ -112,10 +113,7 @@ export async function ServerPublicationsScreen({
           {result.items.length ? (
             <div className="space-y-3">
               {result.items.map((item) => (
-                <article
-                  key={item.id}
-                  className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4"
-                >
+                <article key={item.id} className={panelClipSpace3P4}>
                   <div className="flex flex-wrap justify-between gap-2">
                     <h2 className="break-words font-heading text-primary">
                       <Link

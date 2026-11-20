@@ -24,7 +24,9 @@ import { moderationCopy } from "../../community/community-moderation-copy";
 import { ContentModerationControls } from "../../community/content-moderation";
 import { getResourceReleaseControlCopy } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkAccentXs } from "../../shell/link-shell";
 import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
+import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   AdminAdPlacementSection,
@@ -164,10 +166,7 @@ export async function AdminHomeScreen({
           title={copy.hubUnavailable}
           description={copy.hubUnavailableHint}
           action={
-            <Link
-              href={adminHref({})}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={adminHref({})} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -294,10 +293,7 @@ export async function AdminHomeScreen({
           title={copy.communityQueue}
           description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
           action={
-            <Link
-              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href="/admin/community"
-            >
+            <Link className={linkAccentXs} href="/admin/community">
               {moderationCopy(locale).title}
             </Link>
           }
@@ -305,10 +301,7 @@ export async function AdminHomeScreen({
         <div className="space-y-2.5">
           {pendingContent.length > 0 ? (
             pendingContent.map((item) => (
-              <div
-                key={item.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
+              <div key={item.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
@@ -386,7 +379,7 @@ export async function AdminHomeScreen({
       {canViewAudit && (
         <section>
           <SectionHeader title={copy.auditLog} description={copy.auditDescription} />
-          <div className="nexus-panel p-4">
+          <div className={panelP4}>
             <DataTable label={copy.auditLog}>
               <DataTableHeader
                 columns={[

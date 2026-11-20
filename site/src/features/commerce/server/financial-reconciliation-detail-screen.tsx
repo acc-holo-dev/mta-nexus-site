@@ -9,6 +9,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -153,7 +154,7 @@ export async function FinancialReconciliationDetailScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

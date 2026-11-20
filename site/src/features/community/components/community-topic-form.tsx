@@ -1,4 +1,6 @@
-"use client";
+import { linkAccentSmPlain } from "../../shell/link-shell";
+
+("use client");
 
 import { Button, ErrorState, Field } from "@nexus/ui";
 import Link from "next/link";
@@ -288,10 +290,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
       {(!actorId || !identityVerified || foreignActor) && (
         <div className="space-y-1">
           {!actorId && <p className="text-sm text-muted">{copy.topicGuestDraft}</p>}
-          <Link
-            href={authEntryHref("login", "/community/new")}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          >
+          <Link href={authEntryHref("login", "/community/new")} className={linkAccentSmPlain}>
             {copy.topicSignIn}
           </Link>
         </div>
@@ -399,7 +398,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
         {occupiedId && (
           <Link
             href={`/workspace/content/${encodeURIComponent(occupiedId)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className={linkAccentSmPlain}
           >
             {copy.topicOpenSaved}
           </Link>

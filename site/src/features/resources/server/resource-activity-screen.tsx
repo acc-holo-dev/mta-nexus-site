@@ -11,6 +11,7 @@ import { resourceActivityService } from "../../../lib/services/resources/resourc
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
@@ -122,7 +123,7 @@ export async function ResourceActivityScreen({
       </p>
       <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((key) => (
-          <div key={key} className="nexus-panel space-y-2 p-5">
+          <div key={key} className={panelSpace2P5}>
             <dt className="text-sm text-secondary">{copy[key]}</dt>
             <dd className="text-2xl font-semibold">
               {result[key].toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}

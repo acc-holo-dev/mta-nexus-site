@@ -10,6 +10,7 @@ import {
 } from "../../organizations/organization-content-copy";
 import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
@@ -289,7 +290,7 @@ export function AuthorContentForm({
             <Link
               prefetch={false}
               href={`/workspace/content/${encodeURIComponent(saved.id)}/history`}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentRounded}
             >
               {authorPublicationDeskCopy(locale).history}
             </Link>
@@ -298,18 +299,12 @@ export function AuthorContentForm({
             {copy.status}: {copy[saved.status]}
           </span>
           {saved.status === "published" && (
-            <Link
-              href={`/articles/${saved.slug}`}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`/articles/${saved.slug}`} className={linkAccentRounded}>
               {copy.publicView}
             </Link>
           )}
           {archived && (
-            <Link
-              href={publicationSupportHref(saved.title)}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={publicationSupportHref(saved.title)} className={linkAccentRounded}>
               {copy.archivedNote}
             </Link>
           )}
@@ -330,10 +325,7 @@ export function AuthorContentForm({
             </Button>
           )}
           {(organization || server) && !saved && (
-            <Link
-              href={workspacePath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={workspacePath} className={linkAccentSmRounded}>
               {server ? serverContentCopy(locale).title : organizationContentCopy(locale).title}
             </Link>
           )}

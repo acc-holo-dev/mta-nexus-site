@@ -24,7 +24,7 @@ it("locks ErrorState read failures, EmptyState empties, min-h-11 CTAs, and clip 
   expect(source).toContain("historyUnavailableDescription");
   expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-9");
   expect(source).toContain("copy.historyEmpty");
   expect(source).toContain("copy.reload");

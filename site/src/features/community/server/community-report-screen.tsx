@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlBare, pageShellStack4, pageShellStack6 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -88,10 +89,7 @@ export async function CommunityReportScreen({
           title={copy.forbidden}
           description={copy.forbiddenHint}
           action={
-            <Link
-              href="/admin"
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin" className={linkAccentSmRounded}>
               {dictionary.admin.title}
             </Link>
           }
@@ -104,10 +102,7 @@ export async function CommunityReportScreen({
       <h1 className="text-2xl font-bold text-primary">{title}</h1>
       <p className="text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
       {staff && !id && (
-        <Link
-          href="/admin/reports/targets"
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
           {reportGroupsCopy(locale).open}
         </Link>
       )}
@@ -144,10 +139,7 @@ export async function CommunityReportScreen({
           title={copy.queryInvalid}
           description={copy.queryInvalidHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {copy.reset}
             </Link>
           }

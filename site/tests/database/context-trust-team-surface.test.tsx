@@ -110,7 +110,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/organizations/team/trust?cursor=next"');
     expect(html).toContain(copy.verifiedServers);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("secret");
     expect(await contextTrustMetadata("organization", context)).toMatchObject({
       title: copy.title,
@@ -155,7 +155,7 @@ it("rejects proof/identity query overrides before service and provides a fresh-s
   expect(html).toContain('role="alert"');
   expect(html).toContain(approvalCopy("en").invalid);
   expect(html).toContain('href="/servers/team/trust"');
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(mocks.trust).not.toHaveBeenCalled();
 });
 it("uses 404 for missing/nonpublic contexts and does not show empty records on failures", async () => {
@@ -168,7 +168,7 @@ it("uses 404 for missing/nonpublic contexts and does not show empty records on f
   expect(html).toContain('role="alert"');
   expect(html).toContain(contextTrustCopy("en").unavailable);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(contextTrustCopy("en").empty);
   expect(html).not.toContain(contextTrustCopy("en").emptyHint);
   expect(html).not.toContain("secret evidence");

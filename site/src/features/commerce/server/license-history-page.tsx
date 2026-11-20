@@ -11,6 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { panelSpace2P4TextSm } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
@@ -128,7 +129,7 @@ export async function LicenseHistoryPage({
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((event) => (
-            <li key={event.id} className="nexus-panel space-y-2 p-4 text-sm">
+            <li key={event.id} className={panelSpace2P4TextSm}>
               <p>
                 {licenseActionLabel(locale, event.action)} ·{" "}
                 {event.actorType === "admin"

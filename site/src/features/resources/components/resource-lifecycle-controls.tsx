@@ -17,6 +17,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { stashSupportObjectContext } from "../../support/center";
@@ -182,7 +183,7 @@ export function ResourceLifecycleControls({
           action={
             <Link
               href={unavailableBuildSupportHref()}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
               onClick={() =>
                 stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
               }
@@ -200,7 +201,7 @@ export function ResourceLifecycleControls({
             product.status === "suspended" ? (
               <Link
                 href={unavailableBuildSupportHref()}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
                 onClick={() => stashSupportObjectContext({ productId: product.id })}
               >
                 {copy.openSupportCase}

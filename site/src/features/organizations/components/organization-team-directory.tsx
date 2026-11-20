@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
@@ -127,7 +128,7 @@ export function OrganizationTeamDirectory({
   }
   const filtered = !!filters.query || filters.role !== undefined || filters.access !== undefined;
   return (
-    <section className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5" aria-busy={pending}>
+    <section className={panelClipSpace5P5} aria-busy={pending}>
       <p className="text-xs text-muted">{copy.private}</p>
       {data.owner && (
         <div className="space-y-2 rounded-lg border border-base p-4">

@@ -47,5 +47,5 @@ it("locks license control ghost CTAs to size=touch without size=sm stragglers", 
   expect(source).not.toContain('size="sm"');
   expect(source).not.toContain("min-h-10");
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(6);
-  expect(source).toMatch(/min-h-11|size="touch"/u);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
 });

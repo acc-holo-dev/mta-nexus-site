@@ -15,6 +15,7 @@ import { libraryCollectionsService } from "../../../lib/services/library/library
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -395,7 +396,7 @@ export default async function Page({
                 {c.previous}
               </Link>
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {report.page} {c.of} {report.totalPages}
             </span>
             {report.page < report.totalPages && (

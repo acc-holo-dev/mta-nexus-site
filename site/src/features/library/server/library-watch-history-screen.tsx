@@ -15,12 +15,13 @@ import { resourceReleaseWatchesService } from "../../../lib/services/resources/r
 import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import {
   pageShellMax5xl as pageShellClass,
   pageShellStack3,
   pageShellStack4,
 } from "../../shell/page-shell";
-import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 
@@ -127,10 +128,7 @@ export async function LibraryWatchHistoryScreen({
       </Link>
       <h1 className="min-w-0 break-words font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
-      <form
-        method="get"
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-4 overflow-x-clip p-4"
-      >
+      <form method="get" className={panelFlexClipWrapEndGap4}>
         <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
           <span className={labelClass}>{c.days}</span>
           <select name="days" className={selectClass} defaultValue={result.days}>
@@ -243,7 +241,7 @@ export async function LibraryWatchHistoryScreen({
               {c.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {c.page} {result.page} {c.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

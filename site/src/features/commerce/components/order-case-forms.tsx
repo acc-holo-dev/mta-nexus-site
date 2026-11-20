@@ -11,6 +11,7 @@ import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { linkAccentRounded } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   clearSupportRetry,
@@ -195,7 +196,7 @@ export function OrderCaseCreateForm({
           {copy.saved}{" "}
           <Link
             href={`/workspace/order-cases/${encodeURIComponent(savedId)}`}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentRounded}
           >
             {copy.open}
           </Link>

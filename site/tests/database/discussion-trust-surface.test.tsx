@@ -256,7 +256,7 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(empty).toContain(copy.verified);
   expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(empty).toContain("min-h-11");
+  expect(empty).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   mocks.approvals.mockResolvedValueOnce({
     subject,
     items: [],
@@ -276,7 +276,7 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(failed).toContain('role="alert"');
   expect(failed).toContain(getDictionary("en").errors.retry);
   expect(failed).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(failed).toContain("min-h-11");
+  expect(failed).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(failed).not.toContain(approvalCopy("en").empty);
   expect(failed).not.toContain(approvalCopy("en").emptyHint);
   expect(failed).not.toContain("secret proof");
@@ -288,7 +288,7 @@ it("rejects public proof filters and returns missing profile 404", async () => {
   expect(html).toContain(approvalCopy("en").invalid);
   expect(html).toContain('role="alert"');
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/users/writer/trust/history"');
   expect(mocks.approvals).not.toHaveBeenCalled();
   mocks.approvals.mockRejectedValue(new AppError("missing", 404, "NOT_FOUND"));

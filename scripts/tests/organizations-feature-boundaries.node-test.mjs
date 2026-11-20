@@ -232,7 +232,10 @@ test("Organizations route entries retain dynamic rendering and metadata", () => 
   ]) {
     const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
     assert.match(source, /export const dynamic = "force-dynamic";/u);
-    assert.match(source, /export\s*\{\s*default,\s*generateMetadata,?\s*\}\s*from/u);
+    assert.match(
+      source,
+      /export\s*\{\s*(?:default,\s*generateMetadata|[A-Za-z]\w*\s+as\s+default,\s*[A-Za-z]\w*\s+as\s+generateMetadata),?\s*\}\s*from/u,
+    );
     assert(source.includes(`/${port}-server";`));
   }
 });

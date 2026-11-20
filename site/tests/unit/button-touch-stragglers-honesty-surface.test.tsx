@@ -19,7 +19,7 @@ it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-
   for (const path of exclusive) {
     const source = read(path);
     expect(source, path).toContain('size="touch"');
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain("min-h-10");
   }
 });

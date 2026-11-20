@@ -6,6 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community/community-report-history-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { reportId, reportRateLimit } from "../community-report-api";
@@ -79,10 +80,7 @@ export async function CommunityReportHistoryPage({
           )}
           description={copy.unavailableHint}
           action={
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSm}>
               {copy.reset}
             </Link>
           }

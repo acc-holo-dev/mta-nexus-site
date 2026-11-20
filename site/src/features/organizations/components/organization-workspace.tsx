@@ -13,6 +13,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
@@ -443,7 +444,7 @@ export function OrganizationWorkspacePanel({
           ) : (
             <span />
           )}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {data.page}
           </span>
           {data.hasMore && (

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
@@ -194,7 +195,7 @@ export function ResourceDownloadButton({
       receipt.version === version ? (
         <Link
           href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {resourceDeliveriesCopy(locale).details}
         </Link>

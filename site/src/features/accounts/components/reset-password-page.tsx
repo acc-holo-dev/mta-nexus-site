@@ -6,6 +6,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
@@ -99,10 +100,7 @@ export function ResetPasswordPage() {
 
   return (
     <div className={pageShellClass}>
-      <section
-        aria-labelledby="reset-heading"
-        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-6 shadow-nexus-sm"
-      >
+      <section aria-labelledby="reset-heading" className={panelClipSpace5P6Shadow}>
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
           <h1 id="reset-heading" className="font-display text-primary">

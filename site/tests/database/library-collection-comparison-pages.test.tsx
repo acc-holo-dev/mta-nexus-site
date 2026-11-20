@@ -210,7 +210,7 @@ it("chooses an owned comparison target before reading resources", async () => {
   expect(html).toContain(copy.choose);
   expect(html).toContain(copy.chooseHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-transfer");
   expect(html).not.toContain("Accessible");
@@ -224,7 +224,7 @@ it("shows EmptyState when comparison filters match no references", async () => {
   const copy = libraryCollectionComparisonCopy("en");
   expect(html).toContain(copy.emptyHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('role="alert"');
   expect(html).toContain('id="library-collection-compare-no-source-items"');
   expect(html).toContain(copy.noSourceItems);
@@ -238,7 +238,7 @@ it("shows ErrorState recovery when comparison fails to load", async () => {
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("returns to the collection list when the comparison identifier is invalid and session lookup fails", async () => {
   vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { confirmedReactionRemoval } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 
@@ -135,10 +136,7 @@ export function ReactionRemoval({
         </p>
       ) : null}
       {(phase === "blocked" || phase === "removed") && (
-        <a
-          href={reloadHref}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <a href={reloadHref} className={linkAccentSm}>
           {copy.reload}
         </a>
       )}

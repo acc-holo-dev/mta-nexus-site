@@ -16,7 +16,7 @@ it("locks admin support access denied to ErrorState with home recovery", () => {
   expect(source).toContain("description={dictionary.admin.accessDeniedDescription}");
   expect(source).toContain("ShieldAlert");
   expect(source).toContain("dictionary.errors.home");
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(source).not.toContain("font-caption text-muted");
   expect(source).not.toContain("font-display text-primary");

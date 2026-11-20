@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { linkAccentSm } from "../../shell/link-shell";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 
 function downloadSupportContext(value: {
@@ -29,10 +30,7 @@ export function SupportDownloadHelpLink({
   const context = downloadSupportContext({ productId, buildId, receiptId });
   if (!context) return null;
   return (
-    <Link
-      href={supportObjectContextHref(context)}
-      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-    >
+    <Link href={supportObjectContextHref(context)} className={linkAccentSm}>
       {label}
     </Link>
   );

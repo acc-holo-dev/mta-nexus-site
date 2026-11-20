@@ -1,5 +1,4 @@
-import { LoginScreen, loginMetadata } from "../../../features/accounts/login-page-server";
-
-export const generateMetadata = loginMetadata;
-
-export default LoginScreen;
+export {
+  LoginScreen as default,
+  loginMetadata as generateMetadata,
+} from "../../../features/accounts/login-page-server";

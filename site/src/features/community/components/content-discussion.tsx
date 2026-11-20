@@ -9,6 +9,8 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import {
   ContentCommentSubmitError,
   createCommentIntentKey,
@@ -401,7 +403,7 @@ export function ContentDiscussion({
   const emptyFiltered = Boolean(activeQuery.current);
   return (
     <section id="discussion" className={shellClass}>
-      <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4">
+      <div className={panelClipSpace3P4}>
         <ContentFollowControls
           contentId={contentId}
           title={title ?? slug}
@@ -440,10 +442,7 @@ export function ContentDiscussion({
       </div>
 
       {viewer && (
-        <Link
-          href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/discussions" className={linkAccentSm}>
           {ownDiscussionCopy(locale).title}
         </Link>
       )}

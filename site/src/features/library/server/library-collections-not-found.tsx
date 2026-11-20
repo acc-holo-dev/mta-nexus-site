@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { linkAccentRounded } from "../../shell/link-shell";
 import { pageShellMaxXl } from "../../shell/page-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 
@@ -8,10 +9,7 @@ export async function LibraryCollectionsNotFound() {
   return (
     <section className={pageShellMaxXl}>
       <h1 className="font-display text-primary">{c.notFound}</h1>
-      <Link
-        href="/workspace/library/collections"
-        className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/library/collections" className={linkAccentRounded}>
         {c.title}
       </Link>
     </section>

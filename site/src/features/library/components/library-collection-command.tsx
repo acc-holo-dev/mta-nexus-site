@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -396,7 +397,7 @@ export function LibraryCollectionCommandForm({
             action={
               <a
                 href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSmRounded}
               >
                 {c.reload}
               </a>

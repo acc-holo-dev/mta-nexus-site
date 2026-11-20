@@ -16,6 +16,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
@@ -447,7 +448,7 @@ export function DiscussionReportBatch({
                 ? `/admin/community/${encodeURIComponent(contentId)}/reports`
                 : `/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports`
             }
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {commentId === null
               ? reportGroupsCopy(locale).reset

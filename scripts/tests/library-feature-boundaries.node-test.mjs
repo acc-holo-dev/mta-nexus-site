@@ -288,7 +288,7 @@ test("Library collection routes preserve dynamic rendering and server entry", ()
     assert(source.includes("features/library/collections-server"));
     assert.match(
       source,
-      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata)/u,
+      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata|\{[\s\S]*?\bas\s+generateMetadata\b)/u,
     );
   }
 });
@@ -308,7 +308,7 @@ test("Library release routes preserve dynamic rendering and server entry", () =>
     assert(source.includes(`features/library/${port}-server`));
     assert.match(
       source,
-      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata)/u,
+      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata|\{[\s\S]*?\bas\s+generateMetadata\b)/u,
     );
   }
 });
@@ -328,7 +328,10 @@ test("Library private page routes preserve dynamic rendering and metadata", () =
       "utf8",
     );
     assert.match(source, /export const dynamic = "force-dynamic";/u);
-    assert.match(source, /export\s*\{\s*default,\s*generateMetadata,?\s*\}\s*from/u);
+    assert.match(
+      source,
+      /export\s*\{\s*(?:default,\s*generateMetadata|[A-Za-z]\w*\s+as\s+default,\s*[A-Za-z]\w*\s+as\s+generateMetadata),?\s*\}\s*from/u,
+    );
     assert(source.includes(`/${port}-server";`));
   }
 });

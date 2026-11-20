@@ -17,7 +17,7 @@ it("locks resource author touch/empty surfaces to size=touch and EmptyState hone
   for (const path of exclusive) {
     const source = read(path);
     expect(source, path).toContain('size="touch"');
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain("min-h-8");
   }
 

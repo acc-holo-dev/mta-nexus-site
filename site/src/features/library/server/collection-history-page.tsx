@@ -14,8 +14,9 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
-import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -123,7 +124,7 @@ export default async function Page({
         <form
           method="get"
           action="/workspace/library/collections/history"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-4 overflow-x-clip p-4"
+          className={panelFlexClipWrapEndGap4}
         >
           <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
             <span className={labelClass}>{h.days}</span>
@@ -317,7 +318,7 @@ export default async function Page({
                 {c.previous}
               </Link>
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages && (

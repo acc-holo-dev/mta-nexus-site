@@ -5,10 +5,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentSmPlain } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { platformReportCopy } from "../platform-report-i18n";
@@ -77,10 +77,7 @@ export async function PlatformReportsScreen({
             title={copy.notFound}
             description={getDictionary(typedLocale).errors.formErrorHint}
           />
-          <Link
-            href="/workspace/platform-reports"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/platform-reports" className={linkAccentSm}>
             {copy.back}
           </Link>
         </div>
@@ -123,18 +120,12 @@ export async function PlatformReportsScreen({
             </p>
           ) : null}
           {report.targetPreview?.href ? (
-            <Link
-              href={report.targetPreview.href}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={report.targetPreview.href} className={linkAccentSm}>
               {copy.openTarget}
             </Link>
           ) : null}
         </div>
-        <Link
-          href="/workspace/platform-reports"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/platform-reports" className={linkAccentSm}>
           {copy.back}
         </Link>
       </div>
@@ -153,10 +144,7 @@ export async function PlatformReportsScreen({
           title={copy.unavailable}
           description={copy.unavailableDescription}
           action={
-            <Link
-              href="/workspace/platform-reports"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
-            >
+            <Link href="/workspace/platform-reports" className={linkAccentSmPlain}>
               {copy.retry}
             </Link>
           }

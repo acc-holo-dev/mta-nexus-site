@@ -4,6 +4,7 @@ import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { linkMuted } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
@@ -231,7 +232,7 @@ export function CommunityReportList({
               {copy.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {filters.page}
           </span>
           {page?.hasMore && filters.page < 9999 && (

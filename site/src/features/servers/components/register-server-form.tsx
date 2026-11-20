@@ -6,6 +6,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlPadded } from "../../shell/page-shell";
+import { panelGridClipShadow } from "../../shell/panel-shell";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
@@ -276,7 +277,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         style={!verified ? { display: "none" } : undefined}
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className={panelGridClipShadow}
       >
         <div className="space-y-1.5 sm:col-span-2">
           <label htmlFor="server-organization" className={nativeLabelClass}>

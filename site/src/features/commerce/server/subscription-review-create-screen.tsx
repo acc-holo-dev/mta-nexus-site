@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { PlanReviewForm } from "../plan-reviews";
@@ -102,7 +103,7 @@ export async function SubscriptionReviewCreateScreen({
                 {c.previous}
               </Link>
             ) : null}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {scopes.page} {c.of} {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (

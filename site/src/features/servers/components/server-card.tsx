@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
+import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -256,7 +257,7 @@ export function HomeNetworkServerCard({
     : playerCountLabel(observation.players, observation.maxPlayers, copy.playersUnknown);
 
   return (
-    <article aria-label={name} className="nexus-panel flex flex-col gap-3 p-5">
+    <article aria-label={name} className={panelFlexColGap3P5}>
       <div className="min-w-0 space-y-1">
         <h3 className="truncate text-sm font-bold text-primary">{name}</h3>
         <p className="truncate text-xs text-muted">

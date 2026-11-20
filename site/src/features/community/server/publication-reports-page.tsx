@@ -6,7 +6,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
+import { panelP5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { reportRateLimit } from "../community-report-api";
 import { REPORT_TYPES } from "../community-report-contract";
@@ -79,20 +81,14 @@ export async function PublicationReportsPage({
           <p className="text-sm text-muted">{copy.publicationDescription}</p>
         </header>
         <div className="flex flex-wrap gap-4">
-          <Link
-            href="/admin/reports/targets"
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
             {copy.title}
           </Link>
-          <Link
-            href={`/admin/community/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`/admin/community/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
             {copy.context}
           </Link>
         </div>
-        <details className="nexus-panel p-5">
+        <details className={panelP5}>
           <summary className="cursor-pointer text-sm font-semibold text-primary">
             {copy.publicationBody}
           </summary>
@@ -138,10 +134,7 @@ export async function PublicationReportsPage({
               <Button type="submit" className="min-h-11" variant="outline">
                 {copy.apply}
               </Button>
-              <Link
-                href={path}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={path} className={linkAccentSm}>
                 {copy.reset}
               </Link>
             </div>
@@ -157,10 +150,7 @@ export async function PublicationReportsPage({
         />
         <nav aria-label={labels.page} className="flex flex-wrap items-center gap-4 text-sm">
           {filters.page > 1 && (
-            <Link
-              href={href(filters.page - 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(filters.page - 1)} className={linkAccent}>
               {labels.previous}
             </Link>
           )}
@@ -168,10 +158,7 @@ export async function PublicationReportsPage({
             {labels.page} {filters.page}
           </span>
           {data.hasMore && filters.page < 9999 && (
-            <Link
-              href={href(filters.page + 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(filters.page + 1)} className={linkAccent}>
               {labels.next}
             </Link>
           )}
@@ -189,10 +176,7 @@ export async function PublicationReportsPage({
           )}
           description={labels.formErrorHint}
           action={
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSmRounded}>
               {labels.reload}
             </Link>
           }

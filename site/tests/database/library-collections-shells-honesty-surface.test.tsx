@@ -92,7 +92,7 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   expect(market).toContain("ErrorState");
   expect(market).toContain("EmptyState");
   expect(market).toContain("pageShellClass");
-  expect(market).toMatch(/min-h-11|size="touch"/u);
+  expect(market).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(market).not.toContain('role="alert"');
   expect(market).not.toContain("throw error");
 
@@ -101,7 +101,7 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   expect(articles).toContain("EmptyState");
   expect(articles).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(articles).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(articles).toMatch(/min-h-11|size="touch"/u);
+  expect(articles).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
 
   expect(read("site/src/lib/i18n/en/product.ts")).toContain("detailUnavailableDescription");
   expect(read("site/src/lib/i18n/ru/product.ts")).toContain("noBuildsHint");

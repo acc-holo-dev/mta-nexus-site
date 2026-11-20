@@ -11,6 +11,7 @@ import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
+import { linkAccent, linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import { communityReportCopy } from "../community-report-copy";
@@ -38,10 +39,7 @@ export function CommunityReportHistory({
       !!filters.until;
   return (
     <div className={pageShellMax4xlCompactTight}>
-      <Link
-        href={base}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={base} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
       <header className="min-w-0 space-y-2">
@@ -79,23 +77,20 @@ export function CommunityReportHistory({
         <Button type="submit" className="min-h-11" variant="outline">
           {copy.apply}
         </Button>
-        <Link
-          href={path}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={path} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </form>
       <div className="flex min-w-0 flex-wrap justify-between gap-3 text-sm">
         <Link
           href={changeHistoryHref(path, filters, { fresh: true })}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {copy.latest}
         </Link>
         <a
           href={changeHistoryHref(`/api${base}/history/export`, filters, { until: page.until })}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {copy.download}
         </a>
@@ -109,10 +104,7 @@ export function CommunityReportHistory({
           icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
           action={
             filtered ? (
-              <Link
-                href={path}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={path} className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -157,7 +149,7 @@ export function CommunityReportHistory({
       {page.nextCursor && (
         <Link
           href={changeHistoryHref(path, filters, { cursor: page.nextCursor, until: page.until })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmRounded}
         >
           {copy.older}
         </Link>

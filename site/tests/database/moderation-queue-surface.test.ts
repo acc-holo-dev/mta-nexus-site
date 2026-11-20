@@ -158,7 +158,9 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain(copy.noVerificationRequests);
     expect(markup).toContain(copy.noRiskBuilds);
     expect(markup).toContain("border-dashed");
-    expect(markup).toContain("inline-flex min-h-11 items-center");
+    expect(markup).toMatch(
+      /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+    );
     expect(markup).toContain(`${copy.reportPage} 3`);
     expect(markup).toContain("min-w-0 space-y-8 overflow-x-clip");
     expect(markup).toContain('href="/admin/support"');

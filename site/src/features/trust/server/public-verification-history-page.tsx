@@ -6,8 +6,9 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicVerificationHistoryService } from "../../../lib/services/trust/public-verification-history-service";
+import { linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
-import { panelClipSpace2P5, panelClipSpace3P5 } from "../../shell/panel-shell";
+import { panelClipSpace2P5, panelClipSpace3P5, panelClipSpace3P6 } from "../../shell/panel-shell";
 import { approvalPageHref, parseApprovalQuery } from "../public-verification-history-contract";
 import { approvalCopy, approvalError } from "../public-verification-history-copy";
 
@@ -63,7 +64,7 @@ export async function ApprovalHistoryPage({
       <Link href={`/users/${encodeURIComponent(username)}/trust`} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
+      <header className={panelClipSpace3P6}>
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         {page && (
           <p className="break-words font-semibold text-primary">
@@ -167,7 +168,7 @@ export async function ApprovalHistoryPage({
         <Link
           prefetch={false}
           href={approvalPageHref(username, filters, page.nextCursor)}
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 text-sm text-secondary"
+          className={linkSecondaryBorder}
         >
           {copy.older}
         </Link>

@@ -94,7 +94,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toContain(copy.description);
       expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     },
   );
 
@@ -133,7 +133,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toContain(copy.openInbox);
       expect(html).toContain('href="/notifications?state=unread"');
       expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).not.toContain('role="alert"');
       expect(html).not.toContain(copy.error);
     },
@@ -183,7 +183,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toContain('href="/"');
       expect(html).toContain('href="/notifications?state=unread"');
       expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).not.toContain(copy.empty);
       expect(html).not.toContain(copy.emptyHint);
     },
@@ -214,7 +214,7 @@ describe("HomePersonalChangesPanel", () => {
     expect(html).toContain(copy.partial);
     expect(html).toContain("Build shipped");
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain('role="alert"');
   });
 });

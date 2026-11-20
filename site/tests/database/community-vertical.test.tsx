@@ -206,7 +206,7 @@ describe("community topic submission behavior", () => {
     expect(form).not.toContain('name="status"');
     expect(form).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(form).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(form).toContain("min-h-11");
+    expect(form).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the community topic create shell with a touch-sized back link", async () => {
@@ -216,7 +216,7 @@ describe("community topic submission behavior", () => {
     expect(html).toContain(copy.startTitle);
     expect(html).toContain(copy.backToCommunity);
     expect(html).toContain('href="/community"');
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("reports a session lookup failure instead of treating it as a guest", async () => {

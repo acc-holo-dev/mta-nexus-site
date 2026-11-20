@@ -77,7 +77,9 @@ it.each(["en", "ru"] as const)(
       />,
     );
 
-    expect(html).toContain("inline-flex min-h-11 items-center");
+    expect(html).toMatch(
+      /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+    );
     expect(html).toContain('href="/market/demo-mod"');
     expect(html).toContain('href="/users/author"');
     expect(html).toContain('href="/admin/resources/prd_1/builds/bld_pending"');

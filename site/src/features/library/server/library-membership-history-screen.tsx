@@ -13,6 +13,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
@@ -107,10 +108,7 @@ export async function LibraryMembershipHistoryScreen({
               title={m.loadUnavailable}
               description={m.loadUnavailableDescription}
               action={
-                <Link
-                  href={membershipHistoryHref(receiptId)}
-                  className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={membershipHistoryHref(receiptId)} className={linkAccentSmRounded}>
                   {dictionary.errors.retry}
                 </Link>
               }
@@ -151,10 +149,7 @@ export async function LibraryMembershipHistoryScreen({
             title={m.loadUnavailable}
             description={m.loadUnavailableDescription}
             action={
-              <Link
-                href={retryHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -243,10 +238,7 @@ export async function LibraryMembershipHistoryScreen({
             {h.filter}
           </Button>
           {filtered ? (
-            <Link
-              href={membershipHistoryHref()}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={membershipHistoryHref()} className={linkAccentSm}>
               {m.clear}
             </Link>
           ) : null}
@@ -318,10 +310,7 @@ export async function LibraryMembershipHistoryScreen({
             title={m.loadUnavailable}
             description={m.loadUnavailableDescription}
             action={
-              <Link
-                href={membershipHistoryHref()}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -337,10 +326,7 @@ export async function LibraryMembershipHistoryScreen({
           title={title}
           description={title === c.retry ? m.loadUnavailableDescription : undefined}
           action={
-            <Link
-              href={membershipHistoryHref()}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

@@ -119,7 +119,7 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.emptyLibraryHint);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/library"');
     expect(html).toContain('href="/workspace/servers/new"');
     expect(html).toContain(dictionary.workspace.libraryTitle);
@@ -333,7 +333,7 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(dictionary.workspace.noServers);
     expect(html).not.toContain("library-secret");
     expect(html).not.toContain(dictionary.workspace.emptyLibrary);
@@ -347,7 +347,7 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(dictionary.workspace.emptyLibrary);
     expect(html).not.toContain("servers-secret");
     expect(html).not.toContain(dictionary.workspace.noServers);

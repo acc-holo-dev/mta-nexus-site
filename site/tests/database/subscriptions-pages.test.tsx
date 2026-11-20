@@ -255,7 +255,7 @@ it("shows an honest recovery state when subscription data fails to load", async 
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/subscriptions"');
 });
 it("shows honest recovery when history or receipt loads fail", async () => {

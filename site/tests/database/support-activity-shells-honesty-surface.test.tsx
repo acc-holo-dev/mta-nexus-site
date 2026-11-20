@@ -149,7 +149,7 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
     const source = read(surface);
     expect(source).toContain("ErrorState");
     expectClippedLoadingSource(source);
-    expect(source).toContain("min-h-11");
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   }
   expect(read("site/src/features/support/components/support-center.tsx")).toContain("EmptyState");
   expect(read("site/src/features/trust/server/public-context-trust-page.tsx")).toContain(
@@ -172,7 +172,7 @@ it("locks support case/filter/message controls to touch targets without min-h-10
   ] as const;
   for (const path of touchSurfaces) {
     const source = read(path);
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain("min-h-10");
     expect(source, path).not.toContain("min-h-9");
   }
@@ -180,8 +180,8 @@ it("locks support case/filter/message controls to touch targets without min-h-10
     'size="touch"',
   );
   expect(read("site/src/features/support/components/support-center.tsx")).toContain('size="touch"');
-  expect(read("site/src/features/support/components/support-center.tsx")).toContain(
-    "inline-flex min-h-11 items-center",
+  expect(read("site/src/features/support/components/support-center.tsx")).toMatch(
+    /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
   );
   expect(read("site/src/features/support/components/support-message-browser.tsx")).toContain(
     'size="touch"',

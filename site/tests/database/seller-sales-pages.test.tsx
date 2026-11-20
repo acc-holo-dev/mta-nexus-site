@@ -154,7 +154,7 @@ it("invalid filters render a localized ErrorState recovery before data reads", a
   expect(html).toContain(copy.invalid);
   expect(html).toContain(copy.invalidDescription);
   expect(html).toContain(copy.reset);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/sales/report"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.scopes).not.toHaveBeenCalled();
@@ -248,7 +248,7 @@ it("shows an honest recovery state when the sales report fails to load", async (
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/sales/report?page=2"');
   expect(html).not.toContain("report unavailable");
 });

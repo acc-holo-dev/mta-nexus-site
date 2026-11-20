@@ -1,10 +1,6 @@
-import {
-  CommercialPlanCreateScreen,
-  commercialPlanCreateMetadata,
-} from "../../../../../features/commerce/commercial-plan-create-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = commercialPlanCreateMetadata;
-
-export default CommercialPlanCreateScreen;
+export {
+  CommercialPlanCreateScreen as default,
+  commercialPlanCreateMetadata as generateMetadata,
+} from "../../../../../features/commerce/commercial-plan-create-server";

@@ -17,6 +17,7 @@ import {
   resourceReleaseWatchesUrl,
 } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -263,7 +264,7 @@ export async function LibraryWatchesScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

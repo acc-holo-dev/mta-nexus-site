@@ -16,6 +16,7 @@ import {
   resourceDeliveriesUrl,
 } from "../../resources/resource-deliveries-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -236,7 +237,7 @@ export async function LibraryDownloadsScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

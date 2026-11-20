@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { linkAccent, linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { REPORT_TYPES } from "../community-report-contract";
@@ -39,10 +40,7 @@ export function CommunityReportGroups({
   if (filters.query) contextQuery.set("q", filters.query);
   return (
     <div className={pageShellMax5xlCompactTight}>
-      <Link
-        href="/admin/reports"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin/reports" className={linkAccentSm}>
         {copy.back}
       </Link>
       <header className="min-w-0 space-y-2">
@@ -110,10 +108,7 @@ export function CommunityReportGroups({
             <Button type="submit" className="min-h-11" variant="outline">
               {copy.apply}
             </Button>
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSm}>
               {copy.reset}
             </Link>
           </div>
@@ -127,10 +122,7 @@ export function CommunityReportGroups({
           icon={<Flag className="h-6 w-6" aria-hidden="true" />}
           action={
             filtered ? (
-              <Link
-                href={path}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={path} className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -172,17 +164,14 @@ export function CommunityReportGroups({
                 {copy.last}: <time dateTime={item.lastAt}>{date(item.lastAt)} UTC</time>
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link
-                  href={item.reportHref}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={item.reportHref} className={linkAccentSm}>
                   {labels.detail}
                 </Link>
                 {item.target && (
                   <>
                     <Link
                       href={`${item.targetType === "content" ? `/admin/community/${item.target.contentId}/reports` : `/admin/community/${item.target.contentId}/discussion/${item.targetId}/reports`}?${contextQuery}`}
-                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkAccentSm}
                     >
                       {copy.inspect}
                     </Link>
@@ -192,7 +181,7 @@ export function CommunityReportGroups({
                           ? `/admin/community/${item.target.contentId}`
                           : `/admin/community/${item.target.contentId}/discussion/${item.targetId}`
                       }
-                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkAccentSm}
                     >
                       {copy.context}
                     </Link>
@@ -204,16 +193,13 @@ export function CommunityReportGroups({
         </ol>
       )}
       <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-        <Link
-          href={reportGroupsHref(filters, path, { fresh: true })}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={reportGroupsHref(filters, path, { fresh: true })} className={linkAccentSm}>
           {copy.latest}
         </Link>
         {page.nextCursor && (
           <Link
             href={reportGroupsHref(filters, path, { cursor: page.nextCursor, until: page.until })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.more}
           </Link>

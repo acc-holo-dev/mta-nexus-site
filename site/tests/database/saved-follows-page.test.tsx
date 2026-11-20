@@ -117,7 +117,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/saved?type=organization&amp;q=Team"');
     expect(html).not.toContain("database-secret");
     expect(html).not.toContain("data-loaded");

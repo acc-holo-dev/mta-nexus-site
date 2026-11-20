@@ -12,6 +12,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -103,10 +104,7 @@ export async function CollectionReleasesScreen({
           title={c.loadUnavailable}
           description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

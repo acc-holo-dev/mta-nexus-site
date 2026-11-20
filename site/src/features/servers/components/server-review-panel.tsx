@@ -9,7 +9,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
-import { panelSpace4P5 } from "../../shell/panel-shell";
+import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedServerReview } from "../server-review-confirmation";
 import {
   serverReviewCopy,
@@ -362,7 +362,7 @@ export function ServerReviewPanel({
           ) : (
             <ul className="space-y-3">
               {page.reviews.map((review) => (
-                <li key={review.id} className="nexus-panel space-y-2 p-4 text-sm">
+                <li key={review.id} className={panelSpace2P4TextSm}>
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                     <span>
                       {copy.author}:{" "}

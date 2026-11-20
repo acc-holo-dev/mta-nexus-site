@@ -1,6 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { linkAccentSmRounded } from "../link-shell";
 import { pageShellMax5xlDenseTight } from "../page-shell";
 
 export function PlatformSessionError({
@@ -21,10 +22,7 @@ export function PlatformSessionError({
         title={message}
         description={getDictionary(locale).errors.sessionRetryHint}
         action={
-          <Link
-            href={retryHref}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={retryHref} className={linkAccentSmRounded}>
             {getDictionary(locale).errors.retry}
           </Link>
         }

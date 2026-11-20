@@ -7,6 +7,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { panelClipSpace4P4 } from "../../shell/panel-shell";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
@@ -126,7 +127,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
   }
   if (ready.current !== actorId) return null;
   return (
-    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
+    <section className={panelClipSpace4P4}>
       <h2>{copy.discovery}</h2>
       <div className="flex flex-wrap gap-3">
         <Button
@@ -316,7 +317,7 @@ export function StorageCleanupControls({
   }
   if (ready.current !== scope) return null;
   return (
-    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
+    <section className={panelClipSpace4P4}>
       <p>{copy.cleanupNote}</p>
       <ActionConfirmCheckbox
         id="storage-maintenance-cleanup-confirm"

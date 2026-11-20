@@ -39,6 +39,7 @@ const sourceFiles = new Set([
   resolve(sourceRoot, "features/accounts/server/developer-profile-screen.tsx"),
   resolve(sourceRoot, "features/shell/page-shell.ts"),
   resolve(sourceRoot, "features/shell/panel-shell.ts"),
+  resolve(sourceRoot, "features/shell/link-shell.ts"),
   resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
   resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
   resolve(sourceRoot, "features/community/publication-feed-copy.ts"),

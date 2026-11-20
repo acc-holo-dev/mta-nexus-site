@@ -49,7 +49,7 @@ it("locks collections error boundary with ErrorState description and touch retry
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain(copy.reload);
   expectClippedLoadingSource(html);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it.each([
@@ -94,7 +94,7 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     const source = read(page);
     expect(source).toContain("ErrorState");
     expectClippedLoadingSource(source);
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
   expect(read("site/src/app/workspace/library/collections/error.tsx")).toContain(

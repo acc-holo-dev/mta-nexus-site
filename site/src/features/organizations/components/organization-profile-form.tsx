@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { linkAccentSm } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
@@ -498,10 +499,7 @@ export function OrganizationProfileForm({
         </section>
       )}
       {initial && (
-        <Link
-          href={`/organizations/${encodeURIComponent(initial.slug)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/organizations/${encodeURIComponent(initial.slug)}`} className={linkAccentSm}>
           {copy.publicView}
         </Link>
       )}

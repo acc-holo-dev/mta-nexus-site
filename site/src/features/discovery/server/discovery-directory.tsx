@@ -19,6 +19,7 @@ import { FollowButton } from "../../community/follow";
 import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
+import { linkAccentRounded, linkAccentSm } from "../../shell/link-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
@@ -167,7 +168,7 @@ export async function DirectoryResults({
         description={copy.unavailableHint}
         action={
           <Link
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentRounded}
             href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
           >
             {getDictionary(locale).errors.retry}
@@ -262,17 +263,11 @@ export async function DirectoryResults({
             description={hasActiveDiscoverFilters(state) ? copy.emptyFiltered : copy.emptyHint}
             action={
               hasActiveDiscoverFilters(state) ? (
-                <Link
-                  href={discoverHref({ type: state.type }, path)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={discoverHref({ type: state.type }, path)} className={linkAccentSm}>
                   {copy.reset}
                 </Link>
               ) : (
-                <Link
-                  href="/market?maxPrice=0"
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href="/market?maxPrice=0" className={linkAccentSm}>
                   {getDictionary(locale).home.browseResources}
                 </Link>
               )
@@ -397,17 +392,14 @@ export async function DirectoryResults({
       )}
       {stream && "nextCursor" in result ? (
         <nav aria-label={copy.pages} className="flex flex-wrap gap-4 border-t border-base pt-4">
-          <a
-            href={discoveryStreamHref(stream)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={discoveryStreamHref(stream)} className={linkAccentSm}>
             {discoveryStreamCopy(locale).latest}
           </a>
           {"previousCursor" in result && typeof result.previousCursor === "string" && (
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.previousCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
             >
               {discoveryStreamCopy(locale).newer}
             </Link>
@@ -416,7 +408,7 @@ export async function DirectoryResults({
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.nextCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
             >
               {discoveryStreamCopy(locale).older}
             </Link>

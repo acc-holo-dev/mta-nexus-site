@@ -26,6 +26,7 @@ import {
   pageShellStack4,
   pageShellStack6,
 } from "../../shell/page-shell";
+import { panelHeroBetween } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const actionLinkClass =
@@ -136,7 +137,7 @@ export default async function OrganizationProfilePage({
 
   return (
     <div className={pageShellClass}>
-      <section className="nexus-panel flex min-w-0 flex-col justify-between gap-6 overflow-x-clip p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+      <section className={panelHeroBetween}>
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
             {logoUrl ? (

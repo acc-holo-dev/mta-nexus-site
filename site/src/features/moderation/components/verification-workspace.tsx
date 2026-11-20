@@ -12,6 +12,7 @@ import {
   platformRequest,
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
@@ -548,7 +549,7 @@ export function VerificationWorkspace({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {teamFilters.page}
           </span>
           {teams?.hasMore && teamFilters.page < 9999 ? (
@@ -799,7 +800,7 @@ export function VerificationWorkspace({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {filters.page}
           </span>
           {overview?.history.hasMore && filters.page < 9999 ? (

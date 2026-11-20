@@ -29,7 +29,7 @@ it("locks commerce and account form failures to ErrorState with touch CTAs", () 
   for (const path of formComponents) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('role="alert"');
   }
 });

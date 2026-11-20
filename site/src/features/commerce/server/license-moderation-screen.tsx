@@ -11,6 +11,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -92,20 +93,14 @@ export async function LicenseModerationScreen({
   if (!result) {
     return (
       <div className={pageShellMax5xl}>
-        <Link
-          href="/admin"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin" className={linkAccentSm}>
           {copy.adminBack}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={returnHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -116,19 +111,13 @@ export async function LicenseModerationScreen({
 
   return (
     <div className={pageShellMax5xl}>
-      <Link
-        href="/admin"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin" className={linkAccentSm}>
         {copy.adminBack}
       </Link>
       <h1 className="font-display text-primary">{copy.moderation}</h1>
       <p className="text-sm text-secondary">{copy.policy}</p>
       {user.role === "admin" && (
-        <Link
-          href="/admin/licenses/maintenance"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin/licenses/maintenance" className={linkAccentSm}>
           {getLicenseMaintenanceCopy(locale).maintenance}
         </Link>
       )}
@@ -159,10 +148,7 @@ export async function LicenseModerationScreen({
             {copy.searchButton}
           </Button>
           {filtersActive ? (
-            <Link
-              href="/admin/licenses"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin/licenses" className={linkAccentSm}>
               {copy.clearFilters}
             </Link>
           ) : null}
@@ -180,10 +166,7 @@ export async function LicenseModerationScreen({
                 )}{" "}
                 · {license.expiresAt ? formatHistoryDate(license.expiresAt, locale) : history.never}
               </p>
-              <Link
-                href={`/admin/licenses/${license.id}`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={`/admin/licenses/${license.id}`} className={linkAccentSm}>
                 {copy.manage} · {license.id}
               </Link>
             </li>
@@ -196,10 +179,7 @@ export async function LicenseModerationScreen({
           icon={<KeyRound className="h-6 w-6" aria-hidden="true" />}
           action={
             filtersActive ? (
-              <Link
-                href="/admin/licenses"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/admin/licenses" className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : undefined
@@ -209,23 +189,17 @@ export async function LicenseModerationScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={history.page} className="flex flex-wrap justify-between gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={href(result.page - 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page - 1)} className={linkAccent}>
               {history.previous}
             </Link>
           ) : (
             <span />
           )}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={href(result.page + 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page + 1)} className={linkAccent}>
               {history.next}
             </Link>
           ) : (

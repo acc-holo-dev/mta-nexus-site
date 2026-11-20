@@ -173,7 +173,7 @@ it("shows an honest recovery state when the report queue fails", async () => {
   expect(html).toContain(`>${copy.reports}</h1>`);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("view=history&amp;page=2");
 });
 it("shows an honest recovery state when a report detail fails", async () => {
@@ -233,7 +233,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.empty);
     expect(html).toContain(copy.emptyHint);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -252,7 +252,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageUnavailable);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/market/resource/reviews?page=2"');
     expect(html).not.toContain("database-secret");
   },

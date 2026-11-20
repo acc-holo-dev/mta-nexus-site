@@ -5,6 +5,7 @@ import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlStandard } from "../../shell/page-shell";
+import { panelGridClipShadow } from "../../shell/panel-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -423,7 +424,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         key={formEpoch}
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className={panelGridClipShadow}
       >
         <fieldset disabled={loading} className="contents">
           <Input

@@ -15,6 +15,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
+import { linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { confirmedLicenseControl } from "../license-control-confirmation";
@@ -360,7 +361,7 @@ export function LicenseControlPanel({
                   >
                     {copy.previous}
                   </Button>
-                  <span className="inline-flex min-h-11 items-center">
+                  <span className={linkMinH}>
                     {servers.page} / {servers.totalPages}
                   </span>
                   <Button

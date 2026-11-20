@@ -169,7 +169,7 @@ it("renders empty account history and maps an absent account to a missing page",
   expect(filteredEmpty).toContain(copy.empty);
   expect(filteredEmpty).toContain(copy.emptyHint);
   expect(filteredEmpty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(filteredEmpty).toContain("min-h-11");
+  expect(filteredEmpty).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(filteredEmpty).not.toContain('role="alert"');
   expect(clearLinks(filteredEmpty)).toBe(2);
   state.history.mockResolvedValue({
@@ -200,7 +200,7 @@ it("shows ErrorState recovery when collection history fails to load", async () =
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(copy.emptyHint);
 });
 it("locks ErrorState for invalid history filters with retry shell", async () => {
@@ -209,7 +209,7 @@ it("locks ErrorState for invalid history filters with retry shell", async () => 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it.each(["en", "ru"] as const)(

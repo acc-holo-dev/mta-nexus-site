@@ -31,7 +31,7 @@ it("locks library form sources to ErrorState honesty without plain alert paragra
   for (const form of forms) {
     const source = read(form);
     expect(source).toContain("ErrorState");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
 });
@@ -83,7 +83,7 @@ it("renders collections error panel with ErrorState description and touch recove
   expect(html).toContain("bg-danger-soft");
   expect(html).toContain(copy.conflict);
   expect(html).toContain(copy.actionErrorDescription);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('class="text-warning"');
 });

@@ -13,6 +13,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 import { contentService } from "../../../lib/services/community/content-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlLoose } from "../../shell/page-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
@@ -217,10 +218,7 @@ export default async function ArticleDetailPage({
           title={discussionCopy.identityUnavailable}
           description={discussionCopy.identityUnavailableDescription}
           action={
-            <Link
-              href={articlePath}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={articlePath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }

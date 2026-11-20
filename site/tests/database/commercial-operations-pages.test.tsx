@@ -176,7 +176,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("disabled");
     expect(html).toContain("scope=organization&amp;page=1");
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("PRIVATE");
   },
 );

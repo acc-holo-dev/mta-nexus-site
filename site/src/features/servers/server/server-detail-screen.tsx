@@ -23,7 +23,7 @@ import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
 import { pageShellStack8 } from "../../shell/page-shell";
-import { panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
+import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { ServerClaimControlPanel } from "../claim-controls";
 import { ServerConnectControls } from "../connect";
@@ -397,7 +397,7 @@ export async function ServerDetailScreen({
           ) : null}
         </div>
 
-        <div className="nexus-panel space-y-3 p-6">
+        <div className={panelSpace3P6}>
           <div className="text-xs font-semibold uppercase tracking-wider text-muted">
             {copy.connectionIp}
           </div>
@@ -407,7 +407,7 @@ export async function ServerDetailScreen({
           <div className="text-[11px] text-faint">{copy.selectHint}</div>
         </div>
 
-        <div className="nexus-panel space-y-3 p-6">
+        <div className={panelSpace3P6}>
           <div className="text-xs font-semibold uppercase tracking-wider text-muted">
             {copy.runtime}
           </div>

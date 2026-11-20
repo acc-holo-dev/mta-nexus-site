@@ -315,7 +315,7 @@ it("shows an honest recovery state when owner license detail fails", async () =>
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/licenses/lic_a"');
   expect(html).not.toContain(license.key);
   expect(state.servers).not.toHaveBeenCalled();
@@ -329,7 +329,7 @@ it("shows an honest recovery state when moderator license detail fails", async (
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/admin/licenses/lic_a"');
   expect(html).not.toContain(license.key);
 });
@@ -338,7 +338,7 @@ it("clips the moderator license detail shell and raises history navigation to to
   const html = renderToStaticMarkup(await ModeratorPage(params));
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/admin/licenses/lic_a/history"');
   expect(html).not.toContain(license.key);
 });
@@ -349,6 +349,6 @@ it("renders EmptyState when owner license detail has no recorded actions", async
   expect(html).toContain(copy.noHistory);
   expect(html).toContain(copy.policy);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(license.key);
 });

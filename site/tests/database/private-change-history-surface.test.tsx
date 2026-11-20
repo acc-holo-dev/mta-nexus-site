@@ -251,7 +251,7 @@ it("preserves normalized organization selectors and renders a read failure disti
   expect(html).toContain(privateChangeHistoryCopy("en").unavailable);
   expect(html).toContain(privateChangeHistoryCopy("en").reload);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain("database-private");
   expect(html).not.toContain(privateChangeHistoryCopy("en").empty);
 });

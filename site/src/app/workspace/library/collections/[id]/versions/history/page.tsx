@@ -1,10 +1,6 @@
-import {
-  LibrarySelectionBatchScreen,
-  librarySelectionBatchMetadata,
-} from "../../../../../../../features/library/selection-batch-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = librarySelectionBatchMetadata;
-
-export default LibrarySelectionBatchScreen;
+export {
+  LibrarySelectionBatchScreen as default,
+  librarySelectionBatchMetadata as generateMetadata,
+} from "../../../../../../../features/library/selection-batch-server";

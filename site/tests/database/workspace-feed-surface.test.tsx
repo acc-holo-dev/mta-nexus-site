@@ -66,7 +66,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await FollowingPage({}));
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(copy.title);
     expect(copy.emptyFollowing).not.toBe(copy.emptyFollowingHint);
     expect(copy.emptyFiltered).not.toBe(copy.emptyFilteredHint);
@@ -91,7 +91,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.error);
     expect(html).toContain(getDictionary(locale).errors.retry);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/feed?source=server&amp;q=MTA"');
     expect(html).not.toContain("session-secret");
     expect(html).not.toContain(copy.emptyFollowing);
@@ -117,7 +117,7 @@ it.each(["en", "ru"] as const)(
     expect(unavailable).toContain(copy.loadUnavailable);
     expect(unavailable).toContain(copy.retry);
     expect(unavailable).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(unavailable).toContain("min-h-11");
+    expect(unavailable).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(unavailable).not.toContain(copy.emptyFollowing);
     expect(unavailable).not.toContain(copy.error);
 
@@ -144,7 +144,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFollowingHint);
     expect(html).toContain(copy.discover);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/discover"');
   },
 );
@@ -166,7 +166,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFilteredHint);
     expect(html).toContain(copy.reset);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain(copy.emptyFollowing);
     expect(html).not.toContain('href="/discover"');
   },

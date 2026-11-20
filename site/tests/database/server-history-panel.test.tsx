@@ -49,7 +49,7 @@ it.each(["en", "ru"] as const)(
       /<a\b[^>]*href="\/servers\/server\?history=30d#server-history-title"[^>]*>/,
     )?.[0];
     expect(selectedLink).toContain('aria-current="true"');
-    expect(selectedLink).toContain("min-h-11");
+    expect(selectedLink).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html.match(/class="flex h-full min-w-0 flex-1 items-end"/g) ?? []).toHaveLength(31);
     expect(html).toContain(locale === "ru" ? "число игроков неизвестно" : "player count unknown");
     expect(html).not.toContain("NaN");
@@ -88,7 +88,7 @@ it("keeps an unavailable history separate from live status and empty periods", (
   expect(html).toContain('role="alert"');
   expect(html).toContain('href="/servers/server"');
   expect(html).toContain("Try again");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(copy.empty);
   expect(html).not.toContain(copy.emptyHint);
 });

@@ -20,6 +20,7 @@ import { HomeNetworkServerCard } from "../../servers/client";
 import { HomePersonalChangesPanel } from "../home-personal";
 import { loadPersonalChangesSummary } from "../home-personal-changes-server";
 import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../home-personal-preference";
+import { linkAccentSm } from "../link-shell";
 
 function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
   let sum = 0;
@@ -163,10 +164,7 @@ export async function HomePage() {
           title={dictionary.home.personalError}
           description={dictionary.home.personalErrorHint}
           action={
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/" className={linkAccentSm}>
               {dictionary.home.personalRetry}
             </Link>
           }

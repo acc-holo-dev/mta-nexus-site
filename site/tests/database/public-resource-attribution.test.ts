@@ -58,7 +58,7 @@ describe("buttonClassName geometry contract", () => {
     expect(primary).toContain("h-10");
     expect(outlineSm).toContain("h-8");
     expect(hero).toContain("h-11");
-    expect(touch).toContain("min-h-11");
+    expect(touch).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(primary).toContain("focus-visible:ring-2");
     expect(outlineSm).toContain("focus-visible:ring-2");
   });

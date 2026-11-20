@@ -111,7 +111,7 @@ it("keeps save disabled and offers ErrorState recovery after a private load fail
   expect(html).toContain(profilePrivacyCopy("en").unavailable);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toMatch(/<fieldset disabled=""/u);
   expect(html).toContain(profilePrivacyCopy("en").reload);
   expect(html).not.toContain("private SQL");

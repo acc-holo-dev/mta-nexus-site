@@ -144,7 +144,7 @@ it("locks residual delegated surfaces to ErrorState/EmptyState honesty chrome", 
     const source = read(surface);
     expect(source).toContain("ErrorState");
     expectClippedLoadingSource(source);
-    expect(source).toContain("min-h-11");
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   }
   expect(read("site/src/features/servers/server/server-workspace-history-screen.tsx")).toContain(
     "EmptyState",

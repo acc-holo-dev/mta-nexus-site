@@ -12,6 +12,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { panelClipSpace5P5, panelP5 } from "../../shell/panel-shell";
 import { confirmedCommercialPlan, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -242,13 +243,13 @@ export function CommercialPlanForm({
     setValues((current) => ({ ...current, [key]: value }));
   if (ready !== identity)
     return (
-      <section className="nexus-panel p-5">
+      <section className={panelP5}>
         <p role="note">{copy.editNote}</p>
         {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       </section>
     );
   return (
-    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5">
+    <form onSubmit={submit} className={panelClipSpace5P5}>
       <p role="note" className="text-sm text-secondary">
         {copy.editNote}
       </p>

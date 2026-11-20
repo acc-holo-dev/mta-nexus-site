@@ -16,6 +16,7 @@ import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
 import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
+import { panelHeroBetween } from "../../shell/panel-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -113,7 +114,7 @@ export async function DeveloperProfileScreen({
 
   return (
     <div className={pageShellClass}>
-      <section className="nexus-panel flex min-w-0 flex-col justify-between gap-6 overflow-x-clip p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+      <section className={panelHeroBetween}>
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <Avatar
             src={user.avatarUrl || undefined}

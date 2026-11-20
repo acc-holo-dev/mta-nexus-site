@@ -2,6 +2,7 @@ import type { OrderTermsReport } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { formatFinancialMinor } from "../financial-i18n";
@@ -174,7 +175,7 @@ export function OrderTermsReportView({
               {c.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {c.page} {report.page} {c.of} {report.totalPages}
           </span>
           {report.page < report.totalPages ? (

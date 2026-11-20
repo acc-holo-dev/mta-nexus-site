@@ -12,7 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
-import { panelSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
+import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
@@ -335,7 +335,7 @@ export async function OrderCaseListPage({
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((item) => (
-            <li key={item.id} className="nexus-panel space-y-2 p-5">
+            <li key={item.id} className={panelSpace2P5}>
               <Link
                 href={`${base}/${encodeURIComponent(item.id)}`}
                 className={`break-words font-semibold ${navLinkClass}`}

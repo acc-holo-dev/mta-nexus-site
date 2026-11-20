@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -81,19 +82,13 @@ export default async function NotificationCenterPage({
   return (
     <div className={pageShellMax4xlTight}>
       <header className="space-y-3 border-b border-base pb-6">
-        <Link
-          href="/workspace"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace" className={linkAccentSm}>
           {copy.workspace}
         </Link>
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.openBetaNote}</p>
-        <Link
-          href="/settings#notification-heading"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/settings#notification-heading" className={linkAccentSm}>
           {copy.settings}
         </Link>
       </header>
@@ -154,10 +149,7 @@ export default async function NotificationCenterPage({
               {copy.search}
             </Button>
             {filtersActive ? (
-              <Link
-                href="/notifications"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/notifications" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : null}
@@ -170,7 +162,7 @@ export default async function NotificationCenterPage({
               ? notificationInboxHref("/notifications", { ...filters, at: undefined })
               : "/notifications"
           }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.latest}
         </Link>
@@ -179,10 +171,7 @@ export default async function NotificationCenterPage({
             title={error}
             description={copy.unavailableHint}
             action={
-              <Link
-                href={returnPath}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={returnPath} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }

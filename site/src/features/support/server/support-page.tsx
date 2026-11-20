@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   pageShellMax5xlBare,
   pageShellMax5xlDenseTight,
@@ -83,10 +84,7 @@ export async function SupportPageSurface({
           title={copy.forbidden}
           description={copy.forbiddenHint}
           action={
-            <Link
-              href="/support"
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/support" className={linkAccentSmRounded}>
               {support.title}
             </Link>
           }
@@ -108,10 +106,7 @@ export async function SupportPageSurface({
           title={copy.notFound}
           description={copy.notFoundHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {support.back}
             </Link>
           }
@@ -127,10 +122,7 @@ export async function SupportPageSurface({
           title={copy.queryInvalid}
           description={copy.queryInvalidHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {copy.reset}
             </Link>
           }

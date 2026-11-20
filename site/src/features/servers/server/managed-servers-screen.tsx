@@ -11,7 +11,9 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
+import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ManagedServerCard } from "../managed-card-server";
 import {
@@ -107,11 +109,7 @@ export async function ManagedServersScreen({
         </Link>
       </header>
       <search aria-label={copy.search}>
-        <form
-          action="/workspace/servers"
-          method="get"
-          className="nexus-panel flex flex-wrap items-end gap-4 p-4"
-        >
+        <form action="/workspace/servers" method="get" className={panelFlexWrapEndGap4P4}>
           <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-xs text-secondary">
             {copy.search}
             <input
@@ -227,7 +225,7 @@ export async function ManagedServersScreen({
               {copy.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (

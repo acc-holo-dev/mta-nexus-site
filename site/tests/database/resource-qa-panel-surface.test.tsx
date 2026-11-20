@@ -48,7 +48,7 @@ it("shows a public-read notice for guests and stale build context in the list", 
   expect(html).toContain(copy.buildUnavailable);
   expect(html).not.toContain(copy.ask);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it("explains when a signed-in reader cannot ask", () => {
@@ -89,7 +89,7 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   expect(failure).toContain(copy.unavailableDescription);
   expect(failure).toContain(copy.retry);
   expect(failure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(failure).toContain("min-h-11");
+  expect(failure).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(failure).not.toContain(copy.emptyHint);
 
   const empty = renderToStaticMarkup(

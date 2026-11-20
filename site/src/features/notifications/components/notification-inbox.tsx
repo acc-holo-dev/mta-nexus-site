@@ -7,6 +7,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccent, linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import {
@@ -298,7 +299,7 @@ export function NotificationInbox({
               event.preventDefault();
               void exportPage();
             }}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.export}
           </a>
@@ -404,11 +405,7 @@ export function NotificationInbox({
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             emptyFiltered ? (
-              <Link
-                prefetch={false}
-                href="/notifications"
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link prefetch={false} href="/notifications" className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -463,11 +460,7 @@ export function NotificationInbox({
                   <div className="flex flex-wrap items-center gap-4">
                     {item.link && (
                       // Destination navigation alone does not change isRead; use the explicit mark controls.
-                      <Link
-                        prefetch={false}
-                        href={item.link}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      >
+                      <Link prefetch={false} href={item.link} className={linkAccentSm}>
                         {copy.view}
                       </Link>
                     )}
@@ -492,7 +485,7 @@ export function NotificationInbox({
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.newerCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.newer}
           </Link>
@@ -501,7 +494,7 @@ export function NotificationInbox({
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.olderCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.older}
           </Link>

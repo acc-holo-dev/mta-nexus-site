@@ -13,6 +13,8 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
@@ -130,7 +132,7 @@ export function AuthorPublicationRestore({
     }
   }
   return (
-    <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4" aria-busy={busy}>
+    <div className={panelClipSpace3P4} aria-busy={busy}>
       <p className="text-sm text-muted">{copy.restoreHelp}</p>
       <Button
         type="button"
@@ -159,7 +161,7 @@ export function AuthorPublicationRestore({
                 ? `/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}`
                 : `/workspace/content/${encodeURIComponent(id)}`
           }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.restored}
         </Link>

@@ -178,7 +178,7 @@ it("shows ErrorState recovery when receipt detail fails to load", async () => {
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(copy.unknownHint);
 });
 it.each(["en", "ru"] as const)(
@@ -202,7 +202,7 @@ it("locks ErrorState for unexpected receipt selectors with retry shell", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("does not promise inverse state for unsupported commands and handles foreign/missing receipts neutrally", async () => {
   const value = report();

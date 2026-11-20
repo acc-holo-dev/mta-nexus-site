@@ -1,10 +1,6 @@
-import {
-  RegisterServerScreen,
-  registerServerMetadata,
-} from "../../../../features/servers/register-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = registerServerMetadata;
-
-export default RegisterServerScreen;
+export {
+  RegisterServerScreen as default,
+  registerServerMetadata as generateMetadata,
+} from "../../../../features/servers/register-server";

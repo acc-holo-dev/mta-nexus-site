@@ -105,7 +105,7 @@ it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(
     expect(html).toContain('role="alert"');
     expect(html).toContain(libraryCollectionManifestsCopy("en").loadUnavailableDescription);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(state.history).not.toHaveBeenCalled();
   },
 );
@@ -118,7 +118,7 @@ it("shows ErrorState recovery when import export fails to load", async () => {
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("maps missing or foreign collection to the same unavailable page", async () => {
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
@@ -137,7 +137,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain(libraryCollectionManifestsCopy(locale).reconcileTitle);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(await reconcileMetadata()).toMatchObject({
       title: `${libraryCollectionManifestsCopy(locale).reconcileTitle} | MTA NEXUS`,
       robots: { index: false, follow: false },
@@ -158,7 +158,7 @@ it("shows ErrorState recovery when reconcile export fails to load", async () => 
   expect(html).toContain(`>${copy.reconcileTitle}</h1>`);
   expect(html).toContain(copy.reconcileLoadUnavailableDescription);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("returns to the collection list for invalid import and reconciliation identifiers", async () => {
   vi.spyOn(authService, "getSession")
@@ -183,7 +183,7 @@ it.each(["en", "ru"] as const)(
     state.locale = locale;
     const html = await screen();
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );

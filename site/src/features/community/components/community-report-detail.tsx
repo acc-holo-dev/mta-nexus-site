@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
@@ -161,7 +162,7 @@ export function CommunityReportDetailView({
       <div className="flex min-w-0 flex-wrap items-center gap-4">
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmRounded}
         >
           {copy.back}
         </Link>
@@ -202,10 +203,7 @@ export function CommunityReportDetailView({
       ) : null}
       {report ? (
         <>
-          <Link
-            href={`${path}/history`}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`${path}/history`} className={linkAccentSmRounded}>
             {reportHistoryCopy(locale).title}
           </Link>
           <section className={panelMinSpace4P5}>
@@ -266,18 +264,12 @@ export function CommunityReportDetailView({
             <h2 className="text-lg font-semibold text-primary">{copy.currentTarget}</h2>
             <p className="text-xs text-muted">{copy.currentHint}</p>
             {staff && report.moderationHref && (
-              <Link
-                href={report.moderationHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={report.moderationHref} className={linkAccentSmRounded}>
                 {discussionReportsCopy(locale).link}
               </Link>
             )}
             {staff && report.moderationHref && (
-              <Link
-                href={`${report.moderationHref}/reports`}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={`${report.moderationHref}/reports`} className={linkAccentSmRounded}>
                 {reportGroupsCopy(locale).inspect}
               </Link>
             )}

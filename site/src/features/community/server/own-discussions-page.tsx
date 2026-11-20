@@ -7,6 +7,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -181,7 +182,7 @@ export default async function OwnDiscussionsPage({
         <Link
           prefetch={false}
           href={ownDiscussionHref(filters, page.nextCursor)}
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 text-sm text-secondary"
+          className={linkSecondaryBorder}
         >
           {copy.next}
         </Link>

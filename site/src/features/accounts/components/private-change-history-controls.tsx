@@ -2,6 +2,8 @@ import { CHANGE_HISTORY_PERIODS, type ChangeHistoryFilters } from "@nexus/domain
 import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSm } from "../../shell/link-shell";
+import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 const selectClass =
@@ -26,7 +28,7 @@ export function PrivateChangeHistoryFilters<
   const copy = privateChangeHistoryCopy(locale);
   return (
     <search aria-label={search ? copy.search : copy.apply}>
-      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-4 p-4">
+      <form method="get" action={path} className={panelFlexWrapEndGap4P4}>
         <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
           <span className={labelClass}>{copy.period}</span>
           <select name="period" className={selectClass} defaultValue={filters.period}>
@@ -65,10 +67,7 @@ export function PrivateChangeHistoryFilters<
         <Button type="submit" variant="secondary">
           {copy.apply}
         </Button>
-        <Link
-          href={path}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={path} className={linkAccentSm}>
           {copy.reset}
         </Link>
       </form>
@@ -89,10 +88,7 @@ export function PrivateChangeHistoryCutoff({ until, locale }: { until: string; l
 }
 export function ProfileChangeHistoryLink({ locale }: { locale: Locale }) {
   return (
-    <Link
-      href="/settings/history"
-      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-    >
+    <Link href="/settings/history" className={linkAccentSm}>
       {privateChangeHistoryCopy(locale).profileTitle}
     </Link>
   );

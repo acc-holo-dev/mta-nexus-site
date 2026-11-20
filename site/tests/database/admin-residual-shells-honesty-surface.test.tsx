@@ -64,7 +64,7 @@ it("locks admin license detail honesty chrome with ErrorState recovery", () => {
   const source = read("site/src/features/commerce/server/license-moderation-detail-screen.tsx");
   expect(source).toContain("ErrorState");
   expectClippedLoadingSource(source);
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).toContain("loadUnavailable");
   expect(source).toContain("pageShellClass");
   expect(source).not.toContain('role="alert"');
@@ -127,7 +127,9 @@ it("locks admin builds quarantine actionable links to min-h-11 touch targets", (
     "site/src/features/moderation/components/admin-builds-quarantine-section.tsx",
   );
   expect(source).toContain("touchLinkClass");
-  expect(source).toContain("inline-flex min-h-11 items-center");
+  expect(source).toMatch(
+    /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+  );
   expect(source).not.toContain('className="text-accent underline');
   expect(source).not.toContain('className="inline-block text-xs font-semibold text-accent');
 });

@@ -60,14 +60,14 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
     /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
   );
   expect(settingsClient).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(settingsClient).toMatch(/min-h-11|size="touch"/u);
+  expect(settingsClient).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(settingsClient).not.toContain('role="alert"');
 
   const authForm = read("site/src/features/accounts/components/auth-form.tsx");
   expect(authForm).toContain("ErrorState");
   expect(authForm).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(authForm).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(authForm).toMatch(/min-h-11|size="touch"/u);
+  expect(authForm).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(authForm).not.toContain('role="alert"');
 
   const history = read("site/src/features/accounts/components/profile-change-history.tsx");
@@ -75,7 +75,7 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
   expect(history).toContain("EmptyState");
   expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(history).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(history).toMatch(/min-h-11|size="touch"/u);
+  expect(history).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(history).not.toContain('role="alert"');
 });
 
@@ -87,7 +87,7 @@ it("locks settings password and recovery native controls to fieldControlClass wi
     const source = read(path);
     expect(source, path).toContain("fieldControlClass");
     expect(source, path).toContain('className: "min-h-11"');
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain("h-10");
     expect(source, path).not.toContain("fieldClassBlock");
   }

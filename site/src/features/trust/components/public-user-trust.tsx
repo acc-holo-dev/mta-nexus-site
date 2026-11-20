@@ -2,7 +2,7 @@ import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
-import { panelClipSpace3P5, panelClipSpace4P5 } from "../../shell/panel-shell";
+import { panelClipSpace3P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
@@ -24,7 +24,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       <Link href={profile} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
+      <header className={panelClipSpace3P6}>
         <Link href={`${profile}/trust/history`} className={actionLinkClass}>
           {approvalCopy(locale).title}
         </Link>

@@ -2,8 +2,9 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
-import { panelSpace3P5 } from "../../shell/panel-shell";
+import { panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -50,10 +51,7 @@ export async function LibraryCollectionsListView({
           title={c.loadUnavailable}
           description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -125,7 +123,7 @@ export async function LibraryCollectionsListView({
       )}
       <ol className="grid gap-4 sm:grid-cols-2">
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-2 p-5">
+          <li key={item.id} className={panelSpace2P5}>
             <h2 className="break-words font-semibold">
               <Link href={collectionHref(item.id)} className={libraryCollectionsLinkClass}>
                 {item.name}

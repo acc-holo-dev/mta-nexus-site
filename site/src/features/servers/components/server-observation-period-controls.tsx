@@ -1,6 +1,7 @@
 import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentSm } from "../../shell/link-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
 import { serverStatisticsHref } from "../server-statistics-contract";
@@ -91,7 +92,7 @@ export function ServerObservationPeriodControls({
           <Link
             prefetch={false}
             href={href(window, new Date(time - width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.previousPeriod}
           </Link>
@@ -100,7 +101,7 @@ export function ServerObservationPeriodControls({
           <Link
             prefetch={false}
             href={href(window, new Date(time + width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.nextPeriod}
           </Link>

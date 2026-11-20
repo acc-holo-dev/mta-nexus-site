@@ -3,6 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { panelClipSpace4P6 } from "../../shell/panel-shell";
 import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
@@ -24,7 +25,7 @@ export function OwnDiscussionDetail({
     [pending, setPending] = useState(false);
   if (removed)
     return (
-      <div className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6">
+      <div className={panelClipSpace4P6}>
         <p role="status" className="text-sm text-success">
           {copy.removed}
         </p>
@@ -34,7 +35,7 @@ export function OwnDiscussionDetail({
       </div>
     );
   return (
-    <article className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6" aria-busy={pending}>
+    <article className={panelClipSpace4P6} aria-busy={pending}>
       <h1 className="min-w-0 break-words text-xl font-bold text-primary">
         {comment.title ?? copy.hidden}
       </h1>

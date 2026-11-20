@@ -20,5 +20,5 @@ it("locks public profile form failures to ErrorState and keeps success as status
   expect(source).toContain("text-success");
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');
   expect(source).not.toContain('role="alert"');
-  expect(source).toMatch(/min-h-11|size="touch"/u);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
 });

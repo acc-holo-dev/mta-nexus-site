@@ -16,6 +16,7 @@ import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -260,7 +261,7 @@ export async function LibraryVersionsScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

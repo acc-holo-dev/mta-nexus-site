@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellStack3 } from "../../shell/page-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { supportActivitySchema } from "../support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 
@@ -67,10 +68,7 @@ export function SupportStatusHistory({
         ? dictionary.support.resolved
         : dictionary.support.closed;
   return (
-    <details
-      className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4"
-      onToggle={(event) => setOpen(event.currentTarget.open)}
-    >
+    <details className={panelClipSpace3P4} onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary className="min-h-11 cursor-pointer font-heading text-primary">
         {copy.history}
       </summary>

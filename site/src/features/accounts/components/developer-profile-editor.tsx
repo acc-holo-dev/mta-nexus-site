@@ -5,6 +5,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -140,7 +141,7 @@ export function DeveloperProfileEditor({
     }
   }
   return (
-    <div className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6" aria-busy={pending}>
+    <div className={panelClipSpace5P5Sm} aria-busy={pending}>
       <p className="text-sm text-muted">{copy.invalidation}</p>
       <p className="text-xs text-muted">{copy.pendingChange}</p>
       {profile?.verifiedDeveloper && (

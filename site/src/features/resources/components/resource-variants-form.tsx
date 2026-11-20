@@ -10,7 +10,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
-import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
@@ -518,7 +518,7 @@ export function ResourceVariantsForm({
         </form>
       )}
       {newest && (
-        <section aria-label={copy.variantsLatest} className="nexus-panel space-y-2 p-4 text-sm">
+        <section aria-label={copy.variantsLatest} className={panelSpace2P4TextSm}>
           <p>{copy.variantsChanged}</p>
           <p>{copy.variantsDraftHelp}</p>
           {newest.group ? (

@@ -10,8 +10,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
-import { panelMinSpace2P4 } from "../../shell/panel-shell";
+import { panelMinSpace2P4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
@@ -76,20 +77,14 @@ export async function LicenseMaintenanceScreen({
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link
-          href="/admin/licenses"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin/licenses" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={returnHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -100,10 +95,7 @@ export async function LicenseMaintenanceScreen({
 
   return (
     <div className={pageShellMax4xl}>
-      <Link
-        href="/admin/licenses"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin/licenses" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.maintenance}</h1>
@@ -114,7 +106,7 @@ export async function LicenseMaintenanceScreen({
           [copy.warnings, result.expiring],
           [copy.unknownTerms, result.unknownTerms],
         ].map(([label, total]) => (
-          <div className="nexus-panel p-4" key={label}>
+          <div className={panelP4} key={label}>
             <dt className="text-sm text-muted">{label}</dt>
             <dd className="text-xl text-primary">{total}</dd>
           </div>
@@ -153,21 +145,15 @@ export async function LicenseMaintenanceScreen({
       {result.totalPages > 1 && (
         <nav aria-label={copy.currentPage} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 && (
-            <Link
-              href={`?page=${result.page - 1}`}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page - 1}`} className={linkAccent}>
               {copy.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link
-              href={`?page=${result.page + 1}`}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page + 1}`} className={linkAccent}>
               {copy.next}
             </Link>
           )}

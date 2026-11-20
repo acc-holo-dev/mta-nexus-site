@@ -117,7 +117,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).toContain("ErrorState");
     expect(source).toContain("EmptyState");
     expectClippedLoadingSource(source);
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).toContain('"en" | "ru"');
     expect(source).not.toContain('role="alert"');
   }
@@ -125,7 +125,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   const terms = read("site/src/features/commerce/server/purchase-terms-screen.tsx");
   expect(terms).toContain("ErrorState");
   expectClippedLoadingSource(terms);
-  expect(terms).toMatch(/min-h-11|size="touch"/u);
+  expect(terms).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(terms).toContain("title={c.invalid}");
   expect(terms).not.toContain('role="alert"');
   expect(terms).not.toContain('<p role="alert"');

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { CommunityTopicForm } from "../topic-form";
@@ -27,10 +28,7 @@ export default async function NewCommunityTopicPage() {
   return (
     <div className={pageShellMax3xl}>
       <div className="min-w-0 space-y-1.5">
-        <Link
-          href="/community"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/community" className={linkAccentSm}>
           {copy.backToCommunity}
         </Link>
         <h1 className="font-display text-primary">{copy.startTitle}</h1>

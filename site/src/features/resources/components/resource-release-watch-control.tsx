@@ -9,6 +9,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
@@ -198,10 +199,7 @@ export function ResourceReleaseWatchControl({
       ) : null}
       {disabledReason ? <ErrorState title={disabledReason} description={copy.blockedHint} /> : null}
       {!hasAccess && acquireHref ? (
-        <Link
-          href={acquireHref}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={acquireHref} className={linkAccentSm}>
           {copy.acquireRequired}
         </Link>
       ) : null}
@@ -255,17 +253,11 @@ export function ResourceReleaseWatchControl({
       ) : null}
       {surface === "detail" || !commerceEnabled ? (
         <div className="flex flex-wrap gap-3 text-sm">
-          <Link
-            href={settingsHref}
-            className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={settingsHref} className={linkAccent}>
             {copy.settings}
           </Link>
           {surface === "detail" ? (
-            <Link
-              href="/workspace/library/watches"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/workspace/library/watches" className={linkAccent}>
               {copy.watchCenter}
             </Link>
           ) : null}

@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
-import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { panelFlexWrapEndP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
@@ -143,7 +143,7 @@ export async function ResourceRequirementsScreen({
       <p className="text-secondary">{copy.note}</p>
       {scope !== "library" && <p className="text-muted">{copy.preview}</p>}
       {query.previewBuildId && (
-        <p role="note" className="nexus-panel p-4">
+        <p role="note" className={panelP4}>
           {copy.libraryPreview}
         </p>
       )}

@@ -27,6 +27,7 @@ import { ObjectReportForm } from "../../moderation/object-report";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
 import { authEntryHref } from "../../shell/auth-return";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
@@ -104,10 +105,7 @@ export async function UserProfileScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={profileHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={profileHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -207,7 +205,7 @@ export async function UserProfileScreen({
             {visibility.showActivity && (
               <Link
                 href={`/users/${encodeURIComponent(user.username)}/activity`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
               >
                 {publicationCopy(locale).activity}
               </Link>
@@ -228,10 +226,7 @@ export async function UserProfileScreen({
       </section>
 
       <DeveloperExperience profile={professional} locale={locale} />
-      <Link
-        href={`/users/${encodeURIComponent(user.username)}/trust`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={`/users/${encodeURIComponent(user.username)}/trust`} className={linkAccentSm}>
         {trustCopy(locale).title}
       </Link>
       {resourcePage.total > 0 && (

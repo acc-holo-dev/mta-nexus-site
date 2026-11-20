@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
 import {
   formatHistoryIntervalUtc,
@@ -45,10 +46,7 @@ export function ServerHistoryPanel({
           description={copy.unavailableHint}
           action={
             retryHref ? (
-              <Link
-                href={retryHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             ) : undefined

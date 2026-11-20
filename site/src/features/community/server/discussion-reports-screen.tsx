@@ -11,10 +11,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   pageShellMax5xlTight as pageShellClass,
   pageShellMax5xlBare,
 } from "../../shell/page-shell";
+import { panelGrid2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";
 import { REPORT_TYPES } from "../community-report-contract";
@@ -162,7 +164,7 @@ export async function DiscussionReportsScreen({
         </p>
         <Link
           href={moderatedDiscussionHref(id, undefined, undefined, commentId)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.back}
         </Link>
@@ -173,7 +175,7 @@ export async function DiscussionReportsScreen({
         </p>
       )}
       <search aria-label={copy.search}>
-        <form action={path} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
+        <form action={path} className={panelGrid2P5}>
           <label className="space-y-1 text-sm text-primary">
             <span>{copy.search}</span>
             <input
@@ -206,10 +208,7 @@ export async function DiscussionReportsScreen({
             <Button className="min-h-11" type="submit">
               {copy.apply}
             </Button>
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSm}>
               {copy.clear}
             </Link>
           </div>
@@ -241,7 +240,7 @@ export async function DiscussionReportsScreen({
         <Link
           prefetch={false}
           href={discussionReportsHref(id, commentId, filters ?? undefined)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {general.latest}
         </Link>
@@ -249,7 +248,7 @@ export async function DiscussionReportsScreen({
           <Link
             prefetch={false}
             href={discussionReportsHref(id, commentId, filters ?? undefined, data.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {general.older}
           </Link>

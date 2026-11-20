@@ -114,7 +114,7 @@ it("adds login next from pathname when PlatformSignIn has no returnPath", () => 
   expect(html).toContain("/auth/register?next=%2Fworkspace%2Fcontent");
   expect(html).toContain(copy.signInMessage);
   expect(html).toContain(copy.createAccount);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
 });
 

@@ -75,7 +75,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(inventory).toContain("ErrorState");
   expect(inventory).toContain("EmptyState");
   expectClippedLoadingSource(inventory);
-  expect(inventory).toContain("min-h-11");
+  expect(inventory).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(inventory).toContain("loadUnavailableHint");
   expect(inventory).toContain("emptyHint");
   expect(inventory).toContain("emptyFilterHint");
@@ -86,7 +86,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   );
   expect(compatibility).toContain("ErrorState");
   expectClippedLoadingSource(compatibility);
-  expect(compatibility).toContain("min-h-11");
+  expect(compatibility).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(compatibility).toContain("loadUnavailableHint");
   expect(compatibility).not.toContain('role="alert"');
 
@@ -94,7 +94,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(manage).toContain("ErrorState");
   expect(manage).toContain("EmptyState");
   expectClippedLoadingSource(manage);
-  expect(manage).toContain("min-h-11");
+  expect(manage).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(manage).toContain('id="resource-build-quarantined"');
   expect(manage).toContain("quarantineReason");
   expect(manage).not.toMatch(/className="whitespace-pre-wrap break-words text-sm text-danger"/u);

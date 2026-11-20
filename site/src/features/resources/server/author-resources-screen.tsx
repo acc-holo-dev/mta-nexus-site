@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourcePublisherService } from "../../../lib/services/resources/resource-publisher-service";
 import { getCommercialCopy } from "../../commerce/commercial-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourcePublisherFilters } from "../publisher-view";
@@ -170,7 +171,7 @@ export async function AuthorResourcesScreen({
               {copy.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (

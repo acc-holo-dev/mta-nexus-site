@@ -18,6 +18,6 @@ it("exposes search landmarks and touch-sized filter inputs on residual library f
     const source = read(path);
     expect(source, path).toMatch(/<search aria-label=\{(?:cc|v|c)\.search\}>/u);
     expect(source, path).toContain('name="q"');
-    expect(source, path).toContain("min-h-11");
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   }
 });

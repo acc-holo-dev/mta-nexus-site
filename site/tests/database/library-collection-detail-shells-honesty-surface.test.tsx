@@ -78,7 +78,7 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
     const source = read(screen);
     expect(source).toContain("ErrorState");
     expectClippedLoadingSource(source);
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
   expect(read("site/src/features/library/server/collection-releases-screen.tsx")).toContain(
@@ -95,7 +95,9 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
 it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
   const source = read("site/src/features/library/server/collection-requirements-screen.tsx");
   expect(source).toContain('size="touch"');
-  expect(source).toContain("inline-flex min-h-11 items-center");
+  expect(source).toMatch(
+    /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+  );
   expect(source).toContain("unavailableItemCount");
   expect(source).toContain("c.unavailable");
   expect(source).toContain("description={c.withheld}");

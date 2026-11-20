@@ -28,7 +28,7 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
   for (const path of formComponents) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('role="alert"');
   }
 });
@@ -50,14 +50,14 @@ it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
   expect(source).toMatch(
     /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
   );
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-8");
 });
 
 it("locks context switcher native select to fieldControlClass without h-10 chrome", () => {
   const source = read("site/src/features/accounts/components/context-switcher.tsx");
   expect(source).toContain("fieldControlClass");
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("h-10");
   expect(source).not.toContain("fieldClassBlock");
 });

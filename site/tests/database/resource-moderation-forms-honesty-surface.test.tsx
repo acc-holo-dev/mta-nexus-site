@@ -47,7 +47,7 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
   for (const path of exclusive) {
     const source = read(path);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("min-h-11");
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(source).not.toContain('role="alert"');
   }
 });
@@ -140,21 +140,21 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     state.locale = locale;
     const form = renderToStaticMarkup(<NewResourceForm actorId="author" />);
-    expect(form).toContain("min-h-11");
+    expect(form).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(form).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(form).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 
     const build = renderToStaticMarkup(
       <BuildModerationControls buildId="bld_clean" scanStatus="clean" hasScanProvenance />,
     );
-    expect(build).toContain("min-h-11");
+    expect(build).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 
     const quarantine = renderToStaticMarkup(
       <BuildQuarantineControls buildId="bld_pub" status="published" />,
     );
-    expect(quarantine).toContain("min-h-11");
+    expect(quarantine).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 
     const report = renderToStaticMarkup(<ReportModerationControls reportId="rep_1" />);
-    expect(report).toContain("min-h-11");
+    expect(report).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );

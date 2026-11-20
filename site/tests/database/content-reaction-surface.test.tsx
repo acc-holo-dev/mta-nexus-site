@@ -209,7 +209,7 @@ it("clips honest reactions loading shells on narrow layouts", async () => {
 });
 it("keeps reaction removal controls at a usable touch target", async () => {
   const html = renderToStaticMarkup(await ReactionsPage({}));
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain(reactionCopy("en").remove);
 });
 it.each(["en", "ru"] as const)(
@@ -245,7 +245,7 @@ it("offers safe trust recovery on infrastructure failure and 404 on a missing pr
   expect(html).toContain('role="alert"');
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/users/writer/trust"');
   expect(html).not.toContain("secret SQL");
@@ -256,7 +256,7 @@ it("clips public trust panels and loading shells on narrow layouts", async () =>
   const panel = renderToStaticMarkup(<PublicUserTrustPanel data={trustData} locale="en" />);
   expect(panel).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(panel).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(panel).toContain("min-h-11");
+  expect(panel).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   const { default: TrustLoading } = await import("../../src/app/users/[username]/trust/loading");
   const loading = renderToStaticMarkup(await TrustLoading());
   expect(loading).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import {
   confirmsModeratedDiscussionRemoval,
@@ -134,7 +135,7 @@ export function ModeratedDiscussionRemoval({
           action={
             blocked ? (
               <a
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
                 href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
               >
                 {general.reload}
@@ -150,7 +151,7 @@ export function ModeratedDiscussionRemoval({
       )}
       {blocked && !error ? (
         <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
           href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
         >
           {general.reload}

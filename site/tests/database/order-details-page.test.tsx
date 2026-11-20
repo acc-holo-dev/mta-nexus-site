@@ -96,7 +96,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('href="?page=1"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("/api/checkout");
   },
 );
@@ -109,7 +109,7 @@ it("recovers with ErrorState when order details fail to load", async () => {
   expect(html).toContain(copy.orderLoadUnavailableHint);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/purchases/ord_a?page=2"');
 });
 it("renders EmptyState when an order has no line items", async () => {

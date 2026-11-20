@@ -16,6 +16,7 @@ import {
   resourceStatusLabel,
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -81,20 +82,14 @@ export async function StaffResourceDetailScreen({
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link
-          href="/admin/resources"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin/resources" className={linkAccentSm}>
           {copy.moderation}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={returnHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -165,7 +160,7 @@ export async function StaffResourceDetailScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

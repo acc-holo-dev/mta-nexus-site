@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack7 } from "../../shell/page-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import {
@@ -99,7 +100,7 @@ export async function DiscoverPage({
       <DirectoryFilters state={state} locale={locale} />
       {["servers", "creators", "organizations"].includes(state.type) && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
           href={discoveryStreamHref({
             ...state,
             type: state.type as "servers" | "creators" | "organizations",

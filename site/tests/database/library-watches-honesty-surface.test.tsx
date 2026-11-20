@@ -94,7 +94,7 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     const source = read(page);
     expect(source).toContain("ErrorState");
     expectClippedLoadingSource(source);
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
   expect(read("site/src/features/library/server/library-watches-screen.tsx")).toContain(

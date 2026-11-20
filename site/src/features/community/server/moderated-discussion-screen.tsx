@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   pageShellMax5xlTight as pageShellClass,
   pageShellMax5xlBare,
@@ -206,25 +207,16 @@ export async function ModeratedDiscussionScreen({
           {publication.title} · {general[publication.status]}
         </p>
         <nav className="flex flex-wrap gap-4">
-          <Link
-            href={`/admin/community/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`/admin/community/${encodeURIComponent(id)}`} className={linkAccentSm}>
             {copy.publication}
           </Link>
           {commentId && (
-            <Link
-              href={moderatedDiscussionHref(id)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
               {copy.back}
             </Link>
           )}
           {commentId && (
-            <Link
-              href={discussionReportsHref(id, commentId)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={discussionReportsHref(id, commentId)} className={linkAccentSm}>
               {discussionReportsCopy(locale).open}
             </Link>
           )}
@@ -259,10 +251,7 @@ export async function ModeratedDiscussionScreen({
               <Button className="min-h-11" type="submit">
                 {general.apply}
               </Button>
-              <Link
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={moderatedDiscussionHref(id)}
-              >
+              <Link className={linkAccentSm} href={moderatedDiscussionHref(id)}>
                 {general.reset}
               </Link>
             </form>
@@ -279,7 +268,7 @@ export async function ModeratedDiscussionScreen({
                   </p>
                   <Link
                     href={moderatedDiscussionHref(id, undefined, undefined, item.id)}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentSm}
                   >
                     {copy.review}
                   </Link>
@@ -373,7 +362,7 @@ export async function ModeratedDiscussionScreen({
             undefined,
             commentId,
           )}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {general.latest}
         </Link>
@@ -388,7 +377,7 @@ export async function ModeratedDiscussionScreen({
               data.nextCursor,
               commentId,
             )}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {general.older}
           </Link>

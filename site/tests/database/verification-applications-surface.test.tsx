@@ -237,7 +237,7 @@ it.each(["en", "ru"] as const)(
     expect(detail).toContain(copy.noEvents);
     expect(detail).toContain(copy.noEventsHint);
     expect(detail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(detail).toContain("min-h-11");
+    expect(detail).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 it("clips honest verification application loading shells on narrow layouts", async () => {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentXs } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
@@ -305,7 +306,7 @@ export function FollowWorkspace({
                   <Link
                     prefetch={false}
                     href={`${item.href}?comment=${encodeURIComponent(item.discussion.latestId)}#comment-${encodeURIComponent(item.discussion.latestId)}`}
-                    className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXs}
                   >
                     {copy.latestReply}
                   </Link>
@@ -330,7 +331,7 @@ export function FollowWorkspace({
                   <Link
                     prefetch={false}
                     href={`/workspace/library/${encodeURIComponent(item.targetId)}/collections`}
-                    className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentXs}
                     title={copy.toCollectionHint}
                   >
                     {copy.toCollection}
@@ -347,7 +348,7 @@ export function FollowWorkspace({
                     target: item.targetId,
                     cursor: undefined,
                   })}
-                  className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentXs}
                 >
                   {publicationCopy(locale).targetFeed}
                 </Link>

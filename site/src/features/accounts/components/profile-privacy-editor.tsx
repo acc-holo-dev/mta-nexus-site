@@ -7,6 +7,7 @@ import type { Locale } from "../../../lib/i18n";
 import { PlatformRequestError, platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
+import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,
@@ -157,7 +158,7 @@ export function ProfilePrivacyEditor({
 
   return (
     <section
-      className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6"
+      className={panelClipSpace5P5Sm}
       aria-busy={pending ? true : undefined}
       aria-label={copy.title}
     >

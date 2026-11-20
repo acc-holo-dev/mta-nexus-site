@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { linkAccentRounded } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { panelGrid2P5 } from "../../shell/panel-shell";
 import { confirmedResourceCopy } from "../resource-copy-confirmation";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import { ResourceCopyMetadataView } from "./resource-copy-metadata";
@@ -80,7 +82,7 @@ export function ResourceCopyForm({
         {preview.source.scope === "organization" ? c.organization : c.personal}
       </p>
       <ResourceCopyMetadataView metadata={preview.metadata} locale={locale} />
-      <fieldset disabled={busy || frozen} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
+      <fieldset disabled={busy || frozen} className={panelGrid2P5}>
         <Input
           id={`${field}-title`}
           label={c.name}
@@ -111,7 +113,7 @@ export function ResourceCopyForm({
         </Button>
         <Link
           href={`/workspace/resources/${encodeURIComponent(preview.source.id)}/copies`}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {c.history}
         </Link>

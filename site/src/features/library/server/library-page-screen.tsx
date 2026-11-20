@@ -19,7 +19,9 @@ import { resourceDeliveriesCopy } from "../../resources/resource-deliveries-i18n
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentBorder, linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
+import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
@@ -84,58 +86,31 @@ export async function LibraryPageScreen({
       </header>
 
       <div className="flex min-w-0 flex-wrap gap-2">
-        <Link
-          href="/workspace/library/collections"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library/collections" className={linkAccentBorder}>
           {libraryCollectionsCopy(locale).title}
         </Link>
-        <Link
-          href={collectionInventoryHref()}
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={collectionInventoryHref()} className={linkAccentBorder}>
           {libraryCollectionInventoryCopy(locale).inventory}
         </Link>
-        <Link
-          href="/workspace/cart"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/cart" className={linkAccentBorder}>
           {getResourceCommerceCopy(locale).openCart}
         </Link>
-        <Link
-          href="/workspace/acquisitions"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/acquisitions" className={linkAccentBorder}>
           {getResourceActivityCopy(locale).history}
         </Link>
-        <Link
-          href="/workspace/library/updates"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library/updates" className={linkAccentBorder}>
           {getResourceReleaseControlCopy(locale).updates}
         </Link>
-        <Link
-          href="/workspace/library/downloads"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library/downloads" className={linkAccentBorder}>
           {resourceDeliveriesCopy(locale).title}
         </Link>
-        <Link
-          href="/workspace/library/watches"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library/watches" className={linkAccentBorder}>
           {resourceReleaseWatchesCopy(locale).title}
         </Link>
-        <Link
-          href="/workspace/acquisitions/receipts"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/acquisitions/receipts" className={linkAccentSm}>
           {resourceCartReceiptsCopy(locale).title}
         </Link>
-        <Link
-          href="/workspace/library/reviews"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library/reviews" className={linkAccentBorder}>
           {resourceReviewCopy(locale).own}
         </Link>
       </div>
@@ -144,10 +119,7 @@ export async function LibraryPageScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={libraryHref(filter, page)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={libraryHref(filter, page)} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -199,7 +171,7 @@ export async function LibraryPageScreen({
           ) : (
             <ol className="grid gap-4 md:grid-cols-2">
               {result.items.map((item) => (
-                <li key={item.resourceId} className="nexus-panel flex flex-col gap-3 p-5">
+                <li key={item.resourceId} className={panelFlexColGap3P5}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <h2 className="min-w-0 break-words text-base font-semibold text-primary">
                       {item.downloadable ? item.title : copy.unavailableResource}

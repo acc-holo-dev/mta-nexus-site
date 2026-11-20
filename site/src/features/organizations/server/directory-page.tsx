@@ -7,6 +7,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -144,7 +145,7 @@ export default async function OrganizationsPage({
             ) : (
               <span />
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {copy.page} {result.page}
             </span>
             {result.hasMore && (

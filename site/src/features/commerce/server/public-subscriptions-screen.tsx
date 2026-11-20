@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
@@ -166,7 +167,7 @@ export async function PublicSubscriptionsScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

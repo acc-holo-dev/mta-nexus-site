@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -131,7 +132,7 @@ export async function SubscriptionHistoryScreen({
               {c.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (

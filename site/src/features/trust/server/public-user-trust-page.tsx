@@ -7,6 +7,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicUserTrustService } from "../../../lib/services/trust/public-user-trust-service";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace3P6 } from "../../shell/panel-shell";
 import { PublicUserTrustPanel } from "../public-user-trust";
 import { trustCopy } from "../public-user-trust-copy";
 
@@ -41,7 +42,7 @@ export async function TrustPage({ params }: { params: Promise<{ username: string
   if (!data)
     return (
       <div className={pageShellClass}>
-        <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
+        <header className={panelClipSpace3P6}>
           <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         </header>
         <ErrorState

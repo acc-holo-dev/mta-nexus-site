@@ -1,12 +1,12 @@
 "use client";
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
-
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
@@ -554,10 +554,7 @@ export function SupportCenter({
             icon={<LifeBuoy className="h-6 w-6" aria-hidden="true" />}
             action={
               filtersActive ? (
-                <Link
-                  href={basePath}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={basePath} className={linkAccent}>
                   {workspaceCopy.reset}
                 </Link>
               ) : undefined
@@ -602,10 +599,7 @@ export function SupportCenter({
           className="flex items-center justify-between gap-3"
         >
           {page > 1 ? (
-            <Link
-              href={supportHref(basePath, initialFilters, page - 1)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={supportHref(basePath, initialFilters, page - 1)} className={linkAccentSm}>
               {dictionary.market.previousPage}
             </Link>
           ) : (
@@ -615,10 +609,7 @@ export function SupportCenter({
             {dictionary.market.pageLabel} {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link
-              href={supportHref(basePath, initialFilters, page + 1)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={supportHref(basePath, initialFilters, page + 1)} className={linkAccentSm}>
               {dictionary.market.nextPage}
             </Link>
           ) : (

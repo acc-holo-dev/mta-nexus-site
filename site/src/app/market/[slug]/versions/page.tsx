@@ -1,10 +1,6 @@
-import {
-  PublicResourceVersionsPage,
-  publicResourceVersionsMetadata,
-} from "../../../../features/resources/versions-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = publicResourceVersionsMetadata;
-
-export default PublicResourceVersionsPage;
+export {
+  PublicResourceVersionsPage as default,
+  publicResourceVersionsMetadata as generateMetadata,
+} from "../../../../features/resources/versions-server";

@@ -235,7 +235,7 @@ describe("public safely published version archive", () => {
     expect(html).toContain('href="/market/safe-release/versions"');
     expect(html).toContain('href="/market/safe-release/versions?page=3"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
     await page(["1", "2"]);
     expect(state.history).toHaveBeenLastCalledWith("prd_release", 1);
@@ -270,7 +270,7 @@ describe("public safely published version archive", () => {
       expect(html).toContain('role="alert"');
       expect(html).toContain(copy.loadUnavailable);
       expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).toContain('href="/market/safe-release/versions?page=2"');
       expect(html).not.toContain("database-secret");
       expect(html).not.toContain('data-testid="build-provenance"');

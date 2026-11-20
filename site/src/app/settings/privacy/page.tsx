@@ -1,10 +1,6 @@
-import {
-  SettingsPrivacyScreen,
-  settingsPrivacyMetadata,
-} from "../../../features/accounts/settings-privacy-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = settingsPrivacyMetadata;
-
-export default SettingsPrivacyScreen;
+export {
+  SettingsPrivacyScreen as default,
+  settingsPrivacyMetadata as generateMetadata,
+} from "../../../features/accounts/settings-privacy-server";

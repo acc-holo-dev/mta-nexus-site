@@ -1,10 +1,6 @@
-import {
-  LibraryCollectionsScreen,
-  libraryCollectionsMetadata,
-} from "../../../../../../features/library/collections-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = libraryCollectionsMetadata;
-
-export default LibraryCollectionsScreen;
+export {
+  LibraryCollectionsScreen as default,
+  libraryCollectionsMetadata as generateMetadata,
+} from "../../../../../../features/library/collections-server";

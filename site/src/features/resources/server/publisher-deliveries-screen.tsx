@@ -10,7 +10,9 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceDeliveriesService } from "../../../lib/services/commerce/resource-deliveries-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import { deliverySearchParams, publisherDeliveriesQuery } from "../resource-deliveries-query";
@@ -137,7 +139,7 @@ export async function PublisherDeliveriesScreen({
       </form>
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {(["all", ...RESOURCE_DELIVERY_STATUSES] as const).map((status) => (
-          <div key={status} className="nexus-panel p-4">
+          <div key={status} className={panelP4}>
             <dt className="text-xs text-muted">{status === "all" ? copy.total : copy[status]}</dt>
             <dd className="text-2xl text-primary">{result.counts[status]}</dd>
           </div>
@@ -208,7 +210,7 @@ export async function PublisherDeliveriesScreen({
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (

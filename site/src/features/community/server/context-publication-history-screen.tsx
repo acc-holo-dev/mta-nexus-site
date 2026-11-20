@@ -17,7 +17,7 @@ import {
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
-import { panelSpace2P4 } from "../../shell/panel-shell";
+import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -151,7 +151,7 @@ export async function ContextPublicationHistoryScreen({
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-4">
+                <li key={event.id} className={panelClipSpace2P4}>
                   <p className="font-semibold text-primary">{history[event.kind]}</p>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

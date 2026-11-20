@@ -1,10 +1,10 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
+import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
@@ -394,10 +394,7 @@ export function SupportCaseThread({
           locale={locale}
           onChangeStatus={(status) => void updateStatus(status)}
         />
-        <Link
-          href={`${backHref}/${caseId}/messages`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`${backHref}/${caseId}/messages`} className={linkAccentSm}>
           {supportMessageCopy(locale).title}
         </Link>
       </header>

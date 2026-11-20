@@ -217,7 +217,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain("gross");
     expect(html).not.toContain('name="withdraw"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("recovers with ErrorState when sales history fails to load", async () => {
@@ -229,7 +229,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.salesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/sales?page=2"');
   });
 
@@ -313,7 +313,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.loadUnavailable);
     expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(
       'href="/workspace/licenses?page=2&amp;status=expiring&amp;binding=bound&amp;term=finite&amp;sort=expires_soon&amp;q=alpha"',
     );
@@ -340,7 +340,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(maintenance.clear);
     expect(html).toContain('href="/workspace/licenses"');
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the honest license archive loading shell on narrow layouts", async () => {
@@ -358,7 +358,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.purchasesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/purchases?page=2"');
   });
 

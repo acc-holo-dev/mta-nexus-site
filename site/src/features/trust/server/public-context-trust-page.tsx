@@ -6,7 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
-import { panelClipSpace2P5, panelClipSpace4P5 } from "../../shell/panel-shell";
+import { panelClipSpace2P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   type ContextKind,
   contextTrustHref,
@@ -63,7 +63,7 @@ export async function PublicContextTrustPage({
       <Link href={base} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
+      <header className={panelClipSpace3P6}>
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         {page && <p className="break-words font-semibold text-primary">{page.subject.name}</p>}
         <p className="text-sm text-muted">{copy.description}</p>

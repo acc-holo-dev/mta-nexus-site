@@ -15,6 +15,7 @@ import {
   resourceStatusLabel,
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -85,20 +86,14 @@ export async function StaffResourcesScreen({
   if (!result) {
     return (
       <div className={pageShellMax5xl}>
-        <Link
-          href="/admin"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin" className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link
-              href={returnHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={returnHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -109,10 +104,7 @@ export async function StaffResourcesScreen({
 
   return (
     <div className={pageShellMax5xl}>
-      <Link
-        href="/admin"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/admin" className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.moderation}</h1>
@@ -148,10 +140,7 @@ export async function StaffResourcesScreen({
           {copy.search}
         </Button>
         {filtersActive ? (
-          <Link
-            href="/admin/resources"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/admin/resources" className={linkAccentSm}>
             {copy.clearFilters}
           </Link>
         ) : null}
@@ -182,10 +171,7 @@ export async function StaffResourcesScreen({
           icon={<Package className="h-6 w-6" aria-hidden="true" />}
           action={
             filtersActive ? (
-              <Link
-                href="/admin/resources"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/admin/resources" className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : undefined
@@ -195,21 +181,15 @@ export async function StaffResourcesScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={href(result.page - 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page - 1)} className={linkAccent}>
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center">
+          <span className={linkMinH}>
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={href(result.page + 1)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page + 1)} className={linkAccent}>
               {copy.next}
             </Link>
           ) : null}

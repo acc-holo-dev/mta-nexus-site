@@ -9,8 +9,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
-import { panelSpace3P5 } from "../../shell/panel-shell";
+import { panelFlexWrapEndGap4P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -77,7 +78,7 @@ export async function SubscriptionReviewsScreen({
         <p role="note" className="text-sm text-secondary">
           {c.notice}
         </p>
-        <form method="get" className="nexus-panel flex flex-wrap items-end gap-4 p-4">
+        <form method="get" className={panelFlexWrapEndGap4P4}>
           <label htmlFor="review-account">
             <span className="block text-sm">{c.account}</span>
             <select
@@ -125,7 +126,7 @@ export async function SubscriptionReviewsScreen({
                 {c.previous}
               </Link>
             ) : null}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.scopeNext} · {scopes.page} / {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (
@@ -168,7 +169,7 @@ export async function SubscriptionReviewsScreen({
                 {c.previous}
               </Link>
             ) : null}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages ? (

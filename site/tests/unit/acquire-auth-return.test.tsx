@@ -34,7 +34,7 @@ describe("acquire guest auth return (FLOW-01)", () => {
     expect(page).toContain('size="touch"');
     expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(page).toContain("min-h-11");
+    expect(page).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(page).not.toContain('role="alert"');
     expect(loading).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(loading).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);

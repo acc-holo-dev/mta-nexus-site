@@ -1,10 +1,6 @@
-import {
-  CartWorkspaceScreen,
-  cartWorkspaceMetadata,
-} from "../../../features/commerce/cart-workspace-server";
-
 export const dynamic = "force-dynamic";
 
-export const generateMetadata = cartWorkspaceMetadata;
-
-export default CartWorkspaceScreen;
+export {
+  CartWorkspaceScreen as default,
+  cartWorkspaceMetadata as generateMetadata,
+} from "../../../features/commerce/cart-workspace-server";

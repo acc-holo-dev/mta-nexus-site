@@ -10,6 +10,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
 import {
   confirmedReactionMutation,
   type ReactionState,
@@ -209,10 +210,7 @@ export function ContentReactions({
         />
       )}
       {shownState?.authenticated && (
-        <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href="/workspace/reactions"
-        >
+        <Link className={linkAccentSm} href="/workspace/reactions">
           {copy.my}
         </Link>
       )}

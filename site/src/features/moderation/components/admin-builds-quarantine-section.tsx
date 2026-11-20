@@ -3,6 +3,7 @@ import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
+import { panelFlexBetweenP4 } from "../../shell/panel-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
@@ -84,10 +85,7 @@ export function AdminBuildsQuarantineSection({
         <div className="space-y-2.5">
           {pendingBuilds.length > 0 ? (
             pendingBuilds.map((build) => (
-              <div
-                key={build.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
+              <div key={build.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
@@ -191,10 +189,7 @@ export function AdminBuildsQuarantineSection({
         <div className="space-y-2.5">
           {riskBuilds.length > 0 ? (
             riskBuilds.map((build) => (
-              <div
-                key={build.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
+              <div key={build.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge

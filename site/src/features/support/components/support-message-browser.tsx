@@ -2,6 +2,7 @@ import type { SupportMessageFilters } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
@@ -107,10 +108,7 @@ export function SupportMessageBrowser({
           description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             filtered ? (
-              <Link
-                href={path}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={path} className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined

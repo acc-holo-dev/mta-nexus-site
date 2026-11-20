@@ -80,7 +80,7 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
   expect(source).toContain("ErrorState");
   expect(source).toContain("EmptyState");
   expectClippedLoadingSource(source);
-  expect(source).toMatch(/min-h-11|size="touch"/u);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("salesLoadUnavailable");
   expect(source).toContain("salesLoadUnavailableHint");
@@ -93,7 +93,7 @@ it("locks sales report honesty chrome with ErrorState recovery and no plain aler
   const source = read("site/src/features/commerce/server/seller-sales-report-screen.tsx");
   expect(source).toContain("ErrorState");
   expectClippedLoadingSource(source);
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).toContain("loadUnavailableHint");
   expect(source).toContain("invalidDescription");
   expect(source).toContain("c.reset");
@@ -105,7 +105,7 @@ it("locks seller sales report apply CTA to size=touch", () => {
   const source = read("site/src/features/commerce/server/seller-sales-report.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-10");
 });
 

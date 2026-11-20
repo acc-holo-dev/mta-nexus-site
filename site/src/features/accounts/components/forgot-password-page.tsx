@@ -6,6 +6,7 @@ import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
+import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
 import { recoveryJsonRequest } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
 
@@ -61,10 +62,7 @@ export function ForgotPasswordPage() {
 
   return (
     <div className={pageShellClass}>
-      <section
-        aria-labelledby="forgot-heading"
-        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-6 shadow-nexus-sm"
-      >
+      <section aria-labelledby="forgot-heading" className={panelClipSpace5P6Shadow}>
         <div className="flex items-center gap-3">
           <KeyRound className="h-5 w-5 text-accent" aria-hidden="true" />
           <h1 id="forgot-heading" className="font-display text-primary">

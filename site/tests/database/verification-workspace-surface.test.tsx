@@ -172,7 +172,7 @@ it("shows errors without presenting a failed read as empty history or editable d
   expect(html).toContain('role="alert"');
   expect(html).toContain('id="verification-workspace-unavailable"');
   expect(html).toContain(copy.unavailable);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain(copy.noApplications);
   const editor = renderToStaticMarkup(

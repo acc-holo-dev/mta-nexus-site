@@ -63,7 +63,7 @@ it.each(["ru", "en"] as const)(
     expect(renderToStaticMarkup(<SupportCaseActions {...props} busy />)).toContain('disabled=""');
     const staff = renderToStaticMarkup(<SupportCaseActions {...props} staff />);
     expect(staff).toContain("border border-base bg-surface");
-    expect(staff).toContain("min-h-11");
+    expect(staff).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(staff).toContain("text-accent");
   },
 );

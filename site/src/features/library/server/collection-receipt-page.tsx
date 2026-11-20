@@ -11,7 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
-import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
@@ -184,10 +184,7 @@ export default async function Page({
         {report.resources.length > 0 && (
           <ul className={pageShellStack3}>
             {report.resources.map((resource) => (
-              <li
-                key={resource.productId}
-                className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-4"
-              >
+              <li key={resource.productId} className={panelClipSpace2P4}>
                 <p>
                   {resource.currentAvailable
                     ? (resource.currentTitle ?? c.unavailable)

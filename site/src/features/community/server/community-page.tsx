@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { publicationCopy } from "../publication-feed-copy";
@@ -49,16 +50,10 @@ export default async function CommunityPage({
       </header>
 
       <div className="flex flex-wrap gap-4">
-        <Link
-          href="/workspace/content"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/content" className={linkAccentSm}>
           {platformCopy.studio}
         </Link>
-        <Link
-          href="/workspace/feed"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/feed" className={linkAccentSm}>
           {publicationCopy(locale).title}
         </Link>
       </div>
@@ -76,7 +71,7 @@ export default async function CommunityPage({
           action={
             <Link
               href={contentPageHref("/community", filters, filters.page)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -114,10 +109,7 @@ export default async function CommunityPage({
           icon={<MessageSquare className="h-6 w-6" />}
           action={
             filtersActive ? (
-              <Link
-                href="/community"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/community" className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : (

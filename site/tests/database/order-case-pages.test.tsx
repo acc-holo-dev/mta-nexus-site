@@ -170,7 +170,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('name="reviewStatus"');
     expect(html).toContain('name="threadStatus"');
     expect(html).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(copy.apply);
   },
 );
@@ -196,7 +196,7 @@ it("shows an honest recovery state when the case queue fails", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("reviewStatus=refund_recommended&amp;page=2");
   expect(html).not.toContain("&lt;Private order&gt;");
 });

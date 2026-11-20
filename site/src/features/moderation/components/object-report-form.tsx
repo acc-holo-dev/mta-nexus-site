@@ -6,6 +6,7 @@ import { type FormEvent, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -112,10 +113,7 @@ export function ObjectReportForm({
         description={copy.identityUnavailableDescription}
         action={
           retryHref ? (
-            <a
-              href={retryHref}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <a href={retryHref} className={linkAccent}>
               {copy.retry}
             </a>
           ) : undefined

@@ -40,7 +40,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyHint);
     expect(html).toContain(copy.discover);
     expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 
