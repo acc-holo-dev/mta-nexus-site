@@ -3173,8 +3173,6 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-
-
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ### Источники
@@ -3229,8 +3227,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Зависимости и условия
 
 Без обязательных task dependencies.
-
-
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3340,8 +3336,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Зависимости и условия
 
 Без обязательных task dependencies.
-
-
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3459,8 +3453,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 Без обязательных task dependencies.
 
-
-
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ### Источники
@@ -3508,8 +3500,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Зависимости и условия
 
 Без обязательных task dependencies.
-
-
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3610,8 +3600,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Зависимости и условия
 
 Без обязательных task dependencies.
-
-
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -4001,8 +3989,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 Без обязательных task dependencies.
 
-
-
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ### Источники
@@ -4047,8 +4033,6 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Зависимости и условия
 
 UX-06
-
-
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 

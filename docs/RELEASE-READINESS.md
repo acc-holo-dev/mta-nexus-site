@@ -65,7 +65,6 @@
 
 Локальные проверки готовности на хосте:
 
-
 - `pnpm legal:check` — **PASSED** (exit 0): маршруты `/terms`, `/privacy`, `/community-rules` на месте.
   Это проверка **продуктовых поверхностей**, а не юридическое одобрение — ревью counsel остаётся human gate.
 - `pnpm observability:ready` (`NEXUS_OBSERVABILITY_READY_ACK=YES`) — **НЕ прошёл**: не заданы три порога
