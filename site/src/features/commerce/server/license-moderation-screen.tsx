@@ -11,6 +11,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   effectiveLicenseStatus,
@@ -21,7 +22,6 @@ import {
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 export async function licenseModerationMetadata(): Promise<Metadata> {
   return {

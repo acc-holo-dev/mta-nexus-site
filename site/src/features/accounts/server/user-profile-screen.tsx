@@ -27,11 +27,11 @@ import { ObjectReportForm } from "../../moderation/object-report";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
 import { authEntryHref } from "../../shell/auth-return";
+import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-import { pageShellStack10, pageShellStack6 } from "../../shell/page-shell";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
 

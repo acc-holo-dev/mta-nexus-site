@@ -4,6 +4,7 @@ import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellStack5 } from "../../shell/page-shell";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
@@ -79,7 +80,7 @@ export function CommunityReportList({
     }
   }
   return (
-    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
+    <div className={pageShellStack5} aria-busy={pending}>
       <nav className="flex min-w-0 flex-wrap gap-3" aria-label={copy.status}>
         {(["pending", "history"] as const).map((view) => (
           <Link

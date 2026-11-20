@@ -24,6 +24,7 @@ import { moderationCopy } from "../../community/community-moderation-copy";
 import { ContentModerationControls } from "../../community/content-moderation";
 import { getResourceReleaseControlCopy } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   AdminAdPlacementSection,
@@ -32,7 +33,6 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
-import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 
 export async function adminHomeMetadata(): Promise<Metadata> {
   return {

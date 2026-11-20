@@ -1,7 +1,7 @@
 import { buildRepository } from "@nexus/db";
 import { EmptyState, ErrorState } from "@nexus/ui";
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary, type Locale } from "../../../lib/i18n";
@@ -13,6 +13,7 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
@@ -21,7 +22,6 @@ import {
   parseReleaseHistoryPage,
   releaseHistoryHref,
 } from "../public-release-history";
-import { pageShellMax5xlMid as pageShellClass } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -160,7 +160,7 @@ export async function PublicResourceVersionsPage({
       {history.releases.length === 0 ? (
         <EmptyState title={copy.noBuilds} description={copy.noBuildsHint} />
       ) : (
-        <ol className="min-w-0 space-y-4 overflow-x-clip">
+        <ol className={pageShellStack4}>
           {history.releases.map((release) => (
             <li key={release.id} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
               <header className="flex flex-wrap items-start justify-between gap-3">

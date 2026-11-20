@@ -6,10 +6,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
-import { pageShellMax4xl } from "../../shell/page-shell";
 export async function commercialPlanCreateMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).createDocumentTitle} | MTA NEXUS`,

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { discoveryCopy } from "../discovery-copy";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof discoveryCopy>;
 type StringKey = {

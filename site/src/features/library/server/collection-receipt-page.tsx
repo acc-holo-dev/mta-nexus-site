@@ -10,7 +10,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
@@ -181,7 +181,7 @@ export default async function Page({
           </article>
         )}
         {report.resources.length > 0 && (
-          <ul className="min-w-0 space-y-3 overflow-x-clip">
+          <ul className={pageShellStack3}>
             {report.resources.map((resource) => (
               <li
                 key={resource.productId}

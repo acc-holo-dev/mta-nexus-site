@@ -10,6 +10,7 @@ import {
 } from "../../organizations/organization-content-copy";
 import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { pageShellStack4 } from "../../shell/page-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import {
@@ -267,7 +268,7 @@ export function AuthorContentForm({
     }
   }
   return (
-    <div className="min-w-0 space-y-4 overflow-x-clip">
+    <div className={pageShellStack4}>
       {server && (
         <p className="text-sm text-secondary">
           {serverContentCopy(locale).context}: <strong>{server.name}</strong>

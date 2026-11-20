@@ -3,9 +3,9 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { CommunityTopicForm } from "../topic-form";
-import { pageShellMax3xl } from "../../shell/page-shell";
 
 export default async function NewCommunityTopicPage() {
   const locale = await getRequestLocale();

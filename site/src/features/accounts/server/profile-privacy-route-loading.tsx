@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax3xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-import { pageShellMax3xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof profilePrivacyCopy>;
 type StringKey = {

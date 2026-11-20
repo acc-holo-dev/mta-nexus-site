@@ -5,6 +5,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellClip } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { NewResourceForm } from "../create-controls";
 
@@ -33,7 +34,7 @@ export async function ResourceCreateScreen() {
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/resources/new" />;
   return (
-    <div className="min-w-0 overflow-x-clip">
+    <div className={pageShellClip}>
       <NewResourceForm key={actor.id} actorId={actor.id} />
     </div>
   );

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { publicationCopy } from "../publication-feed-copy";
 import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;

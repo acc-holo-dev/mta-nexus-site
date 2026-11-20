@@ -5,13 +5,13 @@ import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
 } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
-import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 
 type Proof = AccountRecoveryProof;
 type State =

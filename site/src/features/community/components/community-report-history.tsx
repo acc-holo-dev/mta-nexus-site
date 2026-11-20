@@ -11,11 +11,11 @@ import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
 import { changeHistoryHref } from "../../accounts/private-change-history-query";
+import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { communityReportCopy } from "../community-report-copy";
 import type { ReportHistoryPage } from "../community-report-history-contract";
 import { reportHistoryCopy } from "../community-report-history-copy";
 import { platformFieldClass } from "../user-platform-client";
-import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 export function CommunityReportHistory({
   page,
   filters,

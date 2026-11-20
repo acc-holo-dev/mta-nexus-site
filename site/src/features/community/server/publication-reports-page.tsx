@@ -6,6 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { reportRateLimit } from "../community-report-api";
 import { REPORT_TYPES } from "../community-report-contract";
@@ -17,7 +18,6 @@ import {
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import { platformFieldClass } from "../user-platform-client";
-import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,

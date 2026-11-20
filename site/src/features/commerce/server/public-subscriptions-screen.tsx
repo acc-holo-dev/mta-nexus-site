@@ -5,12 +5,12 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { subscriptionsCopy } from "../subscriptions-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 const shellClass = pageShellMax5xl;
 const linkClass =

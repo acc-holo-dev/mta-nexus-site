@@ -5,12 +5,12 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
 import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
 import { type ReportGroupsPage, reportGroupsHref } from "../community-report-groups-contract";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { platformFieldClass } from "../user-platform-client";
-import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 export function CommunityReportGroups({
   page,
   filters,

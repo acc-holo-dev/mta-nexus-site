@@ -6,12 +6,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportGroupsService } from "../../../lib/services/community/community-report-groups-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { reportRateLimit } from "../community-report-api";
 import { parseReportGroupsQuery } from "../community-report-groups-contract";
 import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
 import { CommunityReportGroups } from "../components/community-report-groups";
-import { pageShellMax5xlDenseTight } from "../../shell/page-shell";
 export async function reportGroupsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).title,

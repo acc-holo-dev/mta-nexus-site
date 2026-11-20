@@ -9,11 +9,11 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { sellerSalesCopy } from "../seller-sales-i18n";
 import { sellerSalesPageQuery } from "../seller-sales-query";
 import { SellerSalesReportView } from "./seller-sales-report";
-import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

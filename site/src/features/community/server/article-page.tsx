@@ -13,13 +13,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
 import { contentService } from "../../../lib/services/community/content-service";
+import { pageShellMax4xlLoose } from "../../shell/page-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
 import { ContentReactions } from "../reactions";
 import { CommunityReportForm } from "../report-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
-import { pageShellMax4xlLoose } from "../../shell/page-shell";
 
 export async function generateMetadata({
   params,

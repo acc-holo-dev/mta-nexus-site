@@ -9,6 +9,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { resourcePublicationReadinessService } from "../../../lib/services/resources/resource-publication-readiness-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { AuthorResourceForms, RetireBuildForm } from "../author-controls";
 import { ResourceLifecycleControls } from "../lifecycle-controls";
@@ -16,7 +17,6 @@ import { ResourcePublicationReadinessPanel } from "../publisher-view";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
-import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

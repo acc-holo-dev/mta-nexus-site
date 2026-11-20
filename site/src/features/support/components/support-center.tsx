@@ -8,6 +8,7 @@ import { platformFieldClass } from "../../community/user-platform-client";
 import { currentBrowserReturnPath } from "../../shell/auth-return";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -25,7 +26,6 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../support-workspace-copy";
-import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 

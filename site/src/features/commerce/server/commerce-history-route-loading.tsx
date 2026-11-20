@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
 type HistoryStringKey = {

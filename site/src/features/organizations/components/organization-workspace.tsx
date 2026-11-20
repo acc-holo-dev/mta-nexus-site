@@ -13,6 +13,7 @@ import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -28,7 +29,6 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 export function OrganizationWorkspacePanel({
   initial,

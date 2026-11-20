@@ -1,9 +1,10 @@
 import { ProfilePrivacyRouteLoading } from "../../../features/accounts/profile-privacy-route-loading-server";
+import { pageShellMax3xl } from "../../../features/shell/page-shell";
 
 export default async function Loading() {
   return ProfilePrivacyRouteLoading({
     headingId: "privacy-loading-heading",
-    className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax3xl,
     rows: 0,
     leading: (
       <>

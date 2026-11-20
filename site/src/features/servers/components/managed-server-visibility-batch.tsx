@@ -11,6 +11,7 @@ import {
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
+import { pageShellStack4 } from "../../shell/page-shell";
 import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
@@ -182,7 +183,7 @@ export function ManagedServerVisibilityBatch({
     }
   }
   return (
-    <section className="min-w-0 space-y-4 overflow-x-clip" aria-busy={busy}>
+    <section className={pageShellStack4} aria-busy={busy}>
       <div className="nexus-panel space-y-4 p-5">
         <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
         <p className="text-sm text-muted">{copy.batchHelp}</p>

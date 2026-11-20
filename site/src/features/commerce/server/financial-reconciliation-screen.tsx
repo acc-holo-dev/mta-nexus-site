@@ -10,6 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { parseHistoryPage } from "../commerce-history-format";
 import {
@@ -18,7 +19,6 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 export async function financialReconciliationMetadata(): Promise<Metadata> {
   return {

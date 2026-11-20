@@ -5,13 +5,13 @@ import { MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
 } from "../account-recovery-browser";
 import { authEmailVerificationApiCopy } from "../auth-email-verification-api-copy";
-import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
 
 type Proof = AccountRecoveryProof;
 type State =

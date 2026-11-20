@@ -12,6 +12,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
@@ -22,7 +23,6 @@ import { collectionHref, collectionId, collectionPageParams } from "../library-c
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 export async function collectionReleasesMetadata(): Promise<Metadata> {
   return {
     title: `${collectionReleasesCopy(await getRequestLocale()).title} | MTA NEXUS`,

@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
@@ -11,10 +11,10 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
-import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

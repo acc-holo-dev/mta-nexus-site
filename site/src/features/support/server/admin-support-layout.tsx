@@ -4,12 +4,12 @@ import { ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMaxMdGuest } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
 
 export async function AdminSupportLayout({ children }: { children: ReactNode }) {
   const locale = await getRequestLocale();

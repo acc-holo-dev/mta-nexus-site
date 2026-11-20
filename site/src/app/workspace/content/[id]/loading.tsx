@@ -1,10 +1,11 @@
 import { AuthorPublicationDeskRouteLoading } from "../../../../features/community/author-publication-desk-route-loading-server";
 import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
+import { pageShellMax3xlTight } from "../../../../features/shell/page-shell";
 
 export default async function Loading() {
   return AuthorPublicationDeskRouteLoading({
     headingId: "edit-publication-loading-heading",
-    className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip",
+    className: pageShellMax3xlTight,
     rowClassName: "h-16 rounded bg-inset",
     leading: (
       <>

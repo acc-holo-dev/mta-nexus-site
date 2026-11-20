@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { pageShellMaxXl } from "../../shell/page-shell";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 
 export async function LibraryCollectionsNotFound() {
   const c = libraryCollectionsCopy(await getRequestLocale());

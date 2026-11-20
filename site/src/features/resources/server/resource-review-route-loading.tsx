@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { resourceReviewCopy } from "../resource-review-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type ReviewCopy = ReturnType<typeof resourceReviewCopy>;
 type ReviewKey = {

@@ -10,12 +10,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { licenseControlService } from "../../../lib/services/commerce/license-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
-import { pageShellMax4xl } from "../../shell/page-shell";
 export async function licenseMaintenanceMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseMaintenanceCopy(await getRequestLocale()).maintenance} | MTA NEXUS`,

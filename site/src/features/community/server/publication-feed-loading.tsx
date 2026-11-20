@@ -1,6 +1,6 @@
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { publicationCopy } from "../publication-feed-copy";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
 

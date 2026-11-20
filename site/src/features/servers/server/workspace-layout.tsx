@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { ServerWorkspaceNav } from "../workspace-navigation";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { ServerWorkspaceNav } from "../workspace-navigation";
 
 export async function ServerWorkspaceLayout({
   children,

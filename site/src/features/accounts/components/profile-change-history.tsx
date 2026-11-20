@@ -6,6 +6,7 @@ import {
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";
@@ -13,7 +14,6 @@ import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
 } from "./private-change-history-controls";
-import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

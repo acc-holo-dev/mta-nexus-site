@@ -13,8 +13,8 @@ import { communityModerationService } from "../../../lib/services/community/comm
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
-  pageShellMax5xlBare,
   pageShellMax5xlTight as pageShellClass,
+  pageShellMax5xlBare,
 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";

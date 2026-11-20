@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { approvalCopy } from "../public-verification-history-copy";
-import { pageShellMax4xlTight } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof approvalCopy>;
 type StringKey = {

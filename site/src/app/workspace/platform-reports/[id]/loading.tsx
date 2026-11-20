@@ -1,9 +1,10 @@
 import { PlatformReportRouteLoading } from "../../../../features/moderation/platform-report-route-loading-server";
+import { pageShellMax5xl } from "../../../../features/shell/page-shell";
 
 export default async function Loading() {
   return PlatformReportRouteLoading({
     headingId: "platform-report-detail-loading-heading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax5xl,
     rows: 0,
     leading: (
       <>

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
-import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import {
   type ContextKind,
   contextTrustHref,
@@ -137,7 +137,7 @@ export async function PublicContextTrustPage({
           </Link>
         </section>
       )}
-      <section className="min-w-0 space-y-4 overflow-x-clip">
+      <section className={pageShellStack4}>
         <h2 className="font-heading text-primary">{copy.history}</h2>
         <p className="text-sm text-muted">{approvals.scope}</p>
         <a href={latest} className={actionLinkClass}>

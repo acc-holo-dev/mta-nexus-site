@@ -15,7 +15,11 @@ import { resourceReleaseWatchesService } from "../../../lib/services/resources/r
 import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import {
+  pageShellMax5xl as pageShellClass,
+  pageShellStack3,
+  pageShellStack4,
+} from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 
@@ -182,7 +186,7 @@ export async function LibraryWatchHistoryScreen({
         />
       ) : null}
       {result.items.length ? (
-        <ol className="min-w-0 space-y-4 overflow-x-clip">
+        <ol className={pageShellStack4}>
           {result.items.map((item) => (
             <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
               <h2>{c[item.source]}</h2>
@@ -195,7 +199,7 @@ export async function LibraryWatchHistoryScreen({
                 </p>
               )}
               {item.changes && (
-                <ul className="min-w-0 space-y-3 overflow-x-clip">
+                <ul className={pageShellStack3}>
                   {item.changes.map((change) => (
                     <li key={change.productId} className="space-y-2 border-t border-base pt-3">
                       {change.currentAvailable && change.currentTitle && (

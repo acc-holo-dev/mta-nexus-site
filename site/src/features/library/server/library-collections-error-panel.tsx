@@ -1,9 +1,9 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { pageShellMaxXl } from "../../shell/page-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { libraryCollectionsLinkClass } from "./library-collections-screen-shared";
-import { pageShellMaxXl } from "../../shell/page-shell";
 
 const recoveryLinkClass = `${libraryCollectionsLinkClass} inline-flex min-h-11 items-center`;
 

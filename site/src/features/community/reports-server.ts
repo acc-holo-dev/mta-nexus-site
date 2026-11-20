@@ -2,6 +2,6 @@ import "server-only";
 
 export {
   CommunityReportScreen,
-  communityReportMetadata,
   communityReportListMetadata,
+  communityReportMetadata,
 } from "./server/community-report-screen";

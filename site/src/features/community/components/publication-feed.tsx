@@ -1,6 +1,7 @@
 import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellStack5 } from "../../shell/page-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -65,7 +66,7 @@ export function PublicationFeed({
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="min-w-0 space-y-5 overflow-x-clip"
+      className={pageShellStack5}
     >
       {following && filters.target && (
         <p className="nexus-panel flex min-w-0 flex-wrap items-center gap-3 p-4 text-sm text-muted">

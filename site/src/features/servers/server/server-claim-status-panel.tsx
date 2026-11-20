@@ -2,6 +2,7 @@ import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellStack4 } from "../../shell/page-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
 
@@ -23,7 +24,7 @@ export function ServerClaimStatusPanel({
   const waiting = request?.status === "pending";
   const dateLabel = (date: Date) => `${date.toISOString().replace("T", " ").slice(0, 16)} UTC`;
   return (
-    <div className="min-w-0 space-y-4 overflow-x-clip">
+    <div className={pageShellStack4}>
       {(status.isVerified || request) && (
         <section
           className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"

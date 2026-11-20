@@ -22,8 +22,8 @@ import { getLibraryCopy } from "../../library/library-view";
 import { ManagedServerCard } from "../../servers/managed-card-server";
 import { getManagedServerCopy } from "../../servers/managed-server-view";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
-import { PlatformSessionError } from "../session-error";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
+import { PlatformSessionError } from "../session-error";
 
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
+import { pageShellStack3 } from "../../shell/page-shell";
 import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
@@ -32,7 +33,7 @@ export function ServerHistoryPanel({
 
   if (!history) {
     return (
-      <section aria-labelledby="server-history-title" className="min-w-0 space-y-3 overflow-x-clip">
+      <section aria-labelledby="server-history-title" className={pageShellStack3}>
         <h2
           id="server-history-title"
           className="text-sm font-bold uppercase tracking-wider text-primary"

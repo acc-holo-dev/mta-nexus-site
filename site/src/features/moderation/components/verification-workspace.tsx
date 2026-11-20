@@ -12,6 +12,7 @@ import {
   platformRequest,
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -27,7 +28,6 @@ import {
   verificationMutationError,
 } from "../../trust/verification-workspace-copy";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
-import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
 

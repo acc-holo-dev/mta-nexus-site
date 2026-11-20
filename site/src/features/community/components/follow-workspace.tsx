@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
+import { pageShellStack5 } from "../../shell/page-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
   FOLLOW_TYPES,
@@ -167,7 +168,7 @@ export function FollowWorkspace({
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="min-w-0 space-y-5 overflow-x-clip"
+      className={pageShellStack5}
     >
       <nav aria-label={copy.title} className="flex min-w-0 gap-2 overflow-x-auto">
         {[undefined, ...FOLLOW_TYPES].map((value) => (

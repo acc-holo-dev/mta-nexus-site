@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax6xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getManagedServerCopy } from "../managed-server-view";
-import { pageShellMax6xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof getManagedServerCopy>;
 type StringKey = {

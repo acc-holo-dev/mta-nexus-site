@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellStack5 } from "../../shell/page-shell";
 import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
@@ -155,7 +156,7 @@ export function CommunityReportDetailView({
     }
   }
   return (
-    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
+    <div className={pageShellStack5} aria-busy={pending}>
       <div className="flex min-w-0 flex-wrap items-center gap-4">
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}

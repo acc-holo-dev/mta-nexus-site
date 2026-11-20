@@ -2,8 +2,8 @@
 
 import { Button, ErrorState } from "@nexus/ui";
 import { useNexusLocale } from "../../shell/locale";
-import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { pageShellMaxXl } from "../../shell/page-shell";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 
 export function LibraryCollectionsRouteError({ reset }: { reset: () => void }) {
   const { locale } = useNexusLocale();

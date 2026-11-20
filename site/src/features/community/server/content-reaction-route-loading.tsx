@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { reactionCopy } from "../content-reaction-copy";
-import { pageShellMax4xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof reactionCopy>;
 type StringKey = {

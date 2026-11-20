@@ -8,9 +8,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { securityCenterService } from "../../../lib/services/accounts/security-center-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { securityActivityLabelKey } from "../security-activity";
-import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
 
 const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
 const panelShellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";

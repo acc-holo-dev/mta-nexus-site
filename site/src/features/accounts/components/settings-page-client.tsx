@@ -14,6 +14,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { authPasswordApiCopy } from "../auth-password-api-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
@@ -31,7 +32,6 @@ import { SettingsActiveSessions } from "./settings-active-sessions";
 import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
-import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 
 type Notice = {
   text: string;

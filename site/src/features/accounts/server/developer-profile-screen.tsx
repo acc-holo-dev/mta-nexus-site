@@ -15,10 +15,10 @@ import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
+import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
-import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

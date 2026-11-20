@@ -15,8 +15,8 @@ import {
   resourceStatusLabel,
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
 

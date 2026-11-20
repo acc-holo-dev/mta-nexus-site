@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 
 export function AdminResourceRouteLoading({
   headingId,

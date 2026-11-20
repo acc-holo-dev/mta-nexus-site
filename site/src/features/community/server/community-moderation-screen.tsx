@@ -20,13 +20,18 @@ import {
   parseModerationQuery,
 } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import {
+  pageShellMax4xlTight,
+  pageShellMaxMdDense,
+  pageShellStack5,
+  pageShellStack6,
+} from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
-import { pageShellMax4xlTight, pageShellMaxMdDense, pageShellStack6 } from "../../shell/page-shell";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -123,7 +128,7 @@ export async function CommunityModerationScreen({
     if (raw && !parsed.success) error = copy.unavailable;
     if (!parsed.success)
       return (
-        <div className="min-w-0 space-y-5 overflow-x-clip">
+        <div className={pageShellStack5}>
           <Link className={focusLink} href="/admin/community">
             {copy.back}
           </Link>

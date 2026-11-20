@@ -21,8 +21,12 @@ import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
+import {
+  pageShellStack10 as pageShellClass,
+  pageShellStack4,
+  pageShellStack6,
+} from "../../shell/page-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
-import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -216,7 +220,7 @@ export default async function OrganizationProfilePage({
       ) : null}
 
       {resourcePage.total > 0 && (
-        <section id="resources" className="min-w-0 space-y-4 overflow-x-clip">
+        <section id="resources" className={pageShellStack4}>
           <h2 className="font-heading text-primary">
             {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
@@ -242,7 +246,7 @@ export default async function OrganizationProfilePage({
       )}
 
       {articlePage.total > 0 && (
-        <section id="articles" className="min-w-0 space-y-4 overflow-x-clip">
+        <section id="articles" className={pageShellStack4}>
           <h2 className="font-heading text-primary">
             {copy.articles} ({articlePage.total})
           </h2>

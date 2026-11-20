@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicVerificationHistoryService } from "../../../lib/services/trust/public-verification-history-service";
-import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { approvalPageHref, parseApprovalQuery } from "../public-verification-history-contract";
 import { approvalCopy, approvalError } from "../public-verification-history-copy";
 
@@ -147,7 +147,7 @@ export async function ApprovalHistoryPage({
         />
       )}
       {page && (
-        <ol className="min-w-0 space-y-3 overflow-x-clip">
+        <ol className={pageShellStack3}>
           {page.items.map((record) => (
             <li key={record.key} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
               <h2 className="font-semibold text-primary">{copy[record.type]}</h2>

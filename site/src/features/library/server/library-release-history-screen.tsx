@@ -9,11 +9,11 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
-import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryReleaseHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,

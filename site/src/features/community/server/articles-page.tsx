@@ -5,11 +5,11 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
 import { discoveryStreamCopy } from "../../discovery/discovery-stream-copy";
+import { pageShellStack8 } from "../../shell/page-shell";
 import { ArticleCard } from "../article-view";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { contentPageHref, editorialTypes, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
-import { pageShellStack8 } from "../../shell/page-shell";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).articles;

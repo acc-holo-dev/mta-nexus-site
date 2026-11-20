@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { pageShellStack7 } from "../../shell/page-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import {
   DISCOVER_TYPES,
@@ -51,7 +52,7 @@ export async function DiscoverPage({
   const results = await DirectoryResults({ state, locale });
 
   return (
-    <div className="min-w-0 space-y-7 overflow-x-clip">
+    <div className={pageShellStack7}>
       <PageHeader
         title={copy.title}
         description={copy.description}

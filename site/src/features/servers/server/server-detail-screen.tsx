@@ -22,6 +22,7 @@ import { serverService } from "../../../lib/services/servers/server-service";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
+import { pageShellStack8 } from "../../shell/page-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { ServerClaimControlPanel } from "../claim-controls";
 import { ServerConnectControls } from "../connect";
@@ -31,7 +32,6 @@ import { ServerReviewPanel } from "../review-controls";
 import { parseServerHistoryWindow } from "../server-history-window";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerUpdatesPanel } from "../updates-server";
-import { pageShellStack8 } from "../../shell/page-shell";
 
 const getServer = cache((slug: string) => serverService.getServerBySlug(slug));
 

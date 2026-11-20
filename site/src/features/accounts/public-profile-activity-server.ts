@@ -1,5 +1,5 @@
 export {
   PublicProfileActivity,
-  publicProfileMetadata,
   publicProfileActivityMetadata,
+  publicProfileMetadata,
 } from "./server/public-profile-activity";

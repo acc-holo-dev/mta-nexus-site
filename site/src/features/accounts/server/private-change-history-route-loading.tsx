@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
-import { pageShellMax5xlDense } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof privateChangeHistoryCopy>;
 type StringKey = {

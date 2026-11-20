@@ -14,7 +14,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
@@ -192,7 +192,7 @@ export default async function Page({
             }
           />
         ) : null}
-        <ol className="min-w-0 space-y-4 overflow-x-clip">
+        <ol className={pageShellStack4}>
           {result.items.map((item) => {
             const receipt = item.receipt,
               command = receipt?.command;

@@ -7,12 +7,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { supportMessageDiscoveryService } from "../../../lib/services/support/support-message-discovery-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
-import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 
 export async function supportMessageMetadata() {
   return {

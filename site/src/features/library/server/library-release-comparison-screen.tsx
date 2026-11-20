@@ -9,12 +9,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
-import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryReleaseComparisonMetadata(): Promise<Metadata> {
   return {
     title: `${libraryReleaseComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,

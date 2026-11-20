@@ -5,9 +5,9 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { serverService } from "../../../lib/services/servers/server-service";
+import { pageShellStack8 } from "../../shell/page-shell";
 import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";
-import { pageShellStack8 } from "../../shell/page-shell";
 
 export async function serversMetadata(): Promise<Metadata> {
   return {

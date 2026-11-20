@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
@@ -18,7 +19,6 @@ import {
   parseNotificationInboxQuery,
 } from "../notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
-import { pageShellMax4xlTight } from "../../shell/page-shell";
 export async function generateMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return {

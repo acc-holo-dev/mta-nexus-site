@@ -12,6 +12,12 @@ import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
+import {
+  pageShellMax2xlDensePy12,
+  pageShellMax2xlStandard,
+  pageShellMaxXl,
+  pageShellMaxXlPy12,
+} from "../../shell/page-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
 interface ProductInfo {
@@ -24,8 +30,8 @@ interface ProductInfo {
   currentVersion: string;
 }
 
-const shellClass = "mx-auto min-w-0 max-w-2xl space-y-6 overflow-x-clip py-8";
-const narrowShellClass = "mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16";
+const shellClass = pageShellMax2xlStandard;
+const narrowShellClass = pageShellMaxXl;
 const primaryLinkClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-accent px-5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 const secondaryLinkClass =
@@ -163,7 +169,7 @@ function AcquireContent() {
 
   if (productId && claimedProductId === productId) {
     return (
-      <div className="mx-auto min-w-0 max-w-xl overflow-x-clip py-12">
+      <div className={pageShellMaxXlPy12}>
         <section
           role="status"
           aria-live="polite"
@@ -273,7 +279,7 @@ function AcquireContent() {
   if (!product || product.id !== productId) {
     return (
       <HonestLoadingShell
-        className="mx-auto min-w-0 max-w-2xl space-y-4 overflow-x-clip py-12"
+        className={pageShellMax2xlDensePy12}
         headingId="acquire-product-loading-heading"
         title={copy.title}
         loadingLabel={copy.loadingProduct}
@@ -402,7 +408,7 @@ export function AcquirePage() {
     <Suspense
       fallback={
         <HonestLoadingShell
-          className="mx-auto min-w-0 max-w-2xl space-y-4 overflow-x-clip py-12"
+          className={pageShellMax2xlDensePy12}
           headingId="acquire-session-loading-heading"
           title={dictionary.checkout.title}
           loadingLabel={dictionary.checkout.loadingSession}

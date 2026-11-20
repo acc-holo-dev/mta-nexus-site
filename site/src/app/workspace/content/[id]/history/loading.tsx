@@ -1,9 +1,10 @@
 import { AuthorPublicationDeskRouteLoading } from "../../../../../features/community/author-publication-desk-route-loading-server";
+import { pageShellMax5xl } from "../../../../../features/shell/page-shell";
 
 export default async function Loading() {
   return AuthorPublicationDeskRouteLoading({
     headingId: "content-history-loading-heading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax5xl,
     rows: 4,
     titleKey: "history",
   });

@@ -24,6 +24,7 @@ import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
+import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ProductDependencyList } from "../components/product-dependency-list";
@@ -43,7 +44,6 @@ import { getResourceCommerceCopy } from "../resource-commerce-i18n";
 import { safeResourceImageUrl } from "../resource-image-url";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
-import { pageShellStack10 as pageShellClass } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -594,7 +594,7 @@ export async function ProductDetailPage({
             )}
 
             {builds.length > 0 ? (
-              <div className="min-w-0 space-y-4 overflow-x-clip">
+              <div className={pageShellStack4}>
                 {builds.map((build) => (
                   <article
                     key={build.id}

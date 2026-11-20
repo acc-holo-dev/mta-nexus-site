@@ -16,11 +16,11 @@ import {
   resourceStatusLabel,
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
-import { pageShellMax4xl } from "../../shell/page-shell";
 
 export async function staffResourceDetailMetadata(): Promise<Metadata> {
   return {

@@ -16,6 +16,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
@@ -446,7 +447,7 @@ export function ResourceQaPanel({
       ) : null}
 
       {selectedId && detail ? (
-        <div className="min-w-0 space-y-4 overflow-x-clip">
+        <div className={pageShellStack4}>
           <button
             type="button"
             className={textActionClass}
@@ -523,7 +524,7 @@ export function ResourceQaPanel({
             />
           )}
 
-          <div className="min-w-0 space-y-3 overflow-x-clip">
+          <div className={pageShellStack3}>
             {detail.thread.answers.length === 0 ? (
               <EmptyState
                 title={copy.noAnswers}
@@ -610,7 +611,7 @@ export function ResourceQaPanel({
           ) : null}
         </div>
       ) : (
-        <div className="min-w-0 space-y-4 overflow-x-clip">
+        <div className={pageShellStack4}>
           {authenticated === null ? (
             <ErrorState
               id="resource-qa-identity-unavailable"
@@ -695,7 +696,7 @@ export function ResourceQaPanel({
             />
           ) : null}
           {!readError && page && page.threads.length > 0 ? (
-            <ul className="min-w-0 space-y-3 overflow-x-clip">
+            <ul className={pageShellStack3}>
               {page.threads.map((thread) => (
                 <li
                   key={thread.id}

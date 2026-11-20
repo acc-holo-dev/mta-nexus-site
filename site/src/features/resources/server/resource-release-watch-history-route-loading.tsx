@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { resourceReleaseWatchHistoryCopy } from "../resource-release-watch-history-i18n";
-import { pageShellMax5xlTight } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof resourceReleaseWatchHistoryCopy>;
 type StringKey = {

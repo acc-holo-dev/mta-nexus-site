@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
-import { pageShellMax4xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof ownDiscussionCopy>;
 type StringKey = {

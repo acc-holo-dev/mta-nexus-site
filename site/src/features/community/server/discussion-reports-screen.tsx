@@ -12,8 +12,8 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import {
-  pageShellMax5xlBare,
   pageShellMax5xlTight as pageShellClass,
+  pageShellMax5xlBare,
 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";

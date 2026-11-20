@@ -11,8 +11,8 @@ import { resourceReviewCopy, resourceReviewState } from "../../resources/resourc
 import { resourceReviewPageQuery } from "../../resources/resource-review-query";
 import { ResourceReviewPager } from "../../resources/reviews-view";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

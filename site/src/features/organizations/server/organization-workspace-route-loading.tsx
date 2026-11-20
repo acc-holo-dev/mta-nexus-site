@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getOrganizationCopy } from "../organization-workspace-copy";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type OrgCopy = ReturnType<typeof getOrganizationCopy>;
 type OrgStringKey = {

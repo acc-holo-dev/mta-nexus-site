@@ -4,6 +4,7 @@ import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellStack3 } from "../../shell/page-shell";
 import { supportActivitySchema } from "../support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 
@@ -74,7 +75,7 @@ export function SupportStatusHistory({
         {copy.history}
       </summary>
       {open && (
-        <div className="min-w-0 space-y-3 overflow-x-clip" aria-live="polite">
+        <div className={pageShellStack3} aria-live="polite">
           {error ? (
             <ErrorState
               title={error}
@@ -101,7 +102,7 @@ export function SupportStatusHistory({
               icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
             />
           ) : (
-            <ol className="min-w-0 space-y-3 overflow-x-clip">
+            <ol className={pageShellStack3}>
               {data.items.map((item) => (
                 <li
                   key={item.id}

@@ -13,6 +13,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -24,7 +25,6 @@ import {
   membershipHistoryHref,
 } from "../library-membership-history-query";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
-import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryMembershipHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryMembershipHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,

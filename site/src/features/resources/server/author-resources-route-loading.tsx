@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { DictionaryRouteLoading } from "../../shell/route-honest-loading-server";
 import { pageShellMax5xl } from "../../shell/page-shell";
+import { DictionaryRouteLoading } from "../../shell/route-honest-loading-server";
 
 type AuthorResourcesTitleKey = "title" | "edit";
 

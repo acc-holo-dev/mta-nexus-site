@@ -2,6 +2,7 @@
 
 import { HonestLoadingShell } from "../honest-loading";
 import { useNexusLocale } from "../locale";
+import { pageShellMax7xl } from "../page-shell";
 
 const PLACEHOLDER_KEYS = [1, 2, 3] as const;
 
@@ -10,7 +11,7 @@ export function GlobalLoadingPage() {
 
   return (
     <HonestLoadingShell
-      className="mx-auto min-w-0 max-w-7xl space-y-6 overflow-x-clip"
+      className={pageShellMax7xl}
       headingId="global-loading-heading"
       title={dictionary.errors.loading}
       loadingLabel={dictionary.errors.loading}

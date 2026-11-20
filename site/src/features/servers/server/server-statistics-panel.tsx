@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
 import type { ServerStatisticsResult } from "../../../lib/services/servers/server-statistics-service";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";
@@ -10,7 +11,6 @@ import { serverStatisticsCopy } from "../server-statistics-copy";
 import { serverStatisticsIntervals } from "../server-statistics-export";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

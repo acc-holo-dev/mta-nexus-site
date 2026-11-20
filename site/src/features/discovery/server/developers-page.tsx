@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import { parseDiscoverQuery } from "../discover-query";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 export async function developersMetadata(): Promise<Metadata> {
   const copy = getDictionary(await getRequestLocale()).developers;

@@ -2,10 +2,10 @@ import type { OrderTermsReport } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 // Honesty residual: consistency flags via ErrorState.
 const ORDER_TERMS_FLAG_IDS = {

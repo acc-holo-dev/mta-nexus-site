@@ -7,10 +7,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { pageShellStack6 } from "../../shell/page-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
-import { pageShellStack6 } from "../../shell/page-shell";
 
 const CATEGORIES = [
   { id: "all", key: "all" },

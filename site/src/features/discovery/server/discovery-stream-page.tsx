@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import { discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
@@ -13,7 +14,6 @@ import {
   STREAM_TYPES,
 } from "../discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
-import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

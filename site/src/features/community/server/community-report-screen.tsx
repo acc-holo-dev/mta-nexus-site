@@ -10,6 +10,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportService } from "../../../lib/services/community/community-report-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlBare, pageShellStack4, pageShellStack6 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   communityReportDetailSchema,
@@ -20,7 +21,6 @@ import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
-import { pageShellMax5xlBare, pageShellStack6 } from "../../shell/page-shell";
 export async function communityReportMetadata(): Promise<Metadata> {
   return {
     title: communityReportCopy(await getRequestLocale()).detail,
@@ -138,7 +138,7 @@ export async function CommunityReportScreen({
   const filters = communityReportPageQuery(await searchParams);
   if (!filters)
     return (
-      <div className="min-w-0 space-y-4 overflow-x-clip">
+      <div className={pageShellStack4}>
         {header}
         <ErrorState
           title={copy.queryInvalid}

@@ -1,5 +1,5 @@
-import { SupportWorkspaceRouteLoading } from "../../../features/support/support-workspace-route-loading-server";
 import { pageShellStack6 } from "../../../features/shell/page-shell";
+import { SupportWorkspaceRouteLoading } from "../../../features/support/support-workspace-route-loading-server";
 
 export default async function Loading() {
   return SupportWorkspaceRouteLoading({

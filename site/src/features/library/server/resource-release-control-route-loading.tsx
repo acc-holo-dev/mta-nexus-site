@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof getResourceReleaseControlCopy>;
 type StringKey = {

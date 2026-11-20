@@ -6,16 +6,16 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
-import { PlatformSessionError } from "../../shell/session-error";
-import { SupportCenter } from "../center";
-import { supportQuery } from "../support-workspace-contract";
-import { supportWorkspaceCopy } from "../support-workspace-copy";
-import { SupportCaseThread } from "../thread";
 import {
   pageShellMax5xlBare,
   pageShellMax5xlDenseTight,
   pageShellMax5xlLooseTight,
 } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { SupportCenter } from "../center";
+import { supportQuery } from "../support-workspace-contract";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
+import { SupportCaseThread } from "../thread";
 
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;

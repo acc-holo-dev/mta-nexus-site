@@ -6,6 +6,7 @@ import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
@@ -27,7 +28,6 @@ import {
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
-import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 
 export function SupportCaseThread({
   caseId,

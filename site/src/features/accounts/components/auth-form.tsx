@@ -5,9 +5,9 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
+import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
-import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 
 type AuthMode = "login" | "register";
 

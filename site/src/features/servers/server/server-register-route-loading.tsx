@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
+import { getDictionary } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { pageShellMax2xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
-import { getDictionary } from "../../../lib/i18n";
 
 export function ServerRegisterRouteLoading({
   headingId = "server-new-loading-heading",

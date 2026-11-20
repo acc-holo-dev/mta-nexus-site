@@ -4,10 +4,10 @@ import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationProfileForm } from "../profile";
-import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

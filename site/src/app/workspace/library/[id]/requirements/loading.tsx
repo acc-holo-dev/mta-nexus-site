@@ -1,9 +1,10 @@
 import { ResourceRequirementsRouteLoading } from "../../../../../features/resources/resource-requirements-route-loading-server";
+import { pageShellMax5xl } from "../../../../../features/shell/page-shell";
 
 export default async function Loading() {
   return ResourceRequirementsRouteLoading({
     headingId: "library-requirements-loading-heading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax5xl,
     rows: 4,
     leading: <div className="h-10 w-64 rounded bg-inset" />,
     titleKey: "title",

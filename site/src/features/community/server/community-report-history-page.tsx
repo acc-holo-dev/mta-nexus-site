@@ -6,12 +6,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityReportHistoryService } from "../../../lib/services/community/community-report-history-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { reportId, reportRateLimit } from "../community-report-api";
 import { parseReportHistoryQuery } from "../community-report-history-contract";
 import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
 import { CommunityReportHistory } from "../components/community-report-history";
-import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,

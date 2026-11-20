@@ -12,12 +12,12 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
 import { ResourceReviewPager } from "../reviews-view";
-import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

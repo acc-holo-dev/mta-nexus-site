@@ -16,7 +16,7 @@ import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
@@ -140,7 +140,7 @@ export async function LibraryVersionsScreen({
         {current?.version ?? copy.unavailable}
       </p>
       {current ? (
-        <div className="min-w-0 space-y-3 overflow-x-clip">
+        <div className={pageShellStack3}>
           <ResourceDownloadButton
             key={`${id}:${current.id}:${current.version}`}
             productId={id}
@@ -206,7 +206,7 @@ export async function LibraryVersionsScreen({
         </Link>
       </section>
       {result.versions.length ? (
-        <ol className="min-w-0 space-y-3 overflow-x-clip">
+        <ol className={pageShellStack3}>
           {result.versions.map((version) => (
             <li key={version.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
               <h3 className="font-semibold text-primary">{version.version}</h3>

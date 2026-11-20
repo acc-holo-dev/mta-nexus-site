@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { ArticleCard } from "../../community/article-view";
 import { publicationCopy } from "../../community/publication-feed-copy";
+import { pageShellStack4 } from "../../shell/page-shell";
 
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -23,7 +24,7 @@ export function ServerUpdatesPanel({
   const retryHref = serverSlug ? `/servers/${encodeURIComponent(serverSlug)}` : undefined;
 
   return (
-    <section className="min-w-0 space-y-4 overflow-x-clip" aria-labelledby="server-updates-heading">
+    <section className={pageShellStack4} aria-labelledby="server-updates-heading">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
           <h2

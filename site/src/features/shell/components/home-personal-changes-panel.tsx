@@ -1,5 +1,6 @@
 import { EmptyState, ErrorState, SectionHeader } from "@nexus/ui";
 import Link from "next/link";
+import { pageShellStack3 } from "../../shell/page-shell";
 import type { PersonalChangesSummary } from "../home-personal-changes-types";
 import type { HomePersonalPreference } from "../home-personal-preference";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
@@ -48,10 +49,7 @@ export function HomePersonalChangesPanel({
   copy: HomePersonalCopy;
 }) {
   return (
-    <section
-      aria-labelledby={HOME_PERSONAL_CHANGES_HEADING_ID}
-      className="min-w-0 space-y-3 overflow-x-clip"
-    >
+    <section aria-labelledby={HOME_PERSONAL_CHANGES_HEADING_ID} className={pageShellStack3}>
       <SectionHeader
         title={copy.title}
         description={copy.description}
@@ -103,7 +101,7 @@ export function HomePersonalChangesPanel({
       ) : null}
 
       {summary.status === "partial" || summary.status === "ok" ? (
-        <div className="min-w-0 space-y-3 overflow-x-clip">
+        <div className={pageShellStack3}>
           {summary.status === "partial" ? (
             <p className="text-sm text-muted">{copy.partial}</p>
           ) : null}

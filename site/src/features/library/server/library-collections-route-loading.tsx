@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
-import { pageShellMax5xl } from "../../shell/page-shell";
 
 type CollectionsCopy = ReturnType<typeof libraryCollectionsCopy>;
 type CollectionsTitleKey = {

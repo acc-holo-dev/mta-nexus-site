@@ -5,6 +5,7 @@ import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax2xlPadded } from "../../shell/page-shell";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
@@ -242,7 +243,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-2xl space-y-6 overflow-x-clip px-4 py-8 sm:px-0">
+    <div className={pageShellMax2xlPadded}>
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>

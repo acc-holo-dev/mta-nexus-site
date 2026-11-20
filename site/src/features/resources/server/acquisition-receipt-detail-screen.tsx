@@ -10,12 +10,12 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCartReceiptsService } from "../../../lib/services/commerce/resource-cart-receipts-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCartReviewEvidence } from "../cart-view";
 import { ResourceDownloadButton } from "../download";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../resource-cart-receipts-query";
-import { pageShellMax4xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -19,13 +19,13 @@ import { resourceDeliveriesCopy } from "../../resources/resource-deliveries-i18n
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { getLibraryCopy, libraryHref, parseLibraryFilter, parseLibraryPage } from "../library-view";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
-import { pageShellMax5xlMid } from "../../shell/page-shell";
 
 export async function libraryPageMetadata(): Promise<Metadata> {
   return {

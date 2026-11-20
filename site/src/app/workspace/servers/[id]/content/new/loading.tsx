@@ -1,9 +1,10 @@
 import { ServerContentRouteLoading } from "../../../../../../features/servers/server-content-route-loading-server";
+import { pageShellMax3xl } from "../../../../../../features/shell/page-shell";
 
 export default async function Loading() {
   return ServerContentRouteLoading({
     headingId: "server-content-new-loading-heading",
-    className: "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax3xl,
     rows: 4,
     leading: <div className="h-10 w-64 rounded bg-inset" />,
     titleKey: "new",
